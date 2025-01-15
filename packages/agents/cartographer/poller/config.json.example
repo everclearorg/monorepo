@@ -1,0 +1,17 @@
+{
+  "logLevel": "debug",
+  "chains": {
+    "44787": {
+      "providers": ["https://alfajores-forno.celo-testnet.org"],
+      "subgraphUrls": ["https://api.studio.thegraph.com/query/60851/chimera-hub-celo-alfajores/version/latest"]},
+    "97": {
+      "providers": ["https://bsc-testnet.public.blastapi.io", "https://endpoints.omniatech.io/v1/bsc/testnet/public"],
+      "subgraphUrls": ["https://api.studio.thegraph.com/query/60851/chimera-spoke-chapel/version/latest"]},
+    "11155111": {
+      "providers": ["https://1rpc.io/sepolia", "https://ethereum-sepolia-rpc.publicnode.com"],
+      "subgraphUrls": ["https://api.studio.thegraph.com/query/60851/chimera-spoke-sepolia/version/latest"]}
+  },
+  "environment": "staging",
+  "hubDomain": "111551111",
+  "databaseUrl": "postgres://postgres:qwerty@localhost:5432/everclear?sslmode=disable"
+}

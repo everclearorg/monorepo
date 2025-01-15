@@ -1,0 +1,153 @@
+[
+  {
+    "name": "Everclear",
+    "id": 25327,
+    "rpc": "https://rpc.everclear.raas.gelato.cloud",
+    "environments": [
+      "MainnetStaging",
+      "MainnetProduction"
+    ],
+    "realm": "hub"
+  },
+  {
+    "name": "Optimism",
+    "id": 10,
+    "rpc": "https://mainnet.optimism.io",
+    "environments": [
+      "MainnetStaging",
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Arbitrum One",
+    "id": 42161,
+    "rpc": "https://arbitrum-one.public.blastapi.io",
+    "environments": [
+      "MainnetStaging",
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Base",
+    "id": 8453,
+    "rpc": "https://base-mainnet.public.blastapi.io",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Bnb",
+    "id": 56,
+    "rpc": "https://bsc-mainnet.public.blastapi.io",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Ethereum",
+    "id": 1,
+    "rpc": "https://mainnet.gateway.tenderly.co",
+    "environments": [
+      "MainnetStaging",
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Zircuit",
+    "id": 48900,
+    "rpc": "https://zircuit1-mainnet.p2pify.com",
+    "environments": [
+      "MainnetStaging",
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Blast",
+    "id": 81457,
+    "rpc": "https://blastl2-mainnet.public.blastapi.io",
+    "verifierUrl": "https://api.blastscan.io/api",
+    "environments": [
+      "MainnetStaging",
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Scroll Sepolia",
+    "id": 534351,
+    "rpc": "https://scroll-testnet-public.unifra.io",
+    "verifierUrl": "https://api-sepolia.scrollscan.com/api",
+    "environments": [
+      "TestnetStaging",
+      "TestnetProduction"
+    ],
+    "realm": "hub"
+  },
+  {
+    "name": "Everclear Sepolia",
+    "id": 6398,
+    "rpc": "https://rpc.connext-sepolia.gelato.digital",
+    "environments": [
+      "TestnetStaging",
+      "TestnetProduction"
+    ],
+    "realm": "hub"
+  },
+  {
+    "name": "Ethereum Sepolia",
+    "id": 11155111,
+    "rpc": "https://1rpc.io/sepolia",
+    "environments": [
+      "TestnetStaging",
+      "TestnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Arbitrum Sepolia",
+    "id": 421614,
+    "rpc": "https://sepolia-rollup.arbitrum.io/rpc",
+    "environments": [
+      "TestnetStaging",
+      "TestnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Optimism Sepolia",
+    "id": 11155420,
+    "rpc": "https://sepolia.optimism.io",
+    "environments": [
+      "TestnetStaging",
+      "TestnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "BNB Testnet",
+    "id": 97,
+    "rpc": "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    "verifierUrl": "https://api-testnet.bscscan.com/api",
+    "environments": [
+      "TestnetStaging",
+      "TestnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Anvil",
+    "id": 31337,
+    "rpc": "127.0.0.1:8545",
+    "environments": [
+      "TestnetStaging",
+      "TestnetProduction"
+    ],
+    "realm": "spoke"
+  }
+]

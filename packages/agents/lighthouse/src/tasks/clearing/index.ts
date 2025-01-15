@@ -1,0 +1,1 @@
+export { processExpiredIntents } from './processExpiredIntents';

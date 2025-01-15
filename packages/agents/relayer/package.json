@@ -1,0 +1,53 @@
+{
+  "name": "@chimera-monorepo/relayer",
+  "version": "0.0.1.alpha.0",
+  "description": "Generic relayer agent for Everclear",
+  "author": "Everclear",
+  "license": "MIT",
+  "scripts": {
+    "start:poller": "RELAYER_SERVICE=poller node --enable-source-maps dist/run.js",
+    "start:server": "RELAYER_SERVICE=server node --enable-source-maps dist/run.js",
+    "docker:redis:up": "docker run -it --rm --name redis -p 6379:6379 redis",
+    "lint": "eslint ./src --ext .ts --env node",
+    "test": "yarn test:unit",
+    "test:unit": "nyc ts-mocha --require test/globalTestHook.ts --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.build.json",
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
+    "purge": "yarn clean && rimraf ./node_modules",
+    "version": "yarn version"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "eslintIgnore": [],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "dependencies": {
+    "@chimera-monorepo/adapters-cache": "workspace:*",
+    "@chimera-monorepo/adapters-web3signer": "workspace:*",
+    "@chimera-monorepo/chainservice": "workspace:*",
+    "@chimera-monorepo/utils": "workspace:*",
+    "@sinclair/typebox": "0.25.21",
+    "ethers": "5.7.2",
+    "fastify": "4.13.0",
+    "interval-promise": "1.4.0",
+    "pino": "8.10.0",
+    "tsc": "2.0.4"
+  },
+  "devDependencies": {
+    "concurrently": "7.6.0",
+    "eslint": "8.34.0",
+    "mocha": "10.2.0",
+    "nyc": "15.1.0",
+    "rimraf": "5.0.1",
+    "sinon": "17.0.1",
+    "ts-mocha": "10.0.0",
+    "typescript": "5.3.3"
+  }
+}

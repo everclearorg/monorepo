@@ -1,0 +1,26 @@
+[
+  {
+    "address": "0x4C526917051ee1981475BB6c49361B0756F505a8",
+    "domainName": "Everclear Sepolia",
+    "domainId": 6398,
+    "environment": "TestnetProduction"
+  },
+  {
+    "address": "0xd05a33e7C55551D7D0015aa156b006531Fc33ED2",
+    "domainName": "Everclear Sepolia",
+    "domainId": 6398,
+    "environment": "TestnetStaging"
+  },
+  {
+    "address": "0x372396818F125b8f3AA5a73e70C30F54c6195331",
+    "domainName": "Everclear",
+    "domainId": 25327,
+    "environment": "MainnetStaging"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Everclear",
+    "domainId": 25327,
+    "environment": "MainnetProduction"
+  }
+]

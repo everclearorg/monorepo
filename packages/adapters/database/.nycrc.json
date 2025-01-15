@@ -1,0 +1,12 @@
+{
+    "extends": "../../../.nycrc.json",
+    "exclude": [
+        "dist",
+        "test",
+        "src/zapatos/**",
+        "src/db/**",
+        "src/index.ts"
+    ],
+    "all": true,
+    "check-coverage": true
+}

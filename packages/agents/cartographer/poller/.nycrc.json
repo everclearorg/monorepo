@@ -1,0 +1,15 @@
+{
+  "extends": "../../../../.nycrc.json",
+  "exclude": [
+    "dist/**/*",
+    "test/**/*",
+    "src/mockable.ts",
+    "src/shared.ts",
+    "src/index.ts",
+    "src/run.ts",
+    "src/bindings/*",
+    "src/pollers/index.ts",
+    "src/lib/operations/index.ts",
+    "src/lib/operations/migrations.ts"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+    "name": "@chimera-monorepo/lighthouse",
+    "version": "0.0.1",
+    "description": "Lighthouse codebase for Everclear",
+    "main": "dist/index.js",
+    "author": "Everclear",
+    "license": "MIT",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist/**/*",
+        "src/**/*"
+    ],
+    "scripts": {
+        "start:intent": "LIGHTHOUSE_SERVICE=intent npx ts-node src/tasks/run.ts",
+        "start:fill": "LIGHTHOUSE_SERVICE=fill npx ts-node src/tasks/run.ts",
+        "start:settlement": "LIGHTHOUSE_SERVICE=settlement npx ts-node src/tasks/run.ts",
+        "start:expired": "LIGHTHOUSE_SERVICE=expired npx ts-node src/tasks/run.ts",
+        "start:invoice": "LIGHTHOUSE_SERVICE=invoice npx ts-node src/tasks/run.ts",
+        "start:reward": "LIGHTHOUSE_SERVICE=reward npx ts-node src/tasks/run.ts",
+        "start:reward_metadata": "LIGHTHOUSE_SERVICE=reward_metadata npx ts-node src/tasks/run.ts",
+        "lint:src": "eslint ./src --env node",
+        "lint:fix": "yarn lint:src --fix",
+        "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+        "build": "tsc --build ./tsconfig.json",
+        "purge": "yarn clean && rimraf ./coverage ./node_modules",
+        "test": "yarn test:unit",
+        "test:unit": "nyc ts-mocha --require test/globalTestHook.ts --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
+        "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
+        "version": "yarn version"
+    },
+    "dependencies": {
+        "@chimera-monorepo/adapters-relayer": "workspace:*",
+        "@chimera-monorepo/adapters-web3signer": "workspace:*",
+        "@chimera-monorepo/chainservice": "workspace:*",
+        "@chimera-monorepo/database": "workspace:*",
+        "@chimera-monorepo/utils": "workspace:*",
+        "@hyperlane-xyz/sdk": "3.10.0",
+        "@openzeppelin/merkle-tree": "^1.0.7",
+        "@sinclair/typebox": "0.25.21",
+        "aws-lambda": "1.0.7",
+        "datadog-lambda-js": "6.86.0",
+        "dd-trace": "3.13.2",
+        "dotenv": "16.0.3",
+        "ethers": "5.7.2"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "8.10.110",
+        "eslint": "8.34.0",
+        "nyc": "15.1.0",
+        "rimraf": "5.0.1",
+        "sinon": "15.0.1",
+        "ts-mocha": "10.0.0",
+        "ts-node": "10.9.1",
+        "typescript": "5.3.3"
+    },
+    "packageManager": "yarn@3.3.1"
+}

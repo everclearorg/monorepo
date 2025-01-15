@@ -1,0 +1,45 @@
+{
+  "name": "@chimera-monorepo/adapters-cache",
+  "version": "0.0.1",
+  "description": "adapter for handling communication with Redis cache",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "dev": "",
+    "start": "",
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
+    "test": "yarn test:unit",
+    "test:unit": "nyc ts-mocha --check-leaks --exit --timeout 120000 './test/**/*.spec.ts'",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.build.json",
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
+    "purge": "yarn clean && rimraf ./coverage ./node_modules",
+    "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
+    "docker:redis:up": "docker run -it --rm --name redis -p 6379:6379 redis",
+    "version": "yarn version"
+  },
+  "eslintIgnore": [],
+  "author": "Everclear",
+  "license": "ISC",
+  "dependencies": {
+    "@chimera-monorepo/utils": "workspace:*",
+    "@typescript-eslint/eslint-plugin": "5.52.0",
+    "ethers": "5.7.2",
+    "ioredis": "5.3.1",
+    "ioredis-mock": "8.2.6"
+  },
+  "devDependencies": {
+    "@types/ioredis": "5.0.0",
+    "@types/mocha": "10.0.1",
+    "eslint": "8.34.0",
+    "nyc": "15.1.0",
+    "rimraf": "5.0.1",
+    "ts-mocha": "10.0.0",
+    "tslib": "2.5.0",
+    "typescript": "5.3.3"
+  }
+}

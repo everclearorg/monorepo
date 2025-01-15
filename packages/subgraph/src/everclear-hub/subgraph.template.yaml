@@ -1,0 +1,129 @@
+specVersion: 0.0.5
+schema:
+  file: ./src/everclear-hub/schema.graphql
+dataSources:
+  # EVERCLEAR HUB events
+  - kind: ethereum/contract
+    name: EverclearHub
+    network: '{{network}}'
+    source:
+      address: '{{address}}'
+      abi: EverclearHub
+      # prettier-ignore
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Router
+        - Meta
+      abis:
+        - name: EverclearHub
+          # prettier-ignore
+          file: {{filePath}}
+      eventHandlers:
+        # event IntentProcessed(bytes32 indexed _intentId, IBaseManager.IntentStatus indexed _status);
+        - event: IntentProcessed(indexed bytes32,indexed uint8)
+          handler: handleIntentProcessed
+        # event FillProcessed(bytes32 indexed _intentId, IntentStatus _status);
+        - event: FillProcessed(indexed bytes32,uint8)
+          handler: handleFillProcessed
+        # event SettlementEnqueued(bytes32 indexed _intentId, uint32 indexed _domain, uint32 indexed _entryEpoch, bytes32 _asset, uint256 _amount, bool _updateVirtualBalance, bytes32 _owner);
+        - event: SettlementEnqueued(indexed bytes32,indexed uint32,indexed uint48,bytes32,uint256,bool,bytes32)
+          handler: handleSettlementEnqueued
+        # event SettlementQueueProcessed(bytes32 _messageId, uint32 _domain, uint32 _amount, uint256 _quote);
+        - event: SettlementQueueProcessed(bytes32,uint32,uint32,uint256)
+          handler: handleSettlementQueueProcessed
+        # event InvoiceEnqueued(bytes32 indexed _intentId, bytes32 indexed _tickerHash, uint48 indexed _entryEpoch, uint256 _amount, bytes32 _owner)
+        - event: InvoiceEnqueued(indexed bytes32,indexed bytes32,indexed uint48,uint256,bytes32)
+          handler: handleInvoiceEnqueued
+        # event ExpiredIntentsHandled(bytes32[] _intentIds);
+        - event: ExpiredIntentsHandled(bytes32[])
+          handler: handleExpiredIntentsHandled
+        # event ReturnUnsupportedIntent(uint32 indexed _domain, bytes32 _messageId, bytes32 _intentId);
+        - event: ReturnUnsupportedIntent(indexed uint32,bytes32,bytes32)
+          handler: handleReturnUnsupportedIntent
+        # event DepositEnqueued(uint48 indexed _epoch, uint32 indexed _domain, bytes32 indexed _tickerHash, bytes32 _intentId, uint256 _amount);
+        - event: DepositEnqueued(indexed uint48,indexed uint32,indexed bytes32,bytes32,uint256)
+          handler: handleDepositEnqueued
+        # event DepositProcessed(uint48 indexed _epoch, uint32 indexed _domain, bytes32 indexed _tickerHash, bytes32 _intentId, uint256 _amount);
+        - event: DepositProcessed(indexed uint48,indexed uint32,indexed bytes32,bytes32,uint256)
+          handler: handleDepositProcessed
+        # event FeesWithdrawn(address _withdrawer, bytes32 _feeRecipient, bytes32 _tickerHash, uint256 _amount, bytes32 _paymentId);
+        - event: FeesWithdrawn(address,bytes32,bytes32,uint256,bytes32)
+          handler: handleFeesWithdrawn
+
+        # event AssetConfigSet(AssetConfig _config);
+        - event: AssetConfigSet((bytes32,bytes32,uint32,bool,uint8))
+          handler: handleAssetConfigSet
+        # event TokenConfigsSet(IHubStorage.TokenSetup[] _configs);
+        - event: TokenConfigsSet((bytes32,bool,uint8,uint24,uint24,(address,uint24)[],(bytes32,bytes32,uint32,bool,uint8)[])[])
+          handler: handleTokenConfigsSet
+        # event event MaxDiscountDbpsSet(bytes32 _tickerHash, uint24 _oldMaxDiscountBps, uint24 _newMaxDiscountBps);
+        - event: MaxDiscountDbpsSet(bytes32,uint24,uint24)
+          handler: handleMaxDiscountDbpsSet
+        # event PrioritizedStrategySet(bytes32 _tickerHash, IEverclear.Strategy _strategy);
+        - event: PrioritizedStrategySet(bytes32,uint8)
+          handler: handlePrioritizedStrategySet
+        # event DiscountPerEpochSet(bytes32 _tickerHash, uint24 _oldDiscountPerEpoch, uint24 _newDiscountPerEpoch);
+        - event: DiscountPerEpochSet(bytes32,uint24,uint24)
+          handler: handleDiscountPerEpochSet
+
+        # event OwnershipProposed(address indexed _proposedOwner, uint256 _timestamp);
+        - event: OwnershipProposed(indexed address,uint256)
+          handler: handleOwnershipProposed
+        # event OwnershipTransferred(address indexed _oldOwner, address indexed _newOwner);
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        # event Paused();
+        - event: Paused()
+          handler: handlePaused
+        # event Paused();
+        - event: Unpaused()
+          handler: handleUnpaused
+
+        # event GatewayUpdated(address _oldGateway, address _newGateway);
+        - event: GatewayUpdated(address,address)
+          handler: handleGatewayUpdated
+
+        # FIXME: track message ids / in flight updates
+        # # event LighthouseUpdated(address _oldLighthouse, address _newLighthouse, bytes32[] _messageIds);
+        # - event: LighthouseUpdated(address,address,bytes32[])
+        #   handler: handleLighthouseUpdated
+        # # event WatchtowerUpdated(address _oldWatchtower, address _newWatchtower, bytes32[] _messageIds);
+        # - event: WatchtowerUpdated(address,address,bytes32[])
+        #   handler: handleWatchtowerUpdated
+        # # event MailboxUpdated(address _mailbox, uint32[] _domains, bytes32[] _messageIds);
+        # - event: MailboxUpdated(address,uint32[],bytes32[])
+        #   handler: handleMailboxUpdated
+        # # event SecurityModuleUpdated(address _securityModule, uint32[] _domains, bytes32[] _messageIds);
+        # - event: SecurityModuleUpdated(address,uint32[],bytes32[])
+        #   handler: handleSecurityModuleUpdated
+
+        # event AcceptanceDelayUpdated(uint256 _oldAcceptanceDelay, uint256 _newAcceptanceDelay);
+        - event: AcceptanceDelayUpdated(uint256,uint256)
+          handler: handleAcceptanceDelayUpdated
+        # event SupportedDomainsAdded(IHubStorage.DomainSetup[] _domains);
+        - event: SupportedDomainsAdded((uint32,uint256)[])
+          handler: handleSupportedDomainsAdded
+        # event SupportedDomainsRemoved(uint32[] _domains);
+        - event: SupportedDomainsRemoved(uint32[])
+          handler: handleSupportedDomainsRemoved
+        # event MinSolverSupportedDomainsUpdated(uint8 _oldMinSolverSupportedDomains, uint8 _newMinSolverSupportedDomains);
+        - event: MinSolverSupportedDomainsUpdated(uint8,uint8)
+          handler: handleMinSolverSupportedDomainsUpdated
+        # event EpochLengthUpdated(uint48 _oldEpochLength, uint48 _newEpochLength);
+        - event: EpochLengthUpdated(uint48,uint48)
+          handler: handleEpochLengthUpdated
+        # event ExpiryTimeBufferUpdated(uint48 _oldExpiryTimeBuffer, uint48 _newExpiryTimeBuffer);
+        - event: ExpiryTimeBufferUpdated(uint48,uint48)
+          handler: handleExpiryTimeBufferUpdated
+
+        # event SolverConfigUpdated(bytes32 indexed _solver, uint32[] _supportedDomains);
+        - event: SolverConfigUpdated(indexed bytes32,uint32[])
+          handler: handleSolverConfigUpdated
+        # event IncreaseVirtualBalanceSet(bytes32 indexed _user, bool _status);
+        - event: IncreaseVirtualBalanceSet(indexed bytes32,bool)
+          handler: handleIncreaseVirtualBalanceSet
+      file: ./src/everclear-hub/mapping/index.ts

@@ -1,0 +1,40 @@
+{
+    "name": "@chimera-monorepo/database",
+    "version": "0.0.1",
+    "description": "Database adapter codebase for Everclear",
+    "main": "dist/index.js",
+    "author": "Everclear",
+    "license": "MIT",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist/**/*",
+        "src/**/*"
+    ],
+    "scripts": {
+        "lint:src": "eslint ./src --env node",
+        "lint:fix": "yarn lint:src --fix",
+        "test": "yarn test:unit",
+        "test:unit": "nyc ts-mocha --require test/globalTestHook.ts --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
+        "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+        "build": "tsc --build ./tsconfig.json",
+        "purge": "yarn clean && rimraf ./coverage ./node_modules",
+        "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
+        "docker:start:postgres": "docker run --name cartographer-db --rm -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=qwerty ghcr.io/connext/database:sha-67ebbe2",
+        "dbmate": "dbmate",
+        "zapatos": "zapatos",
+        "version": "yarn version"
+    },
+    "dependencies": {
+        "@chimera-monorepo/utils": "workspace:*",
+        "pg": "8.9.0",
+        "zapatos": "6.4.0"
+    },
+    "devDependencies": {
+        "@types/pg": "8.6.6",
+        "eslint": "8.34.0",
+        "nyc": "15.1.0",
+        "rimraf": "5.0.1",
+        "ts-mocha": "10.0.0",
+        "typescript": "5.3.3"
+    }
+}

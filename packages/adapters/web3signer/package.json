@@ -1,0 +1,44 @@
+{
+  "name": "@chimera-monorepo/adapters-web3signer",
+  "version": "2.0.0",
+  "description": "adapter for subgraph interaction of everclear protocol",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc --build ./tsconfig.build.json",
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
+    "test": "yarn test:unit",
+    "test:unit": "exit 0",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
+    "purge": "yarn clean && rimraf ./coverage ./node_modules",
+    "version": "yarn version"
+  },
+  "nodemonConfig": {
+    "exec": "node --enable-source-maps ./dist/index.js | pino-pretty",
+    "delay": "500",
+    "ext": "js,json",
+    "watch": [
+      ".env",
+      "./dist"
+    ]
+  },
+  "eslintIgnore": [],
+  "author": "Everclear",
+  "license": "ISC",
+  "dependencies": {
+    "@chimera-monorepo/utils": "workspace:*",
+    "@typescript-eslint/eslint-plugin": "5.52.0",
+    "ethers": "5.7.2"
+  },
+  "devDependencies": {
+    "eslint": "8.34.0",
+    "ts-node": "10.9.1",
+    "tslib": "2.5.0",
+    "typescript": "5.3.3"
+  }
+}

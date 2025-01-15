@@ -1,0 +1,14 @@
+#!/bin/sh
+
+. "$(dirname "$0")/_/husky.sh"
+#
+# Fetch changes that are staged for commit
+STAGED_CHANGES=$(git diff --cached --name-only -- packages/contracts)
+
+# Check if there are staged changes in the packages/contract directory
+if [ -z "$STAGED_CHANGES" ]; then
+  echo "No changes in packages/contract directory. Skipping build."
+else
+  echo "Changes detected in packages/contract directory. Running yarn build."
+  yarn workspace @chimera-monorepo/contracts build:sol && yarn workspace @chimera-monorepo/contracts lint:fix
+fi

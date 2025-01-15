@@ -1,0 +1,22 @@
+[
+  {
+    "subgraphName": "everclear-hub-sepolia",
+    "network": "connext-sepolia",
+    "domain": "6398",
+    "environment": "production",
+    "indexers": [
+      "studio",
+      "goldsky",
+      "local"
+    ]
+  },
+  {
+    "subgraphName": "everclear-hub",
+    "network": "everclear",
+    "domain": "25327",
+    "environment": "production",
+    "indexers": [
+      "goldsky"
+    ]
+  }
+]

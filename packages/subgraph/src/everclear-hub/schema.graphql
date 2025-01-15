@@ -1,0 +1,266 @@
+enum HubIntentStatus {
+  NONE
+  ADDED
+  DEPOSIT_PROCESSED
+  FILLED
+  ADDED_AND_FILLED
+  INVOICED
+  SETTLED
+  SETTLED_AND_MANUALLY_EXECUTED
+  UNSUPPORTED
+  UNSUPPORTED_RETURNED
+}
+
+enum Strategy {
+  DEFAULT
+  XERC20
+}
+
+type HubIntent @entity {
+  id: Bytes!
+  status: HubIntentStatus!
+
+  settlement: HubSettlement
+
+  addEvent: IntentAddEvent
+  fillEvent: IntentFillEvent
+  message: SettlementMessage
+}
+
+type IntentAddEvent @entity(immutable: true) {
+  id: Bytes!
+  intent: HubIntent!
+  status: HubIntentStatus!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}
+
+type IntentFillEvent @entity(immutable: true) {
+  id: Bytes!
+  intent: HubIntent!
+  status: HubIntentStatus!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}
+
+type SettlementQueueMapping @entity(immutable: true) {
+  id: Bytes! # queue index for settlement
+  intentId: Bytes!
+}
+
+# Settlements that are waiting to be dispatched by hyperlane
+type SettlementQueue @entity {
+  id: Bytes! # domain
+  domain: BigInt!
+  lastProcessed: BigInt
+  size: BigInt!
+  first: BigInt!
+  last: BigInt!
+}
+
+# Settlements are tied to intents
+type HubSettlement @entity {
+  id: Bytes! # intent id
+  intent: HubIntent!
+  queueIdx: BigInt!
+
+  amount: BigInt!
+  asset: Bytes!
+  updateVirtualBalance: Boolean!
+  recipient: Bytes!
+  domain: BigInt!
+  entryEpoch: BigInt!
+
+  enqueuedEvent: SettlementEnqueuedEvent!
+}
+
+type SettlementEnqueuedEvent @entity(immutable: true) {
+  id: Bytes!
+  settlement: HubSettlement!
+  intent: HubIntent!
+
+  domain: BigInt! # assigned via queue placement
+  queue: SettlementQueue!
+  queueIdx: BigInt!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}
+
+enum SettlementMessageType {
+  SETTLED
+  UNSUPPORTED_RETURNED
+}
+
+# Messages are batched by asset and domain, can include multiple settlements
+type SettlementMessage @entity(immutable: true) {
+  id: Bytes!
+  quote: BigInt!
+  domain: BigInt!
+  intentIds: [Bytes!]!
+  type: SettlementMessageType!
+
+  txOrigin: Bytes!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txNonce: BigInt!
+  gasLimit: BigInt!
+  gasPrice: BigInt!
+}
+
+type Invoice @entity {
+  id: Bytes! # intent id
+  intent: HubIntent!
+
+  tickerHash: Bytes!
+  amount: BigInt!
+  owner: Bytes!
+  entryEpoch: BigInt!
+
+  enqueuedEvent: SettlementEnqueuedEvent
+}
+
+type InvoiceEnqueuedEvent @entity(immutable: true) {
+  id: Bytes!
+  invoice: Invoice!
+  intent: HubIntent!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}
+
+type DepositQueue @entity {
+  id: Bytes! # epoch - domain - tickerHash
+  epoch: BigInt!
+  domain: BigInt!
+  tickerHash: Bytes!
+  lastProcessed: BigInt
+  size: BigInt!
+  first: BigInt!
+  last: BigInt!
+}
+
+type Deposit @entity {
+  id: Bytes! # deposit id
+  intent: HubIntent!
+
+  epoch: BigInt!
+  domain: BigInt!
+  amount: BigInt!
+  tickerHash: Bytes!
+
+  enqueuedEvent: DepositEnqueuedEvent
+  processedEvent: DepositProcessedEvent
+}
+
+type DepositEnqueuedEvent @entity(immutable: true) {
+  id: Bytes!
+  deposit: Deposit!
+  intent: HubIntent!
+
+  queue: DepositQueue!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}
+
+type DepositProcessedEvent @entity(immutable: true) {
+  id: Bytes!
+  deposit: Deposit!
+  intent: HubIntent!
+
+  queue: DepositQueue!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}
+
+type FeesWithdrawnEvent @entity(immutable: true) {
+  id: Bytes!
+  withdrawer: Bytes!
+  recipient: Bytes!
+  tickerHash: Bytes!
+  amount: BigInt!
+  paymentId: Bytes!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}
+
+type Token @entity {
+  id: Bytes! # Ticker Hash
+  initLastClosedEpochProcessed: Boolean!
+  feeRecipients: [Bytes!]
+  feeAmounts: [BigInt!]
+  maxDiscountBps: BigInt!
+  discountPerEpoch: BigInt!
+  prioritizedStrategy: Strategy!
+  assets: [Asset!]! @derivedFrom(field: "token")
+}
+
+type Asset @entity {
+  id: Bytes! # TickerHash  + domain
+  assetHash: Bytes!
+  token: Token
+  domain: BigInt
+  adopted: Bytes!
+  approval: Boolean!
+  strategy: Strategy!
+}
+
+type Solver @entity {
+  id: Bytes! # solver address
+  supportedDomains: [BigInt!]
+  updateVirtualBalance: Boolean!
+}
+
+type Domain @entity {
+  id: Bytes! # domain
+  domain: BigInt!
+  blockGasLimit: BigInt!
+}
+
+type Meta @entity {
+  id: Bytes!
+  domain: BigInt
+  paused: Boolean
+  owner: Bytes
+  proposedOwner: Bytes
+  proposedOwnershipTimestamp: BigInt
+  supportedDomains: [Domain!]
+  acceptanceDelay: BigInt
+
+  gateway: Bytes
+  watchtower: Bytes
+  manager: Bytes
+  settler: Bytes
+  minSolverSupportedDomains: BigInt
+  expiryTimeBuffer: BigInt
+
+  discountPerEpoch: BigInt
+  epochLength: BigInt!
+}

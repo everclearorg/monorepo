@@ -1,0 +1,43 @@
+{
+  "name": "@chimera-monorepo/adapters-subgraph",
+  "version": "0.0.1",
+  "description": "adapter for subgraph interaction of everclear protocol",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "dev": "",
+    "start": "",
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
+    "test": "yarn test:unit",
+    "test:unit": "nyc ts-mocha --require test/globalTestHook.ts --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.build.json",
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
+    "purge": "yarn clean && rimraf ./coverage ./node_modules",
+    "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
+    "version": "yarn version"
+  },
+  "author": "Everclear",
+  "license": "ISC",
+  "dependencies": {
+    "@chimera-monorepo/utils": "workspace:*",
+    "@sinclair/typebox": "0.25.21",
+    "@typescript-eslint/eslint-plugin": "5.52.0",
+    "ethers": "5.7.2",
+    "graphql": "16.8.1",
+    "graphql-request": "6.1.0"
+  },
+  "devDependencies": {
+    "eslint": "8.34.0",
+    "nyc": "15.1.0",
+    "rimraf": "5.0.1",
+    "ts-mocha": "10.0.0",
+    "ts-node": "10.9.1",
+    "tslib": "2.5.0",
+    "typescript": "5.3.3"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "@chimera-monorepo/cartographer",
+  "version": "2.0.0",
+  "description": "",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "update:dev": "yarn start:depositors && yarn start:monitor && yarn start:invoices && yarn start:intents",
+    "start:intents": "CARTOGRAPHER_SERVICE=intents npx ts-node src/run.ts",
+    "start:invoices": "CARTOGRAPHER_SERVICE=invoices npx ts-node src/run.ts",
+    "start:depositors": "CARTOGRAPHER_SERVICE=depositors npx ts-node src/run.ts",
+    "start:monitor": "CARTOGRAPHER_SERVICE=monitor npx ts-node src/run.ts",
+    "docker:start:postgrest": "docker run --name cartographer-postgrest --rm -p 3000:3000 -e PGRST_DB_URI=postgres://reader:3eadooor@host.docker.internal:5432/everclear -e PGRST_DB_SCHEMA=public -e PGRST_DB_ANON_ROLE=query postgrest/postgrest",
+    "lint": "eslint ./src --ext .ts --env node",
+    "test": "yarn test:unit",
+    "test:unit": "nyc ts-mocha --require 'test/globalTestHook.ts' --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.build.json",
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0",
+    "purge": "yarn clean && rimraf ./coverage ./node_modules",
+    "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
+    "version": "yarn version"
+  },
+  "author": "Everclear / Wonderland",
+  "license": "MIT",
+  "dependencies": {
+    "@chimera-monorepo/adapters-subgraph": "workspace:*",
+    "@chimera-monorepo/database": "workspace:*",
+    "@chimera-monorepo/utils": "workspace:*",
+    "@sinclair/typebox": "0.25.21",
+    "datadog-lambda-js": "6.86.0",
+    "dd-trace": "3.13.2",
+    "dotenv": "16.0.3",
+    "ethers": "5.7.2",
+    "interval-promise": "1.4.0",
+    "pg": "8.9.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.110",
+    "@types/pg": "8.6.6",
+    "concurrently": "7.6.0",
+    "eslint": "8.34.0",
+    "nodemon": "2.0.20",
+    "nyc": "15.1.0",
+    "pino-pretty": "9.2.0",
+    "rimraf": "3.0.2",
+    "sinclair": "0.2.0",
+    "sinon": "15.0.1",
+    "ts-mocha": "10.0.0",
+    "ts-node": "10.9.1",
+    "tslib": "2.5.0",
+    "typescript": "4.9.5"
+  },
+  "gitHead": "937a7cde93e6ac1e151c6374f48adf83d3fa4ec6",
+  "stableVersion": "2.0.0"
+}

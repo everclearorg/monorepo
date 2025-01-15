@@ -1,0 +1,12 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "exclude": [
+    "dist",
+    "test",
+    "src/lib/entities/**",
+    "src/**/index.ts",
+    "src/lib/caches/cache.ts"
+  ],
+  "all": true,
+  "check-coverage": true
+}

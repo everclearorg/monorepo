@@ -1,0 +1,5 @@
+{
+  "logLevel": "debug",
+  "web3SignerUrl": "http://signer-lighthouse:9000",
+  "environment": "production"
+}

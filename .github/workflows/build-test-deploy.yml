@@ -1,0 +1,830 @@
+name: E2E Workflow for Everclear
+
+on:
+  push:
+    branches:
+      - testnet-staging
+      - testnet-prod
+      - prod
+  pull_request:
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+env:
+  MAINNET_RPC: ${{ secrets.MAINNET_RPC }}
+  SEPOLIA_RPC: ${{ secrets.SEPOLIA_RPC }}
+  BNB_TESTNET_RPC: ${{ secrets.BSC_RPC }}
+  SCROLL_SEPOLIA_RPC: ${{ secrets.SCROLL_SEPOLIA_RPC }}
+
+jobs:
+  set-aws-region:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set AWS Region
+        id: set-aws-region
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/prod" ]]; then
+            echo "AWS_REGION=us-west-2" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/testnet-prod" ]]; then
+            echo "AWS_REGION=eu-north-1" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/testnet-staging" ]]; then
+            echo "AWS_REGION=eu-west-1" >> $GITHUB_OUTPUT
+          else
+            echo "AWS_REGION=eu-west-1" >> $GITHUB_OUTPUT
+          fi
+    outputs:
+      AWS_REGION: ${{ steps.set-aws-region.outputs.AWS_REGION }}
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: [set-aws-region]
+    permissions:
+      contents: read
+
+    env:
+      # Needed for offchain unit tests
+      DATABASE_URL: postgres://postgres:qwerty@localhost:5432/everclear?sslmode=disable
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: ghcr.io/connext/database:sha-67ebbe2
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: qwerty
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Check Yarn version
+        run: yarn --version
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Precompile using 0.8.14 and via-ir=false
+        run: yarn build
+
+      - name: Install DBMate
+        run: sudo curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 && sudo chmod +x /usr/local/bin/dbmate
+
+      - name: Migrate Database
+        run: yarn workspace @chimera-monorepo/database dbmate up
+
+      - name: Run tests
+        shell: bash
+        run: yarn test:unit
+
+      - name: Yarn lint
+        env:
+          NODE_OPTIONS: '--max-old-space-size=12288'
+        run: yarn lint:check
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+  build-and-push-relayer-image:
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/testnet-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/prod'
+    env:
+      REGISTRY: 679752396206.dkr.ecr.${{ needs.set-aws-region.outputs.AWS_REGION }}.amazonaws.com
+      IMAGE_TAG: chimera-${{ github.sha }}
+      REPOSITORY: chimera-relayer
+    runs-on: ubuntu-latest
+    needs: [set-aws-region]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Private ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+
+        run: |
+          DOCKER_BUILDKIT=1 docker build -f docker/relayer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+    outputs:
+      json: ${{ steps.meta.outputs.json }}
+
+  build-and-push-watchtower-image:
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/testnet-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/prod'
+    env:
+      REGISTRY: 679752396206.dkr.ecr.${{ needs.set-aws-region.outputs.AWS_REGION }}.amazonaws.com
+      IMAGE_TAG: chimera-${{ github.sha }}
+      REPOSITORY: chimera-watchtower
+    runs-on: ubuntu-latest
+    needs: [set-aws-region]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Private ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+
+        run: |
+          DOCKER_BUILDKIT=1 docker build -f docker/watchtower/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+    outputs:
+      json: ${{ steps.meta.outputs.json }}
+
+  build-and-push-lighthouse-image:
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/testnet-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/prod'
+    env:
+      REGISTRY: 679752396206.dkr.ecr.${{ needs.set-aws-region.outputs.AWS_REGION }}.amazonaws.com
+      IMAGE_TAG: chimera-${{ github.sha }}
+      REPOSITORY: chimera-lighthouse
+    runs-on: ubuntu-latest
+    needs: [set-aws-region]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Private ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+
+        run: |
+          DOCKER_BUILDKIT=1 docker build -f docker/lighthouse/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+    outputs:
+      json: ${{ steps.meta.outputs.json }}
+
+  build-and-push-cartographer-image:
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/testnet-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/prod'
+    env:
+      REGISTRY: 679752396206.dkr.ecr.${{ needs.set-aws-region.outputs.AWS_REGION }}.amazonaws.com
+      IMAGE_TAG: chimera-${{ github.sha }}
+      REPOSITORY: chimera-cartographer
+    runs-on: ubuntu-latest
+    needs: [set-aws-region]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Private ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+
+        run: |
+          DOCKER_BUILDKIT=1 docker build -f docker/cartographer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+    outputs:
+      json: ${{ steps.meta.outputs.json }}
+
+  build-and-push-monitor-image:
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/testnet-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/prod'
+    env:
+      REGISTRY: 679752396206.dkr.ecr.${{ needs.set-aws-region.outputs.AWS_REGION }}.amazonaws.com
+      IMAGE_TAG: chimera-${{ github.sha }}
+      REPOSITORY: chimera-monitor
+    runs-on: ubuntu-latest
+    needs: [set-aws-region]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Private ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+
+        run: |
+          DOCKER_BUILDKIT=1 docker build -f docker/monitor/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+    outputs:
+      json: ${{ steps.meta.outputs.json }}
+
+  build-and-push-monitor-poller-image:
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/testnet-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/prod'
+    env:
+      REGISTRY: 679752396206.dkr.ecr.${{ needs.set-aws-region.outputs.AWS_REGION }}.amazonaws.com
+      IMAGE_TAG: chimera-${{ github.sha }}
+      REPOSITORY: chimera-monitor-poller
+    runs-on: ubuntu-latest
+    needs: [set-aws-region]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Private ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+
+        run: |
+          DOCKER_BUILDKIT=1 docker build -f docker/monitor/poller/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+    outputs:
+      json: ${{ steps.meta.outputs.json }}
+
+  e2e-tests:
+    if: github.ref != 'refs/heads/testnet-staging' || github.ref != 'refs/heads/mainnet-staging'
+    runs-on: ubuntu-latest
+    needs:
+      [
+        build-and-test,
+        build-and-push-relayer-image,
+        build-and-push-watchtower-image,
+        build-and-push-monitor-image,
+        build-and-push-monitor-poller-image,
+        build-and-push-lighthouse-image,
+        build-and-push-cartographer-image,
+      ]
+    env:
+      RELAYER_IMAGE: chimera-${{ github.sha }}
+      WATCHTOWER_IMAGE: chimera-${{ github.sha }}
+      MONITOR_IMAGE: chimera-${{ github.sha }}
+      MONITOR_POLLER_IMAGE: chimera-${{ github.sha }}
+      LIGHTHOUSE_IMAGE: chimera-${{ github.sha }}
+      CARTOGRAPHER_IMAGE: chimera-${{ github.sha }}
+      WEB3_SIGNER_PRIVATE_KEY_RELAYER: '0x0dbbe8e4ae425a6d2687f1a7e3ba17bc98c673636790f1b8ad91193c05875ef1'
+      MAINNET_RPC: ${{ secrets.MAINNET_RPC }}
+      SEPOLIA_RPC: ${{ secrets.SEPOLIA_RPC }}
+      BNB_TESTNET_RPC: ${{ secrets.BSC_RPC }}
+      SCROLL_SEPOLIA_RPC: ${{ secrets.SCROLL_SEPOLIA_RPC }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build project and generate out directory
+        run: yarn build
+
+      # - name: Integration Tests
+      #   run: yarn test:integration
+
+    outputs:
+      relayer-tags: ${{ needs.build-and-push-relayer-image.outputs.json }}
+      watchtower-tags: ${{ needs.build-and-push-watchtower-image.outputs.json }}
+      monitor-tags: ${{ needs.build-and-push-monitor-image.outputs.json }}
+      monitor-poller-tags: ${{ needs.build-and-push-monitor-poller-image.outputs.json }}
+      lighthouse-tags: ${{ needs.build-and-push-lighthouse-image.outputs.json }}
+      cartographer-tags: ${{ needs.build-and-push-cartographer-image.outputs.json }}
+
+  terraform-infra:
+    if: github.ref == 'refs/heads/testnent-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/prod'
+    runs-on: ubuntu-latest
+    needs:
+      [
+        build-and-test,
+        build-and-push-relayer-image,
+        build-and-push-watchtower-image,
+        build-and-push-monitor-image,
+        build-and-push-monitor-poller-image,
+        build-and-push-lighthouse-image,
+        build-and-push-cartographer-image,
+      ]
+    env:
+      RELAYER_IMAGE: chimera-${{ github.sha }}
+      WATCHTOWER_IMAGE: chimera-${{ github.sha }}
+      MONITOR_IMAGE: chimera-${{ github.sha }}
+      MONITOR_POLLER_IMAGE: chimera-${{ github.sha }}
+      LIGHTHOUSE_IMAGE: chimera-${{ github.sha }}
+      CARTOGRAPHER_IMAGE: chimera-${{ github.sha }}
+      WEB3_SIGNER_PRIVATE_KEY_RELAYER: '0x0dbbe8e4ae425a6d2687f1a7e3ba17bc98c673636790f1b8ad91193c05875ef1'
+      MNEMONIC: 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat'
+      SCROLL_SEPOLIA_RPC: 'https://sepolia-rpc.scroll.io'
+      SEPOLIA_RPC: 'https://ethereum-sepolia-rpc.publicnode.com'
+      BNB_TESTNET_RPC: 'https://data-seed-prebsc-1-s1.bnbchain.org:8545'
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build project and generate out directory
+        run: yarn build
+
+    outputs:
+      relayer-tags: ${{ needs.build-and-push-relayer-image.outputs.json }}
+      watchtower-tags: ${{ needs.build-and-push-watchtower-image.outputs.json }}
+      monitor-tags: ${{ needs.build-and-push-monitor-image.outputs.json }}
+      monitor-poller-tags: ${{ needs.build-and-push-monitor-poller-image.outputs.json }}
+      lighthouse-tags: ${{ needs.build-and-push-lighthouse-image.outputs.json }}
+      cartographer-tags: ${{ needs.build-and-push-cartographer-image.outputs.json }}
+
+  terraform-services-backend-staging-testnet:
+    if: github.ref == 'refs/heads/testnet-staging'
+    needs: [e2e-tests]
+    env:
+      AWS_PROFILE: aws-deployer-connext
+      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Sops
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: '3.7.2'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: Fooji/create-aws-profile-action@v1
+        with:
+          profile: aws-deployer-connext
+          region: us-east-1
+          key: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          secret: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Decrypt Testnet Secrets
+        id: decrypt
+        run: sops -d ops/env/testnet/backend/secrets.staging.json > ops/testnet/staging/backend/tfvars.json
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./ops/testnet/staging/backend
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./ops/testnet/staging/backend
+        run: |
+          terraform plan -var-file=tfvars.json
+
+      - name: Terraform Docker Image onto AWS
+        if: github.ref == 'refs/heads/testnet-staging'
+        id: apply
+        working-directory: ./ops/testnet/staging/backend
+        run: |
+          terraform apply -var-file=tfvars.json -auto-approve
+
+  terraform-services-core-staging-testnet:
+    if: github.ref == 'refs/heads/testnet-staging'
+    needs: [e2e-tests]
+    env:
+      AWS_PROFILE: aws-deployer-connext
+      TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_watchtower: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
+      TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Sops
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: '3.7.2'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: Fooji/create-aws-profile-action@v1
+        with:
+          profile: aws-deployer-connext
+          region: us-east-1
+          key: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          secret: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Decrypt Testnet Secrets
+        id: decrypt
+        run: sops -d ops/env/testnet/core/secrets.staging.json > ops/testnet/staging/core/tfvars.json
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./ops/testnet/staging/core
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./ops/testnet/staging/core
+        run: |
+          terraform plan -var-file=tfvars.json
+
+      - name: Terraform Docker Image onto AWS
+        if: github.ref == 'refs/heads/testnet-staging'
+        id: apply
+        working-directory: ./ops/testnet/staging/core
+        run: |
+          terraform apply -var-file=tfvars.json -auto-approve
+
+    outputs:
+      relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}
+      watchtower-tags: ${{ needs.e2e-tests.outputs.watchtower-tags }}
+      monitor-tags: ${{ needs.e2e-tests.outputs.monitor-tags }}
+      monitor-poller-tags: ${{ needs.e2e-tests.outputs.monitor-poller-tags }}
+      lighthouse-tags: ${{ needs.e2e-tests.outputs.lighthouse-tags }}
+      cartographer-tags: ${{ needs.e2e-tests.outputs.cartographer-tags }}
+
+  terraform-services-core-prod-testnet:
+    if: github.ref == 'refs/heads/testnet-prod'
+    needs: [e2e-tests]
+    env:
+      AWS_PROFILE: aws-deployer-connext
+      TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_watchtower: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
+      TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Sops
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: '3.7.2'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: Fooji/create-aws-profile-action@v1
+        with:
+          profile: aws-deployer-connext
+          region: us-east-1
+          key: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          secret: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Decrypt Testnet Production Secrets
+        id: decrypt
+        run: sops -d ops/env/testnet/core/secrets.prod.json > ops/testnet/prod/core/tfvars.json
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./ops/testnet/prod/core
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./ops/testnet/prod/core
+        run: |
+          terraform plan -var-file=tfvars.json
+
+      - name: Terraform Docker Image onto AWS
+        id: apply
+        working-directory: ./ops/testnet/prod/core
+        run: |
+          terraform apply -var-file=tfvars.json -auto-approve
+
+    outputs:
+      relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}
+      watchtower-tags: ${{ needs.e2e-tests.outputs.watchtower-tags }}
+      monitor-tags: ${{ needs.e2e-tests.outputs.monitor-tags }}
+      monitor-poller-tags: ${{ needs.e2e-tests.outputs.monitor-poller-tags }}
+      lighthouse-tags: ${{ needs.e2e-tests.outputs.lighthouse-tags }}
+      cartographer-tags: ${{ needs.e2e-tests.outputs.cartographer-tags }}
+
+  terraform-services-backend-prod-testnet:
+    if: github.ref == 'refs/heads/testnet-prod'
+    needs: [e2e-tests]
+    env:
+      AWS_PROFILE: aws-deployer-connext
+      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Sops
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: '3.7.2'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: Fooji/create-aws-profile-action@v1
+        with:
+          profile: aws-deployer-connext
+          region: us-east-1
+          key: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          secret: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Decrypt Testnet Secrets
+        id: decrypt
+        run: sops -d ops/env/testnet/backend/secrets.prod.json > ops/testnet/prod/backend/tfvars.json
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./ops/testnet/prod/backend
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./ops/testnet/prod/backend
+        run: |
+          terraform plan -var-file=tfvars.json
+
+      - name: Terraform Docker Image onto AWS
+        id: apply
+        working-directory: ./ops/testnet/prod/backend
+        run: |
+          terraform apply -var-file=tfvars.json -auto-approve
+
+    outputs:
+      cartographer-tags: ${{ needs.e2e-tests.outputs.cartographer-tags }}
+
+  terraform-services-core-prod:
+    if: github.ref == 'refs/heads/prod'
+    needs: [e2e-tests]
+    env:
+      AWS_PROFILE: aws-deployer-connext
+      TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_watchtower: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
+      TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Sops
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: '3.7.2'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: Fooji/create-aws-profile-action@v1
+        with:
+          profile: aws-deployer-connext
+          region: us-east-1
+          key: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          secret: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Decrypt Mainnet Production Secrets
+        id: decrypt
+        run: sops -d ops/env/mainnet/core/secrets.prod.json > ops/mainnet/prod/core/tfvars.json
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./ops/mainnet/prod/core
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./ops/mainnet/prod/core
+        run: |
+          terraform plan -var-file=tfvars.json
+
+      - name: Terraform Docker Image onto AWS
+        id: apply
+        working-directory: ./ops/mainnet/prod/core
+        run: |
+          terraform apply -var-file=tfvars.json -auto-approve
+
+    outputs:
+      relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}
+      watchtower-tags: ${{ needs.e2e-tests.outputs.watchtower-tags }}
+      monitor-tags: ${{ needs.e2e-tests.outputs.monitor-tags }}
+      monitor-poller-tags: ${{ needs.e2e-tests.outputs.monitor-poller-tags }}
+      lighthouse-tags: ${{ needs.e2e-tests.outputs.lighthouse-tags }}
+      cartographer-tags: ${{ needs.e2e-tests.outputs.cartographer-tags }}
+
+  terraform-services-backend-prod:
+    if: github.ref == 'refs/heads/prod'
+    needs: [e2e-tests]
+    env:
+      AWS_PROFILE: aws-deployer-connext
+      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Sops
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: '3.7.2'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: Fooji/create-aws-profile-action@v1
+        with:
+          profile: aws-deployer-connext
+          region: us-east-1
+          key: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          secret: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Decrypt Mainnet Secrets
+        id: decrypt
+        run: sops -d ops/env/mainnet/backend/secrets.prod.json > ops/mainnet/prod/backend/tfvars.json
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./ops/mainnet/prod/backend
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./ops/mainnet/prod/backend
+        run: |
+          terraform plan -var-file=tfvars.json
+
+      - name: Terraform Docker Image onto AWS
+        id: apply
+        working-directory: ./ops/mainnet/prod/backend
+        run: |
+          terraform apply -var-file=tfvars.json -auto-approve
+
+    outputs:
+      cartographer-tags: ${{ needs.e2e-tests.outputs.cartographer-tags }}

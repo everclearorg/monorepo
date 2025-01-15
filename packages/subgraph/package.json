@@ -1,0 +1,51 @@
+{
+  "name": "@chimera-monorepo/subgraph",
+  "version": "0.0.1",
+  "description": "Subgraph codebase for Everclear",
+  "author": "Everclear",
+  "license": "MIT",
+  "files": [
+    "schema.graphql",
+    "generated"
+  ],
+  "scripts": {
+    "graph": "graph",
+    "graph:build": "graph build",
+    "build": "",
+    "codegen": "graph codegen",
+    "goldsky": "goldsky",
+    "deploy": "ts-node ./scripts/deploy.ts",
+    "deploy:hub:staging": "bash -c 'source .env' && yarn deploy everclear-hub --version staging --networks all --label v0.0.2",
+    "deploy:spoke:staging": "bash -c 'source .env' && yarn deploy everclear-spoke --version staging --networks all --label v0.0.14",
+    "deploy:hub:production": "bash -c 'source .env' && yarn deploy everclear-hub --version production --networks connext-sepolia --label v0.0.4",
+    "deploy:spoke:production": "bash -c 'source .env' && yarn deploy everclear-spoke --version production --networks sepolia chapel optimism-sepolia arbitrum-sepolia --label v0.0.4",
+    "deploy:spoke:mainnet:production": "bash -c 'source .env' && yarn deploy everclear-spoke --version production --networks mainnet optimism base bsc arbitrum-one --label v0.0.3",
+    "deploy:spoke:mainnet:production:zircuit": "bash -c 'source .env' && yarn deploy everclear-spoke --version production --networks zircuit --label v0.0.1",
+    "deploy:spoke:mainnet:staging:blast": "bash -c 'source .env' && yarn deploy everclear-spoke --version staging --networks blast --label v0.0.1",
+    "deploy:spoke:mainnet:production:blast": "bash -c 'source .env' && yarn deploy everclear-spoke --version production --networks blast --label v0.0.1",
+    "deploy:hub:mainnet:production": "bash -c 'source .env' && yarn deploy everclear-hub --version production --networks everclear --label v0.0.1",
+    "lint": "eslint ./src --ext .ts --env node",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "purge": "yarn clean && rimraf ./build ./generated ./node_modules",
+    "test": "yarn test:unit",
+    "test:unit": "exit 0",
+    "version": "yarn version"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.69.2",
+    "@graphprotocol/graph-ts": "0.34.0",
+    "@types/js-yaml": "4.0.9",
+    "@types/mustache": "4.2.2",
+    "@types/yaml": "1.9.7",
+    "eslint": "8.34.0",
+    "rimraf": "3.0.2"
+  },
+  "dependencies": {
+    "commander": "12.0.0",
+    "dotenv": "16.0.3",
+    "js-yaml": "4.1.0",
+    "mustache": "4.2.0",
+    "ts-node": "10.9.1",
+    "yaml": "2.2.1"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "extends": "../../../.nycrc.json",
+  "all": true,
+  "exclude": [
+    "dist/**",
+    "src/errors.ts",
+    "src/index.ts",
+    "src/mockable.ts",
+    "src/everclear/index.ts",
+    "src/gelato/index.ts",
+    "src/mockable.ts",
+    "test/**"
+  ],
+  "check-coverage": true
+}

@@ -1,0 +1,88 @@
+specVersion: 0.0.5
+schema:
+  file: ./src/everclear-spoke/schema.graphql
+dataSources:
+  # EVERCLEAR SPOKE events
+  - kind: ethereum/contract
+    name: EverclearSpoke
+    network: '{{network}}'
+    source:
+      address: '{{address}}'
+      abi: EverclearSpoke
+      # prettier-ignore
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - OriginIntent
+        - DestinationIntent
+        - IntentAddEvent
+        - IntentFillEvent
+        - IntentBumpedEvent
+        - Transfer
+        - Balance
+        - UnclaimedBalance
+        - Router
+        - RouterEvent
+        - Message
+        - Meta
+      abis:
+        - name: EverclearSpoke
+          # prettier-ignore
+          file: {{filePath}}
+      eventHandlers:
+        # event IntentAdded(bytes32 indexed _intentId, uint256 _queueIdx, Intent _intent);
+        - event: IntentAdded(indexed bytes32,uint256,(bytes32,bytes32,bytes32,bytes32,uint24,uint32,uint64,uint48,uint48,uint256,uint32[],bytes))
+          handler: handleIntentAdded
+        # event IntentFilled(bytes32 indexed _intentId, address indexed _solver, uint256 _totalFeeDBPS, uint256 _queueIdx, Intent _intent);
+        - event: IntentFilled(indexed bytes32,indexed address,uint256,uint256,(bytes32,bytes32,bytes32,bytes32,uint24,uint32,uint64,uint48,uint48,uint256,uint32[],bytes))
+          handler: handleIntentFilled
+        # event Deposited(address indexed _depositant, address indexed _asset, uint256 _amount);
+        - event: Deposited(indexed address,indexed address,uint256)
+          handler: handleDeposited
+        # event Withdrawn(address indexed _withdrawer, address indexed _asset, uint256 _amount);
+        - event: Withdrawn(indexed address,indexed address,uint256)
+          handler: handleWithdrawn
+        # event IntentQueueProcessed(bytes32 indexed _messageId, uint256 _firstIdx, uint256 _lastIdx, uint256 _quote);
+        - event: IntentQueueProcessed(indexed bytes32,uint256,uint256,uint256)
+          handler: handleIntentQueueProcessed
+        # event FillQueueProcessed(bytes32 indexed _messageId, uint256 _firstIdx, uint256 _lastIdx, uint256 _quote);
+        - event: FillQueueProcessed(indexed bytes32,uint256,uint256,uint256)
+          handler: handleFillQueueProcessed
+        # event Settled(bytes32 indexed _intentId, bytes32 _account, bytes32 _asset, uint256 _amount);
+        - event: Settled(indexed bytes32,address,address,uint256)
+          handler: handleSettled
+        # event ExternalCalldataExecuted(bytes32 indexed _intentId, bytes _returnData);
+        - event: ExternalCalldataExecuted(indexed bytes32,bytes)
+          handler: handleExternalCalldataExecuted
+        # event Paused();
+        - event: Paused()
+          handler: handlePaused
+        # event Unpaused();
+        - event: Unpaused()
+          handler: handleUnpaused
+        # event GatewayUpdated(address _oldGateway, address _newGateway);
+        - event: GatewayUpdated(address,address)
+          handler: handleGatewayUpdated
+        # event LighthouseUpdated(address _oldLightHouse, address _newLightHouse);
+        - event: LighthouseUpdated(address,address)
+          handler: handleLighthouseUpdated
+        # event MessageReceiverUpdated(address _oldMessageReceiver, address _newMessageReceiver);
+        - event: MessageReceiverUpdated(address,address)
+          handler: handleMessageReceiverUpdated
+        # event StrategySetForAsset(address _asset, IEverclear.Strategy _strategy);
+        - event: StrategySetForAsset(address,uint8)
+          handler: handleStrategySetForAsset
+        # event ModuleSetForStrategy(IEverclear.Strategy _strategy, address _module);
+        - event: ModuleSetForStrategy(uint8,address)
+          handler: handleModuleSetForStrategy
+
+        # event AssetTransferFailed(address indexed _asset, address indexed _recipient, uint256 _amount);
+        - event: AssetTransferFailed(indexed address,indexed address,uint256)
+          handler: handleAssetTransferFailed
+        # eevent AssetMintFailed(address indexed _asset, address indexed _recipient, uint256 _amount, Strategy _strategy);
+        - event: AssetMintFailed(indexed address,indexed address,uint256,uint8)
+          handler: handleAssetMintFailed
+      file: ./src/everclear-spoke/mapping/index.ts

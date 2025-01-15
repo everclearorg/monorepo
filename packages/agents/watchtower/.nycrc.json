@@ -1,0 +1,15 @@
+{
+  "extends": "../../../.nycrc.json",
+  "exclude": [
+    "dist",
+    "test",
+    "src/bindings",
+    "src/helpers/index.ts",
+    "src/lib/errors/index.ts",
+    "src/index.ts",
+    "src/watcher.ts",
+    "src/mockable.ts"
+  ],
+  "all": true,
+  "check-coverage": true
+}

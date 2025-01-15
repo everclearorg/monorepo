@@ -1,0 +1,59 @@
+{
+  "name": "chimera-monorepo",
+  "version": "0.0.1",
+  "description": "Chimera Everclear",
+  "repository": "https://github.com/defi-wonderland/chimera-monorepo.git",
+  "author": "Everclear / Wonderland",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/utils",
+    "packages/adapters/cache",
+    "packages/adapters/chainservice",
+    "packages/adapters/subgraph",
+    "packages/adapters/web3signer",
+    "packages/adapters/relayer",
+    "packages/adapters/database",
+    "packages/agents/cartographer/poller",
+    "packages/agents/lighthouse",
+    "packages/agents/monitor",
+    "packages/agents/relayer",
+    "packages/agents/watchtower",
+    "packages/contracts",
+    "packages/subgraph"
+  ],
+  "scripts": {
+    "build:contracts": "yarn workspace @chimera-monorepo/contracts build",
+    "build:relayer": "yarn workspace @chimera-monorepo/relayer build",
+    "build": "yarn workspaces foreach --parallel -p --topological-dev run build",
+    "lint:fix": "yarn workspaces foreach -A --parallel run lint:fix",
+    "lint": "yarn workspaces foreach -A --parallel run lint",
+    "clean": "yarn workspaces foreach -A --parallel run clean",
+    "purge": "yarn workspaces foreach -A --parallel run purge && rimraf './node_modules'",
+    "test": "yarn workspaces foreach -A --parallel run test",
+    "test:unit": "yarn workspaces foreach -v -A --parallel run test:unit",
+    "test:integration": "yarn workspaces foreach -v -A --parallel run test:integration"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "17.0.3",
+    "@commitlint/config-conventional": "17.0.3",
+    "@istanbuljs/nyc-config-typescript": "1.0.2",
+    "@jtbennett/ts-project-scripts": "1.0.0-rc.4",
+    "@typescript-eslint/eslint-plugin": "6.21.0",
+    "@typescript-eslint/parser": "6.21.0",
+    "eslint": "8.34.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-prettier": "5.0.1",
+    "husky": "8.0.3",
+    "prettier": "3.2.5",
+    "rimraf": "5.0.1",
+    "sort-package-json": "2.10.0"
+  },
+  "dependencies": {
+    "fastify": "4.26.2",
+    "zapatos": "6.4.0"
+  },
+  "packageManager": "yarn@3.3.1"
+}
