@@ -1,0 +1,45 @@
+# General
+yarn-error.log
+node_modules
+.DS_STORE
+.vscode
+.secrets
+
+# Foundry files
+contracts/cache
+out-via-ir
+
+# Config files
+.env
+
+# Terraform files
+tfvars.json
+tf_vars.json
+tf-vars.json
+*.hcl
+.terraform
+
+# Avoid ignoring gitkeep
+!/**/.gitkeep
+
+# Keep the latest deployment only
+broadcast/*/*/*
+
+# Out dir
+out
+
+packages/**/dist
+packages/**/node_modules
+*.tsBuildInfo
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+
+.nyc_output
+
+**/*/*.config.json
+**/*/config.*.json
+**/*/config.json
+
+.idea

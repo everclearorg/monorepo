@@ -1,0 +1,18 @@
+@watchtowerUrl = http://localhost:8080
+@adminToken = blahblah
+
+### PING
+GET {{watchtowerUrl}}/ping
+
+###
+GET {{watchtowerUrl}}/balance
+
+###
+POST {{watchtowerUrl}}/pause
+Content-Type: application/json
+
+{
+    "adminToken": "{{adminToken}}",
+    "reason": "Test"
+}
+

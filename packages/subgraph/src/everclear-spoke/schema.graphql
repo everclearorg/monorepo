@@ -1,0 +1,290 @@
+enum IntentStatus {
+  NONE
+  ADDED # signifies added to the message queue
+  DISPATCHED # signifies the batch containing the message has been sent
+  SETTLED # signifies settlement has arrived on spoke domain for intent
+  SETTLED_AND_MANUALLY_EXECUTED # settlement has arrived & calldata executed
+}
+
+enum Strategy {
+  DEFAULT
+  XERC20
+}
+
+type OriginIntent @entity {
+  id: Bytes! # intent id
+  queueIdx: BigInt!
+  message: Message
+  settlement: SettlementIntent
+
+  status: IntentStatus!
+
+  initiator: Bytes!
+  receiver: Bytes!
+  inputAsset: Bytes!
+  outputAsset: Bytes!
+  maxFee: BigInt!
+  origin: BigInt!
+  nonce: BigInt!
+  timestamp: BigInt!
+  ttl: BigInt!
+  amount: BigInt!
+  destinations: [BigInt!]
+  data: Bytes!
+
+  # Add Intent Transaction
+  addEvent: IntentAddEvent!
+}
+
+type IntentAddEvent @entity(immutable: true) {
+  id: Bytes!
+  intent: OriginIntent!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+type DestinationIntent @entity {
+  id: Bytes! # intent id
+  queueIdx: BigInt!
+  message: Message
+  status: IntentStatus!
+  settlement: SettlementIntent
+
+  initiator: Bytes!
+  receiver: Bytes!
+  inputAsset: Bytes!
+  outputAsset: Bytes!
+  maxFee: BigInt!
+  origin: BigInt!
+  nonce: BigInt!
+  timestamp: BigInt!
+  ttl: BigInt!
+  amount: BigInt!
+  destinations: [BigInt!]
+  data: Bytes!
+
+  fillEvent: IntentFillEvent!
+  calldataExecutedEvent: ExternalCalldataExecutedEvent
+}
+
+type IntentFillEvent @entity(immutable: true) {
+  id: Bytes!
+  intent: DestinationIntent!
+
+  solver: Bytes!
+  fee: BigInt
+
+  # Add Fill Transaction
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+type ExternalCalldataExecutedEvent @entity(immutable: true) {
+  id: Bytes!
+  intent: DestinationIntent!
+
+  returnData: Bytes!
+
+  # Calldata Executed Transaction
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+type SettlementIntent @entity {
+  id: Bytes! # intent id
+  status: IntentStatus!
+
+  # Settlement information
+  recipient: Bytes!
+  asset: Bytes!
+  amount: BigInt!
+
+  # Settlement Transaction
+  settlementEvent: IntentSettleEvent!
+  calldataExecutedEvent: ExternalCalldataExecutedEvent
+}
+
+type IntentSettleEvent @entity(immutable: true) {
+  id: Bytes!
+  intentId: Bytes!
+  settlement: SettlementIntent!
+
+  # Settle Transaction
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+type Balance @entity {
+  id: Bytes! # account-asset
+  account: Depositor!
+  asset: Bytes!
+  amount: BigInt!
+}
+
+type Depositor @entity {
+  id: Bytes!
+  balances: [Balance!]! @derivedFrom(field: "account")
+}
+
+type UnclaimedBalance @entity {
+  id: Bytes!
+  amount: BigInt!
+}
+
+enum DepositorEventType {
+  DEPOSIT
+  WITHDRAW
+}
+
+type DepositorEvent @entity(immutable: true) {
+  id: Bytes!
+  depositor: Depositor!
+  type: DepositorEventType!
+  asset: Bytes!
+  amount: BigInt!
+  balance: BigInt!
+
+  txOrigin: Bytes!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txNonce: BigInt!
+  gasLimit: BigInt!
+  gasPrice: BigInt!
+}
+
+type AssetTransferFailedEvent @entity(immutable: true) {
+  id: Bytes!
+
+  asset: Bytes!
+  recipient: Bytes!
+  amount: BigInt!
+
+  # AssetTransferFailed Transaction
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+type AssetMintFailedEvent @entity(immutable: true) {
+  id: Bytes!
+
+  asset: Bytes!
+  recipient: Bytes!
+  amount: BigInt!
+  strategy: Strategy!
+
+  # AssetMintFailed Transaction
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+enum MessageType {
+  INTENT
+  FILL
+  SETTLEMENT
+  MAILBOX_UPDATE
+  SECURITY_MODULE_UPDATE
+  GATEWAY_UPDATE
+  LIGHTHOUSE_UPDATE
+}
+
+type Message @entity(immutable: true) {
+  id: Bytes!
+  type: MessageType!
+  quote: BigInt!
+
+  firstIdx: BigInt!
+  lastIdx: BigInt!
+
+  intentIds: [Bytes!]!
+
+  txOrigin: Bytes!
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txNonce: BigInt!
+  gasLimit: BigInt!
+  gasPrice: BigInt!
+}
+
+type IntentQueueMapping @entity(immutable: true) {
+  id: Bytes! # queue index for intent
+  intentId: Bytes!
+}
+
+type FillQueueMapping @entity(immutable: true) {
+  id: Bytes! # queue index for fill
+  intentId: Bytes!
+}
+
+enum QueueType {
+  INTENT
+  FILL
+}
+
+type Queue @entity {
+  id: Bytes! # 'INTENT' or 'FILL'
+  type: QueueType!
+  lastProcessed: BigInt
+  size: BigInt!
+  first: BigInt!
+  last: BigInt!
+}
+
+type Meta @entity {
+  id: Bytes!
+  domain: BigInt
+  paused: Boolean
+  gateway: Bytes
+  lighthouse: Bytes
+  messageReceiver: Bytes
+}
+
+type StrategyForAsset @entity {
+  id: Bytes!
+  asset: Bytes!
+  strategy: BigInt!
+}
+
+type ModuleForStrategy @entity {
+  id: Bytes!
+  strategy: BigInt!
+  module: Bytes!
+}

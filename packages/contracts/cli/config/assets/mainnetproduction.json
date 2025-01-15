@@ -1,0 +1,18 @@
+[
+    {
+        "symbol": "WETH",
+        "contractName": "WETH"
+    },
+    {
+        "symbol": "USDT",
+        "contractName": "USDT"
+    },
+    {
+        "symbol": "USDC",
+        "contractName": "USDC"
+    },
+    {
+        "symbol": "xPufETH",
+        "contractName": "PufETH"
+    }
+]

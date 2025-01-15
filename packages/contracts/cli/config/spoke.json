@@ -1,0 +1,98 @@
+[
+  {
+    "address": "0x3650432cB5331e6dc95be8C1d8168b7c37f677e2",
+    "domainName": "Ethereum Sepolia",
+    "domainId": 11155111,
+    "environment": "TestnetProduction"
+  },
+  {
+    "address": "0x97f24e4eeD4d05D48cb8a45ADfE5e6aF2de14F71",
+    "domainName": "Arbitrum Sepolia",
+    "domainId": 421614,
+    "environment": "TestnetProduction"
+  },
+  {
+    "address": "0xf9A4d8cED1b8c53B39429BB9a8A391b74E85aE5C",
+    "domainName": "Optimism Sepolia",
+    "domainId": 11155420,
+    "environment": "TestnetProduction"
+  },
+  {
+    "address": "0xFeaaF6291E40252413aA6cb5214F486c8088207e",
+    "domainName": "BNB Testnet",
+    "domainId": 97,
+    "environment": "TestnetProduction"
+  },
+  {
+    "address": "0x54dFa8c1964ccCEcdA7206773de910D54E7E4c6C",
+    "domainName": "Ethereum",
+    "domainId": 1,
+    "environment": "TestnetStaging"
+  },
+  {
+    "address": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
+    "domainName": "Optimism",
+    "domainId": 10,
+    "environment": "MainnetStaging"
+  },
+  {
+    "address": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
+    "domainName": "Arbitrum One",
+    "domainId": 42161,
+    "environment": "MainnetStaging"
+  },
+  {
+    "address": "0x9d3DE64eC0491251306a3B30d0a385C3a005B9F4",
+    "domainName": "Zircuit",
+    "domainId": 48900,
+    "environment": "MainnetStaging"
+  },
+  {
+    "address": "0xf1D5d2D7C6c3D125eBbf137BE5093c0C5D7Fa032",
+    "domainName": "Blast",
+    "domainId": 81457,
+    "environment": "MainnetStaging"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Optimism",
+    "domainId": 10,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Arbitrum One",
+    "domainId": 42161,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Base",
+    "domainId": 8453,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Bnb",
+    "domainId": 56,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Ethereum",
+    "domainId": 1,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe",
+    "domainName": "Zircuit",
+    "domainId": 48900,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7",
+    "domainName": "Blast",
+    "domainId": 81457,
+    "environment": "MainnetProduction"
+  }
+]

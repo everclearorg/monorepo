@@ -1,0 +1,27 @@
+| File                                                                                         | % Lines            | % Statements       | % Branches       | % Funcs           |
+|----------------------------------------------------------------------------------------------|--------------------|--------------------|------------------|-------------------|
+| src/contracts/common/AssetUtils.sol                                                          | 100.00% (6/6)      | 100.00% (7/7)      | 100.00% (3/3)    | 100.00% (2/2)     |
+| src/contracts/common/GasTank.sol                                                             | 100.00% (13/13)    | 100.00% (14/14)    | 100.00% (3/3)    | 100.00% (5/5)     |
+| src/contracts/common/Gateway.sol                                                             | 100.00% (38/38)    | 97.92% (47/48)     | 83.33% (5/6)     | 100.00% (10/10)   |
+| src/contracts/common/MessageLib.sol                                                          | 100.00% (16/16)    | 100.00% (16/16)    | 100.00% (0/0)    | 100.00% (14/14)   |
+| src/contracts/common/QueueLib.sol                                                            | 100.00% (12/12)    | 85.71% (12/14)     | 0.00% (0/2)      | 100.00% (4/4)     |
+| src/contracts/common/TypeCasts.sol                                                           | 100.00% (2/2)      | 100.00% (2/2)      | 100.00% (0/0)    | 100.00% (2/2)     |
+| src/contracts/hub/EverclearHub.sol                                                           | 95.24% (60/63)     | 91.18% (62/68)     | 100.00% (0/0)    | 93.02% (40/43)    |
+| src/contracts/hub/HubGateway.sol                                                             | 100.00% (11/11)    | 92.86% (13/14)     | 66.67% (2/3)     | 100.00% (7/7)     |
+| src/contracts/hub/HubStorage.sol                                                             | 81.82% (18/22)     | 89.29% (25/28)     | 71.43% (5/7)     | 92.86% (13/14)    |
+| src/contracts/hub/lib/HubQueueLib.sol                                                        | 95.83% (23/24)     | 90.91% (30/33)     | 60.00% (3/5)     | 87.50% (7/8)      |
+| src/contracts/hub/lib/InvoiceListLib.sol                                                     | 100.00% (23/23)    | 100.00% (23/23)    | 100.00% (9/9)    | 100.00% (3/3)     |
+| src/contracts/hub/lib/Uint32Set.sol                                                          | 93.94% (31/33)     | 93.18% (41/44)     | 100.00% (5/5)    | 84.62% (11/13)    |
+| src/contracts/hub/modules/Handler.sol                                                        | 100.00% (38/38)    | 100.00% (48/48)    | 100.00% (9/9)    | 100.00% (3/3)     |
+| src/contracts/hub/modules/HubMessageReceiver.sol                                             | 98.70% (76/77)     | 98.98% (97/98)     | 100.00% (20/20)  | 100.00% (5/5)     |
+| src/contracts/hub/modules/Settler.sol                                                        | 99.33% (149/150)   | 99.49% (194/195)   | 97.06% (33/34)   | 100.00% (13/13)   |
+| src/contracts/hub/modules/SettlerLogic.sol                                                   | 100.00% (48/48)    | 100.00% (59/59)    | 100.00% (11/11)  | 100.00% (7/7)     |
+| src/contracts/hub/modules/managers/AssetManager.sol                                          | 100.00% (46/46)    | 100.00% (56/56)    | 100.00% (4/4)    | 100.00% (7/7)     |
+| src/contracts/hub/modules/managers/ProtocolManager.sol                                       | 100.00% (85/85)    | 100.00% (104/104)  | 100.00% (8/8)    | 100.00% (25/25)   |
+| src/contracts/hub/modules/managers/UsersManager.sol                                          | 100.00% (15/15)    | 100.00% (20/20)    | 100.00% (4/4)    | 100.00% (2/2)     |
+| src/contracts/intent/CallExecutor.sol                                                        | 100.00% (8/8)      | 88.89% (8/9)       | 0.00% (0/1)      | 100.00% (1/1)     |
+| src/contracts/intent/EverclearSpoke.sol                                                      | 97.39% (149/153)   | 97.93% (189/193)   | 95.83% (23/24)   | 97.06% (33/34)    |
+| src/contracts/intent/SpokeGateway.sol                                                        | 100.00% (6/6)      | 100.00% (8/8)      | 100.00% (2/2)    | 100.00% (5/5)     |
+| src/contracts/intent/SpokeStorage.sol                                                        | 91.67% (11/12)     | 93.33% (14/15)     | 83.33% (5/6)     | 100.00% (5/5)     |
+| src/contracts/intent/modules/SpokeMessageReceiver.sol                                        | 95.24% (60/63)     | 96.34% (79/82)     | 86.96% (20/23)   | 90.00% (9/10)     |
+| src/contracts/intent/modules/XERC20Module.sol                                                | 94.44% (17/18)     | 96.15% (25/26)     | 100.00% (5/5)    | 100.00% (5/5)     |

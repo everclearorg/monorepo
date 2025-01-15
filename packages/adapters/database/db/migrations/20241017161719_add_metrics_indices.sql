@@ -1,0 +1,21 @@
+-- migrate:up
+CREATE INDEX daily_metrics_by_chains_tokens_day_index ON public.daily_metrics_by_chains_tokens USING btree (day);
+CREATE INDEX daily_metrics_by_chains_tokens_from_chain_id_index ON public.daily_metrics_by_chains_tokens USING btree (from_chain_id);
+CREATE INDEX daily_metrics_by_chains_tokens_to_chain_id_index ON public.daily_metrics_by_chains_tokens USING btree (to_chain_id);
+CREATE INDEX daily_metrics_by_chains_tokens_from_asset_address_index ON public.daily_metrics_by_chains_tokens USING btree (from_asset_address);
+CREATE INDEX daily_metrics_by_chains_tokens_to_asset_address_index ON public.daily_metrics_by_chains_tokens USING btree (to_asset_address);
+CREATE INDEX daily_metrics_by_chains_tokens_from_asset_symbol_index ON public.daily_metrics_by_chains_tokens USING btree (from_asset_symbol);
+CREATE INDEX daily_metrics_by_chains_tokens_to_asset_symbol_index ON public.daily_metrics_by_chains_tokens USING btree (to_asset_symbol);
+
+CREATE INDEX daily_metrics_by_date_day_index ON public.daily_metrics_by_date USING btree (day);
+
+-- migrate:down
+DROP INDEX IF EXISTS public.daily_metrics_by_chains_tokens_day_index;
+DROP INDEX IF EXISTS public.daily_metrics_by_chains_tokens_from_chain_id_index;
+DROP INDEX IF EXISTS public.daily_metrics_by_chains_tokens_to_chain_id_index;
+DROP INDEX IF EXISTS public.daily_metrics_by_chains_tokens_from_asset_address_index;
+DROP INDEX IF EXISTS public.daily_metrics_by_chains_tokens_to_asset_address_index;
+DROP INDEX IF EXISTS public.daily_metrics_by_chains_tokens_from_asset_symbol_index;
+DROP INDEX IF EXISTS public.daily_metrics_by_chains_tokens_to_asset_symbol_index;
+
+DROP INDEX IF EXISTS public.daily_metrics_by_date_day_index;

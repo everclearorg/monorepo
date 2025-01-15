@@ -1,0 +1,30 @@
+# @monitorUrl = https://monitor.chimera.testnet.everclear.ninja
+
+@monitorUrl = http://localhost:8060
+@adminToken = blahblah
+@messageId0 = 0xf17f04509a4aa6576bbef5be21b76564e7e7bc4ed96beaf3bb9dbea327a6c661
+@messageId1 = 0xe23ad2fa0ce56f1ab34e7a9497d140ceb564b41bb91ff973a45968972bc4f4e8
+
+@originDomain = 11155111
+@destinationDomain = 97
+@intentId = 0x593d2d4676eec956e7394c42301ead098b34b5024e9b4795cf14e5eeded97ce2
+
+### PING
+GET {{monitorUrl}}/ping
+
+### SELF-RELAY
+POST {{monitorUrl}}/self-relay
+Content-Type: application/json
+
+{
+    "adminToken": "{{adminToken}}",
+    "messageIds": [
+        "{{messageId0}}"
+    ]
+}
+
+###
+GET {{monitorUrl}}/price/97/0x0000000000000000000000000000000000000000
+
+### INTENT STATUS
+GET {{monitorUrl}}/intent-status/{{intentId}}/{{originDomain}}/{{destinationDomain}},{{originDomain}}

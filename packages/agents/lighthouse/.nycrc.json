@@ -1,0 +1,14 @@
+{
+    "extends": "../../../.nycrc.json",
+    "exclude": [
+        "dist",
+        "test",
+        "src/**/index.ts",
+        "src/context.ts",
+        "src/tasks/run.ts",
+        "src/abis/**",
+        "src/errors/**",
+        "**/mockable.ts"
+    ],
+    "all": true
+}

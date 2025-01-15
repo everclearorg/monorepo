@@ -1,0 +1,11 @@
+[
+  {
+    "subgraphName": "everclear-hub-sepolia",
+    "network": "connext-sepolia",
+    "domain": "6398",
+    "environment": "staging",
+    "indexers": [
+      "goldsky"
+    ]
+  }
+]

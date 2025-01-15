@@ -1,0 +1,51 @@
+{
+  "name": "@chimera-monorepo/monitor",
+  "version": "0.0.1",
+  "description": "Monitor codebase for Everclear",
+  "main": "dist/index.js",
+  "author": "Everclear",
+  "license": "MIT",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "start:server": "MONITOR_SERVICE=server node --enable-source-maps dist/run.js",
+    "start:poller": "MONITOR_SERVICE=poller node --enable-source-maps dist/run.js",
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
+    "test": "yarn test:unit",
+    "test:unit": "nyc ts-mocha --require test/globalTestHook.ts --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.json",
+    "purge": "yarn clean && rimraf ./coverage ./node_modules",
+    "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
+    "version": "yarn version"
+  },
+  "dependencies": {
+    "@chimera-monorepo/adapters-cache": "workspace:*",
+    "@chimera-monorepo/adapters-relayer": "workspace:*",
+    "@chimera-monorepo/adapters-subgraph": "workspace:*",
+    "@chimera-monorepo/chainservice": "workspace:*",
+    "@chimera-monorepo/contracts": "workspace:*",
+    "@chimera-monorepo/utils": "workspace:*",
+    "@hyperlane-xyz/sdk": "^3.12.2",
+    "aws-lambda": "1.0.7",
+    "datadog-lambda-js": "6.86.0",
+    "dd-trace": "3.13.2",
+    "dotenv": "16.0.3",
+    "ts-mocha": "10.0.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.110",
+    "@types/lodash": "4.17.0",
+    "eslint": "8.34.0",
+    "fastify": "4.13.0",
+    "interval-promise": "1.4.0",
+    "nyc": "15.1.0",
+    "rimraf": "5.0.1",
+    "typescript": "5.3.3"
+  },
+  "packageManager": "yarn@3.3.1"
+}

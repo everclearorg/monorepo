@@ -1,0 +1,17 @@
+{
+  "db": {
+    "connectionString": "postgres://postgres:qwerty@localhost:5432/everclear?sslmode=disable"
+  },
+  "outDir": "./src",
+  "customJSONParsingForLargeNumbers": true,
+  "schemas": {
+    "public": {
+      "include": "*",
+      "exclude": []
+    },
+    "tokenomics": {
+      "include": "*",
+      "exclude": []
+    }
+  }
+}

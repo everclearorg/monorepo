@@ -1,0 +1,14 @@
+[
+  {
+    "symbol": "TEST",
+    "contractName": "TEST"
+  },
+  {
+    "symbol": "DTT",
+    "contractName": "DecimalsTestToken"
+  },
+  {
+    "symbol": "XTEST",
+    "contractName": "TestxERC20"
+  }
+]

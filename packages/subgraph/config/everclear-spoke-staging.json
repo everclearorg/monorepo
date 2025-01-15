@@ -1,0 +1,47 @@
+[
+  {
+    "subgraphName": "everclear-spoke-sepolia",
+    "network": "sepolia",
+    "domain": "11155111",
+    "environment": "staging",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-chapel",
+    "domain": "97",
+    "environment": "staging",
+    "network": "chapel",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-op-sepolia",
+    "network": "optimism-sepolia",
+    "domain": "11155420",
+    "environment": "staging",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-arb-sepolia",
+    "network": "arbitrum-sepolia",
+    "domain": "421614",
+    "environment": "staging",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-blast",
+    "domain": "81457",
+    "environment": "staging",
+    "network": "blast",
+    "indexers": [
+      "goldsky"
+    ]
+  }
+]

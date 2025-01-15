@@ -1,0 +1,114 @@
+[
+  {
+    "subgraphName": "everclear-spoke-sepolia",
+    "network": "sepolia",
+    "domain": "11155111",
+    "environment": "production",
+    "indexers": [
+      "studio",
+      "goldsky",
+      "local"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-chapel",
+    "domain": "97",
+    "environment": "production",
+    "network": "chapel",
+    "indexers": [
+      "studio",
+      "goldsky",
+      "local"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-op-sepolia",
+    "domain": "11155420",
+    "environment": "production",
+    "network": "optimism-sepolia",
+    "indexers": [
+      "studio",
+      "goldsky",
+      "local"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-arb-sepolia",
+    "domain": "421614",
+    "environment": "production",
+    "network": "arbitrum-sepolia",
+    "indexers": [
+      "studio",
+      "goldsky",
+      "local"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-arbitrum",
+    "domain": "42161",
+    "environment": "production",
+    "network": "arbitrum-one",
+    "indexers": [
+      "goldsky",
+      "studio"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-optimism",
+    "domain": "10",
+    "environment": "production",
+    "network": "optimism",
+    "indexers": [
+      "goldsky",
+      "studio"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-bnb",
+    "domain": "56",
+    "environment": "production",
+    "network": "bsc",
+    "indexers": [
+      "goldsky",
+      "studio"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-mainnet",
+    "domain": "1",
+    "environment": "production",
+    "network": "mainnet",
+    "indexers": [
+      "goldsky",
+      "studio"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-base",
+    "domain": "8453",
+    "environment": "production",
+    "network": "base",
+    "indexers": [
+      "goldsky",
+      "studio"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-zircuit",
+    "domain": "48900",
+    "environment": "production",
+    "network": "zircuit",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-blast",
+    "domain": "81457",
+    "environment": "production",
+    "network": "blast",
+    "indexers": [
+      "goldsky"
+    ]
+  }
+]

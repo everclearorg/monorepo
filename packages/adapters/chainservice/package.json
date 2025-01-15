@@ -1,0 +1,44 @@
+{
+  "name": "@chimera-monorepo/chainservice",
+  "version": "0.0.1",
+  "description": "Chain service codebase for Everclear",
+  "main": "dist/index.js",
+  "author": "Everclear",
+  "license": "MIT",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
+    "test": "yarn test:unit",
+    "test:integration": "nyc ts-mocha --check-leaks --exit --timeout 1200000 'test/integration/**/*.spec.ts'",
+    "test:unit": "nyc ts-mocha --check-leaks --exit --timeout 60000 'test/unit/**/*.spec.ts'",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.json",
+    "purge": "yarn clean && rimraf ./.nyc_coverage ./node_modules",
+    "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
+    "version": "yarn version"
+  },
+  "devDependencies": {
+    "eslint": "8.34.0",
+    "mocha": "8.2.0",
+    "nyc": "15.1.0",
+    "rimraf": "5.0.1",
+    "sinon": "17.0.1",
+    "ts-mocha": "10.0.0",
+    "typescript": "5.3.3"
+  },
+  "dependencies": {
+    "@chimera-monorepo/utils": "workspace:*",
+    "@safe-global/api-kit": "^2.5.6",
+    "@safe-global/protocol-kit": "^5.1.1",
+    "@safe-global/types-kit": "^1.0.1",
+    "@sinclair/typebox": "0.25.21",
+    "ethers": "5.7.2",
+    "interval-promise": "1.4.0",
+    "p-queue": "6.6.2"
+  }
+}

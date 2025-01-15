@@ -1,0 +1,78 @@
+{
+    "chains": {
+        "1337": {
+            "providers": [
+                "http://localhost:8080"
+            ],
+            "subgraphUrls": [
+                "http://1337.mocksubgraph.com"
+            ],
+            "deployments": {
+                "everclear": "0xabc0000000000000000000000000000000000000",
+                "gateway": "0xdef0000000000000000000000000000000000000"
+            },
+            "assets": {}
+        },
+        "1338": {
+            "providers": [
+                "http://localhost:8081"
+            ],
+            "subgraphUrls": [
+                "http://1338.mocksubgraph.com"
+            ],
+            "deployments": {
+                "everclear": "0xabc0000000000000000000000000000000000000",
+                "gateway": "0xdef0000000000000000000000000000000000000"
+            },
+            "assets": {}
+        }
+    },
+    "healthUrls": {
+        "intent": "http://localhost:8383",
+        "settlement": "http://localhost:8383",
+        "fill": "http://localhost:8383"
+    },
+    "hub": {
+        "domain": "6398",
+        "providers": [
+            "http://localhost:8082"
+        ],
+        "subgraphUrls": [
+            "http://6398.mocksubgraph.com"
+        ],
+        "deployments": {
+            "everclear": "0xccc0000000000000000000000000000000000000",
+            "gateway": "0xbbbb000000000000000000000000000000000000",
+            "gauge": "0xaaaa000000000000000000000000000000000000",
+            "rewardDistributor": "0xdddd000000000000000000000000000000000000",
+            "tokenomicsHubGateway": "0xeeee000000000000000000000000000000000000"
+        }
+    },
+    "database": {
+        "url": "postgres.com"
+    },
+    "relayers": [
+        {
+            "url": "http://127.0.0.1:8080",
+            "type": "Everclear",
+            "apiKey": "blahblah"
+        }
+    ],
+    "rewards": {
+        "clearAssetAddress": "0xbbbb000000000000000000000000000000000000",
+        "volume": {
+            "tokens": []
+        },
+        "staking": {
+            "tokens": [],
+            "exitPenalty": []
+        }
+    },
+    "safe": {
+        "txService": "blahblah",
+        "safeAddress": "blahblah",
+        "signer": "blahblah",
+        "masterCopyAddress": "blahblah",
+        "fallbackHandlerAddress": "blahblah"
+    }
+}

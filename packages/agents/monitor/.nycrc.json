@@ -1,0 +1,15 @@
+{
+    "extends": "../../../.nycrc.json",
+    "exclude": [
+        "dist",
+        "test",
+        "src/abis/**",
+        "src/**/index.ts",
+        "src/lambda.ts",
+        "src/helpers/alerts.ts",
+        "src/types/errors.ts",
+        "src/config.ts"
+    ],
+    "all": true,
+    "check-coverage": true
+}
