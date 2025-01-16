@@ -5,7 +5,7 @@ on:
     branches:
       - testnet-staging
       - testnet-prod
-      - prod
+      - mainnet-prod
   pull_request:
 
 defaults:
