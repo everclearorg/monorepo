@@ -21,6 +21,7 @@ env:
   SEPOLIA_RPC: ${{ secrets.SEPOLIA_RPC }}
   BNB_TESTNET_RPC: ${{ secrets.BSC_RPC }}
   SCROLL_SEPOLIA_RPC: ${{ secrets.SCROLL_SEPOLIA_RPC }}
+  GITHUB_TOKEN: ${{ secrets.READ_GITHUB_TOKEN }}
 
 jobs:
   unit-tests:
