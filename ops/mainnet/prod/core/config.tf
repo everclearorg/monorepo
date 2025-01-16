@@ -413,42 +413,36 @@ locals {
       clearAssetAddress = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
       volume = {
         tokens = [
-          # {
-          #   address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8",
-          #   # 750000 CLEAR
-          #   epochVolumeReward = "750000000000000000000000",
-          # }
+          {
+            address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
+            # 750000 CLEAR
+            epochVolumeReward = "750000000000000000000000"
+            baseRewardDbps = 12
+            maxBpsUsdVolumeCap = 250000000
+          }
         ]
       }
       staking = {
         tokens = [
-          # {
-          #   address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8",
-          #   apy = [
-          #     { term: 3,  apyBps: 600 },
-          #     { term: 6,  apyBps: 700 },
-          #     { term: 9,  apyBps: 800 },
-          #     { term: 12, apyBps: 900 },
-          #     { term: 15, apyBps: 1000 },
-          #     { term: 18, apyBps: 1100 },
-          #     { term: 21, apyBps: 1200 },
-          #     { term: 24, apyBps: 1300 }
-          #   ]
-          # },
-          # {
-          #   # TODO: change to WETH address
-          #   address = "0x4cbeeccb5e8008a5cda95bd1bb92948bda5e466b",
-          #   apy = [
-          #     { term: 3,  apyBps: 0 },
-          #     { term: 6,  apyBps: 100 },
-          #     { term: 9,  apyBps: 200 },
-          #     { term: 12, apyBps: 300 },
-          #     { term: 15, apyBps: 400 },
-          #     { term: 18, apyBps: 500 },
-          #     { term: 21, apyBps: 600 },
-          #     { term: 24, apyBps: 700 }
-          #   ]
-          # }
+          {
+            address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8",
+            apy = [
+              { term: 3,  apyBps: 400 },
+              { term: 12, apyBps: 600 },
+              { term: 15, apyBps: 800 },
+              { term: 18, apyBps: 1000 },
+              { term: 21, apyBps: 1200 },
+              { term: 24, apyBps: 1400 }
+            ]
+          },
+          {
+            address = "0x2e31ebd2eb114943630db6ba8c7f7687bda5835f"
+            apy = [
+              { term: 3,  apyBps: 200 },
+              { term: 6,  apyBps: 400 },
+              { term: 9,  apyBps: 600 }
+            ]
+          }
         ]
       }
       reward           = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_reward_heartbeat}"
