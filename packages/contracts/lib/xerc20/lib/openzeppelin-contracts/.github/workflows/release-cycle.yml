@@ -115,7 +115,7 @@ jobs:
       - name: Create PR
         uses: changesets/action@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.READ_GITHUB_TOKEN }}
           PRERELEASE: ${{ needs.state.outputs.is_prerelease }}
         with:
           version: npm run version
