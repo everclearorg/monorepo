@@ -22,6 +22,10 @@ env:
   BNB_TESTNET_RPC: ${{ secrets.BSC_RPC }}
   SCROLL_SEPOLIA_RPC: ${{ secrets.SCROLL_SEPOLIA_RPC }}
 
+permissions:
+  contents: write 
+  pull-requests: write
+
 jobs:
   unit-tests:
     name: Run Unit Tests
@@ -88,13 +92,16 @@ jobs:
           fetch-depth: 0
 
       - name: Lint PR title
-        uses: amannn/action-semantic-pull-request@v5
+        uses: amannn/action-semantic-pull-request@v5.5.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: github.event_name == 'pull_request'
 
       - name: Lint commit
         uses: wagoid/commitlint-github-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        if: github.event_name == 'pull_request'
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
