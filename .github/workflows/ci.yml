@@ -96,6 +96,7 @@ jobs:
 
       - name: Lint commit
         uses: wagoid/commitlint-github-action@v5
+        if: github.event_name == 'pull_request'
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
