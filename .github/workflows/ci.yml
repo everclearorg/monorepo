@@ -22,6 +22,10 @@ env:
   BNB_TESTNET_RPC: ${{ secrets.BSC_RPC }}
   SCROLL_SEPOLIA_RPC: ${{ secrets.SCROLL_SEPOLIA_RPC }}
 
+permissions:
+  contents: write 
+  pull-requests: write
+
 jobs:
   unit-tests:
     name: Run Unit Tests
