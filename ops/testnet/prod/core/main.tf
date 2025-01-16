@@ -338,7 +338,7 @@ module "lighthouse_reward_metadata_cron" {
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "reward_metadata"
   })
-  schedule_expression    = "rate(1 minute)"
+  schedule_expression    = "cron(0 0 ? * TUE *)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -456,4 +456,3 @@ module "watchtower_cache" {
   node_type                     = "cache.t3.small"
   public_redis                  = true
 }
-
