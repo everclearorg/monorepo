@@ -17,6 +17,8 @@ import {
   TEnvironment,
   Environment,
   TSafeConfig,
+  TokenVolumeReward,
+  TokenStakingReward,
 } from '@chimera-monorepo/utils';
 import { InvalidConfig } from './errors';
 
@@ -25,6 +27,40 @@ const DEFAULT_SIZE = 10;
 const DEFAULT_AGE = 90 * 60; // 90 minutes
 const DEFAULT_CONFIRMATIONS = 3;
 const DEFAULT_GAS_LIMIT = 30_000_000;
+const DEFAULT_HEALTH_BASE_URI = 'https://uptime.betterstack.com/api/v1/heartbeat/';
+const DEFAULT_REWARDS_CONFIG = {
+  volume: {
+    tokens: [
+      {
+        // 750000 CLEAR
+        epochVolumeReward: '750000000000000000000000',
+        baseRewardDbps: 12,
+        maxBpsUsdVolumeCap: 250000000,
+      },
+    ],
+  },
+  staking: {
+    tokens: [
+      {
+        apy: [
+          { term: 3, apyBps: 400 },
+          { term: 12, apyBps: 600 },
+          { term: 15, apyBps: 800 },
+          { term: 18, apyBps: 1000 },
+          { term: 21, apyBps: 1200 },
+          { term: 24, apyBps: 1400 },
+        ],
+      },
+      {
+        apy: [
+          { term: 3, apyBps: 200 },
+          { term: 6, apyBps: 400 },
+          { term: 9, apyBps: 600 },
+        ],
+      },
+    ],
+  },
+};
 
 dotenvConfig();
 
@@ -160,6 +196,25 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
 
   const database = process.env.LIGHTHOUSE_DATABASE_URL || configJson.database?.url || configFile.database?.url;
 
+  const healthUrls = configJson?.healthUrls || configFile?.healthUrls || {};
+  for (const key in healthUrls) {
+    if (!healthUrls[key].startsWith('http')) {
+      healthUrls[key] = DEFAULT_HEALTH_BASE_URI + healthUrls[key];
+    }
+  }
+
+  const rewards = configJson.rewards || configFile.rewards || {};
+  if (rewards.volume?.tokens) {
+    rewards.volume.tokens = rewards.volume.tokens.map((item: TokenVolumeReward, index: number) => {
+      return { ...DEFAULT_REWARDS_CONFIG.volume.tokens[index], ...item };
+    });
+  }
+  if (rewards.staking?.tokens) {
+    rewards.staking.tokens = rewards.staking.tokens.map((item: TokenStakingReward, index: number) => {
+      return { ...DEFAULT_REWARDS_CONFIG.staking.tokens[index], ...item };
+    });
+  }
+
   // Generate config
   const lighthouseConfig: LighthouseConfig = {
     chains: chainsForLighthouseConfig,
@@ -171,12 +226,12 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     thresholds,
     signer: process.env.LIGHTHOUSE_SIGNER || configJson?.signer || configFile?.signer || '',
     relayers: configJson.relayers || configFile.relayers || [],
-    rewards: configJson.rewards || configFile.rewards || {},
+    rewards,
     logLevel: (process.env.LIGHTHOUSE_LOG_LEVEL || configFile?.logLevel || 'info') as LogLevel,
     environment,
     network,
     service: (process.env.LIGHTHOUSE_SERVICE || configFile?.service || 'intent') as LighthouseService,
-    healthUrls: configJson?.healthUrls || configFile?.healthUrls || {},
+    healthUrls,
     coingecko: configJson?.coingecko || configFile?.coingecko || '',
     safe: configJson?.safe || configFile?.safe || {},
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},

@@ -170,6 +170,7 @@ export const TTokenVolumeReward = Type.Object({
   baseRewardDbps: Type.Number(),
   maxBpsUsdVolumeCap: Type.Number(),
 });
+export type TokenVolumeReward = Static<typeof TTokenVolumeReward>;
 
 export const TVolumeRewardConfig = Type.Object({
   tokens: Type.Array(TTokenVolumeReward),

@@ -352,13 +352,13 @@ locals {
     }
     signer = "https://${module.lighthouse_web3signer.service_endpoint}"
     healthUrls = {
-      intent           = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_intent_heartbeat}"
-      fill             = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_fill_heartbeat}"
-      settlement       = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_settlement_heartbeat}"
-      expired          = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_expired_heartbeat}"
-      invoice          = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_invoice_heartbeat}"
-      reward           = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_reward_heartbeat}"
-      reward_metadata  = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_reward_metadata_heartbeat}"
+      intent           = "${var.lighthouse_intent_heartbeat}"
+      fill             = "${var.lighthouse_fill_heartbeat}"
+      settlement       = "${var.lighthouse_settlement_heartbeat}"
+      expired          = "${var.lighthouse_expired_heartbeat}"
+      invoice          = "${var.lighthouse_invoice_heartbeat}"
+      reward           = "${var.lighthouse_reward_heartbeat}"
+      reward_metadata  = "${var.lighthouse_reward_metadata_heartbeat}"
     }
     coingecko = "${var.coingecko_api_key}"
     rewards = {
@@ -371,7 +371,6 @@ locals {
         tokens = [
         ]
       }
-      reward           = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_reward_heartbeat}"
     }
     safe = {
       txService = "https://transaction-testnet.safe.everclear.org/api"

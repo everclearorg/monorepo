@@ -349,7 +349,7 @@ locals {
       10 = { maxAge = 60, size = 1 },
       8453 = { maxAge = 60, size = 1 },
       48900 = { maxAge = 60, size = 1 },
-    }      
+    }
     chains = {
       "1" = {
         providers = [
@@ -400,13 +400,13 @@ locals {
     }
     signer = "https://${module.lighthouse_web3signer.service_endpoint}"
     healthUrls = {
-      intent           = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_intent_heartbeat}"
-      fill             = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_fill_heartbeat}"
-      settlement       = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_settlement_heartbeat}"
-      expired          = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_expired_heartbeat}"
-      invoice          = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_invoice_heartbeat}"
-      reward           = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_reward_heartbeat}"
-      reward_metadata  = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_reward_metadata_heartbeat}"
+      intent           = "${var.lighthouse_intent_heartbeat}"
+      fill             = "${var.lighthouse_fill_heartbeat}"
+      settlement       = "${var.lighthouse_settlement_heartbeat}"
+      expired          = "${var.lighthouse_expired_heartbeat}"
+      invoice          = "${var.lighthouse_invoice_heartbeat}"
+      reward           = "${var.lighthouse_reward_heartbeat}"
+      reward_metadata  = "${var.lighthouse_reward_metadata_heartbeat}"
     }
     coingecko = "${var.coingecko_api_key}"
     rewards = {
@@ -415,37 +415,19 @@ locals {
         tokens = [
           {
             address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
-            # 750000 CLEAR
-            epochVolumeReward = "750000000000000000000000"
-            baseRewardDbps = 12
-            maxBpsUsdVolumeCap = 250000000
           }
         ]
       }
       staking = {
         tokens = [
           {
-            address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8",
-            apy = [
-              { term: 3,  apyBps: 400 },
-              { term: 12, apyBps: 600 },
-              { term: 15, apyBps: 800 },
-              { term: 18, apyBps: 1000 },
-              { term: 21, apyBps: 1200 },
-              { term: 24, apyBps: 1400 }
-            ]
+            address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
           },
           {
             address = "0x2e31ebd2eb114943630db6ba8c7f7687bda5835f"
-            apy = [
-              { term: 3,  apyBps: 200 },
-              { term: 6,  apyBps: 400 },
-              { term: 9,  apyBps: 600 }
-            ]
           }
         ]
       }
-      reward           = "https://uptime.betterstack.com/api/v1/heartbeat/${var.lighthouse_reward_heartbeat}"
     }
     safe = {
       txService = "https://transaction.safe.everclear.org/api"
