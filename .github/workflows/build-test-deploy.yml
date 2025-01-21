@@ -755,13 +755,13 @@ jobs:
         id: plan
         working-directory: ./ops/mainnet/prod/core
         run: |
-          terraform plan -var-file=tfvars.json
+          terraform plan -var-file=tfvars.json > /dev/null 2>&1
 
       - name: Terraform Docker Image onto AWS
         id: apply
         working-directory: ./ops/mainnet/prod/core
         run: |
-          terraform apply -var-file=tfvars.json -auto-approve
+          terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
 
     outputs:
       relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}
@@ -818,13 +818,13 @@ jobs:
         id: plan
         working-directory: ./ops/mainnet/prod/backend
         run: |
-          terraform plan -var-file=tfvars.json
+          terraform plan -var-file=tfvars.json > /dev/null 2>&1
 
       - name: Terraform Docker Image onto AWS
         id: apply
         working-directory: ./ops/mainnet/prod/backend
         run: |
-          terraform apply -var-file=tfvars.json -auto-approve
+          terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
 
     outputs:
       cartographer-tags: ${{ needs.e2e-tests.outputs.cartographer-tags }}
