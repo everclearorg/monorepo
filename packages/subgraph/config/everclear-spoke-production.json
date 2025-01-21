@@ -110,5 +110,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-linea",
+    "domain": "59144",
+    "environment": "production",
+    "network": "linea",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]
