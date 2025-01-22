@@ -12,6 +12,8 @@ import {VmSafe} from 'forge-std/Vm.sol';
 
 import {Mocker} from './mocks/Mocker.sol';
 
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
+
 contract TestExtended is Mocker {
   using TypeCasts for address;
   using TypeCasts for bytes32;
@@ -115,5 +117,18 @@ contract TestExtended is Mocker {
     (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_solverPk, MessageHashUtils.toEthSignedMessageHash(_hash));
     _signature = abi.encodePacked(_r, _s, _v);
     _solver = vm.addr(_solverPk);
+  }
+
+  function _limitDestinationLengthTo10(
+    IEverclear.Intent memory _intent
+  ) internal pure returns (IEverclear.Intent memory) {
+    if (_intent.destinations.length < 10) return _intent;
+    uint32[] memory _destinations = new uint32[](10);
+    for (uint256 i; i < 10; i++) {
+      _destinations[i] = _intent.destinations[i];
+    }
+
+    _intent.destinations = _destinations;
+    return _intent;
   }
 }

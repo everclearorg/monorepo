@@ -12,7 +12,14 @@ sort_imports = true
 solc_version = '0.8.25'
 libs = ["../../node_modules", "lib"]
 optimizer_runs = 10_000
-fs_permissions = [{ access = "read-write", path = "./"}]
+fs_permissions = [
+    { access = "read-write", path = "./"}, 
+    { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-mainnet.json" },
+    { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-arbitrum.json" },
+    { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-optimism.json" },
+    { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-base.json" },
+    { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-bnb.json" }
+    ]
 
 [profile.optimized]
 via_ir = true
@@ -40,6 +47,7 @@ scroll-sepolia = "${SCROLL_SEPOLIA_RPC}"
 alfajores = "${ALFAJORES_RPC}"
 everclear-sepolia = "${EVERCLEAR_SEPOLIA_RPC}"
 everclear = "${EVERCLEAR_RPC}"
+zircuit = "${ZIRCUIT_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
@@ -50,3 +58,4 @@ scroll-sepolia = { key = "${SCROLLSCAN_API_KEY}", chain = "scroll-sepolia", url 
 bsc = { key = "${BNBSCAN_API_KEY}", chain = "bsc", url = "https://api-testnet.bscscan.com/api" }
 everclear-sepolia = { key = "${EVERCLEAR_API_KEY}", chain = "6398", url = "https://connext-sepolia.blockscout.com/api" }
 everclear = { key = "${EVERCLEAR_API_KEY}", chain = "25327", url = "https://scan.everclear.org/api/v2" }
+zircuit = { key = "${ZIRCUITSCAN_API_KEY}", chain = "48900", url = "https://explorer.zircuit.com/api/contractVerifyHardhat" }

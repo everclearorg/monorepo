@@ -83,6 +83,7 @@ abstract contract Ethereum {
   IEverclearSpoke public ETHEREUM_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public ETHEREUM_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public ETHEREUM_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  address public ETHEREUM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 }
 
 abstract contract ArbitrumOne {
@@ -92,6 +93,7 @@ abstract contract ArbitrumOne {
   IEverclearSpoke public ARBITRUM_ONE_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public ARBITRUM_ONE_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public ARBITRUM_ONE_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  address public ARBITRUM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 }
 
 abstract contract Base {
@@ -101,6 +103,7 @@ abstract contract Base {
   IEverclearSpoke public BASE_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public BASE_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public BASE_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  address public BASE_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 }
 
 abstract contract Optimism {
@@ -110,6 +113,7 @@ abstract contract Optimism {
   IEverclearSpoke public OPTIMISM_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public OPTIMISM_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public OPTIMISM_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  address public OPTIMISM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 }
 
 abstract contract Bnb {
@@ -119,6 +123,7 @@ abstract contract Bnb {
   IEverclearSpoke public BNB_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public BNB_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public BNB_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  address public BNB_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 }
 
 abstract contract Zircuit {
@@ -128,6 +133,7 @@ abstract contract Zircuit {
   IEverclearSpoke public ZIRCUIT_SPOKE = IEverclearSpoke(0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe);
   ISpokeGateway public ZIRCUIT_SPOKE_GATEWAY = ISpokeGateway(0x2Ec2b2CC1813941b638D3ADBA86A1af7F6488A9E);
   ICallExecutor public ZIRCUIT_EXECUTOR = ICallExecutor(0x391BBeaffe82CCb3570F18F615AE5ab4d6eA2fc0);
+  address public ZIRCUIT_SPOKE_IMPL = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
 }
 
 abstract contract Blast {

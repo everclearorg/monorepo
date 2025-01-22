@@ -1,0 +1,19 @@
+{
+  "chainId": "10",
+  "createdAt": "1734411343000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade Optimism Mainnet Staging",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000259f03d45ea8de916a935e388024cf86d893244a00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}
