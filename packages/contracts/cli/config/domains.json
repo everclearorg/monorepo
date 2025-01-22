@@ -79,6 +79,60 @@
     "realm": "spoke"
   },
   {
+    "name": "Linea",
+    "id": 59144,
+    "rpc": "https://linea.drpc.org",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "zkSync",
+    "id": 324,
+    "rpc": "https://1rpc.io/zksync2-era",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Polygon",
+    "id": 137,
+    "rpc": "https://polygon.drpc.org",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Scroll",
+    "id": 534352,
+    "rpc": "https://scroll.drpc.org",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Taiko",
+    "id": 167000,
+    "rpc": "https://taiko.drpc.org",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Avalanche",
+    "id": 43114,
+    "rpc": "https://avalanche.drpc.org",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
     "name": "Scroll Sepolia",
     "id": 534351,
     "rpc": "https://scroll-testnet-public.unifra.io",
