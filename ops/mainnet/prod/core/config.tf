@@ -126,6 +126,42 @@ locals {
           "https://blastl2-mainnet.public.blastapi.io"
         ]
       }
+      "59144" = {
+        providers = [
+          "https://linea.drpc.org",
+          "https://linea-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "324" = {
+        providers = [
+          "https://1rpc.io/zksync2-era",
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "137" = {
+        providers = [
+          "https://polygon.drpc.org",
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll.drpc.org",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://taiko.drpc.org",
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://avalanche.drpc.org",
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc"
+        ]
+      }
     }
     server = {
       port = 8080
@@ -191,6 +227,42 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea.drpc.org",
+          "https://linea-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "324" = {
+        providers = [
+          "https://1rpc.io/zksync2-era",
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "137" = {
+        providers = [
+          "https://polygon.drpc.org",
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll.drpc.org",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://taiko.drpc.org",
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://avalanche.drpc.org",
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc"
         ]
       }
     }
@@ -264,6 +336,42 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea.drpc.org",
+          "https://linea-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "324" = {
+        providers = [
+          "https://1rpc.io/zksync2-era",
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "137" = {
+        providers = [
+          "https://polygon.drpc.org",
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll.drpc.org",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://taiko.drpc.org",
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://avalanche.drpc.org",
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc"
         ]
       }
     }
@@ -391,6 +499,42 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea.drpc.org",
+          "https://linea-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "324" = {
+        providers = [
+          "https://1rpc.io/zksync2-era",
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "137" = {
+        providers = [
+          "https://polygon.drpc.org",
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll.drpc.org",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://taiko.drpc.org",
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://avalanche.drpc.org",
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc"
         ]
       }
     }
