@@ -69,6 +69,16 @@ abstract contract Everclear {
   address public EVERCLEAR_ISM = address(0); // using default ISM
 }
 
+abstract contract Ethereum {
+  uint32 public constant ETHEREUM = 1;
+  IMailbox public ETHEREUM_MAILBOX = IMailbox(0xc005dc82818d67AF737725bD4bf75435d065D239); // https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/cfb890dc6bf66c62e7d3176cc01197f334ba96cf/rust/config/mainnet_config.json#L632C19-L632C61
+
+  IEverclearSpoke public ETHEREUM_SPOKE = IEverclearSpoke(0xD95Ff203bAAd65A8Fafd5C3dB695FC0a77A809a3);
+  ISpokeGateway public ETHEREUM_SPOKE_GATEWAY = ISpokeGateway(0xF712520F89d295dFdcC4d71B7E8787c060f44e39);
+  ICallExecutor public ETHEREUM_EXECUTOR = ICallExecutor(0xcA48aCE7387574a6120392722eB6f2018C60eF3B);
+  address public ETHEREUM_SPOKE_IMPL = 0x8B5401516fBf40621fec17A3b8D15D5E16754107;
+}
+
 abstract contract ArbitrumOne {
   uint32 public constant ARBITRUM_ONE = 42_161;
   IMailbox public ARBITRUM_ONE_MAILBOX = IMailbox(0x979Ca5202784112f4738403dBec5D0F3B9daabB9); // https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/cfb890dc6bf66c62e7d3176cc01197f334ba96cf/rust/config/mainnet_config.json#L98
@@ -76,6 +86,7 @@ abstract contract ArbitrumOne {
   IEverclearSpoke public ARBITRUM_ONE_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
   ISpokeGateway public ARBITRUM_ONE_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
   ICallExecutor public ARBITRUM_ONE_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
+  address public ARBITRUM_SPOKE_IMPL = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
 }
 
 abstract contract Optimism {
@@ -85,6 +96,7 @@ abstract contract Optimism {
   IEverclearSpoke public OPTIMISM_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
   ISpokeGateway public OPTIMISM_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
   ICallExecutor public OPTIMISM_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
+  address public OPTIMISM_SPOKE_IMPL = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
 }
 
 abstract contract Zircuit {
@@ -105,7 +117,7 @@ abstract contract Blast {
   ICallExecutor public BLAST_EXECUTOR = ICallExecutor(0x88F16B8Cc37f0b07794e6c720DBeA3E792043966);
 }
 
-abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast {}
+abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum {}
 
 abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDomains {
   using TypeCasts for address;

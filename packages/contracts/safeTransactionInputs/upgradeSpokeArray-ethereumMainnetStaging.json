@@ -1,0 +1,19 @@
+{
+  "chainId": "1",
+  "createdAt": "1734288611000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade Ethereum Mainnet Staging",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xD95Ff203bAAd65A8Fafd5C3dB695FC0a77A809a3",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000259f03d45ea8de916a935e388024cf86d893244a00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

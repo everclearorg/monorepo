@@ -494,9 +494,10 @@ contract Unit_Intent is BaseTest {
    * @param _intent The intent to add
    */
   function test_NewIntent(
-    IEverclear.Intent calldata _intent
+    IEverclear.Intent memory _intent
   ) public {
     _validIntent(_intent);
+    _intent = _limitDestinationLengthTo10(_intent);
 
     _newIntent(_intent, 1);
   }
@@ -533,9 +534,10 @@ contract Unit_Intent is BaseTest {
    * @param _permit2Params The permit2 parameters
    */
   function test_NewIntentPermit2(
-    IEverclear.Intent calldata _intent,
+    IEverclear.Intent memory _intent,
     IEverclearSpoke.Permit2Params calldata _permit2Params
   ) public {
+    _intent = _limitDestinationLengthTo10(_intent);
     (IEverclear.Intent memory _intentMessage, bytes32 _intentId) = _createValidIntent(_intent, 1);
 
     vm.mockCall(Constants.PERMIT2, abi.encodeWithSelector(IPermit2.permitTransferFrom.selector), abi.encode(true));
@@ -624,11 +626,13 @@ contract Unit_Intent is BaseTest {
    * @param _intent The intent to add
    */
   function test_Revert_NewIntent_MaxFeeExceeded(
-    IEverclear.Intent calldata _intent
+    IEverclear.Intent memory _intent
   ) public {
-    vm.assume(_intent.amount > 0);
     vm.assume(_intent.destinations.length > 1);
+    vm.assume(_intent.amount > 0);
     vm.assume(_intent.maxFee > Constants.DBPS_DENOMINATOR);
+    _intent = _limitDestinationLengthTo10(_intent);
+
     vm.expectRevert(
       abi.encodeWithSelector(
         IEverclearSpoke.EverclearSpoke_NewIntent_MaxFeeExceeded.selector, _intent.maxFee, Constants.DBPS_DENOMINATOR
@@ -652,12 +656,13 @@ contract Unit_Intent is BaseTest {
    * @param _intent The intent to add
    */
   function test_Revert_NewIntent_CalldataExceedsLimit(
-    IEverclear.Intent calldata _intent
+    IEverclear.Intent memory _intent
   ) public {
     vm.assume(_intent.amount > 0);
     vm.assume(_intent.destinations.length > 1);
     vm.assume(_intent.maxFee < Constants.DBPS_DENOMINATOR);
     vm.assume(_intent.data.length > 0);
+    _intent = _limitDestinationLengthTo10(_intent);
 
     // Create a fixed array of 50,000 zero bytes
     bytes memory fixedData = new bytes(50_000);
@@ -678,6 +683,30 @@ contract Unit_Intent is BaseTest {
       _intent.maxFee,
       0,
       largeData
+    );
+  }
+
+  /**
+   * @notice Tests the newIntent function fails when the destination array is > 10
+   * @param _intent The intent to add
+   */
+  function test_Revert_NewIntent_InvalidIntent(
+    IEverclear.Intent calldata _intent
+  ) public {
+    vm.assume(_intent.amount > 0);
+    vm.assume(_intent.destinations.length > 10);
+    vm.assume(_intent.maxFee > Constants.DBPS_DENOMINATOR);
+    vm.expectRevert(abi.encodeWithSelector(IEverclearSpoke.EverclearSpoke_NewIntent_InvalidIntent.selector));
+
+    everclearSpoke.newIntent(
+      _intent.destinations,
+      _intent.receiver.toAddress(),
+      _intent.inputAsset.toAddress(),
+      address(0),
+      _intent.amount,
+      _intent.maxFee,
+      0,
+      _intent.data
     );
   }
 }
