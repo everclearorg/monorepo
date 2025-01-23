@@ -96,5 +96,10 @@
     "solhint": "github:solhint-community/solhint-community#v4.0.0-rc01",
     "sort-package-json": "1.53.1",
     "typescript": "^5.5.4"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "name": "@everclear-org/contracts"
   }
 }

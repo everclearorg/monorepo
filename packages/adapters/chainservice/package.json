@@ -40,5 +40,10 @@
     "ethers": "5.7.2",
     "interval-promise": "1.4.0",
     "p-queue": "6.6.2"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "name": "@everclear-org/chainservice"
   }
 }

@@ -49,5 +49,10 @@
     "hyperid": "3.2.0",
     "secp256k1": "4.0.3",
     "sinon-chai": "3.7.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "name": "@everclear-org/utils"
   }
 }
