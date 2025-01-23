@@ -121,7 +121,7 @@ jobs:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           workspaces=(
-            "packages/utils:@everclear-org/utils"
+            "packages/utils:@chimera-monorepo/utils"
           )
 
           for entry in "${workspaces[@]}"; do
@@ -168,8 +168,8 @@ jobs:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           workspaces=(
-            "packages/utils:@everclear-org/utils"
-            "packages/contracts:@everclear-org/contracts"
+            "packages/utils:@chimera-monorepo/utils"
+            "packages/contracts:@chimera-monorepo/contracts"
           )
 
           for entry in "${workspaces[@]}"; do
@@ -216,8 +216,8 @@ jobs:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           workspaces=(
-            "packages/utils:@everclear-org/utils"
-            "packages/adapters/chainservice:@everclear-org/chainservice"
+            "packages/utils:@chimera-monorepo/utils"
+            "packages/adapters/chainservice:@chimera-monorepo/chainservice"
           )
 
           for entry in "${workspaces[@]}"; do
