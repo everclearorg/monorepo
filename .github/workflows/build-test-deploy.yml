@@ -216,7 +216,7 @@ jobs:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           workspaces=(
-            "packages/utils:@chimera-monorepo/utils",
+            "packages/utils:@chimera-monorepo/utils"
             "packages/adapters/chainservice:@chimera-monorepo/chainservice"
           )
 
