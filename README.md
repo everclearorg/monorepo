@@ -12,3 +12,17 @@ Solidity smart contracts for the on-chain logic of the protocol. These are categ
 
 ### Utils
 
+### Chainservice
+
+To publish the npm package:
+- Update version in `package.json`
+- Run:
+
+    ```
+   git tag -a chainservice-v<VERSION>
+   ```
+- Push tag
+
+   ```
+  git push origin chainservice-v<VERSION>
+   ```
