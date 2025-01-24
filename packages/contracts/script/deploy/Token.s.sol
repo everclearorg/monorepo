@@ -3,7 +3,7 @@ pragma solidity 0.8.25;
 
 import {Script} from 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
-import {ERC20} from 'isolmate/tokens/ERC20.sol';
+import {ERC20} from 'solmate/src/tokens/ERC20.sol';
 
 interface IXERC20Factory {
   function deployXERC20(
