@@ -48,6 +48,9 @@ alfajores = "${ALFAJORES_RPC}"
 everclear-sepolia = "${EVERCLEAR_SEPOLIA_RPC}"
 everclear = "${EVERCLEAR_RPC}"
 zircuit = "${ZIRCUIT_RPC}"
+linea = "${LINEA_RPC}"
+polygon = "${POLYGON_RPC}"
+avalanche = "${AVALANCHE_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
@@ -59,3 +62,6 @@ bsc = { key = "${BNBSCAN_API_KEY}", chain = "bsc", url = "https://api-testnet.bs
 everclear-sepolia = { key = "${EVERCLEAR_API_KEY}", chain = "6398", url = "https://connext-sepolia.blockscout.com/api" }
 everclear = { key = "${EVERCLEAR_API_KEY}", chain = "25327", url = "https://scan.everclear.org/api/v2" }
 zircuit = { key = "${ZIRCUITSCAN_API_KEY}", chain = "48900", url = "https://explorer.zircuit.com/api/contractVerifyHardhat" }
+linea = { key = "${LINEA_API_KEY}", chain = "59144", url = "https://api.lineascan.build/api" }
+polygon = { key = "${POLYGONSCAN_API_KEY}", chain = "137", url = "https://api.polygonscan.com/api" }
+avalanche = { key = "${AVALANCHESCAN_API_KEY}", chain = "43114", url = "https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan" }

@@ -81,6 +81,15 @@ import ProductionSpokeGatewayZircuit from './production/48900/SpokeGateway.json'
 import ProductionEverclearSpokeBlast from './production/81457/EverclearSpoke.json';
 import ProductionSpokeGatewayBlast from './production/81457/SpokeGateway.json';
 
+import ProductionEverclearSpokePolygon from './production/137/EverclearSpoke.json';
+import ProductionSpokeGatewayPolygon from './production/137/SpokeGateway.json';
+
+import ProductionEverclearSpokeAvalanche from './production/43114/EverclearSpoke.json';
+import ProductionSpokeGatewayAvalanche from './production/43114/SpokeGateway.json';
+
+import ProductionEverclearSpokeLinea from './production/59144/EverclearSpoke.json';
+import ProductionSpokeGatewayLinea from './production/59144/SpokeGateway.json';
+
 export const Deployments = {
   local: {},
   production: {
@@ -144,6 +153,17 @@ export const Deployments = {
       everclear: ProductionEverclearSpokeBlast,
       gateway: ProductionSpokeGatewayBlast,
     },
+    137: {
+      everclear: ProductionEverclearSpokePolygon,
+      gateway: ProductionSpokeGatewayPolygon,
+    },
+    43114: {
+      everclear: ProductionEverclearSpokeAvalanche,
+      gateway: ProductionSpokeGatewayAvalanche,
+    },
+    59144: {
+      everclear: ProductionEverclearSpokeLinea,
+      gateway: ProductionSpokeGatewayLinea,
   },
   staging: {
     //////// Testnet Staging Deployments ////////
