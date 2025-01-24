@@ -53,6 +53,6 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public",
-    "name": "@everclear-org/utils"
+    "name": "@chimera-monorepo/utils"
   }
 }

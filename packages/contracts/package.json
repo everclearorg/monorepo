@@ -100,6 +100,6 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public",
-    "name": "@everclear-org/contracts"
+    "name": "@chimera-monorepo/contracts"
   }
 }

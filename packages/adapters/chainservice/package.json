@@ -44,6 +44,6 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public",
-    "name": "@everclear-org/chainservice"
+    "name": "@chimera-monorepo/chainservice"
   }
 }
