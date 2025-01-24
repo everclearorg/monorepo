@@ -376,8 +376,8 @@ locals {
       txService = "https://transaction-testnet.safe.everclear.org/api"
       safeAddress = "0xd1463D828D8d8097DfD6788f364a2D6fDCBB84D4"
       signer = "${var.lighthouse_web3_signer_private_key}"
-      masterCopy = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"
-      fallbackHandler = "0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99"
+      masterCopyAddress = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"
+      fallbackHandlerAddress = "0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99"
     }
     betterUptime = {
       apiKey = var.betteruptime_api_key
