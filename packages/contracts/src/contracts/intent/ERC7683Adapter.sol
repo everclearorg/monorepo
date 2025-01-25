@@ -20,10 +20,6 @@ contract ERC7683Adapter is IDestinationSettler {
     // The EverclearSpoke contract this adapter wraps
     IEverclearSpoke public immutable everclearSpoke;
 
-    // ERC-7683 interface ID
-    // TODO what is this?
-    bytes4 private constant INTENT_INTERFACE_ID = 0x6b6b2482;
-
     constructor(address _everclearSpoke) {
         everclearSpoke = IEverclearSpoke(_everclearSpoke);
     }
@@ -67,7 +63,7 @@ contract ERC7683Adapter is IDestinationSettler {
         maxSpent[0] = Output({
             token: inputAsset.toBytes32(),
             amount: amount,
-            recipient: address(this).toBytes32(), // Tokens are held by this adapter
+            recipient: receiver.toBytes32(),
             chainId: block.chainid
         });
 
@@ -147,14 +143,5 @@ contract ERC7683Adapter is IDestinationSettler {
     ) internal pure returns (bytes32 intentId, uint256 executionAmount) {
         intentId = keccak256(abi.encode(intent));
         executionAmount = intent.amount - ((intent.amount * fee) / 10000);
-    }
-
-    /**
-     * @notice Implementation of IERC165 interface detection
-     * @param interfaceId The interface identifier to check
-     * @return bool True if the contract implements the interface
-     */
-    function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
-        return interfaceId == INTENT_INTERFACE_ID || interfaceId == type(IERC165).interfaceId;
     }
 } 
