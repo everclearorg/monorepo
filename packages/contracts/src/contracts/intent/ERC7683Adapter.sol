@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.28;
+pragma solidity 0.8.25;
 
-import {ERC7683, IDestinationSettler, ResolvedCrossChainOrder, Output, FillInstruction} from 'contracts/intent/ERC7683.sol';
+import {IDestinationSettler, ResolvedCrossChainOrder, Output, FillInstruction} from 'contracts/intent/ERC7683.sol';
 import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
@@ -20,8 +20,32 @@ contract ERC7683Adapter is IDestinationSettler {
     // The EverclearSpoke contract this adapter wraps
     IEverclearSpoke public immutable everclearSpoke;
 
-    constructor(address _everclearSpoke) {
+    // Fixed period for fill deadline
+    uint32 public immutable FILL_DEADLINE_PERIOD;
+
+    // Group related parameters to reduce stack variables
+    struct IntentParams {
+        uint32[] destinations;
+        address receiver;
+        address inputAsset;
+        address outputAsset;
+        uint256 amount;
+        uint24 maxFee;
+        uint48 ttl;
+        bytes data;
+    }
+
+    struct OrderParams {
+        address user;
+        uint32 destinationChainId;
+        uint48 ttl;
+        bytes32 orderId;
+        uint32 timestamp;
+    }
+
+    constructor(address _everclearSpoke, uint32 _fillDeadlinePeriod) {
         everclearSpoke = IEverclearSpoke(_everclearSpoke);
+        FILL_DEADLINE_PERIOD = _fillDeadlinePeriod;
     }
 
     /**
@@ -46,55 +70,37 @@ contract ERC7683Adapter is IDestinationSettler {
         uint48 ttl,
         bytes calldata data
     ) external returns (bytes32 intentId) {
-        // Call EverclearSpoke's newIntent
-        (intentId, IEverclear.Intent memory intent) = everclearSpoke.newIntent(
-            destinations,
-            receiver,
-            inputAsset,
-            outputAsset,
-            amount,
-            maxFee,
-            ttl,
-            data
-        );
-
-        // Create and emit the ERC-7683 Open event
-        Output[] memory maxSpent = new Output[](1);
-        maxSpent[0] = Output({
-            token: inputAsset.toBytes32(),
+        IntentParams memory params = IntentParams({
+            destinations: destinations,
+            receiver: receiver,
+            inputAsset: inputAsset,
+            outputAsset: outputAsset,
             amount: amount,
-            recipient: receiver.toBytes32(),
-            chainId: block.chainid
+            maxFee: maxFee,
+            ttl: ttl,
+            data: data
         });
 
-        Output[] memory minReceived = new Output[](1);
-        minReceived[0] = Output({
-            token: outputAsset.toBytes32(),
-            amount: amount - ((amount * maxFee) / 10000), // Amount after max fee
-            recipient: receiver.toBytes32(),
-            chainId: uint256(destinations[0]) // First destination chain
-        });
-
-        FillInstruction[] memory fillInstructions = new FillInstruction[](1);
-        fillInstructions[0] = FillInstruction({
-            destinationChainId: destinations[0],
-            destinationSettler: address(this).toBytes32(), // This adapter acts as settler
-            originData: data
-        });
-
-        emit Open(
-            intentId,
-            ResolvedCrossChainOrder({
-                user: msg.sender,
-                originChainId: block.chainid,
-                openDeadline: uint32(block.timestamp), // Already opened
-                fillDeadline: ttl > 0 ? uint32(block.timestamp + ttl) : 0, // TODO fix this
-                orderId: intentId,
-                maxSpent: maxSpent,
-                minReceived: minReceived,
-                fillInstructions: fillInstructions
-            })
+        (intentId,) = everclearSpoke.newIntent(
+            params.destinations,
+            params.receiver,
+            params.inputAsset,
+            params.outputAsset,
+            params.amount,
+            params.maxFee,
+            params.ttl,
+            params.data
         );
+
+        OrderParams memory orderParams = OrderParams({
+            user: msg.sender,
+            destinationChainId: destinations[0],
+            ttl: ttl,
+            orderId: intentId,
+            timestamp: uint32(block.timestamp)
+        });
+
+        emit Open(intentId, _createResolvedOrder(orderParams, params));
     }
 
     /**
@@ -130,18 +136,74 @@ contract ERC7683Adapter is IDestinationSettler {
         );
     }
 
-    /**
-     * @notice Calculate the execution amount after fees
-     * @param intent The intent structure
-     * @param fee The fee in basis points
-     * @return intentId The ID of the intent
-     * @return executionAmount The amount after fees
-     */
-    function _calculateExecutionAmount(
-        IEverclear.Intent calldata intent,
-        uint24 fee
-    ) internal pure returns (bytes32 intentId, uint256 executionAmount) {
-        intentId = keccak256(abi.encode(intent));
-        executionAmount = intent.amount - ((intent.amount * fee) / 10000);
+    function _createOutput(
+        bytes32 token,
+        uint256 amount,
+        bytes32 recipient,
+        uint256 chainId
+    ) internal pure returns (Output memory) {
+        return Output({
+            token: token,
+            amount: amount,
+            recipient: recipient,
+            chainId: chainId
+        });
+    }
+
+    function _createMaxSpent(
+        IntentParams memory params
+    ) internal view returns (Output[] memory) {
+        Output[] memory maxSpent = new Output[](1);
+        maxSpent[0] = _createOutput(
+            params.inputAsset.toBytes32(),
+            params.amount,
+            params.receiver.toBytes32(),
+            block.chainid
+        );
+        return maxSpent;
+    }
+
+    function _createMinReceived(
+        IntentParams memory params,
+        uint256 destinationChainId
+    ) internal pure returns (Output[] memory) {
+        Output[] memory minReceived = new Output[](1);
+        uint256 amountAfterFees = params.amount - ((params.amount * params.maxFee) / 10000);
+        minReceived[0] = _createOutput(
+            params.outputAsset.toBytes32(),
+            amountAfterFees,
+            params.receiver.toBytes32(),
+            destinationChainId
+        );
+        return minReceived;
+    }
+
+    function _createFillInstructions(
+        uint32 destinationChainId,
+        bytes memory data
+    ) internal view returns (FillInstruction[] memory) {
+        FillInstruction[] memory instructions = new FillInstruction[](1);
+        instructions[0] = FillInstruction({
+            destinationChainId: destinationChainId,
+            destinationSettler: address(this).toBytes32(),
+            originData: data
+        });
+        return instructions;
+    }
+
+    function _createResolvedOrder(
+        OrderParams memory orderParams,
+        IntentParams memory intentParams
+    ) internal view returns (ResolvedCrossChainOrder memory) {
+        return ResolvedCrossChainOrder({
+            user: orderParams.user,
+            originChainId: block.chainid,
+            openDeadline: orderParams.timestamp,
+            fillDeadline: uint32(orderParams.timestamp + FILL_DEADLINE_PERIOD),
+            orderId: orderParams.orderId,
+            maxSpent: _createMaxSpent(intentParams),
+            minReceived: _createMinReceived(intentParams, orderParams.destinationChainId),
+            fillInstructions: _createFillInstructions(orderParams.destinationChainId, intentParams.data)
+        });
     }
 } 
