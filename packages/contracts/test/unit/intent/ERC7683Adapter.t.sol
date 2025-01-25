@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {Test} from 'forge-std/Test.sol';
+import {Test, Vm} from 'forge-std/Test.sol';
 import {Mocker} from 'test/utils/mocks/Mocker.sol';
 import {ERC7683Adapter} from 'contracts/intent/ERC7683Adapter.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
@@ -118,21 +118,8 @@ contract ERC7683AdapterTest is Test, Mocker {
             originData: data
         });
 
-        // Expect the Open event with correct parameters
-        vm.expectEmit(true, true, true, true);
-        emit Open(
-            bytes32(0), // We don't know the exact intentId yet, but we can verify the rest
-            ResolvedCrossChainOrder({
-                user: USER,
-                originChainId: block.chainid,
-                openDeadline: uint32(block.timestamp),
-                fillDeadline: uint32(block.timestamp + 1 days),
-                orderId: bytes32(0), // Will be filled in by the contract
-                maxSpent: expectedMaxSpent,
-                minReceived: expectedMinReceived,
-                fillInstructions: expectedFillInstructions
-            })
-        );
+        // Record logs
+        vm.recordLogs();
 
         // Execute newIntent as USER
         vm.prank(USER);
@@ -147,8 +134,55 @@ contract ERC7683AdapterTest is Test, Mocker {
             data
         );
 
-        // Verify intentId is not zero
-        assertTrue(intentId != bytes32(0), 'Intent ID should not be zero');
+        // Get the logs
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+        
+        // Find the Open event
+        bool foundOpenEvent = false;
+        for (uint i = 0; i < logs.length; i++) {
+            // Check if this is the Open event
+            if (logs[i].topics[0] == keccak256("Open(bytes32,(address,uint256,uint32,uint32,bytes32,(bytes32,uint256,bytes32,uint256)[],(bytes32,uint256,bytes32,uint256)[],(uint64,bytes32,bytes)[]))")) {
+                foundOpenEvent = true;
+                
+                // The orderId is in topics[1]
+                bytes32 emittedOrderId = logs[i].topics[1];
+                
+                // Decode the ResolvedCrossChainOrder from data
+                ResolvedCrossChainOrder memory emittedOrder = abi.decode(logs[i].data, (ResolvedCrossChainOrder));
+                
+                // Verify each field
+                assertEq(emittedOrderId, intentId, "OrderId mismatch");
+                assertEq(emittedOrder.user, USER, "User mismatch");
+                assertEq(emittedOrder.originChainId, block.chainid, "OriginChainId mismatch");
+                assertEq(emittedOrder.openDeadline, uint32(block.timestamp), "OpenDeadline mismatch");
+                assertEq(emittedOrder.fillDeadline, uint32(block.timestamp + 1 days), "FillDeadline mismatch");
+                assertEq(emittedOrder.orderId, intentId, "OrderId in struct mismatch");
+                
+                // Verify maxSpent
+                assertEq(emittedOrder.maxSpent.length, 1, "MaxSpent length mismatch");
+                assertEq(emittedOrder.maxSpent[0].token, expectedMaxSpent[0].token, "MaxSpent token mismatch");
+                assertEq(emittedOrder.maxSpent[0].amount, expectedMaxSpent[0].amount, "MaxSpent amount mismatch");
+                assertEq(emittedOrder.maxSpent[0].recipient, expectedMaxSpent[0].recipient, "MaxSpent recipient mismatch");
+                assertEq(emittedOrder.maxSpent[0].chainId, expectedMaxSpent[0].chainId, "MaxSpent chainId mismatch");
+                
+                // Verify minReceived
+                assertEq(emittedOrder.minReceived.length, 1, "MinReceived length mismatch");
+                assertEq(emittedOrder.minReceived[0].token, expectedMinReceived[0].token, "MinReceived token mismatch");
+                assertEq(emittedOrder.minReceived[0].amount, expectedMinReceived[0].amount, "MinReceived amount mismatch");
+                assertEq(emittedOrder.minReceived[0].recipient, expectedMinReceived[0].recipient, "MinReceived recipient mismatch");
+                assertEq(emittedOrder.minReceived[0].chainId, expectedMinReceived[0].chainId, "MinReceived chainId mismatch");
+                
+                // Verify fillInstructions
+                assertEq(emittedOrder.fillInstructions.length, 1, "FillInstructions length mismatch");
+                assertEq(emittedOrder.fillInstructions[0].destinationChainId, expectedFillInstructions[0].destinationChainId, "FillInstructions destinationChainId mismatch");
+                assertEq(emittedOrder.fillInstructions[0].destinationSettler, expectedFillInstructions[0].destinationSettler, "FillInstructions destinationSettler mismatch");
+                assertEq(emittedOrder.fillInstructions[0].originData, expectedFillInstructions[0].originData, "FillInstructions originData mismatch");
+                
+                break;
+            }
+        }
+        
+        assertTrue(foundOpenEvent, "Open event not found");
 
         // Verify the mock was called correctly
         assertTrue(everclearSpoke.status(intentId) == IEverclear.IntentStatus.ADDED, 'Intent status not set to ADDED');
