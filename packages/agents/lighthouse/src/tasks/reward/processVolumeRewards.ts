@@ -318,7 +318,10 @@ export const processVolumeRewards = async (
           // rewardPercentage = chainRewardPercentage * userRewardPercentage
           // variableReward (in token) = variablePool * rewardPercentage
           const divisor = totalVote.mul(totalVolume[domain]);
-          const domainVariableReward = epochResult.scaledUserVolume.mul(domainVoteMap[domain] ?? 0).div(divisor);
+          const domainVariableReward = variableRewardsPool
+            .mul(epochResult.scaledUserVolume)
+            .mul(domainVoteMap[domain] ?? 0)
+            .div(divisor);
 
           if (domainVariableReward.lt(0)) {
             const error = new InvalidState({
