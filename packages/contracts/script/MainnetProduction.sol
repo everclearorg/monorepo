@@ -181,7 +181,7 @@ abstract contract Avalanche {
   ICallExecutor public AVALANCHE_EXECUTOR = ICallExecutor(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
 }
 
-abstract contract zkSync {
+abstract contract ZkSync {
   uint32 public constant ZKSYNC = 324;
   IMailbox public ZKSYNC_MAILBOX = IMailbox(0x6bD0A2214797Bc81e0b006F7B74d6221BcD8cb6E);
 
@@ -202,7 +202,7 @@ abstract contract MainnetProductionDomains is
   Linea,
   Polygon,
   Avalanche,
-  zkSync
+  ZkSync
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
@@ -262,11 +262,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: LINEA,
-        blockGasLimit: 24_000_000,
-        gateway: address(LINEA_SPOKE_GATEWAY).toBytes32()
-      })
+      DomainAndGateway({chainId: LINEA, blockGasLimit: 24_000_000, gateway: address(LINEA_SPOKE_GATEWAY).toBytes32()})
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
@@ -293,7 +289,8 @@ abstract contract MainnetProductionEnvironment is
   MainnetAssets,
   MainnetProductionSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ETHEREUM, ARBITRUM_ONE, OPTIMISM, BASE, BNB, ZIRCUIT, BLAST, LINEA, POLYGON, AVALANCHE];
+  uint32[] public SUPPORTED_DOMAINS =
+    [ETHEREUM, ARBITRUM_ONE, OPTIMISM, BASE, BNB, ZIRCUIT, BLAST, LINEA, POLYGON, AVALANCHE];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed
