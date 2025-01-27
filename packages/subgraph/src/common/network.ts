@@ -17,7 +17,7 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(97);
   } else if (network == 'gnosis') {
     chainId = BigInt.fromI32(100);
-  } else if (network == 'polygon') {
+  } else if (network == 'matic') {
     chainId = BigInt.fromI32(137);
   } else if (network == 'fantom') {
     chainId = BigInt.fromI32(250);

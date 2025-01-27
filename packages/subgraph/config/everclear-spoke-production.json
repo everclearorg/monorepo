@@ -133,7 +133,7 @@
     "subgraphName": "everclear-spoke-polygon",
     "domain": "137",
     "environment": "production",
-    "network": "polygon",
+    "network": "matic",
     "indexers": [
       "goldsky"
     ]
