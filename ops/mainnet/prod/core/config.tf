@@ -150,12 +150,12 @@ locals {
           "https://scroll-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
-      "167000" = {
-        providers = [
-          "https://taiko.drpc.org",
-          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-        ]
-      }
+      # "167000" = {
+      #   providers = [
+      #     "https://taiko.drpc.org",
+      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+      #   ]
+      # }
       "43114" = {
         providers = [
           "https://avalanche.drpc.org",
@@ -253,12 +253,12 @@ locals {
           "https://scroll-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
-      "167000" = {
-        providers = [
-          "https://taiko.drpc.org",
-          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-        ]
-      }
+      # "167000" = {
+      #   providers = [
+      #     "https://taiko.drpc.org",
+      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+      #   ]
+      # }
       "43114" = {
         providers = [
           "https://avalanche.drpc.org",
@@ -362,12 +362,12 @@ locals {
           "https://scroll-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
-      "167000" = {
-        providers = [
-          "https://taiko.drpc.org",
-          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-        ]
-      }
+      # "167000" = {
+      #   providers = [
+      #     "https://taiko.drpc.org",
+      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+      #   ]
+      # }
       "43114" = {
         providers = [
           "https://avalanche.drpc.org",
@@ -525,12 +525,12 @@ locals {
           "https://scroll-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
-      "167000" = {
-        providers = [
-          "https://taiko.drpc.org",
-          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-        ]
-      }
+      # "167000" = {
+      #   providers = [
+      #     "https://taiko.drpc.org",
+      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+      #   ]
+      # }
       "43114" = {
         providers = [
           "https://avalanche.drpc.org",
