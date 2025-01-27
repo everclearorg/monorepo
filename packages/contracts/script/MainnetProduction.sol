@@ -39,6 +39,9 @@ abstract contract MainnetAssets {
   address public constant OPTIMISM_WETH = 0x4200000000000000000000000000000000000006;
   address public constant BNB_WETH = 0x2170Ed0880ac9A755fd29B2688956BD959F933F8;
   address public constant BLAST_WETH = 0x4300000000000000000000000000000000000004;
+  address public constant LINEA_WETH = 0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f;
+  address public constant POLYGON_WETH = 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619;
+  address public constant AVALANCHE_WETH = 0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB; // NOTE: WETH.e
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base
@@ -46,6 +49,9 @@ abstract contract MainnetAssets {
   address public constant ARBITRUM_USDT = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
   address public constant OPTIMISM_USDT = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58;
   address public constant BNB_USDT = 0x55d398326f99059fF775485246999027B3197955;
+  address public constant LINEA_USDT = 0xA219439258ca9da29E9Cc4cE5596924745e12B93;
+  address public constant POLYGON_USDT = 0xc2132D05D31c914a87C6611C10748AEb04B58e8F;
+  address public constant AVALANCHE_USDT = 0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7;
 
   ///////////////////// USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -53,6 +59,9 @@ abstract contract MainnetAssets {
   address public constant ARBITRUM_USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831; // NOT USDC.e
   address public constant OPTIMISM_USDC = 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85; // NOT USDC.e
   address public constant BNB_USDC = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
+  address public constant LINEA_USDC = 0x176211869cA2b568f2A7D4EE941E073a821EE1ff; // USDC.e
+  address public constant POLYGON_USDC = 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359;
+  address public constant AVALANCHE_USDC = 0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
@@ -145,7 +154,56 @@ abstract contract Blast {
   ICallExecutor public BLAST_EXECUTOR = ICallExecutor(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
 }
 
-abstract contract MainnetProductionDomains is Everclear, Ethereum, ArbitrumOne, Base, Optimism, Bnb, Zircuit, Blast {}
+abstract contract Linea {
+  uint32 public constant LINEA = 59_144;
+  IMailbox public LINEA_MAILBOX = IMailbox(0x02d16BC51af6BfD153d67CA61754cF912E82C4d9);
+
+  IEverclearSpoke public LINEA_SPOKE = IEverclearSpoke(0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751);
+  ISpokeGateway public LINEA_SPOKE_GATEWAY = ISpokeGateway(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
+  ICallExecutor public LINEA_EXECUTOR = ICallExecutor(0x7480BAeD22695AeA229fDD280a5194d51dc54A21);
+}
+
+abstract contract Polygon {
+  uint32 public constant POLYGON = 137;
+  IMailbox public POLYGON_MAILBOX = IMailbox(0x5d934f4e2f797775e53561bB72aca21ba36B96BB);
+
+  IEverclearSpoke public POLYGON_SPOKE = IEverclearSpoke(0x7189C59e245135696bFd2906b56607755F84F3fD);
+  ISpokeGateway public POLYGON_SPOKE_GATEWAY = ISpokeGateway(0x26CFF54f11608Cd3060408690803AB4a43f462f2);
+  ICallExecutor public POLYGON_EXECUTOR = ICallExecutor(0xd08c4718A58bf1f13F540dAEB170f22533d292b7);
+}
+
+abstract contract Avalanche {
+  uint32 public constant AVALANCHE = 43_114;
+  IMailbox public AVALANCHE_MAILBOX = IMailbox(0xFf06aFcaABaDDd1fb08371f9ccA15D73D51FeBD6);
+
+  IEverclearSpoke public AVALANCHE_SPOKE = IEverclearSpoke(0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460);
+  ISpokeGateway public AVALANCHE_SPOKE_GATEWAY = ISpokeGateway(0x7EB63a646721de65eBa79ffe91c55DCE52b73c12);
+  ICallExecutor public AVALANCHE_EXECUTOR = ICallExecutor(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
+}
+
+abstract contract ZkSync {
+  uint32 public constant ZKSYNC = 324;
+  IMailbox public ZKSYNC_MAILBOX = IMailbox(0x6bD0A2214797Bc81e0b006F7B74d6221BcD8cb6E);
+
+  // IEverclearSpoke public ZKSYNC_SPOKE;
+  // ISpokeGateway public ZKSYNC_SPOKE_GATEWAY;
+  // ICallExecutor public ZKSYNC_EXECUTOR;
+}
+
+abstract contract MainnetProductionDomains is
+  Everclear,
+  Ethereum,
+  ArbitrumOne,
+  Base,
+  Optimism,
+  Bnb,
+  Zircuit,
+  Blast,
+  Linea,
+  Polygon,
+  Avalanche,
+  ZkSync
+{}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
   using TypeCasts for address;
@@ -202,6 +260,26 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: BLAST, blockGasLimit: 30_000_000, gateway: address(BLAST_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: LINEA, blockGasLimit: 24_000_000, gateway: address(LINEA_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({
+        chainId: POLYGON,
+        blockGasLimit: 30_000_000,
+        gateway: address(POLYGON_SPOKE_GATEWAY).toBytes32()
+      })
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({
+        chainId: AVALANCHE,
+        blockGasLimit: 15_000_000,
+        gateway: address(AVALANCHE_SPOKE_GATEWAY).toBytes32()
+      })
+    );
   }
 }
 
@@ -211,7 +289,8 @@ abstract contract MainnetProductionEnvironment is
   MainnetAssets,
   MainnetProductionSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ETHEREUM, ARBITRUM_ONE, OPTIMISM, BASE, BNB, ZIRCUIT, BLAST];
+  uint32[] public SUPPORTED_DOMAINS =
+    [ETHEREUM, ARBITRUM_ONE, OPTIMISM, BASE, BNB, ZIRCUIT, BLAST, LINEA, POLYGON, AVALANCHE];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed
