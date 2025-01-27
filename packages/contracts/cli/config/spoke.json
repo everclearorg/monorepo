@@ -94,5 +94,23 @@
     "domainName": "Blast",
     "domainId": 81457,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0x7189C59e245135696bFd2906b56607755F84F3fD",
+    "domainName": "Polygon",
+    "domainId": 137,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460",
+    "domainName": "Avalanche",
+    "domainId": 43114,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751",
+    "domainName": "Linea",
+    "domainId": 59144,
+    "environment": "MainnetProduction"
   }
 ]

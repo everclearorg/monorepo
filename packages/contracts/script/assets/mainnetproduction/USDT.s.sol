@@ -36,7 +36,7 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](4);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](7);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -74,13 +74,40 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    ///// Linea
+    _assetConfigs[4] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: LINEA_USDT.toBytes32(),
+      domain: LINEA,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Polygon
+    _assetConfigs[5] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: POLYGON_USDT.toBytes32(),
+      domain: POLYGON,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Avalanche
+    _assetConfigs[6] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: AVALANCHE_USDT.toBytes32(),
+      domain: AVALANCHE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
                           TOKEN SETUP 
     //////////////////////////////////////////////////////////////*/
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: true,
+      initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
       maxDiscountDbps: 12, // 1.2 BPS
       discountPerEpoch: 3, // 0.3 BPS
