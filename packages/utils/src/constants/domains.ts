@@ -25,7 +25,7 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [48900, 48900], // Zircuit Mainnet
   [81457, 81457], // Blast mainnet
   [59140, 59140], // Linea Mainnet
-  [167, 167], // Taiko Mainnet
+  [167000, 167000], // Taiko Mainnet
 ]);
 
 const TESTNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
