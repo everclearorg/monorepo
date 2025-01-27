@@ -1,4 +1,3 @@
-
 locals {
   cartographer_env_vars = {
     CARTOGRAPHER_CONFIG = local.local_cartographer_config,
@@ -75,6 +74,42 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.blastapi.io/${var.blast_key}",
+          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      # "324" = {
+      #   providers = [
+      #     "https://1rpc.io/zksync2-era",
+      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+      #   ]
+      # }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      # "534352" = {
+      #   providers = [
+      #     "https://scroll.drpc.org",
+      #     "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+      #   ]
+      # }
+      # "167000" = {
+      #   providers = [
+      #     "https://taiko.drpc.org",
+      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+      #   ]
+      # }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }
