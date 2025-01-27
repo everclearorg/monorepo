@@ -1,2365 +1,940 @@
 {
-    "address": "0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751",
-    "startBlock": 14952261,
-    "abi": [
-        {
-            "type": "constructor",
-            "inputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "DOMAIN",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint32",
-                    "internalType": "uint32"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "EVERCLEAR",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint32",
-                    "internalType": "uint32"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "FILL_INTENT_FOR_SOLVER_TYPEHASH",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "PERMIT2",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "address",
-                    "internalType": "contract IPermit2"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "UPGRADE_INTERFACE_VERSION",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "string",
-                    "internalType": "string"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "balances",
-            "inputs": [
-                {
-                    "name": "_asset",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_user",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "callExecutor",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "address",
-                    "internalType": "contract ICallExecutor"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "deposit",
-            "inputs": [
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "executeIntentCalldata",
-            "inputs": [
-                {
-                    "name": "_intent",
-                    "type": "tuple",
-                    "internalType": "struct IEverclear.Intent",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "fillIntent",
-            "inputs": [
-                {
-                    "name": "_intent",
-                    "type": "tuple",
-                    "internalType": "struct IEverclear.Intent",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                },
-                {
-                    "name": "_fee",
-                    "type": "uint24",
-                    "internalType": "uint24"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "_fillMessage",
-                    "type": "tuple",
-                    "internalType": "struct IEverclear.FillMessage",
-                    "components": [
-                        {
-                            "name": "intentId",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "solver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "fee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "executionTimestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        }
-                    ]
-                }
-            ],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "fillIntentForSolver",
-            "inputs": [
-                {
-                    "name": "_solver",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_intent",
-                    "type": "tuple",
-                    "internalType": "struct IEverclear.Intent",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                },
-                {
-                    "name": "_nonce",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_fee",
-                    "type": "uint24",
-                    "internalType": "uint24"
-                },
-                {
-                    "name": "_signature",
-                    "type": "bytes",
-                    "internalType": "bytes"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "_fillMessage",
-                    "type": "tuple",
-                    "internalType": "struct IEverclear.FillMessage",
-                    "components": [
-                        {
-                            "name": "intentId",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "solver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "fee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "executionTimestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        }
-                    ]
-                }
-            ],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "fillQueue",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "first",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "last",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "gateway",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "address",
-                    "internalType": "contract ISpokeGateway"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "initialize",
-            "inputs": [
-                {
-                    "name": "_init",
-                    "type": "tuple",
-                    "internalType": "struct ISpokeStorage.SpokeInitializationParams",
-                    "components": [
-                        {
-                            "name": "gateway",
-                            "type": "address",
-                            "internalType": "contract ISpokeGateway"
-                        },
-                        {
-                            "name": "callExecutor",
-                            "type": "address",
-                            "internalType": "contract ICallExecutor"
-                        },
-                        {
-                            "name": "messageReceiver",
-                            "type": "address",
-                            "internalType": "address"
-                        },
-                        {
-                            "name": "lighthouse",
-                            "type": "address",
-                            "internalType": "address"
-                        },
-                        {
-                            "name": "watchtower",
-                            "type": "address",
-                            "internalType": "address"
-                        },
-                        {
-                            "name": "hubDomain",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "owner",
-                            "type": "address",
-                            "internalType": "address"
-                        }
-                    ]
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "intentQueue",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "first",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "last",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "lighthouse",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "messageGasLimit",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "messageReceiver",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "modules",
-            "inputs": [
-                {
-                    "name": "_strategy",
-                    "type": "uint8",
-                    "internalType": "enum IEverclear.Strategy"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "_module",
-                    "type": "address",
-                    "internalType": "contract ISettlementModule"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "newIntent",
-            "inputs": [
-                {
-                    "name": "_destinations",
-                    "type": "uint32[]",
-                    "internalType": "uint32[]"
-                },
-                {
-                    "name": "_receiver",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_inputAsset",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_outputAsset",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_maxFee",
-                    "type": "uint24",
-                    "internalType": "uint24"
-                },
-                {
-                    "name": "_ttl",
-                    "type": "uint48",
-                    "internalType": "uint48"
-                },
-                {
-                    "name": "_data",
-                    "type": "bytes",
-                    "internalType": "bytes"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_intent",
-                    "type": "tuple",
-                    "internalType": "struct IEverclear.Intent",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                }
-            ],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "newIntent",
-            "inputs": [
-                {
-                    "name": "_destinations",
-                    "type": "uint32[]",
-                    "internalType": "uint32[]"
-                },
-                {
-                    "name": "_receiver",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_inputAsset",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_outputAsset",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_maxFee",
-                    "type": "uint24",
-                    "internalType": "uint24"
-                },
-                {
-                    "name": "_ttl",
-                    "type": "uint48",
-                    "internalType": "uint48"
-                },
-                {
-                    "name": "_data",
-                    "type": "bytes",
-                    "internalType": "bytes"
-                },
-                {
-                    "name": "_permit2Params",
-                    "type": "tuple",
-                    "internalType": "struct IEverclearSpoke.Permit2Params",
-                    "components": [
-                        {
-                            "name": "nonce",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "deadline",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "signature",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_intent",
-                    "type": "tuple",
-                    "internalType": "struct IEverclear.Intent",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                }
-            ],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "nonce",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint64",
-                    "internalType": "uint64"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "nonces",
-            "inputs": [
-                {
-                    "name": "owner",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "owner",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "pause",
-            "inputs": [],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "paused",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "bool",
-                    "internalType": "bool"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "processFillQueue",
-            "inputs": [
-                {
-                    "name": "_amount",
-                    "type": "uint32",
-                    "internalType": "uint32"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "payable"
-        },
-        {
-            "type": "function",
-            "name": "processFillQueueViaRelayer",
-            "inputs": [
-                {
-                    "name": "_domain",
-                    "type": "uint32",
-                    "internalType": "uint32"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint32",
-                    "internalType": "uint32"
-                },
-                {
-                    "name": "_relayer",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_ttl",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_nonce",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_bufferDBPS",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_signature",
-                    "type": "bytes",
-                    "internalType": "bytes"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "processIntentQueue",
-            "inputs": [
-                {
-                    "name": "_intents",
-                    "type": "tuple[]",
-                    "internalType": "struct IEverclear.Intent[]",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "payable"
-        },
-        {
-            "type": "function",
-            "name": "processIntentQueueViaRelayer",
-            "inputs": [
-                {
-                    "name": "_domain",
-                    "type": "uint32",
-                    "internalType": "uint32"
-                },
-                {
-                    "name": "_intents",
-                    "type": "tuple[]",
-                    "internalType": "struct IEverclear.Intent[]",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                },
-                {
-                    "name": "_relayer",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_ttl",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_nonce",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_bufferDBPS",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_signature",
-                    "type": "bytes",
-                    "internalType": "bytes"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "proxiableUUID",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "receiveMessage",
-            "inputs": [
-                {
-                    "name": "",
-                    "type": "bytes",
-                    "internalType": "bytes"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "renounceOwnership",
-            "inputs": [],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "setModuleForStrategy",
-            "inputs": [
-                {
-                    "name": "_strategy",
-                    "type": "uint8",
-                    "internalType": "enum IEverclear.Strategy"
-                },
-                {
-                    "name": "_module",
-                    "type": "address",
-                    "internalType": "contract ISettlementModule"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "setStrategyForAsset",
-            "inputs": [
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_strategy",
-                    "type": "uint8",
-                    "internalType": "enum IEverclear.Strategy"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "status",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "status",
-                    "type": "uint8",
-                    "internalType": "enum IEverclear.IntentStatus"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "strategies",
-            "inputs": [
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "outputs": [
-                {
-                    "name": "_strategy",
-                    "type": "uint8",
-                    "internalType": "enum IEverclear.Strategy"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "transferOwnership",
-            "inputs": [
-                {
-                    "name": "newOwner",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "unpause",
-            "inputs": [],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "updateGateway",
-            "inputs": [
-                {
-                    "name": "_newGateway",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "updateMessageGasLimit",
-            "inputs": [
-                {
-                    "name": "_newGasLimit",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "updateMessageReceiver",
-            "inputs": [
-                {
-                    "name": "_newMessageReceiver",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "updateSecurityModule",
-            "inputs": [
-                {
-                    "name": "_newSecurityModule",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "function",
-            "name": "upgradeToAndCall",
-            "inputs": [
-                {
-                    "name": "newImplementation",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "data",
-                    "type": "bytes",
-                    "internalType": "bytes"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "payable"
-        },
-        {
-            "type": "function",
-            "name": "watchtower",
-            "inputs": [],
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ],
-            "stateMutability": "view"
-        },
-        {
-            "type": "function",
-            "name": "withdraw",
-            "inputs": [
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ],
-            "outputs": [],
-            "stateMutability": "nonpayable"
-        },
-        {
-            "type": "event",
-            "name": "AssetMintFailed",
-            "inputs": [
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_recipient",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_strategy",
-                    "type": "uint8",
-                    "indexed": false,
-                    "internalType": "enum IEverclear.Strategy"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "AssetTransferFailed",
-            "inputs": [
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_recipient",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "Deposited",
-            "inputs": [
-                {
-                    "name": "_depositant",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "ExternalCalldataExecuted",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "indexed": true,
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_returnData",
-                    "type": "bytes",
-                    "indexed": false,
-                    "internalType": "bytes"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "FillQueueProcessed",
-            "inputs": [
-                {
-                    "name": "_messageId",
-                    "type": "bytes32",
-                    "indexed": true,
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_firstIdx",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_lastIdx",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_quote",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "GatewayUpdated",
-            "inputs": [
-                {
-                    "name": "_oldGateway",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_newGateway",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "Initialized",
-            "inputs": [
-                {
-                    "name": "version",
-                    "type": "uint64",
-                    "indexed": false,
-                    "internalType": "uint64"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "IntentAdded",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "indexed": true,
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_queueIdx",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_intent",
-                    "type": "tuple",
-                    "indexed": false,
-                    "internalType": "struct IEverclear.Intent",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "IntentFilled",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "indexed": true,
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_solver",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_totalFeeDBPS",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_queueIdx",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_intent",
-                    "type": "tuple",
-                    "indexed": false,
-                    "internalType": "struct IEverclear.Intent",
-                    "components": [
-                        {
-                            "name": "initiator",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "receiver",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "inputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "outputAsset",
-                            "type": "bytes32",
-                            "internalType": "bytes32"
-                        },
-                        {
-                            "name": "maxFee",
-                            "type": "uint24",
-                            "internalType": "uint24"
-                        },
-                        {
-                            "name": "origin",
-                            "type": "uint32",
-                            "internalType": "uint32"
-                        },
-                        {
-                            "name": "nonce",
-                            "type": "uint64",
-                            "internalType": "uint64"
-                        },
-                        {
-                            "name": "timestamp",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "ttl",
-                            "type": "uint48",
-                            "internalType": "uint48"
-                        },
-                        {
-                            "name": "amount",
-                            "type": "uint256",
-                            "internalType": "uint256"
-                        },
-                        {
-                            "name": "destinations",
-                            "type": "uint32[]",
-                            "internalType": "uint32[]"
-                        },
-                        {
-                            "name": "data",
-                            "type": "bytes",
-                            "internalType": "bytes"
-                        }
-                    ]
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "IntentQueueProcessed",
-            "inputs": [
-                {
-                    "name": "_messageId",
-                    "type": "bytes32",
-                    "indexed": true,
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_firstIdx",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_lastIdx",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_quote",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "LighthouseUpdated",
-            "inputs": [
-                {
-                    "name": "_oldLightHouse",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_newLightHouse",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "MessageGasLimitUpdated",
-            "inputs": [
-                {
-                    "name": "_oldGasLimit",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_newGasLimit",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "MessageReceiverUpdated",
-            "inputs": [
-                {
-                    "name": "_oldMessageReceiver",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_newMessageReceiver",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "ModuleSetForStrategy",
-            "inputs": [
-                {
-                    "name": "_strategy",
-                    "type": "uint8",
-                    "indexed": false,
-                    "internalType": "enum IEverclear.Strategy"
-                },
-                {
-                    "name": "_module",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "contract ISettlementModule"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "OwnershipTransferred",
-            "inputs": [
-                {
-                    "name": "previousOwner",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "newOwner",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "Paused",
-            "inputs": [],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "Settled",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "indexed": true,
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_account",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "StrategySetForAsset",
-            "inputs": [
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_strategy",
-                    "type": "uint8",
-                    "indexed": false,
-                    "internalType": "enum IEverclear.Strategy"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "Unpaused",
-            "inputs": [],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "Upgraded",
-            "inputs": [
-                {
-                    "name": "implementation",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "WatchtowerUpdated",
-            "inputs": [
-                {
-                    "name": "_oldWatchtower",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_newWatchtower",
-                    "type": "address",
-                    "indexed": false,
-                    "internalType": "address"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "event",
-            "name": "Withdrawn",
-            "inputs": [
-                {
-                    "name": "_withdrawer",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_asset",
-                    "type": "address",
-                    "indexed": true,
-                    "internalType": "address"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "indexed": false,
-                    "internalType": "uint256"
-                }
-            ],
-            "anonymous": false
-        },
-        {
-            "type": "error",
-            "name": "AddressEmptyCode",
-            "inputs": [
-                {
-                    "name": "target",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "AddressInsufficientBalance",
-            "inputs": [
-                {
-                    "name": "account",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "ECDSAInvalidSignature",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "ECDSAInvalidSignatureLength",
-            "inputs": [
-                {
-                    "name": "length",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "ECDSAInvalidSignatureS",
-            "inputs": [
-                {
-                    "name": "s",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "ERC1967InvalidImplementation",
-            "inputs": [
-                {
-                    "name": "implementation",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "ERC1967NonPayable",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ExecuteIntentCalldata_InvalidStatus",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_FillIntent_InsufficientFunds",
-            "inputs": [
-                {
-                    "name": "_requested",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_available",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_FillIntent_IntentExpired",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_FillIntent_InvalidStatus",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_FillIntent_MaxFeeExceeded",
-            "inputs": [
-                {
-                    "name": "_fee",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_maxFee",
-                    "type": "uint24",
-                    "internalType": "uint24"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_InvalidMessageType",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_InvalidSignature",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_InvalidVarUpdate",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_NewIntent_CalldataExceedsLimit",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_NewIntent_InvalidIntent",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_NewIntent_MaxFeeExceeded",
-            "inputs": [
-                {
-                    "name": "_fee",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_maxFee",
-                    "type": "uint24",
-                    "internalType": "uint24"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_NewIntent_ZeroAmount",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_Pause_NotAuthorized",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_Paused",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ProcessFillViaRelayer_NotRelayer",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ProcessFillViaRelayer_TTLExpired",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ProcessFillViaRelayer_WrongDomain",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ProcessIntentQueue_NotFound",
-            "inputs": [
-                {
-                    "name": "_intentId",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                },
-                {
-                    "name": "_position",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ProcessQueue_InvalidAmount",
-            "inputs": [
-                {
-                    "name": "_first",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_last",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ProcessQueue_ZeroAmount",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_Unauthorized",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_WrongDestination",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "EverclearSpoke_ZeroAddress",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "FailedInnerCall",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "InvalidAccountNonce",
-            "inputs": [
-                {
-                    "name": "account",
-                    "type": "address",
-                    "internalType": "address"
-                },
-                {
-                    "name": "currentNonce",
-                    "type": "uint256",
-                    "internalType": "uint256"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "InvalidInitialization",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "NotInitializing",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "OwnableInvalidOwner",
-            "inputs": [
-                {
-                    "name": "owner",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "OwnableUnauthorizedAccount",
-            "inputs": [
-                {
-                    "name": "account",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "Queue_EmptyQueue",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "SafeERC20FailedOperation",
-            "inputs": [
-                {
-                    "name": "token",
-                    "type": "address",
-                    "internalType": "address"
-                }
-            ]
-        },
-        {
-            "type": "error",
-            "name": "UUPSUnauthorizedCallContext",
-            "inputs": []
-        },
-        {
-            "type": "error",
-            "name": "UUPSUnsupportedProxiableUUID",
-            "inputs": [
-                {
-                    "name": "slot",
-                    "type": "bytes32",
-                    "internalType": "bytes32"
-                }
-            ]
+  "address": "0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751",
+  "startBlock": 14952261,
+  "abi": [
+    { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+    {
+      "inputs": [{ "internalType": "address", "name": "target", "type": "address" }],
+      "name": "AddressEmptyCode",
+      "type": "error"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+      "name": "AddressInsufficientBalance",
+      "type": "error"
+    },
+    { "inputs": [], "name": "ECDSAInvalidSignature", "type": "error" },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "length", "type": "uint256" }],
+      "name": "ECDSAInvalidSignatureLength",
+      "type": "error"
+    },
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "s", "type": "bytes32" }],
+      "name": "ECDSAInvalidSignatureS",
+      "type": "error"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "implementation", "type": "address" }],
+      "name": "ERC1967InvalidImplementation",
+      "type": "error"
+    },
+    { "inputs": [], "name": "ERC1967NonPayable", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed", "type": "error" },
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "_intentId", "type": "bytes32" }],
+      "name": "EverclearSpoke_ExecuteIntentCalldata_InvalidStatus",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_requested", "type": "uint256" },
+        { "internalType": "uint256", "name": "_available", "type": "uint256" }
+      ],
+      "name": "EverclearSpoke_FillIntent_InsufficientFunds",
+      "type": "error"
+    },
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "_intentId", "type": "bytes32" }],
+      "name": "EverclearSpoke_FillIntent_IntentExpired",
+      "type": "error"
+    },
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "_intentId", "type": "bytes32" }],
+      "name": "EverclearSpoke_FillIntent_InvalidStatus",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_fee", "type": "uint256" },
+        { "internalType": "uint24", "name": "_maxFee", "type": "uint24" }
+      ],
+      "name": "EverclearSpoke_FillIntent_MaxFeeExceeded",
+      "type": "error"
+    },
+    { "inputs": [], "name": "EverclearSpoke_InvalidMessageType", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_InvalidSignature", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_InvalidVarUpdate", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_NewIntent_CalldataExceedsLimit", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_NewIntent_InvalidIntent", "type": "error" },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_fee", "type": "uint256" },
+        { "internalType": "uint24", "name": "_maxFee", "type": "uint24" }
+      ],
+      "name": "EverclearSpoke_NewIntent_MaxFeeExceeded",
+      "type": "error"
+    },
+    { "inputs": [], "name": "EverclearSpoke_NewIntent_ZeroAmount", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_Pause_NotAuthorized", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_Paused", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_ProcessFillViaRelayer_NotRelayer", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_ProcessFillViaRelayer_TTLExpired", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_ProcessFillViaRelayer_WrongDomain", "type": "error" },
+    {
+      "inputs": [
+        { "internalType": "bytes32", "name": "_intentId", "type": "bytes32" },
+        { "internalType": "uint256", "name": "_position", "type": "uint256" }
+      ],
+      "name": "EverclearSpoke_ProcessIntentQueue_NotFound",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_first", "type": "uint256" },
+        { "internalType": "uint256", "name": "_last", "type": "uint256" },
+        { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "EverclearSpoke_ProcessQueue_InvalidAmount",
+      "type": "error"
+    },
+    { "inputs": [], "name": "EverclearSpoke_ProcessQueue_ZeroAmount", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_Unauthorized", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_WrongDestination", "type": "error" },
+    { "inputs": [], "name": "EverclearSpoke_ZeroAddress", "type": "error" },
+    { "inputs": [], "name": "FailedInnerCall", "type": "error" },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "account", "type": "address" },
+        { "internalType": "uint256", "name": "currentNonce", "type": "uint256" }
+      ],
+      "name": "InvalidAccountNonce",
+      "type": "error"
+    },
+    { "inputs": [], "name": "InvalidInitialization", "type": "error" },
+    { "inputs": [], "name": "NotInitializing", "type": "error" },
+    {
+      "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    { "inputs": [], "name": "Queue_EmptyQueue", "type": "error" },
+    {
+      "inputs": [{ "internalType": "address", "name": "token", "type": "address" }],
+      "name": "SafeERC20FailedOperation",
+      "type": "error"
+    },
+    { "inputs": [], "name": "UUPSUnauthorizedCallContext", "type": "error" },
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "slot", "type": "bytes32" }],
+      "name": "UUPSUnsupportedProxiableUUID",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "_asset", "type": "address" },
+        { "indexed": true, "internalType": "address", "name": "_recipient", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "_amount", "type": "uint256" },
+        { "indexed": false, "internalType": "enum IEverclear.Strategy", "name": "_strategy", "type": "uint8" }
+      ],
+      "name": "AssetMintFailed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "_asset", "type": "address" },
+        { "indexed": true, "internalType": "address", "name": "_recipient", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "AssetTransferFailed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "_depositant", "type": "address" },
+        { "indexed": true, "internalType": "address", "name": "_asset", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "Deposited",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "bytes32", "name": "_intentId", "type": "bytes32" },
+        { "indexed": false, "internalType": "bytes", "name": "_returnData", "type": "bytes" }
+      ],
+      "name": "ExternalCalldataExecuted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "bytes32", "name": "_messageId", "type": "bytes32" },
+        { "indexed": false, "internalType": "uint256", "name": "_firstIdx", "type": "uint256" },
+        { "indexed": false, "internalType": "uint256", "name": "_lastIdx", "type": "uint256" },
+        { "indexed": false, "internalType": "uint256", "name": "_quote", "type": "uint256" }
+      ],
+      "name": "FillQueueProcessed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "address", "name": "_oldGateway", "type": "address" },
+        { "indexed": false, "internalType": "address", "name": "_newGateway", "type": "address" }
+      ],
+      "name": "GatewayUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [{ "indexed": false, "internalType": "uint64", "name": "version", "type": "uint64" }],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "bytes32", "name": "_intentId", "type": "bytes32" },
+        { "indexed": false, "internalType": "uint256", "name": "_queueIdx", "type": "uint256" },
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "indexed": false,
+          "internalType": "struct IEverclear.Intent",
+          "name": "_intent",
+          "type": "tuple"
         }
-    ]
+      ],
+      "name": "IntentAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "bytes32", "name": "_intentId", "type": "bytes32" },
+        { "indexed": true, "internalType": "address", "name": "_solver", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "_totalFeeDBPS", "type": "uint256" },
+        { "indexed": false, "internalType": "uint256", "name": "_queueIdx", "type": "uint256" },
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "indexed": false,
+          "internalType": "struct IEverclear.Intent",
+          "name": "_intent",
+          "type": "tuple"
+        }
+      ],
+      "name": "IntentFilled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "bytes32", "name": "_messageId", "type": "bytes32" },
+        { "indexed": false, "internalType": "uint256", "name": "_firstIdx", "type": "uint256" },
+        { "indexed": false, "internalType": "uint256", "name": "_lastIdx", "type": "uint256" },
+        { "indexed": false, "internalType": "uint256", "name": "_quote", "type": "uint256" }
+      ],
+      "name": "IntentQueueProcessed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "address", "name": "_oldLightHouse", "type": "address" },
+        { "indexed": false, "internalType": "address", "name": "_newLightHouse", "type": "address" }
+      ],
+      "name": "LighthouseUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "uint256", "name": "_oldGasLimit", "type": "uint256" },
+        { "indexed": false, "internalType": "uint256", "name": "_newGasLimit", "type": "uint256" }
+      ],
+      "name": "MessageGasLimitUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "address", "name": "_oldMessageReceiver", "type": "address" },
+        { "indexed": false, "internalType": "address", "name": "_newMessageReceiver", "type": "address" }
+      ],
+      "name": "MessageReceiverUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "enum IEverclear.Strategy", "name": "_strategy", "type": "uint8" },
+        { "indexed": false, "internalType": "contract ISettlementModule", "name": "_module", "type": "address" }
+      ],
+      "name": "ModuleSetForStrategy",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
+        { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    { "anonymous": false, "inputs": [], "name": "Paused", "type": "event" },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "bytes32", "name": "_intentId", "type": "bytes32" },
+        { "indexed": false, "internalType": "address", "name": "_account", "type": "address" },
+        { "indexed": false, "internalType": "address", "name": "_asset", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "Settled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "address", "name": "_asset", "type": "address" },
+        { "indexed": false, "internalType": "enum IEverclear.Strategy", "name": "_strategy", "type": "uint8" }
+      ],
+      "name": "StrategySetForAsset",
+      "type": "event"
+    },
+    { "anonymous": false, "inputs": [], "name": "Unpaused", "type": "event" },
+    {
+      "anonymous": false,
+      "inputs": [{ "indexed": true, "internalType": "address", "name": "implementation", "type": "address" }],
+      "name": "Upgraded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "address", "name": "_oldWatchtower", "type": "address" },
+        { "indexed": false, "internalType": "address", "name": "_newWatchtower", "type": "address" }
+      ],
+      "name": "WatchtowerUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "_withdrawer", "type": "address" },
+        { "indexed": true, "internalType": "address", "name": "_asset", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "Withdrawn",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "DOMAIN",
+      "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "EVERCLEAR",
+      "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "FILL_INTENT_FOR_SOLVER_TYPEHASH",
+      "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PERMIT2",
+      "outputs": [{ "internalType": "contract IPermit2", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH",
+      "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH",
+      "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "UPGRADE_INTERFACE_VERSION",
+      "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "bytes32", "name": "_asset", "type": "bytes32" },
+        { "internalType": "bytes32", "name": "_user", "type": "bytes32" }
+      ],
+      "name": "balances",
+      "outputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "callExecutor",
+      "outputs": [{ "internalType": "contract ICallExecutor", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_asset", "type": "address" },
+        { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "internalType": "struct IEverclear.Intent",
+          "name": "_intent",
+          "type": "tuple"
+        }
+      ],
+      "name": "executeIntentCalldata",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "internalType": "struct IEverclear.Intent",
+          "name": "_intent",
+          "type": "tuple"
+        },
+        { "internalType": "uint24", "name": "_fee", "type": "uint24" }
+      ],
+      "name": "fillIntent",
+      "outputs": [
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "intentId", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "solver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "uint24", "name": "fee", "type": "uint24" },
+            { "internalType": "uint48", "name": "executionTimestamp", "type": "uint48" }
+          ],
+          "internalType": "struct IEverclear.FillMessage",
+          "name": "_fillMessage",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_solver", "type": "address" },
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "internalType": "struct IEverclear.Intent",
+          "name": "_intent",
+          "type": "tuple"
+        },
+        { "internalType": "uint256", "name": "_nonce", "type": "uint256" },
+        { "internalType": "uint24", "name": "_fee", "type": "uint24" },
+        { "internalType": "bytes", "name": "_signature", "type": "bytes" }
+      ],
+      "name": "fillIntentForSolver",
+      "outputs": [
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "intentId", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "solver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "uint24", "name": "fee", "type": "uint24" },
+            { "internalType": "uint48", "name": "executionTimestamp", "type": "uint48" }
+          ],
+          "internalType": "struct IEverclear.FillMessage",
+          "name": "_fillMessage",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fillQueue",
+      "outputs": [
+        { "internalType": "uint256", "name": "first", "type": "uint256" },
+        { "internalType": "uint256", "name": "last", "type": "uint256" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "gateway",
+      "outputs": [{ "internalType": "contract ISpokeGateway", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            { "internalType": "contract ISpokeGateway", "name": "gateway", "type": "address" },
+            { "internalType": "contract ICallExecutor", "name": "callExecutor", "type": "address" },
+            { "internalType": "address", "name": "messageReceiver", "type": "address" },
+            { "internalType": "address", "name": "lighthouse", "type": "address" },
+            { "internalType": "address", "name": "watchtower", "type": "address" },
+            { "internalType": "uint32", "name": "hubDomain", "type": "uint32" },
+            { "internalType": "address", "name": "owner", "type": "address" }
+          ],
+          "internalType": "struct ISpokeStorage.SpokeInitializationParams",
+          "name": "_init",
+          "type": "tuple"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "intentQueue",
+      "outputs": [
+        { "internalType": "uint256", "name": "first", "type": "uint256" },
+        { "internalType": "uint256", "name": "last", "type": "uint256" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lighthouse",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "messageGasLimit",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "messageReceiver",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "enum IEverclear.Strategy", "name": "_strategy", "type": "uint8" }],
+      "name": "modules",
+      "outputs": [{ "internalType": "contract ISettlementModule", "name": "_module", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint32[]", "name": "_destinations", "type": "uint32[]" },
+        { "internalType": "address", "name": "_receiver", "type": "address" },
+        { "internalType": "address", "name": "_inputAsset", "type": "address" },
+        { "internalType": "address", "name": "_outputAsset", "type": "address" },
+        { "internalType": "uint256", "name": "_amount", "type": "uint256" },
+        { "internalType": "uint24", "name": "_maxFee", "type": "uint24" },
+        { "internalType": "uint48", "name": "_ttl", "type": "uint48" },
+        { "internalType": "bytes", "name": "_data", "type": "bytes" }
+      ],
+      "name": "newIntent",
+      "outputs": [
+        { "internalType": "bytes32", "name": "_intentId", "type": "bytes32" },
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "internalType": "struct IEverclear.Intent",
+          "name": "_intent",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint32[]", "name": "_destinations", "type": "uint32[]" },
+        { "internalType": "address", "name": "_receiver", "type": "address" },
+        { "internalType": "address", "name": "_inputAsset", "type": "address" },
+        { "internalType": "address", "name": "_outputAsset", "type": "address" },
+        { "internalType": "uint256", "name": "_amount", "type": "uint256" },
+        { "internalType": "uint24", "name": "_maxFee", "type": "uint24" },
+        { "internalType": "uint48", "name": "_ttl", "type": "uint48" },
+        { "internalType": "bytes", "name": "_data", "type": "bytes" },
+        {
+          "components": [
+            { "internalType": "uint256", "name": "nonce", "type": "uint256" },
+            { "internalType": "uint256", "name": "deadline", "type": "uint256" },
+            { "internalType": "bytes", "name": "signature", "type": "bytes" }
+          ],
+          "internalType": "struct IEverclearSpoke.Permit2Params",
+          "name": "_permit2Params",
+          "type": "tuple"
+        }
+      ],
+      "name": "newIntent",
+      "outputs": [
+        { "internalType": "bytes32", "name": "_intentId", "type": "bytes32" },
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "internalType": "struct IEverclear.Intent",
+          "name": "_intent",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nonce",
+      "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
+      "name": "nonces",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    { "inputs": [], "name": "pause", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+      "inputs": [],
+      "name": "paused",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint32", "name": "_amount", "type": "uint32" }],
+      "name": "processFillQueue",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint32", "name": "_domain", "type": "uint32" },
+        { "internalType": "uint32", "name": "_amount", "type": "uint32" },
+        { "internalType": "address", "name": "_relayer", "type": "address" },
+        { "internalType": "uint256", "name": "_ttl", "type": "uint256" },
+        { "internalType": "uint256", "name": "_nonce", "type": "uint256" },
+        { "internalType": "uint256", "name": "_bufferDBPS", "type": "uint256" },
+        { "internalType": "bytes", "name": "_signature", "type": "bytes" }
+      ],
+      "name": "processFillQueueViaRelayer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "internalType": "struct IEverclear.Intent[]",
+          "name": "_intents",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "processIntentQueue",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint32", "name": "_domain", "type": "uint32" },
+        {
+          "components": [
+            { "internalType": "bytes32", "name": "initiator", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "receiver", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "inputAsset", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "outputAsset", "type": "bytes32" },
+            { "internalType": "uint24", "name": "maxFee", "type": "uint24" },
+            { "internalType": "uint32", "name": "origin", "type": "uint32" },
+            { "internalType": "uint64", "name": "nonce", "type": "uint64" },
+            { "internalType": "uint48", "name": "timestamp", "type": "uint48" },
+            { "internalType": "uint48", "name": "ttl", "type": "uint48" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint32[]", "name": "destinations", "type": "uint32[]" },
+            { "internalType": "bytes", "name": "data", "type": "bytes" }
+          ],
+          "internalType": "struct IEverclear.Intent[]",
+          "name": "_intents",
+          "type": "tuple[]"
+        },
+        { "internalType": "address", "name": "_relayer", "type": "address" },
+        { "internalType": "uint256", "name": "_ttl", "type": "uint256" },
+        { "internalType": "uint256", "name": "_nonce", "type": "uint256" },
+        { "internalType": "uint256", "name": "_bufferDBPS", "type": "uint256" },
+        { "internalType": "bytes", "name": "_signature", "type": "bytes" }
+      ],
+      "name": "processIntentQueueViaRelayer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "proxiableUUID",
+      "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "bytes", "name": "", "type": "bytes" }],
+      "name": "receiveMessage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+      "inputs": [
+        { "internalType": "enum IEverclear.Strategy", "name": "_strategy", "type": "uint8" },
+        { "internalType": "contract ISettlementModule", "name": "_module", "type": "address" }
+      ],
+      "name": "setModuleForStrategy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_asset", "type": "address" },
+        { "internalType": "enum IEverclear.Strategy", "name": "_strategy", "type": "uint8" }
+      ],
+      "name": "setStrategyForAsset",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "_intentId", "type": "bytes32" }],
+      "name": "status",
+      "outputs": [{ "internalType": "enum IEverclear.IntentStatus", "name": "status", "type": "uint8" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+      "name": "strategies",
+      "outputs": [{ "internalType": "enum IEverclear.Strategy", "name": "_strategy", "type": "uint8" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    { "inputs": [], "name": "unpause", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+      "inputs": [{ "internalType": "address", "name": "_newGateway", "type": "address" }],
+      "name": "updateGateway",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "_newGasLimit", "type": "uint256" }],
+      "name": "updateMessageGasLimit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "_newMessageReceiver", "type": "address" }],
+      "name": "updateMessageReceiver",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "_newSecurityModule", "type": "address" }],
+      "name": "updateSecurityModule",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "newImplementation", "type": "address" },
+        { "internalType": "bytes", "name": "data", "type": "bytes" }
+      ],
+      "name": "upgradeToAndCall",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "watchtower",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_asset", "type": "address" },
+        { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]
 }
