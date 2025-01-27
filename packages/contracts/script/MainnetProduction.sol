@@ -262,11 +262,12 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-    DomainAndGateway({
-      chainId: LINEA,
-      blockGasLimit: 24_000_000,
-      gateway: address(LINEA_SPOKE_GATEWAY).toBytes32()
-    });
+      DomainAndGateway({
+        chainId: LINEA,
+        blockGasLimit: 24_000_000,
+        gateway: address(LINEA_SPOKE_GATEWAY).toBytes32()
+      })
+    );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
