@@ -457,6 +457,8 @@ locals {
       10 = { maxAge = 60, size = 1 },
       8453 = { maxAge = 60, size = 1 },
       48900 = { maxAge = 60, size = 1 },
+      25327 = { maxAge = 60, size = 1 },
+      81457 = { maxAge = 60, size = 1 },
     }
     chains = {
       "1" = {
