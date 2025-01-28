@@ -36,8 +36,49 @@ contract NewIntentBase is Script, ScriptUtils {
   bytes _data;
   uint256 _runs;
 
-  function _getInputs() internal {
-    _userPk = vm.parseUint(vm.promptSecret('User private key'));
+  // function _getInputs() internal {
+  //   _userPk = vm.parseUint(vm.promptSecret('User private key'));
+  //   _sender = vm.addr(_userPk);
+  //   console.log('Sender:', _sender);
+
+  //   // Set default values
+  //   _setDefaults();
+
+  //   // Get user overrides
+  //   _parseDestinationsFromInput();
+
+  //   try vm.parseAddress(vm.prompt('To address (on destination)')) returns (address _res) {
+  //     _to = _res;
+  //   } catch (bytes memory) {}
+
+  //   try vm.parseAddress(vm.prompt('Asset address to deposit')) returns (address _res) {
+  //     _inputAsset = _res;
+  //   } catch (bytes memory) {}
+
+  //   try vm.parseAddress(vm.prompt('Asset address to receive (on destination)')) returns (address _res) {
+  //     _outputAsset = _res;
+  //   } catch (bytes memory) {}
+
+  //   uint256 _amountWithoutDecimals;
+  //   try vm.parseUint(vm.prompt('Amount to deposit')) returns (uint256 _res) {
+  //     _amountWithoutDecimals = _res;
+  //   } catch (bytes memory) {}
+
+  //   try vm.parseUint(vm.prompt('Time to live')) returns (uint256 _res) {
+  //     _ttl = uint48(_res);
+  //   } catch (bytes memory) {}
+
+  //   try vm.parseUint(vm.prompt('Runs')) returns (uint256 _res) {
+  //     _runs = _res;
+  //   } catch (bytes memory) {}
+
+  //   // Convert amount to wei
+  //   _amount =
+  //     _amountWithoutDecimals > 0 ? _amountWithoutDecimals * (10 ** IERC20Metadata(_inputAsset).decimals()) : _amount;
+  // }
+
+    function _getInputs() internal {
+    _userPk = vm.envUint('PRIVATE_KEY');
     _sender = vm.addr(_userPk);
     console.log('Sender:', _sender);
 
@@ -45,36 +86,11 @@ contract NewIntentBase is Script, ScriptUtils {
     _setDefaults();
 
     // Get user overrides
-    _parseDestinationsFromInput();
-
-    try vm.parseAddress(vm.prompt('To address (on destination)')) returns (address _res) {
-      _to = _res;
-    } catch (bytes memory) {}
-
-    try vm.parseAddress(vm.prompt('Asset address to deposit')) returns (address _res) {
-      _inputAsset = _res;
-    } catch (bytes memory) {}
-
-    try vm.parseAddress(vm.prompt('Asset address to receive (on destination)')) returns (address _res) {
-      _outputAsset = _res;
-    } catch (bytes memory) {}
-
-    uint256 _amountWithoutDecimals;
-    try vm.parseUint(vm.prompt('Amount to deposit')) returns (uint256 _res) {
-      _amountWithoutDecimals = _res;
-    } catch (bytes memory) {}
-
-    try vm.parseUint(vm.prompt('Time to live')) returns (uint256 _res) {
-      _ttl = uint48(_res);
-    } catch (bytes memory) {}
-
-    try vm.parseUint(vm.prompt('Runs')) returns (uint256 _res) {
-      _runs = _res;
-    } catch (bytes memory) {}
+    // _parseDestinationsFromInput();
 
     // Convert amount to wei
-    _amount =
-      _amountWithoutDecimals > 0 ? _amountWithoutDecimals * (10 ** IERC20Metadata(_inputAsset).decimals()) : _amount;
+    // _amount =
+    //   _amountWithoutDecimals > 0 ? _amountWithoutDecimals * (10 ** IERC20Metadata(_inputAsset).decimals()) : _amount;
   }
 
   function _setDefaults() internal virtual {}
@@ -200,6 +216,9 @@ contract MainnetProduction is NewIntentBase, MainnetProductionEnvironment {
     _spokes[ETHEREUM] = ETHEREUM_SPOKE;
     _spokes[BNB] = BNB_SPOKE;
     _spokes[BASE] = BASE_SPOKE;
+    _spokes[LINEA] = LINEA_SPOKE;
+    _spokes[AVALANCHE] = AVALANCHE_SPOKE;
+    _spokes[POLYGON] = POLYGON_SPOKE;
 
     _getInputs();
   }
@@ -209,12 +228,15 @@ contract MainnetProduction is NewIntentBase, MainnetProductionEnvironment {
    */
   function _setDefaults() internal override {
     // Assumes staging environment uses either Sepolia or BSC Testnet
-    _destinations.push(OPTIMISM);
+    _destinations.push(POLYGON);
 
     _to = _sender;
-    _inputAsset = ARBITRUM_USDT;
-    _outputAsset = OPTIMISM_USDT;
-    _amount = 1_000_000;
+    _inputAsset = AVALANCHE_USDC;
+    _outputAsset = POLYGON_USDC;
+    // NOTE: For STABLES ONLY
+    _amount = (1 * 10 ** IERC20Metadata(_inputAsset).decimals()) / 10;
+    // NOTE FOR WETH/ETH nonstables;
+    // _amount = 1 wei;
     _runs = 1;
     // Default of ttl is 0
   }
