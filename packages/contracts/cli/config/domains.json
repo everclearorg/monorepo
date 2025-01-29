@@ -81,15 +81,6 @@
     "realm": "spoke"
   },
   {
-    "name": "Linea",
-    "id": 59144,
-    "rpc": "https://linea.drpc.org",
-    "environments": [
-      "MainnetProduction"
-    ],
-    "realm": "spoke"
-  },
-  {
     "name": "zkSync",
     "id": 324,
     "rpc": "https://1rpc.io/zksync2-era",
