@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { existsSync, readFileSync } from 'fs';
-
 import { Type, Static } from '@sinclair/typebox';
 import { config as dotenvConfig } from 'dotenv';
 import {
@@ -21,6 +21,7 @@ import {
   TokenStakingReward,
 } from '@chimera-monorepo/utils';
 import { InvalidConfig } from './errors';
+import { getSsmParameter } from './tasks/helpers/mockable';
 
 // FIXME: read from chaindata
 const DEFAULT_SIZE = 10;
@@ -109,14 +110,23 @@ export const TLighthouseConfig = Type.Object({
 export type LighthouseConfig = Static<typeof TLighthouseConfig>;
 
 export const loadConfig = async (): Promise<LighthouseConfig> => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let configJson: any = {};
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let configFile: any = {};
+  let configStr: string | undefined;
 
-  // try to ready from env
+  const paramName = `${process.env.DD_SERVICE}-${process.env.DD_ENV}-config`;
   try {
-    configJson = JSON.parse(process.env.LIGHTHOUSE_CONFIG || '{}');
+    configStr = await getSsmParameter(paramName);
+    if (!configStr) {
+      console.info(paramName, 'is not found in parameter store');
+    }
+  } catch (e: unknown) {
+    console.info('Error getting', paramName, 'from parameter store', e);
+  }
+
+  // try to read from env
+  try {
+    configJson = JSON.parse(configStr || process.env.LIGHTHOUSE_CONFIG || '{}');
   } catch (e: unknown) {
     console.warn('No LIGHTHOUSE_CONFIG exists, using config file and individual env vars', e);
   }

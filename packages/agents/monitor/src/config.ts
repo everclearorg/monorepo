@@ -5,7 +5,7 @@ import { config as dotenvConfig } from 'dotenv';
 import lodash from 'lodash';
 import * as fs from 'fs';
 import { getContext } from './context';
-import { getDefaultABIConfig, getEverclearConfig } from './mockable';
+import { getDefaultABIConfig, getEverclearConfig, getSsmParameter } from './mockable';
 
 dotenvConfig();
 const DEFAULT_POLL_INTERVAL = 5_000; // 5s
@@ -91,11 +91,24 @@ export const DefaultShadowTables = [
 export const getConfig = async (): Promise<MonitorConfig> => {
   let configJson: Record<string, any> = {};
   let configFile: any = {};
+  let configStr: string | undefined;
+
+  const paramName = `${process.env.DD_SERVICE}-${process.env.DD_ENV}-config`;
   try {
-    configJson = JSON.parse(process.env.MONITOR_CONFIG || '');
+    configStr = await getSsmParameter(paramName);
+    if (!configStr) {
+      console.info(paramName, 'is not found in parameter store');
+    }
+  } catch (e: unknown) {
+    console.info('Error getting', paramName, 'from parameter store', e);
+  }
+
+  try {
+    configJson = JSON.parse(configStr || process.env.MONITOR_CONFIG || '');
   } catch (e: unknown) {
     console.info('No MONITOR_CONFIG exists, using config file and individual env vars');
   }
+
   try {
     let json: string;
 

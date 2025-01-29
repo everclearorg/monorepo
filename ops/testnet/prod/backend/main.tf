@@ -156,6 +156,7 @@ module "cartographer-depositors-lambda-cron" {
   container_env_vars  = merge(local.cartographer_env_vars, { CARTOGRAPHER_SERVICE = "depositors" })
   schedule_expression = "rate(1 minute)"
   memory_size         = 1024
+  config              = local.local_cartographer_config
 }
 
 module "cartographer-intents-lambda-cron" {
@@ -168,6 +169,7 @@ module "cartographer-intents-lambda-cron" {
   container_env_vars  = merge(local.cartographer_env_vars, { CARTOGRAPHER_SERVICE = "intents" })
   schedule_expression = "rate(1 minute)"
   memory_size         = 1024
+  config              = local.local_cartographer_config
 }
 
 module "cartographer-invoices-lambda-cron" {
@@ -180,6 +182,7 @@ module "cartographer-invoices-lambda-cron" {
   container_env_vars  = merge(local.cartographer_env_vars, { CARTOGRAPHER_SERVICE = "invoices" })
   schedule_expression = "rate(1 minute)"
   memory_size         = 1024
+  config              = local.local_cartographer_config
 }
 
 module "cartographer-monitor-lambda-cron" {
@@ -192,6 +195,7 @@ module "cartographer-monitor-lambda-cron" {
   container_env_vars  = merge(local.cartographer_env_vars, { CARTOGRAPHER_SERVICE = "monitor" })
   schedule_expression = "rate(1 minute)"
   memory_size         = 1024
+  config              = local.local_cartographer_config
 }
 
 

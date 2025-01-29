@@ -65,3 +65,9 @@ variable "lambda_security_groups" {
   type    = list(string)
   default = []
 }
+
+variable "config" {
+  description = "Lambda configuration"
+  type        = string
+  sensitive   = true
+}

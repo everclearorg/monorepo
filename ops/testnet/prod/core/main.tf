@@ -236,6 +236,7 @@ module "lighthouse_intent_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_fill_cron" {
@@ -254,6 +255,7 @@ module "lighthouse_fill_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_settlement_cron" {
@@ -272,6 +274,7 @@ module "lighthouse_settlement_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_expired_cron" {
@@ -290,6 +293,7 @@ module "lighthouse_expired_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_invoice_cron" {
@@ -308,6 +312,7 @@ module "lighthouse_invoice_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_reward_cron" {
@@ -326,6 +331,7 @@ module "lighthouse_reward_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_reward_metadata_cron" {
@@ -344,6 +350,7 @@ module "lighthouse_reward_metadata_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "monitor_poller_cron" {
@@ -362,6 +369,7 @@ module "monitor_poller_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_monitor_config
 }
 
 

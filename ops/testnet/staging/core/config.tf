@@ -29,7 +29,6 @@ locals {
   ]
 
   monitor_poller_env_vars = {
-    MONITOR_CONFIG = local.local_monitor_config,
     ENVIRONMENT    = var.environment,
     STAGE          = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -39,15 +38,14 @@ locals {
   }
 
   lighthouse_env_vars = {
-    LIGHTHOUSE_CONFIG = local.local_lighthouse_config,
     ENVIRONMENT       = var.environment,
     STAGE             = var.stage,
     DD_LOGS_ENABLED   = true,
     DD_ENV            = "${var.environment}-${var.stage}",
     DD_API_KEY        = var.dd_api_key,
     DD_LAMBDA_HANDLER = "packages/agents/lighthouse/dist/index.handler"
-    # To enable the graph API, uncomment the following line 
-    # GRAPH_API_KEY     = var.graph_api_key 
+    # To enable the graph API, uncomment the following line
+    # GRAPH_API_KEY     = var.graph_api_key
   }
   
   lighthouse_web3signer_env_vars = [
