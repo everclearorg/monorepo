@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 import {Uint32Set} from 'contracts/hub/lib/Uint32Set.sol';
 

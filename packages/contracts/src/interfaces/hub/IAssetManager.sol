@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';

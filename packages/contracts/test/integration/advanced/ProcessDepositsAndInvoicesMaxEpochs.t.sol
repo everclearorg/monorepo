@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
 

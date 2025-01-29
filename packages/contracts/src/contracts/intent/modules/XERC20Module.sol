@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 import {IXERC20} from 'interfaces/common/IXERC20.sol';

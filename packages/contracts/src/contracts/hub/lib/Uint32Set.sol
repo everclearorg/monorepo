@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.9.0) (utils/structs/EnumerableSet.sol)
 // This file was procedurally generated from scripts/generate/templates/EnumerableSet.js.
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 /**
  * @dev Library for managing uint32 sets. Copied and adapted from OpenZeppelin's EnumerableSet library.
