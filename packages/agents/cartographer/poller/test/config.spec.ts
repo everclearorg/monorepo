@@ -51,9 +51,9 @@ describe('Config', () => {
     });
 
     it('should read config from AWS SSM parameter store', async () => {
-      ssmStub.resolves(JSON.stringify({ ...createCartographerConfig(), databaseUrl: 'https://database.com' }));
+      ssmStub.resolves(JSON.stringify({ ...createCartographerConfig(), pollInterval: 98765 }));
       const config = await getEnvConfig();
-      await expect(config.database).to.be.equal('https://database.com');
+      await expect(config.pollInterval).to.be.equal(98765);
     });
   });
 
