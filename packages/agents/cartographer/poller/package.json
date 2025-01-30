@@ -8,6 +8,8 @@
     "src/**/*"
   ],
   "scripts": {
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
     "update:dev": "yarn start:depositors && yarn start:monitor && yarn start:invoices && yarn start:intents",
     "start:intents": "CARTOGRAPHER_SERVICE=intents npx ts-node src/run.ts",
     "start:invoices": "CARTOGRAPHER_SERVICE=invoices npx ts-node src/run.ts",

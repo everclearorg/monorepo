@@ -65,3 +65,14 @@ variable "lambda_security_groups" {
   type    = list(string)
   default = []
 }
+
+variable "config" {
+  description = "Lambda configuration"
+  type        = string
+  sensitive   = true
+}
+
+variable "config_param_name" {
+  description = "The SSM parameter name of the lambda configuration"
+  type        = string
+}
