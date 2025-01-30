@@ -71,3 +71,8 @@ variable "config" {
   type        = string
   sensitive   = true
 }
+
+variable "config_param_name" {
+  description = "The SSM parameter name of the lambda configuration"
+  type        = string
+}

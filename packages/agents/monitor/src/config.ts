@@ -93,14 +93,18 @@ export const getConfig = async (): Promise<MonitorConfig> => {
   let configFile: any = {};
   let configStr: string | undefined;
 
-  const paramName = `${process.env.DD_SERVICE}-${process.env.DD_ENV}-config`;
-  try {
-    configStr = await getSsmParameter(paramName);
-    if (!configStr) {
-      console.info(paramName, 'is not found in parameter store');
+  const paramName = process.env.CONFIG_PARAMETER_NAME;
+  if (paramName) {
+    try {
+      configStr = await getSsmParameter(paramName);
+      if (!configStr) {
+        console.info(paramName, 'is not found in parameter store');
+      }
+    } catch (e: unknown) {
+      console.info('Error getting', paramName, 'from parameter store', e);
     }
-  } catch (e: unknown) {
-    console.info('Error getting', paramName, 'from parameter store', e);
+  } else {
+    console.info('Monitor CONFIG_PARAMETER_NAME is not set');
   }
 
   try {

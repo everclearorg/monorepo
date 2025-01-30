@@ -75,6 +75,10 @@ describe('Config', () => {
     });
 
     it('should read config from AWS SSM parameter store', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        CONFIG_PARAMETER_NAME: 'monitor-config',
+      });
       const database = { url: 'https://database.com' };
       ssmStub.resolves(JSON.stringify({ ...mock.config(), database }));
       const config = await getConfig();

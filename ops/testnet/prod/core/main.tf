@@ -227,8 +227,10 @@ module "lighthouse_intent_cron" {
   container_family    = "lighthouse-intent"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = "${container_family}-${environment}-${stage}-config"
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "intent"
+    CONFIG_PARAMETER_NAME = config_param_name
   })
   schedule_expression    = "rate(1 minute)"
   timeout                = 300
@@ -246,8 +248,10 @@ module "lighthouse_fill_cron" {
   container_family    = "lighthouse-fill"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = "${container_family}-${environment}-${stage}-config"
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "fill"
+    CONFIG_PARAMETER_NAME = config_param_name
   })
   schedule_expression    = "rate(3 minutes)"
   timeout                = 300
@@ -265,8 +269,10 @@ module "lighthouse_settlement_cron" {
   container_family    = "lighthouse-settlement"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = "${container_family}-${environment}-${stage}-config"
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "settlement"
+    CONFIG_PARAMETER_NAME = config_param_name
   })
   schedule_expression    = "rate(1 minute)"
   timeout                = 300
@@ -284,8 +290,10 @@ module "lighthouse_expired_cron" {
   container_family    = "lighthouse-expired"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = "${container_family}-${environment}-${stage}-config"
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "expired"
+    CONFIG_PARAMETER_NAME = config_param_name
   })
   schedule_expression    = "rate(10 minutes)"
   timeout                = 300
@@ -303,8 +311,10 @@ module "lighthouse_invoice_cron" {
   container_family    = "lighthouse-invoice"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = "${container_family}-${environment}-${stage}-config"
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "invoice"
+    CONFIG_PARAMETER_NAME = config_param_name
   })
   schedule_expression    = "rate(1 minute)"
   timeout                = 300
@@ -322,8 +332,10 @@ module "lighthouse_reward_cron" {
   container_family    = "lighthouse-reward"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = "${container_family}-${environment}-${stage}-config"
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "reward"
+    CONFIG_PARAMETER_NAME = config_param_name
   })
   schedule_expression    = "rate(1 minute)"
   timeout                = 300
@@ -341,8 +353,10 @@ module "lighthouse_reward_metadata_cron" {
   container_family    = "lighthouse-reward_metadata"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = "${container_family}-${environment}-${stage}-config"
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "reward_metadata"
+    CONFIG_PARAMETER_NAME = config_param_name
   })
   schedule_expression    = "cron(0 0 ? * TUE *)"
   timeout                = 300
@@ -360,8 +374,10 @@ module "monitor_poller_cron" {
   container_family    = "monitor-poller"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = "${container_family}-${environment}-${stage}-config"
   container_env_vars  = merge(local.monitor_poller_env_vars, {
     MONITOR_SERVICE = "poller"
+    CONFIG_PARAMETER_NAME = config_param_name
   })
   schedule_expression    = "rate(10 minutes)"
   timeout                = 300

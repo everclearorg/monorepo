@@ -82,6 +82,10 @@ describe('Config', () => {
     });
 
     it('should read config from AWS SSM parameter store', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        CONFIG_PARAMETER_NAME: 'lighthouse-config',
+      });
       ssmStub.resolves(JSON.stringify(mock.config({ coingecko: 'prices.com' })));
       const config = await getConfig();
       await expect(config.coingecko).to.be.equal('prices.com');

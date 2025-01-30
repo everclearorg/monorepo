@@ -51,6 +51,10 @@ describe('Config', () => {
     });
 
     it('should read config from AWS SSM parameter store', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        CONFIG_PARAMETER_NAME: 'cartographer-config',
+      });
       ssmStub.resolves(JSON.stringify({ ...createCartographerConfig(), pollInterval: 98765 }));
       const config = await getEnvConfig();
       await expect(config.pollInterval).to.be.equal(98765);
