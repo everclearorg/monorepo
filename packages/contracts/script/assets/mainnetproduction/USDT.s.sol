@@ -36,7 +36,7 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](7);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](9);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -97,6 +97,24 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: AVALANCHE_USDT.toBytes32(),
       domain: AVALANCHE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Scroll
+    _assetConfigs[7] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SCROLL_USDT.toBytes32(),
+      domain: SCROLL,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Taiko
+    _assetConfigs[8] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: TAIKO_USDT.toBytes32(),
+      domain: TAIKO,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });

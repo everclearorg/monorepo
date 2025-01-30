@@ -112,5 +112,23 @@
     "domainName": "Linea",
     "domainId": 59144,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Scroll",
+    "domainId": 534352,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7",
+    "domainName": "Taiko",
+    "domainId": 167000,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Apechain",
+    "domainId": 33139,
+    "environment": "MainnetProduction"
   }
 ]
