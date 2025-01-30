@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 import {ScriptUtils} from '../utils/Utils.sol';
 
@@ -480,6 +480,48 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       watchtower: WATCHTOWER,
       ism: address(0), // using the default ism
       mailbox: address(ZKSYNC_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    _deploymentParams[SCROLL] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(SCROLL_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    _deploymentParams[TAIKO] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(TAIKO_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    _deploymentParams[APECHAIN] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(APECHAIN_MAILBOX), // domain mailbox
       hubDomain: EVERCLEAR_DOMAIN,
       hubGateway: address(HUB_GATEWAY),
       owner: OWNER,

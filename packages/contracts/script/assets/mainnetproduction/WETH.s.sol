@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
@@ -36,85 +36,112 @@ contract WETH is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](9);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](3);
 
-    ///// Optimism
+    // ///// Optimism
+    // _assetConfigs[0] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: OPTIMISM_WETH.toBytes32(),
+    //   domain: OPTIMISM,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    // ///// Arbitrum
+    // _assetConfigs[1] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: ARBITRUM_WETH.toBytes32(),
+    //   domain: ARBITRUM_ONE,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    // ///// Base
+    // _assetConfigs[2] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: BASE_WETH.toBytes32(),
+    //   domain: BASE,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    // ///// Bnb
+    // _assetConfigs[3] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: BNB_WETH.toBytes32(),
+    //   domain: BNB,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    // ///// Ethereum
+    // _assetConfigs[4] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: ETHEREUM_WETH.toBytes32(),
+    //   domain: ETHEREUM,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    // ///// Blast
+    // _assetConfigs[5] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: BLAST_WETH.toBytes32(),
+    //   domain: BLAST,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    // ///// Linea
+    // _assetConfigs[6] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: LINEA_WETH.toBytes32(),
+    //   domain: LINEA,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    // ///// Polygon
+    // _assetConfigs[7] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: POLYGON_WETH.toBytes32(),
+    //   domain: POLYGON,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    // ///// Avalanche
+    // _assetConfigs[8] = IHubStorage.AssetConfig({
+    //   tickerHash: _tickerHash,
+    //   adopted: AVALANCHE_WETH.toBytes32(),
+    //   domain: AVALANCHE,
+    //   approval: true,
+    //   strategy: IEverclear.Strategy.DEFAULT
+    // });
+
+    ///// Scroll
     _assetConfigs[0] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: OPTIMISM_WETH.toBytes32(),
-      domain: OPTIMISM,
+      adopted: SCROLL_WETH.toBytes32(),
+      domain: SCROLL,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Arbitrum
+    ///// Apechain
     _assetConfigs[1] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ARBITRUM_WETH.toBytes32(),
-      domain: ARBITRUM_ONE,
+      adopted: APECHAIN_WETH.toBytes32(),
+      domain: APECHAIN,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Base
+    ///// Taiko
     _assetConfigs[2] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: BASE_WETH.toBytes32(),
-      domain: BASE,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Bnb
-    _assetConfigs[3] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: BNB_WETH.toBytes32(),
-      domain: BNB,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Ethereum
-    _assetConfigs[4] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: ETHEREUM_WETH.toBytes32(),
-      domain: ETHEREUM,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Blast
-    _assetConfigs[5] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: BLAST_WETH.toBytes32(),
-      domain: BLAST,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Linea
-    _assetConfigs[6] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: LINEA_WETH.toBytes32(),
-      domain: LINEA,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Polygon
-    _assetConfigs[7] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: POLYGON_WETH.toBytes32(),
-      domain: POLYGON,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Avalanche
-    _assetConfigs[8] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: AVALANCHE_WETH.toBytes32(),
-      domain: AVALANCHE,
+      adopted: TAIKO_WETH.toBytes32(),
+      domain: TAIKO,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
