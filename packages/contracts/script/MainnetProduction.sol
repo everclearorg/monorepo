@@ -58,7 +58,7 @@ abstract contract MainnetAssets {
   address public constant SCROLL_USDT = 0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df;
   address public constant TAIKO_USDT = 0x2DEF195713CF4a606B49D07E520e22C17899a736;
 
-  ///////////////////// USDC, cannot find Apechain USDC 
+  ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
   address public constant BASE_USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
   address public constant ARBITRUM_USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831; // NOT USDC.e
@@ -319,19 +319,11 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: SCROLL,
-        blockGasLimit: 10_000_000,
-        gateway: address(SCROLL_SPOKE_GATEWAY).toBytes32()
-      })
+      DomainAndGateway({chainId: SCROLL, blockGasLimit: 10_000_000, gateway: address(SCROLL_SPOKE_GATEWAY).toBytes32()})
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: TAIKO,
-        blockGasLimit: 30_000_000,
-        gateway: address(TAIKO_SPOKE_GATEWAY).toBytes32()
-      })
+      DomainAndGateway({chainId: TAIKO, blockGasLimit: 30_000_000, gateway: address(TAIKO_SPOKE_GATEWAY).toBytes32()})
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
