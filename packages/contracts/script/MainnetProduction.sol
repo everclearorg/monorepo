@@ -44,7 +44,7 @@ abstract contract MainnetAssets {
   address public constant AVALANCHE_WETH = 0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB; // NOTE: WETH.e
   address public constant SCROLL_WETH = 0x5300000000000000000000000000000000000004;
   address public constant TAIKO_WETH = 0xA51894664A773981C6C112C43ce576f315d5b1B6;
-  address public constant APECHAIN_WETH = 0x7f9FBf9bDd3F4105C478b996B648FE6e828a1e98;
+  address public constant APECHAIN_WETH = 0xcF800F4948D16F23333508191B1B1591daF70438;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
