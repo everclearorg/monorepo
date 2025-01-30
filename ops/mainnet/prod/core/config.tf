@@ -28,7 +28,6 @@ locals {
   ]
 
   monitor_poller_env_vars = {
-    MONITOR_CONFIG = local.local_monitor_config,
     ENVIRONMENT    = var.environment,
     STAGE          = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -39,7 +38,6 @@ locals {
   }
 
   lighthouse_env_vars = {
-    LIGHTHOUSE_CONFIG = local.local_lighthouse_config,
     ENVIRONMENT       = var.environment,
     STAGE             = var.stage,
     DD_LOGS_ENABLED   = true,

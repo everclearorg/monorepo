@@ -40,6 +40,7 @@ resource "aws_iam_role" "lambda" {
     })
   }
 }
+
 resource "aws_lambda_function" "executable" {
   function_name = "${var.container_family}-${var.environment}-${var.stage}"
   image_uri     = "${local.repository_url}:${var.docker_image_tag}"
@@ -87,3 +88,10 @@ resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment_lambda_vpc
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
+resource "aws_ssm_parameter" "lambda_config" {
+  type        = "SecureString"
+  name        = var.config_param_name
+  description = "Saves lambda configuration"
+  value       = var.config
+  overwrite   = true
+}
