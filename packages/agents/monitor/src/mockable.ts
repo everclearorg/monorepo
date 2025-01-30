@@ -13,6 +13,7 @@ import {
   getHyperlaneMsgDelivered as _getHyperlaneMsgDelivered,
   sendAlerts as _sendAlerts,
   resolveAlerts as _resolveAlerts,
+  getSsmParameter as _getSsmParameter,
 } from '@chimera-monorepo/utils';
 
 export const getContract = (address: string, abi: ContractInterface, provider?: providers.JsonRpcProvider) =>
@@ -31,3 +32,4 @@ export const getTokenPriceFromUniV3 = _getTokenPriceFromUniV3;
 export const getHyperlaneMsgDelivered = _getHyperlaneMsgDelivered;
 export const sendAlerts = _sendAlerts;
 export const resolveAlerts = _resolveAlerts;
+export const getSsmParameter = _getSsmParameter;

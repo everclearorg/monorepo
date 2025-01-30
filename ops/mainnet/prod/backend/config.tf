@@ -1,6 +1,5 @@
 locals {
   cartographer_env_vars = {
-    CARTOGRAPHER_CONFIG = local.local_cartographer_config,
     DATABASE_URL        = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear",
     ENVIRONMENT         = var.environment,
     EVERCLEAR_CONFIG    = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json",
