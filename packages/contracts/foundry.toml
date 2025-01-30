@@ -51,12 +51,9 @@ zircuit = "${ZIRCUIT_RPC}"
 linea = "${LINEA_RPC}"
 polygon = "${POLYGON_RPC}"
 avalanche = "${AVALANCHE_RPC}"
-
 taiko = "${TAIKO_RPC}"
 scroll = "${SCROLL_RPC}"
 apechain = "${APECHAIN_RPC}"
-
-sonic = "${SONIC_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
@@ -71,9 +68,6 @@ zircuit = { key = "${ZIRCUITSCAN_API_KEY}", chain = "48900", url = "https://expl
 linea = { key = "${LINEA_API_KEY}", chain = "59144", url = "https://api.lineascan.build/api" }
 polygon = { key = "${POLYGONSCAN_API_KEY}", chain = "137", url = "https://api.polygonscan.com/api" }
 avalanche = { key = "${AVALANCHESCAN_API_KEY}", chain = "43114", url = "https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan" }
-
 taiko = { key = "${TAIKOSCAN_API_KEY}", chain = "100", url = "https://api.taikoscan.io/api" }
 scroll = { key = "${SCROLLSCAN_API_KEY}", chain = "534351", url = "https://api.scrollscan.com/api" }
 apechain = { key = "${APECHAINSCAN_API_KEY}", chain = "59144", url = "https://api.apescan.io/api" }
-
-sonic = { key = "${SONICSCAN_API_KEY}", chain = "11155420", url = "https://api.sonic.xyz/api" }
