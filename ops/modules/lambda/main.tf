@@ -35,6 +35,16 @@ resource "aws_iam_role" "lambda" {
             "logs:PutLogEvents"
           ],
           "Resource" : ["*"]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "ssm:DescribeParameters",
+            "ssm:GetParameter",
+            "ssm:GetParameters",
+            "ssm:GetParametersByPath"
+          ],
+          "Resource" : ["*"]
         }
       ]
     })
