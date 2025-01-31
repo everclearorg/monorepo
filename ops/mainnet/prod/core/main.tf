@@ -337,7 +337,7 @@ module "lighthouse_reward_cron" {
     LIGHTHOUSE_SERVICE = "reward"
     CONFIG_PARAMETER_NAME = config_param_name
   })
-  schedule_expression    = "rate(1 minute)"
+  schedule_expression    = "rate(1 day)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -358,7 +358,7 @@ module "lighthouse_reward_metadata_cron" {
     LIGHTHOUSE_SERVICE = "reward_metadata"
     CONFIG_PARAMETER_NAME = config_param_name
   })
-  schedule_expression    = "rate(1 minute)"
+  schedule_expression    = "rate(1 day)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -480,4 +480,3 @@ module "watchtower_cache" {
   node_type                     = "cache.t3.small"
   public_redis                  = true
 }
-
