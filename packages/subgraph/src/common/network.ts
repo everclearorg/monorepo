@@ -77,6 +77,8 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(25327);
   } else if (network == 'taiko') {
     chainId = BigInt.fromI32(167000);
+  } else if (network == 'apechain-mainnet') {
+    chainId = BigInt.fromI32(33139);
   } else {
     throw new Error(`No chainName for network ${network}`);
   }
