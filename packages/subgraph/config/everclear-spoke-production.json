@@ -151,7 +151,7 @@
     "subgraphName": "everclear-spoke-apechain",
     "domain": "33139",
     "environment": "production",
-    "network": "apechain",
+    "network": "apechain-mainnet",
     "indexers": [
       "goldsky"
     ]
