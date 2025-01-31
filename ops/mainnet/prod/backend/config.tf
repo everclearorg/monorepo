@@ -99,18 +99,23 @@ locals {
           "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "534352" = {
-      #   providers = [
-      #     "https://scroll.drpc.org",
-      #     "https://scroll-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
-      # "167000" = {
-      #   providers = [
-      #     "https://taiko.drpc.org",
-      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-      #   ]
-      # }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
