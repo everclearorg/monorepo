@@ -93,5 +93,4 @@ resource "aws_ssm_parameter" "lambda_config" {
   name        = var.config_param_name
   description = "Saves lambda configuration"
   value       = var.config
-  overwrite   = true
 }
