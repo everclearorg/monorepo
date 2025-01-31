@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { existsSync, readFileSync } from 'fs';
-
 import { Type, Static } from '@sinclair/typebox';
 import { config as dotenvConfig } from 'dotenv';
 import { ajv, ChainConfig, getEverclearConfig, TChainConfig, THubConfig, TLogLevel } from '@chimera-monorepo/utils';
 import { DEFAULT_SAFE_CONFIRMATIONS } from './lib/operations';
+import { getSsmParameter } from './mockable';
 
 const DEFAULT_POLL_INTERVAL = 15_000;
 
@@ -37,12 +38,28 @@ export type CartographerConfig = Static<typeof CartographerConfigSchema>;
 export const getEnvConfig = async (): Promise<CartographerConfig> => {
   let configJson: Record<string, any> = {};
   let configFile: any = {};
+  let configStr: string | undefined;
+
+  const paramName = process.env.CONFIG_PARAMETER_NAME;
+  if (paramName) {
+    try {
+      configStr = await getSsmParameter(paramName);
+      if (!configStr) {
+        console.info(paramName, 'is not found in parameter store');
+      }
+    } catch (e: unknown) {
+      console.info('Error getting', paramName, 'from parameter store', e);
+    }
+  } else {
+    console.info('Cartographer CONFIG_PARAMETER_NAME is not set');
+  }
 
   try {
-    configJson = JSON.parse(process.env.CARTOGRAPHER_CONFIG || '{}');
+    configJson = JSON.parse(configStr || process.env.CARTOGRAPHER_CONFIG || '{}');
   } catch (e: unknown) {
     console.info('No CARTOGRAPHER_CONFIG exists, using config file and individual env vars', e);
   }
+
   try {
     let json: string;
 

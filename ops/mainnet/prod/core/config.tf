@@ -4,6 +4,15 @@ locals {
   default_db_endpoint      = "rds-postgres-cartographer-chimera.c64s9irwuemi.us-west-2.rds.amazonaws.com"
   default_db_url           = "postgresql://${var.postgres_user}:${var.postgres_password}@${local.default_db_endpoint}:5432/everclear"
 
+  lighthouse_intent_config_param_name = "lighthouse-intent-${var.environment}-${var.stage}-config"
+  lighthouse_fill_config_param_name = "lighthouse-fill-${var.environment}-${var.stage}-config"
+  lighthouse_settlement_config_param_name = "lighthouse-settlement-${var.environment}-${var.stage}-config"
+  lighthouse_expired_config_param_name = "lighthouse-expired-${var.environment}-${var.stage}-config"
+  lighthouse_invoice_config_param_name = "lighthouse-invoice-${var.environment}-${var.stage}-config"
+  lighthouse_reward_config_param_name = "lighthouse-reward-${var.environment}-${var.stage}-config"
+  lighthouse_reward_metadata_config_param_name = "lighthouse-reward_metadata-${var.environment}-${var.stage}-config"
+  monitor_poller_config_param_name = "monitor-poller-${var.environment}-${var.stage}-config"
+
   relayer_env_vars = [
     { name = "RELAYER_CONFIG", value = local.local_relayer_config },
     { name = "ENVIRONMENT", value = var.environment },
@@ -28,7 +37,6 @@ locals {
   ]
 
   monitor_poller_env_vars = {
-    MONITOR_CONFIG = local.local_monitor_config,
     ENVIRONMENT    = var.environment,
     STAGE          = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -39,7 +47,6 @@ locals {
   }
 
   lighthouse_env_vars = {
-    LIGHTHOUSE_CONFIG = local.local_lighthouse_config,
     ENVIRONMENT       = var.environment,
     STAGE             = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -144,18 +151,23 @@ locals {
           "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "534352" = {
-      #   providers = [
-      #     "https://scroll.drpc.org",
-      #     "https://scroll-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
-      # "167000" = {
-      #   providers = [
-      #     "https://taiko.drpc.org",
-      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-      #   ]
-      # }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
@@ -247,18 +259,23 @@ locals {
           "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "534352" = {
-      #   providers = [
-      #     "https://scroll.drpc.org",
-      #     "https://scroll-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
-      # "167000" = {
-      #   providers = [
-      #     "https://taiko.drpc.org",
-      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-      #   ]
-      # }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
@@ -356,18 +373,23 @@ locals {
           "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "534352" = {
-      #   providers = [
-      #     "https://scroll.drpc.org",
-      #     "https://scroll-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
-      # "167000" = {
-      #   providers = [
-      #     "https://taiko.drpc.org",
-      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-      #   ]
-      # }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
@@ -524,18 +546,23 @@ locals {
           "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "534352" = {
-      #   providers = [
-      #     "https://scroll.drpc.org",
-      #     "https://scroll-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
-      # "167000" = {
-      #   providers = [
-      #     "https://taiko.drpc.org",
-      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-      #   ]
-      # }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",

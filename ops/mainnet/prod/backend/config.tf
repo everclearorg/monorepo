@@ -1,6 +1,11 @@
 locals {
+
+  cartographer_depositors_config_param_name = "cartographer-depositors-${var.environment}-${var.stage}-config"
+  cartographer_intents_config_param_name = "cartographer-intents-${var.environment}-${var.stage}-config"
+  cartographer_invoices_config_param_name = "cartographer-invoices-${var.environment}-${var.stage}-config"
+  cartographer_monitor_config_param_name = "cartographer-monitor-${var.environment}-${var.stage}-config"
+
   cartographer_env_vars = {
-    CARTOGRAPHER_CONFIG = local.local_cartographer_config,
     DATABASE_URL        = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear",
     ENVIRONMENT         = var.environment,
     EVERCLEAR_CONFIG    = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json",
@@ -94,18 +99,23 @@ locals {
           "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "534352" = {
-      #   providers = [
-      #     "https://scroll.drpc.org",
-      #     "https://scroll-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
-      # "167000" = {
-      #   providers = [
-      #     "https://taiko.drpc.org",
-      #     "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
-      #   ]
-      # }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",

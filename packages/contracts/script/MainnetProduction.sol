@@ -42,9 +42,12 @@ abstract contract MainnetAssets {
   address public constant LINEA_WETH = 0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f;
   address public constant POLYGON_WETH = 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619;
   address public constant AVALANCHE_WETH = 0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB; // NOTE: WETH.e
+  address public constant SCROLL_WETH = 0x5300000000000000000000000000000000000004;
+  address public constant TAIKO_WETH = 0xA51894664A773981C6C112C43ce576f315d5b1B6;
+  address public constant APECHAIN_WETH = 0xcF800F4948D16F23333508191B1B1591daF70438;
 
   ///////////////////// USDT
-  // NOTE: USDT is not supported on Base
+  // NOTE: USDT is not supported on Base, Apechain
   address public constant ETHEREUM_USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
   address public constant ARBITRUM_USDT = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
   address public constant OPTIMISM_USDT = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58;
@@ -52,8 +55,10 @@ abstract contract MainnetAssets {
   address public constant LINEA_USDT = 0xA219439258ca9da29E9Cc4cE5596924745e12B93;
   address public constant POLYGON_USDT = 0xc2132D05D31c914a87C6611C10748AEb04B58e8F;
   address public constant AVALANCHE_USDT = 0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7;
+  address public constant SCROLL_USDT = 0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df;
+  address public constant TAIKO_USDT = 0x2DEF195713CF4a606B49D07E520e22C17899a736;
 
-  ///////////////////// USDC
+  ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
   address public constant BASE_USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
   address public constant ARBITRUM_USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831; // NOT USDC.e
@@ -62,6 +67,8 @@ abstract contract MainnetAssets {
   address public constant LINEA_USDC = 0x176211869cA2b568f2A7D4EE941E073a821EE1ff; // USDC.e
   address public constant POLYGON_USDC = 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359;
   address public constant AVALANCHE_USDC = 0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E;
+  address public constant SCROLL_USDC = 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4;
+  address public constant TAIKO_USDC = 0x07d83526730c7438048D55A4fc0b850e2aaB6f0b;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
@@ -181,6 +188,33 @@ abstract contract Avalanche {
   ICallExecutor public AVALANCHE_EXECUTOR = ICallExecutor(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
 }
 
+abstract contract Scroll {
+  uint32 public constant SCROLL = 534_352;
+  IMailbox public SCROLL_MAILBOX = IMailbox(0x2f2aFaE1139Ce54feFC03593FeE8AB2aDF4a85A7);
+
+  IEverclearSpoke public SCROLL_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public SCROLL_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public SCROLL_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+}
+
+abstract contract Taiko {
+  uint32 public constant TAIKO = 167_000;
+  IMailbox public TAIKO_MAILBOX = IMailbox(0x28EFBCadA00A7ed6772b3666F3898d276e88CAe3);
+
+  IEverclearSpoke public TAIKO_SPOKE = IEverclearSpoke(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ISpokeGateway public TAIKO_SPOKE_GATEWAY = ISpokeGateway(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
+  ICallExecutor public TAIKO_EXECUTOR = ICallExecutor(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+}
+
+abstract contract Apechain {
+  uint32 public constant APECHAIN = 33_139;
+  IMailbox public APECHAIN_MAILBOX = IMailbox(0x7f50C5776722630a0024fAE05fDe8b47571D7B39);
+
+  IEverclearSpoke public APECHAIN_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public APECHAIN_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public APECHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+}
+
 abstract contract ZkSync {
   uint32 public constant ZKSYNC = 324;
   IMailbox public ZKSYNC_MAILBOX = IMailbox(0x6bD0A2214797Bc81e0b006F7B74d6221BcD8cb6E);
@@ -202,7 +236,10 @@ abstract contract MainnetProductionDomains is
   Linea,
   Polygon,
   Avalanche,
-  ZkSync
+  ZkSync,
+  Taiko,
+  Scroll,
+  Apechain
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
@@ -280,6 +317,22 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
         gateway: address(AVALANCHE_SPOKE_GATEWAY).toBytes32()
       })
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: SCROLL, blockGasLimit: 10_000_000, gateway: address(SCROLL_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: TAIKO, blockGasLimit: 30_000_000, gateway: address(TAIKO_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({
+        chainId: APECHAIN,
+        blockGasLimit: 30_000_000,
+        gateway: address(APECHAIN_SPOKE_GATEWAY).toBytes32()
+      })
+    );
   }
 }
 
@@ -290,7 +343,7 @@ abstract contract MainnetProductionEnvironment is
   MainnetProductionSupportedDomainsAndGateways
 {
   uint32[] public SUPPORTED_DOMAINS =
-    [ETHEREUM, ARBITRUM_ONE, OPTIMISM, BASE, BNB, ZIRCUIT, BLAST, LINEA, POLYGON, AVALANCHE];
+    [ETHEREUM, ARBITRUM_ONE, OPTIMISM, BASE, BNB, ZIRCUIT, BLAST, LINEA, POLYGON, AVALANCHE, TAIKO, SCROLL, APECHAIN];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed

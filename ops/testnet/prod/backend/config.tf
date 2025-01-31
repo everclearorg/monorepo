@@ -1,7 +1,11 @@
-
 locals {
+
+  cartographer_depositors_config_param_name = "cartographer-depositors-${var.environment}-${var.stage}-config"
+  cartographer_intents_config_param_name = "cartographer-intents-${var.environment}-${var.stage}-config"
+  cartographer_invoices_config_param_name = "cartographer-invoices-${var.environment}-${var.stage}-config"
+  cartographer_monitor_config_param_name = "cartographer-monitor-${var.environment}-${var.stage}-config"
+
   cartographer_env_vars = {
-    CARTOGRAPHER_CONFIG = local.local_cartographer_config,
     DATABASE_URL        = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear",
     ENVIRONMENT         = var.environment,
     EVERCLEAR_CONFIG    = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.testnet.json",

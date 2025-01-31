@@ -93,11 +93,14 @@ import ProductionSpokeGatewayPolygon from './production/137/SpokeGateway.json';
 import ProductionEverclearSpokeScroll from './production/534352/EverclearSpoke.json';
 import ProductionSpokeGatewayScroll from './production/534352/SpokeGateway.json';
 
-// import ProductionEverclearSpokeTaiko from './production/167000/EverclearSpoke.json';
-// import ProductionSpokeGatewayTaiko from './production/167000/SpokeGateway.json';
+import ProductionEverclearSpokeTaiko from './production/167000/EverclearSpoke.json';
+import ProductionSpokeGatewayTaiko from './production/167000/SpokeGateway.json';
 
 import ProductionEverclearSpokeAvalanche from './production/43114/EverclearSpoke.json';
 import ProductionSpokeGatewayAvalanche from './production/43114/SpokeGateway.json';
+
+import ProductionEverclearSpokeApeChain from './production/33139/EverclearSpoke.json';
+import ProductionSpokeGatewayApeChain from './production/33139/SpokeGateway.json';
 
 export const Deployments = {
   local: {},
@@ -178,10 +181,14 @@ export const Deployments = {
       everclear: ProductionEverclearSpokeScroll,
       gateway: ProductionSpokeGatewayScroll,
     },
-    // 167000: {
-    //   everclear: ProductionEverclearSpokeTaiko,
-    //   gateway: ProductionSpokeGatewayTaiko,
-    // },
+    33139: {
+      everclear: ProductionEverclearSpokeApeChain,
+      gateway: ProductionSpokeGatewayApeChain,
+    },
+    167000: {
+      everclear: ProductionEverclearSpokeTaiko,
+      gateway: ProductionSpokeGatewayTaiko,
+    },
     43114: {
       everclear: ProductionEverclearSpokeAvalanche,
       gateway: ProductionSpokeGatewayAvalanche,

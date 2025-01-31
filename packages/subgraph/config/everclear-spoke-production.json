@@ -148,6 +148,15 @@
     ]
   },
   {
+    "subgraphName": "everclear-spoke-apechain",
+    "domain": "33139",
+    "environment": "production",
+    "network": "apechain-mainnet",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
     "subgraphName": "everclear-spoke-taiko",
     "domain": "167000",
     "environment": "production",

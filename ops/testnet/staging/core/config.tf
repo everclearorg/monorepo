@@ -5,6 +5,13 @@ locals {
   default_db_endpoint      = "rds-postgres-cartographer-chimera.c2g2uuqedmjs.eu-west-1.rds.amazonaws.com"
   default_db_url           = "postgresql://${var.postgres_user}:${var.postgres_password}@${local.default_db_endpoint}:5432/everclear"
 
+  lighthouse_intent_config_param_name = "lighthouse-intent-${var.environment}-${var.stage}-config"
+  lighthouse_fill_config_param_name = "lighthouse-fill-${var.environment}-${var.stage}-config"
+  lighthouse_settlement_config_param_name = "lighthouse-settlement-${var.environment}-${var.stage}-config"
+  lighthouse_expired_config_param_name = "lighthouse-expired-${var.environment}-${var.stage}-config"
+  lighthouse_invoice_config_param_name = "lighthouse-invoice-${var.environment}-${var.stage}-config"
+  monitor_poller_config_param_name = "monitor-poller-${var.environment}-${var.stage}-config"
+
   relayer_env_vars = [
     { name = "RELAYER_CONFIG", value = local.local_relayer_config },
     { name = "ENVIRONMENT", value = var.environment },
@@ -29,7 +36,6 @@ locals {
   ]
 
   monitor_poller_env_vars = {
-    MONITOR_CONFIG = local.local_monitor_config,
     ENVIRONMENT    = var.environment,
     STAGE          = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -39,15 +45,14 @@ locals {
   }
 
   lighthouse_env_vars = {
-    LIGHTHOUSE_CONFIG = local.local_lighthouse_config,
     ENVIRONMENT       = var.environment,
     STAGE             = var.stage,
     DD_LOGS_ENABLED   = true,
     DD_ENV            = "${var.environment}-${var.stage}",
     DD_API_KEY        = var.dd_api_key,
     DD_LAMBDA_HANDLER = "packages/agents/lighthouse/dist/index.handler"
-    # To enable the graph API, uncomment the following line 
-    # GRAPH_API_KEY     = var.graph_api_key 
+    # To enable the graph API, uncomment the following line
+    # GRAPH_API_KEY     = var.graph_api_key
   }
   
   lighthouse_web3signer_env_vars = [
