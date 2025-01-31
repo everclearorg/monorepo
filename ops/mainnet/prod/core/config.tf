@@ -171,7 +171,7 @@ locals {
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
-          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          "https://avax-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }
@@ -279,7 +279,7 @@ locals {
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
-          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          "https://avax-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }
@@ -393,7 +393,7 @@ locals {
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
-          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          "https://avax-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }
@@ -569,7 +569,7 @@ locals {
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
-          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          "https://avax-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }
