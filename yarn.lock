@@ -12172,7 +12172,7 @@ __metadata:
 "isolmate@github:defi-wonderland/isolmate#59e18043c2450fef550f1744b3705ce9ebcaf1c8":
   version: 6.2.0-beta2
   resolution: "isolmate@https://github.com/defi-wonderland/isolmate.git#commit=59e18043c2450fef550f1744b3705ce9ebcaf1c8"
-  checksum: 20590bd0df236508f540f1cb76ce4a361bc5a5ebcdb6be3b013709cbcc77ab3eb727ca355b326c305bd2fb44062dffd747aefc71f4d538b9a3b5816fdd3e4f7e
+  checksum: 08e1b73c055f54999c3c4e8b729b383d7b3b36e03b5e40029e925c362a922542bdb85ecc67d9e1ca67942fc3f83f428d7b717a76f9797f327eac03a4cb02554e
   languageName: node
   linkType: hard
 

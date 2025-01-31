@@ -126,6 +126,15 @@
     "realm": "spoke"
   },
   {
+    "name": "Apechain",
+    "id": 33139,
+    "rpc": "https://apechain.drpc.org",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
     "name": "Avalanche",
     "id": 43114,
     "rpc": "https://avalanche.drpc.org",
