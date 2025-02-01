@@ -101,8 +101,7 @@ locals {
       }
       "534352" = {
         providers = [
-          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "167000" = {
