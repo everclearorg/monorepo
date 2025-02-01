@@ -161,12 +161,12 @@ locals {
           "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
         ]
       }
-      "33139" = {
-        providers = [
-          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
-          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "33139" = {
+      #   providers = [
+      #     "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+      #     "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
@@ -267,12 +267,12 @@ locals {
           "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
         ]
       }
-      "33139" = {
-        providers = [
-          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
-          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "33139" = {
+      #   providers = [
+      #     "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+      #     "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
@@ -380,12 +380,12 @@ locals {
           "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
         ]
       }
-      "33139" = {
-        providers = [
-          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
-          #"https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "33139" = {
+      #   providers = [
+      #     "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+      #     #"https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
@@ -481,8 +481,8 @@ locals {
       137 = { maxAge = 60, size = 1 },
       43114 = { maxAge = 60, size = 1 },
       534352 = { maxAge = 60, size = 1 },
-      167000 = { maxAge = 60, size = 1 },
-      33139 = { maxAge = 60, size = 1 }
+      167000 = { maxAge = 60, size = 1 }
+      # 33139 = { maxAge = 60, size = 1 }
     }
     chains = {
       "1" = {
@@ -556,12 +556,12 @@ locals {
           "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
         ]
       }
-      "33139" = {
-        providers = [
-          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
-          #"https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "33139" = {
+      #   providers = [
+      #     "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+      #     #"https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
