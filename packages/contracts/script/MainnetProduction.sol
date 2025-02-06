@@ -47,7 +47,7 @@ abstract contract MainnetAssets {
   address public constant APECHAIN_WETH = 0xcF800F4948D16F23333508191B1B1591daF70438;
 
   ///////////////////// USDT
-  // NOTE: USDT is not supported on Base, Apechain
+  // NOTE: USDT is not supported on Apechain
   address public constant ETHEREUM_USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
   address public constant ARBITRUM_USDT = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
   address public constant OPTIMISM_USDT = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58;
@@ -57,6 +57,7 @@ abstract contract MainnetAssets {
   address public constant AVALANCHE_USDT = 0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7;
   address public constant SCROLL_USDT = 0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df;
   address public constant TAIKO_USDT = 0x2DEF195713CF4a606B49D07E520e22C17899a736;
+  address public constant BASE_USDT = 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
