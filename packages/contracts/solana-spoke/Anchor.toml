@@ -14,7 +14,7 @@ spoke-message-receiver = "GjCjjGERAG5prDApTCdtzkpxNjCAY8SQxzthwF7bbbg1"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
