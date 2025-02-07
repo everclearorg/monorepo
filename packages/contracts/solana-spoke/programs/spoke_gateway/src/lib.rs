@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+pub mod spoke_storage;
 
 declare_id!("Gate111111111111111111111111111111111111111");
 

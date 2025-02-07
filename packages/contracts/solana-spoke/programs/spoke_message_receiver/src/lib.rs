@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use spoke_storage::spoke_storage::SpokeStorageState;
+mod spoke_storage;
 
 declare_id!("MsgR111111111111111111111111111111111111111");
 
@@ -89,7 +89,7 @@ fn process_batch_settlement(ctx: Context<ReceiveMessage>, data: &[u8]) -> Result
 pub struct ReceiveMessage<'info> {
     /// The state account to update
     #[account(mut)]
-    pub state: Account<'info, SpokeStorageState>,
+    pub state: Account<'info, spoke_storage::SpokeStorageState>,
 }
 
 

@@ -5,8 +5,6 @@
 use anchor_lang::prelude::*;
 use std::collections::VecDeque;
 
-declare_id!("Spok111111111111111111111111111111111111111");
-
 /// Maximum number of intents that can be queued
 pub const MAX_INTENT_QUEUE_SIZE: usize = 1000;
 /// Maximum number of fills that can be queued
