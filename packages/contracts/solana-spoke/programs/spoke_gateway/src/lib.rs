@@ -172,4 +172,6 @@ pub enum CustomError {
     EmptyMessage,
     #[msg("Message too large")]
     MessageTooLarge,
+    #[msg("Insufficient funds for message fee")]
+    InsufficientFunds,
 } 
