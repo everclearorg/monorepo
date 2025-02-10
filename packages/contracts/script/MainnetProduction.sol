@@ -45,6 +45,7 @@ abstract contract MainnetAssets {
   address public constant SCROLL_WETH = 0x5300000000000000000000000000000000000004;
   address public constant TAIKO_WETH = 0xA51894664A773981C6C112C43ce576f315d5b1B6;
   address public constant APECHAIN_WETH = 0xcF800F4948D16F23333508191B1B1591daF70438;
+  address public constant ZIRCUIT_WETH = 0x4200000000000000000000000000000000000006;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
@@ -57,6 +58,7 @@ abstract contract MainnetAssets {
   address public constant AVALANCHE_USDT = 0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7;
   address public constant SCROLL_USDT = 0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df;
   address public constant TAIKO_USDT = 0x2DEF195713CF4a606B49D07E520e22C17899a736;
+  address public constant ZIRCUIT_USDT = 0x46dDa6a5a559d861c06EC9a95Fb395f5C3Db0742;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -69,6 +71,7 @@ abstract contract MainnetAssets {
   address public constant AVALANCHE_USDC = 0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E;
   address public constant SCROLL_USDC = 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4;
   address public constant TAIKO_USDC = 0x07d83526730c7438048D55A4fc0b850e2aaB6f0b;
+  address public constant ZIRCUIT_USDC = 0x3b952c8C9C44e8Fe201e2b26F6B2200203214cfF;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
