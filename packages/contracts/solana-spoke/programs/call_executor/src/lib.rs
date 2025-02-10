@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 
-declare_id!("Ca11Exc1111111111111111111111111111111111111");
+declare_id!("73N4pP9REgvPnoXaKdpmB6acvJAHug3nYZbcopj2tPta");
 
 #[program]
 pub mod call_executor {

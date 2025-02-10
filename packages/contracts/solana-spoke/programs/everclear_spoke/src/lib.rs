@@ -21,7 +21,7 @@ pub const PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xCC; 32];
 // Dummy Permit2 address
 pub const PERMIT2: Pubkey = Pubkey::new_from_array([0u8; 32]);
 
-declare_id!("EverclrSpk1111111111111111111111111111111111");
+declare_id!("FH6w3aVDLKtZn3AmK3bxM9RBvJ6WBKEhp6VFZb5Axcoy");
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct SpokeInitializationParams {
@@ -598,7 +598,7 @@ pub mod everclear_spoke {
         // TODO: Verify Permit2 signature via CPI to Permit2 program
         
         // Create the intent
-        self.new_intent(ctx, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data)
+        new_intent(ctx, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data)
     }
 
     /// Process intent queue via a relayer
@@ -612,7 +612,7 @@ pub mod everclear_spoke {
         relayer_sig.verify(PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH, msg_hash)?;
         
         // Process the queue
-        self.process_intent_queue(ctx, count)
+        process_intent_queue(ctx, count)
     }
 
     /// Process fill queue via a relayer
@@ -626,7 +626,7 @@ pub mod everclear_spoke {
         relayer_sig.verify(PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH, msg_hash)?;
         
         // Process the queue
-        self.process_fill_queue(ctx, count)
+        process_fill_queue(ctx, count)
     }
 
     /// Fill intent with solver signature verification
@@ -644,7 +644,7 @@ pub mod everclear_spoke {
         solver_sig.verify(FILL_INTENT_FOR_SOLVER_TYPEHASH, msg_hash)?;
         
         // Fill the intent
-        self.fill_intent(ctx, intent_id, fee)
+        fill_intent(ctx, intent_id, fee)
     }
 }
 
