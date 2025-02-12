@@ -64,6 +64,7 @@ scroll = "${SCROLL_RPC}"
 apechain = "${APECHAIN_RPC}"
 mode = "${MODE_RPC}"
 unichain = "${UNICHAIN_RPC}"
+zksync = "${ZKSYNC_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
@@ -83,3 +84,4 @@ scroll = { key = "${SCROLLSCAN_API_KEY}", chain = "534351", url = "https://api.s
 apechain = { key = "${APECHAINSCAN_API_KEY}", chain = "59144", url = "https://api.apescan.io/api" }
 mode = { key = "${MODE_VERIFIER_KEY}", url = "${MODE_VERIFIER_API_URL}" }
 unichain = { key = "${UNICHAIN_API_KEY}", chain = "130", url = "${UNICHAIN_VERIFIER_API_URL}" }
+zksync = { key = "${ZKSYNC_API_KEY}", chain = "324", url = "${ZKSYNC_VERIFIER_API_URL}" }

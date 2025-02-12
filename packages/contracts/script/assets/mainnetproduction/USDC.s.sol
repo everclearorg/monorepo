@@ -36,7 +36,7 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](12);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](13);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -142,6 +142,15 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: UNICHAIN_USDC.toBytes32(),
       domain: UNICHAIN,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// zkSync
+    _assetConfigs[12] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: ZKSYNC_USDC.toBytes32(),
+      domain: ZKSYNC,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });

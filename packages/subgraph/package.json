@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "graph": "graph",
-    "graph:build": "graph build", 
+    "graph:build": "graph build",
     "build": "",
     "codegen": "graph codegen",
     "goldsky": "goldsky",

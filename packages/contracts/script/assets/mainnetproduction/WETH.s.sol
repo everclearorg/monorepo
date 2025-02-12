@@ -36,7 +36,7 @@ contract WETH is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](14);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](15);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -160,6 +160,15 @@ contract WETH is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: UNICHAIN_WETH.toBytes32(),
       domain: UNICHAIN,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// zkSync
+    _assetConfigs[14] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: ZKSYNC_WETH.toBytes32(),
+      domain: ZKSYNC,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });

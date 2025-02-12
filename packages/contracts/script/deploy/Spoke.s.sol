@@ -527,9 +527,9 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       owner: OWNER,
       maxSolversFee: MAX_FEE
     });
-  _deploymentParams[UNICHAIN] = DeploymentParams({ // set domain id as mapping key
+    _deploymentParams[UNICHAIN] = DeploymentParams({ // set domain id as mapping key
       gateway: ISpokeGateway(address(0)),
-      executor: ICallExecutor(address(0)), 
+      executor: ICallExecutor(address(0)),
       messageReceiver: address(0),
       lighthouse: LIGHTHOUSE,
       watchtower: WATCHTOWER,

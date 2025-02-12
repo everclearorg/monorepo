@@ -133,7 +133,7 @@
     "subgraphName": "everclear-spoke-zksync",
     "domain": "324",
     "environment": "production",
-    "network": "zksync",
+    "network": "zksync-era",
     "indexers": [
       "goldsky"
     ]

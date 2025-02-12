@@ -53,7 +53,7 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(84531);
   } else if (network == 'base') {
     chainId = BigInt.fromI32(8453);
-  } else if (network == 'zksync') {
+  } else if (network == 'zksync-era') {
     chainId = BigInt.fromI32(324);
   } else if (network == 'xgon') {
     chainId = BigInt.fromI32(195);

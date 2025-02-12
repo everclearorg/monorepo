@@ -139,12 +139,12 @@ locals {
           "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      }
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
@@ -258,12 +258,12 @@ locals {
           "https://linea-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      }
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
@@ -383,12 +383,12 @@ locals {
           "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      }
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
@@ -518,7 +518,8 @@ locals {
       137 = { maxAge = 60, size = 1 },
       43114 = { maxAge = 60, size = 1 },
       34443 = { maxAge = 60, size = 1 },
-      130 = { maxAge = 60, size = 1 }
+      130 = { maxAge = 60, size = 1 },
+      324 = { maxAge = 60, size = 1 }
     }
     chains = {
       "1" = {
@@ -569,12 +570,12 @@ locals {
           "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      }
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
