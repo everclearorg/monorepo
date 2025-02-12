@@ -47,6 +47,7 @@ abstract contract MainnetAssets {
   address public constant APECHAIN_WETH = 0xcF800F4948D16F23333508191B1B1591daF70438;
   address public constant MODE_WETH = 0x4200000000000000000000000000000000000006; // Mode's canonical WETH
   address public constant UNICHAIN_WETH = 0x4200000000000000000000000000000000000006;
+  address public constant ZKSYNC_WETH = 0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
@@ -60,6 +61,8 @@ abstract contract MainnetAssets {
   address public constant SCROLL_USDT = 0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df;
   address public constant TAIKO_USDT = 0x2DEF195713CF4a606B49D07E520e22C17899a736;
   address public constant MODE_USDT = 0xf0F161fDA2712DB8b566946122a5af183995e2eD; // Mode's USDT
+  address public constant ZKSYNC_USDT = 0x493257fD37EDB34451f62EDf8D2a0C418852bA4C;
+  address public constant UNICHAIN_USDT = 0x588CE4F028D8e7B53B687865d6A67b3A54C75518;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -74,6 +77,7 @@ abstract contract MainnetAssets {
   address public constant TAIKO_USDC = 0x07d83526730c7438048D55A4fc0b850e2aaB6f0b;
   address public constant MODE_USDC = 0xd988097fb8612cc24eeC14542bC03424c656005f; // Mode's USDC
   address public constant UNICHAIN_USDC = 0x078D782b760474a361dDA0AF3839290b0EF57AD6;
+  address public constant ZKSYNC_USDC = 0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
@@ -368,6 +372,14 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
         chainId: UNICHAIN,
         blockGasLimit: 30_000_000,
         gateway: address(UNICHAIN_SPOKE_GATEWAY).toBytes32()
+      })
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({
+        chainId: ZKSYNC,
+        blockGasLimit: 30_000_000,
+        gateway: address(ZKSYNC_SPOKE_GATEWAY).toBytes32()
       })
     );
   }

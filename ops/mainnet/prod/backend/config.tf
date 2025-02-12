@@ -87,12 +87,12 @@ locals {
           "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      },
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
