@@ -144,6 +144,15 @@
     "realm": "spoke"
   },
   {
+    "name": "Mode",
+    "id": 34443,
+    "rpc": "https://mode-mainnet.blastapi.io/43b468df-b3e8-4ee0-bd65-0b663a470cac",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
     "name": "Scroll Sepolia",
     "id": 534351,
     "rpc": "https://scroll-testnet-public.unifra.io",

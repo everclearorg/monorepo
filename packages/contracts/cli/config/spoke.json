@@ -130,5 +130,11 @@
     "domainName": "Apechain",
     "domainId": 33139,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99",
+    "domainName": "Mode",
+    "domainId": 34443,
+    "environment": "MainnetProduction"
   }
 ]

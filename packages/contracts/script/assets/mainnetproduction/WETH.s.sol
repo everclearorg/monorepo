@@ -36,7 +36,7 @@ contract WETH is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](12);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](13);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -142,6 +142,15 @@ contract WETH is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: TAIKO_WETH.toBytes32(),
       domain: TAIKO,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Mode
+    _assetConfigs[12] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MODE_WETH.toBytes32(),
+      domain: MODE,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });

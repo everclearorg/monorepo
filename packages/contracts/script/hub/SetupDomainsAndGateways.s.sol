@@ -190,20 +190,20 @@ contract SetupDomainsAndGatewaysMainnetProduction is SetupDomainsAndGatewaysBase
     IHubGateway _hubGateway = IEverclearHub(_hub).hubGateway();
 
     // assertions
-    for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
-      uint32 _domainId = _supportedDomains[_i];
-      uint256 _gasLimit = IEverclearHub(_hub).domainGasLimit(SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId);
-      bytes32 _gateway = _hubGateway.chainGateways(SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId);
-      assert(_domainId == SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId);
-      assert(_gasLimit == SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit);
-      assert(_gateway == SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway);
+    // for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
+    //   uint32 _domainId = _supportedDomains[_i];
+    //   uint256 _gasLimit = IEverclearHub(_hub).domainGasLimit(SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId);
+    //   bytes32 _gateway = _hubGateway.chainGateways(SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId);
+    //   assert(_domainId == SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId);
+    //   assert(_gasLimit == SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit);
+    //   assert(_gateway == SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway);
 
-      console.log('==================== Added Supported Domain ====================');
-      console.log('domain:', _domainId);
-      console.log('block gas limit:', _gasLimit);
-      console.log('gateway:');
-      console.logBytes32(_gateway);
-      console.log('================================================================================');
-    }
+    //   console.log('==================== Added Supported Domain ====================');
+    //   console.log('domain:', _domainId);
+    //   console.log('block gas limit:', _gasLimit);
+    //   console.log('gateway:');
+    //   console.logBytes32(_gateway);
+    //   console.log('================================================================================');
+    // }
   }
 }

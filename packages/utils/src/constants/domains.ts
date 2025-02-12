@@ -18,7 +18,7 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [43114, 43114], // Avalanche C-Chain
   [1088, 1088], // Metis Andromeda
   [5000, 5000], // Mantle
-  [34443, 34443], // Mode
+  [34443, 34443], // Mode Mainnet
   [534352, 534352], // Scroll
   [196, 196], // X Layer Mainnet
   [25327, 25327], // Everclear Mainnet
