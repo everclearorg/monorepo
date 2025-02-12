@@ -376,11 +376,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: ZKSYNC,
-        blockGasLimit: 30_000_000,
-        gateway: address(ZKSYNC_SPOKE_GATEWAY).toBytes32()
-      })
+      DomainAndGateway({chainId: ZKSYNC, blockGasLimit: 30_000_000, gateway: address(ZKSYNC_SPOKE_GATEWAY).toBytes32()})
     );
   }
 }
