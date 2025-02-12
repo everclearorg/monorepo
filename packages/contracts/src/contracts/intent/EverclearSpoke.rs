@@ -103,6 +103,10 @@ pub mod everclear_spoke {
     pub fn deposit(ctx: Context<Deposit>, asset: Pubkey, amount: u64) -> Result<()> {
         let state = &mut ctx.accounts.state;
         let depositor = ctx.accounts.depositor.key();
+<<<<<<< Updated upstream
+=======
+        // TODO: This wold need to transfer tokens in Solana
+>>>>>>> Stashed changes
         // In production you would also perform a CPI call to the Token Program for a token transfer.
         if let Some(entry) = state
             .balances

@@ -21,7 +21,11 @@ pub const PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xCC; 32];
 // Dummy Permit2 address
 pub const PERMIT2: Pubkey = Pubkey::new_from_array([0u8; 32]);
 
+<<<<<<< Updated upstream
 declare_id!("FH6w3aVDLKtZn3AmK3bxM9RBvJ6WBKEhp6VFZb5Axcoy");
+=======
+declare_id!("EverclrSpk1111111111111111111111111111111111");
+>>>>>>> Stashed changes
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct SpokeInitializationParams {
@@ -193,6 +197,10 @@ pub mod everclear_spoke {
         let vault_authority_seeds = &[
             b"vault",
             ctx.accounts.mint.key().as_ref(),
+<<<<<<< Updated upstream
+=======
+            program_id.as_ref(), // Adding the program id to the seed to protect this?
+>>>>>>> Stashed changes
             &[ctx.accounts.vault_authority_bump],
         ];
         let signer = &[&vault_authority_seeds[..]];
@@ -228,7 +236,12 @@ pub mod everclear_spoke {
         let state = &mut ctx.accounts.spoke_state;
         require!(!state.paused, SpokeError::ContractPaused);
         require!(destinations.len() > 0, SpokeError::InvalidOperation);
+<<<<<<< Updated upstream
         // If a single destination and ttl != 0, require output_asset is non-zero.
+=======
+        
+        // Validate intent parameters
+>>>>>>> Stashed changes
         if destinations.len() == 1 {
             require!(output_asset != Pubkey::default(), SpokeError::InvalidIntent);
         } else {
@@ -237,6 +250,7 @@ pub mod everclear_spoke {
         }
         // Check max_fee is within allowed range (for example, <= 10_000 for basis points)
         require!(max_fee <= 10_000, SpokeError::MaxFeeExceeded);
+<<<<<<< Updated upstream
 
         // Update global nonce.
         state.nonce = state.nonce.checked_add(1).ok_or(SpokeError::InvalidOperation)?;
@@ -253,12 +267,46 @@ pub mod everclear_spoke {
         reduce_balance(&mut state.balances, input_asset, ctx.accounts.authority.key(), amount)?;
 
         // Append the intent_id to the intent_queue.
+=======
+        require!(amount > 0, SpokeError::ZeroAmount);  // Add zero amount check like Solidity
+
+        // Update global nonce and create intent_id
+        state.nonce = state.nonce.checked_add(1).ok_or(SpokeError::InvalidOperation)?;
+        let clock = Clock::get()?;
+        
+        // Create intent_id with all parameters
+        let mut hasher_input = Vec::new();
+        hasher_input.extend_from_slice(ctx.accounts.authority.key.as_ref());    // initiator
+        hasher_input.extend_from_slice(&receiver.to_bytes());                   // receiver
+        hasher_input.extend_from_slice(&input_asset.to_bytes());               // input asset
+        hasher_input.extend_from_slice(&output_asset.to_bytes());              // output asset
+        hasher_input.extend_from_slice(&max_fee.to_be_bytes());                // max fee
+        hasher_input.extend_from_slice(&state.domain.to_be_bytes());           // origin domain
+        hasher_input.extend_from_slice(&state.nonce.checked_add(1)             // nonce
+            .ok_or(SpokeError::InvalidOperation)?.to_be_bytes());
+        hasher_input.extend_from_slice(&clock.unix_timestamp.to_be_bytes());    // timestamp
+        hasher_input.extend_from_slice(&ttl.to_be_bytes());                    // ttl
+        hasher_input.extend_from_slice(&amount.to_be_bytes());                 // amount
+        hasher_input.extend_from_slice(&destinations.try_to_vec()?);           // destinations
+        hasher_input.extend_from_slice(&data);                                 // data
+
+        let intent_id = keccak_256(&hasher_input);
+
+        // Always reduce balance (no Permit2 optionality)
+        reduce_balance(&mut state.balances, input_asset, ctx.accounts.authority.key(), amount)?;
+
+        // Update intent queue and status
+>>>>>>> Stashed changes
         state.intent_queue.push_back(intent_id);
 
         // Also, record a minimal status mapping (we only record the intent_id and its status).
         state.status.insert(intent_id, IntentStatus::Added);
 
+<<<<<<< Updated upstream
         // Emit an event with full intent details.
+=======
+        // Emit event
+>>>>>>> Stashed changes
         emit!(IntentAddedEvent {
             intent_id,
             initiator: ctx.accounts.authority.key(),
@@ -354,6 +402,7 @@ pub mod everclear_spoke {
     }
 
     /// Process a batch of intents in the queue and dispatch a cross-chain message via Hyperlane.
+<<<<<<< Updated upstream
     pub fn process_intent_queue(ctx: Context<AuthState>, count: u32) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(!state.paused, SpokeError::ContractPaused);
@@ -374,6 +423,37 @@ pub mod everclear_spoke {
             data.extend_from_slice(&EVERCLEAR_DOMAIN.to_le_bytes()); // destination domain
             data.extend_from_slice(&state.gateway.to_bytes());       // recipient (hub gateway)
             data.extend_from_slice(&(batch_message.len() as u64).to_le_bytes());
+=======
+    pub fn process_intent_queue(
+        ctx: Context<AuthState>, 
+        intents: Vec<Intent>,  // Pass full intents, not just count
+        message_gas_limit: u64
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(!state.paused, SpokeError::ContractPaused);
+        require!(intents.len() > 0, SpokeError::InvalidAmount);
+        require!(intents.len() <= state.intent_queue.len(), SpokeError::InvalidQueueOperation);
+
+        // Verify each intent matches the queue
+        for intent in intents.iter() {
+            let queue_intent_id = state.intent_queue.pop_front()
+                .ok_or(SpokeError::InvalidQueueOperation)?;
+            
+            // Hash the intent to verify it matches queue
+            let intent_hash = keccak_256(&intent.try_to_vec()?);
+            require!(queue_intent_id == intent_hash, SpokeError::IntentNotFound);
+        }
+
+        // Format message using proper message lib
+        let batch_message = MessageLib::format_intent_message_batch(&intents)?;
+
+        // Call Hyperlane with proper gas handling
+        let ix_data = {
+            let mut data = Vec::new();
+            data.extend_from_slice(&EVERCLEAR_DOMAIN.to_be_bytes());
+            data.extend_from_slice(&state.gateway.to_bytes());
+            data.extend_from_slice(&message_gas_limit.to_be_bytes());
+>>>>>>> Stashed changes
             data.extend_from_slice(&batch_message);
             data
         };
@@ -386,11 +466,20 @@ pub mod everclear_spoke {
             &ix,
             &[ctx.accounts.hyperlane_mailbox.to_account_info()],
         )?;
+<<<<<<< Updated upstream
         emit!(IntentQueueProcessedEvent {
             message_id: keccak_256(&batch_message),
             first_index: 0, // for demonstration
             last_index: count as u64,
             fee_spent: 0, // placeholder
+=======
+
+        emit!(IntentQueueProcessedEvent {
+            message_id,
+            first_index: state.intent_queue.first_index(),
+            last_index: state.intent_queue.first_index() + intents.len() as u64,
+            fee_spent,
+>>>>>>> Stashed changes
         });
         Ok(())
     }
@@ -598,7 +687,11 @@ pub mod everclear_spoke {
         // TODO: Verify Permit2 signature via CPI to Permit2 program
         
         // Create the intent
+<<<<<<< Updated upstream
         new_intent(ctx, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data)
+=======
+        self.new_intent(ctx, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data)
+>>>>>>> Stashed changes
     }
 
     /// Process intent queue via a relayer
@@ -612,7 +705,11 @@ pub mod everclear_spoke {
         relayer_sig.verify(PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH, msg_hash)?;
         
         // Process the queue
+<<<<<<< Updated upstream
         process_intent_queue(ctx, count)
+=======
+        self.process_intent_queue(ctx, count)
+>>>>>>> Stashed changes
     }
 
     /// Process fill queue via a relayer
@@ -626,7 +723,11 @@ pub mod everclear_spoke {
         relayer_sig.verify(PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH, msg_hash)?;
         
         // Process the queue
+<<<<<<< Updated upstream
         process_fill_queue(ctx, count)
+=======
+        self.process_fill_queue(ctx, count)
+>>>>>>> Stashed changes
     }
 
     /// Fill intent with solver signature verification
@@ -644,7 +745,11 @@ pub mod everclear_spoke {
         solver_sig.verify(FILL_INTENT_FOR_SOLVER_TYPEHASH, msg_hash)?;
         
         // Fill the intent
+<<<<<<< Updated upstream
         fill_intent(ctx, intent_id, fee)
+=======
+        self.fill_intent(ctx, intent_id, fee)
+>>>>>>> Stashed changes
     }
 }
 
@@ -1042,6 +1147,11 @@ pub enum SpokeError {
     InvalidSignature,
     #[msg("Invalid Permit2 data")]
     InvalidPermit2Data,
+<<<<<<< Updated upstream
+=======
+    #[msg("Zero amount provided")]
+    ZeroAmount,
+>>>>>>> Stashed changes
 }
 
 // =====================================================================
