@@ -20,6 +20,8 @@ broadcast/*/*/*
 
 # Out dir
 out
+zk/out-zk
+zk/zkout
 
 # Coverage reports
 lcov.info

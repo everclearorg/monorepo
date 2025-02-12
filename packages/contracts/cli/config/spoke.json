@@ -130,5 +130,17 @@
     "domainName": "Apechain",
     "domainId": 33139,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0x7F5e085981C93C579c865554B9b723B058AaE4D3",
+    "domainName": "zkSync",
+    "domainId": 324,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Unichain",
+    "domainId": 130,
+    "environment": "MainnetProduction"
   }
 ]

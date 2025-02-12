@@ -144,6 +144,22 @@
     "realm": "spoke"
   },
   {
+    "name": "Mode",
+    "id": 34443,
+    "rpc": "https://mode.drpc.org",
+    "environments": [
+      "MainnetProduction"
+    ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Unichain",
+    "id": 130,
+    "rpc": "https://mainnet.unichain.org",
+    "environments": ["MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
     "name": "Scroll Sepolia",
     "id": 534351,
     "rpc": "https://scroll-testnet-public.unifra.io",
