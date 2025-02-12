@@ -219,9 +219,9 @@ abstract contract ZkSync {
   uint32 public constant ZKSYNC = 324;
   IMailbox public ZKSYNC_MAILBOX = IMailbox(0x6bD0A2214797Bc81e0b006F7B74d6221BcD8cb6E);
 
-  IEverclearSpoke public ZKSYNC_SPOKE = IEverclearSpoke(0x7F5e085981C93C579c865554B9b723B058AaE4D3);
-  ISpokeGateway public ZKSYNC_SPOKE_GATEWAY = ISpokeGateway(0x0Bab6c0073a706fE045E4608CA4cD905136CBBe0);
-  ICallExecutor public ZKSYNC_EXECUTOR = ICallExecutor(0xd2cC1a32430B1b81b0ed6327bc37670a26ca4568);
+  // IEverclearSpoke public ZKSYNC_SPOKE;
+  // ISpokeGateway public ZKSYNC_SPOKE_GATEWAY;
+  // ICallExecutor public ZKSYNC_EXECUTOR;
 }
 
 abstract contract MainnetProductionDomains is
