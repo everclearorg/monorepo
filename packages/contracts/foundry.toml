@@ -21,6 +21,14 @@ fs_permissions = [
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-bnb.json" }
     ]
 
+[profile.zksync]
+src = "src-zk"
+out = "out-zksync" 
+libs = ["../../node_modules","lib"]
+compile = true
+fallback_oz = false
+mode = "1"
+
 [profile.optimized]
 via_ir = true
 out = 'out-via-ir'
@@ -54,6 +62,9 @@ avalanche = "${AVALANCHE_RPC}"
 taiko = "${TAIKO_RPC}"
 scroll = "${SCROLL_RPC}"
 apechain = "${APECHAIN_RPC}"
+mode = "${MODE_RPC}"
+unichain = "${UNICHAIN_RPC}"
+zksync = "${ZKSYNC_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
@@ -71,3 +82,6 @@ avalanche = { key = "${AVALANCHESCAN_API_KEY}", chain = "43114", url = "https://
 taiko = { key = "${TAIKOSCAN_API_KEY}", chain = "100", url = "https://api.taikoscan.io/api" }
 scroll = { key = "${SCROLLSCAN_API_KEY}", chain = "534351", url = "https://api.scrollscan.com/api" }
 apechain = { key = "${APECHAINSCAN_API_KEY}", chain = "59144", url = "https://api.apescan.io/api" }
+mode = { key = "${MODE_VERIFIER_KEY}", url = "${MODE_VERIFIER_API_URL}" }
+unichain = { key = "${UNICHAIN_API_KEY}", chain = "130", url = "${UNICHAIN_VERIFIER_API_URL}" }
+zksync = { key = "${ZKSYNC_API_KEY}", chain = "324", url = "${ZKSYNC_VERIFIER_API_URL}" }
