@@ -36,7 +36,7 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](10);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](12);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -124,6 +124,24 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: TAIKO_USDC.toBytes32(),
       domain: TAIKO,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Mode
+    _assetConfigs[10] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MODE_USDC.toBytes32(),
+      domain: MODE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Unichain
+    _assetConfigs[11] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: UNICHAIN_USDC.toBytes32(),
+      domain: UNICHAIN,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });

@@ -173,6 +173,17 @@ locals {
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
           "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
+        ]
       }
     }
     server = {
@@ -280,6 +291,17 @@ locals {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
           "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
         ]
       }
     }
@@ -395,6 +417,17 @@ locals {
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
           "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
+        ]
       }
     }
     betterUptime = {
@@ -484,6 +517,8 @@ locals {
       59144 = { maxAge = 60, size = 1 },
       137 = { maxAge = 60, size = 1 },
       43114 = { maxAge = 60, size = 1 },
+      34443 = { maxAge = 60, size = 1 },
+      130 = { maxAge = 60, size = 1 }
     }
     chains = {
       "1" = {
@@ -567,6 +602,17 @@ locals {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
           "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
         ]
       }
     }

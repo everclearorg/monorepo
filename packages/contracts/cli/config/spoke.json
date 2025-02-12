@@ -136,5 +136,11 @@
     "domainName": "zkSync",
     "domainId": 324,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Unichain",
+    "domainId": 130,
+    "environment": "MainnetProduction"
   }
 ]

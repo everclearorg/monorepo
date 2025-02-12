@@ -103,6 +103,15 @@
     ]
   },
   {
+    "subgraphName": "everclear-spoke-mode",
+    "domain": "34443",
+    "environment": "production", 
+    "network": "mode-mainnet",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
     "subgraphName": "everclear-spoke-blast",
     "domain": "81457",
     "environment": "production",
@@ -170,6 +179,15 @@
     "domain": "43114",
     "environment": "production",
     "network": "avalanche",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-unichain",
+    "domain": "130",
+    "environment": "production",
+    "network": "unichain",
     "indexers": [
       "goldsky"
     ]

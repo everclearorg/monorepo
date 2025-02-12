@@ -121,6 +121,17 @@ locals {
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
           "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
+        ]
       }
     }
   })
