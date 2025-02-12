@@ -4,6 +4,15 @@ locals {
   default_db_endpoint      = "rds-postgres-cartographer-chimera.c64s9irwuemi.us-west-2.rds.amazonaws.com"
   default_db_url           = "postgresql://${var.postgres_user}:${var.postgres_password}@${local.default_db_endpoint}:5432/everclear"
 
+  lighthouse_intent_config_param_name = "lighthouse-intent-${var.environment}-${var.stage}-config"
+  lighthouse_fill_config_param_name = "lighthouse-fill-${var.environment}-${var.stage}-config"
+  lighthouse_settlement_config_param_name = "lighthouse-settlement-${var.environment}-${var.stage}-config"
+  lighthouse_expired_config_param_name = "lighthouse-expired-${var.environment}-${var.stage}-config"
+  lighthouse_invoice_config_param_name = "lighthouse-invoice-${var.environment}-${var.stage}-config"
+  lighthouse_reward_config_param_name = "lighthouse-reward-${var.environment}-${var.stage}-config"
+  lighthouse_reward_metadata_config_param_name = "lighthouse-reward_metadata-${var.environment}-${var.stage}-config"
+  monitor_poller_config_param_name = "monitor-poller-${var.environment}-${var.stage}-config"
+
   relayer_env_vars = [
     { name = "RELAYER_CONFIG", value = local.local_relayer_config },
     { name = "ENVIRONMENT", value = var.environment },
@@ -28,7 +37,6 @@ locals {
   ]
 
   monitor_poller_env_vars = {
-    MONITOR_CONFIG = local.local_monitor_config,
     ENVIRONMENT    = var.environment,
     STAGE          = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -39,7 +47,6 @@ locals {
   }
 
   lighthouse_env_vars = {
-    LIGHTHOUSE_CONFIG = local.local_lighthouse_config,
     ENVIRONMENT       = var.environment,
     STAGE             = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -126,6 +133,47 @@ locals {
           "https://blastl2-mainnet.public.blastapi.io"
         ]
       }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.blastapi.io/${var.blast_key}",
+          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      # "324" = {
+      #   providers = [
+      #     "https://1rpc.io/zksync2-era",
+      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+      #   ]
+      # }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
     }
     server = {
       port = 8080
@@ -191,6 +239,47 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://linea-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      # "324" = {
+      #   providers = [
+      #     "https://1rpc.io/zksync2-era",
+      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+      #   ]
+      # }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }
@@ -264,6 +353,47 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.blastapi.io/${var.blast_key}",
+          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      # "324" = {
+      #   providers = [
+      #     "https://1rpc.io/zksync2-era",
+      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+      #   ]
+      # }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }
@@ -349,6 +479,11 @@ locals {
       10 = { maxAge = 60, size = 1 },
       8453 = { maxAge = 60, size = 1 },
       48900 = { maxAge = 60, size = 1 },
+      25327 = { maxAge = 60, size = 1 },
+      81457 = { maxAge = 60, size = 1 },
+      59144 = { maxAge = 60, size = 1 },
+      137 = { maxAge = 60, size = 1 },
+      43114 = { maxAge = 60, size = 1 },
     }
     chains = {
       "1" = {
@@ -391,6 +526,47 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.blastapi.io/${var.blast_key}",
+          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      # "324" = {
+      #   providers = [
+      #     "https://1rpc.io/zksync2-era",
+      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+      #   ]
+      # }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }

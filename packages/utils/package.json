@@ -36,7 +36,8 @@
     "typescript": "5.3.3"
   },
   "dependencies": {
-    "@chimera-monorepo/contracts": "0.0.1-alpha.1",
+    "@aws-sdk/client-ssm": "^3.735.0",
+    "@chimera-monorepo/contracts": "workspace:*",
     "@hyperlane-xyz/sdk": "3.15.1",
     "@sinclair/typebox": "0.25.21",
     "@urql/core": "5.0.4",

@@ -44,11 +44,11 @@ import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
 import {SpokeStorage} from 'contracts/intent/SpokeStorage.sol';
-
 /**
  * @title EverclearSpoke
  * @notice Spoke contract for Everclear
  */
+
 contract EverclearSpoke is
   SpokeStorage,
   UUPSUpgradeable,
@@ -120,6 +120,7 @@ contract EverclearSpoke is
     uint48 _ttl,
     bytes calldata _data
   ) external whenNotPaused returns (bytes32 _intentId, Intent memory _intent) {
+    if (_destinations.length > 10) revert EverclearSpoke_NewIntent_InvalidIntent();
     (_intentId, _intent) = _newIntent({
       _destinations: _destinations,
       _receiver: _receiver,
@@ -145,6 +146,7 @@ contract EverclearSpoke is
     bytes calldata _data,
     Permit2Params calldata _permit2Params
   ) external whenNotPaused returns (bytes32 _intentId, Intent memory _intent) {
+    if (_destinations.length > 10) revert EverclearSpoke_NewIntent_InvalidIntent();
     PERMIT2.permitTransferFrom(
       IPermit2.PermitTransferFrom({
         permitted: IPermit2.TokenPermissions({token: IERC20(_inputAsset), amount: _amount}),

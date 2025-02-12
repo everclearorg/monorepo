@@ -1,0 +1,297 @@
+{
+  "address": "0x26CFF54f11608Cd3060408690803AB4a43f462f2",
+  "startBlock": 67023011,
+  "abi": [
+    { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+    {
+      "inputs": [{ "internalType": "address", "name": "target", "type": "address" }],
+      "name": "AddressEmptyCode",
+      "type": "error"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "implementation", "type": "address" }],
+      "name": "ERC1967InvalidImplementation",
+      "type": "error"
+    },
+    { "inputs": [], "name": "ERC1967NonPayable", "type": "error" },
+    { "inputs": [], "name": "FailedInnerCall", "type": "error" },
+    { "inputs": [], "name": "GasTank_CallFailed", "type": "error" },
+    { "inputs": [], "name": "GasTank_InsufficientFunds", "type": "error" },
+    { "inputs": [], "name": "GasTank_NotAuthorized", "type": "error" },
+    { "inputs": [], "name": "Gateway_Handle_InvalidOriginDomain", "type": "error" },
+    { "inputs": [], "name": "Gateway_Handle_InvalidSender", "type": "error" },
+    { "inputs": [], "name": "Gateway_Handle_NotCalledByMailbox", "type": "error" },
+    { "inputs": [], "name": "Gateway_SendMessage_InsufficientBalance", "type": "error" },
+    { "inputs": [], "name": "Gateway_SendMessage_UnauthorizedCaller", "type": "error" },
+    { "inputs": [], "name": "Gateway_SendMessage_UnsuccessfulRebate", "type": "error" },
+    { "inputs": [], "name": "Gateway_ZeroAddress", "type": "error" },
+    { "inputs": [], "name": "InvalidInitialization", "type": "error" },
+    { "inputs": [], "name": "NotInitializing", "type": "error" },
+    {
+      "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    { "inputs": [], "name": "UUPSUnauthorizedCallContext", "type": "error" },
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "slot", "type": "bytes32" }],
+      "name": "UUPSUnsupportedProxiableUUID",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "_address", "type": "address" },
+        { "indexed": false, "internalType": "bool", "name": "_authorized", "type": "bool" }
+      ],
+      "name": "GasReceiverAuthorized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "_sender", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "GasTankDeposited",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [{ "indexed": true, "internalType": "uint256", "name": "_amount", "type": "uint256" }],
+      "name": "GasTankSpent",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "_sender", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      ],
+      "name": "GasTankWithdrawn",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [{ "indexed": false, "internalType": "uint64", "name": "version", "type": "uint64" }],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "address", "name": "_oldMailbox", "type": "address" },
+        { "indexed": false, "internalType": "address", "name": "_newMailbox", "type": "address" }
+      ],
+      "name": "MailboxUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
+        { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "address", "name": "_oldSecurityModule", "type": "address" },
+        { "indexed": false, "internalType": "address", "name": "_newSecurityModule", "type": "address" }
+      ],
+      "name": "SecurityModuleUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [{ "indexed": true, "internalType": "address", "name": "implementation", "type": "address" }],
+      "name": "Upgraded",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "EVERCLEAR_GATEWAY",
+      "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "EVERCLEAR_ID",
+      "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "UPGRADE_INTERFACE_VERSION",
+      "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_receiver", "type": "address" },
+        { "internalType": "bool", "name": "_authorized", "type": "bool" }
+      ],
+      "name": "authorizeGasReceiver",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint32", "name": "_origin", "type": "uint32" },
+        { "internalType": "bytes32", "name": "_sender", "type": "bytes32" },
+        { "internalType": "bytes", "name": "_message", "type": "bytes" }
+      ],
+      "name": "handle",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_owner", "type": "address" },
+        { "internalType": "address", "name": "_mailbox", "type": "address" },
+        { "internalType": "address", "name": "_receiver", "type": "address" },
+        { "internalType": "address", "name": "_interchainSecurityModule", "type": "address" },
+        { "internalType": "uint32", "name": "_everclearId", "type": "uint32" },
+        { "internalType": "bytes32", "name": "_hubGateway", "type": "bytes32" }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "interchainSecurityModule",
+      "outputs": [{ "internalType": "contract IInterchainSecurityModule", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "_address", "type": "address" }],
+      "name": "isAuthorizedGasReceiver",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "mailbox",
+      "outputs": [{ "internalType": "contract IMailbox", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "proxiableUUID",
+      "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint32", "name": "_chainId", "type": "uint32" },
+        { "internalType": "bytes", "name": "_message", "type": "bytes" },
+        { "internalType": "uint256", "name": "_gasLimit", "type": "uint256" }
+      ],
+      "name": "quoteMessage",
+      "outputs": [{ "internalType": "uint256", "name": "_fee", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "receiver",
+      "outputs": [{ "internalType": "contract IMessageReceiver", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+      "inputs": [
+        { "internalType": "uint32", "name": "_chainId", "type": "uint32" },
+        { "internalType": "bytes", "name": "_message", "type": "bytes" },
+        { "internalType": "uint256", "name": "_fee", "type": "uint256" },
+        { "internalType": "uint256", "name": "_gasLimit", "type": "uint256" }
+      ],
+      "name": "sendMessage",
+      "outputs": [
+        { "internalType": "bytes32", "name": "_messageId", "type": "bytes32" },
+        { "internalType": "uint256", "name": "_feeSpent", "type": "uint256" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint32", "name": "_chainId", "type": "uint32" },
+        { "internalType": "bytes", "name": "_message", "type": "bytes" },
+        { "internalType": "uint256", "name": "_gasLimit", "type": "uint256" }
+      ],
+      "name": "sendMessage",
+      "outputs": [
+        { "internalType": "bytes32", "name": "_messageId", "type": "bytes32" },
+        { "internalType": "uint256", "name": "_feeSpent", "type": "uint256" }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "_newMailbox", "type": "address" }],
+      "name": "updateMailbox",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "_newSecurityModule", "type": "address" }],
+      "name": "updateSecurityModule",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "newImplementation", "type": "address" },
+        { "internalType": "bytes", "name": "data", "type": "bytes" }
+      ],
+      "name": "upgradeToAndCall",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }],
+      "name": "withdrawGas",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    { "stateMutability": "payable", "type": "receive" }
+  ]
+}

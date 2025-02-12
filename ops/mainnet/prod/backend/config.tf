@@ -1,7 +1,11 @@
-
 locals {
+
+  cartographer_depositors_config_param_name = "cartographer-depositors-${var.environment}-${var.stage}-config"
+  cartographer_intents_config_param_name = "cartographer-intents-${var.environment}-${var.stage}-config"
+  cartographer_invoices_config_param_name = "cartographer-invoices-${var.environment}-${var.stage}-config"
+  cartographer_monitor_config_param_name = "cartographer-monitor-${var.environment}-${var.stage}-config"
+
   cartographer_env_vars = {
-    CARTOGRAPHER_CONFIG = local.local_cartographer_config,
     DATABASE_URL        = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear",
     ENVIRONMENT         = var.environment,
     EVERCLEAR_CONFIG    = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json",
@@ -75,6 +79,47 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.blastapi.io/${var.blast_key}",
+          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      # "324" = {
+      #   providers = [
+      #     "https://1rpc.io/zksync2-era",
+      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
+      #   ]
+      # }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://scroll-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "33139" = {
+        providers = [
+          "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
     }

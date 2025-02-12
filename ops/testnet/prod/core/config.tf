@@ -5,6 +5,15 @@ locals {
   default_db_endpoint      = "rds-postgres-cartographer-chimera.c4trm8wqup58.eu-north-1.rds.amazonaws.com"
   default_db_url           = "postgresql://${var.postgres_user}:${var.postgres_password}@${local.default_db_endpoint}:5432/everclear"
 
+  lighthouse_intent_config_param_name = "lighthouse-intent-${var.environment}-${var.stage}-config"
+  lighthouse_fill_config_param_name = "lighthouse-fill-${var.environment}-${var.stage}-config"
+  lighthouse_settlement_config_param_name = "lighthouse-settlement-${var.environment}-${var.stage}-config"
+  lighthouse_expired_config_param_name = "lighthouse-expired-${var.environment}-${var.stage}-config"
+  lighthouse_invoice_config_param_name = "lighthouse-invoice-${var.environment}-${var.stage}-config"
+  lighthouse_reward_config_param_name = "lighthouse-reward-${var.environment}-${var.stage}-config"
+  lighthouse_reward_metadata_config_param_name = "lighthouse-reward_metadata-${var.environment}-${var.stage}-config"
+  monitor_poller_config_param_name = "monitor-poller-${var.environment}-${var.stage}-config"
+
   relayer_env_vars = [
     { name = "RELAYER_CONFIG", value = local.local_relayer_config },
     { name = "ENVIRONMENT", value = var.environment },
@@ -12,6 +21,7 @@ locals {
     { name = "DD_PROFILING_ENABLED", value = "true" },
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
   ]
+
   relayer_web3signer_env_vars = [
     { name = "WEB3_SIGNER_PRIVATE_KEY", value = var.relayer_web3_signer_private_key },
     { name = "WEB3SIGNER_HTTP_HOST_ALLOWLIST", value = "*" },
@@ -28,7 +38,6 @@ locals {
   ]
 
   monitor_poller_env_vars = {
-    MONITOR_CONFIG = local.local_monitor_config,
     ENVIRONMENT    = var.environment,
     STAGE          = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -38,7 +47,6 @@ locals {
   }
 
   lighthouse_env_vars = {
-    LIGHTHOUSE_CONFIG = local.local_lighthouse_config,
     ENVIRONMENT       = var.environment,
     STAGE             = var.stage,
     DD_LOGS_ENABLED   = true,

@@ -1,0 +1,19 @@
+{
+  "chainId": "421614",
+  "createdAt": "1737576717000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade Arbitrum Sepolia",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xda058E1bD948457EB166D304a2680Fe1c813AC21",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000d385af1a209890aee184bdf75f328ac396d52fb600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

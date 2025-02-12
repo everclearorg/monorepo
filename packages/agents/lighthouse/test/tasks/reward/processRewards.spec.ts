@@ -178,6 +178,9 @@ describe('#processRewards', () => {
     await processRewards();
 
     if (data.epochResults.length) {
+      if (!database.saveEpochResults.calledWith(match(data.epochResults))) {
+        console.error(database.saveEpochResults.getCall(0).firstArg);
+      }
       expect(database.saveEpochResults.calledWith(match(data.epochResults)), "epochResult do not match").to.be.true;
     } else {
       expect(database.saveEpochResults.notCalled, "no epochResult should be saved").to.be.true;
@@ -244,7 +247,13 @@ describe('#processRewards', () => {
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     processNewLockPositionsStub = stub(Mockable, 'processNewLockPositions').resolves(0);
     historicPrice = mock.instances.historicPrice() as SinonStubbedInstance<HistoricPrice>;
-    historicPrice.getHistoricTokenPrice.resolves(2000);
+    historicPrice.getHistoricTokenPrice.callsFake(async (asset, date) => {
+      // return a smaller value if its mock CLEAR
+      if (asset.address == mkAddress('0x678')) {
+        return 0.1
+      }
+      return 2000.0
+    });
 
     encodeFunctionData = stub(Interface.prototype, 'encodeFunctionData');
     encodeFunctionData.returns('0xencoded');

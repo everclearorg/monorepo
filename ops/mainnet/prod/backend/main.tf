@@ -155,9 +155,14 @@ module "cartographer-depositors-lambda-cron" {
   container_family    = "cartographer-depositors"
   environment         = var.environment
   stage               = var.stage
-  container_env_vars  = merge(local.cartographer_env_vars, { CARTOGRAPHER_SERVICE = "depositors" })
+  config_param_name   = local.cartographer_depositors_config_param_name
+  container_env_vars  = merge(local.cartographer_env_vars, {
+    CARTOGRAPHER_SERVICE = "depositors"
+    CONFIG_PARAMETER_NAME = local.cartographer_depositors_config_param_name
+  })
   schedule_expression = "rate(1 minute)"
   memory_size         = 1024
+  config              = local.local_cartographer_config
 }
 
 module "cartographer-intents-lambda-cron" {
@@ -167,9 +172,14 @@ module "cartographer-intents-lambda-cron" {
   container_family    = "cartographer-intents"
   environment         = var.environment
   stage               = var.stage
-  container_env_vars  = merge(local.cartographer_env_vars, { CARTOGRAPHER_SERVICE = "intents" })
+  config_param_name   = local.cartographer_intents_config_param_name
+  container_env_vars  = merge(local.cartographer_env_vars, {
+    CARTOGRAPHER_SERVICE = "intents"
+    CONFIG_PARAMETER_NAME = local.cartographer_intents_config_param_name
+  })
   schedule_expression = "rate(1 minute)"
   memory_size         = 1024
+  config              = local.local_cartographer_config
 }
 
 module "cartographer-invoices-lambda-cron" {
@@ -179,9 +189,14 @@ module "cartographer-invoices-lambda-cron" {
   container_family    = "cartographer-invoices"
   environment         = var.environment
   stage               = var.stage
-  container_env_vars  = merge(local.cartographer_env_vars, { CARTOGRAPHER_SERVICE = "invoices" })
+  config_param_name   = local.cartographer_invoices_config_param_name
+  container_env_vars  = merge(local.cartographer_env_vars, {
+    CARTOGRAPHER_SERVICE = "invoices"
+    CONFIG_PARAMETER_NAME = local.cartographer_invoices_config_param_name
+  })
   schedule_expression = "rate(1 minute)"
   memory_size         = 1024
+  config              = local.local_cartographer_config
 }
 
 module "cartographer-monitor-lambda-cron" {
@@ -191,9 +206,14 @@ module "cartographer-monitor-lambda-cron" {
   container_family    = "cartographer-monitor"
   environment         = var.environment
   stage               = var.stage
-  container_env_vars  = merge(local.cartographer_env_vars, { CARTOGRAPHER_SERVICE = "monitor" })
+  config_param_name   = local.cartographer_monitor_config_param_name
+  container_env_vars  = merge(local.cartographer_env_vars, {
+    CARTOGRAPHER_SERVICE = "monitor"
+    CONFIG_PARAMETER_NAME = local.cartographer_monitor_config_param_name
+  })
   schedule_expression = "rate(1 minute)"
   memory_size         = 1024
+  config              = local.local_cartographer_config
 }
 
 

@@ -1,15 +1,21 @@
 import { expect } from '@chimera-monorepo/utils';
-import { stub } from 'sinon';
+import { SinonStub, stub } from 'sinon';
 import { getConfig, getEnvConfig } from '../src/config';
-import { createProcessEnv, createCartographerConfig } from './mock';
+import { createProcessEnv } from './mock';
+import * as Mockable from '../src/mockable';
+import { createCartographerConfig } from './mock';
 
 describe('Config', () => {
+  let ssmStub: SinonStub;
+
   beforeEach(() => {
     stub(process, 'env').value({
       ...process.env,
       ...createProcessEnv(),
       EVERCLEAR_CONFIG: 'https://raw.githubusercontent.com/connext/chaindata/main/everclear.testnet.json',
     });
+    ssmStub = stub(Mockable, 'getSsmParameter');
+    ssmStub.resolves(undefined);
   });
 
   describe('#getEnvConfig', () => {
@@ -42,6 +48,16 @@ describe('Config', () => {
         CARTOGRAPHER_CONFIG_FILE: 'test-config.json',
       });
       await expect(getEnvConfig()).to.be.rejected;
+    });
+
+    it('should read config from AWS SSM parameter store', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        CONFIG_PARAMETER_NAME: 'cartographer-config',
+      });
+      ssmStub.resolves(JSON.stringify({ ...createCartographerConfig(), pollInterval: 98765 }));
+      const config = await getEnvConfig();
+      await expect(config.pollInterval).to.be.equal(98765);
     });
   });
 

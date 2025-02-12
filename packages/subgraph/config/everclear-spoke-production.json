@@ -110,5 +110,68 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-linea",
+    "domain": "59144",
+    "environment": "production",
+    "network": "linea",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-zksync",
+    "domain": "324",
+    "environment": "production",
+    "network": "zksync",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-polygon",
+    "domain": "137",
+    "environment": "production",
+    "network": "matic",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-scroll",
+    "domain": "534352",
+    "environment": "production",
+    "network": "scroll",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-apechain",
+    "domain": "33139",
+    "environment": "production",
+    "network": "apechain-mainnet",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-taiko",
+    "domain": "167000",
+    "environment": "production",
+    "network": "taiko",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-avalanche",
+    "domain": "43114",
+    "environment": "production",
+    "network": "avalanche",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]
