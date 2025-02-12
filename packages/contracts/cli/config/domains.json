@@ -146,10 +146,17 @@
   {
     "name": "Mode",
     "id": 34443,
-    "rpc": "https://mode-mainnet.blastapi.io/43b468df-b3e8-4ee0-bd65-0b663a470cac",
+    "rpc": "https://mode.drpc.org",
     "environments": [
       "MainnetProduction"
     ],
+    "realm": "spoke"
+  },
+  {
+    "name": "Unichain",
+    "id": 130,
+    "rpc": "https://mainnet.unichain.org",
+    "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
   {

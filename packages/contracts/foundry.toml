@@ -55,6 +55,7 @@ taiko = "${TAIKO_RPC}"
 scroll = "${SCROLL_RPC}"
 apechain = "${APECHAIN_RPC}"
 mode = "${MODE_RPC}"
+unichain = "${UNICHAIN_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
@@ -72,4 +73,5 @@ avalanche = { key = "${AVALANCHESCAN_API_KEY}", chain = "43114", url = "https://
 taiko = { key = "${TAIKOSCAN_API_KEY}", chain = "100", url = "https://api.taikoscan.io/api" }
 scroll = { key = "${SCROLLSCAN_API_KEY}", chain = "534351", url = "https://api.scrollscan.com/api" }
 apechain = { key = "${APECHAINSCAN_API_KEY}", chain = "59144", url = "https://api.apescan.io/api" }
-mode = { key = "${MODE_API_KEY}", chain = "34443", url = "https://explorer-mode-mainnet-0.t.conduit.xyz/api" }
+mode = { key = "${MODE_VERIFIER_KEY}", url = "${MODE_VERIFIER_API_URL}" }
+unichain = { key = "${UNICHAIN_API_KEY}", chain = "130", url = "${UNICHAIN_VERIFIER_API_URL}" }

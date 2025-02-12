@@ -182,5 +182,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-unichain",
+    "domain": "130",
+    "environment": "production",
+    "network": "unichain",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]

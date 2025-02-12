@@ -27,6 +27,7 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [59140, 59140], // Linea Mainnet
   [167000, 167000], // Taiko Mainnet
   [33139, 33139], // ApeChain
+  [130, 130], // Unichain
 ]);
 
 const TESTNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([

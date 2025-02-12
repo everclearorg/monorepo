@@ -132,9 +132,9 @@
     "environment": "MainnetProduction"
   },
   {
-    "address": "0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99",
-    "domainName": "Mode",
-    "domainId": 34443,
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Unichain",
+    "domainId": 130,
     "environment": "MainnetProduction"
   }
 ]
