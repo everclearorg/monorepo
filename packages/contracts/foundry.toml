@@ -21,6 +21,14 @@ fs_permissions = [
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-bnb.json" }
     ]
 
+[profile.zksync]
+src = "src-zk"
+out = "out-zksync" 
+libs = ["../../node_modules","lib"]
+compile = true
+fallback_oz = false
+mode = "1"
+
 [profile.optimized]
 via_ir = true
 out = 'out-via-ir'
