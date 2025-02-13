@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::clock::Clock;
-use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, TransferChecked, MintTo, Burn};
-use anchor_spl::associated_token::{self, get_associated_token_address};
+use anchor_spl::token::{self, Token, TokenAccount, Mint};
+// use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, TransferChecked, MintTo, Burn};
+use anchor_spl::associated_token::{get_associated_token_address};
 use std::collections::{VecDeque, HashMap};
 
 // Constants
@@ -24,7 +24,7 @@ pub const FILL_INTENT_FOR_SOLVER_TYPEHASH: [u8; 32] = [0xAA; 32]; // placeholder
 pub const PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xBB; 32];
 pub const PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xCC; 32];
 
-declare_id!("FH6w3aVDLKtZn3AmK3bxM9RBvJ6WBKEhp6VFZb5Axcoy");
+declare_id!("4JkMGKKcKq7ZjUo5xdif6yvpE85hGS3tdP1sumuN7rFM");
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct SpokeInitializationParams {
@@ -113,6 +113,7 @@ pub mod everclear_spoke {
     /// This reduces the user's on‑chain balance and transfers tokens out.
     pub fn withdraw(
         ctx: Context<Withdraw>,
+        vault_authority_bump: u8,
         amount: u64,
     ) -> Result<()> {
         let state = &ctx.accounts.spoke_state;
@@ -124,8 +125,14 @@ pub mod everclear_spoke {
         
         // Transfer tokens from the vault to the user's token account.
         // The vault is owned by a PDA (program_vault_authority).
-        let seeds = vault_authority_seeds(&ID, &ctx.accounts.mint.key(), ctx.accounts.vault_authority_bump);
-        let signer = &[&seeds[..]];
+        let seeds = vault_authority_seeds(&ID, &ctx.accounts.mint.key(), vault_authority_bump);
+        let signer_seeds = [
+            &seeds[0][..],
+            &seeds[1][..],
+            &seeds[2][..],
+            &seeds[3][..],
+        ];
+        let signer = &[&signer_seeds[..]];
 
         let cpi_accounts = Transfer {
             from: ctx.accounts.from_token_account.to_account_info(),
@@ -180,7 +187,7 @@ pub mod everclear_spoke {
         )?;
         require!(normalized_amount > 0, SpokeError::ZeroAmount);  // Add zero amount check like Solidity
 
-        // Transfer from user’s token account -> program’s vault
+        // Transfer from user's token account -> program's vault
         let cpi_accounts = Transfer {
             from: ctx.accounts.user_token_account.to_account_info(),
             to: ctx.accounts.program_vault_account.to_account_info(),
@@ -197,6 +204,7 @@ pub mod everclear_spoke {
         // Create intent_id with all parameters
         // TODO: May need to encode this properly
         // TODO: Would need to update processIntentQueue logic on update
+        // TODO: Check the clock operation here
         let new_intent_struct = Intent {
             initiator: ctx.accounts.authority.key(),
             receiver,
@@ -265,7 +273,7 @@ pub mod everclear_spoke {
         }
 
         // Format message using proper message lib
-        let batch_message = format_intent_message_batch(&intents)?;
+        let batch_message = super::format_intent_message_batch(&intents)?;
 
         // Call Hyperlane with proper gas handling
         let ix_data = {
@@ -307,23 +315,26 @@ pub mod everclear_spoke {
     ) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(!state.paused, SpokeError::ContractPaused);
-        // Verify the origin is from Everclear.
         require!(origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
-        // Verify sender matches the stored message_receiver.
         require!(sender == state.message_receiver, SpokeError::InvalidSender);
 
-        // For demonstration, assume payload's first byte indicates message type.
-        // 1 = Settlement Batch, 2 = Variable Update, etc.
         require!(!payload.is_empty(), SpokeError::InvalidMessage);
         let msg_type = payload[0];
         match msg_type {
             1 => {
-                // Settlement batch
                 msg!("Processing settlement batch message");
-                let settlement_data = &payload[1..]; // everything after the first byte
+                let settlement_data = &payload[1..];
                 let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
-                    .map_err(|_| SpokeError::InvalidMessage)?; // decode a vector of Settlement
-                handle_batch_settlement(state, batch)?;
+                    .map_err(|_| SpokeError::InvalidMessage)?;
+                handle_batch_settlement(
+                    state,
+                    batch,
+                    &ctx.accounts.vault_token_account,
+                    &ctx.accounts.vault_authority,
+                    ctx.accounts.vault_authority_bump,
+                    &ctx.accounts.token_program,
+                    ctx.remaining_accounts,  // Pass remaining_accounts from ctx
+                )?;
             },
             2 => {
                 // Var update
@@ -339,78 +350,39 @@ pub mod everclear_spoke {
         Ok(())
     }
 
-    fn handle_batch_settlement(
-        state: &mut SpokeState,
-        batch: Vec<Settlement>,
-    ) -> Result<()> {
-        for s in batch.iter() {
-            handle_settlement(state, s)?;
-        }
+    /// Update the gateway address (admin only).
+    pub fn update_gateway(ctx: Context<AuthState>, new_gateway: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        let authority = ctx.accounts.authority.key();
+        require!(state.owner == authority, SpokeError::OnlyOwner);
+
+        _update_gateway(state, new_gateway)?;
+        
         Ok(())
     }
 
-    fn handle_settlement(
-        state: &mut SpokeState,
-        settlement: &Settlement,
-        vault_token_account: &Account<TokenAccount>,
-        vault_authority: &UncheckedAccount,
-        vault_authority_bump: u8,
-        token_program: &Program<Token>,
-    ) -> Result<()> {
-        // 1) Check if already settled
-        let current_status = state.status.get(&settlement.intent_id).copied().unwrap_or(IntentStatus::None);
-        if current_status == IntentStatus::Settled 
-            || current_status == IntentStatus::SettledAndManuallyExecuted 
-        {
-            msg!("Intent already settled, ignoring");
-            return Ok(());
-        }
+    pub fn update_lighthouse(ctx: Context<AuthState>, new_lighthouse: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
 
-        // 2) Mark as settled in storage
-        state.status.insert(settlement.intent_id, IntentStatus::Settled);
+        _update_lighthouse(state, new_lighthouse)?;
+        Ok(())
+    }
 
-        // 3) Normalise the settlement amount
-        let minted_decimals = vault_token_account.mint.decimals; 
-        let amount = normalize_decimals(settlement.amount, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
-        if amount == 0 {
-            return Ok(());
-        }
+    pub fn update_watchtower(ctx: Context<AuthState>, new_watchtower: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
 
-        // Attempt CPI transfer
-        let seeds = vault_authority_seeds(&ID, &vault_token_account.mint.key(), vault_authority_bump);
-        let signer = &[&seeds[..]];
+        _update_watchtower(state, new_watchtower)?;
+        Ok(())
+    }
 
-        let cpi_accounts = anchor_spl::token::Transfer {
-            from: vault_token_account.to_account_info(),
-            to: make_recipient_token_account_info(
-                ctx.remaining_accounts,
-                settlement.recipient,
-                settlement.asset
-            )?,
-            authority: vault_authority.to_account_info(),
-        };
-        let cpi_ctx = CpiContext::new_with_signer(token_program.to_account_info(), cpi_accounts, signer);
+    pub fn update_mailbox(ctx: Context<AuthState>, new_mailbox: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        // enforce only owner can do it
+        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
 
-        let transfer_result = token::transfer(cpi_ctx, amount);
-
-        if transfer_result.is_err() {
-            // The transfer failed. Fallback to storing in user’s local balance
-            // e.g. store "settlement.amount" in the local ledger
-            increase_balance(&mut state.balances, settlement.asset, settlement.recipient, amount);
-            emit!(AssetTransferFailed {
-                asset: settlement.asset,
-                recipient: settlement.recipient,
-                amount: amount,
-            });
-        }
-
-        emit!(SettledEvent {
-           intent_id: settlement.intent_id,
-           recipient: settlement.recipient,
-           asset: settlement.asset,
-           amount: amount,
-        });
-
+        _update_mailbox(state, new_mailbox)?;
         Ok(())
     }
 
@@ -418,14 +390,13 @@ pub mod everclear_spoke {
         state: &mut SpokeState, 
         var_data: &[u8]
     ) -> Result<()> {
-        // e.g., parse the first 32 bytes as a “var hash”
+        // e.g., parse the first 32 bytes as a "var hash"
         require!(var_data.len() >= 32, SpokeError::InvalidMessage);
         let mut var_hash = [0u8; 32];
         var_hash.copy_from_slice(&var_data[..32]);
         let rest = &var_data[32..];
         
-        // TOOD: Implement the gateway and mailbox functions
-        // Compare var_hash with your known “gateway”, “mailbox”, “lighthouse”, or “watchtower” constants
+        // Compare var_hash with your known constants
         if var_hash == GATEWAY_HASH {
             let new_gateway: Pubkey = try_deserialize_a_pubkey(rest)?;
             _update_gateway(state, new_gateway)?;
@@ -443,212 +414,6 @@ pub mod everclear_spoke {
         }
 
         Ok(())
-    }
-
-    /// Update the gateway address (admin only).
-    pub fn update_gateway(ctx: Context<AuthState>, new_gateway: Pubkey) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        let authority = ctx.accounts.authority.key();
-        require!(state.owner == authority, SpokeError::OnlyOwner);
-
-        _update_gateway(state, new_gateway)?;
-        
-        Ok(())
-    }
-
-    fn _update_gateway(state: &mut SpokeState, new_gateway: Pubkey) -> Result<()> {
-        let old = state.gateway;
-        state.gateway = new_gateway;
-        emit!(GatewayUpdatedEvent { old_gateway: old, new_gateway });
-        Ok(())
-    }
-
-    pub fn update_lighthouse(ctx: Context<AuthState>, new_lighthouse: Pubkey) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
-
-        _update_lighthouse(state, new_lighthouse)?;
-        Ok(())
-    }
-
-    fn _update_lighthouse(state: &mut SpokeState, new_lighthouse: Pubkey) -> Result<()> {
-        let old = state.lighthouse;
-        state.lighthouse = new_lighthouse;
-        emit!(LighthouseUpdatedEvent {
-            old_lighthouse: old,
-            new_lighthouse,
-        });
-        Ok(())
-    }
-
-    pub fn update_watchtower(ctx: Context<AuthState>, new_watchtower: Pubkey) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
-
-        _update_watchtower(state, new_watchtower)?;
-        Ok(())
-    }
-
-    fn _update_watchtower(state: &mut SpokeState, new_watchtower: Pubkey) -> Result<()> {
-        let old = state.watchtower;
-        state.watchtower = new_watchtower;
-        emit!(WatchtowerUpdatedEvent {
-            old_watchtower: old,
-            new_watchtower,
-        });
-        Ok(())
-    }
-    
-    pub fn update_mailbox(ctx: Context<AuthState>, new_mailbox: Pubkey) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        // enforce only owner can do it
-        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
-
-        _update_mailbox(state, new_mailbox)?;
-        Ok(())
-    }
-
-    fn _update_mailbox(state: &mut SpokeState, new_mailbox: Pubkey) -> Result<()> {
-        let old = state.mailbox;
-        state.mailbox = new_mailbox;
-        emit!(MailboxUpdatedEvent {
-            old_mailbox: old,
-            new_mailbox,
-        });
-        Ok(())
-    }
-
-    pub fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
-        // Example:
-        let mut buffer = Vec::new();
-        // e.g. prefix a message type byte
-        buffer.push(1); 
-        // then Borsh‐encode the `Vec<Intent>`
-        let encoded = intents.try_to_vec()?;
-        buffer.extend_from_slice(&encoded);
-        Ok(buffer)
-    }
-
-    pub fn compute_intent_hash(intent: &Intent) -> [u8; 32] {
-        let mut hasher_input = Vec::new();
-    
-        // 1) Initiator
-        hasher_input.extend_from_slice(intent.initiator.as_ref());
-    
-        // 2) Receiver
-        hasher_input.extend_from_slice(intent.receiver.as_ref());
-    
-        // 3) InputAsset
-        hasher_input.extend_from_slice(intent.input_asset.as_ref());
-    
-        // 4) OutputAsset
-        hasher_input.extend_from_slice(intent.output_asset.as_ref());
-    
-        // 5) maxFee
-        hasher_input.extend_from_slice(&intent.max_fee.to_be_bytes());
-    
-        // 6) originDomain
-        hasher_input.extend_from_slice(&intent.origin_domain.to_be_bytes());
-    
-        // 7) nonce
-        hasher_input.extend_from_slice(&intent.nonce.to_be_bytes());
-    
-        // 8) timestamp
-        hasher_input.extend_from_slice(&intent.timestamp.to_be_bytes());
-    
-        // 9) ttl
-        hasher_input.extend_from_slice(&intent.ttl.to_be_bytes());
-    
-        // 10) normalizedAmount
-        hasher_input.extend_from_slice(&intent.normalized_amount.to_be_bytes());
-    
-        // 11) destinations (Borsh or plain “Vec<u8>” for them).
-        //    If you want raw 4-byte concatenation for each, do it manually:
-        //    for d in intent.destinations.iter() { hasher_input.extend_from_slice(&d.to_be_bytes()); }
-        //
-        //    Or, if your original code used `.try_to_vec()`, replicate that:
-        //    let encoded_dest = intent.destinations.try_to_vec().unwrap();
-        let encoded_dest = intent.destinations.try_to_vec().unwrap();
-        hasher_input.extend_from_slice(&encoded_dest);
-    
-        // 12) data
-        hasher_input.extend_from_slice(&intent.data);
-    
-        // 13) Return keccak256
-        keccak_256(&hasher_input)
-    }
-
-    pub fn normalize_decimals(
-        amount: u64,
-        minted_decimals: u8,
-        target_decimals: u8,
-    ) -> Result<u64> {
-        if minted_decimals == target_decimals {
-            // No scaling needed
-            return Ok(amount);
-        } else if minted_decimals > target_decimals {
-            // e.g. minted_decimals=9, target_decimals=6 => downscale
-            let shift = minted_decimals - target_decimals;
-            // prevent potential divide-by-zero or overshoot
-            if shift > 12 {
-                // you might fail or just saturate for large differences
-                return err!(SpokeError::DecimalConversionOverflow);
-            }
-            Ok(amount / 10u64.pow(shift as u32))
-        } else {
-            // minted_decimals < target_decimals => upscale
-            let shift = target_decimals - minted_decimals;
-            // watch for overflow if we do big multiplications
-            let factor = 10u64.checked_pow(shift as u32).ok_or(SpokeError::DecimalConversionOverflow)?;
-            let scaled = amount.checked_mul(factor).ok_or(SpokeError::DecimalConversionOverflow)?;
-            Ok(scaled)
-        }
-    }
-
-    fn make_recipient_token_account_info<'info>(
-        remaining_accounts: &mut [AccountInfo<'info>],
-        recipient: Pubkey,
-        asset_mint: Pubkey,
-    ) -> Result<AccountInfo<'info>> {
-        // 1) Derive the associated token account (ATA)
-        let expected_ata_key = get_associated_token_address(&recipient, &asset_mint);
-    
-        // 2) Find that account in the remaining accounts. 
-        //    Alternatively, you could require it as a named account in the IDL.
-        for acc_info in remaining_accounts.iter() {
-            if acc_info.key == &expected_ata_key {
-                // Optionally verify it's a valid token account (spl checks, owner = token program, etc.)
-                return Ok(acc_info.clone());
-            }
-        }
-    
-        // If we get here, we did not find the ATA in the remaining accounts
-        // You may want to auto-create it with the Associated Token Program, or throw an error:
-        err!(SpokeError::InvalidOperation)
-    }
-
-    fn try_deserialize_a_pubkey(data: &[u8]) -> Result<Pubkey> {
-        // 1) Ensure we have at least 32 bytes
-        if data.len() < 32 {
-            return err!(SpokeError::InvalidMessage);
-        }
-    
-        // 2) Copy the first 32 bytes into a Pubkey
-        let key_array: [u8; 32] = data[..32].try_into().map_err(|_| SpokeError::InvalidMessage)?;
-        Ok(Pubkey::new_from_array(key_array))
-    }
-
-    fn vault_authority_seeds<'a>(
-        program_id: &'a Pubkey,
-        mint_pubkey: &'a Pubkey,
-        bump: u8,
-    ) -> [&'a [u8]; 4] {
-        [
-            b"vault",
-            mint_pubkey.as_ref(),
-            program_id.as_ref(),
-            &[bump],
-        ]
     }
 }
 
@@ -690,6 +455,15 @@ pub struct AuthState<'info> {
     )]
     pub spoke_state: Account<'info, SpokeState>,
     pub authority: Signer<'info>,
+    pub vault_token_account: Account<'info, TokenAccount>,
+    #[account(
+        seeds = [b"vault"],
+        bump = vault_authority_bump,
+    )]
+    /// CHECK: This is a PDA that signs for the vault
+    pub vault_authority: UncheckedAccount<'info>,
+    pub token_program: Program<'info, Token>,
+    pub vault_authority_bump: u8,
 }
 
 #[derive(Accounts)]
@@ -708,11 +482,11 @@ pub struct NewIntent<'info> {
     // The mint of the token the user is depositing
     pub mint: Account<'info, Mint>,
 
-    // The user’s associated token account for that mint
+    // The user's associated token account for that mint
     #[account(mut, constraint = user_token_account.mint == mint.key())]
     pub user_token_account: Account<'info, TokenAccount>,
 
-    // The program’s vault token account for that mint
+    // The program's vault token account for that mint
     #[account(mut, constraint = program_vault_account.mint == mint.key())]
     pub program_vault_account: Account<'info, TokenAccount>,
 
@@ -736,9 +510,12 @@ pub struct Withdraw<'info> {
     pub from_token_account: Account<'info, TokenAccount>,
     #[account(mut, constraint = to_token_account.mint == mint.key())]
     pub to_token_account: Account<'info, TokenAccount>,
+    #[account(
+        seeds = [b"vault"],
+        bump,  // This will use the bump passed in through the instruction
+    )]
     /// CHECK: This is a PDA that signs for the vault.
     pub vault_authority: UncheckedAccount<'info>,
-    pub vault_authority_bump: u8,
     pub token_program: Program<'info, Token>,
 }
 
@@ -749,6 +526,22 @@ pub struct Settlement {
     pub asset: Pubkey,
     pub recipient: Pubkey,
     pub amount: u64,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Intent {
+    pub initiator: Pubkey,
+    pub receiver: Pubkey,
+    pub input_asset: Pubkey,
+    pub output_asset: Pubkey,
+    pub max_fee: u32,
+    pub origin_domain: u32,
+    pub nonce: u64,
+    pub timestamp: u64,
+    pub ttl: u64,
+    pub normalized_amount: u64,
+    pub destinations: Vec<u32>,
+    pub data: Vec<u8>,
 }
 
 /// Context for Hyperlane dispatch: We require a Hyperlane mailbox account.
@@ -773,6 +566,12 @@ pub struct QueueState<T> {
 }
 
 impl<T> QueueState<T> {
+    pub const SIZE: usize = 8  // discriminator
+    + 4    // vec length prefix
+    + 8    // first
+    + 8;   // last
+    // Add any other fixed size fields
+    
     pub fn new() -> Self {
         Self {
             items: VecDeque::new(),
@@ -1001,7 +800,11 @@ pub enum SpokeError {
     #[msg("Decimal conversion overflow")]
     DecimalConversionOverflow,
     #[msg("Already initialized")]
-    AlreadyInitialized
+    AlreadyInitialized,
+    #[msg("Invalid Owner")]
+    InvalidOwner,
+    #[msg("Invalid var update")]
+    InvalidVarUpdate
 }
 
 // =====================================================================
@@ -1039,4 +842,268 @@ fn keccak_256(data: &[u8]) -> [u8; 32] {
     let mut output = [0u8; 32];
     hasher.finalize(&mut output);
     output
+}
+
+fn handle_batch_settlement<'info>(
+    state: &mut SpokeState,
+    batch: Vec<Settlement>,
+    vault_token_account: &Account<'info, TokenAccount>,
+    vault_authority: &UncheckedAccount<'info>,
+    vault_authority_bump: u8,
+    token_program: &Program<'info, Token>,
+    remaining_accounts: &'info [AccountInfo<'info>],
+) -> Result<()> {
+    for s in batch.iter() {
+        handle_settlement(
+            state,
+            s,
+            vault_token_account,
+            vault_authority,
+            vault_authority_bump,
+            token_program,
+            remaining_accounts,
+        )?;
+    }
+    Ok(())
+}
+
+fn handle_settlement<'info>(
+    state: &mut SpokeState,
+    settlement: &Settlement,
+    vault_token_account: &Account<'info, TokenAccount>,
+    vault_authority: &UncheckedAccount<'info>,
+    vault_authority_bump: u8,
+    token_program: &Program<'info, Token>,
+    remaining_accounts: &'info [AccountInfo<'info>],
+) -> Result<()> {
+    // 1) Check if already settled
+    let current_status = state.status.get(&settlement.intent_id).copied().unwrap_or(IntentStatus::None);
+    if current_status == IntentStatus::Settled 
+        || current_status == IntentStatus::SettledAndManuallyExecuted 
+    {
+        msg!("Intent already settled, ignoring");
+        return Ok(());
+    }
+
+    // 2) Mark as settled in storage
+    state.status.insert(settlement.intent_id, IntentStatus::Settled);
+
+    // 3) Normalise the settlement amount
+    let mint_info = remaining_accounts
+        .iter()
+        .find(|acc| acc.key() == vault_token_account.mint)
+        .ok_or(SpokeError::InvalidOperation)?;
+
+    let mint_account = Account::<Mint>::try_from(mint_info)?;
+    let minted_decimals = mint_account.decimals;
+    let amount = normalize_decimals(settlement.amount, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
+    if amount == 0 {
+        return Ok(());
+    }
+
+    // Attempt CPI transfer
+    let seeds = vault_authority_seeds(&ID, &vault_token_account.mint.key(), vault_authority_bump);
+    let signer_seeds = [
+        &seeds[0][..],
+        &seeds[1][..],
+        &seeds[2][..],
+        &seeds[3][..],
+    ];
+    let signer = &[&signer_seeds[..]];
+
+    let cpi_accounts = anchor_spl::token::Transfer {
+        from: vault_token_account.to_account_info(),
+        to: make_recipient_token_account_info(remaining_accounts, settlement.recipient, settlement.asset)?,
+        authority: vault_authority.to_account_info(),
+    };
+    let cpi_ctx = CpiContext::new_with_signer(token_program.to_account_info(), cpi_accounts, signer);
+
+    let transfer_result = token::transfer(cpi_ctx, amount);
+
+    if transfer_result.is_err() {
+        // The transfer failed. Fallback to storing in user's local balance
+        // e.g. store "settlement.amount" in the local ledger
+        increase_balance(&mut state.balances, settlement.asset, settlement.recipient, amount);
+        emit!(AssetTransferFailed {
+            asset: settlement.asset,
+            recipient: settlement.recipient,
+            amount: amount,
+        });
+    }
+
+    emit!(SettledEvent {
+       intent_id: settlement.intent_id,
+       recipient: settlement.recipient,
+       asset: settlement.asset,
+       amount: amount,
+    });
+
+    Ok(())
+}
+
+fn vault_authority_seeds<'a>(
+    program_id: &Pubkey,
+    mint_pubkey: &Pubkey,
+    bump: u8,
+) -> [Vec<u8>; 4] {
+    [
+        b"vault".to_vec(),
+        mint_pubkey.to_bytes().to_vec(),
+        program_id.to_bytes().to_vec(),
+        vec![bump],
+    ]
+}
+
+fn normalize_decimals(
+    amount: u64,
+    minted_decimals: u8,
+    target_decimals: u8,
+) -> Result<u64> {
+    if minted_decimals == target_decimals {
+        // No scaling needed
+        return Ok(amount);
+    } else if minted_decimals > target_decimals {
+        // e.g. minted_decimals=9, target_decimals=6 => downscale
+        let shift = minted_decimals - target_decimals;
+        // prevent potential divide-by-zero or overshoot
+        if shift > 12 {
+            // you might fail or just saturate for large differences
+            return err!(SpokeError::DecimalConversionOverflow);
+        }
+        Ok(amount / 10u64.pow(shift as u32))
+    } else {
+        // minted_decimals < target_decimals => upscale
+        let shift = target_decimals - minted_decimals;
+        // watch for overflow if we do big multiplications
+        let factor = 10u64.checked_pow(shift as u32).ok_or(SpokeError::DecimalConversionOverflow)?;
+        let scaled = amount.checked_mul(factor).ok_or(SpokeError::DecimalConversionOverflow)?;
+        Ok(scaled)
+    }
+}
+
+fn make_recipient_token_account_info<'info>(
+    remaining_accounts: &'info [AccountInfo<'info>],
+    recipient: Pubkey,
+    asset_mint: Pubkey,
+) -> Result<AccountInfo<'info>> {
+    // 1) Derive the associated token account (ATA)
+    let expected_ata_key = get_associated_token_address(&recipient, &asset_mint);
+
+    // 2) Find that account in the remaining accounts
+    for acc_info in remaining_accounts.iter() {
+        if acc_info.key() == expected_ata_key {
+            return Ok(acc_info.clone());
+        }
+    }
+
+    // If we get here, we did not find the ATA in the remaining accounts
+    err!(SpokeError::InvalidOperation)
+}
+
+fn try_deserialize_a_pubkey(data: &[u8]) -> Result<Pubkey> {
+    // 1) Ensure we have at least 32 bytes
+    if data.len() < 32 {
+        return err!(SpokeError::InvalidMessage);
+    }
+
+    // 2) Copy the first 32 bytes into a Pubkey
+    let key_array: [u8; 32] = data[..32].try_into().map_err(|_| SpokeError::InvalidMessage)?;
+    Ok(Pubkey::new_from_array(key_array))
+}
+
+fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
+    // Example:
+    let mut buffer = Vec::new();
+    // e.g. prefix a message type byte
+    buffer.push(1); 
+    // then Borsh‐encode the `Vec<Intent>`
+    let encoded = intents.try_to_vec()?;
+    buffer.extend_from_slice(&encoded);
+    Ok(buffer)
+}
+
+fn compute_intent_hash(intent: &Intent) -> [u8; 32] {
+    let mut hasher_input = Vec::new();
+
+    // 1) Initiator
+    hasher_input.extend_from_slice(intent.initiator.as_ref());
+
+    // 2) Receiver
+    hasher_input.extend_from_slice(intent.receiver.as_ref());
+
+    // 3) InputAsset
+    hasher_input.extend_from_slice(intent.input_asset.as_ref());
+
+    // 4) OutputAsset
+    hasher_input.extend_from_slice(intent.output_asset.as_ref());
+
+    // 5) maxFee
+    hasher_input.extend_from_slice(&intent.max_fee.to_be_bytes());
+
+    // 6) originDomain
+    hasher_input.extend_from_slice(&intent.origin_domain.to_be_bytes());
+
+    // 7) nonce
+    hasher_input.extend_from_slice(&intent.nonce.to_be_bytes());
+
+    // 8) timestamp
+    hasher_input.extend_from_slice(&intent.timestamp.to_be_bytes());
+
+    // 9) ttl
+    hasher_input.extend_from_slice(&intent.ttl.to_be_bytes());
+
+    // 10) normalizedAmount
+    hasher_input.extend_from_slice(&intent.normalized_amount.to_be_bytes());
+
+    // 11) destinations (Borsh or plain "Vec<u8>" for them).
+    //    If you want raw 4-byte concatenation for each, do it manually:
+    //    for d in intent.destinations.iter() { hasher_input.extend_from_slice(&d.to_be_bytes()); }
+    //
+    //    Or, if your original code used `.try_to_vec()`, replicate that:
+    //    let encoded_dest = intent.destinations.try_to_vec().unwrap();
+    let encoded_dest = intent.destinations.try_to_vec().unwrap();
+    hasher_input.extend_from_slice(&encoded_dest);
+
+    // 12) data
+    hasher_input.extend_from_slice(&intent.data);
+
+    // 13) Return keccak256
+    keccak_256(&hasher_input)
+}
+
+fn _update_gateway(state: &mut SpokeState, new_gateway: Pubkey) -> Result<()> {
+    let old = state.gateway;
+    state.gateway = new_gateway;
+    emit!(GatewayUpdatedEvent { old_gateway: old, new_gateway });
+    Ok(())
+}
+
+fn _update_lighthouse(state: &mut SpokeState, new_lighthouse: Pubkey) -> Result<()> {
+    let old = state.lighthouse;
+    state.lighthouse = new_lighthouse;
+    emit!(LighthouseUpdatedEvent {
+        old_lighthouse: old,
+        new_lighthouse,
+    });
+    Ok(())
+}
+
+fn _update_watchtower(state: &mut SpokeState, new_watchtower: Pubkey) -> Result<()> {
+    let old = state.watchtower;
+    state.watchtower = new_watchtower;
+    emit!(WatchtowerUpdatedEvent {
+        old_watchtower: old,
+        new_watchtower,
+    });
+    Ok(())
+}
+
+fn _update_mailbox(state: &mut SpokeState, new_mailbox: Pubkey) -> Result<()> {
+    let old = state.mailbox;
+    state.mailbox = new_mailbox;
+    emit!(MailboxUpdatedEvent {
+        old_mailbox: old,
+        new_mailbox,
+    });
+    Ok(())
 }
