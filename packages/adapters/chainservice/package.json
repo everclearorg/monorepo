@@ -1,6 +1,6 @@
 {
   "name": "@chimera-monorepo/chainservice",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.3",
   "description": "Chain service codebase for Everclear",
   "main": "dist/index.js",
   "author": "Everclear",
@@ -32,7 +32,7 @@
     "typescript": "5.3.3"
   },
   "dependencies": {
-    "@chimera-monorepo/utils": "0.0.1-alpha.1",
+    "@chimera-monorepo/utils": "0.0.1-alpha.3",
     "@safe-global/api-kit": "^2.5.6",
     "@safe-global/protocol-kit": "^5.1.1",
     "@safe-global/types-kit": "^1.0.1",

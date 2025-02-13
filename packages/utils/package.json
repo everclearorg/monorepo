@@ -1,6 +1,6 @@
 {
   "name": "@chimera-monorepo/utils",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.3",
   "description": "Common utilities for use",
   "main": "dist/index.js",
   "author": "Everclear",
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.735.0",
-    "@chimera-monorepo/contracts": "workspace:*",
+    "@chimera-monorepo/contracts": "0.0.1-alpha.3",
     "@hyperlane-xyz/sdk": "3.15.1",
     "@sinclair/typebox": "0.25.21",
     "@urql/core": "5.0.4",
