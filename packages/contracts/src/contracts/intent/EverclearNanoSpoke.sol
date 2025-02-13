@@ -38,7 +38,6 @@ import {Constants} from 'contracts/intent/lib/Constants.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
-import {IPermit2} from 'interfaces/common/IPermit2.sol';
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 import {IEverclearNanoSpoke} from 'interfaces/intent/IEverclearNanoSpoke.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
@@ -75,7 +74,6 @@ contract EverclearNanoSpoke is
   IMessageReceiver
 {
   using QueueLib for QueueLib.IntentQueue;
-  using QueueLib for QueueLib.FillQueue;
   using SafeERC20 for IERC20;
   using TypeCasts for address;
   using TypeCasts for bytes32;
@@ -226,7 +224,6 @@ contract EverclearNanoSpoke is
 
     // Intialize the queues
     intentQueue.first = 1;
-    fillQueue.first = 1;
   }
 
   /*///////////////////////////////////////////////////////////////
