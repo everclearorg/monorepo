@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::clock::Clock;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, TransferChecked, MintTo, Burn};
+use anchor_spl::associated_token::{self, get_associated_token_address};
 use std::collections::{VecDeque, HashMap};
 
 // Constants
@@ -9,23 +10,21 @@ pub const THIS_DOMAIN: u32 = 1234;       // This spoke's domain ID
 pub const EVERCLEAR_DOMAIN: u32 = 9999;  // Hub's domain ID
 pub const MAX_INTENT_QUEUE_SIZE: usize = 1000;
 pub const MAX_FILL_QUEUE_SIZE: usize = 1000;
-pub const MAX_STRATEGIES: usize = 100;
-pub const MAX_MODULES: usize = 50;
 pub const MAX_CALLDATA_SIZE: usize = 10240; // 10KB
 pub const DBPS_DENOMINATOR: u32 = 10_000;
+pub const DEFAULT_NORMALIZED_DECIMALS: u8 = 18;
+
+// TODO: Need to define these hashes
+pub const GATEWAY_HASH: [u8; 32] = [0x01; 32]; // placeholder
+pub const MAILBOX_HASH: [u8; 32] = [0x02; 32]; // placeholder
+pub const LIGHTHOUSE_HASH: [u8; 32] = [0x03; 32]; // placeholder
+pub const WATCHTOWER_HASH: [u8; 32] = [0x04; 32]; // placeholder
 
 pub const FILL_INTENT_FOR_SOLVER_TYPEHASH: [u8; 32] = [0xAA; 32]; // placeholder
 pub const PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xBB; 32];
 pub const PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xCC; 32];
 
-// Dummy Permit2 address
-pub const PERMIT2: Pubkey = Pubkey::new_from_array([0u8; 32]);
-
-<<<<<<< Updated upstream
 declare_id!("FH6w3aVDLKtZn3AmK3bxM9RBvJ6WBKEhp6VFZb5Axcoy");
-=======
-declare_id!("EverclrSpk1111111111111111111111111111111111");
->>>>>>> Stashed changes
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct SpokeInitializationParams {
@@ -37,82 +36,44 @@ pub struct SpokeInitializationParams {
     pub message_receiver: Pubkey,
     pub gateway: Pubkey,
     pub message_gas_limit: u64,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct Permit2Data {
-    pub token: Pubkey,
-    pub amount: u64,
-    pub expiration: u64,
-    pub nonce: u64,
-    pub signature: [u8; 64],
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct RelayerSignature {
-    pub signer: Pubkey,
-    pub signature: [u8; 64],
-    pub deadline: u64,
-}
-
-impl RelayerSignature {
-    pub fn verify(&self, typehash: [u8; 32], msg_hash: [u8; 32]) -> Result<()> {
-        let clock = Clock::get()?;
-        require!(clock.unix_timestamp as u64 <= self.deadline, SpokeError::SignatureExpired);
-        
-        // Construct the message to verify
-        let mut hasher = tiny_keccak::Keccak::v256();
-        hasher.update(&typehash);
-        hasher.update(&msg_hash);
-        hasher.update(&self.deadline.to_le_bytes());
-        let mut hash = [0u8; 32];
-        hasher.finalize(&mut hash);
-        
-        // Verify signature (placeholder - implement actual ed25519 verification)
-        require!(verify_ed25519_signature(&self.signer, &hash, &self.signature), SpokeError::InvalidSignature);
-        Ok(())
-    }
-}
-
-// Helper function to verify ed25519 signatures
-fn verify_ed25519_signature(signer: &Pubkey, message: &[u8], signature: &[u8; 64]) -> bool {
-    // TODO: Implement actual ed25519 verification
-    // This is a placeholder that always returns true
-    true
+    pub owner: Pubkey,
 }
 
 #[program]
 pub mod everclear_spoke {
     use super::*;
-
+    
+    // TODO: Do we need to add initializer modifier to this?
     /// Initialize the global state.
     /// This function creates the SpokeState (global config) PDA.
+    #[access_control(ctx.accounts.ensure_owner_is_valid(&init.owner))]
     pub fn initialize(
         ctx: Context<Initialize>,
         init: SpokeInitializationParams,
     ) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
+
+        require!(state.initialized_version == 0, SpokeError::AlreadyInitialized);
+        state.initialized_version = 1;
+
         state.paused = false;
         state.domain = init.domain;
-        state.everclear = init.hub_domain;
+        state.gateway = init.gateway;
+        state.message_receiver = init.message_receiver;
         state.lighthouse = init.lighthouse;
         state.watchtower = init.watchtower;
         state.call_executor = init.call_executor;
-        state.message_receiver = init.message_receiver;
-        state.gateway = init.gateway;
+        state.everclear = init.hub_domain;
         state.message_gas_limit = init.message_gas_limit;
         state.nonce = 0;
         
         // Initialize our mappings and queues
         state.intent_queue = QueueState::new();
-        state.fill_queue = QueueState::new();
         state.balances = HashMap::new();
         state.status = HashMap::new();
-        state.strategy_by_asset = HashMap::new();
-        state.module_by_strategy = HashMap::new();
         
         // Set owner to the payer (deployer)
-        state.owner = ctx.accounts.payer.key();
+        state.owner = init.owner;
         state.bump = *ctx.bumps.get("spoke_state").unwrap();
         
         emit!(InitializedEvent {
@@ -148,38 +109,6 @@ pub mod everclear_spoke {
         Ok(())
     }
 
-    /// Deposit SPL tokens into the program.
-    /// The user's tokens are transferred to a program-controlled vault.
-    pub fn deposit(
-        ctx: Context<Deposit>,
-        amount: u64,
-    ) -> Result<()> {
-        let state = &ctx.accounts.spoke_state;
-        require!(!state.paused, SpokeError::ContractPaused);
-        require!(amount > 0, SpokeError::InvalidAmount);
-
-        // Transfer tokens from user to program vault.
-        let cpi_ctx = CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            Transfer {
-                from: ctx.accounts.from_token_account.to_account_info(),
-                to: ctx.accounts.to_token_account.to_account_info(),
-                authority: ctx.accounts.user_authority.to_account_info(),
-            },
-        );
-        token::transfer(cpi_ctx, amount)?;
-
-        // Update user balance (stored on-chain in the global state's dynamic vector).
-        increase_balance(&mut ctx.accounts.spoke_state.balances, ctx.accounts.mint.key(), ctx.accounts.user_authority.key(), amount);
-
-        emit!(DepositedEvent {
-            user: ctx.accounts.user_authority.key(),
-            asset: ctx.accounts.mint.key(),
-            amount,
-        });
-        Ok(())
-    }
-
     /// Withdraw SPL tokens from the program's vault.
     /// This reduces the user's on‑chain balance and transfers tokens out.
     pub fn withdraw(
@@ -192,18 +121,12 @@ pub mod everclear_spoke {
 
         // Check the user has sufficient balance.
         reduce_balance(&mut ctx.accounts.spoke_state.balances, ctx.accounts.mint.key(), ctx.accounts.user_authority.key(), amount)?;
+        
         // Transfer tokens from the vault to the user's token account.
         // The vault is owned by a PDA (program_vault_authority).
-        let vault_authority_seeds = &[
-            b"vault",
-            ctx.accounts.mint.key().as_ref(),
-<<<<<<< Updated upstream
-=======
-            program_id.as_ref(), // Adding the program id to the seed to protect this?
->>>>>>> Stashed changes
-            &[ctx.accounts.vault_authority_bump],
-        ];
-        let signer = &[&vault_authority_seeds[..]];
+        let seeds = vault_authority_seeds(&ID, &ctx.accounts.mint.key(), ctx.accounts.vault_authority_bump);
+        let signer = &[&seeds[..]];
+
         let cpi_accounts = Transfer {
             from: ctx.accounts.from_token_account.to_account_info(),
             to: ctx.accounts.to_token_account.to_account_info(),
@@ -223,7 +146,7 @@ pub mod everclear_spoke {
     /// The user "locks" funds (previously deposited) and creates an intent.
     /// For simplicity, we assume full deposit has been made before.
     pub fn new_intent(
-        ctx: Context<AuthState>,
+        ctx: Context<NewIntent>,
         receiver: Pubkey,
         input_asset: Pubkey,
         output_asset: Pubkey,
@@ -236,12 +159,9 @@ pub mod everclear_spoke {
         let state = &mut ctx.accounts.spoke_state;
         require!(!state.paused, SpokeError::ContractPaused);
         require!(destinations.len() > 0, SpokeError::InvalidOperation);
-<<<<<<< Updated upstream
+        require!(destinations.len() <= 10, SpokeError::InvalidIntent);
+
         // If a single destination and ttl != 0, require output_asset is non-zero.
-=======
-        
-        // Validate intent parameters
->>>>>>> Stashed changes
         if destinations.len() == 1 {
             require!(output_asset != Pubkey::default(), SpokeError::InvalidIntent);
         } else {
@@ -250,70 +170,64 @@ pub mod everclear_spoke {
         }
         // Check max_fee is within allowed range (for example, <= 10_000 for basis points)
         require!(max_fee <= 10_000, SpokeError::MaxFeeExceeded);
-<<<<<<< Updated upstream
+        require!(data.len() <= MAX_CALLDATA_SIZE, SpokeError::InvalidOperation);
 
-        // Update global nonce.
-        state.nonce = state.nonce.checked_add(1).ok_or(SpokeError::InvalidOperation)?;
-        // Create a simple intent_id as the SHA256 hash of (initiator, nonce, amount, current time).
-        let clock = Clock::get()?;
-        let mut hasher_input = Vec::new();
-        hasher_input.extend_from_slice(ctx.accounts.authority.key.as_ref());
-        hasher_input.extend_from_slice(&state.nonce.to_le_bytes());
-        hasher_input.extend_from_slice(&amount.to_le_bytes());
-        hasher_input.extend_from_slice(&clock.unix_timestamp.to_le_bytes());
-        let intent_id = keccak_256(&hasher_input);
+        let minted_decimals = ctx.accounts.mint.decimals;
+        let normalized_amount = normalize_decimals(
+            amount,
+            minted_decimals,
+            DEFAULT_NORMALIZED_DECIMALS,
+        )?;
+        require!(normalized_amount > 0, SpokeError::ZeroAmount);  // Add zero amount check like Solidity
 
-        // Optionally, reduce the user's deposit balance by the amount.
-        reduce_balance(&mut state.balances, input_asset, ctx.accounts.authority.key(), amount)?;
-
-        // Append the intent_id to the intent_queue.
-=======
-        require!(amount > 0, SpokeError::ZeroAmount);  // Add zero amount check like Solidity
+        // Transfer from user’s token account -> program’s vault
+        let cpi_accounts = Transfer {
+            from: ctx.accounts.user_token_account.to_account_info(),
+            to: ctx.accounts.program_vault_account.to_account_info(),
+            authority: ctx.accounts.authority.to_account_info(),
+        };
+        let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
+        token::transfer(cpi_ctx, amount)?;
 
         // Update global nonce and create intent_id
-        state.nonce = state.nonce.checked_add(1).ok_or(SpokeError::InvalidOperation)?;
+        let new_nonce = state.nonce.checked_add(1).ok_or(SpokeError::InvalidOperation)?;
+        state.nonce = new_nonce;
         let clock = Clock::get()?;
         
         // Create intent_id with all parameters
-        let mut hasher_input = Vec::new();
-        hasher_input.extend_from_slice(ctx.accounts.authority.key.as_ref());    // initiator
-        hasher_input.extend_from_slice(&receiver.to_bytes());                   // receiver
-        hasher_input.extend_from_slice(&input_asset.to_bytes());               // input asset
-        hasher_input.extend_from_slice(&output_asset.to_bytes());              // output asset
-        hasher_input.extend_from_slice(&max_fee.to_be_bytes());                // max fee
-        hasher_input.extend_from_slice(&state.domain.to_be_bytes());           // origin domain
-        hasher_input.extend_from_slice(&state.nonce.checked_add(1)             // nonce
-            .ok_or(SpokeError::InvalidOperation)?.to_be_bytes());
-        hasher_input.extend_from_slice(&clock.unix_timestamp.to_be_bytes());    // timestamp
-        hasher_input.extend_from_slice(&ttl.to_be_bytes());                    // ttl
-        hasher_input.extend_from_slice(&amount.to_be_bytes());                 // amount
-        hasher_input.extend_from_slice(&destinations.try_to_vec()?);           // destinations
-        hasher_input.extend_from_slice(&data);                                 // data
-
-        let intent_id = keccak_256(&hasher_input);
-
-        // Always reduce balance (no Permit2 optionality)
-        reduce_balance(&mut state.balances, input_asset, ctx.accounts.authority.key(), amount)?;
+        // TODO: May need to encode this properly
+        // TODO: Would need to update processIntentQueue logic on update
+        let new_intent_struct = Intent {
+            initiator: ctx.accounts.authority.key(),
+            receiver,
+            input_asset,
+            output_asset,
+            max_fee,
+            origin_domain: state.domain,
+            nonce: new_nonce,
+            timestamp: clock.unix_timestamp as u64,
+            ttl,
+            normalized_amount,
+            destinations,
+            data,
+        };
+        
+        let intent_id = compute_intent_hash(&new_intent_struct);
 
         // Update intent queue and status
->>>>>>> Stashed changes
         state.intent_queue.push_back(intent_id);
 
         // Also, record a minimal status mapping (we only record the intent_id and its status).
         state.status.insert(intent_id, IntentStatus::Added);
 
-<<<<<<< Updated upstream
         // Emit an event with full intent details.
-=======
-        // Emit event
->>>>>>> Stashed changes
         emit!(IntentAddedEvent {
             intent_id,
             initiator: ctx.accounts.authority.key(),
             receiver,
             input_asset,
             output_asset,
-            amount,
+            normalized_amount,
             max_fee,
             origin_domain: state.domain,
             ttl,
@@ -321,109 +235,15 @@ pub mod everclear_spoke {
             destinations,
             data,
         });
-        Ok(())
-    }
-
-    /// Fill an intent.
-    /// Called by a solver to fulfill an intent; transfers tokens or mints xAssets accordingly.
-    pub fn fill_intent(
-        ctx: Context<AuthState>,
-        intent_id: [u8; 32],
-        fee: u32,
-    ) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        require!(!state.paused, SpokeError::ContractPaused);
-        // Find the intent in our status mapping.
-        let current_status = state.status.get(&intent_id).cloned().unwrap_or(IntentStatus::None);
-        // Only allow fill if intent is in Added state.
-        require!(current_status == IntentStatus::Added, SpokeError::InvalidIntentStatus);
-
-        // Check TTL: if current time exceeds (intent.timestamp + ttl), then intent is expired.
-        // (For demonstration, assume TTL is stored as part of the event; in production, you'd store it on‑chain.)
-        let clock = Clock::get()?;
-        // For this demo, we do not have the original timestamp/ttl on-chain; assume valid.
-        // In production, you'd store them in an Intent account.
         
-        // For demonstration, simulate token transfer (or mint if XERC20 strategy applies)
-        // Here we assume that if output_asset is non-zero, then funds exist in the program's vault.
-        // Otherwise, if output_asset is default, we assume XERC20 minting is required.
-        if ctx.accounts.intent_output_asset.key() != Pubkey::default() {
-            // Standard asset: Transfer tokens from solver's vault (or program's custody) to the intended receiver.
-            // For demonstration, we assume the solver has already deposited the output asset in the program's vault.
-            // So we perform a token transfer from the program's vault (owned by a PDA) to the receiver's account.
-            let vault_authority_seeds = &[
-                b"vault",
-                ctx.accounts.intent_output_asset.key().as_ref(),
-                &[ctx.accounts.vault_authority_bump],
-            ];
-            let signer = &[&vault_authority_seeds[..]];
-            let cpi_accounts = Transfer {
-                from: ctx.accounts.intent_from_token_account.to_account_info(),
-                to: ctx.accounts.intent_to_token_account.to_account_info(),
-                authority: ctx.accounts.vault_authority.to_account_info(),
-            };
-            let cpi_ctx = CpiContext::new_with_signer(ctx.accounts.token_program.to_account_info(), cpi_accounts, signer);
-            token::transfer(cpi_ctx, ctx.accounts.intent_amount)?;
-        } else {
-            // XERC20 strategy: Mint the output asset (xAsset) to the receiver.
-            let cpi_accounts = MintTo {
-                mint: ctx.accounts.xasset_mint.to_account_info(),
-                to: ctx.accounts.intent_to_token_account.to_account_info(),
-                authority: ctx.accounts.mint_authority.to_account_info(),
-            };
-            // The mint_authority is a PDA.
-            let mint_authority_seeds = &[
-                b"xasset_mint_authority",
-                ctx.accounts.xasset_mint.key().as_ref(),
-                &[ctx.accounts.mint_authority_bump],
-            ];
-            let signer = &[&mint_authority_seeds[..]];
-            let cpi_ctx = CpiContext::new_with_signer(ctx.accounts.token_program.to_account_info(), cpi_accounts, signer);
-            token::mint_to(cpi_ctx, ctx.accounts.intent_amount)?;
-        }
-        // Mark the intent as filled.
-        state.status.insert(intent_id, IntentStatus::Filled);
+        // TODO: Do we need this for off-chain logic?
+        // let queue_index = state.intent_queue.last_index();   
+        // emit!(IntentAddedEvent { ..., queue_index, ... });
 
-        // Record a fill message in the fill_queue.
-        let fill_msg = FillMessage {
-            intent_id,
-            solver: ctx.accounts.authority.key(),
-            execution_timestamp: clock.unix_timestamp as u64,
-            fee,
-        };
-        state.fill_queue.push_back(fill_msg);
-
-        emit!(IntentFilledEvent {
-            intent_id,
-            solver: ctx.accounts.authority.key(),
-            fee,
-        });
         Ok(())
     }
 
     /// Process a batch of intents in the queue and dispatch a cross-chain message via Hyperlane.
-<<<<<<< Updated upstream
-    pub fn process_intent_queue(ctx: Context<AuthState>, count: u32) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        require!(!state.paused, SpokeError::ContractPaused);
-        require!(count > 0, SpokeError::InvalidAmount);
-        require!(count as usize <= state.intent_queue.len(), SpokeError::InvalidQueueOperation);
-
-        // Collect the first 'count' intent IDs.
-        let intents: Vec<[u8;32]> = state.intent_queue.drain(0..(count as usize)).collect();
-        // (In production, you would also include full intent data or verify with an off‑chain aggregator.)
-
-        // Build a batch message (here we simply serialize the vector).
-        let batch_message = intents.try_to_vec()?;
-
-        // Call Hyperlane Mailbox via CPI.
-        // For demonstration, we construct a dummy instruction.
-        let ix_data = {
-            let mut data = Vec::new();
-            data.extend_from_slice(&EVERCLEAR_DOMAIN.to_le_bytes()); // destination domain
-            data.extend_from_slice(&state.gateway.to_bytes());       // recipient (hub gateway)
-            data.extend_from_slice(&(batch_message.len() as u64).to_le_bytes());
-=======
     pub fn process_intent_queue(
         ctx: Context<AuthState>, 
         intents: Vec<Intent>,  // Pass full intents, not just count
@@ -435,17 +255,17 @@ pub mod everclear_spoke {
         require!(intents.len() <= state.intent_queue.len(), SpokeError::InvalidQueueOperation);
 
         // Verify each intent matches the queue
+        let old_first = state.intent_queue.first_index();
         for intent in intents.iter() {
             let queue_intent_id = state.intent_queue.pop_front()
                 .ok_or(SpokeError::InvalidQueueOperation)?;
-            
-            // Hash the intent to verify it matches queue
-            let intent_hash = keccak_256(&intent.try_to_vec()?);
-            require!(queue_intent_id == intent_hash, SpokeError::IntentNotFound);
+        
+            let computed = compute_intent_hash(intent);
+            require!(queue_intent_id == computed, SpokeError::IntentNotFound);
         }
 
         // Format message using proper message lib
-        let batch_message = MessageLib::format_intent_message_batch(&intents)?;
+        let batch_message = format_intent_message_batch(&intents)?;
 
         // Call Hyperlane with proper gas handling
         let ix_data = {
@@ -453,7 +273,6 @@ pub mod everclear_spoke {
             data.extend_from_slice(&EVERCLEAR_DOMAIN.to_be_bytes());
             data.extend_from_slice(&state.gateway.to_bytes());
             data.extend_from_slice(&message_gas_limit.to_be_bytes());
->>>>>>> Stashed changes
             data.extend_from_slice(&batch_message);
             data
         };
@@ -462,63 +281,19 @@ pub mod everclear_spoke {
             accounts: vec![],
             data: ix_data,
         };
+        // TODO: Not handling messageId or fee spent here
         anchor_lang::solana_program::program::invoke(
             &ix,
             &[ctx.accounts.hyperlane_mailbox.to_account_info()],
         )?;
-<<<<<<< Updated upstream
-        emit!(IntentQueueProcessedEvent {
-            message_id: keccak_256(&batch_message),
-            first_index: 0, // for demonstration
-            last_index: count as u64,
-            fee_spent: 0, // placeholder
-=======
-
-        emit!(IntentQueueProcessedEvent {
-            message_id,
-            first_index: state.intent_queue.first_index(),
-            last_index: state.intent_queue.first_index() + intents.len() as u64,
-            fee_spent,
->>>>>>> Stashed changes
-        });
-        Ok(())
-    }
-
-    /// Process a batch of fill messages and dispatch a cross-chain message via Hyperlane.
-    pub fn process_fill_queue(ctx: Context<AuthState>, count: u32) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        require!(!state.paused, SpokeError::ContractPaused);
-        require!(count > 0, SpokeError::InvalidAmount);
-        require!(count as usize <= state.fill_queue.len(), SpokeError::InvalidQueueOperation);
-
-        // Collect the first 'count' fill messages.
-        let fills: Vec<FillMessage> = state.fill_queue.drain(0..(count as usize)).collect();
-        let batch_message = fills.try_to_vec()?;
-
-        // Dispatch via Hyperlane Mailbox.
-        let ix_data = {
-            let mut data = Vec::new();
-            data.extend_from_slice(&EVERCLEAR_DOMAIN.to_le_bytes());
-            data.extend_from_slice(&state.gateway.to_bytes());
-            data.extend_from_slice(&(batch_message.len() as u64).to_le_bytes());
-            data.extend_from_slice(&batch_message);
-            data
-        };
-        let ix = anchor_lang::solana_program::instruction::Instruction {
-            program_id: ctx.accounts.hyperlane_mailbox.key(),
-            accounts: vec![],
-            data: ix_data,
-        };
-        anchor_lang::solana_program::program::invoke(
-            &ix,
-            &[ctx.accounts.hyperlane_mailbox.to_account_info()],
-        )?;
-        emit!(FillQueueProcessedEvent {
-            message_id: keccak_256(&batch_message),
-            first_index: 0,
-            last_index: count as u64,
-            fee_spent: 0,
-        });
+        
+        // TODO: Need the meesage_id and fee spent data from above
+        // emit!(IntentQueueProcessedEvent {
+        //     message_id,
+        //     first_index: old_first,
+        //     last_index: old_first + intents.len() as u64,
+        //     fee_spent,
+        // });
         Ok(())
     }
 
@@ -543,16 +318,18 @@ pub mod everclear_spoke {
         let msg_type = payload[0];
         match msg_type {
             1 => {
-                // Settlement batch message: process each settlement.
-                // For demonstration, assume payload contains a vector of (intent_id, asset, recipient, amount).
-                // In production, you'd decode using a proper schema.
+                // Settlement batch
                 msg!("Processing settlement batch message");
-                // (Here you would iterate over each settlement record and perform token transfers/mint/burn.)
+                let settlement_data = &payload[1..]; // everything after the first byte
+                let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
+                    .map_err(|_| SpokeError::InvalidMessage)?; // decode a vector of Settlement
+                handle_batch_settlement(state, batch)?;
             },
             2 => {
-                // Variable update: update gateway, watchtower, etc.
+                // Var update
                 msg!("Processing variable update message");
-                // (Decode variable identifier and new value, then update state.)
+                let var_data = &payload[1..];
+                handle_var_update(state, var_data)?;
             },
             _ => {
                 return Err(SpokeError::InvalidMessage.into());
@@ -562,194 +339,316 @@ pub mod everclear_spoke {
         Ok(())
     }
 
+    fn handle_batch_settlement(
+        state: &mut SpokeState,
+        batch: Vec<Settlement>,
+    ) -> Result<()> {
+        for s in batch.iter() {
+            handle_settlement(state, s)?;
+        }
+        Ok(())
+    }
+
+    fn handle_settlement(
+        state: &mut SpokeState,
+        settlement: &Settlement,
+        vault_token_account: &Account<TokenAccount>,
+        vault_authority: &UncheckedAccount,
+        vault_authority_bump: u8,
+        token_program: &Program<Token>,
+    ) -> Result<()> {
+        // 1) Check if already settled
+        let current_status = state.status.get(&settlement.intent_id).copied().unwrap_or(IntentStatus::None);
+        if current_status == IntentStatus::Settled 
+            || current_status == IntentStatus::SettledAndManuallyExecuted 
+        {
+            msg!("Intent already settled, ignoring");
+            return Ok(());
+        }
+
+        // 2) Mark as settled in storage
+        state.status.insert(settlement.intent_id, IntentStatus::Settled);
+
+        // 3) Normalise the settlement amount
+        let minted_decimals = vault_token_account.mint.decimals; 
+        let amount = normalize_decimals(settlement.amount, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
+        if amount == 0 {
+            return Ok(());
+        }
+
+        // Attempt CPI transfer
+        let seeds = vault_authority_seeds(&ID, &vault_token_account.mint.key(), vault_authority_bump);
+        let signer = &[&seeds[..]];
+
+        let cpi_accounts = anchor_spl::token::Transfer {
+            from: vault_token_account.to_account_info(),
+            to: make_recipient_token_account_info(
+                ctx.remaining_accounts,
+                settlement.recipient,
+                settlement.asset
+            )?,
+            authority: vault_authority.to_account_info(),
+        };
+        let cpi_ctx = CpiContext::new_with_signer(token_program.to_account_info(), cpi_accounts, signer);
+
+        let transfer_result = token::transfer(cpi_ctx, amount);
+
+        if transfer_result.is_err() {
+            // The transfer failed. Fallback to storing in user’s local balance
+            // e.g. store "settlement.amount" in the local ledger
+            increase_balance(&mut state.balances, settlement.asset, settlement.recipient, amount);
+            emit!(AssetTransferFailed {
+                asset: settlement.asset,
+                recipient: settlement.recipient,
+                amount: amount,
+            });
+        }
+
+        emit!(SettledEvent {
+           intent_id: settlement.intent_id,
+           recipient: settlement.recipient,
+           asset: settlement.asset,
+           amount: amount,
+        });
+
+        Ok(())
+    }
+
+    fn handle_var_update(
+        state: &mut SpokeState, 
+        var_data: &[u8]
+    ) -> Result<()> {
+        // e.g., parse the first 32 bytes as a “var hash”
+        require!(var_data.len() >= 32, SpokeError::InvalidMessage);
+        let mut var_hash = [0u8; 32];
+        var_hash.copy_from_slice(&var_data[..32]);
+        let rest = &var_data[32..];
+        
+        // TOOD: Implement the gateway and mailbox functions
+        // Compare var_hash with your known “gateway”, “mailbox”, “lighthouse”, or “watchtower” constants
+        if var_hash == GATEWAY_HASH {
+            let new_gateway: Pubkey = try_deserialize_a_pubkey(rest)?;
+            _update_gateway(state, new_gateway)?;
+        } else if var_hash == MAILBOX_HASH {
+            let new_mailbox: Pubkey = try_deserialize_a_pubkey(rest)?;
+            _update_mailbox(state, new_mailbox)?;
+        } else if var_hash == LIGHTHOUSE_HASH {
+            let new_lighthouse: Pubkey = try_deserialize_a_pubkey(rest)?;
+            _update_lighthouse(state, new_lighthouse)?;
+        } else if var_hash == WATCHTOWER_HASH {
+            let new_watchtower: Pubkey = try_deserialize_a_pubkey(rest)?;
+            _update_watchtower(state, new_watchtower)?;
+        } else {
+            return err!(SpokeError::InvalidVarUpdate);
+        }
+
+        Ok(())
+    }
+
     /// Update the gateway address (admin only).
     pub fn update_gateway(ctx: Context<AuthState>, new_gateway: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
-        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
+        let authority = ctx.accounts.authority.key();
+        require!(state.owner == authority, SpokeError::OnlyOwner);
+
+        _update_gateway(state, new_gateway)?;
+        
+        Ok(())
+    }
+
+    fn _update_gateway(state: &mut SpokeState, new_gateway: Pubkey) -> Result<()> {
         let old = state.gateway;
         state.gateway = new_gateway;
         emit!(GatewayUpdatedEvent { old_gateway: old, new_gateway });
         Ok(())
     }
 
-    /// Set strategy for an asset (admin only).
-    /// For example, 0 = standard, 1 = XERC20 mint/burn.
-    pub fn set_strategy_for_asset(ctx: Context<AuthState>, asset: Pubkey, strategy: u8) -> Result<()> {
+    pub fn update_lighthouse(ctx: Context<AuthState>, new_lighthouse: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
-        update_strategy(&mut state.strategy_by_asset, asset, strategy)?;
-        emit!(StrategySetEvent { asset, strategy });
+
+        _update_lighthouse(state, new_lighthouse)?;
         Ok(())
     }
 
-    /// Execute an arbitrary external call (like CallExecutor in Solidity).
-    /// Only callable by owner or call_executor.
-    pub fn execute_call(
-        ctx: Context<ExecuteCall>,
-        target_program_id: Pubkey,
-        ix_data: Vec<u8>,
-    ) -> Result<()> {
-        let state = &ctx.accounts.spoke_state;
-        require!(!state.paused, SpokeError::ContractPaused);
-        require!(
-            ctx.accounts.authority.key() == state.owner || ctx.accounts.authority.key() == state.call_executor,
-            SpokeError::Unauthorized
-        );
-        // Prevent calling our own program.
-        require!(target_program_id != crate::id(), SpokeError::InvalidOperation);
+    fn _update_lighthouse(state: &mut SpokeState, new_lighthouse: Pubkey) -> Result<()> {
+        let old = state.lighthouse;
+        state.lighthouse = new_lighthouse;
+        emit!(LighthouseUpdatedEvent {
+            old_lighthouse: old,
+            new_lighthouse,
+        });
+        Ok(())
+    }
 
-        let accounts: Vec<AccountMeta> = ctx.remaining_accounts.iter().map(|acc| {
-            AccountMeta {
-                pubkey: acc.key(),
-                is_signer: acc.is_signer,
-                is_writable: acc.is_writable,
+    pub fn update_watchtower(ctx: Context<AuthState>, new_watchtower: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
+
+        _update_watchtower(state, new_watchtower)?;
+        Ok(())
+    }
+
+    fn _update_watchtower(state: &mut SpokeState, new_watchtower: Pubkey) -> Result<()> {
+        let old = state.watchtower;
+        state.watchtower = new_watchtower;
+        emit!(WatchtowerUpdatedEvent {
+            old_watchtower: old,
+            new_watchtower,
+        });
+        Ok(())
+    }
+    
+    pub fn update_mailbox(ctx: Context<AuthState>, new_mailbox: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        // enforce only owner can do it
+        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
+
+        _update_mailbox(state, new_mailbox)?;
+        Ok(())
+    }
+
+    fn _update_mailbox(state: &mut SpokeState, new_mailbox: Pubkey) -> Result<()> {
+        let old = state.mailbox;
+        state.mailbox = new_mailbox;
+        emit!(MailboxUpdatedEvent {
+            old_mailbox: old,
+            new_mailbox,
+        });
+        Ok(())
+    }
+
+    pub fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
+        // Example:
+        let mut buffer = Vec::new();
+        // e.g. prefix a message type byte
+        buffer.push(1); 
+        // then Borsh‐encode the `Vec<Intent>`
+        let encoded = intents.try_to_vec()?;
+        buffer.extend_from_slice(&encoded);
+        Ok(buffer)
+    }
+
+    pub fn compute_intent_hash(intent: &Intent) -> [u8; 32] {
+        let mut hasher_input = Vec::new();
+    
+        // 1) Initiator
+        hasher_input.extend_from_slice(intent.initiator.as_ref());
+    
+        // 2) Receiver
+        hasher_input.extend_from_slice(intent.receiver.as_ref());
+    
+        // 3) InputAsset
+        hasher_input.extend_from_slice(intent.input_asset.as_ref());
+    
+        // 4) OutputAsset
+        hasher_input.extend_from_slice(intent.output_asset.as_ref());
+    
+        // 5) maxFee
+        hasher_input.extend_from_slice(&intent.max_fee.to_be_bytes());
+    
+        // 6) originDomain
+        hasher_input.extend_from_slice(&intent.origin_domain.to_be_bytes());
+    
+        // 7) nonce
+        hasher_input.extend_from_slice(&intent.nonce.to_be_bytes());
+    
+        // 8) timestamp
+        hasher_input.extend_from_slice(&intent.timestamp.to_be_bytes());
+    
+        // 9) ttl
+        hasher_input.extend_from_slice(&intent.ttl.to_be_bytes());
+    
+        // 10) normalizedAmount
+        hasher_input.extend_from_slice(&intent.normalized_amount.to_be_bytes());
+    
+        // 11) destinations (Borsh or plain “Vec<u8>” for them).
+        //    If you want raw 4-byte concatenation for each, do it manually:
+        //    for d in intent.destinations.iter() { hasher_input.extend_from_slice(&d.to_be_bytes()); }
+        //
+        //    Or, if your original code used `.try_to_vec()`, replicate that:
+        //    let encoded_dest = intent.destinations.try_to_vec().unwrap();
+        let encoded_dest = intent.destinations.try_to_vec().unwrap();
+        hasher_input.extend_from_slice(&encoded_dest);
+    
+        // 12) data
+        hasher_input.extend_from_slice(&intent.data);
+    
+        // 13) Return keccak256
+        keccak_256(&hasher_input)
+    }
+
+    pub fn normalize_decimals(
+        amount: u64,
+        minted_decimals: u8,
+        target_decimals: u8,
+    ) -> Result<u64> {
+        if minted_decimals == target_decimals {
+            // No scaling needed
+            return Ok(amount);
+        } else if minted_decimals > target_decimals {
+            // e.g. minted_decimals=9, target_decimals=6 => downscale
+            let shift = minted_decimals - target_decimals;
+            // prevent potential divide-by-zero or overshoot
+            if shift > 12 {
+                // you might fail or just saturate for large differences
+                return err!(SpokeError::DecimalConversionOverflow);
             }
-        }).collect();
-
-        let ix = anchor_lang::solana_program::instruction::Instruction {
-            program_id: target_program_id,
-            accounts,
-            data: ix_data,
-        };
-        anchor_lang::solana_program::program::invoke(&ix, ctx.remaining_accounts)?;
-        emit!(ExternalCallExecutedEvent { target_program_id });
-        Ok(())
+            Ok(amount / 10u64.pow(shift as u32))
+        } else {
+            // minted_decimals < target_decimals => upscale
+            let shift = target_decimals - minted_decimals;
+            // watch for overflow if we do big multiplications
+            let factor = 10u64.checked_pow(shift as u32).ok_or(SpokeError::DecimalConversionOverflow)?;
+            let scaled = amount.checked_mul(factor).ok_or(SpokeError::DecimalConversionOverflow)?;
+            Ok(scaled)
+        }
     }
 
-    /// XERC20 module: Mint debt for an asset.
-    /// Deducts debt from a stored "mintable" balance and mints tokens to the recipient.
-    pub fn xerc20_mint_debt(
-        ctx: Context<Xerc20MintDebt>,
-        amount: u64,
-    ) -> Result<()> {
-        // Check minting limit; for demonstration, we assume sufficient limit.
-        let cpi_accounts = MintTo {
-            mint: ctx.accounts.asset_mint.to_account_info(),
-            to: ctx.accounts.recipient_token_account.to_account_info(),
-            authority: ctx.accounts.mint_authority.to_account_info(),
-        };
-        let seeds = &[
-            b"xerc20_mint_authority",
-            ctx.accounts.asset_mint.key().as_ref(),
-            &[ctx.accounts.mint_authority_bump],
-        ];
-        let signer = &[&seeds[..]];
-        let cpi_ctx = CpiContext::new_with_signer(ctx.accounts.token_program.to_account_info(), cpi_accounts, signer);
-        token::mint_to(cpi_ctx, amount)?;
-        emit!(DebtMintedEvent {
-            asset: ctx.accounts.asset_mint.key(),
-            recipient: ctx.accounts.recipient.key(),
-            amount,
-        });
-        Ok(())
+    fn make_recipient_token_account_info<'info>(
+        remaining_accounts: &mut [AccountInfo<'info>],
+        recipient: Pubkey,
+        asset_mint: Pubkey,
+    ) -> Result<AccountInfo<'info>> {
+        // 1) Derive the associated token account (ATA)
+        let expected_ata_key = get_associated_token_address(&recipient, &asset_mint);
+    
+        // 2) Find that account in the remaining accounts. 
+        //    Alternatively, you could require it as a named account in the IDL.
+        for acc_info in remaining_accounts.iter() {
+            if acc_info.key == &expected_ata_key {
+                // Optionally verify it's a valid token account (spl checks, owner = token program, etc.)
+                return Ok(acc_info.clone());
+            }
+        }
+    
+        // If we get here, we did not find the ATA in the remaining accounts
+        // You may want to auto-create it with the Associated Token Program, or throw an error:
+        err!(SpokeError::InvalidOperation)
     }
 
-    /// XERC20 module: Handle burn strategy.
-    /// Burns tokens from the user's token account.
-    pub fn xerc20_burn_strategy(
-        ctx: Context<Xerc20BurnStrategy>,
-        amount: u64,
-    ) -> Result<()> {
-        // Check burning limit; for demonstration, we assume sufficient limit.
-        let cpi_accounts = Burn {
-            mint: ctx.accounts.asset_mint.to_account_info(),
-            to: ctx.accounts.user_token_account.to_account_info(),
-            authority: ctx.accounts.user_authority.to_account_info(),
-        };
-        let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
-        token::burn(cpi_ctx, amount)?;
-        emit!(BurnedEvent {
-            asset: ctx.accounts.asset_mint.key(),
-            user: ctx.accounts.user_authority.key(),
-            amount,
-        });
-        Ok(())
+    fn try_deserialize_a_pubkey(data: &[u8]) -> Result<Pubkey> {
+        // 1) Ensure we have at least 32 bytes
+        if data.len() < 32 {
+            return err!(SpokeError::InvalidMessage);
+        }
+    
+        // 2) Copy the first 32 bytes into a Pubkey
+        let key_array: [u8; 32] = data[..32].try_into().map_err(|_| SpokeError::InvalidMessage)?;
+        Ok(Pubkey::new_from_array(key_array))
     }
 
-    /// Create a new intent with Permit2 validation
-    pub fn new_intent_with_permit2(
-        ctx: Context<AuthState>,
-        receiver: Pubkey,
-        input_asset: Pubkey,
-        output_asset: Pubkey,
-        amount: u64,
-        max_fee: u32,
-        ttl: u64,
-        destinations: Vec<u32>,
-        data: Vec<u8>,
-        permit: Permit2Data,
-    ) -> Result<()> {
-        // Verify Permit2 data
-        let clock = Clock::get()?;
-        require!(clock.unix_timestamp as u64 <= permit.expiration, SpokeError::InvalidPermit2Data);
-        require!(permit.token == input_asset && permit.amount >= amount, SpokeError::InvalidPermit2Data);
-        
-        // TODO: Verify Permit2 signature via CPI to Permit2 program
-        
-        // Create the intent
-<<<<<<< Updated upstream
-        new_intent(ctx, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data)
-=======
-        self.new_intent(ctx, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data)
->>>>>>> Stashed changes
-    }
-
-    /// Process intent queue via a relayer
-    pub fn process_intent_queue_via_relayer(
-        ctx: Context<AuthState>,
-        count: u32,
-        relayer_sig: RelayerSignature,
-    ) -> Result<()> {
-        // Verify relayer signature
-        let msg_hash = keccak_256(&count.to_le_bytes());
-        relayer_sig.verify(PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH, msg_hash)?;
-        
-        // Process the queue
-<<<<<<< Updated upstream
-        process_intent_queue(ctx, count)
-=======
-        self.process_intent_queue(ctx, count)
->>>>>>> Stashed changes
-    }
-
-    /// Process fill queue via a relayer
-    pub fn process_fill_queue_via_relayer(
-        ctx: Context<AuthState>,
-        count: u32,
-        relayer_sig: RelayerSignature,
-    ) -> Result<()> {
-        // Verify relayer signature
-        let msg_hash = keccak_256(&count.to_le_bytes());
-        relayer_sig.verify(PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH, msg_hash)?;
-        
-        // Process the queue
-<<<<<<< Updated upstream
-        process_fill_queue(ctx, count)
-=======
-        self.process_fill_queue(ctx, count)
->>>>>>> Stashed changes
-    }
-
-    /// Fill intent with solver signature verification
-    pub fn fill_intent_for_solver(
-        ctx: Context<AuthState>,
-        intent_id: [u8; 32],
-        fee: u32,
-        solver_sig: RelayerSignature,
-    ) -> Result<()> {
-        // Verify solver signature
-        let mut msg_data = Vec::new();
-        msg_data.extend_from_slice(&intent_id);
-        msg_data.extend_from_slice(&fee.to_le_bytes());
-        let msg_hash = keccak_256(&msg_data);
-        solver_sig.verify(FILL_INTENT_FOR_SOLVER_TYPEHASH, msg_hash)?;
-        
-        // Fill the intent
-<<<<<<< Updated upstream
-        fill_intent(ctx, intent_id, fee)
-=======
-        self.fill_intent(ctx, intent_id, fee)
->>>>>>> Stashed changes
+    fn vault_authority_seeds<'a>(
+        program_id: &'a Pubkey,
+        mint_pubkey: &'a Pubkey,
+        bump: u8,
+    ) -> [&'a [u8]; 4] {
+        [
+            b"vault",
+            mint_pubkey.as_ref(),
+            program_id.as_ref(),
+            &[bump],
+        ]
     }
 }
 
@@ -772,6 +671,16 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>,
 }
 
+impl<'info> Initialize<'info> {
+    pub fn ensure_owner_is_valid(&self, new_owner: &Pubkey) -> Result<()> {
+        require!(
+            *new_owner != Pubkey::default(),
+            SpokeError::InvalidOwner
+        );
+        Ok(())
+    }
+}
+
 #[derive(Accounts)]
 pub struct AuthState<'info> {
     #[account(
@@ -783,22 +692,31 @@ pub struct AuthState<'info> {
     pub authority: Signer<'info>,
 }
 
-// Deposit: Transfer tokens from user to program vault.
 #[derive(Accounts)]
-pub struct Deposit<'info> {
+pub struct NewIntent<'info> {
+    // The main state
     #[account(
         mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump
     )]
     pub spoke_state: Account<'info, SpokeState>,
-    #[account(mut)]
-    pub user_authority: Signer<'info>,
+
+    // The user calling new_intent
+    pub authority: Signer<'info>,
+
+    // The mint of the token the user is depositing
     pub mint: Account<'info, Mint>,
-    #[account(mut, constraint = from_token_account.mint == mint.key())]
-    pub from_token_account: Account<'info, TokenAccount>,
-    #[account(mut, constraint = to_token_account.mint == mint.key())]
-    pub to_token_account: Account<'info, TokenAccount>,
+
+    // The user’s associated token account for that mint
+    #[account(mut, constraint = user_token_account.mint == mint.key())]
+    pub user_token_account: Account<'info, TokenAccount>,
+
+    // The program’s vault token account for that mint
+    #[account(mut, constraint = program_vault_account.mint == mint.key())]
+    pub program_vault_account: Account<'info, TokenAccount>,
+
+    // The SPL token program
     pub token_program: Program<'info, Token>,
 }
 
@@ -824,17 +742,13 @@ pub struct Withdraw<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-/// Context for execute_call – arbitrary CPI.
-#[derive(Accounts)]
-pub struct ExecuteCall<'info> {
-    #[account(
-        mut,
-        seeds = [b"spoke-state"],
-        bump = spoke_state.bump
-    )]
-    pub spoke_state: Account<'info, SpokeState>,
-    pub authority: Signer<'info>,
-    // Remaining accounts to be passed along to the CPI.
+// Context for the settlements
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Settlement {
+    pub intent_id: [u8; 32],
+    pub asset: Pubkey,
+    pub recipient: Pubkey,
+    pub amount: u64,
 }
 
 /// Context for Hyperlane dispatch: We require a Hyperlane mailbox account.
@@ -848,40 +762,6 @@ pub struct HyperlaneDispatch<'info> {
     pub spoke_state: Account<'info, SpokeState>,
     /// CHECK: This account must be the Hyperlane Mailbox program.
     pub hyperlane_mailbox: UncheckedAccount<'info>,
-}
-
-/// Context for XERC20 mint debt.
-#[derive(Accounts)]
-pub struct Xerc20MintDebt<'info> {
-    #[account(mut,
-        seeds = [b"spoke-state"],
-        bump = spoke_state.bump
-    )]
-    pub spoke_state: Account<'info, SpokeState>,
-    pub recipient: Signer<'info>,
-    pub asset_mint: Account<'info, Mint>,
-    #[account(mut)]
-    pub recipient_token_account: Account<'info, TokenAccount>,
-    /// CHECK: PDA that is the mint authority for the xAsset.
-    pub mint_authority: UncheckedAccount<'info>,
-    pub mint_authority_bump: u8,
-    pub token_program: Program<'info, Token>,
-}
-
-/// Context for XERC20 burn strategy.
-#[derive(Accounts)]
-pub struct Xerc20BurnStrategy<'info> {
-    #[account(mut,
-        seeds = [b"spoke-state"],
-        bump = spoke_state.bump
-    )]
-    pub spoke_state: Account<'info, SpokeState>,
-    #[account(mut)]
-    pub user_authority: Signer<'info>,
-    pub asset_mint: Account<'info, Mint>,
-    #[account(mut)]
-    pub user_token_account: Account<'info, TokenAccount>,
-    pub token_program: Program<'info, Token>,
 }
 
 /// Queue state with first/last indices for efficient management
@@ -922,6 +802,8 @@ impl<T> QueueState<T> {
 /// SpokeState – global configuration.
 #[account]
 pub struct SpokeState {
+    // Initializer version
+    pub initialized_version: u8,
     // Paused flag.
     pub paused: bool,
     // Domain IDs.
@@ -943,11 +825,10 @@ pub struct SpokeState {
     pub balances: HashMap<Pubkey, HashMap<Pubkey, u64>>, // asset -> (user -> amount)
     pub status: HashMap<[u8; 32], IntentStatus>, // intent_id -> status
     pub intent_queue: QueueState<[u8;32]>,
-    pub fill_queue: QueueState<FillMessage>,
-    pub strategy_by_asset: HashMap<Pubkey, u8>,
-    pub module_by_strategy: HashMap<u8, Pubkey>,
     // Bump for PDA.
     pub bump: u8,
+    // Mailbox address
+    pub mailbox: Pubkey
 }
 
 impl SpokeState {
@@ -958,12 +839,8 @@ impl SpokeState {
         + 8                      // message_gas_limit: u64
         + 8                      // nonce: u64
         + 32                     // owner: Pubkey
-        + 4 + (MAX_STRATEGIES * (32 + 8))  // balances HashMap
         + 4 + (MAX_INTENT_QUEUE_SIZE * (32 + 1))  // status HashMap
         + QueueState::<[u8;32]>::SIZE      // intent_queue
-        + QueueState::<FillMessage>::SIZE  // fill_queue
-        + 4 + (MAX_STRATEGIES * (32 + 1))  // strategy_by_asset HashMap
-        + 4 + (MAX_MODULES * (1 + 32))     // module_by_strategy HashMap
         + 1;                     // bump: u8
 }
 
@@ -989,19 +866,6 @@ pub enum IntentStatus {
     SettledAndManuallyExecuted,
 }
 
-/// A fill message structure.
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct FillMessage {
-    pub intent_id: [u8;32],
-    pub solver: Pubkey,
-    pub execution_timestamp: u64,
-    pub fee: u32,
-}
-
-impl FillMessage {
-    pub const SIZE: usize = 32 + 32 + 8 + 4;
-}
-
 // =====================================================================
 // EVENTS
 // =====================================================================
@@ -1020,13 +884,6 @@ pub struct PausedEvent {}
 pub struct UnpausedEvent {}
 
 #[event]
-pub struct DepositedEvent {
-    pub user: Pubkey,
-    pub asset: Pubkey,
-    pub amount: u64,
-}
-
-#[event]
 pub struct WithdrawnEvent {
     pub user: Pubkey,
     pub asset: Pubkey,
@@ -1040,7 +897,7 @@ pub struct IntentAddedEvent {
     pub receiver: Pubkey,
     pub input_asset: Pubkey,
     pub output_asset: Pubkey,
-    pub amount: u64,
+    pub normalized_amount: u64,
     pub max_fee: u32,
     pub origin_domain: u32,
     pub ttl: u64,
@@ -1050,22 +907,7 @@ pub struct IntentAddedEvent {
 }
 
 #[event]
-pub struct IntentFilledEvent {
-    pub intent_id: [u8;32],
-    pub solver: Pubkey,
-    pub fee: u32,
-}
-
-#[event]
 pub struct IntentQueueProcessedEvent {
-    pub message_id: [u8;32],
-    pub first_index: u64,
-    pub last_index: u64,
-    pub fee_spent: u64,
-}
-
-#[event]
-pub struct FillQueueProcessedEvent {
     pub message_id: [u8;32],
     pub first_index: u64,
     pub last_index: u64,
@@ -1079,34 +921,43 @@ pub struct GatewayUpdatedEvent {
 }
 
 #[event]
-pub struct StrategySetEvent {
-    pub asset: Pubkey,
-    pub strategy: u8,
+pub struct MailboxUpdatedEvent {
+    pub old_mailbox: Pubkey,
+    pub new_mailbox: Pubkey,
 }
 
 #[event]
-pub struct ExternalCallExecutedEvent {
-    pub target_program_id: Pubkey,
+pub struct LighthouseUpdatedEvent {
+    pub old_lighthouse: Pubkey,
+    pub new_lighthouse: Pubkey,
 }
 
 #[event]
-pub struct DebtMintedEvent {
+pub struct WatchtowerUpdatedEvent {
+    pub old_watchtower: Pubkey,
+    pub new_watchtower: Pubkey,
+}
+
+
+#[event]
+pub struct MessageReceivedEvent {
+    pub origin: u32,
+    pub sender: Pubkey,
+}
+
+#[event]
+pub struct AssetTransferFailed {
     pub asset: Pubkey,
     pub recipient: Pubkey,
     pub amount: u64,
 }
 
 #[event]
-pub struct BurnedEvent {
+pub struct SettledEvent {
+    pub intent_id: [u8; 32],
+    pub recipient: Pubkey,
     pub asset: Pubkey,
-    pub user: Pubkey,
     pub amount: u64,
-}
-
-#[event]
-pub struct MessageReceivedEvent {
-    pub origin: u32,
-    pub sender: Pubkey,
 }
 
 // =====================================================================
@@ -1145,13 +996,12 @@ pub enum SpokeError {
     SignatureExpired,
     #[msg("Invalid signature")]
     InvalidSignature,
-    #[msg("Invalid Permit2 data")]
-    InvalidPermit2Data,
-<<<<<<< Updated upstream
-=======
     #[msg("Zero amount provided")]
     ZeroAmount,
->>>>>>> Stashed changes
+    #[msg("Decimal conversion overflow")]
+    DecimalConversionOverflow,
+    #[msg("Already initialized")]
+    AlreadyInitialized
 }
 
 // =====================================================================
@@ -1178,15 +1028,6 @@ fn reduce_balance(
     let current_balance = user_balance.get(&user).cloned().unwrap_or(0);
     require!(current_balance >= amount, SpokeError::InvalidAmount);
     *user_balance.entry(user).or_insert(current_balance - amount) = current_balance - amount;
-    Ok(())
-}
-
-fn update_strategy(
-    strategies: &mut HashMap<Pubkey, u8>,
-    asset: Pubkey,
-    new_strategy: u8,
-) -> Result<()> {
-    strategies.insert(asset, new_strategy);
     Ok(())
 }
 
