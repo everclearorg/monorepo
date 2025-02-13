@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Token, TokenAccount, Mint};
+use anchor_spl::token::{self, Token, TokenAccount, Mint, Transfer};
 // use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, TransferChecked, MintTo, Burn};
 use anchor_spl::associated_token::{get_associated_token_address};
 use std::collections::{VecDeque, HashMap};
@@ -24,7 +24,7 @@ pub const FILL_INTENT_FOR_SOLVER_TYPEHASH: [u8; 32] = [0xAA; 32]; // placeholder
 pub const PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xBB; 32];
 pub const PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xCC; 32];
 
-declare_id!("4JkMGKKcKq7ZjUo5xdif6yvpE85hGS3tdP1sumuN7rFM");
+declare_id!("uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC");
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct SpokeInitializationParams {
@@ -74,7 +74,7 @@ pub mod everclear_spoke {
         
         // Set owner to the payer (deployer)
         state.owner = init.owner;
-        state.bump = *ctx.bumps.get("spoke_state").unwrap();
+        state.bump = ctx.bumps.spoke_state;
         
         emit!(InitializedEvent {
             owner: state.owner,
@@ -216,8 +216,8 @@ pub mod everclear_spoke {
             timestamp: clock.unix_timestamp as u64,
             ttl,
             normalized_amount,
-            destinations,
-            data,
+            destinations: destinations.clone(),
+            data: data.clone(),
         };
         
         let intent_id = compute_intent_hash(&new_intent_struct);
@@ -263,7 +263,8 @@ pub mod everclear_spoke {
         require!(intents.len() <= state.intent_queue.len(), SpokeError::InvalidQueueOperation);
 
         // Verify each intent matches the queue
-        let old_first = state.intent_queue.first_index();
+        // NOTE: Commenting as not emitting the event
+        // let old_first = state.intent_queue.first_index();
         for intent in intents.iter() {
             let queue_intent_id = state.intent_queue.pop_front()
                 .ok_or(SpokeError::InvalidQueueOperation)?;
@@ -326,14 +327,24 @@ pub mod everclear_spoke {
                 let settlement_data = &payload[1..];
                 let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
                     .map_err(|_| SpokeError::InvalidMessage)?;
+                
+                let (_, vault_bump) = 
+                    Pubkey::find_program_address(&[b"vault"], &ID);
+                
+                // Create local references to avoid lifetime issues
+                let vault_token_account = &ctx.accounts.vault_token_account;
+                let vault_authority = &ctx.accounts.vault_authority;
+                let token_program = &ctx.accounts.token_program;
+                let remaining_accounts = ctx.remaining_accounts;
+                
                 handle_batch_settlement(
                     state,
                     batch,
-                    &ctx.accounts.vault_token_account,
-                    &ctx.accounts.vault_authority,
-                    ctx.accounts.vault_authority_bump,
-                    &ctx.accounts.token_program,
-                    ctx.remaining_accounts,  // Pass remaining_accounts from ctx
+                    vault_token_account,
+                    vault_authority,
+                    vault_bump,
+                    token_program,
+                    remaining_accounts,
                 )?;
             },
             2 => {
@@ -385,36 +396,36 @@ pub mod everclear_spoke {
         _update_mailbox(state, new_mailbox)?;
         Ok(())
     }
+}
 
-    fn handle_var_update(
-        state: &mut SpokeState, 
-        var_data: &[u8]
-    ) -> Result<()> {
-        // e.g., parse the first 32 bytes as a "var hash"
-        require!(var_data.len() >= 32, SpokeError::InvalidMessage);
-        let mut var_hash = [0u8; 32];
-        var_hash.copy_from_slice(&var_data[..32]);
-        let rest = &var_data[32..];
-        
-        // Compare var_hash with your known constants
-        if var_hash == GATEWAY_HASH {
-            let new_gateway: Pubkey = try_deserialize_a_pubkey(rest)?;
-            _update_gateway(state, new_gateway)?;
-        } else if var_hash == MAILBOX_HASH {
-            let new_mailbox: Pubkey = try_deserialize_a_pubkey(rest)?;
-            _update_mailbox(state, new_mailbox)?;
-        } else if var_hash == LIGHTHOUSE_HASH {
-            let new_lighthouse: Pubkey = try_deserialize_a_pubkey(rest)?;
-            _update_lighthouse(state, new_lighthouse)?;
-        } else if var_hash == WATCHTOWER_HASH {
-            let new_watchtower: Pubkey = try_deserialize_a_pubkey(rest)?;
-            _update_watchtower(state, new_watchtower)?;
-        } else {
-            return err!(SpokeError::InvalidVarUpdate);
-        }
-
-        Ok(())
+fn handle_var_update(
+    state: &mut SpokeState, 
+    var_data: &[u8]
+) -> Result<()> {
+    // e.g., parse the first 32 bytes as a "var hash"
+    require!(var_data.len() >= 32, SpokeError::InvalidMessage);
+    let mut var_hash = [0u8; 32];
+    var_hash.copy_from_slice(&var_data[..32]);
+    let rest = &var_data[32..];
+    
+    // Compare var_hash with your known constants
+    if var_hash == GATEWAY_HASH {
+        let new_gateway: Pubkey = try_deserialize_a_pubkey(rest)?;
+        _update_gateway(state, new_gateway)?;
+    } else if var_hash == MAILBOX_HASH {
+        let new_mailbox: Pubkey = try_deserialize_a_pubkey(rest)?;
+        _update_mailbox(state, new_mailbox)?;
+    } else if var_hash == LIGHTHOUSE_HASH {
+        let new_lighthouse: Pubkey = try_deserialize_a_pubkey(rest)?;
+        _update_lighthouse(state, new_lighthouse)?;
+    } else if var_hash == WATCHTOWER_HASH {
+        let new_watchtower: Pubkey = try_deserialize_a_pubkey(rest)?;
+        _update_watchtower(state, new_watchtower)?;
+    } else {
+        return err!(SpokeError::InvalidVarUpdate);
     }
+
+    Ok(())
 }
 
 // =====================================================================
@@ -448,22 +459,16 @@ impl<'info> Initialize<'info> {
 
 #[derive(Accounts)]
 pub struct AuthState<'info> {
-    #[account(
-        mut,
-        seeds = [b"spoke-state"],
-        bump = spoke_state.bump
-    )]
+    #[account(mut)]
     pub spoke_state: Account<'info, SpokeState>,
     pub authority: Signer<'info>,
+    #[account(mut)]
     pub vault_token_account: Account<'info, TokenAccount>,
-    #[account(
-        seeds = [b"vault"],
-        bump = vault_authority_bump,
-    )]
     /// CHECK: This is a PDA that signs for the vault
     pub vault_authority: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token>,
-    pub vault_authority_bump: u8,
+    /// CHECK: This is the Hyperlane mailbox program
+    pub hyperlane_mailbox: UncheckedAccount<'info>,
 }
 
 #[derive(Accounts)]
@@ -804,7 +809,9 @@ pub enum SpokeError {
     #[msg("Invalid Owner")]
     InvalidOwner,
     #[msg("Invalid var update")]
-    InvalidVarUpdate
+    InvalidVarUpdate,
+    #[msg("Invalid intent")]
+    InvalidIntent,
 }
 
 // =====================================================================
