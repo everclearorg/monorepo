@@ -1,6 +1,6 @@
 {
   "name": "@chimera-monorepo/contracts",
-  "version": "0.0.1-alpha.3",
+  "version": "0.0.1-alpha.4",
   "description": "Smart contracts for Everclear",
   "homepage": "https://github.com/defi-wonderland/chimera-monorepo/packages/contracts",
   "repository": {
