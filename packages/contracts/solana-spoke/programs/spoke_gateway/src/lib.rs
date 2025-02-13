@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 pub mod spoke_storage;
 
-declare_id!("4SpGuFSL53diTuEdVjtpncMLA3o2d2bUCzexk2RJBS67");
+declare_id!("4GszpA8CayGibDsiaB91a4wsdNRS6ZkT4eErUvEW45Yf");
 
 #[program]
 pub mod spoke_gateway {

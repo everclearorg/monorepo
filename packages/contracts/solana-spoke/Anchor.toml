@@ -5,10 +5,10 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-call_executor = "73N4pP9REgvPnoXaKdpmB6acvJAHug3nYZbcopj2tPta"
-everclear_spoke = "FH6w3aVDLKtZn3AmK3bxM9RBvJ6WBKEhp6VFZb5Axcoy"
-spoke_gateway = "4SpGuFSL53diTuEdVjtpncMLA3o2d2bUCzexk2RJBS67"
-spoke_message_receiver = "G1UeqMqQN9QwYGK23fQp4mrJA37YSNL6X2zuZyMFYbcQ"
+call_executor = "HGaUXXufuDrkUPPMfcSkcdhhWTyB2trE2UtjQD4ebyjK"
+everclear_spoke = "4JkMGKKcKq7ZjUo5xdif6yvpE85hGS3tdP1sumuN7rFM"
+spoke_gateway = "4GszpA8CayGibDsiaB91a4wsdNRS6ZkT4eErUvEW45Yf"
+spoke_message_receiver = "8qp4V6EWGL6KgpMcJix5ufVSRu7JezM8sKKUgRwHncbA"
 
 [registry]
 url = "https://api.apr.dev"
