@@ -46,7 +46,7 @@ pub mod everclear_spoke {
     // TODO: Do we need to add initializer modifier to this?
     /// Initialize the global state.
     /// This function creates the SpokeState (global config) PDA.
-    #[access_control(ctx.accounts.ensure_owner_is_valid(&init.owner))]
+    #[access_control(&ctx.accounts.ensure_owner_is_valid(&init.owner))]
     pub fn initialize(
         ctx: Context<Initialize>,
         init: SpokeInitializationParams,
@@ -308,8 +308,8 @@ pub mod everclear_spoke {
 
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
-    pub fn receive_message(
-        ctx: Context<AuthState>,
+    pub fn receive_message<'a>(
+        ctx: Context<'_, '_, 'a, 'a, AuthState<'a>>,
         origin: u32,
         sender: Pubkey,
         payload: Vec<u8>,
