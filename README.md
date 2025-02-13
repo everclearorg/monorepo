@@ -14,15 +14,10 @@ Solidity smart contracts for the on-chain logic of the protocol. These are categ
 
 ### Chainservice
 
-To publish the npm package:
-- Update version in `package.json`
-- Run:
+Service for on-chain transaction submissions, reading on-chain state, and managing domains/providers.
 
-    ```
-   git tag -a chainservice-v<VERSION>
-   ```
-- Push tag
+This package is automatically deployed by the CI pipeline when its `package.json` version is updated. Because it depends on the following workspace packages, make sure their `package.json` versions are synchronized to the updated version.
+- /contracts
+- /utils
 
-   ```
-  git push origin chainservice-v<VERSION>
-   ```
+Dependency order: /contracts -> /utils -> /chainservice
