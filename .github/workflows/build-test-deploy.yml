@@ -113,7 +113,7 @@ jobs:
         run: sudo apt-get install -y jq
 
   publish-contracts:
-    if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-contracts' }}
+    if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-chainservice' }}
     needs: [build-and-test]
     runs-on: ubuntu-latest
     env:
@@ -164,7 +164,7 @@ jobs:
           done
 
   publish-utils:
-    if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-utils' }}
+    if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-chainservice' }}
     needs: [publish-contracts]
     runs-on: ubuntu-latest
     env:
