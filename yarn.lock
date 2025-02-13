@@ -1025,7 +1025,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/chainservice@workspace:packages/adapters/chainservice"
   dependencies:
-    "@chimera-monorepo/utils": 0.0.1-alpha.3
+    "@chimera-monorepo/utils": "workspace:*"
     "@safe-global/api-kit": ^2.5.6
     "@safe-global/protocol-kit": ^5.1.1
     "@safe-global/types-kit": ^1.0.1
@@ -1042,22 +1042,6 @@ __metadata:
     typescript: 5.3.3
   languageName: unknown
   linkType: soft
-
-"@chimera-monorepo/contracts@npm:0.0.1-alpha.3":
-  version: 0.0.1-alpha.3
-  resolution: "@chimera-monorepo/contracts@npm:0.0.1-alpha.3"
-  dependencies:
-    "@hyperlane-xyz/core": 3.8.1
-    "@inquirer/prompts": ^5.3.8
-    "@openzeppelin/contracts": 5.0.2
-    "@openzeppelin/contracts-upgradeable": 5.0.2
-    dotenv: ^16.4.5
-    solmate: ^6.8.0
-    ts-node: ^10.9.2
-    viem: ^2.19.8
-  checksum: fb3754d9be847076e578efc62895be6a7009f1722464c3ce09a8f5353a75e79f751760d71ebcf1167a77e0634ed7381192701d4715f26e28aeca10e96c2f67b2
-  languageName: node
-  linkType: hard
 
 "@chimera-monorepo/contracts@workspace:*, @chimera-monorepo/contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
@@ -1200,34 +1184,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@chimera-monorepo/utils@npm:0.0.1-alpha.3":
-  version: 0.0.1-alpha.3
-  resolution: "@chimera-monorepo/utils@npm:0.0.1-alpha.3"
-  dependencies:
-    "@aws-sdk/client-ssm": ^3.735.0
-    "@chimera-monorepo/contracts": 0.0.1-alpha.3
-    "@hyperlane-xyz/sdk": 3.15.1
-    "@sinclair/typebox": 0.25.21
-    "@urql/core": 5.0.4
-    ajv: 8.12.0
-    ajv-formats: 2.1.1
-    axios: 0.24.0
-    chai: 4.3.7
-    chai-as-promised: 7.1.1
-    chai-subset: 1.6.0
-    hyperid: 3.2.0
-    secp256k1: 4.0.3
-    sinon-chai: 3.7.0
-  checksum: 7d9278794940b0029395307a89abe9a5864a473a2b2bd1d56b708186dddb09e85cec624e2fbd6513db3d3aed441e12de6e03cc479237b819c12c4a91a34980d8
-  languageName: node
-  linkType: hard
-
 "@chimera-monorepo/utils@workspace:*, @chimera-monorepo/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/utils@workspace:packages/utils"
   dependencies:
     "@aws-sdk/client-ssm": ^3.735.0
-    "@chimera-monorepo/contracts": 0.0.1-alpha.3
+    "@chimera-monorepo/contracts": "workspace:*"
     "@hyperlane-xyz/sdk": 3.15.1
     "@sinclair/typebox": 0.25.21
     "@types/chai": 4.3.4
