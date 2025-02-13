@@ -6,6 +6,7 @@ on:
       - testnet-staging
       - testnet-prod
       - mainnet-prod
+      - publish-chainservice
   pull_request:
 
 concurrency:
@@ -110,11 +111,15 @@ jobs:
 
       - name: Install jq
         run: sudo apt-get install -y jq
-      
-      - name: Extract version, determine tag, and publish contracts package
-        if: ${{ github.ref == 'refs/heads/mainnet-prod' }}
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-contracts:
+    if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-contracts' }}
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    env:
+      YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Extract version and publish contracts package
         run: |
           workspaces=(
             "packages/contracts:@chimera-monorepo/contracts"
@@ -158,10 +163,14 @@ jobs:
             fi
           done
 
-      - name: Extract version, determine tag, and publish utils package
-        if: ${{ github.ref == 'refs/heads/mainnet-prod' }}
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  publish-utils:
+    if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-utils' }}
+    needs: [publish-contracts]
+    runs-on: ubuntu-latest
+    env:
+      YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Extract version and publish utils package
         run: |
           workspaces=(
             "packages/utils:@chimera-monorepo/utils"
@@ -205,10 +214,14 @@ jobs:
             fi
           done
 
-      - name: Extract version, determine tag, and publish chainservice package
-        if: ${{ github.ref == 'refs/heads/mainnet-prod' }}
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  publish-chainservice:
+    if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-chainservice' }}
+    needs: [publish-utils]
+    runs-on: ubuntu-latest
+    env:
+      YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Extract version and publish chainservice package
         run: |
           workspaces=(
             "packages/adapters/chainservice:@chimera-monorepo/chainservice"
