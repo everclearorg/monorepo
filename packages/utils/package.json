@@ -1,6 +1,6 @@
 {
   "name": "@chimera-monorepo/utils",
-  "version": "0.0.1-alpha.4",
+  "version": "0.0.1-alpha.5",
   "description": "Common utilities for use",
   "main": "dist/index.js",
   "author": "Everclear",
