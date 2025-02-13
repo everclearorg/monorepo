@@ -139,12 +139,12 @@ locals {
           "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      }
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
@@ -172,6 +172,17 @@ locals {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
           "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
         ]
       }
     }
@@ -247,12 +258,12 @@ locals {
           "https://linea-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      }
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
@@ -280,6 +291,17 @@ locals {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
           "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
         ]
       }
     }
@@ -316,66 +338,56 @@ locals {
       "1" = {
         providers = [
           "https://eth-mainnet.blastapi.io/${var.blast_key}",
-          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "56" = {
         providers = [
           "https://bsc-mainnet.blastapi.io/${var.blast_key}",
-          "https://bnb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "42161" = {
         providers = [
           "https://arbitrum-one.blastapi.io/${var.blast_key}",
-          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
-          "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "8453" = {
         providers = [
-          "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://base-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
       "48900" = {
         providers = [
           "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
-          "https://zircuit1-mainnet.p2pify.com"
         ]
       }
       "81457" = {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
-          "https://blastl2-mainnet.public.blastapi.io"
         ]
       }
       "59144" = {
         providers = [
           "https://linea-mainnet.blastapi.io/${var.blast_key}",
-          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      }
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
-          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "534352" = {
         providers = [
-          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://scroll-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
@@ -387,13 +399,22 @@ locals {
       "33139" = {
         providers = [
           "https://apechain-mainnet.blastapi.io/${var.blast_key}",
-          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
-          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
         ]
       }
     }
@@ -484,71 +505,67 @@ locals {
       59144 = { maxAge = 60, size = 1 },
       137 = { maxAge = 60, size = 1 },
       43114 = { maxAge = 60, size = 1 },
+      34443 = { maxAge = 60, size = 1 },
+      130 = { maxAge = 60, size = 1 },
+      324 = { maxAge = 60, size = 1 },
+      534352 = { maxAge = 60, size = 1 },
+      167000 = { maxAge = 60, size = 1 },
+      33139 = { maxAge = 60, size = 1 }
     }
     chains = {
       "1" = {
         providers = [
           "https://eth-mainnet.blastapi.io/${var.blast_key}",
-          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "56" = {
         providers = [
           "https://bsc-mainnet.blastapi.io/${var.blast_key}",
-          "https://bnb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "42161" = {
         providers = [
           "https://arbitrum-one.blastapi.io/${var.blast_key}",
-          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
-          "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://base-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
       "48900" = {
         providers = [
           "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
-          "https://zircuit1-mainnet.p2pify.com"
         ]
       }
       "81457" = {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
-          "https://blastl2-mainnet.public.blastapi.io"
         ]
       }
       "59144" = {
         providers = [
           "https://linea-mainnet.blastapi.io/${var.blast_key}",
-          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "324" = {
-      #   providers = [
-      #     "https://1rpc.io/zksync2-era",
-      #     "https://zksync-mainnet.blastapi.io/${var.blast_key}"
-      #   ]
-      # }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://1rpc.io/zksync2-era"
+        ]
+      }
       "137" = {
         providers = [
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
-          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "534352" = {
         providers = [
-          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://scroll-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
@@ -560,13 +577,22 @@ locals {
       "33139" = {
         providers = [
           "https://apechain-mainnet.blastapi.io/${var.blast_key}",
-          "https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "43114" = {
         providers = [
           "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
-          "https://avalanche-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
         ]
       }
     }

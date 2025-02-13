@@ -102,6 +102,14 @@ import ProductionSpokeGatewayAvalanche from './production/43114/SpokeGateway.jso
 import ProductionEverclearSpokeApeChain from './production/33139/EverclearSpoke.json';
 import ProductionSpokeGatewayApeChain from './production/33139/SpokeGateway.json';
 
+// Add Mode deployment imports
+import ProductionEverclearSpokeMode from './production/34443/EverclearSpoke.json';
+import ProductionSpokeGatewayMode from './production/34443/SpokeGateway.json';
+
+// Add Unichain deployment imports
+import ProductionEverclearSpokeUnichain from './production/130/EverclearSpoke.json';
+import ProductionSpokeGatewayUnichain from './production/130/SpokeGateway.json';
+
 export const Deployments = {
   local: {},
   production: {
@@ -192,6 +200,14 @@ export const Deployments = {
     43114: {
       everclear: ProductionEverclearSpokeAvalanche,
       gateway: ProductionSpokeGatewayAvalanche,
+    },
+    34443: {
+      everclear: ProductionEverclearSpokeMode,
+      gateway: ProductionSpokeGatewayMode,
+    },
+    130: {
+      everclear: ProductionEverclearSpokeUnichain,
+      gateway: ProductionSpokeGatewayUnichain,
     },
   },
   staging: {
