@@ -6,7 +6,6 @@ on:
       - testnet-staging
       - testnet-prod
       - mainnet-prod
-      - publish-chainservice
   pull_request:
 
 concurrency:
@@ -113,7 +112,7 @@ jobs:
         run: sudo apt-get install -y jq
       
       - name: Extract version, determine tag, and publish contracts package
-        if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-chainservice' }}
+        if: ${{ github.ref == 'refs/heads/mainnet-prod' }}
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -160,7 +159,7 @@ jobs:
           done
 
       - name: Extract version, determine tag, and publish utils package
-        if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-chainservice' }}
+        if: ${{ github.ref == 'refs/heads/mainnet-prod' }}
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -207,7 +206,7 @@ jobs:
           done
 
       - name: Extract version, determine tag, and publish chainservice package
-        if: ${{ github.ref == 'refs/heads/mainnet-prod' || github.ref == 'refs/heads/publish-chainservice' }}
+        if: ${{ github.ref == 'refs/heads/mainnet-prod' }}
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
