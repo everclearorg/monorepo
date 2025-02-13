@@ -9,8 +9,7 @@ crate-type = ["cdylib", "lib"]
 name = "everclear_spoke"
 
 [features]
-anchor-debug = []  # Add this feature flag
-default = ["anchor-debug"]  # Include it in default features if you want it enabled by default
+default = []  # Include it in default features if you want it enabled by default
 cpi = ["no-entrypoint"]
 no-entrypoint = []
 no-idl = []

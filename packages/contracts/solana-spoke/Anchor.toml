@@ -1,4 +1,5 @@
 [toolchain]
+anchor_version = "0.30.1"
 
 [features]
 resolution = true
@@ -6,8 +7,8 @@ skip-lint = false
 
 [programs.devnet]
 call_executor = "HGaUXXufuDrkUPPMfcSkcdhhWTyB2trE2UtjQD4ebyjK"
-everclear_spoke = "4JkMGKKcKq7ZjUo5xdif6yvpE85hGS3tdP1sumuN7rFM"
-spoke_gateway = "4GszpA8CayGibDsiaB91a4wsdNRS6ZkT4eErUvEW45Yf"
+everclear_spoke = "uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC"
+spoke_gateway = "Cuuu22fpegEh5x8da14zVkUp5gwENHK3uM6JwKsdXrtW"
 spoke_message_receiver = "8qp4V6EWGL6KgpMcJix5ufVSRu7JezM8sKKUgRwHncbA"
 
 [registry]
