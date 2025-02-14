@@ -62,6 +62,8 @@ avalanche = "${AVALANCHE_RPC}"
 taiko = "${TAIKO_RPC}"
 scroll = "${SCROLL_RPC}"
 apechain = "${APECHAIN_RPC}"
+zksync = "${ZKSYNC_RPC}"
+unichain = "${UNI_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
