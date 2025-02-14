@@ -55,16 +55,6 @@ pub mod everclear_spoke {
         Ok(())
     }
 
-    /// Withdraw SPL tokens from the program's vault.
-    /// This reduces the user's on‑chain balance and transfers tokens out.
-    pub fn withdraw(
-        ctx: Context<Withdraw>,
-        vault_authority_bump: u8,
-        amount: u64,
-    ) -> Result<()> {
-        instructions::withdraw(ctx, vault_authority_bump, amount, &ID)
-    }
-
     /// Create a new intent.
     /// The user "locks" funds (previously deposited) and creates an intent.
     /// For simplicity, we assume full deposit has been made before.

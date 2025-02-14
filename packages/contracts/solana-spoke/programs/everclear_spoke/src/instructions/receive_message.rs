@@ -1,9 +1,7 @@
-use std::collections::HashMap;
-
 use anchor_lang::prelude::*;
 use anchor_spl::{associated_token::get_associated_token_address, token::{self, Mint, Token, TokenAccount}};
 
-use crate::{consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, GATEWAY_HASH, LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH}, error::SpokeError, events::{AssetTransferFailed, MessageReceivedEvent, SettledEvent}, state::{IntentStatus, SpokeState}, utils::{normalize_decimals, vault_authority_seeds}};
+use crate::{consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, GATEWAY_HASH, LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH}, error::SpokeError, events::{MessageReceivedEvent, SettledEvent}, state::{IntentStatus, SpokeState}, utils::{normalize_decimals, vault_authority_seeds}};
 
 use super::AuthState;
 
@@ -140,19 +138,9 @@ fn handle_settlement<'info>(
         authority: vault_authority.to_account_info(),
     };
     let cpi_ctx = CpiContext::new_with_signer(token_program.to_account_info(), cpi_accounts, signer);
-
-    let transfer_result = token::transfer(cpi_ctx, amount);
-
-    if transfer_result.is_err() {
-        // The transfer failed. Fallback to storing in user's local balance
-        // e.g. store "settlement.amount" in the local ledger
-        increase_balance(&mut state.balances, settlement.asset, settlement.recipient, amount);
-        emit!(AssetTransferFailed {
-            asset: settlement.asset,
-            recipient: settlement.recipient,
-            amount: amount,
-        });
-    }
+    
+    // NOTE: Removed the virtual balance logic
+    token::transfer(cpi_ctx, amount);
 
     emit!(SettledEvent {
        intent_id: settlement.intent_id,
@@ -162,16 +150,6 @@ fn handle_settlement<'info>(
     });
 
     Ok(())
-}
-
-fn increase_balance(
-    balances: &mut HashMap<Pubkey, HashMap<Pubkey, u64>>,
-    asset: Pubkey,
-    user: Pubkey,
-    amount: u64,
-) {
-    let user_balance = balances.entry(asset).or_insert_with(HashMap::new);
-    *user_balance.entry(user).or_insert(0) += amount;
 }
 
 fn handle_var_update(

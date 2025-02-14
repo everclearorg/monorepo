@@ -48,4 +48,6 @@ pub enum SpokeError {
     InvalidVarUpdate,
     #[msg("Invalid intent")]
     InvalidIntent,
+    #[msg("Overflow")]
+    Overflow
 }
