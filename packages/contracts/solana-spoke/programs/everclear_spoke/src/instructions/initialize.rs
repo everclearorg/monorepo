@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use anchor_lang::prelude::*;
 
 use crate::{error::SpokeError, events::InitializedEvent, state::{QueueState, SpokeState}};
@@ -25,9 +23,7 @@ pub fn initialize(
     state.nonce = 0;
     
     // Initialize our mappings and queues
-    state.intent_queue = QueueState::new();
-    state.balances = HashMap::new();
-    state.status = HashMap::new();
+    state.intent_queue = QueueState::new(); 
     
     // Set owner to the payer (deployer)
     state.owner = init.owner;

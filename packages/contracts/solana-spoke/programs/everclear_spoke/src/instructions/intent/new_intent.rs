@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
+use anchor_spl::token::{self, Token, Mint, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
 use crate::{consts::{DEFAULT_NORMALIZED_DECIMALS, MAX_CALLDATA_SIZE}, error::SpokeError, events::IntentAddedEvent, state::{IntentStatus, SpokeState}, utils::{compute_intent_hash, normalize_decimals}};
 
@@ -130,6 +130,8 @@ pub struct NewIntent<'info> {
     pub program_vault_account: Account<'info, TokenAccount>,
 
     // The SPL token program
+    // #[account(mut)]
+    #[account(address = TOKEN_PROGRAM_ID)]
     pub token_program: Program<'info, Token>,
 }
 

@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::{VecDeque};
 
 use anchor_lang::prelude::*;
 
@@ -68,14 +68,21 @@ pub struct SpokeState {
     pub nonce: u64,
     // Owner of the program (admin).
     pub owner: Pubkey,
-    // Dynamic mappings/queues.
-    pub balances: HashMap<Pubkey, HashMap<Pubkey, u64>>, // asset -> (user -> amount)
-    pub status: HashMap<[u8; 32], IntentStatus>, // intent_id -> status
+    // Intent status mapping.
+    pub status: Vec<([u8; 32], IntentStatusAccount)>,
+    // Dynamic mappings/queues
     pub intent_queue: QueueState<[u8;32]>,
     // Bump for PDA.
     pub bump: u8,
     // Mailbox address
     pub mailbox: Pubkey
+}
+
+#[account]
+pub struct IntentStatusAccount {
+    pub key: [u8; 32],
+    pub status: IntentStatus,
+    pub bump: u8, // if needed
 }
 
 impl SpokeState {
