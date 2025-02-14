@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, Mint, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
-use crate::{consts::{DEFAULT_NORMALIZED_DECIMALS, MAX_CALLDATA_SIZE}, error::SpokeError, events::IntentAddedEvent, state::{IntentStatus, SpokeState}, utils::{compute_intent_hash, normalize_decimals}};
+use crate::{consts::{DEFAULT_NORMALIZED_DECIMALS, MAX_CALLDATA_SIZE}, error::SpokeError, events::IntentAddedEvent, state::{IntentStatus, IntentStatusAccount, SpokeState}, utils::{compute_intent_hash, normalize_decimals}};
 
 /// Create a new intent.
 /// The user "locks" funds (previously deposited) and creates an intent.
@@ -80,7 +80,7 @@ pub fn new_intent(
     state.intent_queue.push_back(intent_id);
 
     // Also, record a minimal status mapping (we only record the intent_id and its status).
-    state.status.insert(intent_id, IntentStatus::Added);
+    state.status.push(IntentStatusAccount{ key: intent_id, status: IntentStatus::Added });
 
     // Emit an event with full intent details.
     emit!(IntentAddedEvent {

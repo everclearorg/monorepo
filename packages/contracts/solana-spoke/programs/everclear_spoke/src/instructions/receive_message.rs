@@ -98,16 +98,17 @@ fn handle_settlement<'info>(
     self_program_id: &Pubkey
 ) -> Result<()> {
     // 1) Check if already settled
-    let current_status = state.status.get(&settlement.intent_id).copied().unwrap_or(IntentStatus::None);
-    if current_status == IntentStatus::Settled 
-        || current_status == IntentStatus::SettledAndManuallyExecuted 
-    {
-        msg!("Intent already settled, ignoring");
-        return Ok(());
+    let current_status = state.status.iter_mut().filter(|s| s.key == settlement.intent_id).next();
+    
+    if let Some(current) = current_status {
+        if current.status == IntentStatus::Settled 
+        || current.status == IntentStatus::SettledAndManuallyExecuted {
+            msg!("Intent already settled, ignoring");
+            return Ok(());
+        }
+        // 2) Mark as settled in storage
+        current.status = IntentStatus::Settled;
     }
-
-    // 2) Mark as settled in storage
-    state.status.insert(settlement.intent_id, IntentStatus::Settled);
 
     // 3) Normalise the settlement amount
     let mint_info = remaining_accounts

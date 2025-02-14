@@ -1,5 +1,3 @@
-use std::collections::{VecDeque};
-
 use anchor_lang::prelude::*;
 
 use crate::consts::MAX_INTENT_QUEUE_SIZE;
@@ -7,7 +5,7 @@ use crate::consts::MAX_INTENT_QUEUE_SIZE;
 /// Queue state with first/last indices for efficient management
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct QueueState<T> {
-    pub items: VecDeque<T>,
+    pub items: Vec<T>,
     pub first_index: u64,
     pub last_index: u64,
 }
@@ -21,23 +19,25 @@ impl<T> QueueState<T> {
     
     pub fn new() -> Self {
         Self {
-            items: VecDeque::new(),
+            items: Vec::new(),
             first_index: 0,
             last_index: 0,
         }
     }
 
     pub fn push_back(&mut self, item: T) {
-        self.items.push_back(item);
+        self.items.push(item);
         self.last_index = self.last_index.saturating_add(1);
     }
 
     pub fn pop_front(&mut self) -> Option<T> {
-        let item = self.items.pop_front();
-        if item.is_some() {
+        if !self.items.is_empty() {
+            let item = self.items.remove(0);
             self.first_index = self.first_index.saturating_add(1);
+            Some(item)
+        } else {
+            None
         }
-        item
     }
 
     pub fn len(&self) -> usize {
@@ -69,7 +69,7 @@ pub struct SpokeState {
     // Owner of the program (admin).
     pub owner: Pubkey,
     // Intent status mapping.
-    pub status: Vec<([u8; 32], IntentStatusAccount)>,
+    pub status: Vec<IntentStatusAccount>,
     // Dynamic mappings/queues
     pub intent_queue: QueueState<[u8;32]>,
     // Bump for PDA.
@@ -81,8 +81,7 @@ pub struct SpokeState {
 #[account]
 pub struct IntentStatusAccount {
     pub key: [u8; 32],
-    pub status: IntentStatus,
-    pub bump: u8, // if needed
+    pub status: IntentStatus
 }
 
 impl SpokeState {
