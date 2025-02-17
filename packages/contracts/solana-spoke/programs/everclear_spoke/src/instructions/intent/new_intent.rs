@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, Mint, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
-use crate::{consts::{DEFAULT_NORMALIZED_DECIMALS, MAX_CALLDATA_SIZE}, error::SpokeError, events::IntentAddedEvent, state::{IntentStatus, IntentStatusAccount, SpokeState}, utils::{compute_intent_hash, normalize_decimals}};
+use crate::{consts::{DEFAULT_NORMALIZED_DECIMALS, MAX_CALLDATA_SIZE, EVERCLEAR_DOMAIN}, error::SpokeError, events::IntentAddedEvent, state::{IntentStatus, IntentStatusAccount, SpokeState}, utils::{compute_intent_hash, normalize_decimals}};
 
 /// Create a new intent.
 /// The user "locks" funds (previously deposited) and creates an intent.
@@ -97,12 +97,52 @@ pub fn new_intent(
         destinations,
         data,
     });
-    
-    // TODO: Do we need this for off-chain logic?
-    // let queue_index = state.intent_queue.last_index();   
-    // emit!(IntentAddedEvent { ..., queue_index, ... });
 
+    // Creating a Vec<Intent> for the current intent created above
+    let mut intents = Vec::new();
+    intents.push(new_intent_struct);
+
+    // Format message using proper message lib
+    let batch_message = format_intent_message_batch(&intents)?;
+
+    // Call Hyperlane with proper gas handling
+    let ix_data = {
+        let mut data = Vec::new();
+        data.extend_from_slice(&EVERCLEAR_DOMAIN.to_be_bytes());
+        data.extend_from_slice(&state.gateway.to_bytes());
+        data.extend_from_slice(&state.message_gas_limit.to_be_bytes());
+        data.extend_from_slice(&batch_message);
+        data
+    };
+    let ix = anchor_lang::solana_program::instruction::Instruction {
+        program_id: ctx.accounts.hyperlane_mailbox.key(),
+        accounts: vec![],
+        data: ix_data,
+    };
+    // TODO: Not handling messageId or fee spent here
+    anchor_lang::solana_program::program::invoke(
+        &ix,
+        &[ctx.accounts.hyperlane_mailbox.to_account_info()],
+    )?;
+
+    //  emit!(IntentQueueProcessedEvent {
+    //     message_id,
+    //     first_index: old_first,
+    //     last_index: old_first + intents.len() as u64,
+    //     fee_spent,
+    // });
     Ok(())
+}
+
+fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
+    // Example:
+    let mut buffer = Vec::new();
+    // e.g. prefix a message type byte
+    buffer.push(1); 
+    // then Borsh‐encode the `Vec<Intent>`
+    let encoded = intents.try_to_vec()?;
+    buffer.extend_from_slice(&encoded);
+    Ok(buffer)
 }
 
 #[derive(Accounts)]
@@ -133,6 +173,10 @@ pub struct NewIntent<'info> {
     // #[account(mut)]
     #[account(address = TOKEN_PROGRAM_ID)]
     pub token_program: Program<'info, Token>,
+
+    /// CHECK: This mailbox is referenced solely by address. We do not read or write its data.
+    #[account(address = spoke_state.mailbox)]
+    pub hyperlane_mailbox: UncheckedAccount<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
