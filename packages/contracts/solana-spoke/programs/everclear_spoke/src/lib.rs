@@ -72,15 +72,6 @@ pub mod everclear_spoke {
         instructions::new_intent(ctx, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data)
     }
 
-    /// Process a batch of intents in the queue and dispatch a cross-chain message via Hyperlane.
-    pub fn process_intent_queue(
-        ctx: Context<AuthState>, 
-        intents: Vec<Intent>,  // Pass full intents, not just count
-        message_gas_limit: u64
-    ) -> Result<()> {
-        instructions::process_intent_queue(ctx, intents, message_gas_limit)
-    }
-
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
     pub fn receive_message<'a>(
@@ -121,6 +112,13 @@ pub mod everclear_spoke {
         require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
 
         instructions::update_mailbox(state, new_mailbox)
+    }
+
+    pub fn update_message_gas_limit(ctx: Context<AuthState>, new_limit: u64) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
+
+        instructions::update_message_gas_limit(state, new_limit)
     }
 }
 

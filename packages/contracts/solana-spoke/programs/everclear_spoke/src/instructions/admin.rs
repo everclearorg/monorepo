@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{events::{GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, WatchtowerUpdatedEvent}, state::SpokeState};
+use crate::{events::{GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, WatchtowerUpdatedEvent, MessageGasLimitUpdatedEvent}, state::SpokeState};
 
 pub fn update_gateway(state: &mut SpokeState, new_gateway: Pubkey) -> Result<()> {
     let old = state.gateway;
@@ -35,6 +35,16 @@ pub fn update_mailbox(state: &mut SpokeState, new_mailbox: Pubkey) -> Result<()>
     emit!(MailboxUpdatedEvent {
         old_mailbox: old,
         new_mailbox,
+    });
+    Ok(())
+}
+
+pub fn update_message_gas_limit(state: &mut SpokeState, new_limit: u64) -> Result<()> {
+    let old: u64 = state.message_gas_limit;
+    state.message_gas_limit = new_limit;
+    emit ! (MessageGasLimitUpdatedEvent {
+        old_limit: old,
+        new_limit,
     });
     Ok(())
 }
