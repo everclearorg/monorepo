@@ -30,7 +30,7 @@ contract PufETH is AddAssetBase, MainnetProductionEnvironment {
     //////////////////////////////////////////////////////////////*/
 
     IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](1);
-    _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 0}); // 0 BPS
+    _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 50}); // 5 BPS
 
     /*///////////////////////////////////////////////////////////////
                          ADOPTED CONFIGURATION  
@@ -62,7 +62,7 @@ contract PufETH is AddAssetBase, MainnetProductionEnvironment {
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: true,
+      initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
       maxDiscountDbps: 0,
       discountPerEpoch: 0,
