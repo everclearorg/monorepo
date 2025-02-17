@@ -765,6 +765,7 @@ export class RpcProviderAggregator {
         } catch (e: unknown) {
           this.logger.debug("Couldn't sync provider.", requestContext, methodContext, {
             error: jsonifyError(e as Error),
+            provider: p.name,
           });
         }
       }),
