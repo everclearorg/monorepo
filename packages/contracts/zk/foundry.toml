@@ -1,6 +1,6 @@
 [profile.default]
-src = "src"
-out = "out-zk" 
+src = 'src'
+out = 'zkout'
 libs = ["../lib", "../../../node_modules"]
 compile = true
 fallback_oz = false

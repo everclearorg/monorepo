@@ -75,7 +75,7 @@ abstract contract Gateway is GasTank, IGateway, IMessageRecipient, ISpecifiesInt
 
         if (_unusedFee > 0) {
             // NOTE: Updated to msg.sender i.e. the receiver of unused fee would be the Spoke (due to compiler issue)
-            (bool _success,) = msg.sender.call{value: _unusedFee}("");
+            (bool _success,) = tx.origin.call{value: _unusedFee}("");
             if (!_success) revert Gateway_SendMessage_UnsuccessfulRebate();
         }
     }
