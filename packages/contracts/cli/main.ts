@@ -15,6 +15,7 @@ import { spokeDashboard } from './tasks/spokeDashboard';
 import { setModuleForStrategy } from './tasks/setModuleForStrategy';
 import { deployXERC20 } from './tasks/deployXERC20';
 import { assetDashboard } from './tasks/assetDashboard';
+import { logOwners } from './tasks/logOwners';
 
 async function main() {
   const mainTask = await select({
@@ -81,6 +82,10 @@ async function main() {
         name: 'Cancel',
         value: 'cancel',
       },
+      {
+        name: 'Log All Owners',
+        value: 'log_owners',
+      },
     ],
   });
 
@@ -126,6 +131,9 @@ async function main() {
       break;
     case 'asset_dashboard':
       assetDashboard();
+      break;
+    case 'log_owners':
+      logOwners();
       break;
     case 'cancel':
       return;
