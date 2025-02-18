@@ -79,7 +79,7 @@ pub mod everclear_spoke {
             ttl,
             destinations,
             data,
-            message_gas_limit
+            message_gas_limit,
         )
     }
 
@@ -132,7 +132,6 @@ pub mod everclear_spoke {
         instructions::update_watchtower(state, new_watchtower)
     }
 
-
     pub fn update_mailbox(ctx: Context<AuthState>, new_mailbox: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         // enforce only owner can do it
@@ -146,7 +145,10 @@ pub mod everclear_spoke {
 
     pub fn update_message_gas_limit(ctx: Context<AuthState>, new_limit: u64) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
-        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
+        require!(
+            state.owner == ctx.accounts.authority.key(),
+            SpokeError::OnlyOwner
+        );
 
         instructions::update_message_gas_limit(state, new_limit)
     }
