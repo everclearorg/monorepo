@@ -141,33 +141,6 @@ pub fn new_intent(
         data,
     });
 
-    // Creating a Vec<Intent> for the current intent created above
-    let mut intents = Vec::new();
-    intents.push(new_intent_struct);
-
-    // Format message using proper message lib
-    let batch_message = format_intent_message_batch(&intents)?;
-
-    // Call Hyperlane with proper gas handling
-    let ix_data = {
-        let mut data = Vec::new();
-        data.extend_from_slice(&EVERCLEAR_DOMAIN.to_be_bytes());
-        data.extend_from_slice(&state.gateway.to_bytes());
-        data.extend_from_slice(&state.message_gas_limit.to_be_bytes());
-        data.extend_from_slice(&batch_message);
-        data
-    };
-    let ix = anchor_lang::solana_program::instruction::Instruction {
-        program_id: ctx.accounts.hyperlane_mailbox.key(),
-        accounts: vec![],
-        data: ix_data,
-    };
-    // TODO: Not handling messageId or fee spent here
-    anchor_lang::solana_program::program::invoke(
-        &ix,
-        &[ctx.accounts.hyperlane_mailbox.to_account_info()],
-    )?;
-
     //  emit!(IntentQueueProcessedEvent {
     //     message_id,
     //     first_index: old_first,
