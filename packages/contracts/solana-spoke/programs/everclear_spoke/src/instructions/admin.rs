@@ -2,7 +2,8 @@ use anchor_lang::prelude::*;
 
 use crate::{
     events::{
-        GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent, WatchtowerUpdatedEvent
+        GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent,
+        MessageGasLimitUpdatedEvent, WatchtowerUpdatedEvent,
     },
     state::SpokeState,
 };
