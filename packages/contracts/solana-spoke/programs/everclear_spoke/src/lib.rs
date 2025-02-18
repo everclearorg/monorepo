@@ -5,7 +5,9 @@ pub mod error;
 pub mod events;
 pub mod instructions;
 pub mod state;
-// pub mod hyperlane;
+pub mod hyperlane;
+pub mod token_message;
+pub mod pda_seeds;
 
 use events::*;
 use instructions::*;

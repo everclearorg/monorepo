@@ -1006,6 +1006,7 @@ dependencies = [
  "anchor-spl",
  "fixed-hash",
  "solana-program 2.2.1",
+ "spl-noop",
  "tiny-keccak",
 ]
 
@@ -2961,6 +2962,15 @@ name = "spl-memo"
 version = "4.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a49f49f95f2d02111ded31696ab38a081fab623d4c76bd4cb074286db4560836"
+dependencies = [
+ "solana-program 1.18.26",
+]
+
+[[package]]
+name = "spl-noop"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6dd67ea3d0070a12ff141f5da46f9695f49384a03bce1203a5608f5739437950"
 dependencies = [
  "solana-program 1.18.26",
 ]

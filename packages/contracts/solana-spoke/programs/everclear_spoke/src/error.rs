@@ -52,4 +52,14 @@ pub enum SpokeError {
     Overflow,
     #[msg("Invalid account meta")]
     InvalidAccount,
+    #[msg("Invalid argument data")]
+    InvalidArgument,
+    #[msg("Incorrect program id")]
+    IncorrectProgramId,
+    #[msg("Missing required signature")]
+    MissingRequiredSignature,
+    #[msg("Extraneous account")]
+    ExtraneousAccount,
+    #[msg("Overflowing Integer")]
+    IntegerOverflow
 }
