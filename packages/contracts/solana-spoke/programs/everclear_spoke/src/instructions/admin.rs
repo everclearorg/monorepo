@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{
     events::{
-        GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, WatchtowerUpdatedEvent,
+        GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent, WatchtowerUpdatedEvent
     },
     state::SpokeState,
 };
@@ -50,7 +50,7 @@ pub fn update_mailbox(state: &mut SpokeState, new_mailbox: Pubkey) -> Result<()>
 pub fn update_message_gas_limit(state: &mut SpokeState, new_limit: u64) -> Result<()> {
     let old: u64 = state.message_gas_limit;
     state.message_gas_limit = new_limit;
-    emit ! (MessageGasLimitUpdatedEvent {
+    emit!(MessageGasLimitUpdatedEvent {
         old_limit: old,
         new_limit,
     });
