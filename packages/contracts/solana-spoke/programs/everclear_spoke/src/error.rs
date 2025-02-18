@@ -49,5 +49,7 @@ pub enum SpokeError {
     #[msg("Invalid intent")]
     InvalidIntent,
     #[msg("Overflow")]
-    Overflow
+    Overflow,
+    #[msg("Invalid account meta")]
+    InvalidAccount,
 }

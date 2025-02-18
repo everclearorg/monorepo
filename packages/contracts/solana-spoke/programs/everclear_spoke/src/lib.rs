@@ -1,32 +1,29 @@
 use anchor_lang::prelude::*;
 
 pub mod consts;
-pub mod state;
+pub mod error;
 pub mod events;
 pub mod instructions;
-pub mod error;
+pub mod state;
+// pub mod hyperlane;
 
+use events::*;
 use instructions::*;
 use state::SpokeState;
-use events::*;
 
 declare_id!("uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC");
-
 
 #[program]
 pub mod everclear_spoke {
     use crate::error::SpokeError;
 
     use super::*;
-    
+
     // TODO: Do we need to add initializer modifier to this?
     /// Initialize the global state.
     /// This function creates the SpokeState (global config) PDA.
     #[access_control(&ctx.accounts.ensure_owner_is_valid(&init.owner))]
-    pub fn initialize(
-        ctx: Context<Initialize>,
-        init: SpokeInitializationParams,
-    ) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
         instructions::initialize(ctx, init)
     }
 
@@ -35,7 +32,8 @@ pub mod everclear_spoke {
     pub fn pause(ctx: Context<AuthState>) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(
-            state.lighthouse == ctx.accounts.authority.key() || state.watchtower == ctx.accounts.authority.key(),
+            state.lighthouse == ctx.accounts.authority.key()
+                || state.watchtower == ctx.accounts.authority.key(),
             SpokeError::NotAuthorizedToPause
         );
         state.paused = true;
@@ -47,7 +45,8 @@ pub mod everclear_spoke {
     pub fn unpause(ctx: Context<AuthState>) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(
-            state.lighthouse == ctx.accounts.authority.key() || state.watchtower == ctx.accounts.authority.key(),
+            state.lighthouse == ctx.accounts.authority.key()
+                || state.watchtower == ctx.accounts.authority.key(),
             SpokeError::NotAuthorizedToPause
         );
         state.paused = false;
@@ -68,8 +67,29 @@ pub mod everclear_spoke {
         ttl: u64,
         destinations: Vec<u32>,
         data: Vec<u8>,
+        message_gas_limit: u64,
     ) -> Result<()> {
-        instructions::new_intent(ctx, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data)
+        instructions::new_intent(
+            ctx,
+            receiver,
+            input_asset,
+            output_asset,
+            amount,
+            max_fee,
+            ttl,
+            destinations,
+            data,
+            message_gas_limit
+        )
+    }
+
+    /// Process a batch of intents in the queue and dispatch a cross-chain message via Hyperlane.
+    pub fn process_intent_queue(
+        ctx: Context<AuthState>,
+        intents: Vec<Intent>, // Pass full intents, not just count
+        message_gas_limit: u64,
+    ) -> Result<()> {
+        instructions::process_intent_queue(ctx, intents, message_gas_limit)
     }
 
     /// Receive a cross‑chain message via Hyperlane.
@@ -94,22 +114,32 @@ pub mod everclear_spoke {
 
     pub fn update_lighthouse(ctx: Context<AuthState>, new_lighthouse: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
-        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
+        require!(
+            state.owner == ctx.accounts.authority.key(),
+            SpokeError::OnlyOwner
+        );
 
         instructions::update_lighthouse(state, new_lighthouse)
     }
 
     pub fn update_watchtower(ctx: Context<AuthState>, new_watchtower: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
-        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
+        require!(
+            state.owner == ctx.accounts.authority.key(),
+            SpokeError::OnlyOwner
+        );
 
         instructions::update_watchtower(state, new_watchtower)
     }
 
+
     pub fn update_mailbox(ctx: Context<AuthState>, new_mailbox: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         // enforce only owner can do it
-        require!(state.owner == ctx.accounts.authority.key(), SpokeError::OnlyOwner);
+        require!(
+            state.owner == ctx.accounts.authority.key(),
+            SpokeError::OnlyOwner
+        );
 
         instructions::update_mailbox(state, new_mailbox)
     }

@@ -38,8 +38,12 @@ pub(crate) fn normalize_decimals(
         // minted_decimals < target_decimals => upscale
         let shift = target_decimals - minted_decimals;
         // watch for overflow if we do big multiplications
-        let factor = 10u64.checked_pow(shift as u32).ok_or(SpokeError::DecimalConversionOverflow)?;
-        let scaled = amount.checked_mul(factor).ok_or(SpokeError::DecimalConversionOverflow)?;
+        let factor = 10u64
+            .checked_pow(shift as u32)
+            .ok_or(SpokeError::DecimalConversionOverflow)?;
+        let scaled = amount
+            .checked_mul(factor)
+            .ok_or(SpokeError::DecimalConversionOverflow)?;
         Ok(scaled)
     }
 }

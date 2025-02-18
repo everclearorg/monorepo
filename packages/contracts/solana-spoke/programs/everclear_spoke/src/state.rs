@@ -14,9 +14,9 @@ impl<T> QueueState<T> {
     pub const SIZE: usize = 8  // discriminator
     + 4    // vec length prefix
     + 8    // first
-    + 8;   // last
-    // Add any other fixed size fields
-    
+    + 8; // last
+         // Add any other fixed size fields
+
     pub fn new() -> Self {
         Self {
             items: Vec::new(),
@@ -45,7 +45,6 @@ impl<T> QueueState<T> {
     }
 }
 
-
 /// SpokeState – global configuration.
 #[account]
 pub struct SpokeState {
@@ -71,17 +70,17 @@ pub struct SpokeState {
     // Intent status mapping.
     pub status: Vec<IntentStatusAccount>,
     // Dynamic mappings/queues
-    pub intent_queue: QueueState<[u8;32]>,
+    pub intent_queue: QueueState<[u8; 32]>,
     // Bump for PDA.
     pub bump: u8,
     // Mailbox address
-    pub mailbox: Pubkey
+    pub mailbox: Pubkey,
 }
 
 #[account]
 pub struct IntentStatusAccount {
     pub key: [u8; 32],
-    pub status: IntentStatus
+    pub status: IntentStatus,
 }
 
 impl SpokeState {
@@ -94,7 +93,7 @@ impl SpokeState {
         + 32                     // owner: Pubkey
         + 4 + (MAX_INTENT_QUEUE_SIZE * (32 + 1))  // status HashMap
         + QueueState::<[u8;32]>::SIZE      // intent_queue
-        + 1;                     // bump: u8
+        + 1; // bump: u8
 }
 
 /// Intent status.

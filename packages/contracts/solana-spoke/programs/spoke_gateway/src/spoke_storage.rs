@@ -139,4 +139,4 @@ impl SpokeStorageState {
         (MAX_STRATEGIES * (4 + 1 + 32 + MAX_CALLDATA_SIZE)) + // strategies
         (MAX_MODULES * (32 + 1 + (4 * 100))) + // modules
         (1000 * (32 + 8)); // balances (assuming max 1000 users)
-} 
+}
