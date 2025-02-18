@@ -7,22 +7,27 @@ use crate::{AuthState, Intent};
 
 /// Process a batch of intents in the queue and dispatch a cross-chain message via Hyperlane.
 pub fn process_intent_queue(
-    ctx: Context<AuthState>, 
-    intents: Vec<Intent>,  // Pass full intents, not just count
-    message_gas_limit: u64
+    ctx: Context<AuthState>,
+    intents: Vec<Intent>, // Pass full intents, not just count
+    message_gas_limit: u64,
 ) -> Result<()> {
     let state = &mut ctx.accounts.spoke_state;
     require!(!state.paused, SpokeError::ContractPaused);
     require!(intents.len() > 0, SpokeError::InvalidAmount);
-    require!(intents.len() <= state.intent_queue.len(), SpokeError::InvalidQueueOperation);
+    require!(
+        intents.len() <= state.intent_queue.len(),
+        SpokeError::InvalidQueueOperation
+    );
 
     // Verify each intent matches the queue
     // NOTE: Commenting as not emitting the event
     // let old_first = state.intent_queue.first_index();
     for intent in intents.iter() {
-        let queue_intent_id = state.intent_queue.pop_front()
+        let queue_intent_id = state
+            .intent_queue
+            .pop_front()
             .ok_or(SpokeError::InvalidQueueOperation)?;
-    
+
         let computed = compute_intent_hash(intent);
         require!(queue_intent_id == computed, SpokeError::IntentNotFound);
     }
@@ -49,7 +54,7 @@ pub fn process_intent_queue(
         &ix,
         &[ctx.accounts.hyperlane_mailbox.to_account_info()],
     )?;
-    
+
     // TODO: Need the meesage_id and fee spent data from above
     // emit!(IntentQueueProcessedEvent {
     //     message_id,
@@ -64,7 +69,7 @@ fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
     // Example:
     let mut buffer = Vec::new();
     // e.g. prefix a message type byte
-    buffer.push(1); 
+    buffer.push(1);
     // then Borsh‐encode the `Vec<Intent>`
     let encoded = intents.try_to_vec()?;
     buffer.extend_from_slice(&encoded);

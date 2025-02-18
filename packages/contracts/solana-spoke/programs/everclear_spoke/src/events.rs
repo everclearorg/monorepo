@@ -26,7 +26,7 @@ pub struct WithdrawnEvent {
 
 #[event]
 pub struct IntentAddedEvent {
-    pub intent_id: [u8;32],
+    pub intent_id: [u8; 32],
     pub initiator: Pubkey,
     pub receiver: Pubkey,
     pub input_asset: Pubkey,
@@ -42,7 +42,7 @@ pub struct IntentAddedEvent {
 
 #[event]
 pub struct IntentQueueProcessedEvent {
-    pub message_id: [u8;32],
+    pub message_id: [u8; 32],
     pub first_index: u64,
     pub last_index: u64,
     pub fee_spent: u64,
@@ -71,13 +71,6 @@ pub struct WatchtowerUpdatedEvent {
     pub old_watchtower: Pubkey,
     pub new_watchtower: Pubkey,
 }
-
-#[event]
-pub struct MessageGasLimitUpdatedEvent {
-    pub old_limit: u64,
-    pub new_limit: u64,
-}
-
 
 #[event]
 pub struct MessageReceivedEvent {

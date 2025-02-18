@@ -1,11 +1,19 @@
 use anchor_lang::prelude::*;
 
-use crate::{events::{GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, WatchtowerUpdatedEvent, MessageGasLimitUpdatedEvent}, state::SpokeState};
+use crate::{
+    events::{
+        GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, WatchtowerUpdatedEvent,
+    },
+    state::SpokeState,
+};
 
 pub fn update_gateway(state: &mut SpokeState, new_gateway: Pubkey) -> Result<()> {
     let old = state.gateway;
     state.gateway = new_gateway;
-    emit!(GatewayUpdatedEvent { old_gateway: old, new_gateway });
+    emit!(GatewayUpdatedEvent {
+        old_gateway: old,
+        new_gateway
+    });
     Ok(())
 }
 

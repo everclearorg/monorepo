@@ -1,14 +1,18 @@
 use anchor_lang::prelude::*;
 
-use crate::{error::SpokeError, events::InitializedEvent, state::{QueueState, SpokeState}};
+use crate::{
+    error::SpokeError,
+    events::InitializedEvent,
+    state::{QueueState, SpokeState},
+};
 
-pub fn initialize(
-    ctx: Context<Initialize>,
-    init: SpokeInitializationParams,
-) -> Result<()> {
+pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
     let state = &mut ctx.accounts.spoke_state;
 
-    require!(state.initialized_version == 0, SpokeError::AlreadyInitialized);
+    require!(
+        state.initialized_version == 0,
+        SpokeError::AlreadyInitialized
+    );
     state.initialized_version = 1;
 
     state.paused = false;
@@ -21,14 +25,14 @@ pub fn initialize(
     state.everclear = init.hub_domain;
     state.message_gas_limit = init.message_gas_limit;
     state.nonce = 0;
-    
+
     // Initialize our mappings and queues
-    state.intent_queue = QueueState::new(); 
-    
+    state.intent_queue = QueueState::new();
+
     // Set owner to the payer (deployer)
     state.owner = init.owner;
     state.bump = ctx.bumps.spoke_state;
-    
+
     emit!(InitializedEvent {
         owner: state.owner,
         domain: state.domain,
@@ -54,10 +58,7 @@ pub struct Initialize<'info> {
 
 impl<'info> Initialize<'info> {
     pub fn ensure_owner_is_valid(&self, new_owner: &Pubkey) -> Result<()> {
-        require!(
-            *new_owner != Pubkey::default(),
-            SpokeError::InvalidOwner
-        );
+        require!(*new_owner != Pubkey::default(), SpokeError::InvalidOwner);
         Ok(())
     }
 }
