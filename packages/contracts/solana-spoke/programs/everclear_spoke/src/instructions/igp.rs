@@ -1,14 +1,14 @@
 //! Program instructions.
 
-use borsh::{BorshDeserialize, BorshSerialize};
-
-use hyperlane_core::H256;
+use anchor_lang::prelude::{borsh::{BorshDeserialize, BorshSerialize}, *};
 
 use solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
     program_error::ProgramError,
     pubkey::Pubkey,
 };
+
+use crate::hyperlane::H256;
 
 // use crate::{
 //     accounts::{GasOracle, InterchainGasPaymasterType},
@@ -126,12 +126,12 @@ pub enum IgpInstruction {
 
 impl IgpInstruction {
     /// Deserializes an instruction from a slice.
-    pub fn from_instruction_data(data: &[u8]) -> Result<Self, ProgramError> {
+    pub fn from_instruction_data(data: &[u8]) -> Result<Self> {
         Self::try_from_slice(data).map_err(|_| ProgramError::InvalidInstructionData)
     }
 
     /// Serializes an instruction into a vector of bytes.
-    pub fn into_instruction_data(self) -> Result<Vec<u8>, ProgramError> {
+    pub fn into_instruction_data(self) -> Result<Vec<u8>> {
         self.try_to_vec()
             .map_err(|err| ProgramError::BorshIoError(err.to_string()))
     }
@@ -368,7 +368,7 @@ pub fn pay_for_gas_instruction(
     message_id: H256,
     destination_domain: u32,
     gas_amount: u64,
-) -> Result<(SolanaInstruction, Pubkey), ProgramError> {
+) -> Result<(SolanaInstruction, Pubkey)> {
     let (program_data_account, _program_data_bump) =
         Pubkey::try_find_program_address(igp_program_data_pda_seeds!(), &program_id)
             .ok_or(ProgramError::InvalidSeeds)?;

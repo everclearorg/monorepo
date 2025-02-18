@@ -1,7 +1,7 @@
 //! Instructions for the Hyperlane Sealevel Mailbox program.
 
-use borsh::{BorshDeserialize, BorshSerialize};
-use hyperlane_core::H256;
+use anchor_lang::prelude::{borsh::{BorshDeserialize, BorshSerialize}, *};
+use crate::hyperlane::H256;
 use solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
     program_error::ProgramError,
@@ -55,12 +55,12 @@ pub enum MailboxInstruction {
 
 impl MailboxInstruction {
     /// Deserializes an instruction from a slice.
-    pub fn from_instruction_data(data: &[u8]) -> Result<Self, ProgramError> {
+    pub fn from_instruction_data(data: &[u8]) -> Result<Self> {
         Self::try_from_slice(data).map_err(|_| ProgramError::InvalidInstructionData)
     }
 
     /// Serializes an instruction into a vector of bytes.
-    pub fn into_instruction_data(self) -> Result<Vec<u8>, ProgramError> {
+    pub fn into_instruction_data(self) -> Result<Vec<u8>> {
         self.try_to_vec()
             .map_err(|err| ProgramError::BorshIoError(err.to_string()))
     }
@@ -113,7 +113,7 @@ pub fn init_instruction(
     max_protocol_fee: u64,
     protocol_fee: ProtocolFee,
     payer: Pubkey,
-) -> Result<SolanaInstruction, ProgramError> {
+) -> Result<SolanaInstruction> {
     let (inbox_account, _inbox_bump) =
         Pubkey::try_find_program_address(mailbox_inbox_pda_seeds!(), &program_id)
             .ok_or(ProgramError::InvalidSeeds)?;
@@ -145,7 +145,7 @@ pub fn transfer_ownership_instruction(
     program_id: Pubkey,
     owner_payer: Pubkey,
     new_owner: Option<Pubkey>,
-) -> Result<SolanaInstruction, ProgramError> {
+) -> Result<SolanaInstruction> {
     let (outbox_account, _outbox_bump) =
         Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
             .ok_or(ProgramError::InvalidSeeds)?;
@@ -168,7 +168,7 @@ pub fn set_default_ism_instruction(
     program_id: Pubkey,
     owner_payer: Pubkey,
     default_ism: Pubkey,
-) -> Result<SolanaInstruction, ProgramError> {
+) -> Result<SolanaInstruction> {
     let (inbox_account, _inbox_bump) =
         Pubkey::try_find_program_address(mailbox_inbox_pda_seeds!(), &program_id)
             .ok_or(ProgramError::InvalidSeeds)?;
