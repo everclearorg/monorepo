@@ -4,7 +4,6 @@ use anchor_lang::prelude::{borsh::{BorshDeserialize, BorshSerialize}, *};
 
 use solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
-    program_error::ProgramError,
     pubkey::Pubkey,
 };
 
