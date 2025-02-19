@@ -164,7 +164,7 @@ contract InvoiceHelper is TestExtended {
     // Calculate the amount needed for an intent to exactly purchase `A`
     uint256 _amountB = _calculateDepositAmount(_intentADestination, _amountA, _tickerHash);
     // uint256 _amountB = (_amountA * DBPS_DENOMINATOR) / (DBPS_DENOMINATOR + MAX_FEE);
-    // console.log('amountB    :', _amountB);
+    console.log('amountB    :', _amountB, _applyFees(_amountB, _tickerHash));
 
     // // Reduce by the custodied assets
     // uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _intentADestination));
