@@ -11,22 +11,26 @@ pub struct TokenMessage {
     metadata: Vec<u8>,
 }
 
-// impl Encode for TokenMessage {
-//     fn write_to<W>(&self, writer: &mut W) -> std::io::Result<usize>
-//     where
-//         W: std::io::Write,
-//     {
-//         writer.write_all(self.recipient.as_ref())?;
+impl Encode for TokenMessage {
+    fn write_to<W>(&self, writer: &mut W) -> std::io::Result<usize>
+    where
+        W: std::io::Write,
+    {
+        // 1) Write recipient (32 bytes)
+        writer.write_all(self.recipient.as_ref())?;
 
-//         let mut amount_or_id = [0_u8; 32];
-//         self.amount_or_id.to_big_endian(&mut amount_or_id);
-//         writer.write_all(&amount_or_id)?;
+        // 2) Write amount_or_id (32 bytes, big-endian)
+        let mut amount_or_id = [0_u8; 32];
+        self.amount_or_id.to_big_endian(&mut amount_or_id);
+        writer.write_all(&amount_or_id)?;
 
-//         writer.write_all(&self.metadata)?;
+        // 3) Write metadata
+        writer.write_all(&self.metadata)?;
 
-//         Ok(32 + 32 + self.metadata.len())
-//     }
-// }
+        // The total written: 32 + 32 + metadata.len()
+        Ok(32 + 32 + self.metadata.len())
+    }
+}
 
 // impl Decode for TokenMessage {
 //     fn read_from<R>(reader: &mut R) -> Result<Self, HyperlaneProtocolError>
@@ -74,5 +78,20 @@ impl TokenMessage {
     /// The metadata of the token transfer.
     pub fn metadata(&self) -> &[u8] {
         &self.metadata
+    }
+}
+
+/// Simple trait for types with a canonical encoding
+pub trait Encode {
+    /// Write the canonical encoding to the writer
+    fn write_to<W>(&self, writer: &mut W) -> std::io::Result<usize>
+    where
+        W: std::io::Write;
+
+    /// Serialize to a vec
+    fn to_vec(&self) -> Vec<u8> {
+        let mut buf = vec![];
+        self.write_to(&mut buf).expect("!alloc");
+        buf
     }
 }

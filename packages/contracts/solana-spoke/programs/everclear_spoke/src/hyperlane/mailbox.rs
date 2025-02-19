@@ -4,7 +4,6 @@ use anchor_lang::prelude::{borsh::{BorshDeserialize, BorshSerialize}, *};
 use crate::{error::SpokeError, hyperlane::primitive_type::H256};
 use solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
-    program_error::ProgramError,
     pubkey::Pubkey,
 };
 
