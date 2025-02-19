@@ -8,94 +8,12 @@ use solana_program::{
     pubkey::Pubkey,
 };
 
-use crate::hyperlane::H256;
+use crate::{error::SpokeError, hyperlane::primitive_type::H256, igp_gas_payment_pda_seeds, igp_program_data_pda_seeds};
 
 // use crate::{
 //     accounts::{GasOracle, InterchainGasPaymasterType},
 //     igp_gas_payment_pda_seeds, igp_pda_seeds, igp_program_data_pda_seeds, overhead_igp_pda_seeds,
 // };
-
-/// Gets the PDA seeds for the singleton program data.
-#[macro_export]
-macro_rules! igp_program_data_pda_seeds {
-    () => {{
-        &[b"hyperlane_igp", b"-", b"program_data"]
-    }};
-
-    ($bump_seed:expr) => {{
-        &[b"hyperlane_igp", b"-", b"program_data", &[$bump_seed]]
-    }};
-}
-
-/// Gets the PDA seeds for an IGP account.
-#[macro_export]
-macro_rules! igp_pda_seeds {
-    ($salt:expr) => {{
-        &[b"hyperlane_igp", b"-", b"igp", b"-", $salt.as_ref()]
-    }};
-
-    ($salt:expr, $bump_seed:expr) => {{
-        &[
-            b"hyperlane_igp",
-            b"-",
-            b"igp",
-            b"-",
-            $salt.as_ref(),
-            &[$bump_seed],
-        ]
-    }};
-}
-
-/// Gets the PDA seeds for an Overhead IGP account.
-#[macro_export]
-macro_rules! overhead_igp_pda_seeds {
-    ($salt:expr) => {{
-        &[
-            b"hyperlane_igp",
-            b"-",
-            b"overhead_igp",
-            b"-",
-            $salt.as_ref(),
-        ]
-    }};
-
-    ($salt:expr, $bump_seed:expr) => {{
-        &[
-            b"hyperlane_igp",
-            b"-",
-            b"overhead_igp",
-            b"-",
-            $salt.as_ref(),
-            &[$bump_seed],
-        ]
-    }};
-}
-
-/// Gets the PDA seeds for an IGP gas payment account that's based upon
-/// the pubkey of a unique message account for uniqueness.
-#[macro_export]
-macro_rules! igp_gas_payment_pda_seeds {
-    ($unique_gas_payment_pubkey:expr) => {{
-        &[
-            b"hyperlane_igp",
-            b"-",
-            b"gas_payment",
-            b"-",
-            $unique_gas_payment_pubkey.as_ref(),
-        ]
-    }};
-
-    ($unique_gas_payment_pubkey:expr, $bump_seed:expr) => {{
-        &[
-            b"hyperlane_igp",
-            b"-",
-            b"gas_payment",
-            b"-",
-            $unique_gas_payment_pubkey.as_ref(),
-            &[$bump_seed],
-        ]
-    }};
-}
 
 /// The program instructions.
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
@@ -125,15 +43,10 @@ pub enum IgpInstruction {
 }
 
 impl IgpInstruction {
-    /// Deserializes an instruction from a slice.
-    pub fn from_instruction_data(data: &[u8]) -> Result<Self> {
-        Self::try_from_slice(data).map_err(|_| ProgramError::InvalidInstructionData)
-    }
-
     /// Serializes an instruction into a vector of bytes.
     pub fn into_instruction_data(self) -> Result<Vec<u8>> {
-        self.try_to_vec()
-            .map_err(|err| ProgramError::BorshIoError(err.to_string()))
+        Ok(self.try_to_vec()
+            .map_err(|_| SpokeError::InvalidMessage)?)
     }
 }
 
@@ -371,12 +284,12 @@ pub fn pay_for_gas_instruction(
 ) -> Result<(SolanaInstruction, Pubkey)> {
     let (program_data_account, _program_data_bump) =
         Pubkey::try_find_program_address(igp_program_data_pda_seeds!(), &program_id)
-            .ok_or(ProgramError::InvalidSeeds)?;
+            .ok_or(SpokeError::InvalidSeeds)?;
     let (gas_payment_account, _gas_payment_bump) = Pubkey::try_find_program_address(
         igp_gas_payment_pda_seeds!(unique_gas_payment_account_pubkey),
         &program_id,
     )
-    .ok_or(ProgramError::InvalidSeeds)?;
+    .ok_or(SpokeError::InvalidSeeds)?;
 
     let ixn = IgpInstruction::IgpPayForGas(IgpPayForGas {
         message_id,
