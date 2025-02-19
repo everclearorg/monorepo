@@ -61,5 +61,7 @@ pub enum SpokeError {
     #[msg("Extraneous account")]
     ExtraneousAccount,
     #[msg("Overflowing Integer")]
-    IntegerOverflow
+    IntegerOverflow,
+    #[msg("Invalid seeds for deriving pda")]
+    InvalidSeeds,
 }

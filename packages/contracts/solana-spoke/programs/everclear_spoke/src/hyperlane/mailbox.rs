@@ -1,7 +1,7 @@
 //! Instructions for the Hyperlane Sealevel Mailbox program.
 
 use anchor_lang::prelude::{borsh::{BorshDeserialize, BorshSerialize}, *};
-use crate::hyperlane::H256;
+use crate::{error::SpokeError, hyperlane::primitive_type::H256};
 use solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
     program_error::ProgramError,
@@ -9,6 +9,8 @@ use solana_program::{
 };
 
 use crate::{mailbox_inbox_pda_seeds, mailbox_outbox_pda_seeds};
+
+use super::OutboxDispatch;
 
 /// The Protocol Fee configuration.
 #[derive(BorshSerialize, BorshDeserialize, Debug, PartialEq, Eq, Clone, Default)]
@@ -36,7 +38,7 @@ pub enum MailboxInstruction {
     /// Gets the recipient's ISM.
     InboxGetRecipientIsm(Pubkey),
     /// Dispatches a message.
-    MailboxOutboxDispatch(MailboxOutboxDispatch),
+    OutboxDispatch(OutboxDispatch),
     /// Gets the number of messages that have been dispatched.
     OutboxGetCount,
     /// Gets the latest checkpoint.
@@ -54,15 +56,10 @@ pub enum MailboxInstruction {
 }
 
 impl MailboxInstruction {
-    /// Deserializes an instruction from a slice.
-    pub fn from_instruction_data(data: &[u8]) -> Result<Self> {
-        Self::try_from_slice(data).map_err(|_| ProgramError::InvalidInstructionData)
-    }
-
     /// Serializes an instruction into a vector of bytes.
     pub fn into_instruction_data(self) -> Result<Vec<u8>> {
-        self.try_to_vec()
-            .map_err(|err| ProgramError::BorshIoError(err.to_string()))
+        Ok(self.try_to_vec()
+            .map_err(|_err| SpokeError::InvalidMessage)?)
     }
 }
 
@@ -116,10 +113,10 @@ pub fn init_instruction(
 ) -> Result<SolanaInstruction> {
     let (inbox_account, _inbox_bump) =
         Pubkey::try_find_program_address(mailbox_inbox_pda_seeds!(), &program_id)
-            .ok_or(ProgramError::InvalidSeeds)?;
+            .ok_or(SpokeError::InvalidSeeds)?;
     let (outbox_account, _outbox_bump) =
         Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
-            .ok_or(ProgramError::InvalidSeeds)?;
+            .ok_or(SpokeError::InvalidSeeds)?;
 
     let instruction = SolanaInstruction {
         program_id,
@@ -148,7 +145,7 @@ pub fn transfer_ownership_instruction(
 ) -> Result<SolanaInstruction> {
     let (outbox_account, _outbox_bump) =
         Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
-            .ok_or(ProgramError::InvalidSeeds)?;
+            .ok_or(SpokeError::InvalidSeeds)?;
 
     // 0. `[writeable]` The Outbox PDA account.
     // 1. `[signer]` The current owner.
@@ -171,10 +168,10 @@ pub fn set_default_ism_instruction(
 ) -> Result<SolanaInstruction> {
     let (inbox_account, _inbox_bump) =
         Pubkey::try_find_program_address(mailbox_inbox_pda_seeds!(), &program_id)
-            .ok_or(ProgramError::InvalidSeeds)?;
+            .ok_or(SpokeError::InvalidSeeds)?;
     let (outbox_account, _outbox_bump) =
         Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
-            .ok_or(ProgramError::InvalidSeeds)?;
+            .ok_or(SpokeError::InvalidSeeds)?;
 
     // 0. `[writeable]` - The Inbox PDA account.
     // 1. `[]` - The Outbox PDA account.
