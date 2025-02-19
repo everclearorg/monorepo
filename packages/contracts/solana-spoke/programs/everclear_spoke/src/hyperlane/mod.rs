@@ -111,6 +111,8 @@ pub struct TransferRemote {
     pub recipient: H256,
     /// The amount or ID of the token to transfer.
     pub amount_or_id: U256,
+    // Gas amount
+    pub gas_amount: u64,
 }
 
 pub struct AccountData<T> {
@@ -255,7 +257,8 @@ fn dispatch_with_gas(
     payment_account_metas: Vec<AccountMeta>,
     payment_account_infos: &[AccountInfo],
     mailbox_id: &Pubkey,
-    igp_program_id: &Pubkey
+    igp_program_id: &Pubkey,
+    recipient: &H256,
 ) -> Result<H256> {
     let message_id = dispatch(
         program_id,
@@ -279,7 +282,7 @@ fn dispatch_with_gas(
         payment_account_metas,
     );
 
-    invoke(&igp_ixn, payment_account_infos)?;
+    invoke(&igp_ixn, payment_account_infos).map_err(|e| e.into())?;
 
     Ok(message_id)
 }
@@ -368,7 +371,7 @@ pub struct TransferRemoteContext<'info, T> {
 pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     // program_id: &Pubkey,
     ctx: Context<TransferRemoteContext<T>>,
-    xfer: TransferRemote,
+    xfer: TransferRemote
 ) -> Result<()> {
     // let accounts_iter = &mut accounts.iter();
 
@@ -493,7 +496,7 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
             };
 
             Some((
-                igp_program_id,
+                &igp_program_id,
                 igp_payment_account_metas,
                 igp_payment_account_infos,
             ))
@@ -552,17 +555,18 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     {
         // Dispatch the message and pay for gas.
         dispatch_with_gas(
-            program_id,
+            program_id, 
             dispatch_authority_seeds,
             xfer.destination_domain,
             token_transfer_message,
+            xfer.gas_amount,
             dispatch_account_metas,
             dispatch_account_infos,
             igp_payment_account_metas,
-            &igp_payment_account_infos,
-            mailbox_info,
-            mailbox_id,
+            mailbox_info.key,
+            mailbox_info.key,
             igp_program_id,
+            &xfer.recipient
         )?;
     }
 
