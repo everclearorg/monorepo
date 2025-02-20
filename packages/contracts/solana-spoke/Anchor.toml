@@ -11,11 +11,17 @@ everclear_spoke = "uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC"
 spoke_gateway = "Cuuu22fpegEh5x8da14zVkUp5gwENHK3uM6JwKsdXrtW"
 spoke_message_receiver = "8qp4V6EWGL6KgpMcJix5ufVSRu7JezM8sKKUgRwHncbA"
 
+[programs.localnet]
+call_executor = "HGaUXXufuDrkUPPMfcSkcdhhWTyB2trE2UtjQD4ebyjK"
+everclear_spoke = "uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC"
+spoke_gateway = "Cuuu22fpegEh5x8da14zVkUp5gwENHK3uM6JwKsdXrtW"
+spoke_message_receiver = "8qp4V6EWGL6KgpMcJix5ufVSRu7JezM8sKKUgRwHncbA"
+
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
