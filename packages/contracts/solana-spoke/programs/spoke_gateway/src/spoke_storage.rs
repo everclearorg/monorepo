@@ -5,10 +5,6 @@
 use anchor_lang::prelude::*;
 use std::collections::VecDeque;
 
-/// Maximum number of intents that can be queued
-pub const MAX_INTENT_QUEUE_SIZE: usize = 1000;
-/// Maximum number of fills that can be queued
-pub const MAX_FILL_QUEUE_SIZE: usize = 1000;
 /// Maximum number of strategies that can be registered
 pub const MAX_STRATEGIES: usize = 100;
 /// Maximum number of modules that can be registered
@@ -17,8 +13,6 @@ pub const MAX_MODULES: usize = 50;
 pub const MAX_CALLDATA_SIZE: usize = 10240; // 10KB
 
 pub const FILL_INTENT_FOR_SOLVER_TYPEHASH: [u8; 32] = [0xAA; 32]; // placeholder
-pub const PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xBB; 32];
-pub const PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH: [u8; 32] = [0xCC; 32];
 
 /// Dummy Permit2 address.
 pub const PERMIT2: Pubkey = Pubkey::new_from_array([0u8; 32]);
@@ -109,10 +103,6 @@ pub struct SpokeStorageState {
     pub call_executor: Pubkey,
     /// The Everclear identifier
     pub everclear: u32,
-    /// Queue of pending intents
-    pub intent_queue: VecDeque<Intent>,
-    /// Queue of pending fills
-    pub fill_queue: VecDeque<Fill>,
     /// Registered strategies
     pub strategies: Vec<Strategy>,
     /// Registered modules
@@ -134,8 +124,6 @@ impl SpokeStorageState {
         32 + // watchtower
         32 + // call_executor
         4 + // everclear
-        (MAX_INTENT_QUEUE_SIZE * (32 + 8 + 4 + MAX_CALLDATA_SIZE + 8)) + // intent_queue
-        (MAX_FILL_QUEUE_SIZE * (32 + 8 + 4 + MAX_CALLDATA_SIZE + 8 + 32 + MAX_CALLDATA_SIZE + 8)) + // fill_queue
         (MAX_STRATEGIES * (4 + 1 + 32 + MAX_CALLDATA_SIZE)) + // strategies
         (MAX_MODULES * (32 + 1 + (4 * 100))) + // modules
         (1000 * (32 + 8)); // balances (assuming max 1000 users)

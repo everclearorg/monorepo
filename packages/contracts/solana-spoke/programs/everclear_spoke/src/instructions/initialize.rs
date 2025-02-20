@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 use crate::{
     error::SpokeError,
     events::InitializedEvent,
-    state::{QueueState, SpokeState},
+    state::{SpokeState},
 };
 
 pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
@@ -25,9 +25,6 @@ pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> 
     state.everclear = init.hub_domain;
     state.message_gas_limit = init.message_gas_limit;
     state.nonce = 0;
-
-    // Initialize our mappings and queues
-    state.intent_queue = QueueState::new();
 
     // Set owner to the payer (deployer)
     state.owner = init.owner;
