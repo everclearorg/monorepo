@@ -14,23 +14,10 @@ pub fn process_intent_queue(
     let state = &mut ctx.accounts.spoke_state;
     require!(!state.paused, SpokeError::ContractPaused);
     require!(intents.len() > 0, SpokeError::InvalidAmount);
-    require!(
-        intents.len() <= state.intent_queue.len(),
-        SpokeError::InvalidQueueOperation
-    );
 
     // Verify each intent matches the queue
     // NOTE: Commenting as not emitting the event
     // let old_first = state.intent_queue.first_index();
-    for intent in intents.iter() {
-        let queue_intent_id = state
-            .intent_queue
-            .pop_front()
-            .ok_or(SpokeError::InvalidQueueOperation)?;
-
-        let computed = compute_intent_hash(intent);
-        require!(queue_intent_id == computed, SpokeError::IntentNotFound);
-    }
 
     // Format message using proper message lib
     let batch_message = format_intent_message_batch(&intents)?;

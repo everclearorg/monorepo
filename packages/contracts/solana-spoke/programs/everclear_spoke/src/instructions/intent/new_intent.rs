@@ -117,9 +117,6 @@ pub fn new_intent(
 
     let intent_id = compute_intent_hash(&new_intent_struct);
 
-    // Update intent queue and status
-    state.intent_queue.push_back(intent_id);
-
     // Also, record a minimal status mapping (we only record the intent_id and its status).
     state.status.push(IntentStatusAccount {
         key: intent_id,

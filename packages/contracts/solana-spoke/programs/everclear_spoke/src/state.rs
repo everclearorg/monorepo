@@ -1,7 +1,5 @@
 use anchor_lang::prelude::*;
 
-use crate::consts::MAX_INTENT_QUEUE_SIZE;
-
 /// Queue state with first/last indices for efficient management
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct QueueState<T> {
@@ -69,8 +67,6 @@ pub struct SpokeState {
     pub owner: Pubkey,
     // Intent status mapping.
     pub status: Vec<IntentStatusAccount>,
-    // Dynamic mappings/queues
-    pub intent_queue: QueueState<[u8; 32]>,
     // Bump for PDA.
     pub bump: u8,
     // Mailbox address
@@ -85,15 +81,16 @@ pub struct IntentStatusAccount {
 
 impl SpokeState {
     pub const SIZE: usize = 1    // paused: bool
+        + 1                      // initialized_version: u8
         + 4                      // domain: u32
         + 4                      // everclear: u32
         + 32 * 5                 // 5 Pubkeys
         + 8                      // message_gas_limit: u64
         + 8                      // nonce: u64
         + 32                     // owner: Pubkey
-        + 4 + (MAX_INTENT_QUEUE_SIZE * (32 + 1))  // status HashMap
-        + QueueState::<[u8;32]>::SIZE      // intent_queue
-        + 1; // bump: u8
+        + 4                      // status HashMap
+        + 1                      // bump: u8
+        + 32;                    // mailbox: Pubkey
 }
 
 /// Intent status.

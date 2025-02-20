@@ -22,8 +22,6 @@ pub enum SpokeError {
     InvalidIntentStatus,
     #[msg("Max fee exceeded.")]
     MaxFeeExceeded,
-    #[msg("Queue operation invalid (zero or too many items).")]
-    InvalidQueueOperation,
     #[msg("Invalid origin for inbound message.")]
     InvalidOrigin,
     #[msg("Invalid sender for inbound message.")]

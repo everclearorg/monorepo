@@ -83,15 +83,6 @@ pub mod everclear_spoke {
         )
     }
 
-    /// Process a batch of intents in the queue and dispatch a cross-chain message via Hyperlane.
-    pub fn process_intent_queue(
-        ctx: Context<AuthState>,
-        intents: Vec<Intent>, // Pass full intents, not just count
-        message_gas_limit: u64,
-    ) -> Result<()> {
-        instructions::process_intent_queue(ctx, intents, message_gas_limit)
-    }
-
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
     pub fn receive_message<'a>(
