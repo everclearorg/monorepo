@@ -1,10 +1,12 @@
 use crate::error::SpokeError;
 use crate::mailbox_message_dispatch_authority_pda_seeds;
 use anchor_lang::prelude::{AccountInfo, AccountMeta, Pubkey};
+use anchor_lang::solana_program::system_program;
 use anchor_lang::solana_program::{
     instruction::Instruction,
     program::{get_return_data, invoke, invoke_signed},
 };
+use anchor_lang::solana_program::{msg, program_error::ProgramError};
 use anchor_lang::{
     prelude::{
         borsh::{BorshDeserialize, BorshSerialize},
@@ -14,7 +16,6 @@ use anchor_lang::{
 };
 use igp::{IgpInstruction, IgpPayForGas};
 use mailbox::MailboxInstruction;
-use solana_program::{msg, program_error::ProgramError};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use token_message::{Encode, TokenMessage};
@@ -268,18 +269,20 @@ fn dispatch_with_gas(
         mailbox_id,
     )?;
 
-    // Call the IGP to pay for gas.
-    let igp_ixn = Instruction::new_with_borsh(
-        *igp_program_id,
-        &IgpInstruction::IgpPayForGas(IgpPayForGas {
-            message_id,
-            destination_domain,
-            gas_amount,
-        }),
-        payment_account_metas,
-    );
+    let inst = IgpInstruction::IgpPayForGas(IgpPayForGas {
+        message_id,
+        destination_domain,
+        gas_amount,
+    });
 
-    invoke(&igp_ixn, payment_account_infos).map_err(|e| e.into())?;
+    // Call the IGP to pay for gas.
+    let igp_ixn = Instruction {
+        program_id: *igp_program_id,
+        accounts: payment_account_metas,
+        data: inst.into_instruction_data()?,
+    };
+
+    invoke(&igp_ixn, payment_account_infos)?;
 
     Ok(message_id)
 }
@@ -464,77 +467,76 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     // Similarly defer to the checks in the Mailbox to ensure account validity.
     let dispatched_message_pda = &ctx.accounts.dispatched_message_pda;
 
-    let igp_payment_accounts = if let Some((igp_program_id, igp_account_type)) =
-        token.interchain_gas_paymaster
-    {
-        // Account 9: The IGP program
-        let igp_program_account = &ctx.accounts.igp_program;
-        require!(
-            *igp_program_account.key == igp_program_id,
-            SpokeError::InvalidAccount
-        );
+    let igp_payment_accounts =
+        if let Some((igp_program_id, igp_account_type)) = token.interchain_gas_paymaster {
+            // Account 9: The IGP program
+            let igp_program_account = &ctx.accounts.igp_program;
+            require!(
+                *igp_program_account.key == igp_program_id,
+                SpokeError::InvalidAccount
+            );
 
-        // Account 10: The IGP program data.
-        // No verification is performed here, the IGP will do that.
-        let igp_program_data_account = &ctx.accounts.igp_program_data;
+            // Account 10: The IGP program data.
+            // No verification is performed here, the IGP will do that.
+            let igp_program_data_account = &ctx.accounts.igp_program_data;
 
-        // Account 11: The gas payment PDA.
-        let igp_payment_pda_account = &ctx.accounts.igp_payment_pda;
+            // Account 11: The gas payment PDA.
+            let igp_payment_pda_account = &ctx.accounts.igp_payment_pda;
 
-        // Account 12: The configured IGP account.
-        let configured_igp_account = &ctx.accounts.configured_igp_account;
-        if configured_igp_account.key != igp_account_type.key() {
-            return err!(SpokeError::InvalidAccount);
-        }
-
-        let mut igp_payment_account_metas = vec![
-            AccountMeta::new_readonly(solana_program::system_program::ID.to_bytes().into(), false),
-            AccountMeta::new(*sender_wallet.key, true),
-            AccountMeta::new(*igp_program_data_account.key, false),
-            AccountMeta::new_readonly(*unique_message_account.key, true),
-            AccountMeta::new(*igp_payment_pda_account.key, false),
-        ];
-        let mut igp_payment_account_infos = vec![
-            system_program_account.to_account_info(), // convert Program to AccountInfo
-            sender_wallet.clone(),
-            igp_program_data_account.clone(),
-            unique_message_account.clone(),
-            igp_payment_pda_account.clone(),
-        ];
-
-        match igp_account_type {
-            InterchainGasPaymasterType::Igp(_) => {
-                // No inner IGP needed in this variant
-                igp_payment_account_metas
-                    .push(AccountMeta::new(*configured_igp_account.key, false));
-                igp_payment_account_infos.push(configured_igp_account.clone());
+            // Account 12: The configured IGP account.
+            let configured_igp_account = &ctx.accounts.configured_igp_account;
+            if configured_igp_account.key != igp_account_type.key() {
+                return err!(SpokeError::InvalidAccount);
             }
 
-            InterchainGasPaymasterType::OverheadIgp(_) => {
-                // 1) Unwrap the optional inner_igp_account from your context:
-                let inner_igp_account = ctx
-                    .accounts
-                    .inner_igp_account
-                    .as_ref() // get &AccountInfo<'info>
-                    .ok_or_else(|| error!(SpokeError::InvalidArgument))?;
+            let mut igp_payment_account_metas = vec![
+                AccountMeta::new_readonly(system_program::ID.to_bytes().into(), false),
+                AccountMeta::new(*sender_wallet.key, true),
+                AccountMeta::new(*igp_program_data_account.key, false),
+                AccountMeta::new_readonly(*unique_message_account.key, true),
+                AccountMeta::new(*igp_payment_pda_account.key, false),
+            ];
+            let mut igp_payment_account_infos = vec![
+                system_program_account.to_account_info(), // convert Program to AccountInfo
+                sender_wallet.clone(),
+                igp_program_data_account.clone(),
+                unique_message_account.clone(),
+                igp_payment_pda_account.clone(),
+            ];
 
-                igp_payment_account_metas.extend([
-                    AccountMeta::new(*inner_igp_account.key, false),
-                    AccountMeta::new_readonly(*configured_igp_account.key, false),
-                ]);
-                igp_payment_account_infos
-                    .extend([inner_igp_account.clone(), configured_igp_account.clone()]);
-            }
+            match igp_account_type {
+                InterchainGasPaymasterType::Igp(_) => {
+                    // No inner IGP needed in this variant
+                    igp_payment_account_metas
+                        .push(AccountMeta::new(*configured_igp_account.key, false));
+                    igp_payment_account_infos.push(configured_igp_account.clone());
+                }
+
+                InterchainGasPaymasterType::OverheadIgp(_) => {
+                    // 1) Unwrap the optional inner_igp_account from your context:
+                    let inner_igp_account = ctx
+                        .accounts
+                        .inner_igp_account
+                        .as_ref() // get &AccountInfo<'info>
+                        .ok_or_else(|| error!(SpokeError::InvalidArgument))?;
+
+                    igp_payment_account_metas.extend([
+                        AccountMeta::new(*inner_igp_account.key, false),
+                        AccountMeta::new_readonly(*configured_igp_account.key, false),
+                    ]);
+                    igp_payment_account_infos
+                        .extend([inner_igp_account.clone(), configured_igp_account.clone()]);
+                }
+            };
+
+            Some((
+                &igp_program_id,
+                igp_payment_account_metas,
+                igp_payment_account_infos,
+            ))
+        } else {
+            None
         };
-
-        Some((
-            &igp_program_id,
-            igp_payment_account_metas,
-            igp_payment_account_infos,
-        ))
-    } else {
-        None
-    };
 
     // The amount denominated in the local decimals.
     let local_amount: u64 = xfer
@@ -558,7 +560,7 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     let dispatch_account_metas = vec![
         AccountMeta::new(*mailbox_outbox_account.key, false),
         AccountMeta::new_readonly(*dispatch_authority_account.key, true),
-        AccountMeta::new_readonly(solana_program::system_program::ID.to_bytes().into(), false),
+        AccountMeta::new_readonly(system_program::ID.to_bytes().into(), false),
         AccountMeta::new_readonly(spl_noop::id(), false),
         AccountMeta::new(*sender_wallet.key, true),
         AccountMeta::new_readonly(*unique_message_account.key, true),
