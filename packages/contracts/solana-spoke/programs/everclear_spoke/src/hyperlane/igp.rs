@@ -1,11 +1,14 @@
 //! Program instructions.
 
-use anchor_lang::prelude::{
-    borsh::{BorshDeserialize, BorshSerialize},
-    *,
+use anchor_lang::{
+    prelude::{
+        borsh::{BorshDeserialize, BorshSerialize},
+        *,
+    },
+    solana_program::system_program,
 };
 
-use solana_program::{
+use anchor_lang::solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
     pubkey::Pubkey,
 };
@@ -310,7 +313,7 @@ pub fn pay_for_gas_instruction(
     // 5. `[writeable]` The IGP account.
     // 6. `[]` Overhead IGP account (optional).
     let mut accounts = vec![
-        AccountMeta::new_readonly(solana_program::system_program::id(), false),
+        AccountMeta::new_readonly(system_program::id(), false),
         AccountMeta::new(payer, true),
         AccountMeta::new(program_data_account, false),
         AccountMeta::new_readonly(unique_gas_payment_account_pubkey, true),

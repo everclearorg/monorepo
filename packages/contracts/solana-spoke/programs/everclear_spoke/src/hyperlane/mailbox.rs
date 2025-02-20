@@ -1,13 +1,16 @@
 //! Instructions for the Hyperlane Sealevel Mailbox program.
 
 use crate::{error::SpokeError, hyperlane::primitive_type::H256};
-use anchor_lang::prelude::{
-    borsh::{BorshDeserialize, BorshSerialize},
-    *,
-};
-use solana_program::{
+use anchor_lang::solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
     pubkey::Pubkey,
+};
+use anchor_lang::{
+    prelude::{
+        borsh::{BorshDeserialize, BorshSerialize},
+        *,
+    },
+    solana_program::system_program,
 };
 
 use crate::{mailbox_inbox_pda_seeds, mailbox_outbox_pda_seeds};
@@ -131,7 +134,7 @@ pub fn init_instruction(
         })
         .into_instruction_data()?,
         accounts: vec![
-            AccountMeta::new(solana_program::system_program::id(), false),
+            AccountMeta::new(system_program::id(), false),
             AccountMeta::new(payer, true),
             AccountMeta::new(inbox_account, false),
             AccountMeta::new(outbox_account, false),
