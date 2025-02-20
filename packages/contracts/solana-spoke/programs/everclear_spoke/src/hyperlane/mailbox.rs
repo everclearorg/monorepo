@@ -1,7 +1,10 @@
 //! Instructions for the Hyperlane Sealevel Mailbox program.
 
-use anchor_lang::prelude::{borsh::{BorshDeserialize, BorshSerialize}, *};
 use crate::{error::SpokeError, hyperlane::primitive_type::H256};
+use anchor_lang::prelude::{
+    borsh::{BorshDeserialize, BorshSerialize},
+    *,
+};
 use solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
     pubkey::Pubkey,
@@ -57,7 +60,8 @@ pub enum MailboxInstruction {
 impl MailboxInstruction {
     /// Serializes an instruction into a vector of bytes.
     pub fn into_instruction_data(self) -> Result<Vec<u8>> {
-        Ok(self.try_to_vec()
+        Ok(self
+            .try_to_vec()
             .map_err(|_err| SpokeError::InvalidMessage)?)
     }
 }
