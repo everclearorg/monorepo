@@ -373,6 +373,7 @@ pub struct TransferRemoteContext<'info> {
     pub dispatch_authority: AccountInfo<'info>,
 
     /// The user's wallet (signer)
+    /// CHECK: This is the user's wallet, used only as a signer. No other data is read.
     #[account(signer)]
     pub sender_wallet: AccountInfo<'info>,
 
@@ -391,10 +392,13 @@ pub struct TransferRemoteContext<'info> {
     #[account(executable)]
     pub igp_program: Interface<'info, Igp>,
     #[account(mut)]
+    /// CHECK: This is the ??? TODO: What is this?
     pub igp_program_data: AccountInfo<'info>,
     #[account(mut)]
+    /// CHECK: This is the ??? TODO: What is this?
     pub igp_payment_pda: AccountInfo<'info>,
     #[account(mut)]
+    /// CHECK: This is the ??? TODO: What is this?
     pub configured_igp_account: AccountInfo<'info>,
 
     //
@@ -421,7 +425,7 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     let token_account = &ctx.accounts.token_account;
     // let token_account = next_account_info(accounts_iter)?;
     let token = HyperlaneTokenAccount::fetch(&mut &token_account.data.borrow()[..])
-        .map_err(|e| e.into())?
+        .map_err(|e| ProgramError::from(e))?
         .into_inner();
     let token_seeds: &[&[u8]] = hyperlane_token_pda_seeds!(token.bump);
     let expected_token_key = Pubkey::create_program_address(token_seeds, program_id)
@@ -468,11 +472,11 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     let dispatched_message_pda = &ctx.accounts.dispatched_message_pda;
 
     let igp_payment_accounts =
-        if let Some((igp_program_id, igp_account_type)) = token.interchain_gas_paymaster {
-            // Account 9: The IGP program
+    if let Some((ref igp_program_id, ref igp_account_type)) = token.interchain_gas_paymaster {
+        // Account 9: The IGP program
             let igp_program_account = &ctx.accounts.igp_program;
             require!(
-                *igp_program_account.key == igp_program_id,
+                *igp_program_account.key == *igp_program_id,
                 SpokeError::InvalidAccount
             );
 
@@ -530,7 +534,7 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
             };
 
             Some((
-                &igp_program_id,
+                igp_program_id.clone(),
                 igp_payment_account_metas,
                 igp_payment_account_infos,
             ))
@@ -545,7 +549,7 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
         .map_err(|_| SpokeError::IntegerOverflow)?;
     // Convert to the remote number of decimals, which is universally understood
     // by the remote routers as the number of decimals used by the message amount.
-    let remote_amount = token.local_amount_to_remote_amount(local_amount)?;
+    let remote_amount: U256 = token.local_amount_to_remote_amount(local_amount)?;
 
     // Transfer `local_amount` of tokens in...
     T::transfer_in(
@@ -580,10 +584,6 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     let token_transfer_message = TokenMessage::new(xfer.recipient, remote_amount, vec![]).to_vec();
 
     // NOTE/TODO: Re-executing this as couldn't find the igp_program_id value due to not being defined in the scope
-    let (igp_program_id, igp_account_type) = match token.interchain_gas_paymaster {
-        Some(value) => value,
-        None => return Err(SpokeError::InvalidArgument.into()),
-    };
     if let Some((igp_program_id, igp_payment_account_metas, igp_payment_account_infos)) =
         igp_payment_accounts
     {
@@ -597,9 +597,9 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
             dispatch_account_metas,
             dispatch_account_infos,
             igp_payment_account_metas,
+            &igp_payment_account_infos, // mailbox_info.key,
             mailbox_info.key,
-            mailbox_info.key,
-            igp_program_id,
+            &igp_program_id,
             &xfer.recipient,
         )?;
     }
