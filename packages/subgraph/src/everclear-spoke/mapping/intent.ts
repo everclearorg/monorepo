@@ -309,6 +309,9 @@ export function handleFillQueueProcessed(event: FillQueueProcessed): void {
   message.lastIdx = event.params._lastIdx;
   message.intentIds = intentIds;
 
+  message.txOrigin = event.transaction.from;
+  message.gasLimit = event.transaction.gasLimit;
+  message.gasPrice = event.transaction.gasPrice;
   message.blockNumber = event.block.number;
   message.timestamp = event.block.timestamp;
   message.transactionHash = event.transaction.hash;
