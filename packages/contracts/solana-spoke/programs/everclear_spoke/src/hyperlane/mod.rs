@@ -18,7 +18,7 @@ use igp::{IgpInstruction, IgpPayForGas};
 use mailbox::MailboxInstruction;
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use token_message::{Encode, TokenMessage};
+// use token_message::{Encode, TokenMessage};
 
 // Importing the MailboxInstruction and MailboxOutboxDispatch structs from the mailbox.rs file.
 mod igp;
@@ -111,6 +111,8 @@ pub struct TransferRemote {
     pub amount_or_id: U256,
     // Gas amount
     pub gas_amount: u64,
+    // Message
+    pub message_body: Vec<u8>,
 }
 
 pub struct AccountData<T> {
@@ -581,7 +583,8 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     ];
 
     // The token message body, which specifies the remote_amount.
-    let token_transfer_message = TokenMessage::new(xfer.recipient, remote_amount, vec![]).to_vec();
+    // TODO: I think this needs to change
+    let token_transfer_message = xfer.message_body;
 
     // NOTE/TODO: Re-executing this as couldn't find the igp_program_id value due to not being defined in the scope
     if let Some((igp_program_id, igp_payment_account_metas, igp_payment_account_infos)) =
@@ -614,20 +617,20 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     Ok(())
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-enum TokenType {
-    Native,
-    Synthetic,
-    Collateral,
-}
+// #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+// enum TokenType {
+//     Native,
+//     Synthetic,
+//     Collateral,
+// }
 
-struct TokenTransferRemote {
-    program_id: Pubkey,
-    // Note this is the keypair for normal account not the derived associated token account or delegate.
-    sender: String,
-    amount: u64,
-    // #[arg(long, short, default_value_t = ECLIPSE_DOMAIN)]
-    destination_domain: u32,
-    recipient: String,
-    token_type: TokenType,
-}
+// struct TokenTransferRemote {
+//     program_id: Pubkey,
+//     // Note this is the keypair for normal account not the derived associated token account or delegate.
+//     sender: String,
+//     amount: u64,
+//     // #[arg(long, short, default_value_t = ECLIPSE_DOMAIN)]
+//     destination_domain: u32,
+//     recipient: String,
+//     token_type: TokenType,
+// }

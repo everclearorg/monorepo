@@ -127,15 +127,15 @@ pub fn new_intent(
     });
 
     // Format message using proper message lib
+    let batch_message = format_intent_message_batch(&[new_intent_struct])?;
     let xfer = TransferRemote {
-        destination_domain: 1234,
+        destination_domain: EVERCLEAR_DOMAIN,
         recipient: H256::zero(),
         amount_or_id: U256::from(normalized_amount),
         gas_amount: message_gas_limit,
+        message_body: batch_message,
     };
 
-    // TODO: Need to use the batch message
-    let batch_message = format_intent_message_batch(&[new_intent_struct])?;
     // Build your TransferRemoteContext in a local variable (so it doesn't drop too soon)
     let mut transfer_remote_context = TransferRemoteContext {
         system_program: ctx.accounts.system_program.clone(),
