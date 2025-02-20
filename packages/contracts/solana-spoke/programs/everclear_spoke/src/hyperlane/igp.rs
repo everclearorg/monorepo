@@ -1,13 +1,19 @@
 //! Program instructions.
 
-use anchor_lang::prelude::{borsh::{BorshDeserialize, BorshSerialize}, *};
+use anchor_lang::prelude::{
+    borsh::{BorshDeserialize, BorshSerialize},
+    *,
+};
 
 use solana_program::{
     instruction::{AccountMeta, Instruction as SolanaInstruction},
     pubkey::Pubkey,
 };
 
-use crate::{error::SpokeError, hyperlane::primitive_type::H256, igp_gas_payment_pda_seeds, igp_program_data_pda_seeds};
+use crate::{
+    error::SpokeError, hyperlane::primitive_type::H256, igp_gas_payment_pda_seeds,
+    igp_program_data_pda_seeds,
+};
 
 // use crate::{
 //     accounts::{GasOracle, InterchainGasPaymasterType},
@@ -44,8 +50,7 @@ pub enum IgpInstruction {
 impl IgpInstruction {
     /// Serializes an instruction into a vector of bytes.
     pub fn into_instruction_data(self) -> Result<Vec<u8>> {
-        Ok(self.try_to_vec()
-            .map_err(|_| SpokeError::InvalidMessage)?)
+        Ok(self.try_to_vec().map_err(|_| SpokeError::InvalidMessage)?)
     }
 }
 
