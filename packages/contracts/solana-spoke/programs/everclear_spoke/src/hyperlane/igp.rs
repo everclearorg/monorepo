@@ -1,21 +1,11 @@
 //! Program instructions.
 
-use anchor_lang::{
-    prelude::{
-        borsh::{BorshDeserialize, BorshSerialize},
-        *,
-    },
-    solana_program::system_program,
-};
+use anchor_lang::prelude::{borsh::{BorshDeserialize, BorshSerialize},*};
 
-use anchor_lang::solana_program::{
-    instruction::{AccountMeta, Instruction as SolanaInstruction},
-    pubkey::Pubkey,
-};
+use anchor_lang::solana_program::pubkey::Pubkey;
 
 use crate::{
-    error::SpokeError, hyperlane::primitive_type::H256, igp_gas_payment_pda_seeds,
-    igp_program_data_pda_seeds,
+    error::SpokeError, hyperlane::primitive_type::H256
 };
 
 // use crate::{
@@ -277,61 +267,61 @@ pub struct QuoteGasPayment {
 //     Ok(instruction)
 // }
 
-/// Gets an instruction to pay for gas
-#[allow(clippy::too_many_arguments)]
-pub fn pay_for_gas_instruction(
-    program_id: Pubkey,
-    payer: Pubkey,
-    igp: Pubkey,
-    overhead_igp: Option<Pubkey>,
-    unique_gas_payment_account_pubkey: Pubkey,
-    message_id: H256,
-    destination_domain: u32,
-    gas_amount: u64,
-) -> Result<(SolanaInstruction, Pubkey)> {
-    let (program_data_account, _program_data_bump) =
-        Pubkey::try_find_program_address(igp_program_data_pda_seeds!(), &program_id)
-            .ok_or(SpokeError::InvalidSeeds)?;
-    let (gas_payment_account, _gas_payment_bump) = Pubkey::try_find_program_address(
-        igp_gas_payment_pda_seeds!(unique_gas_payment_account_pubkey),
-        &program_id,
-    )
-    .ok_or(SpokeError::InvalidSeeds)?;
+// /// Gets an instruction to pay for gas
+// #[allow(clippy::too_many_arguments)]
+// pub fn pay_for_gas_instruction(
+//     program_id: Pubkey,
+//     payer: Pubkey,
+//     igp: Pubkey,
+//     overhead_igp: Option<Pubkey>,
+//     unique_gas_payment_account_pubkey: Pubkey,
+//     message_id: H256,
+//     destination_domain: u32,
+//     gas_amount: u64,
+// ) -> Result<(SolanaInstruction, Pubkey)> {
+//     let (program_data_account, _program_data_bump) =
+//         Pubkey::try_find_program_address(igp_program_data_pda_seeds!(), &program_id)
+//             .ok_or(SpokeError::InvalidSeeds)?;
+//     let (gas_payment_account, _gas_payment_bump) = Pubkey::try_find_program_address(
+//         igp_gas_payment_pda_seeds!(unique_gas_payment_account_pubkey),
+//         &program_id,
+//     )
+//     .ok_or(SpokeError::InvalidSeeds)?;
 
-    let ixn = IgpInstruction::IgpPayForGas(IgpPayForGas {
-        message_id,
-        destination_domain,
-        gas_amount,
-    });
+//     let ixn = IgpInstruction::IgpPayForGas(IgpPayForGas {
+//         message_id,
+//         destination_domain,
+//         gas_amount,
+//     });
 
-    // Accounts:
-    // 0. `[executable]` The system program.
-    // 1. `[signer]` The payer.
-    // 2. `[writeable]` The IGP program data.
-    // 3. `[signer]` Unique gas payment account.
-    // 4. `[writeable]` Gas payment PDA.
-    // 5. `[writeable]` The IGP account.
-    // 6. `[]` Overhead IGP account (optional).
-    let mut accounts = vec![
-        AccountMeta::new_readonly(system_program::id(), false),
-        AccountMeta::new(payer, true),
-        AccountMeta::new(program_data_account, false),
-        AccountMeta::new_readonly(unique_gas_payment_account_pubkey, true),
-        AccountMeta::new(gas_payment_account, false),
-        AccountMeta::new(igp, false),
-    ];
-    if let Some(overhead_igp) = overhead_igp {
-        accounts.push(AccountMeta::new_readonly(overhead_igp, false));
-    }
+//     // Accounts:
+//     // 0. `[executable]` The system program.
+//     // 1. `[signer]` The payer.
+//     // 2. `[writeable]` The IGP program data.
+//     // 3. `[signer]` Unique gas payment account.
+//     // 4. `[writeable]` Gas payment PDA.
+//     // 5. `[writeable]` The IGP account.
+//     // 6. `[]` Overhead IGP account (optional).
+//     let mut accounts = vec![
+//         AccountMeta::new_readonly(system_program::id(), false),
+//         AccountMeta::new(payer, true),
+//         AccountMeta::new(program_data_account, false),
+//         AccountMeta::new_readonly(unique_gas_payment_account_pubkey, true),
+//         AccountMeta::new(gas_payment_account, false),
+//         AccountMeta::new(igp, false),
+//     ];
+//     if let Some(overhead_igp) = overhead_igp {
+//         accounts.push(AccountMeta::new_readonly(overhead_igp, false));
+//     }
 
-    let instruction = SolanaInstruction {
-        program_id,
-        data: ixn.try_to_vec()?,
-        accounts,
-    };
+//     let instruction = SolanaInstruction {
+//         program_id,
+//         data: ixn.try_to_vec()?,
+//         accounts,
+//     };
 
-    Ok((instruction, gas_payment_account))
-}
+//     Ok((instruction, gas_payment_account))
+// }
 
 // /// Gets an instruction to change an IGP or Overhead IGP
 // /// account's owner.

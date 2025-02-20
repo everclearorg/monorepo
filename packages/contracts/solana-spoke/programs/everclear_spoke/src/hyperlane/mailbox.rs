@@ -2,7 +2,7 @@
 
 use crate::{error::SpokeError, hyperlane::primitive_type::H256};
 use anchor_lang::solana_program::{
-    instruction::{AccountMeta, Instruction as SolanaInstruction},
+    // instruction::{AccountMeta, Instruction as SolanaInstruction},
     pubkey::Pubkey,
 };
 use anchor_lang::{
@@ -10,10 +10,10 @@ use anchor_lang::{
         borsh::{BorshDeserialize, BorshSerialize},
         *,
     },
-    solana_program::system_program,
+    // solana_program::system_program,
 };
 
-use crate::{mailbox_inbox_pda_seeds, mailbox_outbox_pda_seeds};
+// use crate::{mailbox_inbox_pda_seeds, mailbox_outbox_pda_seeds};
 
 use super::OutboxDispatch;
 
@@ -28,8 +28,8 @@ pub struct ProtocolFee {
     pub beneficiary: Pubkey,
 }
 
-/// The current message version.
-pub const VERSION: u8 = 3;
+// /// The current message version.
+// pub const VERSION: u8 = 3;
 
 /// Instructions supported by the Mailbox program.
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
@@ -108,88 +108,88 @@ pub struct InboxProcess {
     pub message: Vec<u8>,
 }
 
-/// Creates an Init instruction.
-pub fn init_instruction(
-    program_id: Pubkey,
-    local_domain: u32,
-    default_ism: Pubkey,
-    max_protocol_fee: u64,
-    protocol_fee: ProtocolFee,
-    payer: Pubkey,
-) -> Result<SolanaInstruction> {
-    let (inbox_account, _inbox_bump) =
-        Pubkey::try_find_program_address(mailbox_inbox_pda_seeds!(), &program_id)
-            .ok_or(SpokeError::InvalidSeeds)?;
-    let (outbox_account, _outbox_bump) =
-        Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
-            .ok_or(SpokeError::InvalidSeeds)?;
+// /// Creates an Init instruction.
+// pub fn init_instruction(
+//     program_id: Pubkey,
+//     local_domain: u32,
+//     default_ism: Pubkey,
+//     max_protocol_fee: u64,
+//     protocol_fee: ProtocolFee,
+//     payer: Pubkey,
+// ) -> Result<SolanaInstruction> {
+//     let (inbox_account, _inbox_bump) =
+//         Pubkey::try_find_program_address(mailbox_inbox_pda_seeds!(), &program_id)
+//             .ok_or(SpokeError::InvalidSeeds)?;
+//     let (outbox_account, _outbox_bump) =
+//         Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
+//             .ok_or(SpokeError::InvalidSeeds)?;
 
-    let instruction = SolanaInstruction {
-        program_id,
-        data: MailboxInstruction::Init(Init {
-            local_domain,
-            default_ism,
-            max_protocol_fee,
-            protocol_fee,
-        })
-        .into_instruction_data()?,
-        accounts: vec![
-            AccountMeta::new(system_program::id(), false),
-            AccountMeta::new(payer, true),
-            AccountMeta::new(inbox_account, false),
-            AccountMeta::new(outbox_account, false),
-        ],
-    };
-    Ok(instruction)
-}
+//     let instruction = SolanaInstruction {
+//         program_id,
+//         data: MailboxInstruction::Init(Init {
+//             local_domain,
+//             default_ism,
+//             max_protocol_fee,
+//             protocol_fee,
+//         })
+//         .into_instruction_data()?,
+//         accounts: vec![
+//             AccountMeta::new(system_program::id(), false),
+//             AccountMeta::new(payer, true),
+//             AccountMeta::new(inbox_account, false),
+//             AccountMeta::new(outbox_account, false),
+//         ],
+//     };
+//     Ok(instruction)
+// }
 
-/// Creates a TransferOwnership instruction.
-pub fn transfer_ownership_instruction(
-    program_id: Pubkey,
-    owner_payer: Pubkey,
-    new_owner: Option<Pubkey>,
-) -> Result<SolanaInstruction> {
-    let (outbox_account, _outbox_bump) =
-        Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
-            .ok_or(SpokeError::InvalidSeeds)?;
+// /// Creates a TransferOwnership instruction.
+// pub fn transfer_ownership_instruction(
+//     program_id: Pubkey,
+//     owner_payer: Pubkey,
+//     new_owner: Option<Pubkey>,
+// ) -> Result<SolanaInstruction> {
+//     let (outbox_account, _outbox_bump) =
+//         Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
+//             .ok_or(SpokeError::InvalidSeeds)?;
 
-    // 0. `[writeable]` The Outbox PDA account.
-    // 1. `[signer]` The current owner.
-    let instruction = SolanaInstruction {
-        program_id,
-        data: MailboxInstruction::TransferOwnership(new_owner).into_instruction_data()?,
-        accounts: vec![
-            AccountMeta::new(outbox_account, false),
-            AccountMeta::new(owner_payer, true),
-        ],
-    };
-    Ok(instruction)
-}
+//     // 0. `[writeable]` The Outbox PDA account.
+//     // 1. `[signer]` The current owner.
+//     let instruction = SolanaInstruction {
+//         program_id,
+//         data: MailboxInstruction::TransferOwnership(new_owner).into_instruction_data()?,
+//         accounts: vec![
+//             AccountMeta::new(outbox_account, false),
+//             AccountMeta::new(owner_payer, true),
+//         ],
+//     };
+//     Ok(instruction)
+// }
 
-/// Creates an InboxSetDefaultIsm instruction.
-pub fn set_default_ism_instruction(
-    program_id: Pubkey,
-    owner_payer: Pubkey,
-    default_ism: Pubkey,
-) -> Result<SolanaInstruction> {
-    let (inbox_account, _inbox_bump) =
-        Pubkey::try_find_program_address(mailbox_inbox_pda_seeds!(), &program_id)
-            .ok_or(SpokeError::InvalidSeeds)?;
-    let (outbox_account, _outbox_bump) =
-        Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
-            .ok_or(SpokeError::InvalidSeeds)?;
+// /// Creates an InboxSetDefaultIsm instruction.
+// pub fn set_default_ism_instruction(
+//     program_id: Pubkey,
+//     owner_payer: Pubkey,
+//     default_ism: Pubkey,
+// ) -> Result<SolanaInstruction> {
+//     let (inbox_account, _inbox_bump) =
+//         Pubkey::try_find_program_address(mailbox_inbox_pda_seeds!(), &program_id)
+//             .ok_or(SpokeError::InvalidSeeds)?;
+//     let (outbox_account, _outbox_bump) =
+//         Pubkey::try_find_program_address(mailbox_outbox_pda_seeds!(), &program_id)
+//             .ok_or(SpokeError::InvalidSeeds)?;
 
-    // 0. `[writeable]` - The Inbox PDA account.
-    // 1. `[]` - The Outbox PDA account.
-    // 2. `[signer]` - The owner of the Mailbox.
-    let instruction = SolanaInstruction {
-        program_id,
-        data: MailboxInstruction::InboxSetDefaultIsm(default_ism).into_instruction_data()?,
-        accounts: vec![
-            AccountMeta::new(inbox_account, false),
-            AccountMeta::new_readonly(outbox_account, false),
-            AccountMeta::new(owner_payer, true),
-        ],
-    };
-    Ok(instruction)
-}
+//     // 0. `[writeable]` - The Inbox PDA account.
+//     // 1. `[]` - The Outbox PDA account.
+//     // 2. `[signer]` - The owner of the Mailbox.
+//     let instruction = SolanaInstruction {
+//         program_id,
+//         data: MailboxInstruction::InboxSetDefaultIsm(default_ism).into_instruction_data()?,
+//         accounts: vec![
+//             AccountMeta::new(inbox_account, false),
+//             AccountMeta::new_readonly(outbox_account, false),
+//             AccountMeta::new(owner_payer, true),
+//         ],
+//     };
+//     Ok(instruction)
+// }
