@@ -102,32 +102,39 @@ contract InvoiceHelper is TestExtended {
    * Returns a message to be receivedo on the hub with a single intent to be used to purchase
    * some invoice.
    * @param _origin Origin of the intent
-   * @param _amountB Amount of the intent
+   * @param _amount Amount of the intent before fees (i.e. amount to land on hub)
    * @param _inputAsset Asset for the intent
    * @param _tickerHash Ticker for the intent
    * @return _intentBatch The batch (n=1) of intents
-   * @return _intentIdB The identifier of the intent in the batch
+   * @return _intentId The identifier of the intent in the batch
    */
-  function _constructIntentBBatch(
+  function _constructIntentBatch(
     uint32 _origin,
-    uint256 _amountB,
+    uint32 _destination,
+    uint256 _amount,
     bytes32 _inputAsset,
     bytes32 _tickerHash
-  ) private returns (IEverclear.Intent[] memory _intentBatch, bytes32 _intentIdB) {
+  ) private returns (IEverclear.Intent[] memory _intentBatch, bytes32 _intentId) {
     // Format intent batch with updated amount
-    uint32[] memory _destinations = new uint32[](9);
-    _destinations[0] = uint32(10);
-    _destinations[1] = uint32(56);
-    _destinations[2] = uint32(8453);
-    _destinations[3] = uint32(42161);
-    _destinations[4] = uint32(48900);
-    _destinations[5] = uint32(59144);
-    _destinations[6] = uint32(137);
-    _destinations[7] = uint32(43114);
-    _destinations[8] = uint32(81457);
+    uint32[] memory _destinations;
+    if (_destination != 0) {
+      _destinations = new uint32[](1);
+      _destinations[0] = _destination;
+    } else {
+      _destinations = new uint32[](9);
+      _destinations[0] = uint32(10);
+      _destinations[1] = uint32(56);
+      _destinations[2] = uint32(8453);
+      _destinations[3] = uint32(42161);
+      _destinations[4] = uint32(48900);
+      _destinations[5] = uint32(59144);
+      _destinations[6] = uint32(137);
+      _destinations[7] = uint32(43114);
+      _destinations[8] = uint32(81457);
+    }
 
     // Assumes the intent is owned by mark
-    IEverclear.Intent memory _intentB = IEverclear.Intent({
+    IEverclear.Intent memory _intent = IEverclear.Intent({
       initiator: 0x000000000000000000000000cfdfad7450a98654b1b874f89c1f6634a81833bf,
       receiver: 0x000000000000000000000000cfdfad7450a98654b1b874f89c1f6634a81833bf,
       inputAsset: _inputAsset,
@@ -137,13 +144,13 @@ contract InvoiceHelper is TestExtended {
       nonce: 259,
       timestamp: 1738785671,
       ttl: 0,
-      amount: _applyFees(_amountB, _tickerHash),
+      amount: _applyFees(_amount, _tickerHash),
       destinations: _destinations,
       data: hex''
     });
-    _intentIdB = keccak256(abi.encode(_intentB));
+    _intentId = keccak256(abi.encode(_intent));
     _intentBatch = new IEverclear.Intent[](1);
-    _intentBatch[0] = _intentB;
+    _intentBatch[0] = _intent;
   }
 
   /**
@@ -166,7 +173,8 @@ contract InvoiceHelper is TestExtended {
   function _calculateDepositAmount(
     uint32 _settlementDomain,
     uint256 _invoiceAmount,
-    bytes32 _tickerHash
+    bytes32 _tickerHash,
+    uint256 _fee
   ) private returns (uint256 _deposit) {
     // Get the custodied assets
     uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
@@ -174,11 +182,11 @@ contract InvoiceHelper is TestExtended {
     // console.log('required after fees/rewards', _invoiceAmount - _custodied);
 
     // Calculate the amount after fees
-    _deposit = (DBPS_DENOMINATOR * (_invoiceAmount - _custodied)) / (DBPS_DENOMINATOR + MAX_FEE);
+    _deposit = (DBPS_DENOMINATOR * (_invoiceAmount - _custodied)) / (DBPS_DENOMINATOR + _fee);
 
     // console.log('c0', _custodied);
     uint256 toBeDiscounted = _applyFees(_deposit, _tickerHash);
-    uint256 rewards = (toBeDiscounted * MAX_FEE) / DBPS_DENOMINATOR;
+    uint256 rewards = (toBeDiscounted * _fee) / DBPS_DENOMINATOR;
     // console.log('[test] depositsAmount', toBeDiscounted);
     // console.log('[test] invoiceAmount', _invoiceAmount);
     // console.log('[test] liquidity', _custodied + toBeDiscounted);
@@ -197,15 +205,166 @@ contract InvoiceHelper is TestExtended {
     vm.stopPrank();
   }
 
+  function _createADeposit(
+    uint32 _originDomain,
+    uint32 _settlementDomain,
+    address _depositAsset,
+    uint256 _depositAmount,
+    bytes32 _tickerHash
+  ) private returns (bytes32) {
+    // Check the invoice queue length
+    (, , , uint256 _length) = _hub.invoices(_tickerHash);
+    console.log('invoice length', _length);
+
+    // Create an intent
+    (IEverclear.Intent[] memory _targetBatch, bytes32 _target) = _constructIntentBatch(
+      _originDomain,
+      _settlementDomain,
+      _depositAmount,
+      TypeCasts.toBytes32(_depositAsset),
+      _tickerHash
+    );
+
+    // Receive message on hub
+    _receiveBatchIntentMessage(_originDomain, _targetBatch);
+    // Verify target deposit exists
+    IEverclear.IntentStatus _status = _hub.contexts(_target).status;
+    if (_length > 0) {
+      require(_status == IEverclear.IntentStatus.ADDED, 'did not create deposit properly');
+    } else {
+      require(
+        _status == IEverclear.IntentStatus.INVOICED || _status == IEverclear.IntentStatus.SETTLED,
+        'did not create deposit properly'
+      );
+    }
+    return _target;
+  }
+
+  function _createAnInvoice(
+    uint32 _originDomain,
+    uint32 _settlementDomain,
+    address _invoiceAsset,
+    uint256 _invoiceAmount,
+    bytes32 _tickerHash
+  ) private returns (bytes32 _invoiceId) {
+    _invoiceId = _createADeposit(_originDomain, _settlementDomain, _invoiceAsset, _invoiceAmount, _tickerHash);
+    // Process deposits
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+    // Verify target invoice exists
+    require(_hub.contexts(_invoiceId).status == IEverclear.IntentStatus.INVOICED, 'did not create invoice');
+  }
+
+  function _advanceEpochs(uint32 _toAdvance, uint256 _l1Block) private {
+    // Advance to the next epoch
+    uint48 _initialEpoch = _hub.getCurrentEpoch();
+    uint48 _targetEpoch = _initialEpoch + _toAdvance;
+    uint48 _iterations;
+    while (_hub.getCurrentEpoch() != _targetEpoch) {
+      vm.roll(_l1Block + _iterations);
+      _iterations++;
+    }
+    require(_targetEpoch == _hub.getCurrentEpoch(), 'epoch did not advance properly');
+  }
+
   // ================================================
   // ================ Test Cases ====================
   // ================================================
 
   /**
    * @notice IntentA already exists at the front of the queue, there is one deposit with insufficient
-   * balance to settle the intent waiting to be processed.
+   * balance to settle the intent waiting to be processed (both are in the same epoch).
+   *
+   * In this case, both deposits should get rewards.
    */
-  function test_intentPurchaseSecondDeposit() public {}
+  function test_intentPurchaseTwoDepositsSameEpoch() public {
+    // Declare test constants
+    // NOTE: at this point, there are no invoices or deposits in USDT
+    uint256 _l1Block = 21890255;
+    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+
+    // bytes32 _intentA = 0xcb0bd6c7aaca084e84c9f1153bd801e1378fff99b5fa8f273076fa5195ec5242;
+    uint256 _targetInvoiceAmount = 11320000000000000000000; // invoice amount (11320 USDT)
+    uint32 _targetOriginDomain = 42161;
+    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
+    uint32 _targetSettlementDomain = 10;
+    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
+
+    // Create fork
+    {
+      uint256 _l2Block = 796179;
+      _setupFork(_l2Block, _l1Block, true);
+    }
+
+    // Verify queue status
+    {
+      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      require(_length == 0, 'invoice in queue, bad test setup');
+    }
+
+    // Create a target invoice
+    bytes32 _target = _createAnInvoice(
+      _targetOriginDomain,
+      _targetSettlementDomain,
+      _targetOriginAsset,
+      _targetInvoiceAmount,
+      _tickerHash
+    );
+
+    // Advance multiple epochs to ensure there is max discount
+    _advanceEpochs(20, _l1Block);
+
+    // Create an intent with deposit < invoice amount
+    uint256 _deposit0Amount = _calculateDepositAmount(
+      _targetSettlementDomain,
+      _targetInvoiceAmount,
+      _tickerHash,
+      MAX_FEE
+    ) / 3;
+
+    // Create a deposit
+    bytes32 _deposit0 = _createADeposit(
+      _targetSettlementDomain,
+      _targetOriginDomain,
+      _targetSettlementAsset,
+      _deposit0Amount,
+      _tickerHash
+    );
+    // Verify the deposit is added
+    require(_hub.contexts(_deposit0).status == IEverclear.IntentStatus.ADDED, 'deposit0 not added');
+
+    // After test set up, we need to calculate `_deposit1` amount needed to settle `_target`.
+    // This calculation should be straightforward -- calculate the invoice amount using the same
+    // helper as before. This should already accomodate for the larger custodied balance because
+    // deposit0 has arrived on the hub.
+    uint256 _deposit1Amount = _calculateDepositAmount(
+      _targetSettlementDomain,
+      _targetInvoiceAmount,
+      _tickerHash,
+      MAX_FEE
+    );
+    // Create a deposit
+    bytes32 _deposit1 = _createADeposit(
+      _targetSettlementDomain,
+      _targetOriginDomain,
+      _targetSettlementAsset,
+      _deposit1Amount,
+      _tickerHash
+    );
+
+    // Verify the deposit is added
+    require(_hub.contexts(_deposit1).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+
+    // Process the invoice queue
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+
+    // Verify target is settled
+    require(_hub.contexts(_target).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
+
+    // Verify that both deposits got rewards, and deposit1 rewards > deposit0 rewards
+    uint256 _deposit0Rewards = _hub.contexts(_deposit0).pendingRewards;
+    require(_deposit0Rewards > 0, 'deposit0 did not get rewards');
+    require(_hub.contexts(_deposit1).pendingRewards > _deposit0Rewards, 'deposit1 did not get more rewards than 0');
+  }
 
   /**
    * @notice IntentA already exists at the front of the queue, and there are no deposits to be
@@ -228,14 +387,15 @@ contract InvoiceHelper is TestExtended {
     require(_hub.contexts(_intentA).status == IEverclear.IntentStatus.INVOICED, 'intentA not invoiced');
 
     // Calculate the amount needed for an intent to exactly purchase `A`
-    uint256 _amountB = _calculateDepositAmount(_intentADestination, _amountA, _tickerHash);
+    uint256 _amountB = _calculateDepositAmount(_intentADestination, _amountA, _tickerHash, MAX_FEE);
     // uint256 _amountB = (_amountA * DBPS_DENOMINATOR) / (DBPS_DENOMINATOR + MAX_FEE);
     console.log('amountB    :', _amountB, _applyFees(_amountB, _tickerHash));
     console.log('intentB amt:', _applyFees(_amountB, _tickerHash));
 
     // Create the intent to settle the invoice
-    (IEverclear.Intent[] memory _intentBBatch, bytes32 _intentIdB) = _constructIntentBBatch(
+    (IEverclear.Intent[] memory _intentBBatch, bytes32 _intentIdB) = _constructIntentBatch(
       _intentADestination,
+      uint32(0),
       _amountB,
       TypeCasts.toBytes32(_intentBInputAsset),
       _tickerHash
