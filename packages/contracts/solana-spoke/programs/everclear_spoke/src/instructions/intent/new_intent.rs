@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
+use crate::hyperlane::{transfer_remote, HyperlaneSealevelTokenPlugin, HyperlaneToken, TransferRemote, TransferRemoteContext, H256, U256, SplNoop, Mailbox, Igp};
 
 use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, MAX_CALLDATA_SIZE},
@@ -8,6 +9,36 @@ use crate::{
     state::{IntentStatus, IntentStatusAccount, SpokeState},
     utils::{compute_intent_hash, normalize_decimals},
 };
+
+#[derive(Default, Debug, PartialEq, AnchorDeserialize, AnchorSerialize)]
+pub struct HyperlanePlugin;
+
+impl HyperlaneSealevelTokenPlugin for HyperlanePlugin {
+    // We must define the required trait methods!
+    fn initialize<'a, 'b>(
+        _program_id: &Pubkey,
+        _system_program: &'a AccountInfo<'b>,
+        _token_account: &'a AccountInfo<'b>,
+        _payer_account: &'a AccountInfo<'b>,
+        _accounts_iter: &mut std::slice::Iter<'a, AccountInfo<'b>>,
+    ) -> Result<Self> {
+        // For example, do nothing:
+        Ok(HyperlanePlugin)
+    }
+
+    fn transfer_in<'a, 'b>(
+        _program_id: &Pubkey,
+        _token: &HyperlaneToken<Self>,
+        _sender_wallet: &'a AccountInfo<'b>,
+        _accounts_iter: &mut std::slice::Iter<'a, AccountInfo<'b>>,
+        _amount: u64,
+    ) -> Result<()> {
+        // For example, do nothing or do a CPI to spl_token:
+        msg!("HyperlanePlugin::transfer_in called");
+        Ok(())
+    }
+}
+
 
 /// Create a new intent.
 /// The user "locks" funds (previously deposited) and creates an intent.
@@ -69,9 +100,6 @@ pub fn new_intent(
     let clock = Clock::get()?;
 
     // Create intent_id with all parameters
-    // TODO: May need to encode this properly
-    // TODO: Would need to update processIntentQueue logic on update
-    // TODO: Check the clock operation here
     let new_intent_struct = Intent {
         initiator: ctx.accounts.authority.key(),
         receiver,
@@ -99,31 +127,44 @@ pub fn new_intent(
     });
 
     // Format message using proper message lib
+    let xfer = TransferRemote {
+        destination_domain: 1234,
+        recipient: H256::zero(),
+        amount_or_id: U256::from(normalized_amount),
+        gas_amount: message_gas_limit,
+    };
+
+    // TODO: Need to use the batch message
     let batch_message = format_intent_message_batch(&[new_intent_struct])?;
+    // Build your TransferRemoteContext in a local variable (so it doesn't drop too soon)
+    let mut transfer_remote_context = TransferRemoteContext {
+        system_program: ctx.accounts.system_program.clone(),
+        spl_noop_program: ctx.accounts.spl_noop_program.clone(),
+        token_account: ctx.accounts.program_vault_account.to_account_info(),
+        mailbox_program: ctx.accounts.hyperlane_mailbox.clone(),
+        mailbox_outbox: ctx.accounts.mailbox_outbox.to_account_info(),
+        dispatch_authority: ctx.accounts.dispatch_authority.to_account_info(),
+        sender_wallet: ctx.accounts.authority.to_account_info(),
+        unique_message_account: ctx.accounts.unique_message_account.to_account_info(),
+        dispatched_message_pda: ctx.accounts.dispatched_message_pda.to_account_info(),
+        igp_program: ctx.accounts.igp_program.clone(),
+        igp_program_data: ctx.accounts.igp_program_data.to_account_info(),
+        igp_payment_pda: ctx.accounts.igp_payment_pda.to_account_info(),
+        configured_igp_account: ctx.accounts.configured_igp_account.to_account_info(),
+        inner_igp_account:ctx.accounts.inner_igp_account.clone(),
+    };
 
-    // TODO: call into hyperlane module at crate level
+    // Now create the Anchor Context, referencing your local `transfer_remote_context`.
+    let transfer_ctx = Context::new(
+        ctx.program_id,
+        &mut transfer_remote_context, // pass a mutable reference
+        &[],                          // remaining accounts if needed
+        Default::default(),           // any custom context seeds if needed
+    );
 
-    // // Call Hyperlane with proper gas handling
-    // let ix_data = {
-    //     let mut data = Vec::new();
-    //     data.extend_from_slice(&EVERCLEAR_DOMAIN.to_be_bytes());
-    //     data.extend_from_slice(&state.gateway.to_bytes());
-    //     data.extend_from_slice(&message_gas_limit.to_be_bytes());
-    //     data.extend_from_slice(&batch_message);
-    //     data
-    // };
-    // let ix = anchor_lang::solana_program::instruction::Instruction {
-    //     program_id: ctx.accounts.spoke_state.mailbox.key(),
-    //     accounts: vec![],
-    //     data: ix_data,
-    // };
-    // TODO: Not handling messageId or fee spent here
-    // anchor_lang::solana_program::program::invoke(
-    //     &ix,
-    //     &[
 
-    //     ],
-    // )?;
+    // 3) Use `transfer_ctx` safely
+    transfer_remote::<HyperlanePlugin>(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
     emit!(IntentAddedEvent {
@@ -180,7 +221,6 @@ fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
 
 #[derive(Accounts)]
 pub struct NewIntent<'info> {
-    // The main state
     #[account(
         mut,
         seeds = [b"spoke-state"],
@@ -188,29 +228,64 @@ pub struct NewIntent<'info> {
     )]
     pub spoke_state: Account<'info, SpokeState>,
 
-    // The user calling new_intent
     pub authority: Signer<'info>,
 
-    // The mint of the token the user is depositing
     pub mint: Account<'info, Mint>,
-
-    // The user's associated token account for that mint
     #[account(mut, constraint = user_token_account.mint == mint.key())]
     pub user_token_account: Account<'info, TokenAccount>,
-
-    // The program's vault token account for that mint
     #[account(mut, constraint = program_vault_account.mint == mint.key())]
     pub program_vault_account: Account<'info, TokenAccount>,
 
-    // The SPL token program
-    // #[account(mut)]
     #[account(address = TOKEN_PROGRAM_ID)]
     pub token_program: Program<'info, Token>,
 
-    /// CHECK: This mailbox is referenced solely by address. We do not read or write its data.
+    /// CHECK: The Hyperlane Mailbox program (by address only).
     #[account(address = spoke_state.mailbox)]
-    pub hyperlane_mailbox: UncheckedAccount<'info>,
+    pub hyperlane_mailbox: Interface<'info, Mailbox>,
+
+    // The system program
+    pub system_program: Program<'info, System>,
+
+    // The SPL-Noop program
+    pub spl_noop_program: Program<'info, SplNoop>,
+
+    /// CHECK: Outbox data account – the Mailbox will check this
+    #[account(mut)]
+    pub mailbox_outbox: AccountInfo<'info>,
+
+    /// CHECK: Dispatch authority (PDA)
+    #[account(mut)]
+    pub dispatch_authority: AccountInfo<'info>,
+
+    /// CHECK: A unique message / gas payment account (signer)
+    #[account(mut, signer)]
+    pub unique_message_account: AccountInfo<'info>,
+
+    /// CHECK: The message storage PDA
+    #[account(mut)]
+    pub dispatched_message_pda: AccountInfo<'info>,
+
+    //  If using IGP:
+    #[account(executable)]
+    pub igp_program: Interface<'info, Igp>,
+
+    /// CHECK:
+    #[account(mut)]
+    pub igp_program_data: AccountInfo<'info>,
+
+    /// CHECK:
+    #[account(mut)]
+    pub igp_payment_pda: AccountInfo<'info>,
+
+    /// CHECK:
+    #[account(mut)]
+    pub configured_igp_account: AccountInfo<'info>,
+
+    /// CHECK:
+    #[account(mut)]
+    pub inner_igp_account: Option<AccountInfo<'info>>,
 }
+
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct Intent {
