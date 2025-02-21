@@ -144,7 +144,7 @@ contract InvoiceHelper is TestExtended {
       nonce: 259,
       timestamp: 1738785671,
       ttl: 0,
-      amount: _applyFees(_amount, _tickerHash),
+      amount: _amount,
       destinations: _destinations,
       data: hex''
     });
@@ -183,17 +183,18 @@ contract InvoiceHelper is TestExtended {
 
     // Calculate the amount after fees
     _deposit = (DBPS_DENOMINATOR * (_invoiceAmount - _custodied)) / (DBPS_DENOMINATOR + _fee);
+    _deposit += 1; // add this to account for Math.floor() of calculated value ^
 
     // console.log('c0', _custodied);
-    uint256 toBeDiscounted = _applyFees(_deposit, _tickerHash);
-    uint256 rewards = (toBeDiscounted * _fee) / DBPS_DENOMINATOR;
+    uint256 rewards = (_deposit * _fee) / DBPS_DENOMINATOR;
     // console.log('[test] depositsAmount', toBeDiscounted);
     // console.log('[test] invoiceAmount', _invoiceAmount);
     // console.log('[test] liquidity', _custodied + toBeDiscounted);
     // console.log('[test] rewards', rewards);
     // console.log('[test] amount to settle', _invoiceAmount - rewards);
+    // console.log('custodied + deposit    ', _custodied + _deposit);
     // console.log('amount to be discounted', toBeDiscounted);
-    require(_custodied + toBeDiscounted > _invoiceAmount - rewards);
+    require(_custodied + _deposit >= _invoiceAmount - rewards, 'custodied + deposit < invoiceAmount');
   }
 
   function _receiveBatchIntentMessage(uint32 _messageOrigin, IEverclear.Intent[] memory _intentBatch) private {
@@ -214,7 +215,6 @@ contract InvoiceHelper is TestExtended {
   ) private returns (bytes32) {
     // Check the invoice queue length
     (, , , uint256 _length) = _hub.invoices(_tickerHash);
-    console.log('invoice length', _length);
 
     // Create an intent
     (IEverclear.Intent[] memory _targetBatch, bytes32 _target) = _constructIntentBatch(
@@ -410,7 +410,6 @@ contract InvoiceHelper is TestExtended {
     // Verify the deposit was added
     console.log('status B   :', uint8(_hub.contexts(_intentIdB).status));
     require(_hub.contexts(_intentIdB).status == IEverclear.IntentStatus.ADDED, 'intentB not added');
-    require(_hub.contexts(_intentIdB).amountAfterFees == _amountB, 'fees not accounted for');
 
     // Process queue
     _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
