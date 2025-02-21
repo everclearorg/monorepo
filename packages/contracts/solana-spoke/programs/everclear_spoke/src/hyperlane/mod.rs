@@ -474,8 +474,8 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     let dispatched_message_pda = &ctx.accounts.dispatched_message_pda;
 
     let igp_payment_accounts =
-    if let Some((ref igp_program_id, ref igp_account_type)) = token.interchain_gas_paymaster {
-        // Account 9: The IGP program
+        if let Some((ref igp_program_id, ref igp_account_type)) = token.interchain_gas_paymaster {
+            // Account 9: The IGP program
             let igp_program_account = &ctx.accounts.igp_program;
             require!(
                 *igp_program_account.key == *igp_program_id,

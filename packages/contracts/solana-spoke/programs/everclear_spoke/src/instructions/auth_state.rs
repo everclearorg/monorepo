@@ -3,6 +3,7 @@ use anchor_spl::token::{Token, TokenAccount};
 
 use crate::state::SpokeState;
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct AuthState<'info> {
     #[account(mut)]
@@ -17,6 +18,7 @@ pub struct AuthState<'info> {
     pub hyperlane_mailbox: UncheckedAccount<'info>,
 }
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct AdminState<'info> {
     #[account(mut)]

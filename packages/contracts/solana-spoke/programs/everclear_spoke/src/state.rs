@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 /// Queue state with first/last indices for efficient management
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Default, Clone)]
 pub struct QueueState<T> {
     pub items: Vec<T>,
     pub first_index: u64,
@@ -73,12 +73,6 @@ pub struct SpokeState {
     pub mailbox: Pubkey,
 }
 
-#[account]
-pub struct IntentStatusAccount {
-    pub key: [u8; 32],
-    pub status: IntentStatus,
-}
-
 impl SpokeState {
     pub const SIZE: usize = 1    // paused: bool
         + 1                      // initialized_version: u8
@@ -90,7 +84,13 @@ impl SpokeState {
         + 32                     // owner: Pubkey
         + 4                      // status HashMap
         + 1                      // bump: u8
-        + 32;                    // mailbox: Pubkey
+        + 32; // mailbox: Pubkey
+}
+
+#[account]
+pub struct IntentStatusAccount {
+    pub key: [u8; 32],
+    pub status: IntentStatus,
 }
 
 /// Intent status.
