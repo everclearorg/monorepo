@@ -280,6 +280,94 @@ contract InvoiceHelper is TestExtended {
   // ================================================
 
   /**
+   * @notice In this test, we have a pending deposit that is from a previous epoch that has not been
+   * processed. This means the previous deposit will _not_ appear in the custodied balance, and will
+   * _not_ get rewards because the amount is insufficient to fully settle the invoice.
+   *
+   * This simulates the deposit calculation if lighthouse has been down
+   */
+  function test_intentPurchaseUnprocessedEpochs() public {
+    // Declare test constants
+    // NOTE: at this point, there are no invoices or deposits in USDT
+    uint256 _l1Block = 21890255;
+    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+
+    // bytes32 _intentA = 0xcb0bd6c7aaca084e84c9f1153bd801e1378fff99b5fa8f273076fa5195ec5242;
+    uint256 _targetInvoiceAmount = 11320000000000000000000; // invoice amount (11320 USDT)
+    uint32 _targetOriginDomain = 42161;
+    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
+    uint32 _targetSettlementDomain = 10;
+    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
+
+    // Create fork
+    {
+      uint256 _l2Block = 796179;
+      _setupFork(_l2Block, _l1Block, true);
+    }
+
+    // Verify queue status
+    {
+      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      require(_length == 0, 'invoice in queue, bad test setup');
+    }
+
+    // Create a target invoice
+    bytes32 _target = _createAnInvoice(
+      _targetOriginDomain,
+      _targetSettlementDomain,
+      _targetOriginAsset,
+      _applyFees(_targetInvoiceAmount, _tickerHash),
+      _tickerHash
+    );
+
+    // Create a stale deposit with insufficient funds to settle target
+    uint256 _fullSettlement = _calculateDepositAmount(_targetSettlementDomain, _targetInvoiceAmount, _tickerHash, 0);
+    bytes32 _deposit0 = _createADeposit(
+      _targetSettlementDomain,
+      _targetOriginDomain,
+      _targetSettlementAsset,
+      _fullSettlement / 3,
+      _tickerHash
+    );
+
+    // Advance multiple epochs to ensure there is max discount on target, dont process deposit0
+    _advanceEpochs(20, _l1Block);
+
+    // Verify the deposit is added
+    require(_hub.contexts(_deposit0).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+
+    // Calculate amount to purchase target
+    uint256 _deposit1Amount = _calculateDepositAmount(
+      _targetSettlementDomain,
+      _targetInvoiceAmount,
+      _tickerHash,
+      MAX_FEE
+    );
+
+    // Create a deposit
+    bytes32 _deposit1 = _createADeposit(
+      _targetSettlementDomain,
+      _targetOriginDomain,
+      _targetSettlementAsset,
+      _deposit1Amount,
+      _tickerHash
+    );
+
+    // Verify the deposit is added
+    require(_hub.contexts(_deposit1).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+
+    // Process the invoice queue
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+
+    // Verify target is settled
+    require(_hub.contexts(_target).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
+
+    // Verify that both deposits got rewards, and deposit1 rewards > deposit0 rewards
+    require(_hub.contexts(_deposit0).pendingRewards == 0, 'deposit0 did get rewards');
+    require(_hub.contexts(_deposit1).pendingRewards > 0, 'deposit1 did not get rewards');
+  }
+
+  /**
    * @notice IntentA already exists at the front of the queue, there is one deposit with insufficient
    * balance to settle the intent waiting to be processed (both are in the same epoch).
    *
