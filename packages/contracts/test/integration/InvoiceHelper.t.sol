@@ -68,6 +68,7 @@ contract InvoiceHelper is TestExtended {
    * @notice Calculates the amount in, given some target amount after fees
    * @param _amountAfterFees The target amount post fees
    * @param _tickerHash The ticker hash for the fee config
+   * @dev Not used in intent amount calculations
    */
   function _applyFees(uint256 _amountAfterFees, bytes32 _tickerHash) private returns (uint256 _amount) {
     IHubStorage.Fee[] memory _fees = _hub.tokenFees(_tickerHash);
@@ -155,17 +156,14 @@ contract InvoiceHelper is TestExtended {
 
   /**
    * Returns the deposit amount after fees.
-   * @dev To get target intent amount, must call `_applyFees` on this value.
    * @dev This is derived from the overall formula:
    *    liquidity == invoice after discount
    *    custodied0 + depositRequired = invoiceAmount - rewards
    *    c0 + d = i - ((d * MAX_FEE) / DBPS))
    *    d + ((d * MAX_FEE) / DBPS)) = i - c0
    * where you are finding the deposit required under the assumptions:
-   * - There is only one deposit in the epoch (the one you are getting the amount for)
+   * - Your deposit will be added in the same epoch
    * - You are using the exact amount
-   * - The deposit amount will be less than the invoice amount
-   * - The invoice discount is at the max
    * @param _settlementDomain Domain you want to settle on
    * @param _invoiceAmount Amount of the invoice target you are trying to settle
    * @param _tickerHash Ticker of the invoice
@@ -178,11 +176,22 @@ contract InvoiceHelper is TestExtended {
   ) private returns (uint256 _deposit) {
     // Get the custodied assets
     uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
+    console.log('');
+    console.log('trying to settle:', _invoiceAmount);
 
-    // console.log('required after fees/rewards', _invoiceAmount - _custodied);
+    // Get the existing deposits in the epoch
+    uint48 _epoch = _hub.getCurrentEpoch();
+    uint256 _deposited = _hub.depositsAvailableInEpoch(_epoch, _settlementDomain, _tickerHash);
 
-    // Calculate the amount after fees
-    _deposit = (DBPS_DENOMINATOR * (_invoiceAmount - _custodied)) / (DBPS_DENOMINATOR + _fee);
+    // Calculate the amount needed to close out invoice
+    if (_deposited >= _invoiceAmount) {
+      // Sufficient deposits already
+      _deposit = 0;
+      return _deposit;
+    }
+
+    uint256 _scaledDelta = DBPS_DENOMINATOR * (_invoiceAmount - _custodied);
+    _deposit = (_scaledDelta - _fee * _deposited) / (DBPS_DENOMINATOR + _fee);
     _deposit += 1; // add this to account for Math.floor() of calculated value ^
 
     // console.log('c0', _custodied);
@@ -190,11 +199,11 @@ contract InvoiceHelper is TestExtended {
     // console.log('[test] depositsAmount', toBeDiscounted);
     // console.log('[test] invoiceAmount', _invoiceAmount);
     // console.log('[test] liquidity', _custodied + toBeDiscounted);
-    // console.log('[test] rewards', rewards);
-    // console.log('[test] amount to settle', _invoiceAmount - rewards);
-    // console.log('custodied + deposit    ', _custodied + _deposit);
+    // console.log('[test] custodied          ', _custodied);
+    // console.log('[test] amount to settle   ', _invoiceAmount - rewards);
+    // console.log('[test] custodied + deposit', _custodied + _deposit);
     // console.log('amount to be discounted', toBeDiscounted);
-    require(_custodied + _deposit >= _invoiceAmount - rewards, 'custodied + deposit < invoiceAmount');
+    require(_custodied + _deposit + _deposited >= _invoiceAmount - rewards, 'custodied + deposit < invoiceAmount');
   }
 
   function _receiveBatchIntentMessage(uint32 _messageOrigin, IEverclear.Intent[] memory _intentBatch) private {
@@ -306,7 +315,7 @@ contract InvoiceHelper is TestExtended {
       _targetOriginDomain,
       _targetSettlementDomain,
       _targetOriginAsset,
-      _targetInvoiceAmount,
+      _applyFees(_targetInvoiceAmount, _tickerHash),
       _tickerHash
     );
 
@@ -314,19 +323,19 @@ contract InvoiceHelper is TestExtended {
     _advanceEpochs(20, _l1Block);
 
     // Create an intent with deposit < invoice amount
-    uint256 _deposit0Amount = _calculateDepositAmount(
+    uint256 _fullSettlement = _calculateDepositAmount(
       _targetSettlementDomain,
       _targetInvoiceAmount,
       _tickerHash,
       MAX_FEE
-    ) / 3;
+    );
 
     // Create a deposit
     bytes32 _deposit0 = _createADeposit(
       _targetSettlementDomain,
       _targetOriginDomain,
       _targetSettlementAsset,
-      _deposit0Amount,
+      _fullSettlement / 3,
       _tickerHash
     );
     // Verify the deposit is added
@@ -342,6 +351,14 @@ contract InvoiceHelper is TestExtended {
       _tickerHash,
       MAX_FEE
     );
+
+    {
+      uint256 _rewards = ((_deposit1Amount + (_fullSettlement / 3)) * MAX_FEE) / DBPS_DENOMINATOR;
+      console.log('');
+      console.log('[test] rewards            ', _rewards);
+      console.log('[test] amount to settle   ', _targetInvoiceAmount - _rewards);
+      console.log('[test] depositsAmount     ', _deposit1Amount + (_fullSettlement / 3));
+    }
     // Create a deposit
     bytes32 _deposit1 = _createADeposit(
       _targetSettlementDomain,
@@ -386,11 +403,10 @@ contract InvoiceHelper is TestExtended {
     // Verify intentA exists
     require(_hub.contexts(_intentA).status == IEverclear.IntentStatus.INVOICED, 'intentA not invoiced');
 
-    // Calculate the amount needed for an intent to exactly purchase `A`
+    // Calculate the amount needed for an intent3 to exactly purchase `A`
     uint256 _amountB = _calculateDepositAmount(_intentADestination, _amountA, _tickerHash, MAX_FEE);
     // uint256 _amountB = (_amountA * DBPS_DENOMINATOR) / (DBPS_DENOMINATOR + MAX_FEE);
-    console.log('amountB    :', _amountB, _applyFees(_amountB, _tickerHash));
-    console.log('intentB amt:', _applyFees(_amountB, _tickerHash));
+    console.log('amountB    :', _amountB);
 
     // Create the intent to settle the invoice
     (IEverclear.Intent[] memory _intentBBatch, bytes32 _intentIdB) = _constructIntentBatch(
