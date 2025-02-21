@@ -280,6 +280,79 @@ contract InvoiceHelper is TestExtended {
   // ================================================
 
   /**
+   * @notice This tests purchasing some intent with a discount < max discount
+   */
+  function test_intentPurchaseNotAtMax() public {
+    // Declare test constants
+    // NOTE: at this point, there are no invoices or deposits in USDT
+    uint256 _l1Block = 21890255;
+    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+
+    // bytes32 _intentA = 0xcb0bd6c7aaca084e84c9f1153bd801e1378fff99b5fa8f273076fa5195ec5242;
+    uint256 _targetInvoiceAmount = 11320000000000000000000; // invoice amount (11320 USDT)
+    uint32 _targetOriginDomain = 42161;
+    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
+    uint32 _targetSettlementDomain = 10;
+    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
+
+    // Create fork
+    {
+      uint256 _l2Block = 796179;
+      _setupFork(_l2Block, _l1Block, true);
+    }
+
+    // Verify queue status
+    {
+      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      require(_length == 0, 'invoice in queue, bad test setup');
+    }
+
+    // Create a target invoice
+    bytes32 _target = _createAnInvoice(
+      _targetOriginDomain,
+      _targetSettlementDomain,
+      _targetOriginAsset,
+      _applyFees(_targetInvoiceAmount, _tickerHash),
+      _tickerHash
+    );
+
+    // Advance only a few epochs, expected discount is less than min
+    _advanceEpochs(3, _l1Block);
+
+    // Calculate the expected discount
+    (, uint24 _discountPerEpoch, ) = _hub.tokenConfigs(_tickerHash);
+    uint256 _discount = 3 * _discountPerEpoch;
+
+    // Calculate the deposit
+    uint256 _depositAmount = _calculateDepositAmount(
+      _targetSettlementDomain,
+      _targetInvoiceAmount,
+      _tickerHash,
+      _discount
+    );
+    // Create a deposit
+    bytes32 _deposit = _createADeposit(
+      _targetSettlementDomain,
+      _targetOriginDomain,
+      _targetSettlementAsset,
+      _depositAmount,
+      _tickerHash
+    );
+
+    // Verify the deposit is added
+    require(_hub.contexts(_deposit).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+
+    // Process the invoice queue
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+
+    // Verify target is settled
+    require(_hub.contexts(_target).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
+
+    // Verify that the deposit got rewards to settle invoice
+    require(_hub.contexts(_deposit).pendingRewards > 0, 'deposit did not get rewards');
+  }
+
+  /**
    * @notice In this test, we have a pending deposit that is from a previous epoch that has not been
    * processed. This means the previous deposit will _not_ appear in the custodied balance, and will
    * _not_ get rewards because the amount is insufficient to fully settle the invoice.
@@ -362,7 +435,7 @@ contract InvoiceHelper is TestExtended {
     // Verify target is settled
     require(_hub.contexts(_target).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
 
-    // Verify that both deposits got rewards, and deposit1 rewards > deposit0 rewards
+    // Verify that deposit1 got rewards, and deposit0 did not
     require(_hub.contexts(_deposit0).pendingRewards == 0, 'deposit0 did get rewards');
     require(_hub.contexts(_deposit1).pendingRewards > 0, 'deposit1 did not get rewards');
   }
