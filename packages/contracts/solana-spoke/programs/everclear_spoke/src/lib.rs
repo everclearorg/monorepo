@@ -37,7 +37,7 @@ pub mod everclear_spoke {
             SpokeError::NotAuthorizedToPause
         );
         state.paused = true;
-        emit!(PausedEvent {});
+        emit_cpi!(PausedEvent {});
         Ok(())
     }
 
@@ -50,7 +50,7 @@ pub mod everclear_spoke {
             SpokeError::NotAuthorizedToPause
         );
         state.paused = false;
-        emit!(UnpausedEvent {});
+        emit_cpi!(UnpausedEvent {});
         Ok(())
     }
 
@@ -100,7 +100,14 @@ pub mod everclear_spoke {
         let admin = ctx.accounts.admin.key();
         require!(state.owner == admin, SpokeError::OnlyOwner);
 
-        instructions::update_gateway(state, new_gateway)
+        let old = ctx.accounts.spoke_state.gateway;
+        ctx.accounts.spoke_state.gateway = new_gateway;
+        emit_cpi!(GatewayUpdatedEvent {
+            old_gateway: old,
+            new_gateway
+        });
+        Ok(())
+        // instructions::update_gateway(ctx, new_gateway)
     }
 
     pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
@@ -110,7 +117,7 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
 
-        instructions::update_lighthouse(state, new_lighthouse)
+        instructions::update_lighthouse(ctx, new_lighthouse)
     }
 
     pub fn update_watchtower(ctx: Context<AdminState>, new_watchtower: Pubkey) -> Result<()> {
@@ -120,7 +127,7 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
 
-        instructions::update_watchtower(state, new_watchtower)
+        instructions::update_watchtower(ctx, new_watchtower)
     }
 
     pub fn update_mailbox(ctx: Context<AdminState>, new_mailbox: Pubkey) -> Result<()> {
@@ -131,7 +138,7 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
 
-        instructions::update_mailbox(state, new_mailbox)
+        instructions::update_mailbox(ctx, new_mailbox)
     }
 
     pub fn update_message_gas_limit(ctx: Context<AdminState>, new_limit: u64) -> Result<()> {
@@ -141,7 +148,7 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
 
-        instructions::update_message_gas_limit(state, new_limit)
+        instructions::update_message_gas_limit(ctx, new_limit)
     }
 }
 

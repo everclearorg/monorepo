@@ -1,14 +1,18 @@
+use crate::hyperlane::{
+    transfer_remote, HyperlaneSealevelTokenPlugin, HyperlaneToken, Igp, Mailbox, SplNoop,
+    TransferRemote, TransferRemoteContext, H256, U256,
+};
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
-use crate::hyperlane::{transfer_remote, HyperlaneSealevelTokenPlugin, HyperlaneToken, TransferRemote, TransferRemoteContext, H256, U256, SplNoop, Mailbox, Igp};
 
 use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, MAX_CALLDATA_SIZE},
     error::SpokeError,
     events::IntentAddedEvent,
-    state::{IntentStatus, IntentStatusAccount, SpokeState},
-    utils::{compute_intent_hash, normalize_decimals},
     intent::intent::Intent,
+    state::SpokeState,
+    state::{IntentStatus, IntentStatusAccount},
+    utils::{compute_intent_hash, normalize_decimals},
 };
 
 #[derive(Default, Debug, PartialEq, AnchorDeserialize, AnchorSerialize)]
@@ -40,7 +44,6 @@ impl HyperlaneSealevelTokenPlugin for HyperlanePlugin {
     }
 }
 
-
 /// Create a new intent.
 /// The user "locks" funds (previously deposited) and creates an intent.
 /// For simplicity, we assume full deposit has been made before.
@@ -58,7 +61,7 @@ pub fn new_intent(
 ) -> Result<()> {
     let state = &mut ctx.accounts.spoke_state;
     require!(!state.paused, SpokeError::ContractPaused);
-    require!(destinations.len() > 0, SpokeError::InvalidOperation);
+    require!(!destinations.is_empty(), SpokeError::InvalidOperation);
     require!(destinations.len() <= 10, SpokeError::InvalidIntent);
 
     // If a single destination and ttl != 0, require output_asset is non-zero.
@@ -149,7 +152,7 @@ pub fn new_intent(
         igp_program_data: ctx.accounts.igp_program_data.to_account_info(),
         igp_payment_pda: ctx.accounts.igp_payment_pda.to_account_info(),
         configured_igp_account: ctx.accounts.configured_igp_account.to_account_info(),
-        inner_igp_account:ctx.accounts.inner_igp_account.clone(),
+        inner_igp_account: ctx.accounts.inner_igp_account.clone(),
     };
 
     // Now create the Anchor Context, referencing your local `transfer_remote_context`.
@@ -160,12 +163,11 @@ pub fn new_intent(
         Default::default(),           // any custom context seeds if needed
     );
 
-
     // 3) Use `transfer_ctx` safely
     transfer_remote::<HyperlanePlugin>(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
-    emit!(IntentAddedEvent {
+    emit_cpi!(IntentAddedEvent {
         intent_id,
         initiator: ctx.accounts.authority.key(),
         receiver,
@@ -217,6 +219,7 @@ fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
 //     .map_err(Into::into)
 // }
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct NewIntent<'info> {
     #[account(
@@ -283,4 +286,3 @@ pub struct NewIntent<'info> {
     #[account(mut)]
     pub inner_igp_account: Option<AccountInfo<'info>>,
 }
-

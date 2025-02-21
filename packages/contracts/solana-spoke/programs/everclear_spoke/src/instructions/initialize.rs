@@ -1,10 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{
-    error::SpokeError,
-    events::InitializedEvent,
-    state::{SpokeState},
-};
+use crate::{error::SpokeError, events::InitializedEvent, state::SpokeState};
 
 pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
     let state = &mut ctx.accounts.spoke_state;
@@ -31,7 +27,7 @@ pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> 
     state.owner = init.owner;
     state.bump = ctx.bumps.spoke_state;
 
-    emit!(InitializedEvent {
+    emit_cpi!(InitializedEvent {
         owner: state.owner,
         domain: state.domain,
         everclear: state.everclear,
@@ -39,6 +35,7 @@ pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> 
     Ok(())
 }
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct Initialize<'info> {
     #[account(
@@ -54,7 +51,7 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl<'info> Initialize<'info> {
+impl Initialize<'_> {
     pub fn ensure_owner_is_valid(&self, new_owner: &Pubkey) -> Result<()> {
         require!(*new_owner != Pubkey::default(), SpokeError::InvalidOwner);
         Ok(())

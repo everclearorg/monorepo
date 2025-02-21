@@ -21,7 +21,7 @@ idl-build = [
 ]
 
 [dependencies]
-anchor-lang = { version = "0.30.1", features = ["init-if-needed"] }
+anchor-lang = { version = "0.30.1", features = ["init-if-needed", "event-cpi"] }
 anchor-spl = "0.30.1"
 fixed-hash = "=0.8.0" # exact version for hyperlane interfacing
 uint = "=0.9.5" # exact version for hyperlane interfacing
