@@ -8,6 +8,7 @@ use crate::{
     events::IntentAddedEvent,
     state::{IntentStatus, IntentStatusAccount, SpokeState},
     utils::{compute_intent_hash, normalize_decimals},
+    intent::intent::Intent,
 };
 
 #[derive(Default, Debug, PartialEq, AnchorDeserialize, AnchorSerialize)]
@@ -283,19 +284,3 @@ pub struct NewIntent<'info> {
     pub inner_igp_account: Option<AccountInfo<'info>>,
 }
 
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct Intent {
-    pub initiator: Pubkey,
-    pub receiver: Pubkey,
-    pub input_asset: Pubkey,
-    pub output_asset: Pubkey,
-    pub max_fee: u32,
-    pub origin_domain: u32,
-    pub nonce: u64,
-    pub timestamp: u64,
-    pub ttl: u64,
-    pub normalized_amount: u64,
-    pub destinations: Vec<u32>,
-    pub data: Vec<u8>,
-}

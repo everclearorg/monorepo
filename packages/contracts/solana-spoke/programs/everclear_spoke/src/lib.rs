@@ -29,11 +29,11 @@ pub mod everclear_spoke {
 
     /// Pause the program.
     /// Only the lighthouse or watchtower can call this.
-    pub fn pause(ctx: Context<AuthState>) -> Result<()> {
+    pub fn pause(ctx: Context<AdminState>) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(
-            state.lighthouse == ctx.accounts.authority.key()
-                || state.watchtower == ctx.accounts.authority.key(),
+            state.lighthouse == ctx.accounts.admin.key()
+                || state.watchtower == ctx.accounts.admin.key(),
             SpokeError::NotAuthorizedToPause
         );
         state.paused = true;
@@ -42,11 +42,11 @@ pub mod everclear_spoke {
     }
 
     /// Unpause the program.
-    pub fn unpause(ctx: Context<AuthState>) -> Result<()> {
+    pub fn unpause(ctx: Context<AdminState>) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(
-            state.lighthouse == ctx.accounts.authority.key()
-                || state.watchtower == ctx.accounts.authority.key(),
+            state.lighthouse == ctx.accounts.admin.key()
+                || state.watchtower == ctx.accounts.admin.key(),
             SpokeError::NotAuthorizedToPause
         );
         state.paused = false;
@@ -95,49 +95,49 @@ pub mod everclear_spoke {
     }
 
     /// Update the gateway address (admin only).
-    pub fn update_gateway(ctx: Context<AuthState>, new_gateway: Pubkey) -> Result<()> {
+    pub fn update_gateway(ctx: Context<AdminState>, new_gateway: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
-        let authority = ctx.accounts.authority.key();
-        require!(state.owner == authority, SpokeError::OnlyOwner);
+        let admin = ctx.accounts.admin.key();
+        require!(state.owner == admin, SpokeError::OnlyOwner);
 
         instructions::update_gateway(state, new_gateway)
     }
 
-    pub fn update_lighthouse(ctx: Context<AuthState>, new_lighthouse: Pubkey) -> Result<()> {
+    pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(
-            state.owner == ctx.accounts.authority.key(),
+            state.owner == ctx.accounts.admin.key(),
             SpokeError::OnlyOwner
         );
 
         instructions::update_lighthouse(state, new_lighthouse)
     }
 
-    pub fn update_watchtower(ctx: Context<AuthState>, new_watchtower: Pubkey) -> Result<()> {
+    pub fn update_watchtower(ctx: Context<AdminState>, new_watchtower: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(
-            state.owner == ctx.accounts.authority.key(),
+            state.owner == ctx.accounts.admin.key(),
             SpokeError::OnlyOwner
         );
 
         instructions::update_watchtower(state, new_watchtower)
     }
 
-    pub fn update_mailbox(ctx: Context<AuthState>, new_mailbox: Pubkey) -> Result<()> {
+    pub fn update_mailbox(ctx: Context<AdminState>, new_mailbox: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         // enforce only owner can do it
         require!(
-            state.owner == ctx.accounts.authority.key(),
+            state.owner == ctx.accounts.admin.key(),
             SpokeError::OnlyOwner
         );
 
         instructions::update_mailbox(state, new_mailbox)
     }
 
-    pub fn update_message_gas_limit(ctx: Context<AuthState>, new_limit: u64) -> Result<()> {
+    pub fn update_message_gas_limit(ctx: Context<AdminState>, new_limit: u64) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(
-            state.owner == ctx.accounts.authority.key(),
+            state.owner == ctx.accounts.admin.key(),
             SpokeError::OnlyOwner
         );
 
