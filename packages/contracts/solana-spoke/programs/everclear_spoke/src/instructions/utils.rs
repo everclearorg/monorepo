@@ -4,7 +4,7 @@ use crate::error::SpokeError;
 
 use crate::intent::intent::Intent;
 
-pub(crate) fn vault_authority_seeds<'a>(
+pub(crate) fn vault_authority_seeds(
     program_id: &Pubkey,
     mint_pubkey: &Pubkey,
     bump: u8,
@@ -24,7 +24,7 @@ pub(crate) fn normalize_decimals(
 ) -> Result<u64> {
     if minted_decimals == target_decimals {
         // No scaling needed
-        return Ok(amount);
+        Ok(amount)
     } else if minted_decimals > target_decimals {
         // e.g. minted_decimals=9, target_decimals=6 => downscale
         let shift = minted_decimals - target_decimals;

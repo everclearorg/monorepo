@@ -18,7 +18,6 @@ use igp::{IgpInstruction, IgpPayForGas};
 use mailbox::MailboxInstruction;
 use std::cmp::Ordering;
 use std::collections::HashMap;
-// use token_message::{Encode, TokenMessage};
 
 // Importing the MailboxInstruction and MailboxOutboxDispatch structs from the mailbox.rs file.
 mod igp;
@@ -426,8 +425,7 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     // Account 2: Token storage account
     let token_account = &ctx.accounts.token_account;
     // let token_account = next_account_info(accounts_iter)?;
-    let token = HyperlaneTokenAccount::fetch(&mut &token_account.data.borrow()[..])
-        .map_err(|e| ProgramError::from(e))?
+    let token = HyperlaneTokenAccount::fetch(&mut &token_account.data.borrow()[..])?
         .into_inner();
     let token_seeds: &[&[u8]] = hyperlane_token_pda_seeds!(token.bump);
     let expected_token_key = Pubkey::create_program_address(token_seeds, program_id)
@@ -536,7 +534,7 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
             };
 
             Some((
-                igp_program_id.clone(),
+                *igp_program_id,
                 igp_payment_account_metas,
                 igp_payment_account_infos,
             ))

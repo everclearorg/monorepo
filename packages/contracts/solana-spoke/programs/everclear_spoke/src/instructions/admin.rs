@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use super::{AdminState, AuthState};
+use super::AdminState;
 use crate::events::{
     GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent,
     WatchtowerUpdatedEvent,

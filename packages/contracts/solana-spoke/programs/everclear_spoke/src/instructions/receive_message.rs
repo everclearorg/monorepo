@@ -196,13 +196,13 @@ fn handle_settlement<'info>(
         CpiContext::new_with_signer(token_program.to_account_info(), cpi_accounts, signer);
 
     // NOTE: Removed the virtual balance logic
-    token::transfer(cpi_ctx, amount);
+    token::transfer(cpi_ctx, amount)?;
 
     Ok(Some(SettledEvent {
         intent_id: settlement.intent_id,
         recipient: settlement.recipient,
         asset: settlement.asset,
-        amount: amount,
+        amount,
     }))
 }
 
