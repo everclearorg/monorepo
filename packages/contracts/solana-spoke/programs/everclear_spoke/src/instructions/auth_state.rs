@@ -16,3 +16,10 @@ pub struct AuthState<'info> {
     /// CHECK: This is the Hyperlane mailbox program
     pub hyperlane_mailbox: UncheckedAccount<'info>,
 }
+
+#[derive(Accounts)]
+pub struct AdminState<'info> {
+    #[account(mut)]
+    pub spoke_state: Account<'info, SpokeState>,
+    pub admin: Signer<'info>,
+}

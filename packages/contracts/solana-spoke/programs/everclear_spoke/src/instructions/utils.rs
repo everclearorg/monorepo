@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::error::SpokeError;
 
-use super::Intent;
+use crate::intent::intent::Intent;
 
 pub(crate) fn vault_authority_seeds<'a>(
     program_id: &Pubkey,

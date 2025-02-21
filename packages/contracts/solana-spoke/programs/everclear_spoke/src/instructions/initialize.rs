@@ -25,6 +25,7 @@ pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> 
     state.everclear = init.hub_domain;
     state.message_gas_limit = init.message_gas_limit;
     state.nonce = 0;
+    state.mailbox = init.mailbox;
 
     // Set owner to the payer (deployer)
     state.owner = init.owner;
@@ -71,4 +72,5 @@ pub struct SpokeInitializationParams {
     pub gateway: Pubkey,
     pub message_gas_limit: u64,
     pub owner: Pubkey,
+    pub mailbox: Pubkey,
 }
