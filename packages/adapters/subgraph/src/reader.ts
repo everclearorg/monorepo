@@ -322,7 +322,7 @@ export class SubgraphReader {
     queryParams: Map<string, SubgraphQueryMetaParams>,
   ): Promise<DestinationIntent[]> {
     const { parser } = getHelpers();
-    const domains = queryParams.keys();
+    const domains = Array.from(queryParams.keys());
     const requests = [];
     for (const domain of domains) {
       const param = queryParams.get(domain)!;
