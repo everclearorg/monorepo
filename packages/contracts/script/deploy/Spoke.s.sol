@@ -540,5 +540,19 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       owner: OWNER,
       maxSolversFee: MAX_FEE
     });
+
+    _deploymentParams[RONIN] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)), 
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(RONIN_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
   }
 }

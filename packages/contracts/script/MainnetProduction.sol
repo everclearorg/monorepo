@@ -48,6 +48,7 @@ abstract contract MainnetAssets {
   address public constant MODE_WETH = 0x4200000000000000000000000000000000000006; // Mode's canonical WETH
   address public constant UNICHAIN_WETH = 0x4200000000000000000000000000000000000006;
   address public constant ZKSYNC_WETH = 0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91;
+  address public constant RONIN_WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
@@ -78,6 +79,7 @@ abstract contract MainnetAssets {
   address public constant MODE_USDC = 0xd988097fb8612cc24eeC14542bC03424c656005f; // Mode's USDC
   address public constant UNICHAIN_USDC = 0x078D782b760474a361dDA0AF3839290b0EF57AD6;
   address public constant ZKSYNC_USDC = 0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4;
+  address public constant RONIN_USDC = 0x0B7007c13325C48911F73A2daD5FA5dCBf808aDc;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
@@ -252,6 +254,15 @@ abstract contract Unichain {
   ICallExecutor public UNICHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
 }
 
+abstract contract Ronin {
+  uint32 public constant RONIN = 2020;
+  IMailbox public RONIN_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public RONIN_SPOKE = IEverclearSpoke(0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64);
+  ISpokeGateway public RONIN_SPOKE_GATEWAY = ISpokeGateway(0x1FC1f47a6a7c61f53321643A14bEc044213AbF95);
+  ICallExecutor public RONIN_EXECUTOR = ICallExecutor(0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71);
+}
+
 abstract contract MainnetProductionDomains is
   Everclear,
   Ethereum,
@@ -269,7 +280,8 @@ abstract contract MainnetProductionDomains is
   Taiko,
   Scroll,
   Apechain,
-  Unichain
+  Unichain,
+  Ronin
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
@@ -379,6 +391,10 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: ZKSYNC, blockGasLimit: 30_000_000, gateway: address(ZKSYNC_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: RONIN, blockGasLimit: 30_000_000, gateway: address(RONIN_SPOKE_GATEWAY).toBytes32()})
+    );
   }
 }
 
@@ -388,23 +404,26 @@ abstract contract MainnetProductionEnvironment is
   MainnetAssets,
   MainnetProductionSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [
-    ETHEREUM,
-    ARBITRUM_ONE,
-    OPTIMISM,
-    BASE,
-    BNB,
-    ZIRCUIT,
-    BLAST,
-    LINEA,
-    POLYGON,
-    AVALANCHE,
-    TAIKO,
-    SCROLL,
-    APECHAIN,
-    MODE,
-    UNICHAIN
-  ];
+  uint32[] public SUPPORTED_DOMAINS = [RONIN];
+  // uint32[] public SUPPORTED_DOMAINS = [
+  //   ETHEREUM,
+  //   ARBITRUM_ONE,
+  //   OPTIMISM,
+  //   BASE,
+  //   BNB,
+  //   ZIRCUIT,
+  //   BLAST,
+  //   LINEA,
+  //   POLYGON,
+  //   AVALANCHE,
+  //   TAIKO,
+  //   SCROLL,
+  //   APECHAIN,
+  //   MODE,
+  //   UNICHAIN,
+  //   ZKSYNC,
+  //   RONIN
+  // ];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed
