@@ -1,4 +1,5 @@
 use anchor_lang::prelude::Pubkey;
+use crate::hyperlane::H256;
 
 // Constants
 pub const HYPERLANE_MAILBOX_PROGRAM_ID: Pubkey = Pubkey::new_from_array([0; 32]);
@@ -15,3 +16,9 @@ pub const LIGHTHOUSE_HASH: [u8; 32] = [0x03; 32]; // placeholder
 pub const WATCHTOWER_HASH: [u8; 32] = [0x04; 32]; // placeholder
 
 pub const FILL_INTENT_FOR_SOLVER_TYPEHASH: [u8; 32] = [0xAA; 32]; // placeholder
+
+pub const EVERCLEAR_GATEWAY_BYTES: [u8; 32] = [0x01; 32]; // placeholder
+
+pub fn everclear_gateway() -> H256 {
+	H256::from(EVERCLEAR_GATEWAY_BYTES)
+}

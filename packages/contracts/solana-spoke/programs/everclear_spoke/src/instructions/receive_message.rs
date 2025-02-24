@@ -18,6 +18,17 @@ use crate::{
 
 use super::{AdminState, AuthState};
 
+// Receive a message from Hyperlane
+// pub fn handle<'info>(
+//     origin: u32,
+//     sender: Pubkey,
+//     payload: Vec<u8>,
+// ) ->Result<()> {
+//     // require!();
+//     receive_message(ctx, origin, sender, payload, self_program_id);
+//     Ok(())
+// }
+
 /// Receive a cross‑chain message via Hyperlane.
 /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
 pub fn receive_message<'info>(
