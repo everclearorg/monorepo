@@ -543,7 +543,7 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
 
     _deploymentParams[RONIN] = DeploymentParams({
       gateway: ISpokeGateway(address(0)),
-      executor: ICallExecutor(address(0)), 
+      executor: ICallExecutor(address(0)),
       messageReceiver: address(0),
       lighthouse: LIGHTHOUSE,
       watchtower: WATCHTOWER,

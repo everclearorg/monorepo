@@ -48,7 +48,7 @@ abstract contract MainnetAssets {
   address public constant MODE_WETH = 0x4200000000000000000000000000000000000006; // Mode's canonical WETH
   address public constant UNICHAIN_WETH = 0x4200000000000000000000000000000000000006;
   address public constant ZKSYNC_WETH = 0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91;
-  address public constant RONIN_WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+  address public constant RONIN_WETH = 0xc99a6A985eD2Cac1ef41640596C5A5f9F4E19Ef5;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
@@ -404,26 +404,25 @@ abstract contract MainnetProductionEnvironment is
   MainnetAssets,
   MainnetProductionSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [RONIN];
-  // uint32[] public SUPPORTED_DOMAINS = [
-  //   ETHEREUM,
-  //   ARBITRUM_ONE,
-  //   OPTIMISM,
-  //   BASE,
-  //   BNB,
-  //   ZIRCUIT,
-  //   BLAST,
-  //   LINEA,
-  //   POLYGON,
-  //   AVALANCHE,
-  //   TAIKO,
-  //   SCROLL,
-  //   APECHAIN,
-  //   MODE,
-  //   UNICHAIN,
-  //   ZKSYNC,
-  //   RONIN
-  // ];
+  uint32[] public SUPPORTED_DOMAINS = [
+    ETHEREUM,
+    ARBITRUM_ONE,
+    OPTIMISM,
+    BASE,
+    BNB,
+    ZIRCUIT,
+    BLAST,
+    LINEA,
+    POLYGON,
+    AVALANCHE,
+    TAIKO,
+    SCROLL,
+    APECHAIN,
+    MODE,
+    UNICHAIN,
+    ZKSYNC,
+    RONIN
+  ];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed
