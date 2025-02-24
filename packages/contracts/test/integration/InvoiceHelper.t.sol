@@ -39,10 +39,6 @@ contract InvoiceHelper is TestExtended {
   EverclearHub _hub = EverclearHub(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   HubGateway _hubGateway = HubGateway(payable(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa));
 
-  function _applyMaxDiscount(uint256 _toDiscount) private returns (uint256 _discounted) {
-    _discounted = (_toDiscount * (DBPS_DENOMINATOR - MAX_FEE)) / DBPS_DENOMINATOR;
-  }
-
   function _applyDiscount(uint256 _toDiscount, uint256 _fee) private returns (uint256 _discounted) {
     _discounted = (_toDiscount * (DBPS_DENOMINATOR - _fee)) / DBPS_DENOMINATOR;
   }
@@ -79,24 +75,6 @@ contract InvoiceHelper is TestExtended {
     }
     _amount = (DBPS_DENOMINATOR * _amountAfterFees) / (DBPS_DENOMINATOR - _totalFeeDbps);
     require(_amount > _amountAfterFees, 'Fees reduced amount');
-  }
-
-  /**
-   * Calculates all of the deposits that _could_ be applied to invoices that have
-   * not yet been tabulated
-   * @param _tickerHash The ticker for the deposits to sum
-   * @param _domain The domain of the unprocessed deposits
-   */
-  function _getTotalUnprocessedDeposits(bytes32 _tickerHash, uint32 _domain) private returns (uint256 _deposits) {
-    uint48 _lastClosedEpoch = _hub.lastClosedEpochsProcessed(_tickerHash);
-    uint48 _current = _hub.getCurrentEpoch();
-
-    while (_lastClosedEpoch < _current) {
-      // get the deposit for the ticker
-      _deposits += _hub.depositsAvailableInEpoch(_lastClosedEpoch, _domain, _tickerHash);
-      // move to the next epoch
-      _lastClosedEpoch++;
-    }
   }
 
   /**
@@ -155,7 +133,7 @@ contract InvoiceHelper is TestExtended {
   }
 
   /**
-   * Returns the deposit amount after fees.
+   * Returns the deposit amount.
    * @dev This is derived from the overall formula:
    *    liquidity == invoice after discount
    *    custodied0 + depositRequired = invoiceAmount - rewards
@@ -164,6 +142,7 @@ contract InvoiceHelper is TestExtended {
    * where you are finding the deposit required under the assumptions:
    * - Your deposit will be added in the same epoch
    * - You are using the exact amount
+   * - Your deposit amount is < invoice amount (i.e. purchasing a single discounted invoice)
    * @param _settlementDomain Domain you want to settle on
    * @param _invoiceAmount Amount of the invoice target you are trying to settle
    * @param _tickerHash Ticker of the invoice
@@ -172,12 +151,11 @@ contract InvoiceHelper is TestExtended {
     uint32 _settlementDomain,
     uint256 _invoiceAmount,
     bytes32 _tickerHash,
-    uint256 _fee
+    uint256 _fee,
+    uint256 _custodied
   ) private returns (uint256 _deposit) {
-    // Get the custodied assets
-    uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
-    console.log('');
-    console.log('trying to settle:', _invoiceAmount);
+    // console.log('');
+    // console.log('trying to settle:', _invoiceAmount);
 
     // Get the existing deposits in the epoch
     uint48 _epoch = _hub.getCurrentEpoch();
@@ -196,14 +174,26 @@ contract InvoiceHelper is TestExtended {
 
     // console.log('c0', _custodied);
     uint256 rewards = (_deposit * _fee) / DBPS_DENOMINATOR;
-    // console.log('[test] depositsAmount', toBeDiscounted);
-    // console.log('[test] invoiceAmount', _invoiceAmount);
-    // console.log('[test] liquidity', _custodied + toBeDiscounted);
-    // console.log('[test] custodied          ', _custodied);
-    // console.log('[test] amount to settle   ', _invoiceAmount - rewards);
-    // console.log('[test] custodied + deposit', _custodied + _deposit);
+    console.log('[test] invoiceAmount', _invoiceAmount);
+    console.log('[test] liquidity', _custodied + _deposit);
+    console.log('[test] custodied          ', _custodied);
+    console.log('[test] amount to settle   ', _invoiceAmount - rewards);
+    console.log('[test] custodied + deposit', _custodied + _deposit);
     // console.log('amount to be discounted', toBeDiscounted);
     require(_custodied + _deposit + _deposited >= _invoiceAmount - rewards, 'custodied + deposit < invoiceAmount');
+  }
+
+  // override with default initial custodied value
+  function _calculateDepositAmount(
+    uint32 _settlementDomain,
+    uint256 _invoiceAmount,
+    bytes32 _tickerHash,
+    uint256 _fee
+  ) private returns (uint256 _deposit) {
+    // Get the custodied assets
+    uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
+    // Call function
+    _deposit = _calculateDepositAmount(_settlementDomain, _invoiceAmount, _tickerHash, _fee, _custodied);
   }
 
   function _receiveBatchIntentMessage(uint32 _messageOrigin, IEverclear.Intent[] memory _intentBatch) private {
@@ -238,6 +228,7 @@ contract InvoiceHelper is TestExtended {
     _receiveBatchIntentMessage(_originDomain, _targetBatch);
     // Verify target deposit exists
     IEverclear.IntentStatus _status = _hub.contexts(_target).status;
+    console.log('intent amount', _hub.contexts(_target).intent.amount);
     if (_length > 0) {
       require(_status == IEverclear.IntentStatus.ADDED, 'did not create deposit properly');
     } else {
@@ -254,13 +245,52 @@ contract InvoiceHelper is TestExtended {
     uint32 _settlementDomain,
     address _invoiceAsset,
     uint256 _invoiceAmount,
-    bytes32 _tickerHash
+    bytes32 _tickerHash,
+    uint32 _epochsToAdvance,
+    uint256 _l1Block
   ) private returns (bytes32 _invoiceId) {
     _invoiceId = _createADeposit(_originDomain, _settlementDomain, _invoiceAsset, _invoiceAmount, _tickerHash);
+    if (_epochsToAdvance > 0) {
+      _advanceEpochs(_epochsToAdvance, _l1Block);
+    }
     // Process deposits
     _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
     // Verify target invoice exists
     require(_hub.contexts(_invoiceId).status == IEverclear.IntentStatus.INVOICED, 'did not create invoice');
+  }
+
+  // override ^^
+  function _createAnInvoice(
+    uint32 _originDomain,
+    uint32 _settlementDomain,
+    address _invoiceAsset,
+    uint256 _invoiceAmount,
+    bytes32 _tickerHash
+  ) private returns (bytes32 _invoiceId) {
+    _invoiceId = _createAnInvoice(_originDomain, _settlementDomain, _invoiceAsset, _invoiceAmount, _tickerHash);
+  }
+
+  function _createInvoices(
+    uint32 _originDomain,
+    uint32 _settlementDomain,
+    address _invoiceAsset,
+    bytes32 _tickerHash,
+    uint256 _l1Block,
+    uint256[] memory _invoiceAmounts
+  ) private returns (bytes32[] memory _invoiceIds) {
+    uint256 _len = _invoiceAmounts.length;
+    _invoiceIds = new bytes32[](_len);
+    for (uint i; i < _len; i++) {
+      _invoiceIds[i] = _createAnInvoice(
+        _originDomain,
+        _settlementDomain,
+        _invoiceAsset,
+        _applyFees(_invoiceAmounts[i], _tickerHash),
+        _tickerHash,
+        1,
+        _l1Block
+      );
+    }
   }
 
   function _advanceEpochs(uint32 _toAdvance, uint256 _l1Block) private {
@@ -275,9 +305,132 @@ contract InvoiceHelper is TestExtended {
     require(_targetEpoch == _hub.getCurrentEpoch(), 'epoch did not advance properly');
   }
 
+  /**
+   * @notice Calculate the exact deposit amount needed to settle two invoices
+   * @param _settlementDomain The domain to settle on
+   * @param _tickerHash The ticker hash of the invoices
+   * @param _invoice1Amount The amount of the first invoice
+   * @param _invoice2Amount The amount of the second invoice
+   * @param _fee1 The fee (in DBPS) for the first invoice
+   * @param _fee2 The fee (in DBPS) for the second invoice
+   * @return _depositAmount The exact deposit amount needed
+   */
+  function _calculateExactDepositForTwoInvoices(
+    uint32 _settlementDomain,
+    bytes32 _tickerHash,
+    uint256 _invoice1Amount,
+    uint256 _invoice2Amount,
+    uint256 _fee1,
+    uint256 _fee2
+  ) public returns (uint256 _depositAmount) {
+    // Get initial custodied balance
+    uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
+
+    // Calculate first settlement
+    uint256 _settlement1 = _invoice1Amount - ((_invoice1Amount * _fee1) / DBPS_DENOMINATOR);
+
+    // Calculate deposit amount required for both
+    uint256 _totalSettlement = ((DBPS_DENOMINATOR + _fee2) * _settlement1 + DBPS_DENOMINATOR * _invoice2Amount) /
+      (DBPS_DENOMINATOR + _fee2);
+    // _depositAmount = _totalSettlement + 1 - _custodied; //_custodied > _totalSettlement ? 0 : _totalSettlement - _custodied;
+    _depositAmount = _settlement1 + ((DBPS_DENOMINATOR * (_invoice2Amount - _custodied)) / (DBPS_DENOMINATOR + _fee2));
+    _depositAmount += 1;
+    {
+      console.log('[t] depositAmount       :', _depositAmount);
+      console.log('[t] s1                  :', _settlement1);
+      console.log('[t] intermediary deposit:', _depositAmount - _settlement1);
+      console.log('[t] s2                  :', _totalSettlement - _settlement1);
+      console.log('[t] depositInEpoch      :', _depositAmount);
+      console.log('[t] _custodied          :', _custodied);
+    }
+  }
+
   // ================================================
   // ================ Test Cases ====================
   // ================================================
+
+  /**
+   * @notice This tests purchasing multiple intents with a single deposit
+   */
+  function test_singleDepositMultipleIntentPurchases() public {
+    // Declare test constants
+    // NOTE: at this point, there are no invoices or deposits in USDT
+    uint256 _l1Block = 21890255;
+    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+
+    uint256[] memory _targetInvoiceAmounts = new uint256[](2);
+    {
+      _targetInvoiceAmounts[0] = 11320000000000000000000; // 11320
+      _targetInvoiceAmounts[1] = 12323000000000000000000; // 12323
+    }
+    uint32 _targetOriginDomain = 42161;
+    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
+    uint32 _targetSettlementDomain = 10;
+    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
+
+    // Create fork
+    {
+      uint256 _l2Block = 796179;
+      _setupFork(_l2Block, _l1Block, true);
+    }
+
+    // Verify queue status
+    {
+      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      require(_length == 0, 'invoice in queue, bad test setup');
+    }
+
+    bytes32[] memory _targets = _createInvoices(
+      _targetOriginDomain,
+      _targetSettlementDomain,
+      _targetOriginAsset,
+      _tickerHash,
+      _l1Block,
+      _targetInvoiceAmounts
+    );
+
+    _advanceEpochs(20, _l1Block);
+
+    // Calculate the deposit
+    console.log('====== calculating deposit ======');
+    console.log(
+      '[t] test                :',
+      _hub.depositsAvailableInEpoch(_hub.getCurrentEpoch(), _targetSettlementDomain, _tickerHash)
+    );
+
+    uint256 _depositAmount = _calculateExactDepositForTwoInvoices(
+      _targetSettlementDomain,
+      _tickerHash,
+      _targetInvoiceAmounts[0],
+      _targetInvoiceAmounts[1],
+      MAX_FEE,
+      MAX_FEE
+    );
+
+    // Create a deposit
+    bytes32 _deposit = _createADeposit(
+      _targetSettlementDomain,
+      _targetOriginDomain,
+      _targetSettlementAsset,
+      _depositAmount,
+      _tickerHash
+    );
+
+    // Verify the deposit is added
+    require(_hub.contexts(_deposit).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+
+    // Process the invoice queue
+    console.log('====== settling invoices ======');
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+
+    // Verify targets are settled
+    require(_hub.contexts(_targets[0]).status == IEverclear.IntentStatus.SETTLED, 'target[0] not settled');
+    require(_hub.contexts(_targets[1]).status == IEverclear.IntentStatus.SETTLED, 'target[1] not settled');
+
+    // Verify that the deposit got rewards to settle invoice
+    require(_hub.contexts(_deposit).pendingRewards > 0, 'deposit did not get rewards');
+  }
 
   /**
    * @notice This tests purchasing some intent with a discount < max discount
