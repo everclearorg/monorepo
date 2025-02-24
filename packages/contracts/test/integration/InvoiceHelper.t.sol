@@ -309,40 +309,38 @@ contract InvoiceHelper is TestExtended {
    * @notice Calculate the exact deposit amount needed to settle two invoices
    * @param _settlementDomain The domain to settle on
    * @param _tickerHash The ticker hash of the invoices
-   * @param _invoice1Amount The amount of the first invoice
-   * @param _invoice2Amount The amount of the second invoice
-   * @param _fee1 The fee (in DBPS) for the first invoice
-   * @param _fee2 The fee (in DBPS) for the second invoice
    * @return _depositAmount The exact deposit amount needed
    */
-  function _calculateExactDepositForTwoInvoices(
+  function _calculateExactDepositForMultipleInvoices(
     uint32 _settlementDomain,
     bytes32 _tickerHash,
-    uint256 _invoice1Amount,
-    uint256 _invoice2Amount,
-    uint256 _fee1,
-    uint256 _fee2
+    uint256[] memory _invoiceAmounts,
+    uint256[] memory _fees
   ) public returns (uint256 _depositAmount) {
     // Get initial custodied balance
     uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
 
-    // Calculate first settlement
-    uint256 _settlement1 = _invoice1Amount - ((_invoice1Amount * _fee1) / DBPS_DENOMINATOR);
-
-    // Calculate deposit amount required for both
-    uint256 _totalSettlement = ((DBPS_DENOMINATOR + _fee2) * _settlement1 + DBPS_DENOMINATOR * _invoice2Amount) /
-      (DBPS_DENOMINATOR + _fee2);
-    // _depositAmount = _totalSettlement + 1 - _custodied; //_custodied > _totalSettlement ? 0 : _totalSettlement - _custodied;
-    _depositAmount = _settlement1 + ((DBPS_DENOMINATOR * (_invoice2Amount - _custodied)) / (DBPS_DENOMINATOR + _fee2));
-    _depositAmount += 1;
-    {
-      console.log('[t] depositAmount       :', _depositAmount);
-      console.log('[t] s1                  :', _settlement1);
-      console.log('[t] intermediary deposit:', _depositAmount - _settlement1);
-      console.log('[t] s2                  :', _totalSettlement - _settlement1);
-      console.log('[t] depositInEpoch      :', _depositAmount);
-      console.log('[t] _custodied          :', _custodied);
+    // Calculate all n-1 settlements
+    uint256 _settlementsAmount = 0;
+    uint256 _len = _invoiceAmounts.length;
+    for (uint i; i < _len - 1; i++) {
+      _settlementsAmount += _invoiceAmounts[i] - ((_invoiceAmounts[i] * _fees[i]) / DBPS_DENOMINATOR);
     }
+
+    // Calculate deposit amount required
+    // _depositAmount = _totalSettlement + 1 - _custodied; //_custodied > _totalSettlement ? 0 : _totalSettlement - _custodied;
+    _depositAmount =
+      _settlementsAmount +
+      ((DBPS_DENOMINATOR * (_invoiceAmounts[_len - 1] - _custodied)) / (DBPS_DENOMINATOR + _fees[_len - 1]));
+    _depositAmount += 1;
+    // {
+    //   console.log('[t] depositAmount       :', _depositAmount);
+    //   console.log('[t] s1                  :', _settlement1);
+    //   console.log('[t] intermediary deposit:', _depositAmount - _settlement1);
+    //   console.log('[t] s2                  :', _totalSettlement - _settlement1);
+    //   console.log('[t] depositInEpoch      :', _depositAmount);
+    //   console.log('[t] _custodied          :', _custodied);
+    // }
   }
 
   // ================================================
@@ -393,18 +391,15 @@ contract InvoiceHelper is TestExtended {
 
     // Calculate the deposit
     console.log('====== calculating deposit ======');
-    console.log(
-      '[t] test                :',
-      _hub.depositsAvailableInEpoch(_hub.getCurrentEpoch(), _targetSettlementDomain, _tickerHash)
-    );
 
-    uint256 _depositAmount = _calculateExactDepositForTwoInvoices(
+    uint256[] memory _fees = new uint256[](2);
+    _fees[0] = MAX_FEE;
+    _fees[1] = MAX_FEE;
+    uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
       _targetSettlementDomain,
       _tickerHash,
-      _targetInvoiceAmounts[0],
-      _targetInvoiceAmounts[1],
-      MAX_FEE,
-      MAX_FEE
+      _targetInvoiceAmounts,
+      _fees
     );
 
     // Create a deposit
