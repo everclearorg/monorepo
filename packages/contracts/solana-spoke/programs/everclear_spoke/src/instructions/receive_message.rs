@@ -19,20 +19,8 @@ use crate::hyperlane::mailbox::HandleInstruction;
 
 use super::{AdminState, AuthState};
 
-// Receive a message from Hyperlane
-// pub fn handle<'info>(
-//     origin: u32,
-//     sender: Pubkey,
-//     payload: Vec<u8>,
-// ) ->Result<()> {
-//     // require!();
-//     receive_message(ctx, origin, sender, payload, self_program_id);
-//     Ok(())
-// }
-
 /// Receive a cross‑chain message via Hyperlane.
 /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
-/// TODO: May need to be internal
 pub fn handle<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
     handle: HandleInstruction,
@@ -86,7 +74,6 @@ pub fn handle<'info>(
     }
     // HACK: expand emit_cpi! macro for reference issue
     {
-        let sender = handle.sender;
         let disc = anchor_lang::event::EVENT_IX_TAG_LE;
         // TODO: Test the address conversion works
         let inner_data = anchor_lang::Event::data(&MessageReceivedEvent { origin: handle.origin, sender: h256_to_pub(handle.sender) });
