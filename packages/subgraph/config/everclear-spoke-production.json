@@ -191,5 +191,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-ronin",
+    "domain": "2020",
+    "environment": "production",
+    "network": "ronin",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]

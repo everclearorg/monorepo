@@ -65,7 +65,7 @@ apechain = "${APECHAIN_RPC}"
 mode = "${MODE_RPC}"
 unichain = "${UNICHAIN_RPC}"
 zksync = "${ZKSYNC_RPC}"
-
+ronin = "${RONIN_RPC}"
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
 sepolia = { key = "${ETHERSCAN_API_KEY}", chain = "sepolia" }
@@ -85,3 +85,4 @@ apechain = { key = "${APECHAINSCAN_API_KEY}", chain = "59144", url = "https://ap
 mode = { key = "${MODE_VERIFIER_KEY}", url = "${MODE_VERIFIER_API_URL}" }
 unichain = { key = "${UNICHAIN_API_KEY}", chain = "130", url = "${UNICHAIN_VERIFIER_API_URL}" }
 zksync = { key = "${ZKSYNC_API_KEY}", chain = "324", url = "${ZKSYNC_VERIFIER_API_URL}" }
+ronin = { key = "${RONIN_VERIFIER_KEY}", chain = "2020", url = "${RONIN_VERIFIER_API_URL}" }

@@ -142,5 +142,11 @@
     "domainName": "Unichain",
     "domainId": 130,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64",
+    "domainName": "Ronin",
+    "domainId": 2020,
+    "environment": "MainnetProduction"
   }
 ]

@@ -160,6 +160,13 @@
     "realm": "spoke"
   },
   {
+    "name": "Ronin",
+    "id": 2020,
+    "rpc": "https://api.roninchain.com/rpc",
+    "environments": ["MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
     "name": "Scroll Sepolia",
     "id": 534351,
     "rpc": "https://scroll-testnet-public.unifra.io",
