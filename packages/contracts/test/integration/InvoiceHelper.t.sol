@@ -228,7 +228,6 @@ contract InvoiceHelper is TestExtended {
     _receiveBatchIntentMessage(_originDomain, _targetBatch);
     // Verify target deposit exists
     IEverclear.IntentStatus _status = _hub.contexts(_target).status;
-    console.log('intent amount', _hub.contexts(_target).intent.amount);
     if (_length > 0) {
       require(_status == IEverclear.IntentStatus.ADDED, 'did not create deposit properly');
     } else {
@@ -356,10 +355,11 @@ contract InvoiceHelper is TestExtended {
     uint256 _l1Block = 21890255;
     bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
 
-    uint256[] memory _targetInvoiceAmounts = new uint256[](2);
+    uint256[] memory _targetInvoiceAmounts = new uint256[](3);
     {
       _targetInvoiceAmounts[0] = 11320000000000000000000; // 11320
       _targetInvoiceAmounts[1] = 12323000000000000000000; // 12323
+      _targetInvoiceAmounts[2] = 12321000000000000000000; // 12321
     }
     uint32 _targetOriginDomain = 42161;
     address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
@@ -392,9 +392,10 @@ contract InvoiceHelper is TestExtended {
     // Calculate the deposit
     console.log('====== calculating deposit ======');
 
-    uint256[] memory _fees = new uint256[](2);
+    uint256[] memory _fees = new uint256[](3);
     _fees[0] = MAX_FEE;
     _fees[1] = MAX_FEE;
+    _fees[2] = MAX_FEE;
     uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
       _targetSettlementDomain,
       _tickerHash,
