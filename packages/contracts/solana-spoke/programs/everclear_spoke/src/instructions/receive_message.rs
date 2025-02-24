@@ -6,8 +6,7 @@ use anchor_spl::{
 
 use crate::{
     consts::{
-        DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, GATEWAY_HASH, LIGHTHOUSE_HASH, MAILBOX_HASH,
-        WATCHTOWER_HASH,
+        everclear_gateway, pub_to_h256, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH
     },
     error::SpokeError,
     events::{MessageReceivedEvent, SettledEvent},
@@ -31,6 +30,7 @@ use super::{AdminState, AuthState};
 
 /// Receive a cross‑chain message via Hyperlane.
 /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
+/// TODO: May need to be internal
 pub fn receive_message<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
     origin: u32,
@@ -38,8 +38,10 @@ pub fn receive_message<'info>(
     payload: Vec<u8>,
     self_program_id: &Pubkey,
 ) -> Result<()> {
+    // require!(msg.sender == MAILBOX, SpokeError::InvalidSender);
     require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
     require!(origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
+    require!(pub_to_h256(sender) == everclear_gateway(), SpokeError::InvalidSender);
     require!(
         sender == ctx.accounts.spoke_state.message_receiver,
         SpokeError::InvalidSender
@@ -225,10 +227,7 @@ fn handle_var_update(ctx: Context<AdminState>, var_data: &[u8]) -> Result<()> {
     let rest = &var_data[32..];
 
     // Compare var_hash with your known constants
-    if var_hash == GATEWAY_HASH {
-        let new_gateway: Pubkey = try_deserialize_a_pubkey(rest)?;
-        super::update_gateway(ctx, new_gateway)?;
-    } else if var_hash == MAILBOX_HASH {
+    if var_hash == MAILBOX_HASH {
         let new_mailbox: Pubkey = try_deserialize_a_pubkey(rest)?;
         super::update_mailbox(ctx, new_mailbox)?;
     } else if var_hash == LIGHTHOUSE_HASH {

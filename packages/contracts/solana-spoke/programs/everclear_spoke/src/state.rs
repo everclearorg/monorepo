@@ -62,7 +62,6 @@ pub struct SpokeState {
     pub watchtower: Pubkey,
     pub call_executor: Pubkey,
     pub message_receiver: Pubkey,
-    pub gateway: Pubkey,
     // Message gas limit (stored, though not used on Solana).
     pub message_gas_limit: u64,
     // Global nonce for intents.
@@ -82,7 +81,7 @@ impl SpokeState {
         + 1                      // initialized_version: u8
         + 4                      // domain: u32
         + 4                      // everclear: u32
-        + 32 * 5                 // 5 Pubkeys
+        + 32 * 4                 // 5 Pubkeys
         + 8                      // message_gas_limit: u64
         + 8                      // nonce: u64
         + 32                     // owner: Pubkey
