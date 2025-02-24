@@ -15,7 +15,7 @@ declare_id!("uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC");
 
 #[program]
 pub mod everclear_spoke {
-    use crate::error::SpokeError;
+    use crate::{error::SpokeError, hyperlane::mailbox::HandleInstruction};
 
     use super::*;
 
@@ -84,13 +84,11 @@ pub mod everclear_spoke {
 
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
-    pub fn receive_message<'a>(
-        ctx: Context<'_, '_, 'a, 'a, AuthState<'a>>,
-        origin: u32,
-        sender: Pubkey,
-        payload: Vec<u8>,
+    pub fn handle<'info>(
+        ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
+        handle: HandleInstruction,
     ) -> Result<()> {
-        instructions::receive_message(ctx, origin, sender, payload, &ID)
+        instructions::handle(ctx, handle)
     }
 
     pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {

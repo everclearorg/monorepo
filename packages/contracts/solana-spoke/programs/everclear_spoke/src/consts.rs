@@ -26,3 +26,7 @@ pub fn everclear_gateway() -> H256 {
 pub fn pub_to_h256(pubkey:Pubkey) -> H256 {
     H256::from(pubkey.to_bytes())
 }
+
+pub fn h256_to_pub(h256:H256) -> Pubkey {
+    Pubkey::new_from_array(h256.0)
+}
