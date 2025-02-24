@@ -351,18 +351,20 @@ contract InvoiceHelper is TestExtended {
    * @dev Queue state should be:
    *      A
    *      B
-   * where amountB < amountA, and you only want to purchase B.
+   *      C
+   * where (amountB + amountC) < amountA, and you only want to purchase B, C.
    */
-  function test_purchaseNonHeadInvoice() public {
+  function test_purchaseNonHeadInvoices() public {
     // Declare test constants
     // NOTE: at this point, there are no invoices or deposits in USDT
     uint256 _l1Block = 21890255;
     bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
 
-    uint256[] memory _targetInvoiceAmounts = new uint256[](2);
+    uint256[] memory _targetInvoiceAmounts = new uint256[](3);
     {
       _targetInvoiceAmounts[0] = 12323000000000000000000; // 12323
       _targetInvoiceAmounts[1] = 11320000000000000000000; // 11320 -> target
+      _targetInvoiceAmounts[2] = 320000000000000000000; // 320 -> target
     }
     uint32 _targetOriginDomain = 42161;
     address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
@@ -394,10 +396,12 @@ contract InvoiceHelper is TestExtended {
 
     bytes32 _deposit;
     {
-      uint256[] memory _fees = new uint256[](1);
+      uint256[] memory _fees = new uint256[](2);
       _fees[0] = MAX_FEE;
-      uint256[] memory _targets = new uint256[](1);
+      _fees[1] = MAX_FEE;
+      uint256[] memory _targets = new uint256[](2);
       _targets[0] = _targetInvoiceAmounts[1];
+      _targets[1] = _targetInvoiceAmounts[2];
       uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
         _targetSettlementDomain,
         _tickerHash,
