@@ -347,6 +347,90 @@ contract InvoiceHelper is TestExtended {
   // ================================================
 
   /**
+   * @notice This tests purchasing an invoice that is not at the front of the queue.
+   * @dev Queue state should be:
+   *      A
+   *      B
+   * where amountB < amountA, and you only want to purchase B.
+   */
+  function test_purchaseNonHeadInvoice() public {
+    // Declare test constants
+    // NOTE: at this point, there are no invoices or deposits in USDT
+    uint256 _l1Block = 21890255;
+    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+
+    uint256[] memory _targetInvoiceAmounts = new uint256[](2);
+    {
+      _targetInvoiceAmounts[0] = 12323000000000000000000; // 12323
+      _targetInvoiceAmounts[1] = 11320000000000000000000; // 11320 -> target
+    }
+    uint32 _targetOriginDomain = 42161;
+    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
+    uint32 _targetSettlementDomain = 10;
+    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
+
+    // Create fork
+    {
+      uint256 _l2Block = 796179;
+      _setupFork(_l2Block, _l1Block, true);
+
+      // Verify queue status
+      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      require(_length == 0, 'invoice in queue, bad test setup');
+    }
+
+    // Create invoices
+    bytes32[] memory _targets = _createInvoices(
+      _targetOriginDomain,
+      _targetSettlementDomain,
+      _targetOriginAsset,
+      _tickerHash,
+      _l1Block,
+      _targetInvoiceAmounts
+    );
+
+    // Take to max discount
+    _advanceEpochs(20, _l1Block);
+
+    bytes32 _deposit;
+    {
+      uint256[] memory _fees = new uint256[](1);
+      _fees[0] = MAX_FEE;
+      uint256[] memory _targets = new uint256[](1);
+      _targets[0] = _targetInvoiceAmounts[1];
+      uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
+        _targetSettlementDomain,
+        _tickerHash,
+        _targets,
+        _fees
+      );
+
+      // Create a deposit
+      _deposit = _createADeposit(
+        _targetSettlementDomain,
+        _targetOriginDomain,
+        _targetSettlementAsset,
+        _depositAmount,
+        _tickerHash
+      );
+    }
+
+    // Verify the deposit is added
+    require(_hub.contexts(_deposit).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+
+    // Process the invoice queue
+    console.log('====== settling invoices ======');
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+
+    // Verify targets are settled
+    require(_hub.contexts(_targets[0]).status == IEverclear.IntentStatus.INVOICED, 'target[0] not invoiced');
+    require(_hub.contexts(_targets[1]).status == IEverclear.IntentStatus.SETTLED, 'target[1] not settled');
+
+    // Verify that the deposit got rewards to settle invoice
+    require(_hub.contexts(_deposit).pendingRewards > 0, 'deposit did not get rewards');
+  }
+
+  /**
    * @notice This tests purchasing multiple intents with a single deposit
    */
   function test_singleDepositMultipleIntentPurchases() public {
@@ -417,7 +501,6 @@ contract InvoiceHelper is TestExtended {
 
     // Process the invoice queue
     console.log('====== settling invoices ======');
-    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
     _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
 
     // Verify targets are settled
