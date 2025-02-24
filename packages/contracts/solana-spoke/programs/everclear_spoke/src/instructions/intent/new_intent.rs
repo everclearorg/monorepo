@@ -1,7 +1,7 @@
-use crate::hyperlane::{
+use crate::{consts::everclear_gateway, hyperlane::{
     transfer_remote, HyperlaneSealevelTokenPlugin, HyperlaneToken, Igp, Mailbox, SplNoop,
-    TransferRemote, TransferRemoteContext, H256, U256,
-};
+    TransferRemote, TransferRemoteContext, U256,
+}};
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
@@ -131,7 +131,7 @@ pub fn new_intent(
     let batch_message = format_intent_message_batch(&[new_intent_struct])?;
     let xfer = TransferRemote {
         destination_domain: EVERCLEAR_DOMAIN,
-        recipient: H256::zero(),
+        recipient: everclear_gateway(),
         amount_or_id: U256::from(normalized_amount),
         gas_amount: message_gas_limit,
         message_body: batch_message,

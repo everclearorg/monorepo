@@ -389,7 +389,6 @@ pub struct TransferRemoteContext<'info> {
 
     // -- If using an IGP, add those below as well:
 
-    // TODO: Where am I getting IGP from?
     #[account(executable)]
     pub igp_program: Interface<'info, Igp>,
     #[account(mut)]
@@ -581,10 +580,8 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     ];
 
     // The token message body, which specifies the remote_amount.
-    // TODO: I think this needs to change
     let token_transfer_message = xfer.message_body;
 
-    // NOTE/TODO: Re-executing this as couldn't find the igp_program_id value due to not being defined in the scope
     if let Some((igp_program_id, igp_payment_account_metas, igp_payment_account_infos)) =
         igp_payment_accounts
     {

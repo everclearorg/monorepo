@@ -19,7 +19,6 @@ pub mod everclear_spoke {
 
     use super::*;
 
-    // TODO: Do we need to add initializer modifier to this?
     /// Initialize the global state.
     /// This function creates the SpokeState (global config) PDA.
     #[access_control(&ctx.accounts.ensure_owner_is_valid(&init.owner))]
