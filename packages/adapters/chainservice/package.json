@@ -1,6 +1,6 @@
 {
   "name": "@chimera-monorepo/chainservice",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha.6",
   "description": "Chain service codebase for Everclear",
   "main": "dist/index.js",
   "author": "Everclear",
@@ -40,5 +40,10 @@
     "ethers": "5.7.2",
     "interval-promise": "1.4.0",
     "p-queue": "6.6.2"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "name": "@chimera-monorepo/chainservice"
   }
 }

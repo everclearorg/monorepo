@@ -1,6 +1,6 @@
 {
   "name": "@chimera-monorepo/utils",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha.6",
   "description": "Common utilities for use",
   "main": "dist/index.js",
   "author": "Everclear",
@@ -50,5 +50,10 @@
     "hyperid": "3.2.0",
     "secp256k1": "4.0.3",
     "sinon-chai": "3.7.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "name": "@chimera-monorepo/utils"
   }
 }
