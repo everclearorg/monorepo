@@ -131,6 +131,12 @@ locals {
         providers = [
           "https://mainnet.unichain.org"
         ]
+      },
+      "2020" = {
+        providers = [
+          "https://api.roninchain.com/rpc",
+          "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
       }
     }
   })
