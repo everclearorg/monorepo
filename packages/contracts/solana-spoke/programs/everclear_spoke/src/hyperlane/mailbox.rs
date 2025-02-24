@@ -194,7 +194,7 @@ pub struct InboxProcess {
 //     Ok(instruction)
 // }
 
-#[derive(Eq, PartialEq, BorshSerialize, BorshDeserialize, Debug)]
+#[derive(Eq, PartialEq, AnchorSerialize, AnchorDeserialize, Debug)]
 pub struct HandleInstruction {
     pub origin: u32,
     pub sender: H256,

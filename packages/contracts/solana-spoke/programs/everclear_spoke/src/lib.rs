@@ -10,12 +10,13 @@ pub mod state;
 use events::*;
 use instructions::*;
 use state::SpokeState;
+use hyperlane::mailbox::HandleInstruction;
 
 declare_id!("uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC");
 
 #[program]
 pub mod everclear_spoke {
-    use crate::{error::SpokeError, hyperlane::mailbox::HandleInstruction};
+    use crate::error::SpokeError;
 
     use super::*;
 
