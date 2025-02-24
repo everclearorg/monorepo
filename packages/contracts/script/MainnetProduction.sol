@@ -420,12 +420,8 @@ abstract contract MainnetProductionEnvironment is
     APECHAIN,
     MODE,
     UNICHAIN,
-<<<<<<< Updated upstream
     ZKSYNC,
     RONIN
-=======
-    ZKSYNC
->>>>>>> Stashed changes
   ];
   /**
    * @notice `EverclearHub` initialization parameters
