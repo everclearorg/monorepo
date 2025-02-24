@@ -1,20 +1,7 @@
 use anchor_lang::prelude::*;
 
 use super::AdminState;
-use crate::events::{
-    GatewayUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent,
-    WatchtowerUpdatedEvent,
-};
-
-pub fn update_gateway(ctx: Context<AdminState>, new_gateway: Pubkey) -> Result<()> {
-    let old = ctx.accounts.spoke_state.gateway;
-    ctx.accounts.spoke_state.gateway = new_gateway;
-    emit_cpi!(GatewayUpdatedEvent {
-        old_gateway: old,
-        new_gateway
-    });
-    Ok(())
-}
+use crate::events::{LighthouseUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent,WatchtowerUpdatedEvent,};
 
 pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
     let old = ctx.accounts.spoke_state.lighthouse;

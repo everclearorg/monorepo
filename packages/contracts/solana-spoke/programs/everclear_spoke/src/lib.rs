@@ -93,22 +93,6 @@ pub mod everclear_spoke {
         instructions::receive_message(ctx, origin, sender, payload, &ID)
     }
 
-    /// Update the gateway address (admin only).
-    pub fn update_gateway(ctx: Context<AdminState>, new_gateway: Pubkey) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        let admin = ctx.accounts.admin.key();
-        require!(state.owner == admin, SpokeError::OnlyOwner);
-
-        let old = ctx.accounts.spoke_state.gateway;
-        ctx.accounts.spoke_state.gateway = new_gateway;
-        emit_cpi!(GatewayUpdatedEvent {
-            old_gateway: old,
-            new_gateway
-        });
-        Ok(())
-        // instructions::update_gateway(ctx, new_gateway)
-    }
-
     pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(

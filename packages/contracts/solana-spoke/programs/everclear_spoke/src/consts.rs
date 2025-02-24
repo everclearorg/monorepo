@@ -22,3 +22,7 @@ pub const EVERCLEAR_GATEWAY_BYTES: [u8; 32] = [0x01; 32]; // placeholder
 pub fn everclear_gateway() -> H256 {
 	H256::from(EVERCLEAR_GATEWAY_BYTES)
 }
+
+pub fn pub_to_h256(pubkey:Pubkey) -> H256 {
+    H256::from(pubkey.to_bytes())
+}
