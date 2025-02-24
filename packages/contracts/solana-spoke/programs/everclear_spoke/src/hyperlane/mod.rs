@@ -22,7 +22,7 @@ use std::collections::HashMap;
 // Importing the MailboxInstruction and MailboxOutboxDispatch structs from the mailbox.rs file.
 mod igp;
 mod instructions;
-mod mailbox;
+pub(crate) mod mailbox;
 mod pda_seeds;
 pub mod primitive_type;
 mod token_message;

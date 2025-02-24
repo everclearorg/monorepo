@@ -6,7 +6,7 @@ use anchor_spl::{
 
 use crate::{
     consts::{
-        everclear_gateway, pub_to_h256, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH
+        everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH
     },
     error::SpokeError,
     events::{MessageReceivedEvent, SettledEvent},
@@ -14,6 +14,8 @@ use crate::{
     state::{IntentStatus, SpokeState},
     utils::{normalize_decimals, vault_authority_seeds},
 };
+
+use crate::hyperlane::mailbox::HandleInstruction;
 
 use super::{AdminState, AuthState};
 
@@ -31,43 +33,37 @@ use super::{AdminState, AuthState};
 /// Receive a cross‑chain message via Hyperlane.
 /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
 /// TODO: May need to be internal
-pub fn receive_message<'info>(
+pub fn handle<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
-    origin: u32,
-    sender: Pubkey,
-    payload: Vec<u8>,
-    self_program_id: &Pubkey,
+    handle: HandleInstruction,
 ) -> Result<()> {
+    // TODO: Checking the Hyperlane Mailbox
     // require!(msg.sender == MAILBOX, SpokeError::InvalidSender);
     require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
-    require!(origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
-    require!(pub_to_h256(sender) == everclear_gateway(), SpokeError::InvalidSender);
-    require!(
-        sender == ctx.accounts.spoke_state.message_receiver,
-        SpokeError::InvalidSender
-    );
+    require!(handle.origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
+    require!(handle.sender == everclear_gateway(), SpokeError::InvalidSender);
 
-    require!(!payload.is_empty(), SpokeError::InvalidMessage);
+    require!(!handle.message.is_empty(), SpokeError::InvalidMessage);
     // for emit_epi!
     let authority_info = ctx.accounts.event_authority.to_account_info();
     let authority_bump = ctx.bumps.event_authority;
 
-    let msg_type = payload[0];
+    let msg_type = handle.message[0];
     match msg_type {
         1 => {
             msg!("Processing settlement batch message");
-            let settlement_data = &payload[1..];
+            let settlement_data = &&handle.message[1..];
             let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
                 .map_err(|_| SpokeError::InvalidMessage)?;
 
-            let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], self_program_id);
+            let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], &ctx.program_id);
 
-            handle_batch_settlement(ctx, batch, vault_bump, self_program_id)?;
+            handle_batch_settlement(ctx, batch, vault_bump)?;
         }
         2 => {
             // Var update
             msg!("Processing variable update message");
-            let var_data = &payload[1..];
+            let var_data = &handle.message[1..];
             let admin_state = &mut AdminState {
                 spoke_state: ctx.accounts.spoke_state.clone(),
                 admin: ctx.accounts.authority.clone(),
@@ -90,8 +86,10 @@ pub fn receive_message<'info>(
     }
     // HACK: expand emit_cpi! macro for reference issue
     {
+        let sender = handle.sender;
         let disc = anchor_lang::event::EVENT_IX_TAG_LE;
-        let inner_data = anchor_lang::Event::data(&MessageReceivedEvent { origin, sender });
+        // TODO: Test the address conversion works
+        let inner_data = anchor_lang::Event::data(&MessageReceivedEvent { origin: handle.origin, sender: h256_to_pub(handle.sender) });
         let ix_data: Vec<u8> = disc.into_iter().chain(inner_data).collect();
         let ix = anchor_lang::solana_program::instruction::Instruction::new_with_bytes(
             crate::ID,
@@ -116,8 +114,7 @@ pub fn receive_message<'info>(
 fn handle_batch_settlement<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
     batch: Vec<Settlement>,
-    vault_authority_bump: u8,
-    self_program_id: &Pubkey,
+    vault_authority_bump: u8
 ) -> Result<()> {
     // Create local references to avoid lifetime issues
     for s in batch.iter() {
@@ -134,7 +131,7 @@ fn handle_batch_settlement<'info>(
             spoke_state,
             s,
             vault_authority_bump,
-            self_program_id,
+            ctx.program_id,
         )?;
         if let Some(event) = res {
             emit_cpi!(event)
