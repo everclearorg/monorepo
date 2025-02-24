@@ -347,6 +347,75 @@ contract InvoiceHelper is TestExtended {
   // ================================================
 
   /**
+   * @notice This tests an observed mark purchase that undershot the invoice target:
+   * invoiceA: https://explorer.everclear.org/intents/0x4813e4fb49399aee1253c83682b6a2e7b863ef15eb9c63d06f48e40caad5ce4a
+   * invoiceB (target): https://explorer.everclear.org/intents/0x846935f8559d1487cf595d02540d762d74e6b19171a989505412c89b7b1192e6
+   * attempted purchase: https://explorer.everclear.org/intents/0xabc7d25f17de8fb9ea50ee4eb35d75cf6d01c3043b972802b3a5780e247a4d65
+   * @dev Runs test at block with max discount on fee to compare to API
+   */
+  function test_expectedAmount() public {
+    uint256 _l1Block = 21918628;
+    bytes32 _tickerHash = 0xd6aca1be9729c13d677335161321649cccae6a591554772516700f986f942eaa;
+    uint32 _targetSettlementDomain = 534352;
+    address _targetSettlementAsset = 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4; // USDC on Scroll
+
+    // Create fork
+    {
+      uint256 _l2Block = 819570;
+      _setupFork(_l2Block, _l1Block, true);
+
+      // Verify queue status
+      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      console.log('_length', _length);
+      require(_length >= 2, 'invoices not in queue, bad test setup');
+    }
+
+    uint256[] memory _invoiceQueueAmounts = new uint256[](2);
+    _invoiceQueueAmounts[0] = 9999935289356868044962;
+    _invoiceQueueAmounts[1] = 204995900000000000000;
+
+    bytes32[] memory _invoiceQueue = new bytes32[](2);
+    _invoiceQueue[0] = 0x4813e4fb49399aee1253c83682b6a2e7b863ef15eb9c63d06f48e40caad5ce4a;
+    _invoiceQueue[1] = 0x846935f8559d1487cf595d02540d762d74e6b19171a989505412c89b7b1192e6;
+
+    uint256[] memory _fees = new uint256[](1);
+    _fees[0] = MAX_FEE; // update this if blocks are updated
+
+    uint256[] memory _targetInvoiceAmounts = new uint256[](1);
+    _targetInvoiceAmounts[0] = _invoiceQueueAmounts[1];
+    uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
+      _targetSettlementDomain,
+      _tickerHash,
+      _targetInvoiceAmounts,
+      _fees
+    );
+    console.log('calculated purchase amount:', _depositAmount); // 2047404059810832
+
+    // Create a deposit
+    bytes32 _deposit = _createADeposit(
+      _targetSettlementDomain,
+      uint32(42161),
+      _targetSettlementAsset,
+      _depositAmount,
+      _tickerHash
+    );
+
+    // Verify the deposit is added
+    require(_hub.contexts(_deposit).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+
+    // Process the invoice queue
+    console.log('====== settling invoices ======');
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+
+    // Verify targets are settled
+    require(_hub.contexts(_invoiceQueue[0]).status == IEverclear.IntentStatus.INVOICED, 'target[0] not invoiced');
+    require(_hub.contexts(_invoiceQueue[1]).status == IEverclear.IntentStatus.SETTLED, 'target[1] not settled');
+
+    // Verify that the deposit got rewards to settle invoice
+    require(_hub.contexts(_deposit).pendingRewards > 0, 'deposit did not get rewards');
+  }
+
+  /**
    * @notice This tests purchasing an invoice that is not at the front of the queue.
    * @dev Queue state should be:
    *      A
