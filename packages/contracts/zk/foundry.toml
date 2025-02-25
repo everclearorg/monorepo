@@ -1,19 +1,17 @@
 [profile.default]
-src = "src"
-out = "out-zk" 
+src = 'src'
+out = 'out'
+zkout = 'zkout'
 libs = ["../lib", "../../../node_modules"]
 compile = true
-fallback_oz = false
-mode = "0"
+fallback_oz = true
+mode = "1"
+
+[profile.zksync]
+zk_version = "1.5.7"
+cache_path = "cache"
+verbosity = 3
 
 fs_permissions = [
-    { access = "read", path = "../lib" }
-]
-
-remappings = [
-  "@openzeppelin=../../../node_modules/@openzeppelin",
-  "@hyperlane=../../../node_modules/@hyperlane-xyz/core/contracts",
-  "contracts=src/contracts",
-  "interfaces=src/interfaces",
-  "solidity-stringutils=../lib/openzeppelin-foundry-upgrades/lib/solidity-stringutils",
+    { access = "read", path = "../../lib" }
 ]
