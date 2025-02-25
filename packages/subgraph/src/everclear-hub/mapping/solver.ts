@@ -11,6 +11,7 @@ export function handleSolverConfigUpdated(event: SolverConfigUpdated): void {
   let solver = Solver.load(id);
   if (solver == null) {
     solver = new Solver(id);
+    solver.updateVirtualBalance = false;
   }
 
   solver.supportedDomains = event.params._supportedDomains || [];
@@ -27,6 +28,7 @@ export function handleIncreaseVirtualBalanceSet(event: IncreaseVirtualBalanceSet
   let solver = Solver.load(id);
   if (solver == null) {
     solver = new Solver(id);
+    solver.supportedDomains = [];
   }
 
   solver.updateVirtualBalance = event.params._status;
