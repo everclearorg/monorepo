@@ -536,7 +536,8 @@ locals {
       130 = { maxAge = 60, size = 1 },
       324 = { maxAge = 60, size = 1 },
       534352 = { maxAge = 60, size = 1 },
-      167000 = { maxAge = 60, size = 1 }
+      167000 = { maxAge = 60, size = 1 },
+      2020 = { maxAge = 60, size = 1 }
       # 33139 = { maxAge = 60, size = 1 }
     }
     chains = {
