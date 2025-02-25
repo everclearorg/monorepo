@@ -9,22 +9,22 @@ const command = new Command('unpause')
   .action(async (options) => {
     try {
       const env = getEnvironment();
-      
+
       // Load keypair
       const keypairPath = options.keypair || env.keypairPath;
       const keypair = loadKeypair(keypairPath);
-      
+
       console.log(chalk.blue('Unpausing Everclear Spoke contract...'));
-      
+
       // Connect to the program
       const programId = getProgramId();
       const program = getProgram(programId.toString(), keypair);
-      
+
       // Get the state PDA
       const [stateAddress] = getSpokeStatePda();
-      
+
       console.log(chalk.blue(`State address: ${stateAddress.toString()}`));
-      
+
       // Execute the unpause transaction
       const tx = await program.methods
         .unpause()
@@ -34,18 +34,18 @@ const command = new Command('unpause')
         })
         .signers([keypair])
         .rpc();
-      
+
       await confirmTransaction(getConnection(), tx);
-      
+
       console.log(chalk.green('Everclear Spoke contract unpaused successfully!'));
       console.log(chalk.green(`Transaction: ${tx}`));
-      
+
       // Verify the state
-      const spokeState = await program.account.spokeState.fetch(stateAddress);
+      const spokeState = await (program.account as any).spokeState.fetch(stateAddress);
       console.log(chalk.blue(`Current pause state: ${spokeState.paused ? 'PAUSED' : 'ACTIVE'}`));
     } catch (error) {
       console.error(chalk.red(`Error unpausing Everclear Spoke contract: ${error}`));
     }
   });
 
-export default command; 
+export default command;
