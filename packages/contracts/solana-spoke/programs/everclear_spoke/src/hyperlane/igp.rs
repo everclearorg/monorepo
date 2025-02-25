@@ -23,10 +23,10 @@ pub enum IgpInstruction {
     // InitIgp(InitIgp),
     // /// Initializes an overhead IGP.
     // InitOverheadIgp(InitOverheadIgp),
-    // /// Pays for gas.
+    /// Pays for gas.
     IgpPayForGas(IgpPayForGas),
-    // /// Quotes a gas payment.
-    // QuoteGasPayment(QuoteGasPayment),
+    /// Quotes a gas payment.
+    QuoteGasPayment(QuoteGasPayment),
     // /// Transfers ownership of an IGP.
     // TransferIgpOwnership(Option<Pubkey>),
     // /// Transfers ownership of an overhead IGP.

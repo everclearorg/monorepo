@@ -1,4 +1,7 @@
-use anchor_lang::{prelude::borsh::{self, BorshDeserialize, BorshSerialize}, AnchorDeserialize, AnchorSerialize};
+use anchor_lang::{
+    prelude::borsh::{self, BorshDeserialize, BorshSerialize},
+    AnchorDeserialize, AnchorSerialize,
+};
 use fixed_hash::construct_fixed_hash;
 use uint::construct_uint;
 

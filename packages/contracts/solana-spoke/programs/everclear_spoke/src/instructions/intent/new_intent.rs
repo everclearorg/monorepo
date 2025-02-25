@@ -1,7 +1,10 @@
-use crate::{consts::everclear_gateway, hyperlane::{
-    transfer_remote, HyperlaneSealevelTokenPlugin, HyperlaneToken, Igp, Mailbox, SplNoop,
-    TransferRemote, TransferRemoteContext, U256,
-}};
+use crate::{
+    consts::everclear_gateway,
+    hyperlane::{
+        transfer_remote, Igp, Mailbox, SplNoop,
+        TransferRemote, TransferRemoteContext, U256,
+    },
+};
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
@@ -14,35 +17,6 @@ use crate::{
     state::{IntentStatus, IntentStatusAccount},
     utils::{compute_intent_hash, normalize_decimals},
 };
-
-#[derive(Default, Debug, PartialEq, AnchorDeserialize, AnchorSerialize)]
-pub struct HyperlanePlugin;
-
-impl HyperlaneSealevelTokenPlugin for HyperlanePlugin {
-    // We must define the required trait methods!
-    fn initialize<'a, 'b>(
-        _program_id: &Pubkey,
-        _system_program: &'a AccountInfo<'b>,
-        _token_account: &'a AccountInfo<'b>,
-        _payer_account: &'a AccountInfo<'b>,
-        _accounts_iter: &mut std::slice::Iter<'a, AccountInfo<'b>>,
-    ) -> Result<Self> {
-        // For example, do nothing:
-        Ok(HyperlanePlugin)
-    }
-
-    fn transfer_in<'a, 'b>(
-        _program_id: &Pubkey,
-        _token: &HyperlaneToken<Self>,
-        _sender_wallet: &'a AccountInfo<'b>,
-        _accounts_iter: &mut std::slice::Iter<'a, AccountInfo<'b>>,
-        _amount: u64,
-    ) -> Result<()> {
-        // For example, do nothing or do a CPI to spl_token:
-        msg!("HyperlanePlugin::transfer_in called");
-        Ok(())
-    }
-}
 
 /// Create a new intent.
 /// The user "locks" funds (previously deposited) and creates an intent.
@@ -59,6 +33,9 @@ pub fn new_intent(
     data: Vec<u8>,
     message_gas_limit: u64,
 ) -> Result<()> {
+    // Clone to allow mut ref before move
+    let spoke_state = ctx.accounts.spoke_state.clone();
+
     let state = &mut ctx.accounts.spoke_state;
     require!(!state.paused, SpokeError::ContractPaused);
     require!(!destinations.is_empty(), SpokeError::InvalidOperation);
@@ -137,14 +114,16 @@ pub fn new_intent(
         message_body: batch_message,
     };
 
+    // TODO: make this no_copy
     // Build your TransferRemoteContext in a local variable (so it doesn't drop too soon)
     let mut transfer_remote_context = TransferRemoteContext {
+        spoke_state,
         system_program: ctx.accounts.system_program.clone(),
         spl_noop_program: ctx.accounts.spl_noop_program.clone(),
-        token_account: ctx.accounts.program_vault_account.to_account_info(),
         mailbox_program: ctx.accounts.hyperlane_mailbox.clone(),
         mailbox_outbox: ctx.accounts.mailbox_outbox.to_account_info(),
         dispatch_authority: ctx.accounts.dispatch_authority.to_account_info(),
+        // TODO: need to figure out how this is used for the IGP payer and whether this is correct
         sender_wallet: ctx.accounts.authority.to_account_info(),
         unique_message_account: ctx.accounts.unique_message_account.to_account_info(),
         dispatched_message_pda: ctx.accounts.dispatched_message_pda.to_account_info(),
@@ -164,7 +143,7 @@ pub fn new_intent(
     );
 
     // 3) Use `transfer_ctx` safely
-    transfer_remote::<HyperlanePlugin>(transfer_ctx, xfer)?;
+    transfer_remote(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
     emit_cpi!(IntentAddedEvent {
@@ -215,19 +194,18 @@ fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
 #[event_cpi]
 #[derive(Accounts)]
 pub struct NewIntent<'info> {
-    #[account(mut)]
-    pub payer: Signer<'info>,
     #[account(
         mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump,
         realloc = 8 + std::mem::size_of::<SpokeState>() +
             (std::mem::size_of::<IntentStatusAccount>() * (spoke_state.status.len() + 1)),
-        realloc::payer = payer,
+        realloc::payer = authority,
         realloc::zero = false,
     )]
     pub spoke_state: Account<'info, SpokeState>,
 
+    #[account(mut)]
     pub authority: Signer<'info>,
 
     pub mint: Account<'info, Mint>,

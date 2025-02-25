@@ -7,22 +7,22 @@ pub mod hyperlane;
 pub mod instructions;
 pub mod state;
 
+use error::SpokeError;
 use events::*;
+use hyperlane::mailbox::HandleInstruction;
+use hyperlane::InterchainGasPaymasterType;
 use instructions::*;
 use state::SpokeState;
-use hyperlane::mailbox::HandleInstruction;
 
 declare_id!("uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC");
 
 #[program]
 pub mod everclear_spoke {
-    use crate::error::SpokeError;
-
     use super::*;
 
     /// Initialize the global state.
     /// This function creates the SpokeState (global config) PDA.
-    #[access_control(&ctx.accounts.ensure_owner_is_valid(&init.owner))]
+    #[access_control(ctx.accounts.ensure_owner_is_valid(&init.owner))]
     pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
         instructions::initialize(ctx, init)
     }
@@ -121,6 +121,23 @@ pub mod everclear_spoke {
         );
 
         instructions::update_mailbox(ctx, new_mailbox)
+    }
+
+    /// new_igp contains the IGP address
+    /// new_igp_type contains either the IGP address (as in new_igp), or the overhead IGP address if the IGP is an overhead IGP.
+    pub fn update_igp(
+        ctx: Context<AdminState>,
+        new_igp: Pubkey,
+        new_igp_type: InterchainGasPaymasterType,
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        // enforce only owner can do it
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+
+        instructions::update_igp(ctx, new_igp, new_igp_type)
     }
 
     pub fn update_message_gas_limit(ctx: Context<AdminState>, new_limit: u64) -> Result<()> {

@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 
+use crate::hyperlane::InterchainGasPaymasterType;
+
 /// Queue state with first/last indices for efficient management
 #[derive(AnchorSerialize, AnchorDeserialize, Default, Clone)]
 pub struct QueueState<T> {
@@ -74,6 +76,13 @@ pub struct SpokeState {
     pub bump: u8,
     // Mailbox address
     pub mailbox: Pubkey,
+    // TODO: do we need admin function to increment this?
+    // Bump for mailbox dispatch authority
+    pub mailbox_dispatch_authority_bump: u8,
+    // IGP address
+    pub igp: Pubkey,
+    // IGP Type which either contains igp address (as in `igp`) or the overhead IGP address if the IGP is an overhead IGP
+    pub igp_type: InterchainGasPaymasterType,
 }
 
 impl SpokeState {
@@ -87,7 +96,12 @@ impl SpokeState {
         + 32                     // owner: Pubkey
         + 4                      // status HashMap
         + 1                      // bump: u8
-        + 32; // mailbox: Pubkey
+        + 32                     // mailbox: Pubkey
+        + 1                      // mailbox_dispatch_authority_bump: u8
+        + 32                     // igp: Pubkey
+        + 33                     // igp_type: InterchainGasPaymasterType
+        ;
+        
 }
 
 #[account]

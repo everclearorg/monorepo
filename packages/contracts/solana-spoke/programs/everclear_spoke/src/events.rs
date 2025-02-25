@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 
+use crate::hyperlane::InterchainGasPaymasterType;
+
 // =====================================================================
 // EVENTS
 // =====================================================================
@@ -58,6 +60,14 @@ pub struct GatewayUpdatedEvent {
 pub struct MailboxUpdatedEvent {
     pub old_mailbox: Pubkey,
     pub new_mailbox: Pubkey,
+}
+
+#[event]
+pub struct IgpUpdatedEvent {
+    pub old_igp: Pubkey,
+    pub new_igp: Pubkey,
+    pub old_igp_type: InterchainGasPaymasterType,
+    pub new_igp_type: InterchainGasPaymasterType,
 }
 
 #[event]

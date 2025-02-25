@@ -1,5 +1,6 @@
 use crate::error::SpokeError;
 use crate::mailbox_message_dispatch_authority_pda_seeds;
+use crate::state::{IntentStatusAccount, SpokeState};
 use anchor_lang::prelude::{AccountInfo, AccountMeta, Pubkey};
 use anchor_lang::solana_program::system_program;
 use anchor_lang::solana_program::{
@@ -21,68 +22,13 @@ use std::collections::HashMap;
 
 // Importing the MailboxInstruction and MailboxOutboxDispatch structs from the mailbox.rs file.
 mod igp;
-mod instructions;
 pub(crate) mod mailbox;
 mod pda_seeds;
 pub mod primitive_type;
-mod token_message;
 
 pub use primitive_type::*;
 
 use spl_noop; // Import the spl_noop module
-
-/// Seeds relating to the PDA account with information about this warp route.
-/// For convenience in getting the account metas required for handling messages,
-/// this is the same as the `HANDLE_ACCOUNT_METAS_PDA_SEEDS` in the message
-/// recipient interface.
-#[macro_export]
-macro_rules! hyperlane_token_pda_seeds {
-    () => {{
-        &[
-            b"hyperlane_message_recipient",
-            b"-",
-            b"handle",
-            b"-",
-            b"account_metas",
-        ]
-    }};
-
-    ($bump_seed:expr) => {{
-        &[
-            b"hyperlane_message_recipient",
-            b"-",
-            b"handle",
-            b"-",
-            b"account_metas",
-            &[$bump_seed],
-        ]
-    }};
-}
-
-/// A plugin that handles token transfers for a Hyperlane Sealevel Token program.
-pub trait HyperlaneSealevelTokenPlugin
-where
-    Self:
-        BorshSerialize + BorshDeserialize + std::cmp::PartialEq + std::fmt::Debug + Default + Sized,
-{
-    /// Initializes the plugin.
-    fn initialize<'a, 'b>(
-        program_id: &Pubkey,
-        system_program: &'a AccountInfo<'b>,
-        token_account: &'a AccountInfo<'b>,
-        payer_account: &'a AccountInfo<'b>,
-        accounts_iter: &mut std::slice::Iter<'a, AccountInfo<'b>>,
-    ) -> Result<Self>;
-
-    /// Transfers tokens into the program.
-    fn transfer_in<'a, 'b>(
-        program_id: &Pubkey,
-        token: &HyperlaneToken<Self>,
-        sender_wallet: &'a AccountInfo<'b>,
-        accounts_iter: &mut std::slice::Iter<'a, AccountInfo<'b>>,
-        amount: u64,
-    ) -> Result<()>;
-}
 
 /// Instruction data for the OutboxDispatch instruction.
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
@@ -181,7 +127,7 @@ pub fn convert_decimals(amount: U256, from_decimals: u8, to_decimals: u8) -> Opt
     }
 }
 
-#[derive(AnchorDeserialize, AnchorSerialize)]
+#[derive(AnchorDeserialize, AnchorSerialize, Copy, Clone)]
 pub enum InterchainGasPaymasterType {
     /// An IGP with gas oracles and that receives lamports as payment.
     Igp(Pubkey),
@@ -331,9 +277,9 @@ impl Ids for Igp {
 /// then dispatches a message to the remote recipient.
 ///
 /// Accounts:
-/// 0.  `[executable]` The system program.
-/// 1.  `[executable]` The spl_noop program.
-/// 2.  `[]` The token PDA account.
+/// 0.  `[]` Spoke state PDA.
+/// 1.  `[executable]` The system program.
+/// 2.  `[executable]` The spl_noop program.
 /// 3.  `[executable]` The mailbox program.
 /// 4.  `[writeable]` The mailbox outbox account.
 /// 5.  `[]` Message dispatch authority.
@@ -353,15 +299,23 @@ impl Ids for Igp {
 
 #[derive(Accounts)]
 pub struct TransferRemoteContext<'info> {
+    /// Spoke State
+    #[account(
+        mut,
+        seeds = [b"spoke-state"],
+        bump = spoke_state.bump,
+        realloc = 8 + std::mem::size_of::<SpokeState>() +
+            (std::mem::size_of::<IntentStatusAccount>() * (spoke_state.status.len() + 1)),
+        realloc::payer = sender_wallet,
+        realloc::zero = false,
+    )]
+    pub spoke_state: Account<'info, SpokeState>,
+
     /// The system program
     pub system_program: Program<'info, System>,
 
     /// The SPL-Noop program
     pub spl_noop_program: Program<'info, SplNoop>,
-
-    /// CHECK: Our hyperlane token storage account (example)
-    #[account(mut)]
-    pub token_account: AccountInfo<'info>,
 
     /// The mailbox program
     pub mailbox_program: Interface<'info, Mailbox>,
@@ -375,7 +329,7 @@ pub struct TransferRemoteContext<'info> {
 
     /// The user's wallet (signer)
     /// CHECK: This is the user's wallet, used only as a signer. No other data is read.
-    #[account(signer)]
+    #[account(signer, mut)]
     pub sender_wallet: AccountInfo<'info>,
 
     /// A unique message / gas payment account
@@ -411,7 +365,7 @@ pub struct TransferRemoteContext<'info> {
     pub inner_igp_account: Option<AccountInfo<'info>>, // or handle how you want to handle this
 }
 
-pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
+pub fn transfer_remote(
     ctx: Context<TransferRemoteContext>,
     xfer: TransferRemote,
 ) -> Result<()> {
@@ -423,23 +377,6 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     // Account 1: SPL Noop.
     let spl_noop = &ctx.accounts.spl_noop_program;
 
-    // Account 2: Token storage account
-    let token_account = &ctx.accounts.token_account;
-    // let token_account = next_account_info(accounts_iter)?;
-    let token = HyperlaneTokenAccount::fetch(&mut &token_account.data.borrow()[..])?
-        .into_inner();
-    let token_seeds: &[&[u8]] = hyperlane_token_pda_seeds!(token.bump);
-    let expected_token_key = Pubkey::create_program_address(token_seeds, program_id)
-        .map_err(|_| SpokeError::InvalidArgument)?;
-    require!(
-        token_account.key == &expected_token_key,
-        SpokeError::InvalidArgument
-    );
-    require!(
-        token_account.owner == program_id,
-        SpokeError::IncorrectProgramId
-    );
-
     // Account 3: Mailbox program
     let mailbox_info = &ctx.accounts.mailbox_program;
 
@@ -450,7 +387,7 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     // Account 5: Message dispatch authority
     let dispatch_authority_account = &ctx.accounts.dispatch_authority;
     let dispatch_authority_seeds: &[&[u8]] =
-        mailbox_message_dispatch_authority_pda_seeds!(token.dispatch_authority_bump);
+        mailbox_message_dispatch_authority_pda_seeds!(ctx.accounts.spoke_state.mailbox_dispatch_authority_bump);
     let dispatch_authority_key =
         Pubkey::create_program_address(dispatch_authority_seeds, program_id)
             .map_err(|_| SpokeError::InvalidArgument)?;
@@ -472,95 +409,78 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     // Similarly defer to the checks in the Mailbox to ensure account validity.
     let dispatched_message_pda = &ctx.accounts.dispatched_message_pda;
 
-    let igp_payment_accounts =
-        if let Some((ref igp_program_id, ref igp_account_type)) = token.interchain_gas_paymaster {
-            // Account 9: The IGP program
-            let igp_program_account = &ctx.accounts.igp_program;
-            require!(
-                *igp_program_account.key == *igp_program_id,
-                SpokeError::InvalidAccount
-            );
+    let igp_payment_accounts = {
+        let igp = &ctx.accounts.spoke_state.igp;
+        let igp_type = &ctx.accounts.spoke_state.igp_type;
 
-            // Account 10: The IGP program data.
-            // No verification is performed here, the IGP will do that.
-            let igp_program_data_account = &ctx.accounts.igp_program_data;
+        // Account 9: The IGP program
+        let igp_program_account = &ctx.accounts.igp_program;
+        require!(
+            igp_program_account.key == igp,
+            SpokeError::InvalidAccount
+        );
 
-            // Account 11: The gas payment PDA.
-            let igp_payment_pda_account = &ctx.accounts.igp_payment_pda;
+        // Account 10: The IGP program data.
+        // No verification is performed here, the IGP will do that.
+        let igp_program_data_account = &ctx.accounts.igp_program_data;
 
-            // Account 12: The configured IGP account.
-            let configured_igp_account = &ctx.accounts.configured_igp_account;
-            if configured_igp_account.key != igp_account_type.key() {
-                return err!(SpokeError::InvalidAccount);
+        // Account 11: The gas payment PDA.
+        let igp_payment_pda_account = &ctx.accounts.igp_payment_pda;
+
+        // Account 12: The configured IGP account.
+        let configured_igp_account = &ctx.accounts.configured_igp_account;
+        if configured_igp_account.key != igp_type.key() {
+            return err!(SpokeError::InvalidAccount);
+        }
+
+        let mut igp_payment_account_metas = vec![
+            AccountMeta::new_readonly(system_program::ID.to_bytes().into(), false),
+            AccountMeta::new(*sender_wallet.key, true),
+            AccountMeta::new(*igp_program_data_account.key, false),
+            AccountMeta::new_readonly(*unique_message_account.key, true),
+            AccountMeta::new(*igp_payment_pda_account.key, false),
+        ];
+        let mut igp_payment_account_infos = vec![
+            system_program_account.to_account_info(), // convert Program to AccountInfo
+            sender_wallet.clone(),
+            igp_program_data_account.clone(),
+            unique_message_account.clone(),
+            igp_payment_pda_account.clone(),
+        ];
+
+        match igp_type {
+            InterchainGasPaymasterType::Igp(_) => {
+                // No inner IGP needed in this variant
+                igp_payment_account_metas
+                    .push(AccountMeta::new(*configured_igp_account.key, false));
+                igp_payment_account_infos.push(configured_igp_account.clone());
             }
 
-            let mut igp_payment_account_metas = vec![
-                AccountMeta::new_readonly(system_program::ID.to_bytes().into(), false),
-                AccountMeta::new(*sender_wallet.key, true),
-                AccountMeta::new(*igp_program_data_account.key, false),
-                AccountMeta::new_readonly(*unique_message_account.key, true),
-                AccountMeta::new(*igp_payment_pda_account.key, false),
-            ];
-            let mut igp_payment_account_infos = vec![
-                system_program_account.to_account_info(), // convert Program to AccountInfo
-                sender_wallet.clone(),
-                igp_program_data_account.clone(),
-                unique_message_account.clone(),
-                igp_payment_pda_account.clone(),
-            ];
+            InterchainGasPaymasterType::OverheadIgp(_) => {
+                // 1) Unwrap the optional inner_igp_account from your context:
+                let inner_igp_account = ctx
+                    .accounts
+                    .inner_igp_account
+                    .as_ref() // get &AccountInfo<'info>
+                    .ok_or_else(|| error!(SpokeError::InvalidArgument))?;
 
-            match igp_account_type {
-                InterchainGasPaymasterType::Igp(_) => {
-                    // No inner IGP needed in this variant
-                    igp_payment_account_metas
-                        .push(AccountMeta::new(*configured_igp_account.key, false));
-                    igp_payment_account_infos.push(configured_igp_account.clone());
-                }
-
-                InterchainGasPaymasterType::OverheadIgp(_) => {
-                    // 1) Unwrap the optional inner_igp_account from your context:
-                    let inner_igp_account = ctx
-                        .accounts
-                        .inner_igp_account
-                        .as_ref() // get &AccountInfo<'info>
-                        .ok_or_else(|| error!(SpokeError::InvalidArgument))?;
-
-                    igp_payment_account_metas.extend([
-                        AccountMeta::new(*inner_igp_account.key, false),
-                        AccountMeta::new_readonly(*configured_igp_account.key, false),
-                    ]);
-                    igp_payment_account_infos
-                        .extend([inner_igp_account.clone(), configured_igp_account.clone()]);
-                }
-            };
-
-            Some((
-                *igp_program_id,
-                igp_payment_account_metas,
-                igp_payment_account_infos,
-            ))
-        } else {
-            None
+                igp_payment_account_metas.extend([
+                    AccountMeta::new(*inner_igp_account.key, false),
+                    AccountMeta::new_readonly(*configured_igp_account.key, false),
+                ]);
+                igp_payment_account_infos
+                    .extend([inner_igp_account.clone(), configured_igp_account.clone()]);
+            }
         };
 
-    // The amount denominated in the local decimals.
-    let local_amount: u64 = xfer
-        .amount_or_id
-        .try_into()
-        .map_err(|_| SpokeError::IntegerOverflow)?;
-    // Convert to the remote number of decimals, which is universally understood
-    // by the remote routers as the number of decimals used by the message amount.
-    let remote_amount: U256 = token.local_amount_to_remote_amount(local_amount)?;
+        (
+            *igp,
+            igp_payment_account_metas,
+            igp_payment_account_infos,
+        )
+    };
 
-    // Transfer `local_amount` of tokens in...
-    T::transfer_in(
-        program_id,
-        &*token,
-        sender_wallet,
-        // TODO: Unclear if this solves the problem here
-        &mut [].iter(),
-        local_amount,
-    )?;
+    // NOTE: we do not need transfer in as we do not transfer token cross chain
 
     let dispatch_account_metas = vec![
         AccountMeta::new(*mailbox_outbox_account.key, false),
@@ -584,31 +504,29 @@ pub fn transfer_remote<T: HyperlaneSealevelTokenPlugin>(
     // The token message body, which specifies the remote_amount.
     let token_transfer_message = xfer.message_body;
 
-    if let Some((igp_program_id, igp_payment_account_metas, igp_payment_account_infos)) =
-        igp_payment_accounts
-    {
-        // Dispatch the message and pay for gas.
-        dispatch_with_gas(
-            program_id,
-            dispatch_authority_seeds,
-            xfer.destination_domain,
-            token_transfer_message,
-            xfer.gas_amount,
-            dispatch_account_metas,
-            dispatch_account_infos,
-            igp_payment_account_metas,
-            &igp_payment_account_infos, // mailbox_info.key,
-            mailbox_info.key,
-            &igp_program_id,
-            &xfer.recipient,
-        )?;
-    }
+    let (igp_program_id, igp_payment_account_metas, igp_payment_account_infos) =
+        igp_payment_accounts;
+
+    // Dispatch the message and pay for gas.
+    dispatch_with_gas(
+        program_id,
+        dispatch_authority_seeds,
+        xfer.destination_domain,
+        token_transfer_message,
+        xfer.gas_amount,
+        dispatch_account_metas,
+        dispatch_account_infos,
+        igp_payment_account_metas,
+        &igp_payment_account_infos, // mailbox_info.key,
+        mailbox_info.key,
+        &igp_program_id,
+        &xfer.recipient,
+    )?;
 
     msg!(
-        "Warp route transfer completed to destination: {}, recipient: {}, remote_amount: {}",
+        "transfer completed to destination: {}, recipient: {}",
         xfer.destination_domain,
-        xfer.recipient,
-        remote_amount
+        xfer.recipient
     );
 
     Ok(())

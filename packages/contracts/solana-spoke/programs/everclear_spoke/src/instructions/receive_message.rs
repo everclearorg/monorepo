@@ -6,7 +6,8 @@ use anchor_spl::{
 
 use crate::{
     consts::{
-        everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH
+        everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN,
+        LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH,
     },
     error::SpokeError,
     events::{MessageReceivedEvent, SettledEvent},
@@ -29,7 +30,10 @@ pub fn handle<'info>(
     // require!(msg.sender == MAILBOX, SpokeError::InvalidSender);
     require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
     require!(handle.origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
-    require!(handle.sender == everclear_gateway(), SpokeError::InvalidSender);
+    require!(
+        handle.sender == everclear_gateway(),
+        SpokeError::InvalidSender
+    );
 
     require!(!handle.message.is_empty(), SpokeError::InvalidMessage);
     // for emit_epi!
@@ -76,7 +80,10 @@ pub fn handle<'info>(
     {
         let disc = anchor_lang::event::EVENT_IX_TAG_LE;
         // TODO: Test the address conversion works
-        let inner_data = anchor_lang::Event::data(&MessageReceivedEvent { origin: handle.origin, sender: h256_to_pub(handle.sender) });
+        let inner_data = anchor_lang::Event::data(&MessageReceivedEvent {
+            origin: handle.origin,
+            sender: h256_to_pub(handle.sender),
+        });
         let ix_data: Vec<u8> = disc.into_iter().chain(inner_data).collect();
         let ix = anchor_lang::solana_program::instruction::Instruction::new_with_bytes(
             crate::ID,
@@ -101,7 +108,7 @@ pub fn handle<'info>(
 fn handle_batch_settlement<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
     batch: Vec<Settlement>,
-    vault_authority_bump: u8
+    vault_authority_bump: u8,
 ) -> Result<()> {
     // Create local references to avoid lifetime issues
     for s in batch.iter() {
