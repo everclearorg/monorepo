@@ -391,13 +391,16 @@ pub struct TransferRemoteContext<'info> {
     #[account(executable)]
     pub igp_program: Interface<'info, Igp>,
     #[account(mut)]
-    
+
+    /// CHECK:
     pub igp_program_data: AccountInfo<'info>,
     #[account(mut)]
-    
+
+    /// CHECK:
     pub igp_payment_pda: AccountInfo<'info>,
     #[account(mut)]
-    
+
+    /// CHECK:
     pub configured_igp_account: AccountInfo<'info>,
 
     //
