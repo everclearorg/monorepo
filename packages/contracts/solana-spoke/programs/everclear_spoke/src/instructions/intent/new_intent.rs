@@ -181,13 +181,6 @@ pub fn new_intent(
         destinations,
         data,
     });
-
-    //  emit!(IntentQueueProcessedEvent {
-    //     message_id,
-    //     first_index: old_first,
-    //     last_index: old_first + intents.len() as u64,
-    //     fee_spent,
-    // });
     Ok(())
 }
 
@@ -222,10 +215,16 @@ fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
 #[event_cpi]
 #[derive(Accounts)]
 pub struct NewIntent<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
     #[account(
         mut,
         seeds = [b"spoke-state"],
-        bump = spoke_state.bump
+        bump = spoke_state.bump,
+        realloc = 8 + std::mem::size_of::<SpokeState>() +
+            (std::mem::size_of::<IntentStatusAccount>() * (spoke_state.status.len() + 1)),
+        realloc::payer = payer,
+        realloc::zero = false,
     )]
     pub spoke_state: Account<'info, SpokeState>,
 
