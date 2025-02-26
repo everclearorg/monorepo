@@ -22,7 +22,7 @@ pub fn handle<'info>(
     handle: HandleInstruction,
 ) -> Result<()> {
     // TODO: Checking the Hyperlane Mailbox
-    // require!(msg.sender == MAILBOX, SpokeError::InvalidSender);
+    // require!(msg.sender == ctx.accounts.spoke_state.mailbox, SpokeError::InvalidSender);
     require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
     require!(handle.origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
     require!(
@@ -132,31 +132,40 @@ pub struct InterchainSecurityModuleAccountMetas<'info> {
 }
 
 pub fn handle_account_metas(ctx: Context<HandleAccountMetas>, handle: HandleInstruction) -> Result<AuthStateMetas>{
-    // TODO: how we store bump?
-    let spoke_state_seed: &[&[u8]]= &[b"spoke-state"];
-    let spoke_state =
-        Pubkey::create_program_address(spoke_state_seed, ctx.program_id)
-            .map_err(|_| SpokeError::InvalidArgument)?;
+    let spoke_state_account = &ctx.accounts.spoke_state;
+    let mailbox_pubkey = spoke_state_account.mailbox;
+    let spoke_state_pda = spoke_state_account.key();
 
+    let (event_authority_pubkey, _) =Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
+
+
+    // TODO: This would need to provide an array of token_programs - as settlements can be for different tokens
     let msg_type = handle.message[0];
     match msg_type {
         1 => {
             msg!("Processing settlement batch message");
-            let settlement_data = &&handle.message[1..];
+            let settlement_data = &handle.message[1..];
             let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
                 .map_err(|_| SpokeError::InvalidMessage)?;
+            let asset_pubkeys: Vec<Pubkey> = batch
+                .iter()
+                .map(|settlement| settlement.asset)
+                .collect();
 
-            let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
+
+            // Derive the vault authority PDA
+            let (vault_authority_pubkey, vault_authority_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
+            let (vault_token_account_pubkey, _) = Pubkey::find_program_address(&[b"vault-token"], ctx.program_id);
 
             // TODO: we seems need to have a vec of token_program to handle a vec of settlement
             Ok(AuthStateMetas{
-                spoke_state,
-                authority: todo!(),
-                vault_token_account: todo!(),
-                vault_authority: todo!(),
-                token_program: todo!(),
-                hyperlane_mailbox: todo!(),
-                event_authority: todo!(),
+                spoke_state: spoke_state_pda,
+                authority: spoke_state_account.owner,
+                vault_token_account: vault_token_account_pubkey,
+                vault_authority: vault_authority_pubkey,
+                token_program: asset_pubkeys,
+                hyperlane_mailbox: mailbox_pubkey,
+                event_authority: event_authority_pubkey,
                 program: *ctx.program_id,
             })
         }
@@ -165,13 +174,13 @@ pub fn handle_account_metas(ctx: Context<HandleAccountMetas>, handle: HandleInst
             msg!("variable update message metadata");
             let zero_address = Pubkey::from([0; 32]);
             Ok(AuthStateMetas{
-                spoke_state,
-                authority: todo!(),
+                spoke_state: spoke_state_pda,
+                authority: spoke_state_account.owner,
                 vault_token_account: zero_address,
                 vault_authority: zero_address,
-                token_program: zero_address,
-                hyperlane_mailbox: todo!(),
-                event_authority: todo!(),
+                token_program: vec![zero_address],
+                hyperlane_mailbox: mailbox_pubkey,
+                event_authority: event_authority_pubkey,
                 program: *ctx.program_id,
             })
         }
@@ -179,14 +188,19 @@ pub fn handle_account_metas(ctx: Context<HandleAccountMetas>, handle: HandleInst
             return Err(SpokeError::InvalidMessage.into());
         }
     }
-
-    // TODO: we may need to put all of those in the their pda, hyperlane_mailbox
 }
 
 #[derive(Accounts)]
 pub struct HandleAccountMetas<'info> {
     /// CHECK: this is now undefined pdas where we dont store anything
-    account_metas_pda: AccountInfo<'info>
+    ///     // The global SpokeState, which holds the `mailbox` field.
+    #[account(
+        // Derive the PDA the “usual” Anchor way:
+        seeds = [b"spoke-state"],
+        bump = spoke_state.bump,
+        // Possibly `mut` if you need to write to it
+    )]
+    pub spoke_state: Account<'info, SpokeState>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -195,7 +209,7 @@ pub struct AuthStateMetas {
     pub authority: Pubkey,
     pub vault_token_account: Pubkey,
     pub vault_authority: Pubkey,
-    pub token_program: Pubkey,
+    pub token_program: Vec<Pubkey>,
     pub hyperlane_mailbox: Pubkey,
     pub event_authority: Pubkey,
     pub program: Pubkey,
