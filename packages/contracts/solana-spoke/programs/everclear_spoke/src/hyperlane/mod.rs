@@ -16,11 +16,10 @@ use anchor_lang::{
     Ids,
 };
 use igp::{IgpInstruction, IgpPayForGas};
-use mailbox::MailboxInstruction;
+use mailbox::{MailboxInstruction, OutboxDispatch};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
-// Importing the MailboxInstruction and MailboxOutboxDispatch structs from the mailbox.rs file.
 mod igp;
 pub(crate) mod mailbox;
 mod pda_seeds;
@@ -29,23 +28,6 @@ pub mod primitive_type;
 pub use primitive_type::*;
 
 use spl_noop; // Import the spl_noop module
-
-/// Instruction data for the OutboxDispatch instruction.
-#[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
-pub struct OutboxDispatch {
-    /// The sender of the message.
-    /// This is required and not implied because a program uses a dispatch authority PDA
-    /// to sign the CPI on its behalf. Instruction processing logic prevents a program from
-    /// specifying any message sender it wants by requiring the relevant dispatch authority
-    /// to sign the CPI.
-    pub sender: Pubkey,
-    /// The destination domain of the message.
-    pub destination_domain: u32,
-    /// The remote recipient of the message.
-    pub recipient: H256,
-    /// The message body.
-    pub message_body: Vec<u8>,
-}
 
 pub struct TransferRemote {
     /// The destination domain.
@@ -292,7 +274,7 @@ impl Ids for Igp {
 /// 11. `[writeable]` Gas payment PDA.
 /// 12. `[]` OPTIONAL - The Overhead IGP program, if the configured IGP is an Overhead IGP.
 /// 13. `[writeable]` The IGP account.
-///      ---- End if ----
+///     ---- End if ----
 /// 14. `[executable]` The spl_token_2022 program.
 /// 15. `[writeable]` The mint / mint authority PDA account.
 /// 16. `[writeable]` The token sender's associated token account, from which tokens will be burned.
@@ -365,10 +347,7 @@ pub struct TransferRemoteContext<'info> {
     pub inner_igp_account: Option<AccountInfo<'info>>, // or handle how you want to handle this
 }
 
-pub fn transfer_remote(
-    ctx: Context<TransferRemoteContext>,
-    xfer: TransferRemote,
-) -> Result<()> {
+pub fn transfer_remote(ctx: Context<TransferRemoteContext>, xfer: TransferRemote) -> Result<()> {
     let program_id = ctx.program_id;
 
     // Account 0: System program.
@@ -386,8 +365,9 @@ pub fn transfer_remote(
 
     // Account 5: Message dispatch authority
     let dispatch_authority_account = &ctx.accounts.dispatch_authority;
-    let dispatch_authority_seeds: &[&[u8]] =
-        mailbox_message_dispatch_authority_pda_seeds!(ctx.accounts.spoke_state.mailbox_dispatch_authority_bump);
+    let dispatch_authority_seeds: &[&[u8]] = mailbox_message_dispatch_authority_pda_seeds!(
+        ctx.accounts.spoke_state.mailbox_dispatch_authority_bump
+    );
     let dispatch_authority_key =
         Pubkey::create_program_address(dispatch_authority_seeds, program_id)
             .map_err(|_| SpokeError::InvalidArgument)?;
@@ -415,10 +395,7 @@ pub fn transfer_remote(
 
         // Account 9: The IGP program
         let igp_program_account = &ctx.accounts.igp_program;
-        require!(
-            igp_program_account.key == igp,
-            SpokeError::InvalidAccount
-        );
+        require!(igp_program_account.key == igp, SpokeError::InvalidAccount);
 
         // Account 10: The IGP program data.
         // No verification is performed here, the IGP will do that.
@@ -473,11 +450,7 @@ pub fn transfer_remote(
             }
         };
 
-        (
-            *igp,
-            igp_payment_account_metas,
-            igp_payment_account_infos,
-        )
+        (*igp, igp_payment_account_metas, igp_payment_account_infos)
     };
 
     // NOTE: we do not need transfer in as we do not transfer token cross chain
@@ -531,21 +504,3 @@ pub fn transfer_remote(
 
     Ok(())
 }
-
-// #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-// enum TokenType {
-//     Native,
-//     Synthetic,
-//     Collateral,
-// }
-
-// struct TokenTransferRemote {
-//     program_id: Pubkey,
-//     // Note this is the keypair for normal account not the derived associated token account or delegate.
-//     sender: String,
-//     amount: u64,
-//     // #[arg(long, short, default_value_t = ECLIPSE_DOMAIN)]
-//     destination_domain: u32,
-//     recipient: String,
-//     token_type: TokenType,
-// }

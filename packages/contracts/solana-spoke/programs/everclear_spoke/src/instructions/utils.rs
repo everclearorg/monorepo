@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::error::SpokeError;
 
-use crate::intent::intent::Intent;
+use crate::intent::Intent;
 
 pub(crate) fn vault_authority_seeds(
     program_id: &Pubkey,
@@ -49,7 +49,7 @@ pub(crate) fn normalize_decimals(
 }
 
 /// Minimal keccak256 using the tiny_keccak crate.
-pub(crate) fn keccak_256(data: &[u8]) -> [u8; 32] {
+fn keccak_256(data: &[u8]) -> [u8; 32] {
     use tiny_keccak::{Hasher, Keccak};
     let mut hasher = Keccak::v256();
     hasher.update(data);

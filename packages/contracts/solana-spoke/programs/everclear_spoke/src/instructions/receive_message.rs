@@ -48,7 +48,7 @@ pub fn handle<'info>(
             let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
                 .map_err(|_| SpokeError::InvalidMessage)?;
 
-            let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], &ctx.program_id);
+            let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
 
             handle_batch_settlement(ctx, batch, vault_bump)?;
         }

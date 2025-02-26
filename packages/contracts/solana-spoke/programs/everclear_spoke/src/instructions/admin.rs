@@ -1,10 +1,13 @@
 use anchor_lang::prelude::*;
 
 use super::AdminState;
-use crate::{events::{
-    IgpUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent,
-    WatchtowerUpdatedEvent,
-}, hyperlane::InterchainGasPaymasterType};
+use crate::{
+    events::{
+        IgpUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent,
+        WatchtowerUpdatedEvent,
+    },
+    hyperlane::InterchainGasPaymasterType,
+};
 
 pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
     let old = ctx.accounts.spoke_state.lighthouse;
@@ -36,12 +39,21 @@ pub fn update_mailbox(ctx: Context<AdminState>, new_mailbox: Pubkey) -> Result<(
     Ok(())
 }
 
-pub fn update_igp(ctx: Context<AdminState>, new_igp: Pubkey, new_igp_type: InterchainGasPaymasterType) -> Result<()> {
+pub fn update_igp(
+    ctx: Context<AdminState>,
+    new_igp: Pubkey,
+    new_igp_type: InterchainGasPaymasterType,
+) -> Result<()> {
     let old_igp = ctx.accounts.spoke_state.igp;
     let old_igp_type = ctx.accounts.spoke_state.igp_type;
     ctx.accounts.spoke_state.igp = new_igp;
     ctx.accounts.spoke_state.igp_type = new_igp_type;
-    emit_cpi!(IgpUpdatedEvent { old_igp, new_igp, old_igp_type, new_igp_type });
+    emit_cpi!(IgpUpdatedEvent {
+        old_igp,
+        new_igp,
+        old_igp_type,
+        new_igp_type
+    });
     Ok(())
 }
 

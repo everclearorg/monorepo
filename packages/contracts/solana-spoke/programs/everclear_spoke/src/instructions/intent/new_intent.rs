@@ -1,8 +1,7 @@
 use crate::{
     consts::everclear_gateway,
     hyperlane::{
-        transfer_remote, Igp, Mailbox, SplNoop,
-        TransferRemote, TransferRemoteContext, U256,
+        transfer_remote, Igp, Mailbox, SplNoop, TransferRemote, TransferRemoteContext, U256,
     },
 };
 use anchor_lang::prelude::*;
@@ -12,7 +11,7 @@ use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, MAX_CALLDATA_SIZE},
     error::SpokeError,
     events::IntentAddedEvent,
-    intent::intent::Intent,
+    intent::Intent,
     state::SpokeState,
     state::{IntentStatus, IntentStatusAccount},
     utils::{compute_intent_hash, normalize_decimals},
@@ -173,23 +172,6 @@ fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
     buffer.extend_from_slice(&encoded);
     Ok(buffer)
 }
-
-// pub fn mailbox_outbox_dispatch<'info>(
-//     ctx: CpiContext<'_, '_, '_, 'info, Transfer<'info>>,
-//     lamports: u64,
-// ) -> Result<()> {
-//     let ix = crate::solana_program::system_instruction::transfer(
-//         ctx.accounts.from.key,
-//         ctx.accounts.to.key,
-//         lamports,
-//     );
-//     crate::solana_program::program::invoke_signed(
-//         &ix,
-//         &[ctx.accounts.from, ctx.accounts.to],
-//         ctx.signer_seeds,
-//     )
-//     .map_err(Into::into)
-// }
 
 #[event_cpi]
 #[derive(Accounts)]

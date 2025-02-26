@@ -83,6 +83,8 @@ pub mod everclear_spoke {
         )
     }
 
+    /// Instruction relates to message receiving
+
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
     pub fn handle<'info>(
@@ -91,6 +93,8 @@ pub mod everclear_spoke {
     ) -> Result<()> {
         instructions::handle(ctx, handle)
     }
+
+    /// Admin functions
 
     pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;

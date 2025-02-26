@@ -2,53 +2,6 @@ use anchor_lang::prelude::*;
 
 use crate::hyperlane::InterchainGasPaymasterType;
 
-/// Queue state with first/last indices for efficient management
-#[derive(AnchorSerialize, AnchorDeserialize, Default, Clone)]
-pub struct QueueState<T> {
-    pub items: Vec<T>,
-    pub first_index: u64,
-    pub last_index: u64,
-}
-
-impl<T> QueueState<T> {
-    pub const SIZE: usize = 8  // discriminator
-    + 4    // vec length prefix
-    + 8    // first
-    + 8; // last
-         // Add any other fixed size fields
-
-    pub fn new() -> Self {
-        Self {
-            items: Vec::new(),
-            first_index: 0,
-            last_index: 0,
-        }
-    }
-
-    pub fn push_back(&mut self, item: T) {
-        self.items.push(item);
-        self.last_index = self.last_index.saturating_add(1);
-    }
-
-    pub fn pop_front(&mut self) -> Option<T> {
-        if !self.items.is_empty() {
-            let item = self.items.remove(0);
-            self.first_index = self.first_index.saturating_add(1);
-            Some(item)
-        } else {
-            None
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.items.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.items.is_empty()
-    }
-}
-
 /// SpokeState – global configuration.
 #[account]
 pub struct SpokeState {
@@ -99,9 +52,7 @@ impl SpokeState {
         + 32                     // mailbox: Pubkey
         + 1                      // mailbox_dispatch_authority_bump: u8
         + 32                     // igp: Pubkey
-        + 33                     // igp_type: InterchainGasPaymasterType
-        ;
-        
+        + 33;                    // igp_type: InterchainGasPaymasterType
 }
 
 #[account]
