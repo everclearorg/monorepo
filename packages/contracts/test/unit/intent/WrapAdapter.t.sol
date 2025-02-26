@@ -20,6 +20,10 @@ contract TestWrapAdapter is WrapAdapter {
     function unwrap(address _outputAsset, uint256 _amountOut, address _unwrapReceiver, bytes32 _intentId) external {
         _unwrap(_outputAsset, _amountOut, _unwrapReceiver, _intentId);
     }
+
+    function decodeArbitraryData(bytes calldata _data) external pure returns (address, address) {
+        return _decodeArbitraryData(_data);
+    }
 }
 
 contract BaseTest is TestExtended {
@@ -72,7 +76,31 @@ contract Unit_WrapAdapter_UpdateSpoke is BaseTest {
     }
 }
 
-contract Unit_WrapAdapter_UnwrapIntent is BaseTest {}
+contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
+    using TypeCasts for bytes32;
+    using TypeCasts for address;
+
+    function test_unwrapIntent_XERC20Success(IEverclear.Intent memory _intent, uint256 _amountOut, address _unwrapReceiver) public {
+        vm.assume(_intent.amount > 0);
+        vm.assume(_amountOut <= _intent.amount);
+        vm.assume(_unwrapReceiver != address(0));
+
+        // Configure data - receiver + callReceiver are wrapAdapter and unwrapReceiver != address(0)
+        _intent.receiver = address(wrapAdapter).toBytes32();
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver);
+        _intent.data = abi.encode(address(wrapAdapter), _adapterCallbackCalldata);
+
+        // Deploy and deal XERC20
+        (bytes32 _nativeToken, bytes32 _xerc20token) = deployAndDealXERC20Native(address(wrapAdapter).toBytes32(), _amountOut);
+        _intent.outputAsset = _xerc20token;
+        assertEq(IERC20(_xerc20token.toAddress()).balanceOf(address(wrapAdapter)), _intent.amount);
+        assertEq(IERC20(_nativeToken.toAddress()).balanceOf(address(wrapAdapter)), 0);
+        uint256 _nativeBalance = IERC20(_nativeToken.toAddress()).balanceOf(address(_unwrapReceiver));
+
+        wrapAdapter.unwrapAsset(_intent, _amountOut);
+        assertEq(IERC20(_nativeToken.toAddress()).balanceOf(_unwrapReceiver), _nativeBalance + _amountOut);
+    }
+}
 
 contract Unit_WrapAdapter_UnwrapInvalidCalldata is BaseTest {
     using TypeCasts for address;
@@ -162,3 +190,57 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
 
 
 contract Unit_WrapAdapter_Unwrap is BaseTest {}
+
+contract Unit_WrapAdapter_DecodeArbitraryData is BaseTest {
+    function test_decodeArbitraryData_EmptyData(uint256 _byteSize) public view {
+        vm.assume(_byteSize < 32);
+        bytes memory _data = new bytes(_byteSize);
+
+        (address _callReceiver, address _unwrapReceiver) = wrapAdapter.decodeArbitraryData(_data);
+        assertEq(_callReceiver, address(0));
+        assertEq(_unwrapReceiver, address(0));
+    }
+
+    function test_decodeArbitraryData_CallReceiverOnly() public view {
+        address _callReceiver = address(wrapAdapter);
+
+        bytes memory _data = abi.encode(_callReceiver);
+        (address _decodedCallReceiver, address _unwrapReceiver) = wrapAdapter.decodeArbitraryData(_data);
+        assertEq(_decodedCallReceiver, _callReceiver);
+        assertEq(_unwrapReceiver, address(0));
+    }
+
+    function test_decodeArbitraryData_CallReceiverAndReceiver(address _unwrapReceiver) public view {
+        address _callReceiver = address(wrapAdapter);
+
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver);
+        bytes memory _data = abi.encode(_callReceiver, _adapterCallbackCalldata);
+        (address _decodedCallReceiver, address _decodedUnwrapReceiver) = wrapAdapter.decodeArbitraryData(_data);
+        assertEq(_decodedCallReceiver, _callReceiver);
+        assertEq(_decodedUnwrapReceiver, _unwrapReceiver);
+    }
+
+    function test_decodeArbitraryData_CallReceiverAndInvalidLargeBytes(uint256 _byteSize) public view {
+        vm.assume(_byteSize > 36);
+
+        address _callReceiver = address(wrapAdapter);
+        bytes memory _calldata = new bytes(_byteSize);
+
+        bytes memory _data = abi.encode(_callReceiver, _calldata);
+        (address _decodedCallReceiver, address _unwrapReceiver) = wrapAdapter.decodeArbitraryData(_data);
+        assertEq(_decodedCallReceiver, _callReceiver);
+        assertEq(_unwrapReceiver, address(0));
+    }
+
+    function test_decodeArbitraryData_CallReceiverAndInvalidSmallBytes(uint256 _byteSize) public view {
+        vm.assume(_byteSize < 36);
+
+        address _callReceiver = address(wrapAdapter);
+        bytes memory _calldata = new bytes(_byteSize);
+
+        bytes memory _data = abi.encode(_callReceiver, _calldata);
+        (address _decodedCallReceiver, address _unwrapReceiver) = wrapAdapter.decodeArbitraryData(_data);
+        assertEq(_decodedCallReceiver, _callReceiver);
+        assertEq(_unwrapReceiver, address(0));
+    }
+}

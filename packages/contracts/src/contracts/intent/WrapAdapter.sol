@@ -25,11 +25,12 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         _;
     }
 
-    modifier entryUpdate() {
-        entered = true;
-        _;
-        entered = false;
-    }
+    // modifier entryUpdate() {
+    //     if(entered == true) revert Invalid_Entry_State(); 
+    //     entered = true;
+    //     _;
+    //     entered = false;
+    // }
 
     constructor(address _weth, address _spoke, address _owner) Ownable(_owner) {
         if(_spoke == address(0)) revert Invalid_Address();
@@ -49,11 +50,10 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         emit SpokeUpdated(_oldSpoke, _newSpoke);
     }
 
-    function unwrapAsset(IEverclear.Intent calldata _intent, uint256 _amountOut) external onlyOwner entryUpdate {
+    function unwrapAsset(IEverclear.Intent calldata _intent, uint256 _amountOut) external onlyOwner {
         // Updating state and configure variables used
         address _outputAsset = _intent.outputAsset.toAddress();
-        (address _callReceiver, bytes memory _calldata) = abi.decode(_intent.data, (address, bytes));
-        (, address _unwrapReceiver) = abi.decode(_calldata, (bytes4, address));
+        (address _callReceiver, address _unwrapReceiver) = _decodeArbitraryData(_intent.data);
 
         // Check intent receiver is this, callReceiver is this, amount is valid, and unwrap receiver is non-zero
         if(_intent.receiver.toAddress() != address(this)) revert Invalid_Receiver(_intent.receiver.toAddress());
@@ -61,7 +61,7 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         if(_amountOut > _intent.amount) revert Invalid_Output_Amount();
         if(_unwrapReceiver == address(0)) revert Invalid_Receiver(_unwrapReceiver);
 
-        // Execute on spoke - update status and executes callback
+        // Execute on spoke - update status and executes callback - reverts if !SETTLED
         everclearSpoke.executeIntentCalldata(_intent);
 
         // Unwrapping and emitting
@@ -89,37 +89,12 @@ contract WrapAdapter is IWrapAdapter, Ownable {
 
         // Unwraps to an input receiver
         _unwrap(_outputAsset, _amountOut, _receiver, _intentId);
+
+        // Emitting event once completed
+        emit UnwrapClosed(_intentId, _outputAsset, _amountOut);
     }
 
-    function _decodeArbitraryData(bytes memory _data) internal pure returns (address _callReceiver, address _unwrapReceiver) {
-        // Handling the callReceiver input
-        bytes memory _calldata;
-        if(_data.length < 32) return (address(0), address(0));
-        else if(_data.length == 32) {
-            (_callReceiver) = abi.decode(_data, (address));
-            return (_callReceiver, address(0));
-        } else if(_data.length > 32) {
-            (_callReceiver, _calldata) = abi.decode(_data, (address, bytes));
-        }
-
-        // Handling the additional data input
-        if(_calldata.length < 36) {
-            // Fetch the address from remaining 32 bytes
-            assembly {
-                // Read word starting 4 bytes later - address will occupy lower 20 bytes of 32-byte word
-                let addressWord := mload(add(_calldata, 0x24))
-                // Shift top 12 bytes (96 bits) so that the lower 20 bytes is a proper address.
-                _unwrapReceiver := and(addressWord, 0xffffffffffffffffffffffffffffffffffffffff)
-            }
-            return (_callReceiver, _unwrapReceiver);
-        } else {
-            return (_callReceiver, address(0));
-        }
-    }
-
-    function adapterCallback(bytes memory) external view onlySpoke {
-        if(!entered) revert Invalid_Callback_State();
-    }
+    function adapterCallback(bytes memory) external view onlySpoke {}
 
     /*///////////////////////////////////////////////////////////////
                        EXTERNAL FUNCTIONS
@@ -173,7 +148,32 @@ contract WrapAdapter is IWrapAdapter, Ownable {
             if(!success) revert Transfer_ETH_Failure();
         }
 
-		// Emitting event once completed
         emit UnwrapClosed(_intentId, _outputAsset, _amountOut);
+    }
+
+    function _decodeArbitraryData(bytes memory _data) internal pure returns (address _callReceiver, address _unwrapReceiver) {
+        // Handling the callReceiver input
+        bytes memory _calldata;
+        if(_data.length < 32) return (address(0), address(0));
+        else if(_data.length == 32) {
+            (_callReceiver) = abi.decode(_data, (address));
+            return (_callReceiver, address(0));
+        } else if(_data.length > 32) {
+            (_callReceiver, _calldata) = abi.decode(_data, (address, bytes));
+        }
+
+        // Handling the additional data input
+        if(_calldata.length == 36) {
+            // Fetch the address from remaining 32 bytes
+            assembly {
+                // Read word starting 4 bytes later - address will occupy lower 20 bytes of 32-byte word
+                let addressWord := mload(add(_calldata, 0x24))
+                // Shift top 12 bytes (96 bits) so that the lower 20 bytes is a proper address.
+                _unwrapReceiver := and(addressWord, 0xffffffffffffffffffffffffffffffffffffffff)
+            }
+            return (_callReceiver, _unwrapReceiver);
+        } else {
+            return (_callReceiver, address(0));
+        }
     }
 }

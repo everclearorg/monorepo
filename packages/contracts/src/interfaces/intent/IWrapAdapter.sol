@@ -30,6 +30,7 @@ interface IWrapAdapter {
     error Invalid_Output_Amount();
     error Invalid_Callback_State();
     error Invalid_Manual_Processing();
+    error Invalid_Entry_State();
     error Invalid_Spoke_Caller(address _sender);
     error Invalid_Receiver(address _receiver);
     error Invalid_Callback(address _callback);

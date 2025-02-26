@@ -2,6 +2,8 @@
 pragma solidity ^0.8.19;
 
 import {TestERC20} from './TestERC20.sol';
+import {XERC20} from './TestXToken.sol';
+import {XERC20Lockbox} from './TestLockbox.sol';
 import {Mocker} from './mocks/Mocker.sol';
 import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
@@ -13,6 +15,7 @@ import {VmSafe} from 'forge-std/Vm.sol';
 import {Mocker} from './mocks/Mocker.sol';
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import {IXERC20} from 'interfaces/common/IXERC20.sol';
 
 contract TestExtended is Mocker {
   using TypeCasts for address;
@@ -92,6 +95,21 @@ contract TestExtended is Mocker {
     address _tokenAddress = address(new TestERC20('Token', 'TKN'));
     deal(_tokenAddress, _receiver, _amount);
     _token = _tokenAddress.toBytes32();
+  }
+
+  function deployAndDealXERC20Native(bytes32 _receiver, uint256 _amount) public returns (bytes32 _nativeToken, bytes32 _xerc20Token) {
+    _nativeToken = deployAndDeal(_receiver, _amount);
+    _xerc20Token = deployXERC20(_nativeToken);
+  }
+
+  function deployXERC20(bytes32 _nativeToken) public returns (bytes32 _xerc20Token) {
+    // Deploy the XERC20 token
+    address _tokenAddress = address(new XERC20('TokenX', 'TKNX', address(this)));
+    _xerc20Token = _tokenAddress.toBytes32();
+
+    // Deploy Lockbox
+    address _lockboxAddress = address(new XERC20Lockbox(_xerc20Token.toAddress(), _nativeToken.toAddress(), false));
+    IXERC20(_tokenAddress).setLockbox(_lockboxAddress);
   }
 
   function _validAndDifferentAddresses(address _address1, address _address2) internal pure {
