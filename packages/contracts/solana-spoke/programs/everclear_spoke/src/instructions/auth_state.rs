@@ -6,8 +6,15 @@ use crate::state::SpokeState;
 #[event_cpi]
 #[derive(Accounts)]
 pub struct AuthState<'info> {
-    #[account(mut)]
+    #[account(
+        init,
+        payer = authority,
+        space = 8 + SpokeState::SIZE,
+        seeds = [b"spoke-state"],
+        bump
+    )]
     pub spoke_state: Account<'info, SpokeState>,
+    #[account(mut)]
     pub authority: Signer<'info>,
     #[account(mut)]
     pub vault_token_account: Account<'info, TokenAccount>,
@@ -16,6 +23,7 @@ pub struct AuthState<'info> {
     pub token_program: Program<'info, Token>,
     /// CHECK: This is the Hyperlane mailbox program
     pub hyperlane_mailbox: UncheckedAccount<'info>,
+    pub system_program: Program<'info, System>
 }
 
 #[event_cpi]

@@ -84,6 +84,8 @@ pub mod everclear_spoke {
     }
 
     /// Instruction relates to message receiving
+    /// TODO: find a way to custom set the Discriminator as now its something like `hash(global:interchain_security_module)` while it needs to be
+    /// `hyperlane-message-recipient:interchain-security-module`
 
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
@@ -92,6 +94,25 @@ pub mod everclear_spoke {
         handle: HandleInstruction,
     ) -> Result<()> {
         instructions::handle(ctx, handle)
+    }
+
+    pub fn interchain_security_module(
+        ctx: Context<InterchainSecurityModule>,
+    ) -> Result<()> {
+        instructions::interchain_security_module(ctx)
+    }
+
+    pub fn interchain_security_module_acconut_metas(
+        ctx: Context<InterchainSecurityModuleAccountMetas>,
+    ) -> Result<()> {
+        instructions::interchain_security_module_account_metas(ctx)
+    }
+
+    pub fn handle_account_metas(
+        ctx: Context<HandleAccountMetas>,
+        handle: HandleInstruction,
+    ) -> Result<AuthStateMetas> {
+        instructions::handle_account_metas(ctx, handle)
     }
 
     /// Admin functions

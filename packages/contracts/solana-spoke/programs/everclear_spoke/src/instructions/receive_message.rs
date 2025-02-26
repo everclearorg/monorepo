@@ -8,12 +8,7 @@ use crate::{
     consts::{
         everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN,
         LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH,
-    },
-    error::SpokeError,
-    events::{MessageReceivedEvent, SettledEvent},
-    instructions::AdminStateBumps,
-    state::{IntentStatus, SpokeState},
-    utils::{normalize_decimals, vault_authority_seeds},
+    }, error::SpokeError, events::{MessageReceivedEvent, SettledEvent}, instructions::AdminStateBumps, program::EverclearSpoke, state::{IntentStatus, SpokeState}, utils::{normalize_decimals, vault_authority_seeds}
 };
 
 use crate::hyperlane::mailbox::HandleInstruction;
@@ -104,6 +99,108 @@ pub fn handle<'info>(
     };
     Ok(())
 }
+
+
+pub fn interchain_security_module(
+    _ctx: Context<InterchainSecurityModule>,
+) -> Result<()> {
+    // NOTE: return nothing to use the default ISM
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct InterchainSecurityModule<'info> {
+    /// CHECK: this is a undefined pda that is not in used now
+    inbox_pda: UncheckedAccount<'info>,
+    // self
+    program: Program<'info, EverclearSpoke>,
+    // extra account data required as in interchain_security_module_acconut_metas
+    // we have none now
+}
+
+pub fn interchain_security_module_account_metas(
+    _ctx: Context<InterchainSecurityModuleAccountMetas>,
+) -> Result<()> {
+    // NOTE: we dont need to any account meta for the ISM call
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct InterchainSecurityModuleAccountMetas<'info> {
+    /// CHECK: this is now undefined pdas where we dont store anything
+    account_metas_pda: UncheckedAccount<'info>
+}
+
+pub fn handle_account_metas(ctx: Context<HandleAccountMetas>, handle: HandleInstruction) -> Result<AuthStateMetas>{
+    // TODO: how we store bump?
+    let spoke_state_seed: &[&[u8]]= &[b"spoke-state"];
+    let spoke_state =
+        Pubkey::create_program_address(spoke_state_seed, ctx.program_id)
+            .map_err(|_| SpokeError::InvalidArgument)?;
+
+    let msg_type = handle.message[0];
+    match msg_type {
+        1 => {
+            msg!("Processing settlement batch message");
+            let settlement_data = &&handle.message[1..];
+            let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
+                .map_err(|_| SpokeError::InvalidMessage)?;
+
+            let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
+
+            // TODO: we seems need to have a vec of token_program to handle a vec of settlement
+            Ok(AuthStateMetas{
+                spoke_state,
+                authority: todo!(),
+                vault_token_account: todo!(),
+                vault_authority: todo!(),
+                token_program: todo!(),
+                hyperlane_mailbox: todo!(),
+                event_authority: todo!(),
+                program: *ctx.program_id,
+            })
+        }
+        2 => {
+            // Var update
+            msg!("variable update message metadata");
+            let zero_address = Pubkey::from([0; 32]);
+            Ok(AuthStateMetas{
+                spoke_state,
+                authority: todo!(),
+                vault_token_account: zero_address,
+                vault_authority: zero_address,
+                token_program: zero_address,
+                hyperlane_mailbox: todo!(),
+                event_authority: todo!(),
+                program: *ctx.program_id,
+            })
+        }
+        _ => {
+            return Err(SpokeError::InvalidMessage.into());
+        }
+    }
+
+    // TODO: we may need to put all of those in the their pda, hyperlane_mailbox
+}
+
+#[derive(Accounts)]
+pub struct HandleAccountMetas<'info> {
+    /// CHECK: this is now undefined pdas where we dont store anything
+    account_metas_pda: AccountInfo<'info>
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct AuthStateMetas {
+    pub spoke_state: Pubkey,
+    pub authority: Pubkey,
+    pub vault_token_account: Pubkey,
+    pub vault_authority: Pubkey,
+    pub token_program: Pubkey,
+    pub hyperlane_mailbox: Pubkey,
+    pub event_authority: Pubkey,
+    pub program: Pubkey,
+}
+
 
 fn handle_batch_settlement<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
