@@ -2,6 +2,7 @@
 pragma solidity 0.8.25;
 
 import { console2 as console } from 'forge-std/console2.sol';
+import { Strings } from '@openzeppelin/contracts/utils/Strings.sol';
 
 import { MessageLib } from 'contracts/common/MessageLib.sol';
 import { TypeCasts } from 'contracts/common/TypeCasts.sol';
@@ -21,14 +22,14 @@ import { TestExtended } from '../utils/TestExtended.sol';
  * @notice Designed to help find the correct amount to purchase invoices with.
  */
 contract InvoiceHelper is TestExtended {
-  struct IntentDetails {
-    uint256 originAmount;
-    uint256 fees;
-    uint256 rewards;
-    uint256 invoiceAmount;
-    uint256 invoiceEpoch;
-    uint256 settlementAmount;
-    uint256 settlementEpoch;
+  struct TestConfig {
+    uint256 l1Block;
+    uint256 l2Block;
+    bytes32 tickerHash;
+    uint32 targetOriginDomain;
+    address targetOriginAsset;
+    uint32 targetSettlementDomain;
+    address targetSettlementAsset;
   }
 
   // Set up fee variables
@@ -175,9 +176,11 @@ contract InvoiceHelper is TestExtended {
     // console.log('c0', _custodied);
     uint256 rewards = (_deposit * _fee) / DBPS_DENOMINATOR;
     console.log('[test] invoiceAmount', _invoiceAmount);
-    console.log('[test] liquidity', _custodied + _deposit);
+    console.log('[test] liquidity (custodied + deposit)', _custodied + _deposit);
+    console.log('[test] rewards', rewards);
+    console.log('[test] amount to settle (invoice - rewards)   ', _invoiceAmount - rewards);
     console.log('[test] custodied          ', _custodied);
-    console.log('[test] amount to settle   ', _invoiceAmount - rewards);
+    console.log('[test] deposit           ', _deposit);
     console.log('[test] custodied + deposit', _custodied + _deposit);
     // console.log('amount to be discounted', toBeDiscounted);
     require(_custodied + _deposit + _deposited >= _invoiceAmount - rewards, 'custodied + deposit < invoiceAmount');
@@ -211,9 +214,10 @@ contract InvoiceHelper is TestExtended {
     address _depositAsset,
     uint256 _depositAmount,
     bytes32 _tickerHash
-  ) private returns (bytes32) {
+  ) private returns (bytes32 depositId) {
     // Check the invoice queue length
     (, , , uint256 _length) = _hub.invoices(_tickerHash);
+    console.log('[test] invoice queue length', _length);
 
     // Create an intent
     (IEverclear.Intent[] memory _targetBatch, bytes32 _target) = _constructIntentBatch(
@@ -226,8 +230,10 @@ contract InvoiceHelper is TestExtended {
 
     // Receive message on hub
     _receiveBatchIntentMessage(_originDomain, _targetBatch);
+
     // Verify target deposit exists
     IEverclear.IntentStatus _status = _hub.contexts(_target).status;
+    console.log("    Intent status after receiving on hub:", uint8(_hub.contexts(_target).status));
     if (_length > 0) {
       require(_status == IEverclear.IntentStatus.ADDED, 'did not create deposit properly');
     } else {
@@ -254,7 +260,7 @@ contract InvoiceHelper is TestExtended {
     }
     // Process deposits
     _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
-    // Verify target invoice exists
+    console.log("    Intent status after processing:", uint8(_hub.contexts(_invoiceId).status));
     require(_hub.contexts(_invoiceId).status == IEverclear.IntentStatus.INVOICED, 'did not create invoice');
   }
 
@@ -318,12 +324,15 @@ contract InvoiceHelper is TestExtended {
   ) public returns (uint256 _depositAmount) {
     // Get initial custodied balance
     uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
+    console.log('[test] initial custodied', _custodied);
 
     // Calculate all n-1 settlements
     uint256 _settlementsAmount = 0;
     uint256 _len = _invoiceAmounts.length;
     for (uint i; i < _len - 1; i++) {
       _settlementsAmount += _invoiceAmounts[i] - ((_invoiceAmounts[i] * _fees[i]) / DBPS_DENOMINATOR);
+      console.log('[test] added invoiceAmount', _invoiceAmounts[i], 'with fee', _fees[i]);
+      console.log('[test] settlementAmount now', _settlementsAmount);
     }
 
     // Calculate deposit amount required
@@ -342,9 +351,156 @@ contract InvoiceHelper is TestExtended {
     // }
   }
 
-  // ================================================
-  // ================ Test Cases ====================
-  // ================================================
+  /**
+   * Helper function to create invoices
+   * @param _originDomain The origin domain of the invoices
+   * @param _destinationDomain The destination domain of the invoices
+   * @param _originAsset The asset address at the origin
+   * @param _tickerHash The ticker hash for the invoices
+   * @param _l1Block The L1 block number for epoch advancement
+   * @param _amounts The amounts for each invoice
+   * @param _advanceEpochsPerInvoice Number of epochs to advance after each invoice creation
+   * @return _invoiceIds Array of created invoice IDs
+   */
+  function _createInvoices(
+    uint32 _originDomain,
+    uint32 _destinationDomain,
+    address _originAsset,
+    bytes32 _tickerHash,
+    uint256 _l1Block,
+    uint256[] memory _amounts,
+    uint32 _advanceEpochsPerInvoice
+  ) private returns (bytes32[] memory _invoiceIds) {
+    _invoiceIds = new bytes32[](_amounts.length);
+    for (uint i = 0; i < _amounts.length; i++) {
+      _invoiceIds[i] = _createAnInvoice(
+        _originDomain,
+        _destinationDomain,
+        _originAsset,
+        _applyFees(_amounts[i], _tickerHash),
+        _tickerHash,
+        _advanceEpochsPerInvoice,
+        _l1Block
+      );
+    }
+  }
+
+  /**
+   * Helper function to verify settlement of invoices
+   * @param _tickerHash The ticker hash
+   * @param _invoiceIds Array of invoice IDs to verify settlement status
+   * @param _expectedStatuses Array of expected statuses for each invoice ID
+   * @param _depositId The ID of the deposit to verify rewards for
+   */
+  function _verifySettlement(
+    bytes32 _tickerHash,
+    bytes32[] memory _invoiceIds,
+    IEverclear.IntentStatus[] memory _expectedStatuses,
+    bytes32 _depositId
+  ) private {
+    // Process the invoice queue
+    console.log('====== settling invoices ======');
+    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+    console.log('settled');
+
+    // Verify invoice statuses
+    console.log('invoiceIds length: ', _invoiceIds.length);
+    for (uint i = 0; i < _invoiceIds.length; i++) {
+      console.log('iteration: ', i);
+      require(
+        _hub.contexts(_invoiceIds[i]).status == _expectedStatuses[i], 
+        string.concat('invoice status mismatch at index ', Strings.toString(i))
+      );
+    }
+    
+    // Verify that the deposit got rewards to settle invoice
+    require(_hub.contexts(_depositId).pendingRewards > 0, 'deposit did not get rewards');
+  }
+
+  /**
+   * @notice This tests purchasing an invoice with multiple preceding invoices in the queue.
+   */
+  // function test_expectedAmount_multipleInvoices() public {
+  //   // Setup test variables
+  //   TestConfig memory cfg = TestConfig({
+  //     l1Block: 21890255,
+  //     l2Block: 796179,
+  //     tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+  //     targetOriginDomain: 10, // OP
+  //     targetOriginAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58, // USDT on OP
+  //     targetSettlementDomain: 1, // Eth
+  //     targetSettlementAsset: 0xdAC17F958D2ee523a2206206994597C13D831ec7 // USDT on Eth
+  //   });
+
+  //   {
+  //     _setupFork(cfg.l2Block, cfg.l1Block, true);
+
+  //     // Verify queue status
+  //     (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
+  //     console.log('_length', _length);
+  //     require(_length == 0, 'invoice in queue, bad test setup');
+  //   }
+    
+  //   // Log custodied amount
+  //   uint256 _initialCustodied = _hub.custodiedAssets(_hub.assetHash(cfg.tickerHash, cfg.targetSettlementDomain));
+  //   console.log('[test] initial custodied', _initialCustodied);
+
+  //   uint256[] memory _invoiceQueueAmounts = new uint256[](3);
+  //   {
+  //     _invoiceQueueAmounts[0] = 100000000000000000000;
+  //     _invoiceQueueAmounts[1] = 50000000000000000000;
+  //     _invoiceQueueAmounts[2] = 50000000000000000000;
+  //   }
+
+  //   // Create invoices
+  //   bytes32[] memory _invoiceQueue = _createInvoices(
+  //     cfg.targetOriginDomain,
+  //     cfg.targetSettlementDomain,
+  //     cfg.targetOriginAsset,
+  //     cfg.tickerHash,
+  //     cfg.l1Block,
+  //     _invoiceQueueAmounts
+  //   );
+
+  //   bytes32 _depositId;
+  //   {
+  //     uint256[] memory _fees = new uint256[](3);
+  //     _fees[0] = MAX_FEE;
+  //     _fees[1] = MAX_FEE;
+  //     _fees[2] = MAX_FEE;
+      
+  //     // Calculate deposit amount
+  //     uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
+  //       cfg.targetSettlementDomain,
+  //       cfg.tickerHash,
+  //       _invoiceQueueAmounts,
+  //       _fees
+  //     );
+  //     console.log('calculated purchase amount:', _depositAmount);
+
+  //     // Create deposit 
+  //     _depositId = _createADeposit(
+  //       cfg.targetSettlementDomain,
+  //       cfg.targetOriginDomain,
+  //       cfg.targetSettlementAsset,
+  //       _depositAmount,
+  //       cfg.tickerHash
+  //     );
+  //   }
+
+  //   IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](3);
+  //   _expectedStatuses[0] = IEverclear.IntentStatus.SETTLED;
+  //   _expectedStatuses[1] = IEverclear.IntentStatus.SETTLED;
+  //   _expectedStatuses[2] = IEverclear.IntentStatus.SETTLED;
+
+  //   // Verify settlement
+  //   _verifySettlement(
+  //     cfg.tickerHash,
+  //     _invoiceQueue,
+  //     _expectedStatuses,
+  //     _depositId
+  //   );
+  // }
 
   /**
    * @notice This tests an observed mark purchase that undershot the invoice target:
@@ -354,18 +510,22 @@ contract InvoiceHelper is TestExtended {
    * @dev Runs test at block with max discount on fee to compare to API
    */
   function test_expectedAmount() public {
-    uint256 _l1Block = 21918628;
-    bytes32 _tickerHash = 0xd6aca1be9729c13d677335161321649cccae6a591554772516700f986f942eaa;
-    uint32 _targetSettlementDomain = 534352;
-    address _targetSettlementAsset = 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4; // USDC on Scroll
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21918628,
+      l2Block: 819570,
+      tickerHash: 0xd6aca1be9729c13d677335161321649cccae6a591554772516700f986f942eaa,
+      targetOriginDomain: 59144, // Linea
+      targetOriginAsset: 0x176211869cA2b568f2A7D4EE941E073a821EE1ff, // USDC on Linea
+      targetSettlementDomain: 534352, // Scroll
+      targetSettlementAsset: 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4 // USDC on Scroll
+    });
 
     // Create fork
     {
-      uint256 _l2Block = 819570;
-      _setupFork(_l2Block, _l1Block, true);
+      _setupFork(cfg.l2Block, cfg.l1Block, true);
 
       // Verify queue status
-      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
       console.log('_length', _length);
       require(_length >= 2, 'invoices not in queue, bad test setup');
     }
@@ -384,35 +544,33 @@ contract InvoiceHelper is TestExtended {
     uint256[] memory _targetInvoiceAmounts = new uint256[](1);
     _targetInvoiceAmounts[0] = _invoiceQueueAmounts[1];
     uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
-      _targetSettlementDomain,
-      _tickerHash,
+      cfg.targetSettlementDomain,
+      cfg.tickerHash,
       _targetInvoiceAmounts,
       _fees
     );
     console.log('calculated purchase amount:', _depositAmount); // 2047404059810832
 
-    // Create a deposit
-    bytes32 _deposit = _createADeposit(
-      _targetSettlementDomain,
-      uint32(42161),
-      _targetSettlementAsset,
+    // Create deposit
+    bytes32 _depositId = _createADeposit(
+      cfg.targetSettlementDomain,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementAsset,
       _depositAmount,
-      _tickerHash
+      cfg.tickerHash
     );
 
-    // Verify the deposit is added
-    require(_hub.contexts(_deposit).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+    IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](2);
+    _expectedStatuses[0] = IEverclear.IntentStatus.INVOICED;
+    _expectedStatuses[1] = IEverclear.IntentStatus.SETTLED;
 
-    // Process the invoice queue
-    console.log('====== settling invoices ======');
-    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
-
-    // Verify targets are settled
-    require(_hub.contexts(_invoiceQueue[0]).status == IEverclear.IntentStatus.INVOICED, 'target[0] not invoiced');
-    require(_hub.contexts(_invoiceQueue[1]).status == IEverclear.IntentStatus.SETTLED, 'target[1] not settled');
-
-    // Verify that the deposit got rewards to settle invoice
-    require(_hub.contexts(_deposit).pendingRewards > 0, 'deposit did not get rewards');
+    // Verify settlement
+    _verifySettlement(
+      cfg.tickerHash,
+      _invoiceQueue,
+      _expectedStatuses,
+      _depositId
+    );
   }
 
   /**
@@ -426,8 +584,15 @@ contract InvoiceHelper is TestExtended {
   function test_purchaseNonHeadInvoices() public {
     // Declare test constants
     // NOTE: at this point, there are no invoices or deposits in USDT
-    uint256 _l1Block = 21890255;
-    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21890255,
+      l2Block: 796179,
+      tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+      targetOriginDomain: 42161, // Arb 
+      targetOriginAsset: 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9, // USDT on Arb
+      targetSettlementDomain: 10, // OP
+      targetSettlementAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58 // USDT on OP
+    });
 
     uint256[] memory _targetInvoiceAmounts = new uint256[](3);
     {
@@ -435,72 +600,69 @@ contract InvoiceHelper is TestExtended {
       _targetInvoiceAmounts[1] = 11320000000000000000000; // 11320 -> target
       _targetInvoiceAmounts[2] = 320000000000000000000; // 320 -> target
     }
-    uint32 _targetOriginDomain = 42161;
-    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
-    uint32 _targetSettlementDomain = 10;
-    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
 
     // Create fork
     {
-      uint256 _l2Block = 796179;
-      _setupFork(_l2Block, _l1Block, true);
+      _setupFork(cfg.l2Block, cfg.l1Block, true);
 
       // Verify queue status
-      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
       require(_length == 0, 'invoice in queue, bad test setup');
     }
 
     // Create invoices
     bytes32[] memory _targets = _createInvoices(
-      _targetOriginDomain,
-      _targetSettlementDomain,
-      _targetOriginAsset,
-      _tickerHash,
-      _l1Block,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginAsset,
+      cfg.tickerHash,
+      cfg.l1Block,
       _targetInvoiceAmounts
     );
 
     // Take to max discount
-    _advanceEpochs(20, _l1Block);
+    _advanceEpochs(20, cfg.l1Block);
 
     bytes32 _deposit;
     {
       uint256[] memory _fees = new uint256[](2);
       _fees[0] = MAX_FEE;
       _fees[1] = MAX_FEE;
-      uint256[] memory _targets = new uint256[](2);
-      _targets[0] = _targetInvoiceAmounts[1];
-      _targets[1] = _targetInvoiceAmounts[2];
+      uint256[] memory _targetAmounts = new uint256[](2);
+      _targetAmounts[0] = _targetInvoiceAmounts[1];
+      _targetAmounts[1] = _targetInvoiceAmounts[2];
       uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
-        _targetSettlementDomain,
-        _tickerHash,
-        _targets,
+        cfg.targetSettlementDomain,
+        cfg.tickerHash,
+        _targetAmounts,
         _fees
       );
 
       // Create a deposit
       _deposit = _createADeposit(
-        _targetSettlementDomain,
-        _targetOriginDomain,
-        _targetSettlementAsset,
+        cfg.targetSettlementDomain,
+        cfg.targetOriginDomain,
+        cfg.targetSettlementAsset,
         _depositAmount,
-        _tickerHash
+        cfg.tickerHash
       );
     }
 
-    // Verify the deposit is added
-    require(_hub.contexts(_deposit).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
+    bytes32[] memory _invoicesToVerify = new bytes32[](2);
+    _invoicesToVerify[0] = _targets[0];
+    _invoicesToVerify[1] = _targets[1];
+    
+    IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](2);
+    _expectedStatuses[0] = IEverclear.IntentStatus.INVOICED;
+    _expectedStatuses[1] = IEverclear.IntentStatus.SETTLED;
 
-    // Process the invoice queue
-    console.log('====== settling invoices ======');
-    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
-
-    // Verify targets are settled
-    require(_hub.contexts(_targets[0]).status == IEverclear.IntentStatus.INVOICED, 'target[0] not invoiced');
-    require(_hub.contexts(_targets[1]).status == IEverclear.IntentStatus.SETTLED, 'target[1] not settled');
-
-    // Verify that the deposit got rewards to settle invoice
-    require(_hub.contexts(_deposit).pendingRewards > 0, 'deposit did not get rewards');
+    // Verify settlement
+    _verifySettlement(
+      cfg.tickerHash,
+      _invoicesToVerify,
+      _expectedStatuses,
+      _deposit
+    );
   }
 
   /**
@@ -509,8 +671,15 @@ contract InvoiceHelper is TestExtended {
   function test_singleDepositMultipleIntentPurchases() public {
     // Declare test constants
     // NOTE: at this point, there are no invoices or deposits in USDT
-    uint256 _l1Block = 21890255;
-    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21890255,
+      l2Block: 796179,
+      tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+      targetOriginDomain: 42161,
+      targetOriginAsset: 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9,
+      targetSettlementDomain: 10,
+      targetSettlementAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58 // USDT on OP
+    });
 
     uint256[] memory _targetInvoiceAmounts = new uint256[](3);
     {
@@ -518,33 +687,27 @@ contract InvoiceHelper is TestExtended {
       _targetInvoiceAmounts[1] = 12323000000000000000000; // 12323
       _targetInvoiceAmounts[2] = 12321000000000000000000; // 12321
     }
-    uint32 _targetOriginDomain = 42161;
-    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
-    uint32 _targetSettlementDomain = 10;
-    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
 
     // Create fork
     {
-      uint256 _l2Block = 796179;
-      _setupFork(_l2Block, _l1Block, true);
-    }
+      _setupFork(cfg.l2Block, cfg.l1Block, true);
 
-    // Verify queue status
-    {
-      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      // Verify queue status
+      (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
       require(_length == 0, 'invoice in queue, bad test setup');
     }
 
+    // Create invoices
     bytes32[] memory _targets = _createInvoices(
-      _targetOriginDomain,
-      _targetSettlementDomain,
-      _targetOriginAsset,
-      _tickerHash,
-      _l1Block,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginAsset,
+      cfg.tickerHash,
+      cfg.l1Block,
       _targetInvoiceAmounts
     );
 
-    _advanceEpochs(20, _l1Block);
+    _advanceEpochs(20, cfg.l1Block);
 
     // Calculate the deposit
     console.log('====== calculating deposit ======');
@@ -554,255 +717,271 @@ contract InvoiceHelper is TestExtended {
     _fees[1] = MAX_FEE;
     _fees[2] = MAX_FEE;
     uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
-      _targetSettlementDomain,
-      _tickerHash,
+      cfg.targetSettlementDomain,
+      cfg.tickerHash,
       _targetInvoiceAmounts,
       _fees
     );
 
-    // Create a deposit
+    // Set up expected statuses for verification
+    IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](3);
+    _expectedStatuses[0] = IEverclear.IntentStatus.SETTLED;
+    _expectedStatuses[1] = IEverclear.IntentStatus.SETTLED;
+    _expectedStatuses[2] = IEverclear.IntentStatus.SETTLED;
+
+    // Create deposit
     bytes32 _deposit = _createADeposit(
-      _targetSettlementDomain,
-      _targetOriginDomain,
-      _targetSettlementAsset,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementAsset,
       _depositAmount,
-      _tickerHash
+      cfg.tickerHash
     );
 
-    // Verify the deposit is added
-    require(_hub.contexts(_deposit).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
-
-    // Process the invoice queue
-    console.log('====== settling invoices ======');
-    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
-
-    // Verify targets are settled
-    require(_hub.contexts(_targets[0]).status == IEverclear.IntentStatus.SETTLED, 'target[0] not settled');
-    require(_hub.contexts(_targets[1]).status == IEverclear.IntentStatus.SETTLED, 'target[1] not settled');
-
-    // Verify that the deposit got rewards to settle invoice
-    require(_hub.contexts(_deposit).pendingRewards > 0, 'deposit did not get rewards');
+    // Verify settlement
+    _verifySettlement(
+      cfg.tickerHash,
+      _targets,
+      _expectedStatuses,
+      _deposit
+    );
   }
 
-  /**
-   * @notice This tests purchasing some intent with a discount < max discount
-   */
+  // /**
+  //  * @notice This tests purchasing some intent with a discount < max discount
+  //  */
   function test_intentPurchaseNotAtMax() public {
     // Declare test constants
     // NOTE: at this point, there are no invoices or deposits in USDT
-    uint256 _l1Block = 21890255;
-    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21890255,
+      l2Block: 796179,
+      tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+      targetOriginDomain: 42161, // Arb
+      targetOriginAsset: 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9, // USDT on Arb
+      targetSettlementDomain: 10, // OP
+      targetSettlementAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58 // USDT on OP
+    });
 
     // bytes32 _intentA = 0xcb0bd6c7aaca084e84c9f1153bd801e1378fff99b5fa8f273076fa5195ec5242;
-    uint256 _targetInvoiceAmount = 11320000000000000000000; // invoice amount (11320 USDT)
-    uint32 _targetOriginDomain = 42161;
-    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
-    uint32 _targetSettlementDomain = 10;
-    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
-
+    uint256[] memory _invoiceAmounts = new uint256[](1);
+    {
+      _invoiceAmounts[0] = 11320000000000000000000; // 11320
+    }
+  
     // Create fork
     {
-      uint256 _l2Block = 796179;
-      _setupFork(_l2Block, _l1Block, true);
-    }
+      _setupFork(cfg.l2Block, cfg.l1Block, true);
 
-    // Verify queue status
-    {
-      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      // Verify queue status
+      (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
       require(_length == 0, 'invoice in queue, bad test setup');
     }
 
-    // Create a target invoice
-    bytes32 _target = _createAnInvoice(
-      _targetOriginDomain,
-      _targetSettlementDomain,
-      _targetOriginAsset,
-      _applyFees(_targetInvoiceAmount, _tickerHash),
-      _tickerHash
+    bytes32[] memory _invoiceQueue = _createInvoices(
+      cfg.targetOriginDomain,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginAsset,
+      cfg.tickerHash,
+      cfg.l1Block,
+      _invoiceAmounts
     );
 
     // Advance only a few epochs, expected discount is less than min
-    _advanceEpochs(3, _l1Block);
+    _advanceEpochs(3, cfg.l1Block);
 
     // Calculate the expected discount
-    (, uint24 _discountPerEpoch, ) = _hub.tokenConfigs(_tickerHash);
+    (, uint24 _discountPerEpoch, ) = _hub.tokenConfigs(cfg.tickerHash);
     uint256 _discount = 3 * _discountPerEpoch;
 
     // Calculate the deposit
     uint256 _depositAmount = _calculateDepositAmount(
-      _targetSettlementDomain,
-      _targetInvoiceAmount,
-      _tickerHash,
+      cfg.targetSettlementDomain,
+      _invoiceAmounts[0],
+      cfg.tickerHash,
       _discount
     );
-    // Create a deposit
+    
+    // Create deposit and verify settlement
+    IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](1);
+    _expectedStatuses[0] = IEverclear.IntentStatus.SETTLED;
+
     bytes32 _deposit = _createADeposit(
-      _targetSettlementDomain,
-      _targetOriginDomain,
-      _targetSettlementAsset,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementAsset,
       _depositAmount,
-      _tickerHash
+      cfg.tickerHash
     );
 
-    // Verify the deposit is added
-    require(_hub.contexts(_deposit).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
-
-    // Process the invoice queue
-    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
-
-    // Verify target is settled
-    require(_hub.contexts(_target).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
-
-    // Verify that the deposit got rewards to settle invoice
-    require(_hub.contexts(_deposit).pendingRewards > 0, 'deposit did not get rewards');
+    // Verify settlement
+    _verifySettlement(
+      cfg.tickerHash,
+      _invoiceQueue,
+      _expectedStatuses,
+      _deposit
+    );
   }
 
-  /**
-   * @notice In this test, we have a pending deposit that is from a previous epoch that has not been
-   * processed. This means the previous deposit will _not_ appear in the custodied balance, and will
-   * _not_ get rewards because the amount is insufficient to fully settle the invoice.
-   *
-   * This simulates the deposit calculation if lighthouse has been down
-   */
+  // /**
+  //  * @notice In this test, we have a pending deposit that is from a previous epoch that has not been
+  //  * processed. This means the previous deposit will _not_ appear in the custodied balance, and will
+  //  * _not_ get rewards because the amount is insufficient to fully settle the invoice.
+  //  *
+  //  * This simulates the deposit calculation if lighthouse has been down
+  //  */
   function test_intentPurchaseUnprocessedEpochs() public {
     // Declare test constants
     // NOTE: at this point, there are no invoices or deposits in USDT
-    uint256 _l1Block = 21890255;
-    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21890255,
+      l2Block: 796179,
+      tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+      targetOriginDomain: 42161, // Arb
+      targetOriginAsset: 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9, // USDT on Arb
+      targetSettlementDomain: 10, // OP
+      targetSettlementAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58 // USDT on OP
+    });
 
     // bytes32 _intentA = 0xcb0bd6c7aaca084e84c9f1153bd801e1378fff99b5fa8f273076fa5195ec5242;
-    uint256 _targetInvoiceAmount = 11320000000000000000000; // invoice amount (11320 USDT)
-    uint32 _targetOriginDomain = 42161;
-    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
-    uint32 _targetSettlementDomain = 10;
-    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
+    uint256[] memory _targetInvoiceAmounts = new uint256[](1);
+    {
+      _targetInvoiceAmounts[0] = 11320000000000000000000; // 11320
+    }
 
     // Create fork
     {
-      uint256 _l2Block = 796179;
-      _setupFork(_l2Block, _l1Block, true);
-    }
+      _setupFork(cfg.l2Block, cfg.l1Block, true);
 
-    // Verify queue status
-    {
-      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      // Verify queue status
+      (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
       require(_length == 0, 'invoice in queue, bad test setup');
     }
 
     // Create a target invoice
-    bytes32 _target = _createAnInvoice(
-      _targetOriginDomain,
-      _targetSettlementDomain,
-      _targetOriginAsset,
-      _applyFees(_targetInvoiceAmount, _tickerHash),
-      _tickerHash
+    bytes32[] memory _targets = _createInvoices(
+      cfg.targetOriginDomain,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginAsset,
+      cfg.tickerHash,
+      cfg.l1Block,
+      _targetInvoiceAmounts
     );
 
     // Create a stale deposit with insufficient funds to settle target
-    uint256 _fullSettlement = _calculateDepositAmount(_targetSettlementDomain, _targetInvoiceAmount, _tickerHash, 0);
+    uint256 _fullSettlement = _calculateDepositAmount(
+      cfg.targetSettlementDomain,
+      _targetInvoiceAmounts[0],
+      cfg.tickerHash,
+      0
+    );
     bytes32 _deposit0 = _createADeposit(
-      _targetSettlementDomain,
-      _targetOriginDomain,
-      _targetSettlementAsset,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementAsset,
       _fullSettlement / 3,
-      _tickerHash
+      cfg.tickerHash
     );
 
     // Advance multiple epochs to ensure there is max discount on target, dont process deposit0
-    _advanceEpochs(20, _l1Block);
+    _advanceEpochs(20, cfg.l1Block);
 
     // Verify the deposit is added
     require(_hub.contexts(_deposit0).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
 
     // Calculate amount to purchase target
     uint256 _deposit1Amount = _calculateDepositAmount(
-      _targetSettlementDomain,
-      _targetInvoiceAmount,
-      _tickerHash,
+      cfg.targetSettlementDomain,
+      _targetInvoiceAmounts[0],
+      cfg.tickerHash,
       MAX_FEE
     );
 
     // Create a deposit
     bytes32 _deposit1 = _createADeposit(
-      _targetSettlementDomain,
-      _targetOriginDomain,
-      _targetSettlementAsset,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementAsset,
       _deposit1Amount,
-      _tickerHash
+      cfg.tickerHash
     );
 
     // Verify the deposit is added
     require(_hub.contexts(_deposit1).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
 
     // Process the invoice queue
-    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+    _hub.processDepositsAndInvoices(cfg.tickerHash, 0, 0, 0);
 
     // Verify target is settled
-    require(_hub.contexts(_target).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
+    require(_hub.contexts(_targets[0]).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
 
     // Verify that deposit1 got rewards, and deposit0 did not
     require(_hub.contexts(_deposit0).pendingRewards == 0, 'deposit0 did get rewards');
     require(_hub.contexts(_deposit1).pendingRewards > 0, 'deposit1 did not get rewards');
   }
 
-  /**
-   * @notice IntentA already exists at the front of the queue, there is one deposit with insufficient
-   * balance to settle the intent waiting to be processed (both are in the same epoch).
-   *
-   * In this case, both deposits should get rewards.
-   */
+  // /**
+  //  * @notice IntentA already exists at the front of the queue, there is one deposit with insufficient
+  //  * balance to settle the intent waiting to be processed (both are in the same epoch).
+  //  *
+  //  * In this case, both deposits should get rewards.
+  //  */
   function test_intentPurchaseTwoDepositsSameEpoch() public {
     // Declare test constants
     // NOTE: at this point, there are no invoices or deposits in USDT
-    uint256 _l1Block = 21890255;
-    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21890255,
+      l2Block: 796179,
+      tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+      targetOriginDomain: 42161, // Arb
+      targetOriginAsset: 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9, // USDT on Arb
+      targetSettlementDomain: 10, // OP
+      targetSettlementAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58 // USDT on OP
+    });
 
     // bytes32 _intentA = 0xcb0bd6c7aaca084e84c9f1153bd801e1378fff99b5fa8f273076fa5195ec5242;
-    uint256 _targetInvoiceAmount = 11320000000000000000000; // invoice amount (11320 USDT)
-    uint32 _targetOriginDomain = 42161;
-    address _targetOriginAsset = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
-    uint32 _targetSettlementDomain = 10;
-    address _targetSettlementAsset = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58; // USDT on OP
+    uint256[] memory _targetInvoiceAmounts = new uint256[](1);
+    {
+      _targetInvoiceAmounts[0] = 11320000000000000000000; // invoice amount (11320 USDT)
+    }
 
     // Create fork
     {
-      uint256 _l2Block = 796179;
-      _setupFork(_l2Block, _l1Block, true);
-    }
+      _setupFork(cfg.l2Block, cfg.l1Block, true);
 
-    // Verify queue status
-    {
-      (, , , uint256 _length) = _hub.invoices(_tickerHash);
+      // Verify queue status
+      (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
       require(_length == 0, 'invoice in queue, bad test setup');
     }
 
     // Create a target invoice
-    bytes32 _target = _createAnInvoice(
-      _targetOriginDomain,
-      _targetSettlementDomain,
-      _targetOriginAsset,
-      _applyFees(_targetInvoiceAmount, _tickerHash),
-      _tickerHash
+    bytes32[] memory _targets = _createInvoices(
+      cfg.targetOriginDomain,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginAsset,
+      cfg.tickerHash,
+      cfg.l1Block,
+      _targetInvoiceAmounts
     );
 
     // Advance multiple epochs to ensure there is max discount
-    _advanceEpochs(20, _l1Block);
+    _advanceEpochs(20, cfg.l1Block);
 
     // Create an intent with deposit < invoice amount
     uint256 _fullSettlement = _calculateDepositAmount(
-      _targetSettlementDomain,
-      _targetInvoiceAmount,
-      _tickerHash,
+      cfg.targetSettlementDomain,
+      _targetInvoiceAmounts[0],
+      cfg.tickerHash,
       MAX_FEE
     );
 
     // Create a deposit
     bytes32 _deposit0 = _createADeposit(
-      _targetSettlementDomain,
-      _targetOriginDomain,
-      _targetSettlementAsset,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementAsset,
       _fullSettlement / 3,
-      _tickerHash
+      cfg.tickerHash
     );
     // Verify the deposit is added
     require(_hub.contexts(_deposit0).status == IEverclear.IntentStatus.ADDED, 'deposit0 not added');
@@ -812,9 +991,9 @@ contract InvoiceHelper is TestExtended {
     // helper as before. This should already accomodate for the larger custodied balance because
     // deposit0 has arrived on the hub.
     uint256 _deposit1Amount = _calculateDepositAmount(
-      _targetSettlementDomain,
-      _targetInvoiceAmount,
-      _tickerHash,
+      cfg.targetSettlementDomain,
+      _targetInvoiceAmounts[0],
+      cfg.tickerHash,
       MAX_FEE
     );
 
@@ -822,26 +1001,26 @@ contract InvoiceHelper is TestExtended {
       uint256 _rewards = ((_deposit1Amount + (_fullSettlement / 3)) * MAX_FEE) / DBPS_DENOMINATOR;
       console.log('');
       console.log('[test] rewards            ', _rewards);
-      console.log('[test] amount to settle   ', _targetInvoiceAmount - _rewards);
+      console.log('[test] amount to settle   ', _targetInvoiceAmounts[0] - _rewards);
       console.log('[test] depositsAmount     ', _deposit1Amount + (_fullSettlement / 3));
     }
     // Create a deposit
     bytes32 _deposit1 = _createADeposit(
-      _targetSettlementDomain,
-      _targetOriginDomain,
-      _targetSettlementAsset,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginDomain,
+      cfg.targetSettlementAsset,
       _deposit1Amount,
-      _tickerHash
+      cfg.tickerHash
     );
 
     // Verify the deposit is added
     require(_hub.contexts(_deposit1).status == IEverclear.IntentStatus.ADDED, 'deposit not added');
 
     // Process the invoice queue
-    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+    _hub.processDepositsAndInvoices(cfg.tickerHash, 0, 0, 0);
 
     // Verify target is settled
-    require(_hub.contexts(_target).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
+    require(_hub.contexts(_targets[0]).status == IEverclear.IntentStatus.SETTLED, 'target not settled');
 
     // Verify that both deposits got rewards, and deposit1 rewards > deposit0 rewards
     uint256 _deposit0Rewards = _hub.contexts(_deposit0).pendingRewards;
@@ -849,43 +1028,56 @@ contract InvoiceHelper is TestExtended {
     require(_hub.contexts(_deposit1).pendingRewards > _deposit0Rewards, 'deposit1 did not get more rewards than 0');
   }
 
-  /**
-   * @notice IntentA already exists at the front of the queue, and there are no deposits to be
-   * processed. Will calculate and verify the amountB to purchase a given invoice.
-   */
+  // /**
+  //  * @notice IntentA already exists at the front of the queue, and there are no deposits to be
+  //  * processed. Will calculate and verify the amountB to purchase a given invoice.
+  //  */
   function test_intentPurchaseFirstInvoiceNoDeposits() public {
     // Declare test constants
-    uint256 _l1Block = 21883550;
-    uint256 _l2Block = 790616;
-    bytes32 _tickerHash = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21883550,
+      l2Block: 790616,
+      tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+      targetOriginDomain: 10, // OP
+      targetOriginAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58, // USDT on Arb
+      targetSettlementDomain: 324, // zkSync
+      targetSettlementAsset: 0x493257fD37EDB34451f62EDf8D2a0C418852bA4C // USDT on zkSync
+    });
+    
     bytes32 _intentA = 0xcb0bd6c7aaca084e84c9f1153bd801e1378fff99b5fa8f273076fa5195ec5242;
-    uint256 _amountA = 8999820000000000000; // invoice amount
-    uint32 _intentADestination = 324;
-    address _intentBInputAsset = 0x493257fD37EDB34451f62EDf8D2a0C418852bA4C;
+    uint256[] memory _targetInvoiceAmounts = new uint256[](1);
+    {
+      _targetInvoiceAmounts[0] = 8999820000000000000; // invoice amount
+    }
 
     // Create fork
-    _setupFork(_l2Block, _l1Block, true);
+    _setupFork(cfg.l2Block, cfg.l1Block, true);
 
     // Verify intentA exists
     require(_hub.contexts(_intentA).status == IEverclear.IntentStatus.INVOICED, 'intentA not invoiced');
 
     // Calculate the amount needed for an intent3 to exactly purchase `A`
-    uint256 _amountB = _calculateDepositAmount(_intentADestination, _amountA, _tickerHash, MAX_FEE);
+    uint256 _amountB = _calculateDepositAmount(
+      cfg.targetSettlementDomain, 
+      _targetInvoiceAmounts[0], 
+      cfg.tickerHash, 
+      MAX_FEE
+    );
     // uint256 _amountB = (_amountA * DBPS_DENOMINATOR) / (DBPS_DENOMINATOR + MAX_FEE);
     console.log('amountB    :', _amountB);
 
     // Create the intent to settle the invoice
     (IEverclear.Intent[] memory _intentBBatch, bytes32 _intentIdB) = _constructIntentBatch(
-      _intentADestination,
+      cfg.targetSettlementDomain,
       uint32(0),
       _amountB,
-      TypeCasts.toBytes32(_intentBInputAsset),
-      _tickerHash
+      TypeCasts.toBytes32(cfg.targetSettlementAsset),
+      cfg.tickerHash
     );
     console.log('intentB:');
     console.logBytes32(_intentIdB);
 
-    _receiveBatchIntentMessage(_intentADestination, _intentBBatch);
+    _receiveBatchIntentMessage(cfg.targetSettlementDomain, _intentBBatch);
     // NOTE: if intentB is _not_ enqueued (`receiveMessage` is called) in the same epoch that intentA is
     // settled in, it will not get any rewards.
 
@@ -894,7 +1086,7 @@ contract InvoiceHelper is TestExtended {
     require(_hub.contexts(_intentIdB).status == IEverclear.IntentStatus.ADDED, 'intentB not added');
 
     // Process queue
-    _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
+    _hub.processDepositsAndInvoices(cfg.tickerHash, 0, 0, 0);
 
     // Verify intentA is settled
     console.log('status A   :', uint8(_hub.contexts(_intentA).status));
