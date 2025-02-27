@@ -16,3 +16,28 @@ macro_rules! mailbox_message_dispatch_authority_pda_seeds {
         ]
     }};
 }
+
+/// The PDA seeds relating to the Mailbox's process authority for a particular recipient.
+#[macro_export]
+macro_rules! mailbox_process_authority_pda_seeds {
+    ($recipient_pubkey:expr) => {{
+        &[
+            b"hyperlane",
+            b"-",
+            b"process_authority",
+            b"-",
+            $recipient_pubkey.as_ref(),
+        ]
+    }};
+
+    ($recipient_pubkey:expr, $bump_seed:expr) => {{
+        &[
+            b"hyperlane",
+            b"-",
+            b"process_authority",
+            b"-",
+            $recipient_pubkey.as_ref(),
+            &[$bump_seed],
+        ]
+    }};
+}
