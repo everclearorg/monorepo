@@ -12,7 +12,6 @@ use events::*;
 use hyperlane::mailbox::HandleInstruction;
 use hyperlane::InterchainGasPaymasterType;
 use instructions::*;
-use state::SpokeState;
 
 declare_id!("uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC");
 
@@ -96,9 +95,7 @@ pub mod everclear_spoke {
         instructions::handle(ctx, handle)
     }
 
-    pub fn interchain_security_module(
-        ctx: Context<InterchainSecurityModule>,
-    ) -> Result<()> {
+    pub fn interchain_security_module(ctx: Context<InterchainSecurityModule>) -> Result<()> {
         instructions::interchain_security_module(ctx)
     }
 
@@ -174,33 +171,4 @@ pub mod everclear_spoke {
 
         instructions::update_message_gas_limit(ctx, new_limit)
     }
-}
-
-// =====================================================================
-// ACCOUNTS, STATE, EVENTS, ERRORS, & HELPER FUNCTIONS
-// =====================================================================
-
-/// Context for Hyperlane dispatch: We require a Hyperlane mailbox account.
-#[derive(Accounts)]
-pub struct HyperlaneDispatch<'info> {
-    #[account(
-        mut,
-        seeds = [b"spoke-state"],
-        bump = spoke_state.bump
-    )]
-    pub spoke_state: Account<'info, SpokeState>,
-    /// CHECK: This account must be the Hyperlane Mailbox program.
-    pub hyperlane_mailbox: UncheckedAccount<'info>,
-}
-
-/// A simple record tracking a user's balance for a given asset.
-#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
-pub struct BalanceRecord {
-    pub asset: Pubkey,
-    pub user: Pubkey,
-    pub amount: u64,
-}
-
-impl BalanceRecord {
-    pub const SIZE: usize = 32 + 32 + 8;
 }

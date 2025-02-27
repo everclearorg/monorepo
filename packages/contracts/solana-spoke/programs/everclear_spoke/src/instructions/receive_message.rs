@@ -5,15 +5,17 @@ use anchor_spl::{
 };
 
 use crate::{
-    consts::{
-        everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN,
-        LIGHTHOUSE_HASH, MAILBOX_HASH, WATCHTOWER_HASH,
-    }, error::SpokeError, events::{MessageReceivedEvent, SettledEvent}, instructions::AdminStateBumps, program::EverclearSpoke, state::{IntentStatus, SpokeState}, utils::{normalize_decimals, vault_authority_seeds}
+    consts::{everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
+    error::SpokeError,
+    events::{MessageReceivedEvent, SettledEvent},
+    program::EverclearSpoke,
+    state::{IntentStatus, SpokeState},
+    utils::{normalize_decimals, vault_authority_seeds},
 };
 
 use crate::hyperlane::mailbox::HandleInstruction;
 
-use super::{AdminState, AuthState};
+use super::AuthState;
 
 /// Receive a cross‑chain message via Hyperlane.
 /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
@@ -49,23 +51,7 @@ pub fn handle<'info>(
         }
         2 => {
             // Var update
-            msg!("Processing variable update message");
-            let var_data = &handle.message[1..];
-            let admin_state = &mut AdminState {
-                spoke_state: ctx.accounts.spoke_state.clone(),
-                admin: ctx.accounts.authority.clone(),
-                event_authority: ctx.accounts.event_authority.clone(),
-                program: ctx.accounts.program.clone(),
-            };
-            let admin_ctx = Context::new(
-                ctx.program_id,
-                admin_state,
-                ctx.remaining_accounts,
-                AdminStateBumps {
-                    event_authority: ctx.bumps.event_authority,
-                },
-            );
-            handle_var_update(admin_ctx, var_data)?;
+            msg!("Skipping variable update message");
         }
         _ => {
             return Err(SpokeError::InvalidMessage.into());
@@ -100,10 +86,7 @@ pub fn handle<'info>(
     Ok(())
 }
 
-
-pub fn interchain_security_module(
-    _ctx: Context<InterchainSecurityModule>,
-) -> Result<()> {
+pub fn interchain_security_module(_ctx: Context<InterchainSecurityModule>) -> Result<()> {
     // NOTE: return nothing to use the default ISM
     Ok(())
 }
@@ -128,16 +111,18 @@ pub fn interchain_security_module_account_metas(
 #[derive(Accounts)]
 pub struct InterchainSecurityModuleAccountMetas<'info> {
     /// CHECK: this is now undefined pdas where we dont store anything
-    account_metas_pda: UncheckedAccount<'info>
+    account_metas_pda: UncheckedAccount<'info>,
 }
 
-pub fn handle_account_metas(ctx: Context<HandleAccountMetas>, handle: HandleInstruction) -> Result<AuthStateMetas>{
+pub fn handle_account_metas(
+    ctx: Context<HandleAccountMetas>,
+    handle: HandleInstruction,
+) -> Result<AuthStateMetas> {
     let spoke_state_account = &ctx.accounts.spoke_state;
-    let mailbox_pubkey = spoke_state_account.mailbox;
     let spoke_state_pda = spoke_state_account.key();
 
-    let (event_authority_pubkey, _) =Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
-
+    let (event_authority_pubkey, _) =
+        Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
 
     // TODO: This would need to provide an array of token_programs - as settlements can be for different tokens
     let msg_type = handle.message[0];
@@ -147,24 +132,22 @@ pub fn handle_account_metas(ctx: Context<HandleAccountMetas>, handle: HandleInst
             let settlement_data = &handle.message[1..];
             let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
                 .map_err(|_| SpokeError::InvalidMessage)?;
-            let asset_pubkeys: Vec<Pubkey> = batch
-                .iter()
-                .map(|settlement| settlement.asset)
-                .collect();
-
+            let asset_pubkeys: Vec<Pubkey> =
+                batch.iter().map(|settlement| settlement.asset).collect();
 
             // Derive the vault authority PDA
-            let (vault_authority_pubkey, vault_authority_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
-            let (vault_token_account_pubkey, _) = Pubkey::find_program_address(&[b"vault-token"], ctx.program_id);
+            let (vault_authority_pubkey, vault_authority_bump) =
+                Pubkey::find_program_address(&[b"vault"], ctx.program_id);
+            let (vault_token_account_pubkey, _) =
+                Pubkey::find_program_address(&[b"vault-token"], ctx.program_id);
 
             // TODO: we seems need to have a vec of token_program to handle a vec of settlement
-            Ok(AuthStateMetas{
+            Ok(AuthStateMetas {
                 spoke_state: spoke_state_pda,
                 authority: spoke_state_account.owner,
                 vault_token_account: vault_token_account_pubkey,
                 vault_authority: vault_authority_pubkey,
                 token_program: asset_pubkeys,
-                hyperlane_mailbox: mailbox_pubkey,
                 event_authority: event_authority_pubkey,
                 program: *ctx.program_id,
             })
@@ -173,13 +156,12 @@ pub fn handle_account_metas(ctx: Context<HandleAccountMetas>, handle: HandleInst
             // Var update
             msg!("variable update message metadata");
             let zero_address = Pubkey::from([0; 32]);
-            Ok(AuthStateMetas{
+            Ok(AuthStateMetas {
                 spoke_state: spoke_state_pda,
                 authority: spoke_state_account.owner,
                 vault_token_account: zero_address,
                 vault_authority: zero_address,
                 token_program: vec![zero_address],
-                hyperlane_mailbox: mailbox_pubkey,
                 event_authority: event_authority_pubkey,
                 program: *ctx.program_id,
             })
@@ -192,8 +174,6 @@ pub fn handle_account_metas(ctx: Context<HandleAccountMetas>, handle: HandleInst
 
 #[derive(Accounts)]
 pub struct HandleAccountMetas<'info> {
-    /// CHECK: this is now undefined pdas where we dont store anything
-    ///     // The global SpokeState, which holds the `mailbox` field.
     #[account(
         // Derive the PDA the “usual” Anchor way:
         seeds = [b"spoke-state"],
@@ -210,11 +190,9 @@ pub struct AuthStateMetas {
     pub vault_token_account: Pubkey,
     pub vault_authority: Pubkey,
     pub token_program: Vec<Pubkey>,
-    pub hyperlane_mailbox: Pubkey,
     pub event_authority: Pubkey,
     pub program: Pubkey,
 }
-
 
 fn handle_batch_settlement<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
@@ -319,43 +297,6 @@ fn handle_settlement<'info>(
         asset: settlement.asset,
         amount,
     }))
-}
-
-fn handle_var_update(ctx: Context<AdminState>, var_data: &[u8]) -> Result<()> {
-    // e.g., parse the first 32 bytes as a "var hash"
-    require!(var_data.len() >= 32, SpokeError::InvalidMessage);
-    let mut var_hash = [0u8; 32];
-    var_hash.copy_from_slice(&var_data[..32]);
-    let rest = &var_data[32..];
-
-    // Compare var_hash with your known constants
-    if var_hash == MAILBOX_HASH {
-        let new_mailbox: Pubkey = try_deserialize_a_pubkey(rest)?;
-        super::update_mailbox(ctx, new_mailbox)?;
-    } else if var_hash == LIGHTHOUSE_HASH {
-        let new_lighthouse: Pubkey = try_deserialize_a_pubkey(rest)?;
-        super::update_lighthouse(ctx, new_lighthouse)?;
-    } else if var_hash == WATCHTOWER_HASH {
-        let new_watchtower: Pubkey = try_deserialize_a_pubkey(rest)?;
-        super::update_watchtower(ctx, new_watchtower)?;
-    } else {
-        return err!(SpokeError::InvalidVarUpdate);
-    }
-
-    Ok(())
-}
-
-fn try_deserialize_a_pubkey(data: &[u8]) -> Result<Pubkey> {
-    // 1) Ensure we have at least 32 bytes
-    if data.len() < 32 {
-        return err!(SpokeError::InvalidMessage);
-    }
-
-    // 2) Copy the first 32 bytes into a Pubkey
-    let key_array: [u8; 32] = data[..32]
-        .try_into()
-        .map_err(|_| SpokeError::InvalidMessage)?;
-    Ok(Pubkey::new_from_array(key_array))
 }
 
 fn make_recipient_token_account_info<'info>(

@@ -21,9 +21,7 @@ pub struct AuthState<'info> {
     /// CHECK: This is a PDA that signs for the vault
     pub vault_authority: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token>,
-    /// CHECK: This is the Hyperlane mailbox program
-    pub hyperlane_mailbox: UncheckedAccount<'info>,
-    pub system_program: Program<'info, System>
+    pub system_program: Program<'info, System>,
 }
 
 #[event_cpi]

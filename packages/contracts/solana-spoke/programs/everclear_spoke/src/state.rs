@@ -52,7 +52,7 @@ impl SpokeState {
         + 32                     // mailbox: Pubkey
         + 1                      // mailbox_dispatch_authority_bump: u8
         + 32                     // igp: Pubkey
-        + 33;                    // igp_type: InterchainGasPaymasterType
+        + 33; // igp_type: InterchainGasPaymasterType
 }
 
 #[account]
