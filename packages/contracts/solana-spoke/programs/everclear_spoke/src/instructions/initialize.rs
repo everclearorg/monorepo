@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{error::SpokeError, events::InitializedEvent, state::SpokeState};
+use crate::{error::SpokeError, events::InitializedEvent, hyperlane::InterchainGasPaymasterType, state::SpokeState};
 
 pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
     let state = &mut ctx.accounts.spoke_state;
@@ -21,6 +21,8 @@ pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> 
     state.message_gas_limit = init.message_gas_limit;
     state.nonce = 0;
     state.mailbox = init.mailbox;
+    state.igp = init.igp;
+    state.igp_type = init.igp_type;
 
     // Set owner to the payer (deployer)
     state.owner = init.owner;
@@ -68,4 +70,6 @@ pub struct SpokeInitializationParams {
     pub message_gas_limit: u64,
     pub owner: Pubkey,
     pub mailbox: Pubkey,
+    pub igp: Pubkey,
+    pub igp_type: InterchainGasPaymasterType,
 }
