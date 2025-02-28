@@ -424,12 +424,13 @@ contract InvoiceHelper is TestExtended {
 
   /**
    * @notice This tests purchasing a target invoice where non-targeted preceding invoices must
-   * be part of the total purchase amount because all preceding <= target.
+   * be part of the total purchase amount where preceding <= target.
    * @dev Queue state should be:
    *      A
    *      B
    *      C
-   * where (amountA + amountB) <= amount, and you only want to purchase C.
+   *      D
+   * where AB <= D and C > D and you only want to purchase D.
    */
   function test_purchaseNonHeadInvoiceMustPurchasePreceding() public {
     // NOTE: at this point, there are no invoices or deposits in USDT
@@ -456,11 +457,12 @@ contract InvoiceHelper is TestExtended {
     console.log('[test] initial custodied', _initialCustodied);
 
     // Create all invoices
-    uint256[] memory _invoiceQueueAmounts = new uint256[](3);
+    uint256[] memory _invoiceQueueAmounts = new uint256[](4);
     {
       _invoiceQueueAmounts[0] = 4000000000000000000000; // A: 4000
       _invoiceQueueAmounts[1] = 8000000000000000000000; // B: 8000
-      _invoiceQueueAmounts[2] = 9000000000000000000000; // C: 9000
+      _invoiceQueueAmounts[2] = 9500000000000000000000; // C: 9500
+      _invoiceQueueAmounts[3] = 9000000000000000000000; // D: 9000
     }
     bytes32[] memory _invoiceQueue = _createInvoices(
       cfg.targetOriginDomain,
@@ -476,12 +478,12 @@ contract InvoiceHelper is TestExtended {
     bytes32[] memory _targetInvoices = new bytes32[](3);
     _targetInvoices[0] = _invoiceQueue[0]; // Target invoice A
     _targetInvoices[1] = _invoiceQueue[1]; // Target invoice B
-    _targetInvoices[2] = _invoiceQueue[2]; // Target invoice C
+    _targetInvoices[2] = _invoiceQueue[3]; // Target invoice D
     uint256[] memory _targetInvoiceAmounts = new uint256[](3);
     {
       _targetInvoiceAmounts[0] = 4000000000000000000000; // A
       _targetInvoiceAmounts[1] = 8000000000000000000000; // B
-      _targetInvoiceAmounts[2] = 9000000000000000000000; // C
+      _targetInvoiceAmounts[2] = 9000000000000000000000; // D
     }
 
     // Take to max discount
@@ -513,10 +515,11 @@ contract InvoiceHelper is TestExtended {
     }
 
     // Verify settlement
-    IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](3);
+    IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](4);
     _expectedStatuses[0] = IEverclear.IntentStatus.SETTLED;
     _expectedStatuses[1] = IEverclear.IntentStatus.SETTLED;
-    _expectedStatuses[2] = IEverclear.IntentStatus.SETTLED;
+    _expectedStatuses[2] = IEverclear.IntentStatus.INVOICED;
+    _expectedStatuses[3] = IEverclear.IntentStatus.SETTLED;
 
     _verifySettlement(
       cfg.tickerHash,
