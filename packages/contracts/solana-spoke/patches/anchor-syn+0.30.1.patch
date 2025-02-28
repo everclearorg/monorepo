@@ -1,0 +1,24 @@
+diff --git a/src/parser/spl_interface.rs b/src/parser/spl_interface.rs
+index e965470..3970fe6 100644
+--- a/src/parser/spl_interface.rs
++++ b/src/parser/spl_interface.rs
+@@ -59,5 +59,19 @@ fn parse_interface_instruction(path: &Path) -> [u8; 8] {
+             panic!("Unsupported instruction: {}", instruction);
+         }
+     }
++    if interface == "hyperlane_message_recipient" {
++        let instruction = path.segments[1].ident.to_string();
++        if instruction == "interchain_security_module" {
++            return [45, 18, 245, 87, 234, 46, 246, 15]; // `InterchainSecurityModule`
++        } else if instruction == "interchain_security_module_account_metas" {
++            return [190, 214, 218, 129, 67, 97, 4, 76];
++        } else if instruction == "handle" {
++            return [33, 210, 5, 66, 196, 212, 239, 142];
++        } else if instruction == "handle_account_metas" {
++            return [194, 141, 30, 82, 241, 41, 169, 52];
++        } else {
++            panic!("Unsupported instruction: {}", instruction);
++        }
++    }
+     panic!("Unsupported interface: {}", interface);
+ }

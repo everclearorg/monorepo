@@ -1,3 +1,17 @@
+## prerequisties
+
+- `anchor 0.30.1`
+
+// NOTE: because of dependency resolving issue, I couldnt make `patch-crate` work in the build chain (`build.rs`) directly. Therefore, a seperate
+command is required in the build chain.
+
+Install cargo patch crate with this specific hash (the current main on 28 Feb 2025, manually reviewed code for security):
+`cargo install --git https://github.com/mokeyish/cargo-patch-crate.git --rev ddbb58591d81daf6272ace7d66a7426999b42adf`
+
+Run `patch-crate` to patch `anchor-syn`. This is required as `anchor 0.30.1` does not have support for discriminator:
+
+`cargo patch-crate`
+
 ## build
 
 Build the contract code locally to ebpf using:

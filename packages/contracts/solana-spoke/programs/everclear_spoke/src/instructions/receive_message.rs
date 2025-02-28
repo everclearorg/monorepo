@@ -130,7 +130,6 @@ pub fn handle_account_metas(
     //         &ctx.accounts.spoke_state.mailbox,
     //     );
 
-    // TODO: This would need to provide an array of token_programs - as settlements can be for different tokens
     let msg_type = handle.message[0];
     match msg_type {
         1 => {
