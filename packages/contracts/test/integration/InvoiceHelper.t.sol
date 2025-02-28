@@ -424,13 +424,124 @@ contract InvoiceHelper is TestExtended {
 
   /**
    * @notice This tests purchasing a target invoice where non-targeted preceding invoices must
+   * be part of the total purchase amount due to the FIFO ordering.
+   * @dev Queue state should be:
+   *      A
+   *      B
+   *      C
+   *      D
+   * where A, C <= D, and B > D. and you only want to purchase D
+   * but due to the ordering B also must be purchased.
+   */
+  function test_purchaseNonHeadInvoiceMustPurchaseAllPreceding() public {
+    // NOTE: at this point, there are no invoices or deposits in USDT
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21890255,
+      l2Block: 796179,
+      tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+      targetOriginDomain: 42161, // Arb
+      targetOriginAsset: 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9, // USDT on Arb
+      targetSettlementDomain: 10, // OP
+      targetSettlementAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58 // USDT on OP
+    });
+
+    {
+      _setupFork(cfg.l2Block, cfg.l1Block, true);
+
+      // Verify initial queue status
+      (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
+      console.log('_length', _length);
+      require(_length == 0, 'invoice in queue, bad test setup');
+    }
+    
+    uint256 _initialCustodied = _hub.custodiedAssets(_hub.assetHash(cfg.tickerHash, cfg.targetSettlementDomain));
+    console.log('[test] initial custodied', _initialCustodied);
+
+    // Create all invoices
+    uint256[] memory _invoiceQueueAmounts = new uint256[](4);
+    {
+      _invoiceQueueAmounts[0] = 5000000000000000000000;   // A: 5000
+      _invoiceQueueAmounts[1] = 9500000000000000000000;   // B: 9500
+      _invoiceQueueAmounts[2] = 5500000000000000000000;   // C: 5500
+      _invoiceQueueAmounts[3] = 9000000000000000000000;   // D: 9000
+    }
+    bytes32[] memory _invoiceQueue = _createInvoices(
+      cfg.targetOriginDomain,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginAsset,
+      cfg.tickerHash,
+      cfg.l1Block,
+      _invoiceQueueAmounts
+    );
+
+    // Define the target invoice(s)
+    // Note: we need to add all ABC in order to purchase D
+    bytes32[] memory _targetInvoices = new bytes32[](4);
+    _targetInvoices[0] = _invoiceQueue[0]; // Target invoice A
+    _targetInvoices[1] = _invoiceQueue[1]; // Target invoice B
+    _targetInvoices[2] = _invoiceQueue[2]; // Target invoice C
+    _targetInvoices[3] = _invoiceQueue[3]; // Target invoice D
+    uint256[] memory _targetInvoiceAmounts = new uint256[](4);
+    {
+      _targetInvoiceAmounts[0] = 5000000000000000000000; // A
+      _targetInvoiceAmounts[1] = 9500000000000000000000; // B
+      _targetInvoiceAmounts[2] = 5500000000000000000000; // C
+      _targetInvoiceAmounts[3] = 9000000000000000000000; // D
+    }
+
+    // Take to max discount
+    _advanceEpochs(20, cfg.l1Block);
+
+    // Calculate deposit amount and create deposit
+    bytes32 _depositId;
+    {
+      uint256[] memory _fees = new uint256[](4);
+      _fees[0] = MAX_FEE;
+      _fees[1] = MAX_FEE;
+      _fees[2] = MAX_FEE;
+      _fees[3] = MAX_FEE;
+
+      uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
+        cfg.targetSettlementDomain,
+        cfg.tickerHash,
+        _targetInvoiceAmounts,
+        _fees
+      );
+      console.log('calculated purchase amount:', _depositAmount);
+
+      _depositId = _createADeposit(
+        cfg.targetSettlementDomain,
+        cfg.targetOriginDomain,
+        cfg.targetSettlementAsset,
+        _depositAmount,
+        cfg.tickerHash
+      );
+    }
+
+    // Verify settlement
+    IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](4);
+    _expectedStatuses[0] = IEverclear.IntentStatus.SETTLED;
+    _expectedStatuses[1] = IEverclear.IntentStatus.SETTLED;
+    _expectedStatuses[2] = IEverclear.IntentStatus.SETTLED;
+    _expectedStatuses[3] = IEverclear.IntentStatus.SETTLED;
+
+    _verifySettlement(
+      cfg.tickerHash,
+      _invoiceQueue,
+      _expectedStatuses,
+      _depositId
+    );
+  }
+
+  /**
+   * @notice This tests purchasing a target invoice where non-targeted preceding invoices must
    * be part of the total purchase amount where preceding <= target.
    * @dev Queue state should be:
    *      A
    *      B
    *      C
    *      D
-   * where AB <= D and C > D and you only want to purchase D.
+   * where A,B <= D and C > D and you only want to purchase D.
    */
   function test_purchaseNonHeadInvoiceMustPurchasePreceding() public {
     // NOTE: at this point, there are no invoices or deposits in USDT
