@@ -6,6 +6,9 @@ use crate::state::SpokeState;
 #[event_cpi]
 #[derive(Accounts)]
 pub struct AuthState<'info> {
+    // NOTE: authority will have to be the first account for the usage in receive_message
+    #[account(mut)]
+    pub authority: Signer<'info>,
     #[account(
         init,
         payer = authority,
@@ -14,8 +17,6 @@ pub struct AuthState<'info> {
         bump
     )]
     pub spoke_state: Account<'info, SpokeState>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
     #[account(mut)]
     pub vault_token_account: Account<'info, TokenAccount>,
     /// CHECK: This is a PDA that signs for the vault

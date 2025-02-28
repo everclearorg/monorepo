@@ -123,6 +123,9 @@ pub struct InterchainSecurityModuleAccountMetas<'info> {
     account_metas_pda: UncheckedAccount<'info>,
 }
 
+
+/// Return accounts required for the handle call.
+/// Note the authority parameter will be the first parameter filled by hyperlane and do not needed to be added here.
 pub fn handle_account_metas(
     ctx: Context<HandleAccountMetas>,
     handle: HandleInstruction,
@@ -131,13 +134,6 @@ pub fn handle_account_metas(
 
     let (event_authority_pubkey, _) =
         Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
-
-    // TODO: the mailbox address have to be put inside the accounts_meta_pda
-    // let (expected_process_authority_key, _expected_process_authority_bump) =
-    //     Pubkey::find_program_address(
-    //         mailbox_process_authority_pda_seeds!(ctx.program_id),
-    //         &ctx.accounts.spoke_state.mailbox,
-    //     );
 
     let msg_type = handle.message[0];
     match msg_type {
@@ -155,10 +151,8 @@ pub fn handle_account_metas(
             let (vault_token_account_pubkey, _) =
                 Pubkey::find_program_address(&[b"vault-token"], ctx.program_id);
 
-            // TODO: What is the authority used here? need to confirm with hyperlane contract
             Ok(AuthStateMetas {
                 spoke_state: spoke_state_pda,
-                authority: todo!(),
                 vault_token_account: vault_token_account_pubkey,
                 vault_authority: vault_authority_pubkey,
                 token_program: asset_pubkeys,
@@ -173,7 +167,6 @@ pub fn handle_account_metas(
             let zero_address = Pubkey::from([0; 32]);
             Ok(AuthStateMetas {
                 spoke_state: spoke_state_pda,
-                authority: zero_address,
                 vault_token_account: zero_address,
                 vault_authority: zero_address,
                 token_program: vec![zero_address],
@@ -196,7 +189,6 @@ pub struct HandleAccountMetas<'info> {
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct AuthStateMetas {
     pub spoke_state: Pubkey,
-    pub authority: Pubkey,
     pub vault_token_account: Pubkey,
     pub vault_authority: Pubkey,
     pub token_program: Vec<Pubkey>,
