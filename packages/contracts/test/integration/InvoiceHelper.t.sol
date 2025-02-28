@@ -13,7 +13,7 @@ import { IHubStorage } from 'interfaces/hub/IHubStorage.sol';
 import { EverclearSpoke, IERC20 } from 'contracts/intent/EverclearSpoke.sol';
 import { HubGateway } from 'contracts/hub/HubGateway.sol';
 import { Settler } from 'contracts/hub/modules/Settler.sol';
-
+import { HubMessageReceiver } from 'contracts/hub/modules/HubMessageReceiver.sol';
 import { TestnetProductionEnvironment } from '../../script/TestnetProduction.sol';
 import { TestnetStagingEnvironment } from '../../script/TestnetStaging.sol';
 import { TestExtended } from '../utils/TestExtended.sol';
@@ -56,9 +56,12 @@ contract InvoiceHelper is TestExtended {
     }
 
     Settler _settler = new Settler();
-    address _current = _hub.modules(keccak256('settlement_module'));
+    address _settlerAddr = _hub.modules(keccak256('settlement_module'));
+    vm.etch(_settlerAddr, address(_settler).code);
 
-    vm.etch(_current, address(_settler).code);
+    HubMessageReceiver _receiver = new HubMessageReceiver();
+    address _receiverAddr = _hub.modules(keccak256('message_receiver_module'));
+    vm.etch(_receiverAddr, address(_receiver).code);
   }
 
   /**
@@ -217,7 +220,6 @@ contract InvoiceHelper is TestExtended {
   ) private returns (bytes32 depositId) {
     // Check the invoice queue length
     (, , , uint256 _length) = _hub.invoices(_tickerHash);
-    console.log('[test] invoice queue length', _length);
 
     // Create an intent
     (IEverclear.Intent[] memory _targetBatch, bytes32 _target) = _constructIntentBatch(
@@ -311,7 +313,7 @@ contract InvoiceHelper is TestExtended {
   }
 
   /**
-   * @notice Calculate the exact deposit amount needed to settle two invoices
+   * @notice Calculate the exact deposit amount needed to settle multiple invoices
    * @param _settlementDomain The domain to settle on
    * @param _tickerHash The ticker hash of the invoices
    * @return _depositAmount The exact deposit amount needed
@@ -322,33 +324,38 @@ contract InvoiceHelper is TestExtended {
     uint256[] memory _invoiceAmounts,
     uint256[] memory _fees
   ) public returns (uint256 _depositAmount) {
-    // Get initial custodied balance
-    uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
-    console.log('[test] initial custodied', _custodied);
-
-    // Calculate all n-1 settlements
-    uint256 _settlementsAmount = 0;
+    // Initialize values
     uint256 _len = _invoiceAmounts.length;
-    for (uint i; i < _len - 1; i++) {
-      _settlementsAmount += _invoiceAmounts[i] - ((_invoiceAmounts[i] * _fees[i]) / DBPS_DENOMINATOR);
-      console.log('[test] added invoiceAmount', _invoiceAmounts[i], 'with fee', _fees[i]);
-      console.log('[test] settlementAmount now', _settlementsAmount);
+    
+    // Calculate total amount needed to settle all invoices
+    uint256 _totalNeededAmount = 0;
+    
+    // Add up all invoice amounts
+    for (uint i = 0; i < _len; i++) {
+      _totalNeededAmount += _invoiceAmounts[i];
+      console.log('  [test] invoice', i, 'amount', _invoiceAmounts[i]);
     }
-
-    // Calculate deposit amount required
-    // _depositAmount = _totalSettlement + 1 - _custodied; //_custodied > _totalSettlement ? 0 : _totalSettlement - _custodied;
-    _depositAmount =
-      _settlementsAmount +
-      ((DBPS_DENOMINATOR * (_invoiceAmounts[_len - 1] - _custodied)) / (DBPS_DENOMINATOR + _fees[_len - 1]));
-    _depositAmount += 1;
-    // {
-    //   console.log('[t] depositAmount       :', _depositAmount);
-    //   console.log('[t] s1                  :', _settlement1);
-    //   console.log('[t] intermediary deposit:', _depositAmount - _settlement1);
-    //   console.log('[t] s2                  :', _totalSettlement - _settlement1);
-    //   console.log('[t] depositInEpoch      :', _depositAmount);
-    //   console.log('[t] _custodied          :', _custodied);
-    // }
+    
+    console.log('  [test] total invoice amount', _totalNeededAmount);
+    
+    // Get the custodied amount
+    uint256 _custodied = _hub.custodiedAssets(_hub.assetHash(_tickerHash, _settlementDomain));
+    console.log('  [test] custodied amount', _custodied);
+    
+    // Simplifying, assume all fees are the same (usually MAX in our tests)
+    uint256 _fee = _fees[_len - 1];
+    
+    _depositAmount = _calculateDepositAmount(
+      _settlementDomain,
+      _totalNeededAmount,
+      _tickerHash,
+      _fee,
+      _custodied
+    );
+    
+    console.log('  [test] calculated deposit amount', _depositAmount);
+    
+    return _depositAmount;
   }
 
   /**
@@ -401,14 +408,12 @@ contract InvoiceHelper is TestExtended {
     // Process the invoice queue
     console.log('====== settling invoices ======');
     _hub.processDepositsAndInvoices(_tickerHash, 0, 0, 0);
-    console.log('settled');
 
     // Verify invoice statuses
-    console.log('invoiceIds length: ', _invoiceIds.length);
     for (uint i = 0; i < _invoiceIds.length; i++) {
-      console.log('iteration: ', i);
+      console.log("Intent status at verification:", uint8(_hub.contexts(_invoiceIds[i]).status));
       require(
-        _hub.contexts(_invoiceIds[i]).status == _expectedStatuses[i], 
+        _hub.contexts(_invoiceIds[i]).status == _expectedStatuses[i],
         string.concat('invoice status mismatch at index ', Strings.toString(i))
       );
     }
@@ -418,89 +423,108 @@ contract InvoiceHelper is TestExtended {
   }
 
   /**
-   * @notice This tests purchasing an invoice with multiple preceding invoices in the queue.
+   * @notice This tests purchasing a target invoice where non-targeted preceding invoices must
+   * be part of the total purchase amount because all preceding <= target.
+   * @dev Queue state should be:
+   *      A
+   *      B
+   *      C
+   * where (amountA + amountB) <= amount, and you only want to purchase C.
    */
-  // function test_expectedAmount_multipleInvoices() public {
-  //   // Setup test variables
-  //   TestConfig memory cfg = TestConfig({
-  //     l1Block: 21890255,
-  //     l2Block: 796179,
-  //     tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
-  //     targetOriginDomain: 10, // OP
-  //     targetOriginAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58, // USDT on OP
-  //     targetSettlementDomain: 1, // Eth
-  //     targetSettlementAsset: 0xdAC17F958D2ee523a2206206994597C13D831ec7 // USDT on Eth
-  //   });
+  function test_purchaseNonHeadInvoiceMustPurchasePreceding() public {
+    // NOTE: at this point, there are no invoices or deposits in USDT
+    TestConfig memory cfg = TestConfig({
+      l1Block: 21890255,
+      l2Block: 796179,
+      tickerHash: 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0,
+      targetOriginDomain: 42161, // Arb
+      targetOriginAsset: 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9, // USDT on Arb
+      targetSettlementDomain: 10, // OP
+      targetSettlementAsset: 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58 // USDT on OP
+    });
 
-  //   {
-  //     _setupFork(cfg.l2Block, cfg.l1Block, true);
+    {
+      _setupFork(cfg.l2Block, cfg.l1Block, true);
 
-  //     // Verify queue status
-  //     (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
-  //     console.log('_length', _length);
-  //     require(_length == 0, 'invoice in queue, bad test setup');
-  //   }
+      // Verify initial queue status
+      (, , , uint256 _length) = _hub.invoices(cfg.tickerHash);
+      console.log('_length', _length);
+      require(_length == 0, 'invoice in queue, bad test setup');
+    }
     
-  //   // Log custodied amount
-  //   uint256 _initialCustodied = _hub.custodiedAssets(_hub.assetHash(cfg.tickerHash, cfg.targetSettlementDomain));
-  //   console.log('[test] initial custodied', _initialCustodied);
+    uint256 _initialCustodied = _hub.custodiedAssets(_hub.assetHash(cfg.tickerHash, cfg.targetSettlementDomain));
+    console.log('[test] initial custodied', _initialCustodied);
 
-  //   uint256[] memory _invoiceQueueAmounts = new uint256[](3);
-  //   {
-  //     _invoiceQueueAmounts[0] = 100000000000000000000;
-  //     _invoiceQueueAmounts[1] = 50000000000000000000;
-  //     _invoiceQueueAmounts[2] = 50000000000000000000;
-  //   }
+    // Create all invoices
+    uint256[] memory _invoiceQueueAmounts = new uint256[](3);
+    {
+      _invoiceQueueAmounts[0] = 4000000000000000000000; // A: 4000
+      _invoiceQueueAmounts[1] = 8000000000000000000000; // B: 8000
+      _invoiceQueueAmounts[2] = 9000000000000000000000; // C: 9000
+    }
+    bytes32[] memory _invoiceQueue = _createInvoices(
+      cfg.targetOriginDomain,
+      cfg.targetSettlementDomain,
+      cfg.targetOriginAsset,
+      cfg.tickerHash,
+      cfg.l1Block,
+      _invoiceQueueAmounts
+    );
 
-  //   // Create invoices
-  //   bytes32[] memory _invoiceQueue = _createInvoices(
-  //     cfg.targetOriginDomain,
-  //     cfg.targetSettlementDomain,
-  //     cfg.targetOriginAsset,
-  //     cfg.tickerHash,
-  //     cfg.l1Block,
-  //     _invoiceQueueAmounts
-  //   );
+    // Define the target invoice(s)
+    // Note: we need to add A and B because they need to be purchased first
+    bytes32[] memory _targetInvoices = new bytes32[](3);
+    _targetInvoices[0] = _invoiceQueue[0]; // Target invoice A
+    _targetInvoices[1] = _invoiceQueue[1]; // Target invoice B
+    _targetInvoices[2] = _invoiceQueue[2]; // Target invoice C
+    uint256[] memory _targetInvoiceAmounts = new uint256[](3);
+    {
+      _targetInvoiceAmounts[0] = 4000000000000000000000; // A
+      _targetInvoiceAmounts[1] = 8000000000000000000000; // B
+      _targetInvoiceAmounts[2] = 9000000000000000000000; // C
+    }
 
-  //   bytes32 _depositId;
-  //   {
-  //     uint256[] memory _fees = new uint256[](3);
-  //     _fees[0] = MAX_FEE;
-  //     _fees[1] = MAX_FEE;
-  //     _fees[2] = MAX_FEE;
+    // Take to max discount
+    _advanceEpochs(20, cfg.l1Block);
+
+    // Calculate deposit amount and create deposit
+    bytes32 _depositId;
+    {
+      uint256[] memory _fees = new uint256[](3);
+      _fees[0] = MAX_FEE;
+      _fees[1] = MAX_FEE;
+      _fees[2] = MAX_FEE;
       
-  //     // Calculate deposit amount
-  //     uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
-  //       cfg.targetSettlementDomain,
-  //       cfg.tickerHash,
-  //       _invoiceQueueAmounts,
-  //       _fees
-  //     );
-  //     console.log('calculated purchase amount:', _depositAmount);
+      uint256 _depositAmount = _calculateExactDepositForMultipleInvoices(
+        cfg.targetSettlementDomain,
+        cfg.tickerHash,
+        _targetInvoiceAmounts,
+        _fees
+      );
+      console.log('calculated purchase amount:', _depositAmount);
 
-  //     // Create deposit 
-  //     _depositId = _createADeposit(
-  //       cfg.targetSettlementDomain,
-  //       cfg.targetOriginDomain,
-  //       cfg.targetSettlementAsset,
-  //       _depositAmount,
-  //       cfg.tickerHash
-  //     );
-  //   }
+      _depositId = _createADeposit(
+        cfg.targetSettlementDomain,
+        cfg.targetOriginDomain,
+        cfg.targetSettlementAsset,
+        _depositAmount,
+        cfg.tickerHash
+      );
+    }
 
-  //   IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](3);
-  //   _expectedStatuses[0] = IEverclear.IntentStatus.SETTLED;
-  //   _expectedStatuses[1] = IEverclear.IntentStatus.SETTLED;
-  //   _expectedStatuses[2] = IEverclear.IntentStatus.SETTLED;
+    // Verify settlement
+    IEverclear.IntentStatus[] memory _expectedStatuses = new IEverclear.IntentStatus[](3);
+    _expectedStatuses[0] = IEverclear.IntentStatus.SETTLED;
+    _expectedStatuses[1] = IEverclear.IntentStatus.SETTLED;
+    _expectedStatuses[2] = IEverclear.IntentStatus.SETTLED;
 
-  //   // Verify settlement
-  //   _verifySettlement(
-  //     cfg.tickerHash,
-  //     _invoiceQueue,
-  //     _expectedStatuses,
-  //     _depositId
-  //   );
-  // }
+    _verifySettlement(
+      cfg.tickerHash,
+      _invoiceQueue,
+      _expectedStatuses,
+      _depositId
+    );
+  }
 
   /**
    * @notice This tests an observed mark purchase that undershot the invoice target:
