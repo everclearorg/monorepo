@@ -5,7 +5,13 @@ use anchor_spl::{
 };
 
 use crate::{
-    consts::{everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN}, error::SpokeError, events::{MessageReceivedEvent, SettledEvent}, mailbox_process_authority_pda_seeds, program::EverclearSpoke, state::{IntentStatus, SpokeState}, utils::{normalize_decimals, vault_authority_seeds}
+    consts::{everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
+    error::SpokeError,
+    events::{MessageReceivedEvent, SettledEvent},
+    mailbox_process_authority_pda_seeds,
+    program::EverclearSpoke,
+    state::{IntentStatus, SpokeState},
+    utils::{normalize_decimals, vault_authority_seeds},
 };
 
 use crate::hyperlane::mailbox::HandleInstruction;
@@ -23,7 +29,10 @@ pub fn handle<'info>(
             mailbox_process_authority_pda_seeds!(ctx.program_id),
             &ctx.accounts.spoke_state.mailbox,
         );
-    require!(ctx.accounts.authority.key() == expected_process_authority_key, SpokeError::InvalidSender);
+    require!(
+        ctx.accounts.authority.key() == expected_process_authority_key,
+        SpokeError::InvalidSender
+    );
     require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
     require!(handle.origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
     require!(
@@ -118,7 +127,7 @@ pub fn handle_account_metas(
     ctx: Context<HandleAccountMetas>,
     handle: HandleInstruction,
 ) -> Result<AuthStateMetas> {
-    let (spoke_state_pda , _)= Pubkey::find_program_address(&[b"spoke_state"], ctx.program_id);
+    let (spoke_state_pda, _) = Pubkey::find_program_address(&[b"spoke_state"], ctx.program_id);
 
     let (event_authority_pubkey, _) =
         Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);

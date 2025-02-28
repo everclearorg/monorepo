@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 
-use crate::{error::SpokeError, events::InitializedEvent, hyperlane::InterchainGasPaymasterType, state::SpokeState};
+use crate::{
+    error::SpokeError, events::InitializedEvent, hyperlane::InterchainGasPaymasterType,
+    state::SpokeState,
+};
 
 pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
     let state = &mut ctx.accounts.spoke_state;
