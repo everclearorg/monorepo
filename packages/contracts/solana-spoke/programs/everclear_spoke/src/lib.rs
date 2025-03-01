@@ -9,14 +9,14 @@ pub mod state;
 
 use error::SpokeError;
 use events::*;
-use hyperlane::mailbox::HandleInstruction;
-use hyperlane::InterchainGasPaymasterType;
+use hyperlane::{mailbox::HandleInstruction, InterchainGasPaymasterType, SerializableAccountMeta};
 use instructions::*;
 
 declare_id!("uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC");
 
 #[program]
 pub mod everclear_spoke {
+
     use super::*;
 
     /// Initialize the global state.
@@ -102,7 +102,7 @@ pub mod everclear_spoke {
     #[interface(hyperlane_message_recipient::interchain_security_module_account_metas)]
     pub fn interchain_security_module_acconut_metas(
         ctx: Context<InterchainSecurityModuleAccountMetas>,
-    ) -> Result<()> {
+    ) -> Result<Vec<SerializableAccountMeta>> {
         instructions::interchain_security_module_account_metas(ctx)
     }
 
@@ -110,7 +110,7 @@ pub mod everclear_spoke {
     pub fn handle_account_metas(
         ctx: Context<HandleAccountMetas>,
         handle: HandleInstruction,
-    ) -> Result<AuthStateMetas> {
+    ) -> Result<Vec<SerializableAccountMeta>> {
         instructions::handle_account_metas(ctx, handle)
     }
 

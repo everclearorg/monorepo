@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program::system_program};
 use anchor_spl::{
     associated_token::get_associated_token_address,
     token::{self, Mint, Token, TokenAccount},
@@ -8,6 +8,7 @@ use crate::{
     consts::{everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::{MessageReceivedEvent, SettledEvent},
+    hyperlane::{to_serializable_account_meta, SerializableAccountMeta},
     mailbox_process_authority_pda_seeds,
     program::EverclearSpoke,
     state::{IntentStatus, SpokeState},
@@ -96,6 +97,7 @@ pub fn handle<'info>(
 
 pub fn interchain_security_module(_ctx: Context<InterchainSecurityModule>) -> Result<()> {
     // NOTE: return nothing to use the default ISM
+    // ref: https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/main/rust/sealevel/programs/mailbox/src/processor.rs#L475
     Ok(())
 }
 
@@ -111,9 +113,9 @@ pub struct InterchainSecurityModule<'info> {
 
 pub fn interchain_security_module_account_metas(
     _ctx: Context<InterchainSecurityModuleAccountMetas>,
-) -> Result<()> {
+) -> Result<Vec<SerializableAccountMeta>> {
     // NOTE: we dont need to any account meta for the ISM call
-    Ok(())
+    Ok(vec![])
 }
 
 #[derive(Accounts)]
@@ -127,7 +129,7 @@ pub struct InterchainSecurityModuleAccountMetas<'info> {
 pub fn handle_account_metas(
     ctx: Context<HandleAccountMetas>,
     handle: HandleInstruction,
-) -> Result<AuthStateMetas> {
+) -> Result<Vec<SerializableAccountMeta>> {
     let (spoke_state_pda, _) = Pubkey::find_program_address(&[b"spoke_state"], ctx.program_id);
 
     let (event_authority_pubkey, _) =
@@ -144,33 +146,40 @@ pub fn handle_account_metas(
                 batch.iter().map(|settlement| settlement.asset).collect();
 
             // Derive the vault authority PDA
-            let (vault_authority_pubkey, vault_authority_bump) =
+            let (vault_authority_pubkey, _vault_authority_bump) =
                 Pubkey::find_program_address(&[b"vault"], ctx.program_id);
-            let (vault_token_account_pubkey, _) =
+            let (vault_token_account_pubkey, _vault_token_account_pubkey_bump) =
                 Pubkey::find_program_address(&[b"vault-token"], ctx.program_id);
 
-            Ok(AuthStateMetas {
-                spoke_state: spoke_state_pda,
-                vault_token_account: vault_token_account_pubkey,
-                vault_authority: vault_authority_pubkey,
-                token_program: asset_pubkeys,
-                event_authority: event_authority_pubkey,
-                program: *ctx.program_id,
-            })
+            let mut ret = vec![
+                to_serializable_account_meta(spoke_state_pda, false),
+                // TODO: confirm these two. authority should be the spoke instead
+                to_serializable_account_meta(vault_token_account_pubkey, true),
+                to_serializable_account_meta(vault_authority_pubkey, false),
+            ];
+            ret.extend(
+                asset_pubkeys
+                    .iter()
+                    .map(|asset_pubkey| to_serializable_account_meta(*asset_pubkey, false)),
+            );
+            ret.push(to_serializable_account_meta(system_program::id(), false));
+            ret.push(to_serializable_account_meta(event_authority_pubkey, false));
+            ret.push(to_serializable_account_meta(*ctx.program_id, false));
+            Ok(ret)
         }
         2 => {
             // Var update
             msg!("variable update message metadata");
             // NOTE: we skip variable update message in nanospoke now
             let zero_address = Pubkey::from([0; 32]);
-            Ok(AuthStateMetas {
-                spoke_state: spoke_state_pda,
-                vault_token_account: zero_address,
-                vault_authority: zero_address,
-                token_program: vec![zero_address],
-                event_authority: event_authority_pubkey,
-                program: *ctx.program_id,
-            })
+            Ok(vec![
+                to_serializable_account_meta(spoke_state_pda, false),
+                to_serializable_account_meta(zero_address, false),
+                to_serializable_account_meta(zero_address, false),
+                to_serializable_account_meta(system_program::id(), false),
+                to_serializable_account_meta(event_authority_pubkey, false),
+                to_serializable_account_meta(*ctx.program_id, false),
+            ])
         }
         _ => {
             return Err(SpokeError::InvalidMessage.into());
@@ -183,16 +192,6 @@ pub fn handle_account_metas(
 pub struct HandleAccountMetas<'info> {
     /// CHECK: this is now undefined pdas where we dont store anything
     pub account_metas_pda: UncheckedAccount<'info>,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct AuthStateMetas {
-    pub spoke_state: Pubkey,
-    pub vault_token_account: Pubkey,
-    pub vault_authority: Pubkey,
-    pub token_program: Vec<Pubkey>,
-    pub event_authority: Pubkey,
-    pub program: Pubkey,
 }
 
 fn handle_batch_settlement<'info>(

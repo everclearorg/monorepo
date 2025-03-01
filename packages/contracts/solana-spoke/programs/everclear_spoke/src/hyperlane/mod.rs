@@ -20,11 +20,13 @@ use mailbox::{MailboxInstruction, OutboxDispatch};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
+pub mod account_meta;
 mod igp;
 pub(crate) mod mailbox;
 mod pda_seeds;
 pub mod primitive_type;
 
+pub use account_meta::*;
 pub use primitive_type::*;
 
 use spl_noop; // Import the spl_noop module
