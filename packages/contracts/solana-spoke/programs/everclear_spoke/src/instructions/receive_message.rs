@@ -50,7 +50,6 @@ pub fn handle<'info>(
         1 => {
             msg!("Processing settlement batch message");
             let settlement_data = &&handle.message[1..];
-            // TODO: fix the implementation of Deserialization here as same in EVMs
             let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
                 .map_err(|_| SpokeError::InvalidMessage)?;
 
@@ -123,7 +122,6 @@ pub struct InterchainSecurityModuleAccountMetas<'info> {
     account_metas_pda: UncheckedAccount<'info>,
 }
 
-
 /// Return accounts required for the handle call.
 /// Note the authority parameter will be the first parameter filled by hyperlane and do not needed to be added here.
 pub fn handle_account_metas(
@@ -180,6 +178,7 @@ pub fn handle_account_metas(
     }
 }
 
+// TODO: fix the return types of those to be SerializableAccountMeta, for the signer / writable info
 #[derive(Accounts)]
 pub struct HandleAccountMetas<'info> {
     /// CHECK: this is now undefined pdas where we dont store anything
@@ -321,10 +320,26 @@ fn make_recipient_token_account_info<'info>(
 }
 
 // Context for the settlements
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, Clone)]
 pub struct Settlement {
     pub intent_id: [u8; 32],
     pub asset: Pubkey,
     pub recipient: Pubkey,
     pub amount: u64,
+}
+
+impl AnchorDeserialize for Settlement {
+    fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
+        // TODO: fix the implementation of Deserialization here as same in EVMs
+        todo!()
+    }
+}
+
+/// Settlements object from EVM layer
+pub struct Settlements {}
+
+impl AnchorDeserialize for Settlements {
+    fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
+        todo!()
+    }
 }

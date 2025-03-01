@@ -8,7 +8,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
 use crate::{
-    consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN, MAX_CALLDATA_SIZE},
+    consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::IntentAddedEvent,
     intent::Intent,
@@ -52,10 +52,7 @@ pub fn new_intent(
     }
     // Check max_fee is within allowed range (for example, <= 10_000 for basis points)
     require!(max_fee <= 10_000, SpokeError::MaxFeeExceeded);
-    require!(
-        data.len() <= MAX_CALLDATA_SIZE,
-        SpokeError::InvalidOperation
-    );
+    // NOTE: we do not need to check data len as this is implicitly done with solana tx size limitation of 1232 bytes
 
     let minted_decimals = ctx.accounts.mint.decimals;
     let normalized_amount =
