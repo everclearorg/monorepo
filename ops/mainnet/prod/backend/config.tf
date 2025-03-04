@@ -90,7 +90,7 @@ locals {
       "324" = {
         providers = [
           "https://zksync-mainnet.blastapi.io/${var.blast_key}",
-          "https://1rpc.io/zksync2-era"
+          "https://mainnet.era.zksync.io"
         ]
       },
       "137" = {
