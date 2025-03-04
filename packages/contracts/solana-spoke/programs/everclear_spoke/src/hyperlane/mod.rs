@@ -245,7 +245,7 @@ impl Ids for Mailbox {
 pub struct Igp;
 
 pub const MAINNET_IGP: anchor_lang::prelude::Pubkey =
-    pubkey!("JAvHW21tYXE9dtdG83DReqU2b4LUexFuCbtJT5tF8X6M");
+    pubkey!("BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv");
 pub const TESTNET_IGP: anchor_lang::prelude::Pubkey =
     pubkey!("9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy");
 
