@@ -18,19 +18,13 @@ contract WrapAdapter is IWrapAdapter, Ownable {
     
     IWETH public immutable WETH;
     IEverclearSpoke public everclearSpoke;
-    bool public entered;
+
+    mapping(bytes32 => bool) public manuallyProcessed;
 
     modifier onlySpoke() {
         if(msg.sender != address(everclearSpoke)) revert Invalid_Spoke_Caller(msg.sender);
         _;
     }
-
-    // modifier entryUpdate() {
-    //     if(entered == true) revert Invalid_Entry_State(); 
-    //     entered = true;
-    //     _;
-    //     entered = false;
-    // }
 
     constructor(address _weth, address _spoke, address _owner) Ownable(_owner) {
         if(_spoke == address(0)) revert Invalid_Address();
@@ -55,11 +49,11 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         address _outputAsset = _intent.outputAsset.toAddress();
         (address _callReceiver, address _unwrapReceiver) = _decodeArbitraryData(_intent.data);
 
-        // Check intent receiver is this, callReceiver is this, amount is valid, and unwrap receiver is non-zero
+        // Check intent receiver is this, callReceiver is this, amount is val id, and unwrap receiver is non-zero
         if(_intent.receiver.toAddress() != address(this)) revert Invalid_Receiver(_intent.receiver.toAddress());
         if(_callReceiver != address(this)) revert Invalid_Callback(_callReceiver);
         if(_amountOut > _intent.amount) revert Invalid_Output_Amount();
-        if(_unwrapReceiver == address(0)) revert Invalid_Receiver(_unwrapReceiver);
+        if(_unwrapReceiver == address(0)) revert Invalid_Unwrap_Receiver();
 
         // Execute on spoke - update status and executes callback - reverts if !SETTLED
         everclearSpoke.executeIntentCalldata(_intent);
@@ -73,6 +67,10 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         // Updating state and configure variables used
         address _outputAsset = _intent.outputAsset.toAddress();
         bytes32 _intentId = keccak256(abi.encode(_intent));
+
+        // Checking if already processed
+        if(manuallyProcessed[_intentId]) revert Invalid_Already_Processed();
+        manuallyProcessed[_intentId] = true;
 
         // Attempting to decode bytes - processing
         (address _callReceiver, address _unwrapReceiver) = _decodeArbitraryData(_intent.data);
@@ -89,9 +87,6 @@ contract WrapAdapter is IWrapAdapter, Ownable {
 
         // Unwraps to an input receiver
         _unwrap(_outputAsset, _amountOut, _receiver, _intentId);
-
-        // Emitting event once completed
-        emit UnwrapClosed(_intentId, _outputAsset, _amountOut);
     }
 
     function adapterCallback(bytes memory) external view onlySpoke {}
@@ -99,28 +94,30 @@ contract WrapAdapter is IWrapAdapter, Ownable {
     /*///////////////////////////////////////////////////////////////
                        EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
-    // NOTE: Lockbox is configured as an input - assuming some XERC20s may not be deployed via registry
-    // TODO: IF we expect 100% of XERC20s will be deployed via Registry we will need to remove xERC20 balance check + add lockbox logic
-    function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _assetToWrap, IXERC20Lockbox _lockbox) external payable {
+    function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _wrapAsset) external payable {
         if(_intent.amount == 0) revert Invalid_Input_Amount();
 
-        if (address(_assetToWrap) != address(0)) {
+        // Validating the calldata is correct size and configured with non-zeroed addresses
+        _validateCalldata(_intent.data);
+
+        if (address(_wrapAsset) != address(0)) {
             IERC20 _inputAsset = IERC20(_intent.inputAsset.toAddress());
-            uint256 _inputBalance = _inputAsset.balanceOf(address(this));
 
-            // Transferring to WrapAdapter and approving the lockbox
-            _assetToWrap.safeTransferFrom(msg.sender, address(this), _intent.amount);
-            _assetToWrap.approve(address(_lockbox), _intent.amount);
+            // Fetching lockbox linked to xERC20 and confirming wrapAsset is correct ERC20
+            IXERC20Lockbox _lockbox = IXERC20Lockbox(IXERC20(address(_inputAsset)).lockbox());
+            if(_lockbox.ERC20() != _wrapAsset) revert Invalid_Lockbox();
 
-            // Executing the deposit to lockbox and approving the spoke
+            // Approving the wrapAsset and depositing into the lockbox
+            _wrapAsset.safeTransferFrom(msg.sender, address(this), _intent.amount);
+            _wrapAsset.approve(address(_lockbox), _intent.amount);
             _lockbox.deposit(_intent.amount);
-            _inputAsset.approve(address(everclearSpoke), _intent.amount);
 
-            // TODO: Checking the lockbox provided sent the expected amount of xERC20 back to the contract - may need to replace with registry logic
-            if(_inputAsset.balanceOf(address(this)) != _inputBalance + _intent.amount) revert Invalid_Lockbox();
+            // Given EverclearSpoke allowance
+            _inputAsset.approve(address(everclearSpoke), _intent.amount);
         } else {
             // Executing the deposit ETH and approving the spoke
-            WETH.deposit{value: msg.value}();
+            if(msg.value != _intent.amount) revert Invalid_Msg_Value();
+            WETH.deposit{value: _intent.amount}();
             WETH.approve(address(everclearSpoke), _intent.amount);
         }
 
@@ -140,6 +137,9 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         if(_outputAsset != address(WETH)) {
             // Fetching lockbox info
             IXERC20Lockbox _lockbox = IXERC20Lockbox(IXERC20(_outputAsset).lockbox());
+
+            // Approving the lockbox and withdrawing the xERC20
+            IERC20(_outputAsset).approve(address(_lockbox), _amountOut);
             _lockbox.withdraw(_amountOut);
             _lockbox.ERC20().safeTransfer(_unwrapReceiver, _amountOut);
         } else {
@@ -151,17 +151,15 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         emit UnwrapClosed(_intentId, _outputAsset, _amountOut);
     }
 
-    function _decodeArbitraryData(bytes memory _data) internal pure returns (address _callReceiver, address _unwrapReceiver) {
+    function _decodeArbitraryData(bytes memory _data) internal returns (address _callReceiver, address _unwrapReceiver) {
         // Handling the callReceiver input
         bytes memory _calldata;
-        if(_data.length < 32) return (address(0), address(0));
-        else if(_data.length == 32) {
-            (_callReceiver) = abi.decode(_data, (address));
-            return (_callReceiver, address(0));
-        } else if(_data.length > 32) {
+        if(_data.length == 160) {
             (_callReceiver, _calldata) = abi.decode(_data, (address, bytes));
+        } else {
+            return (address(0), address(0));
         }
-
+        
         // Handling the additional data input
         if(_calldata.length == 36) {
             // Fetch the address from remaining 32 bytes
@@ -175,5 +173,11 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         } else {
             return (_callReceiver, address(0));
         }
+    }
+
+    function _validateCalldata(bytes memory _data) internal {
+        (address _callReceiver, address _unwrapReceiver) = _decodeArbitraryData(_data);
+        if(_callReceiver == address(0)) revert Invalid_Call_Receiver();
+        if(_unwrapReceiver == address(0)) revert Invalid_Unwrap_Receiver();
     }
 }

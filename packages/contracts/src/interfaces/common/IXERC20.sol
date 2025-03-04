@@ -60,6 +60,11 @@ interface IXERC20 {
   error IXERC20_LimitsTooHigh();
 
   /**
+  * @notice Returns the configured lockbox address
+   */
+  function lockbox() external view returns (address);
+
+  /**
    * @notice Sets the lockbox address
    *
    * @param _lockbox The address of the lockbox

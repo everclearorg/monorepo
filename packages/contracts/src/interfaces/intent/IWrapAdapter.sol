@@ -10,7 +10,7 @@ interface IWrapAdapter {
 
     function unwrapAsset(IEverclear.Intent calldata _intent, uint256 _amountOut) external;
 
-    function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _assetToWrap, IXERC20Lockbox _lockbox) external payable;
+    function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _assetToWrap) external payable;
 
     function adapterCallback(bytes memory _data) external;
 
@@ -27,10 +27,14 @@ interface IWrapAdapter {
     error Invalid_Lockbox();
     error Transfer_ETH_Failure();
     error Invalid_Input_Amount();
+    error Invalid_Msg_Value();
     error Invalid_Output_Amount();
     error Invalid_Callback_State();
     error Invalid_Manual_Processing();
     error Invalid_Entry_State();
+    error Invalid_Already_Processed();
+    error Invalid_Call_Receiver();
+    error Invalid_Unwrap_Receiver();
     error Invalid_Spoke_Caller(address _sender);
     error Invalid_Receiver(address _receiver);
     error Invalid_Callback(address _callback);

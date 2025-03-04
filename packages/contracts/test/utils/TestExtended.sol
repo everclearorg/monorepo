@@ -7,6 +7,7 @@ import {XERC20Lockbox} from './TestLockbox.sol';
 import {Mocker} from './mocks/Mocker.sol';
 import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
@@ -16,6 +17,7 @@ import {Mocker} from './mocks/Mocker.sol';
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {IXERC20} from 'interfaces/common/IXERC20.sol';
+import {IXERC20Lockbox} from 'interfaces/common/IXERC20Lockbox.sol';
 
 contract TestExtended is Mocker {
   using TypeCasts for address;
@@ -97,12 +99,18 @@ contract TestExtended is Mocker {
     _token = _tokenAddress.toBytes32();
   }
 
-  function deployAndDealXERC20Native(bytes32 _receiver, uint256 _amount) public returns (bytes32 _nativeToken, bytes32 _xerc20Token) {
+  function deployAndDealXERC20Native(address _wrapAdapter, bytes32 _receiver, uint256 _amount) public returns (bytes32 _nativeToken, bytes32 _xerc20Token) {
     _nativeToken = deployAndDeal(_receiver, _amount);
-    _xerc20Token = deployXERC20(_nativeToken);
+    _xerc20Token = deployXERC20(_nativeToken, _wrapAdapter, _amount);
   }
 
-  function deployXERC20(bytes32 _nativeToken) public returns (bytes32 _xerc20Token) {
+  function deployAndDealXERC20Token(address _wrapAdapter, bytes32 _receiver, uint256 _amount) public returns (bytes32 _nativeToken, bytes32 _xerc20Token) {
+    _nativeToken = deployAndDeal(address(this).toBytes32(), _amount);
+    _xerc20Token = deployXERC20(_nativeToken, _wrapAdapter, _amount);
+    depositNative(_xerc20Token, _nativeToken, _receiver, _amount);
+  }
+
+  function deployXERC20(bytes32 _nativeToken, address _wrapAdapter, uint256 _amount) public returns (bytes32 _xerc20Token) {
     // Deploy the XERC20 token
     address _tokenAddress = address(new XERC20('TokenX', 'TKNX', address(this)));
     _xerc20Token = _tokenAddress.toBytes32();
@@ -110,6 +118,22 @@ contract TestExtended is Mocker {
     // Deploy Lockbox
     address _lockboxAddress = address(new XERC20Lockbox(_xerc20Token.toAddress(), _nativeToken.toAddress(), false));
     IXERC20(_tokenAddress).setLockbox(_lockboxAddress);
+
+    // Setting limits of the wrapAdapter
+    IXERC20(_tokenAddress).setLimits(_wrapAdapter, _amount, _amount);
+  }
+
+  function depositNative(bytes32 _xerc20, bytes32 _nativeToken, bytes32 _receiver, uint256 _amount) public {
+    // Getting the lockbox address
+    XERC20 _xerc20Token = XERC20(_xerc20.toAddress());
+    address _lockbox = _xerc20Token.lockbox();
+
+    // Approving and depositing into the lockbox
+    IERC20(_nativeToken.toAddress()).approve(_lockbox, _amount);
+    IXERC20Lockbox(_lockbox).deposit(_amount);
+
+    // Transferring the XERC20
+    _xerc20Token.transfer(_receiver.toAddress(), _amount);
   }
 
   function _validAndDifferentAddresses(address _address1, address _address2) internal pure {
