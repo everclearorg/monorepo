@@ -72,7 +72,7 @@ pub fn new_intent(
     let new_nonce = state
         .nonce
         .checked_add(1)
-        .ok_or(SpokeError::InvalidOperation)?;
+        .ok_or(error!(SpokeError::InvalidOperation))?;
     state.nonce = new_nonce;
     let clock = Clock::get()?;
 

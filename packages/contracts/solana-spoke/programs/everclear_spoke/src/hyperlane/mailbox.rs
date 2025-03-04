@@ -18,7 +18,7 @@ impl MailboxInstruction {
     pub fn into_instruction_data(self) -> Result<Vec<u8>> {
         Ok(self
             .try_to_vec()
-            .map_err(|_err| SpokeError::InvalidMessage)?)
+            .map_err(|_err| error!(SpokeError::InvalidMessage))?)
     }
 }
 

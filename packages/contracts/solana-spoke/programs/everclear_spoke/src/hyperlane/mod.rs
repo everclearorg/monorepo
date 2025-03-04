@@ -92,7 +92,7 @@ pub struct HyperlaneToken<T> {
 impl<T> HyperlaneToken<T> {
     pub fn local_amount_to_remote_amount(&self, amount: u64) -> Result<U256> {
         convert_decimals(amount.into(), self.decimals, self.remote_decimals)
-            .ok_or(SpokeError::InvalidArgument.into())
+            .ok_or(error!(SpokeError::InvalidArgument))
     }
 }
 
@@ -156,18 +156,15 @@ fn dispatch(
 
     // Parse the message ID from the return data from the prior dispatch.
     let (returning_program_id, returned_data) =
-        get_return_data().ok_or(SpokeError::InvalidArgument)?;
+        get_return_data().ok_or(error!(SpokeError::InvalidArgument))?;
     // The mailbox itself doesn't make any CPIs, but as a sanity check we confirm
     // that the return data is from the mailbox.
     require!(
         *mailbox_id == returning_program_id,
         SpokeError::InvalidArgument,
     );
-    // if returning_program_id != *mailbox {
-    //     return Err(SpokeError::InvalidArgument);
-    // }
     let message_id: H256 =
-        H256::try_from_slice(&returned_data).map_err(|_| SpokeError::InvalidMessage)?;
+        H256::try_from_slice(&returned_data).map_err(|_| error!(SpokeError::InvalidMessage))?;
 
     Ok(message_id)
 }
@@ -372,7 +369,7 @@ pub fn transfer_remote(ctx: Context<TransferRemoteContext>, xfer: TransferRemote
     );
     let dispatch_authority_key =
         Pubkey::create_program_address(dispatch_authority_seeds, program_id)
-            .map_err(|_| SpokeError::InvalidArgument)?;
+            .map_err(|_| error!(SpokeError::InvalidArgument))?;
     require!(
         dispatch_authority_account.key == &dispatch_authority_key,
         SpokeError::InvalidArgument

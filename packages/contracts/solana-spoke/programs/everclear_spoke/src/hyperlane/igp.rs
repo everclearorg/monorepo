@@ -21,7 +21,9 @@ pub enum IgpInstruction {
 impl IgpInstruction {
     /// Serializes an instruction into a vector of bytes.
     pub fn into_instruction_data(self) -> Result<Vec<u8>> {
-        Ok(self.try_to_vec().map_err(|_| SpokeError::InvalidMessage)?)
+        Ok(self
+            .try_to_vec()
+            .map_err(|_| error!(SpokeError::InvalidMessage))?)
     }
 }
 

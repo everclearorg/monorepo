@@ -52,7 +52,7 @@ pub fn handle<'info>(
             msg!("Processing settlement batch message");
             let settlement_data = &&handle.message[1..];
             let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
-                .map_err(|_| SpokeError::InvalidMessage)?;
+                .map_err(|_| error!(SpokeError::InvalidMessage))?;
 
             let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
 
@@ -63,7 +63,7 @@ pub fn handle<'info>(
             msg!("Skipping variable update message");
         }
         _ => {
-            return Err(SpokeError::InvalidMessage.into());
+            return err!(SpokeError::InvalidMessage);
         }
     }
     // HACK: expand emit_cpi! macro for reference issue
@@ -141,14 +141,14 @@ pub fn handle_account_metas(
             msg!("Processing settlement batch message");
             let settlement_data = &handle.message[1..];
             let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
-                .map_err(|_| SpokeError::InvalidMessage)?;
+                .map_err(|_| error!(SpokeError::InvalidMessage))?;
             let asset_pubkeys: Vec<Pubkey> =
                 batch.iter().map(|settlement| settlement.asset).collect();
 
             // Derive the vault authority PDA
             let (vault_authority_pubkey, _vault_authority_bump) =
                 Pubkey::find_program_address(&[b"vault"], ctx.program_id);
-            let (vault_token_account_pubkey, _vault_token_account_pubkey_bump) =
+            let (vault_token_account_pubkey, _vault_token_account_bump) =
                 Pubkey::find_program_address(&[b"vault-token"], ctx.program_id);
 
             let mut ret = vec![
@@ -182,12 +182,11 @@ pub fn handle_account_metas(
             ])
         }
         _ => {
-            return Err(SpokeError::InvalidMessage.into());
+            return err!(SpokeError::InvalidMessage);
         }
     }
 }
 
-// TODO: fix the return types of those to be SerializableAccountMeta, for the signer / writable info
 #[derive(Accounts)]
 pub struct HandleAccountMetas<'info> {
     /// CHECK: this is now undefined pdas where we dont store anything
@@ -254,7 +253,7 @@ fn handle_settlement<'info>(
     let mint_info = remaining_accounts
         .iter()
         .find(|acc| acc.key() == vault_token_account.mint)
-        .ok_or(SpokeError::InvalidOperation)?;
+        .ok_or(error!(SpokeError::InvalidOperation))?;
 
     let mint_account = Account::<Mint>::try_from(mint_info)?;
     let minted_decimals = mint_account.decimals;
@@ -325,6 +324,7 @@ pub struct Settlement {
     pub asset: Pubkey,
     pub recipient: Pubkey,
     pub amount: u64,
+    pub update_virtual_balance: bool,
 }
 
 impl AnchorDeserialize for Settlement {

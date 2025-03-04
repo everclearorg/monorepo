@@ -40,10 +40,10 @@ pub(crate) fn normalize_decimals(
         // watch for overflow if we do big multiplications
         let factor = 10u64
             .checked_pow(shift as u32)
-            .ok_or(SpokeError::DecimalConversionOverflow)?;
+            .ok_or(error!(SpokeError::DecimalConversionOverflow))?;
         let scaled = amount
             .checked_mul(factor)
-            .ok_or(SpokeError::DecimalConversionOverflow)?;
+            .ok_or(error!(SpokeError::DecimalConversionOverflow))?;
         Ok(scaled)
     }
 }
