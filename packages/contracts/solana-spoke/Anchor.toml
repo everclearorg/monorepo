@@ -7,13 +7,13 @@ skip-lint = false
 
 [programs.devnet]
 call_executor = "HGaUXXufuDrkUPPMfcSkcdhhWTyB2trE2UtjQD4ebyjK"
-everclear_spoke = "uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC"
+everclear_spoke = "4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL"
 spoke_gateway = "Cuuu22fpegEh5x8da14zVkUp5gwENHK3uM6JwKsdXrtW"
 spoke_message_receiver = "8qp4V6EWGL6KgpMcJix5ufVSRu7JezM8sKKUgRwHncbA"
 
 [programs.localnet]
 call_executor = "HGaUXXufuDrkUPPMfcSkcdhhWTyB2trE2UtjQD4ebyjK"
-everclear_spoke = "uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC"
+everclear_spoke = "4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL"
 spoke_gateway = "Cuuu22fpegEh5x8da14zVkUp5gwENHK3uM6JwKsdXrtW"
 spoke_message_receiver = "8qp4V6EWGL6KgpMcJix5ufVSRu7JezM8sKKUgRwHncbA"
 
