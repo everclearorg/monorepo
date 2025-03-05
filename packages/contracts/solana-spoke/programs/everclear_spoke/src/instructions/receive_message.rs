@@ -8,7 +8,7 @@ use crate::{
     consts::{everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::{MessageReceivedEvent, SettledEvent},
-    hyperlane::{to_serializable_account_meta, SerializableAccountMeta},
+    hyperlane::{to_serializable_account_meta, SerializableAccountMeta, U256},
     mailbox_process_authority_pda_seeds,
     program::EverclearSpoke,
     state::{IntentStatus, SpokeState},
@@ -182,7 +182,7 @@ pub fn handle_account_metas(
             ])
         }
         _ => {
-            return err!(SpokeError::InvalidMessage);
+            err!(SpokeError::InvalidMessage)
         }
     }
 }
@@ -258,7 +258,8 @@ fn handle_settlement<'info>(
     let mint_account = Account::<Mint>::try_from(mint_info)?;
     let minted_decimals = mint_account.decimals;
     let amount = normalize_decimals(
-        settlement.amount,
+        // TODO: type check this amount properly for edge cases
+        settlement.amount.low_u64(),
         minted_decimals,
         DEFAULT_NORMALIZED_DECIMALS,
     )?;
@@ -321,24 +322,112 @@ fn make_recipient_token_account_info<'info>(
 #[derive(AnchorSerialize, Clone)]
 pub struct Settlement {
     pub intent_id: [u8; 32],
+    pub amount: U256,
     pub asset: Pubkey,
     pub recipient: Pubkey,
-    pub amount: u64,
     pub update_virtual_balance: bool,
 }
 
 impl AnchorDeserialize for Settlement {
     fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
         // TODO: fix the implementation of Deserialization here as same in EVMs
-        todo!()
+        let mut intent_id: [u8; 32] = [0; 32];
+        let mut amount: [u8; 32] = [0; 32];
+        let mut asset: [u8; 32] = [0; 32];
+        let mut recipient: [u8; 32] = [0; 32];
+        reader.read_exact(&mut intent_id)?;
+        reader.read_exact(&mut amount)?;
+        reader.read_exact(&mut asset)?;
+        reader.read_exact(&mut recipient)?;
+        let mut buf: [u8; 32] = [0; 32];
+        reader.read_exact(&mut buf)?;
+        // SAFE: buf len always > 1 and can be unwarpped
+        let settlement = Settlement {
+            intent_id,
+            amount: U256::from_big_endian(&amount),
+            asset: Pubkey::new_from_array(asset),
+            recipient: Pubkey::new_from_array(recipient),
+            update_virtual_balance: buf[31] == 1,
+        };
+        Ok(settlement)
     }
 }
 
 /// Settlements object from EVM layer
-pub struct Settlements {}
+pub struct Settlements {
+    pub settlements: Vec<Settlement>,
+}
 
 impl AnchorDeserialize for Settlements {
     fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
-        todo!()
+        // Structure of the data in slots:
+        // offset
+        // length of data
+        // ?
+        // len of settlements
+        // settlement 1
+        // ...
+        // settlement 2
+        // ...
+        let mut buf = [0u8; 32];
+        // read offset and ignore
+        reader.read_exact(&mut buf)?;
+        // read len and ignore
+        reader.read_exact(&mut buf)?;
+        // read one more block and ignore
+        reader.read_exact(&mut buf)?;
+        // read len and store into buf
+        reader.read_exact(&mut buf)?;
+        // SAFE: buf size > 4 and can always be unwrapped
+        let (_, size) = buf.split_last_chunk().unwrap();
+        let size = u32::from_be_bytes(*size);
+        let mut settlements = vec![];
+        for _ in 0..size {
+            let settlement = Settlement::deserialize_reader(reader)?;
+            settlements.push(settlement);
+        }
+        Ok(Settlements { settlements })
+    }
+}
+
+pub enum MessageType {
+    Intent,
+    Fill,
+    Settlement,
+    VarUpdate,
+}
+
+impl TryFrom<u8> for MessageType {
+    type Error = u8;
+
+    fn try_from(value: u8) -> std::result::Result<Self, Self::Error> {
+        let res = match value {
+            0 => MessageType::Intent,
+            1 => MessageType::Fill,
+            2 => MessageType::Settlement,
+            3 => MessageType::VarUpdate,
+            _ => return Err(value),
+        };
+        Ok(res)
+    }
+}
+pub struct HyperlaneMessages {
+    pub message_type: MessageType,
+    pub rest: Vec<u8>,
+}
+
+impl AnchorDeserialize for HyperlaneMessages {
+    fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
+        // Structure of the data:
+        // MessageType (32 byte)
+        // remaining message contents
+        let mut buf = [0u8; 32];
+        reader.read_exact(&mut buf)?;
+        let message_type: MessageType = MessageType::try_from(buf[31])
+            .map_err(|_| std::io::Error::new(std::io::ErrorKind::InvalidInput, "invalid type"))?;
+
+        let mut rest = vec![];
+        reader.read_to_end(&mut rest)?;
+        Ok(HyperlaneMessages { message_type, rest })
     }
 }

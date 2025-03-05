@@ -16,9 +16,8 @@ pub enum MailboxInstruction {
 impl MailboxInstruction {
     /// Serializes an instruction into a vector of bytes.
     pub fn into_instruction_data(self) -> Result<Vec<u8>> {
-        Ok(self
-            .try_to_vec()
-            .map_err(|_err| error!(SpokeError::InvalidMessage))?)
+        self.try_to_vec()
+            .map_err(|_err| error!(SpokeError::InvalidMessage))
     }
 }
 

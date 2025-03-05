@@ -82,7 +82,7 @@ pub mod everclear_spoke {
         )
     }
 
-    /// Instruction relates to message receiving
+    // Instruction relates to message receiving
 
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
@@ -114,7 +114,7 @@ pub mod everclear_spoke {
         instructions::handle_account_metas(ctx, handle)
     }
 
-    /// Admin functions
+    // Admin functions
 
     pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
@@ -174,7 +174,10 @@ pub mod everclear_spoke {
         instructions::update_message_gas_limit(ctx, new_limit)
     }
 
-    pub fn update_mailbox_dispatch_authority_bump(ctx: Context<AdminState>, new_bump: u8) -> Result<()> {
+    pub fn update_mailbox_dispatch_authority_bump(
+        ctx: Context<AdminState>,
+        new_bump: u8,
+    ) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
         require!(
             state.owner == ctx.accounts.admin.key(),

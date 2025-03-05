@@ -3,8 +3,8 @@ use anchor_lang::prelude::*;
 use super::AdminState;
 use crate::{
     events::{
-        IgpUpdatedEvent, LighthouseUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent,
-        WatchtowerUpdatedEvent, MailboxDispatchAuthorityBumpUpdatedEvent,
+        IgpUpdatedEvent, LighthouseUpdatedEvent, MailboxDispatchAuthorityBumpUpdatedEvent,
+        MailboxUpdatedEvent, MessageGasLimitUpdatedEvent, WatchtowerUpdatedEvent,
     },
     hyperlane::InterchainGasPaymasterType,
 };
@@ -67,12 +67,12 @@ pub fn update_message_gas_limit(ctx: Context<AdminState>, new_limit: u64) -> Res
     Ok(())
 }
 
-pub fn update_mailbox_dispatch_authority_bump(ctx: Context<AdminState>, new_bump: u8) -> Result<()> {
+pub fn update_mailbox_dispatch_authority_bump(
+    ctx: Context<AdminState>,
+    new_bump: u8,
+) -> Result<()> {
     let old_bump: u8 = ctx.accounts.spoke_state.mailbox_dispatch_authority_bump;
     ctx.accounts.spoke_state.mailbox_dispatch_authority_bump = new_bump;
-    emit_cpi!(MailboxDispatchAuthorityBumpUpdatedEvent {
-        old_bump,
-        new_bump,
-    });
+    emit_cpi!(MailboxDispatchAuthorityBumpUpdatedEvent { old_bump, new_bump });
     Ok(())
 }

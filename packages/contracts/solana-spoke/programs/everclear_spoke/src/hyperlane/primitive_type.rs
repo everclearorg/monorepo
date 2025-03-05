@@ -1,5 +1,5 @@
 use anchor_lang::{
-    prelude::borsh::{self, BorshDeserialize, BorshSerialize},
+    prelude::borsh::{self},
     AnchorDeserialize, AnchorSerialize,
 };
 use fixed_hash::construct_fixed_hash;
@@ -13,6 +13,6 @@ construct_fixed_hash! {
 
 construct_uint! {
     /// 256-bit unsigned integer.
-    #[derive(BorshSerialize, BorshDeserialize)]
+    #[derive(AnchorSerialize, AnchorDeserialize)]
     pub struct U256(4);
 }
