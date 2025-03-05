@@ -108,3 +108,9 @@ pub struct MessageGasLimitUpdatedEvent {
     pub old_limit: u64,
     pub new_limit: u64,
 }
+
+#[event]
+pub struct MailboxDispatchAuthorityBumpUpdatedEvent {
+    pub old_bump: u8,
+    pub new_bump: u8,
+}
