@@ -35,6 +35,7 @@ contract WrapAdapter is IWrapAdapter, Ownable {
     /*///////////////////////////////////////////////////////////////
                        PERMISSIONED FUNCTIONS
     //////////////////////////////////////////////////////////////*/
+    /// @inheritdoc IWrapAdapter
     function updateEverclearSpoke(address _newSpoke) external onlyOwner {
         if(_newSpoke == address(0)) revert Invalid_Address();
 
@@ -44,26 +45,22 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         emit SpokeUpdated(_oldSpoke, _newSpoke);
     }
 
-    function unwrapAsset(IEverclear.Intent calldata _intent, uint256 _amountOut) external onlyOwner {
-        // Updating state and configure variables used
-        address _outputAsset = _intent.outputAsset.toAddress();
-        (address _callReceiver, address _unwrapReceiver) = _decodeArbitraryData(_intent.data);
+    /// @inheritdoc IWrapAdapter
+    function batchUnwrapIntent(IEverclear.Intent[] calldata _intents, uint256[] calldata _amountsOut) external onlyOwner {
+        if(_intents.length != _amountsOut.length) revert Invalid_Array_Length();
 
-        // Check intent receiver is this, callReceiver is this, amount is val id, and unwrap receiver is non-zero
-        if(_intent.receiver.toAddress() != address(this)) revert Invalid_Receiver(_intent.receiver.toAddress());
-        if(_callReceiver != address(this)) revert Invalid_Callback(_callReceiver);
-        if(_amountOut > _intent.amount) revert Invalid_Output_Amount();
-        if(_unwrapReceiver == address(0)) revert Invalid_Unwrap_Receiver();
-
-        // Execute on spoke - update status and executes callback - reverts if !SETTLED
-        everclearSpoke.executeIntentCalldata(_intent);
-
-        // Unwrapping and emitting
-        bytes32 _intentId = keccak256(abi.encode(_intent));
-        _unwrap(_outputAsset, _amountOut, _unwrapReceiver, _intentId);
+        for(uint256 i = 0; i < _intents.length; i++) {
+            _unwrapIntent(_intents[i], _amountsOut[i]);
+        }
     }
 
-    function unwrapInvalidCalldata(IEverclear.Intent calldata _intent, uint256 _amountOut, address _receiver) external onlyOwner {        
+    /// @inheritdoc IWrapAdapter
+    function unwrapIntent(IEverclear.Intent calldata _intent, uint256 _amountOut) external onlyOwner {
+        _unwrapIntent(_intent, _amountOut);
+    }
+
+    /// @inheritdoc IWrapAdapter
+    function unwrapInvalidIntent(IEverclear.Intent calldata _intent, uint256 _amountOut, address _receiver) external onlyOwner {        
         // Updating state and configure variables used
         address _outputAsset = _intent.outputAsset.toAddress();
         bytes32 _intentId = keccak256(abi.encode(_intent));
@@ -73,14 +70,14 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         manuallyProcessed[_intentId] = true;
 
         // Attempting to decode bytes - processing
-        (address _callReceiver, address _unwrapReceiver) = _decodeArbitraryData(_intent.data);
+        (address _callReceiver, address _unwrapReceiver, bytes4 _funcSelector) = _decodeArbitraryData(_intent.data);
 
         // Check intent receiver is this, callReceiver is !this OR !unwrap receiver, amount is valid, and intent status is settled
         if(_intent.receiver.toAddress() != address(this)) revert Invalid_Receiver(_intent.receiver.toAddress());
         if(_amountOut > _intent.amount) revert Invalid_Output_Amount();
         
         // Checks the calldata data is invald i.e. should be manually processed
-        if(_callReceiver == address(this) && _unwrapReceiver != address(0)) revert Invalid_Manual_Processing();
+        if(_callReceiver == address(this) && _unwrapReceiver != address(0) && _funcSelector == this.adapterCallback.selector) revert Invalid_Manual_Processing();
 
         // Checks status is SETTLED
         if(everclearSpoke.status(_intentId) != IEverclear.IntentStatus.SETTLED) revert Invalid_Status();
@@ -89,16 +86,16 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         _unwrap(_outputAsset, _amountOut, _receiver, _intentId);
     }
 
+    /// @inheritdoc IWrapAdapter
     function adapterCallback(bytes memory) external view onlySpoke {}
 
     /*///////////////////////////////////////////////////////////////
                        EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
+    /// @inheritdoc IWrapAdapter
     function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _wrapAsset) external payable {
         if(_intent.amount == 0) revert Invalid_Input_Amount();
-
-        // Validating the calldata is correct size and configured with non-zeroed addresses
-        _validateCalldata(_intent.data);
+        if(_intent.outputAsset == bytes32(0)) revert Invalid_Output_Asset();
 
         if (address(_wrapAsset) != address(0)) {
             IERC20 _inputAsset = IERC20(_intent.inputAsset.toAddress());
@@ -123,15 +120,72 @@ contract WrapAdapter is IWrapAdapter, Ownable {
 
         // Executing the new intent on the Spoke
         everclearSpoke.newIntent(_intent.destinations, _intent.receiver.toAddress(), _intent.inputAsset.toAddress(), _intent.outputAsset.toAddress(), _intent.amount, _intent.maxFee, _intent.ttl, _intent.data);
-	       
+    }
+
+    /// @inheritdoc IWrapAdapter
+    function sendUnwrapIntent(IEverclear.Intent memory _intent) external {
+        if(_intent.amount == 0) revert Invalid_Input_Amount();
+        if(_intent.outputAsset == bytes32(0)) revert Invalid_Output_Asset();
+
+        // Validating the intent calldata is configured correctly
+        _validateIntentCalldata(_intent.data);
+
+        // Transferring the ERC20 token to the contract and approving the spoke
+        IERC20 _asset = IERC20(_intent.inputAsset.toAddress());
+        _asset.safeTransferFrom(msg.sender, address(this), _intent.amount);
+        _asset.approve(address(everclearSpoke), _intent.amount);
+
+        // Executing the new intent on the Spoke
+        everclearSpoke.newIntent(_intent.destinations, _intent.receiver.toAddress(), _intent.inputAsset.toAddress(), _intent.outputAsset.toAddress(), _intent.amount, _intent.maxFee, _intent.ttl, _intent.data);
+
         // Emitting an unwrap event with the intent info and Id
         bytes32 _intentId = keccak256(abi.encode(_intent));
         emit UnwrapOpened(_intentId, _intent);
     }
 
+    /// @inheritdoc IWrapAdapter
+    function validateIntentCalldata(IEverclear.Intent memory _intent) external view {
+        _validateIntentCalldata(_intent.data);
+    }
+
     /*///////////////////////////////////////////////////////////////
-                       EXTERNAL FUNCTIONS
+                       INTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
+    /**
+    * @notice Checks intent struct is valid, executes intentCalldata on Spoke, unwraps intent, and sends to user
+    * @dev Supports unwrapping WETH and xERC20
+    * @param _intent The intent to unwrap
+    * @param _amountOut The amount of output asset to send to the unwrap receiver
+    */
+    function _unwrapIntent(IEverclear.Intent calldata _intent, uint256 _amountOut) internal {
+        // Updating state and configure variables used
+        address _outputAsset = _intent.outputAsset.toAddress();
+
+        (address _callReceiver, address _unwrapReceiver, bytes4 _funcSelector) = _decodeArbitraryData(_intent.data);
+
+        // Check intent receiver is this, callReceiver is this, amount is val id, and unwrap receiver is non-zero
+        if(_intent.receiver.toAddress() != address(this)) revert Invalid_Receiver(_intent.receiver.toAddress());
+        if(_callReceiver != address(this)) revert Invalid_Callback(_callReceiver);
+        if(_amountOut > _intent.amount) revert Invalid_Output_Amount();
+        if(_unwrapReceiver == address(0)) revert Invalid_Unwrap_Receiver();
+        if(_funcSelector != this.adapterCallback.selector) revert Invalid_Selector();
+
+        // Execute on spoke - update status and executes callback - reverts if !SETTLED
+        everclearSpoke.executeIntentCalldata(_intent);
+
+        // Unwrapping and emitting
+        bytes32 _intentId = keccak256(abi.encode(_intent));
+        _unwrap(_outputAsset, _amountOut, _unwrapReceiver, _intentId);
+    }
+
+    /**
+    * @notice Unwraps an intent and sends the output asset to the unwrap receiver
+    * @dev Supports unwrapping WETH and xERC20
+    * @param _outputAsset The output asset to unwrap
+    * @param _amountOut The amount of output asset to send to the unwrap receiver
+    * @param _unwrapReceiver The receiver of the unwrapped asset
+    * @param _intentId The intentId of the unwrapped intent
+     */
     function _unwrap(address _outputAsset, uint256 _amountOut, address _unwrapReceiver, bytes32 _intentId) internal {
         // Unwrapping WETH or xERC20        
         if(_outputAsset != address(WETH)) {
@@ -151,33 +205,43 @@ contract WrapAdapter is IWrapAdapter, Ownable {
         emit UnwrapClosed(_intentId, _outputAsset, _amountOut);
     }
 
-    function _decodeArbitraryData(bytes memory _data) internal returns (address _callReceiver, address _unwrapReceiver) {
+    /**
+    * @notice Decodes arbitrary data into callReceiver, unwrapReceiver, and function selector
+    * @dev Invalid data sizing will return zeroed values
+    * @param _data The data to decode
+    * @return _callReceiver The callReceiver address
+    * @return _unwrapReceiver The unwrapReceiver address
+    * @return _funcSelector The function selector
+     */
+    function _decodeArbitraryData(bytes memory _data) internal view returns (address _callReceiver, address _unwrapReceiver, bytes4 _funcSelector) {
         // Handling the callReceiver input
         bytes memory _calldata;
         if(_data.length == 160) {
             (_callReceiver, _calldata) = abi.decode(_data, (address, bytes));
         } else {
-            return (address(0), address(0));
+            return (address(0), address(0), bytes4(0));
         }
         
         // Handling the additional data input
         if(_calldata.length == 36) {
             // Fetch the address from remaining 32 bytes
             assembly {
-                // Read word starting 4 bytes later - address will occupy lower 20 bytes of 32-byte word
+                _funcSelector := mload(add(_calldata, 0x20))
+
+                // Next 32 bytes hold the address, but we only need the lower 20 bytes.
                 let addressWord := mload(add(_calldata, 0x24))
-                // Shift top 12 bytes (96 bits) so that the lower 20 bytes is a proper address.
                 _unwrapReceiver := and(addressWord, 0xffffffffffffffffffffffffffffffffffffffff)
             }
-            return (_callReceiver, _unwrapReceiver);
+            return (_callReceiver, _unwrapReceiver, _funcSelector);
         } else {
-            return (_callReceiver, address(0));
+            return (address(0), address(0), bytes4(0));
         }
     }
 
-    function _validateCalldata(bytes memory _data) internal {
-        (address _callReceiver, address _unwrapReceiver) = _decodeArbitraryData(_data);
+    function _validateIntentCalldata(bytes memory _data) internal view {
+        (address _callReceiver, address _unwrapReceiver, bytes4 _funcSelector) = _decodeArbitraryData(_data);
         if(_callReceiver == address(0)) revert Invalid_Call_Receiver();
         if(_unwrapReceiver == address(0)) revert Invalid_Unwrap_Receiver();
+        if(_funcSelector != this.adapterCallback.selector) revert Invalid_Selector();
     }
 }

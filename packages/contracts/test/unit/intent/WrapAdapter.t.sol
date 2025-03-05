@@ -25,7 +25,7 @@ contract TestWrapAdapter is WrapAdapter {
         _unwrap(_outputAsset, _amountOut, _unwrapReceiver, _intentId);
     }
 
-    function decodeArbitraryData(bytes calldata _data) external returns (address, address) {
+    function decodeArbitraryData(bytes calldata _data) external view returns (address, address, bytes4) {
         return _decodeArbitraryData(_data);
     }
 }
@@ -131,6 +131,13 @@ contract BaseTest is TestExtended {
     }
 }
 
+contract Unit_WrapAdapter_Constructor is BaseTest {
+    function test_Revert_constuctor_InvalidAddress() external {
+        vm.expectRevert(IWrapAdapter.Invalid_Address.selector);
+        new TestWrapAdapter(address(0), address(0), address(0x123));
+    }
+}
+
 contract Unit_WrapAdapter_UpdateSpoke is BaseTest {    
     event SpokeUpdated(address _oldSpoke, address _newSpoke);
 
@@ -161,11 +168,91 @@ contract Unit_WrapAdapter_UpdateSpoke is BaseTest {
     }
 }
 
+contract Unit_WrapAdapter_BatchUnwrapIntent is BaseTest {
+    using TypeCasts for bytes32;
+    using TypeCasts for address;
+
+    function test_batchUnwrapIntent_MixedBatchSuccess(IEverclear.Intent[2] memory _intent, uint256[2] memory _amountOut, address[2] memory _unwrapReceiver) public {
+        // Configuring Intent[0] - XERC20
+        vm.assume(_intent[0].amount > 0);
+        vm.assume(_amountOut[0] <= _intent[0].amount);
+        vm.assume(_amountOut[0] < type(uint256).max / 2);
+        vm.assume(_unwrapReceiver[0] != address(0));
+
+        // Configuring Intent[1] - WETH
+        vm.assume(_intent[1].amount > 0);
+        vm.assume(_amountOut[1] <= _intent[1].amount);
+        _unwrapReceiver[1] = RECIPIENT;
+
+        // Configuring Intent[0] - XERC20
+        // Configure data - receiver + callReceiver are wrapAdapter and unwrapReceiver != address(0)
+        _intent[0].receiver = address(wrapAdapter).toBytes32();
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver[0]);
+        _intent[0].data = abi.encode(address(wrapAdapter), _adapterCallbackCalldata);
+
+        // Deploy and deal XERC20 for Intent[0]
+        (bytes32 _nativeToken, bytes32 _xerc20token) = deployAndDealXERC20Token(address(wrapAdapter), address(wrapAdapter).toBytes32(), _amountOut[0]);
+        _intent[0].outputAsset = _xerc20token;
+        assertEq(IERC20(_xerc20token.toAddress()).balanceOf(address(wrapAdapter)), _amountOut[0]);
+        assertEq(IERC20(_nativeToken.toAddress()).balanceOf(address(wrapAdapter)), 0);
+        uint256 _nativeERC20Balance = IERC20(_nativeToken.toAddress()).balanceOf(address(_unwrapReceiver[0]));
+
+        // Configuring the intent data for [1] - WETH
+        // Configure data - receiver + callReceiver are wrapAdapter and unwrapReceiver != address(0)
+        _intent[1].receiver = address(wrapAdapter).toBytes32();
+        _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver[1]);
+        _intent[1].data = abi.encode(address(wrapAdapter), _adapterCallbackCalldata);
+
+        // Configuring output asset to be WETH
+        _intent[1].outputAsset = WETH.toBytes32();
+        uint256 _nativeWETHBalance = address(_unwrapReceiver[1]).balance;
+
+        // Mocking the expected calls for both
+        mockExecuteIntentCalldata(_intent[0]);
+        mockExecuteIntentCalldata(_intent[1]);
+        mockWETHWithdraw(_amountOut[1]);
+
+        // Dealing the ETH amount that will be sent from wrapAdapter
+        deal(address(wrapAdapter), _amountOut[1]);
+
+        // Constructing the dynamic _intent array
+        IEverclear.Intent[] memory _intentArray = new IEverclear.Intent[](2);
+        _intentArray[0] = _intent[0];
+        _intentArray[1] = _intent[1];
+        uint256[] memory _amounts = new uint256[](2);
+        _amounts[0] = _amountOut[0];
+        _amounts[1] = _amountOut[1];
+
+        // Executing the batch transaction
+        vm.startPrank(wrapAdapter.owner());
+        wrapAdapter.batchUnwrapIntent(_intentArray, _amounts);
+        vm.stopPrank(); 
+    }
+
+    function test_Revert_batchUnwrapIntent_NotOwner() public {
+        IEverclear.Intent[] memory _intents = new IEverclear.Intent[](2);
+        uint256[] memory _amountsOut = new uint256[](2);
+
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this)));
+        wrapAdapter.batchUnwrapIntent(_intents, _amountsOut);
+    }
+
+    function test_Revert_batchUnwrapIntent_InvalidArrayLength() external {
+        IEverclear.Intent[] memory _intent = new IEverclear.Intent[](2);
+        uint256[] memory _amountOut = new uint256[](3);
+
+        vm.startPrank(wrapAdapter.owner());
+        vm.expectRevert(IWrapAdapter.Invalid_Array_Length.selector);
+        wrapAdapter.batchUnwrapIntent(_intent, _amountOut);
+        vm.stopPrank();
+    }
+}
+
 contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
     using TypeCasts for bytes32;
     using TypeCasts for address;
 
-    function test_unwrapAsset_XERC20Success(IEverclear.Intent memory _intent, uint256 _amountOut, address _unwrapReceiver) public {
+    function test_unwrapIntent_XERC20Success(IEverclear.Intent memory _intent, uint256 _amountOut, address _unwrapReceiver) public {
         vm.assume(_intent.amount > 0);
         vm.assume(_amountOut <= _intent.amount);
         vm.assume(_amountOut < type(uint256).max / 2);
@@ -188,14 +275,14 @@ contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
 
         // Unwrapping the asset
         vm.startPrank(wrapAdapter.owner());
-        wrapAdapter.unwrapAsset(_intent, _amountOut);
+        wrapAdapter.unwrapIntent(_intent, _amountOut);
         vm.stopPrank(); 
 
         // Checking state change
         assertEq(IERC20(_nativeToken.toAddress()).balanceOf(_unwrapReceiver), _nativeBalance + _amountOut);
     }
 
-    function test_unwrapAsset_WETHSuccess(IEverclear.Intent memory _intent, uint256 _amountOut) public {
+    function test_unwrapIntent_WETHSuccess(IEverclear.Intent memory _intent, uint256 _amountOut) public {
         vm.assume(_intent.amount > 0);
         vm.assume(_amountOut <= _intent.amount);
         address _unwrapReceiver = RECIPIENT;
@@ -218,14 +305,22 @@ contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
 
         // Unwrapping the asset
         vm.startPrank(wrapAdapter.owner());
-        wrapAdapter.unwrapAsset(_intent, _amountOut);
+        wrapAdapter.unwrapIntent(_intent, _amountOut);
         vm.stopPrank(); 
 
         // Checking state change
         assertEq(address(_unwrapReceiver).balance, _nativeBalance + _amountOut);
     }
 
-    function test_Revert_unwrapAsset_InvalidReceiver(IEverclear.Intent memory _intent, uint256 _amountOut) public {
+    function test_Revert_unwrapIntent_NotOwner() public {
+        IEverclear.Intent memory _intent;
+        uint256 _amountOut;
+
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this)));
+        wrapAdapter.unwrapIntent(_intent, _amountOut);
+    }
+
+    function test_Revert_unwrapIntent_InvalidReceiver(IEverclear.Intent memory _intent, uint256 _amountOut) public {
         vm.assume(_intent.amount > 0);
         vm.assume(_amountOut <= _intent.amount);
 
@@ -239,11 +334,11 @@ contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
         // Calling unwrap function and expecting revert
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(abi.encodeWithSelector(IWrapAdapter.Invalid_Receiver.selector, _intent.receiver.toAddress()));
-        wrapAdapter.unwrapAsset(_intent, _amountOut);
+        wrapAdapter.unwrapIntent(_intent, _amountOut);
         vm.stopPrank(); 
     }
 
-    function test_Revert_unwrapAsset_InvalidCallback(IEverclear.Intent memory _intent, uint256 _amountOut, address _callReceiver) public {
+    function test_Revert_unwrapIntent_InvalidCallback(IEverclear.Intent memory _intent, uint256 _amountOut, address _callReceiver) public {
         vm.assume(_intent.amount > 0);
         vm.assume(_amountOut <= _intent.amount);
         _intent.receiver = address(wrapAdapter).toBytes32();
@@ -256,11 +351,11 @@ contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
         // Calling unwrap function and expecting revert
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(abi.encodeWithSelector(IWrapAdapter.Invalid_Callback.selector, _callReceiver));
-        wrapAdapter.unwrapAsset(_intent, _amountOut);
+        wrapAdapter.unwrapIntent(_intent, _amountOut);
         vm.stopPrank(); 
     }
 
-    function test_Revert_unwrapAsset_InvalidOutputAmount(IEverclear.Intent memory _intent, uint256 _amountOut) public {
+    function test_Revert_unwrapIntent_InvalidOutputAmount(IEverclear.Intent memory _intent, uint256 _amountOut) public {
         vm.assume(_intent.amount > 0);
         _intent.receiver = address(wrapAdapter).toBytes32();
         
@@ -274,11 +369,11 @@ contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
         // Calling unwrap function and expecting revert
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(abi.encodeWithSelector(IWrapAdapter.Invalid_Output_Amount.selector));
-        wrapAdapter.unwrapAsset(_intent, _amountOut);
+        wrapAdapter.unwrapIntent(_intent, _amountOut);
         vm.stopPrank(); 
     }
 
-    function test_Revert_unwrapAsset_InvalidUnwrapReceiver(IEverclear.Intent memory _intent, uint256 _amountOut) public {
+    function test_Revert_unwrapIntent_InvalidUnwrapReceiver(IEverclear.Intent memory _intent, uint256 _amountOut) public {
         vm.assume(_intent.amount > 0);
         vm.assume(_amountOut <= _intent.amount);
         _intent.receiver = address(wrapAdapter).toBytes32();
@@ -290,11 +385,11 @@ contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
         // Calling unwrap function and expecting revert
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(abi.encodeWithSelector(IWrapAdapter.Invalid_Unwrap_Receiver.selector));
-        wrapAdapter.unwrapAsset(_intent, _amountOut);
+        wrapAdapter.unwrapIntent(_intent, _amountOut);
         vm.stopPrank(); 
     }
 
-    function test_Revert_unwrapAsset_WETH_TransferETHFailure(IEverclear.Intent memory _intent, uint256 _amountOut) public {
+    function test_Revert_unwrapIntent_WETH_TransferETHFailure(IEverclear.Intent memory _intent, uint256 _amountOut) public {
         vm.assume(_intent.amount > 0);
         vm.assume(_amountOut <= _intent.amount);
         
@@ -319,16 +414,16 @@ contract Unit_WrapAdapter_UnwrapIntent is BaseTest {
         // Unwrapping the asset
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(IWrapAdapter.Transfer_ETH_Failure.selector);
-        wrapAdapter.unwrapAsset(_intent, _amountOut);
+        wrapAdapter.unwrapIntent(_intent, _amountOut);
         vm.stopPrank(); 
     }
 }
 
-contract Unit_WrapAdapter_UnwrapInvalidCalldata is BaseTest {
+contract Unit_WrapAdapter_UnwrapInvalidIntent is BaseTest {
     using TypeCasts for address;
     using TypeCasts for bytes32;
 
-    function test_unwrapInvalidCalldata_Success_XERC20(IEverclear.Intent memory _intent, uint256 _amountOut, address _unwrapReceiver) public {
+    function test_unwrapInvalidIntent_Success_XERC20(IEverclear.Intent memory _intent, uint256 _amountOut, address _unwrapReceiver) public {
         // Configuring valid amountOut and receiver to pass Invalid_Receiver revert
         vm.assume(_amountOut < _intent.amount);
         vm.assume(_amountOut < type(uint256).max / 2);
@@ -349,14 +444,15 @@ contract Unit_WrapAdapter_UnwrapInvalidCalldata is BaseTest {
         
         // Unwrapping the asset
         vm.startPrank(wrapAdapter.owner());
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amountOut, _unwrapReceiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amountOut, _unwrapReceiver);
         vm.stopPrank();
 
         // Checking state change
         assertEq(IERC20(_nativeToken.toAddress()).balanceOf(_unwrapReceiver), _nativeBalance + _amountOut);
+        assertTrue(wrapAdapter.manuallyProcessed(_intentId));
     }
     
-    function test_unwrapInvalidCalldata_Success_WETH(IEverclear.Intent memory _intent, uint256 _amountOut) public {
+    function test_unwrapInvalidIntent_Success_WETH(IEverclear.Intent memory _intent, uint256 _amountOut) public {
         // Configuring valid amountOut and receiver to pass Invalid_Receiver revert
         vm.assume(_amountOut <= _intent.amount);
         // vm.assume(_unwrapReceiver != address(0));
@@ -376,19 +472,20 @@ contract Unit_WrapAdapter_UnwrapInvalidCalldata is BaseTest {
 
         // Unwrapping the asset
         vm.startPrank(wrapAdapter.owner());
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amountOut, _unwrapReceiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amountOut, _unwrapReceiver);
         vm.stopPrank();
 
         // Checking state change
         assertEq(address(_unwrapReceiver).balance, _nativeBalance + _amountOut);
+        assertTrue(wrapAdapter.manuallyProcessed(_intentId));
     }
 
-    function test_Revert_unwrapInvalidCalldata_OnlyOwner(IEverclear.Intent memory _intent, uint256 _amount, address _receiver) public {
+    function test_Revert_unwrapInvalidIntent_OnlyOwner(IEverclear.Intent memory _intent, uint256 _amount, address _receiver) public {
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this)));
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amount, _receiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amount, _receiver);
     }
 
-    function test_Revert_unwrapInvalidCalldata_InvalidAlreadyProcessed(IEverclear.Intent memory _intent, uint256 _amountOut, address _unwrapReceiver) public {
+    function test_Revert_unwrapInvalidIntent_InvalidAlreadyProcessed(IEverclear.Intent memory _intent, uint256 _amountOut, address _unwrapReceiver) public {
         //////////////////// Successfully unwrapping the asset ////////////////////////
         // Configuring valid amountOut and receiver to pass Invalid_Receiver revert
         vm.assume(_amountOut < _intent.amount);
@@ -410,28 +507,28 @@ contract Unit_WrapAdapter_UnwrapInvalidCalldata is BaseTest {
         
         // Unwrapping the asset
         vm.startPrank(wrapAdapter.owner());
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amountOut, _unwrapReceiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amountOut, _unwrapReceiver);
 
         // Checking state change
         assertEq(IERC20(_nativeToken.toAddress()).balanceOf(_unwrapReceiver), _nativeBalance + _amountOut);
         
         //////////////////// Reverting on retry of same intent ////////////////////////
         vm.expectRevert(IWrapAdapter.Invalid_Already_Processed.selector);
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amountOut, _unwrapReceiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amountOut, _unwrapReceiver);
 
         vm.stopPrank();
     }
 
-    function test_Revert_unwrapInvalidCalldata_InvalidReceiver(IEverclear.Intent memory _intent, uint256 _amount, address _receiver) public {
+    function test_Revert_unwrapInvalidIntent_InvalidReceiver(IEverclear.Intent memory _intent, uint256 _amount, address _receiver) public {
         vm.assume(_intent.receiver.toAddress() != address(wrapAdapter));
         
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(abi.encodeWithSelector(IWrapAdapter.Invalid_Receiver.selector, _intent.receiver.toAddress()));
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amount, _receiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amount, _receiver);
         vm.stopPrank();
     }
 
-    function test_Revert_unwrapInvalidCalldata_InvalidOutputAmount(IEverclear.Intent memory _intent, uint256 _amountOut, address _receiver) public {
+    function test_Revert_unwrapInvalidIntent_InvalidOutputAmount(IEverclear.Intent memory _intent, uint256 _amountOut, address _receiver) public {
         // Configuring the receiver to pass Invalid_Receiver revert
         _intent.receiver = address(wrapAdapter).toBytes32();
 
@@ -440,11 +537,11 @@ contract Unit_WrapAdapter_UnwrapInvalidCalldata is BaseTest {
         
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(IWrapAdapter.Invalid_Output_Amount.selector);
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amountOut, _receiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amountOut, _receiver);
         vm.stopPrank();
     }
 
-    function test_Revert_unwrapInvalidCalldata_InvalidManualProcessing(IEverclear.Intent memory _intent, uint256 _amountOut, address _receiver) public {
+    function test_Revert_unwrapInvalidIntent_InvalidManualProcessing(IEverclear.Intent memory _intent, uint256 _amountOut, address _receiver) public {
         // Configuring valid amountOut and receiver to pass Invalid_Receiver revert
         vm.assume(_amountOut < _intent.amount);
         vm.assume(_receiver != address(0));
@@ -456,11 +553,11 @@ contract Unit_WrapAdapter_UnwrapInvalidCalldata is BaseTest {
         
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(IWrapAdapter.Invalid_Manual_Processing.selector);
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amountOut, _receiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amountOut, _receiver);
         vm.stopPrank();
     }
 
-    function test_Revert_unwrapInvalidCalldata_InvalidStatus(IEverclear.Intent memory _intent, uint256 _amountOut, address _receiver) public {
+    function test_Revert_unwrapInvalidIntent_InvalidStatus(IEverclear.Intent memory _intent, uint256 _amountOut, address _receiver) public {
         // Configuring valid amountOut and receiver to pass Invalid_Receiver revert
         vm.assume(_amountOut < _intent.amount);
         _intent.receiver = address(wrapAdapter).toBytes32();
@@ -472,7 +569,7 @@ contract Unit_WrapAdapter_UnwrapInvalidCalldata is BaseTest {
         
         vm.startPrank(wrapAdapter.owner());
         vm.expectRevert(IWrapAdapter.Invalid_Status.selector);
-        wrapAdapter.unwrapInvalidCalldata(_intent, _amountOut, _receiver);
+        wrapAdapter.unwrapInvalidIntent(_intent, _amountOut, _receiver);
         vm.stopPrank();
     }
 }
@@ -483,6 +580,14 @@ contract Unit_WrapAdapter_AdapterCallback is BaseTest {
 
         vm.expectRevert(abi.encodeWithSelector(IWrapAdapter.Invalid_Spoke_Caller.selector, address(this)));
         wrapAdapter.adapterCallback(_message);
+    }
+
+    function test_adapterCallback_Success() public {
+        bytes memory _message;
+
+        vm.startPrank(address(wrapAdapter.everclearSpoke()));
+        wrapAdapter.adapterCallback(_message);
+        vm.stopPrank();
     }
 }
 
@@ -499,6 +604,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
         vm.assume(_intent.amount > 0);
         vm.assume(_intent.amount < type(uint256).max / 2);
         vm.assume(_caller != address(0));
+        vm.assume(_intent.outputAsset != bytes32(0));
 
         // Deploy and deal XERC20 to be unwrapped
         (bytes32 _nativeToken, bytes32 _xerc20token) = deployAndDealXERC20Native(address(wrapAdapter), _caller.toBytes32(), _intent.amount);
@@ -535,6 +641,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
     function test_wrapAndSendIntent_ETHSuccess(IEverclear.Intent memory _intent, address _caller) public {
         vm.assume(_intent.amount > 0);
         vm.assume(_caller != address(0));
+        vm.assume(_intent.outputAsset != bytes32(0));
 
         // WETH info
         _intent.inputAsset = WETH.toBytes32();
@@ -558,37 +665,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
         vm.stopPrank();
     }
 
-    function test_Revert_wrapAndSendIntent_InvalidCallReceiver(IEverclear.Intent memory _intent, address _caller) public {
-        vm.assume(_intent.amount > 0);
-        vm.assume(_caller != address(0));
-
-        // Configuring the callReceiver as invalid
-        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, address(0x123));
-        _intent.data = abi.encode(address(0), _adapterCallbackCalldata);
-
-        // Sending the wrap transaction
-        vm.startPrank(_caller);
-        vm.expectRevert(IWrapAdapter.Invalid_Call_Receiver.selector);
-        wrapAdapter.wrapAndSendIntent(_intent, IERC20(address(0)));
-        vm.stopPrank();
-    }
-
-    function test_Revert_wrapAndSentIntent_InvalidUnwrapReceiver(IEverclear.Intent memory _intent, address _caller) public {
-        vm.assume(_intent.amount > 0);
-        vm.assume(_caller != address(0));
-
-        // Configuring the unwrapReceiver as invalid
-        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, address(0));
-        _intent.data = abi.encode(address(0x123), _adapterCallbackCalldata);
-
-        // Sending the wrap transaction
-        vm.startPrank(_caller);
-        vm.expectRevert(IWrapAdapter.Invalid_Unwrap_Receiver.selector);
-        wrapAdapter.wrapAndSendIntent(_intent, IERC20(address(0)));
-        vm.stopPrank();
-    }
-
-    /**
+        /**
     * @notice Test that wrapAndSendIntent reverts when amount is 0
     * @param _intent The intent 
     * @param _assetToWrap The asset to wrap
@@ -597,11 +674,16 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
         vm.assume(_caller != address(0));
         _intent.amount = 0;
 
-        // Construct valid calldata
-        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _caller);
-        _intent.data = abi.encode(address(wrapAdapter), _adapterCallbackCalldata);
-
         vm.expectRevert(IWrapAdapter.Invalid_Input_Amount.selector);
+        wrapAdapter.wrapAndSendIntent(_intent, _assetToWrap);
+    }
+
+    function test_Revert_wrapAndSentIntent_InvalidOutputAsset(IEverclear.Intent memory _intent, IERC20 _assetToWrap, address _caller) public {
+        vm.assume(_caller != address(0));
+        vm.assume(_intent.amount != 0);
+        _intent.outputAsset = bytes32(0);
+
+        vm.expectRevert(IWrapAdapter.Invalid_Output_Asset.selector);
         wrapAdapter.wrapAndSendIntent(_intent, _assetToWrap);
     }
 
@@ -609,6 +691,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
         vm.assume(_intent.amount > 0);
         vm.assume(_intent.amount < type(uint256).max / 2);
         vm.assume(_caller != address(0));
+        vm.assume(_intent.outputAsset != bytes32(0));
 
         /// Construct valid calldata
         bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _caller);
@@ -627,6 +710,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
    function test_Revert_wrapAndSendIntent_InvalidMsgValue(IEverclear.Intent memory _intent, address _caller) public {
         vm.assume(_intent.amount > 0);
         vm.assume(_caller != address(0));
+        vm.assume(_intent.outputAsset != bytes32(0));
 
         // WETH info
         _intent.inputAsset = WETH.toBytes32();
@@ -640,6 +724,136 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
         vm.expectRevert(IWrapAdapter.Invalid_Msg_Value.selector);
         wrapAdapter.wrapAndSendIntent{value: 0}(_intent, IERC20(address(0)));
         vm.stopPrank();
+    }
+}
+
+contract Unit_SendUnwrapIntent is BaseTest {
+    using TypeCasts for address;
+    using TypeCasts for bytes32;
+
+    function test_sendUnwrapIntent_XERC20(IEverclear.Intent memory _intent, address _caller) public {
+        vm.assume(_intent.amount > 0);
+        vm.assume(_intent.amount < type(uint256).max / 2);
+        vm.assume(_caller != address(0));
+        vm.assume(_intent.outputAsset != bytes32(0));
+
+        // Deploy and deal XERC20 to be unwrapped
+        (bytes32 _nativeToken, bytes32 _xerc20token) = deployAndDealXERC20Token(address(wrapAdapter), _caller.toBytes32(), _intent.amount);
+        _intent.inputAsset = _xerc20token;
+
+        // Fetching the balances for the caller
+        assertEq(IERC20(_xerc20token.toAddress()).balanceOf(_caller), _intent.amount);
+        uint256 _xerc20Balance = IERC20(_xerc20token.toAddress()).balanceOf(address(wrapAdapter));
+
+        // Construct valid calldata
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _caller);
+        _intent.data = abi.encode(address(wrapAdapter), _adapterCallbackCalldata);
+
+        // Mocking the call to the newIntent function
+        mockNewIntent(_intent);
+
+        // Sending the wrap transaction
+        vm.startPrank(_caller);
+        IERC20(_xerc20token.toAddress()).approve(address(wrapAdapter), _intent.amount);
+        wrapAdapter.sendUnwrapIntent(_intent);
+        vm.stopPrank();
+    }
+
+    function test_sendUnwrapIntent_ERC20(IEverclear.Intent memory _intent, address _caller) public {
+        vm.assume(_intent.amount > 0);
+        vm.assume(_intent.amount < type(uint256).max / 2);
+        vm.assume(_caller != address(0));
+        vm.assume(_intent.outputAsset != bytes32(0));
+
+        // Deploy and deal ERC20 to be unwrapped
+        (bytes32 _token) = deployAndDeal(_caller, _intent.amount);
+        _intent.inputAsset = _token;
+
+        // Fetching the balances for the caller
+        assertEq(IERC20(_token.toAddress()).balanceOf(address(_caller)), _intent.amount);
+        uint256 _balance = IERC20(_token.toAddress()).balanceOf(address(wrapAdapter));
+
+        // Construct valid calldata
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _caller);
+        _intent.data = abi.encode(address(wrapAdapter), _adapterCallbackCalldata);
+
+        // Mocking the call to the newIntent function
+        mockNewIntent(_intent);
+
+        // Sending the wrap transaction
+        vm.startPrank(_caller);
+        IERC20(_token.toAddress()).approve(address(wrapAdapter), _intent.amount);
+        wrapAdapter.sendUnwrapIntent(_intent);
+        vm.stopPrank();
+    }
+
+    function test_Revert_sendUnwrapIntent_InvalidInputAmount(IEverclear.Intent memory _intent) public {
+        _intent.amount = 0;
+
+        vm.expectRevert(IWrapAdapter.Invalid_Input_Amount.selector);
+        wrapAdapter.sendUnwrapIntent(_intent);
+    }
+
+    function test_Revert_sendUnwrapIntent_InvalidOutputAsset(IEverclear.Intent memory _intent) public {
+        vm.assume(_intent.amount != 0);
+        _intent.outputAsset = bytes32(0);
+
+        vm.expectRevert(IWrapAdapter.Invalid_Output_Asset.selector);
+        wrapAdapter.sendUnwrapIntent(_intent);
+    }
+}
+
+contract Unit_ValidateIntentCalldata is BaseTest {
+    function test_validateIntentCalldata_Success(IEverclear.Intent memory _intent, address _unwrapReceiver) public {
+        vm.assume(_unwrapReceiver != address(0));
+
+        // Configuring the correct calldata
+        address _callReceiver = address(wrapAdapter);
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver);
+        bytes memory _data = abi.encode(_callReceiver, _adapterCallbackCalldata);        
+        _intent.data = _data;
+
+        // Calling the validate function
+        wrapAdapter.validateIntentCalldata(_intent);
+    }
+
+    function test_validateIntentCalldata_InvalidCallReceiver(IEverclear.Intent memory _intent, address _unwrapReceiver) public {    
+        // Configuring the correct calldata
+        address _callReceiver = address(0);
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver);
+        bytes memory _data = abi.encode(_callReceiver, _adapterCallbackCalldata);        
+        _intent.data = _data;
+
+        // Calling the validate function
+        vm.expectRevert(IWrapAdapter.Invalid_Call_Receiver.selector);
+        wrapAdapter.validateIntentCalldata(_intent);
+    }
+
+    function test_validateIntentCalldata_InvalidUnwrapReceiver(IEverclear.Intent memory _intent) public {    
+        // Configuring the correct calldata
+        address _callReceiver = address(wrapAdapter);
+        address _unwrapReceiver = address(0);
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver);
+        bytes memory _data = abi.encode(_callReceiver, _adapterCallbackCalldata);        
+        _intent.data = _data;
+
+        // Calling the validate function
+        vm.expectRevert(IWrapAdapter.Invalid_Unwrap_Receiver.selector);
+        wrapAdapter.validateIntentCalldata(_intent);
+    }
+
+    function test_validateIntentCalldata_InvalidFuncSelector(IEverclear.Intent memory _intent, address _unwrapReceiver) public {    
+        vm.assume(_unwrapReceiver != address(0));
+        // Configuring the correct calldata
+        address _callReceiver = address(wrapAdapter);
+        bytes4 _funcSelector = bytes4(0x12345678);
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(_funcSelector, _unwrapReceiver);
+        bytes memory _data = abi.encode(_callReceiver, _adapterCallbackCalldata);        
+        _intent.data = _data;
+
+        // Calling the validate function
+        vm.expectRevert(IWrapAdapter.Invalid_Selector.selector);
+        wrapAdapter.validateIntentCalldata(_intent);
     }
 }
 
@@ -718,12 +932,24 @@ contract Unit_WrapAdapter_Unwrap is BaseTest {
 }
 
 contract Unit_WrapAdapter_DecodeArbitraryData is BaseTest {
+    function test_decodeArbitraryData_Success(address _unwrapReceiver) public  {
+        address _callReceiver = address(wrapAdapter);
+
+        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver);
+        bytes memory _data = abi.encode(_callReceiver, _adapterCallbackCalldata);
+        (address _decodedCallReceiver, address _decodedUnwrapReceiver, bytes4 _decodedFuncSelector) = wrapAdapter.decodeArbitraryData(_data);
+        assertEq(_decodedCallReceiver, _callReceiver);
+        assertEq(_decodedUnwrapReceiver, _unwrapReceiver);
+        assertEq(_decodedFuncSelector, WrapAdapter.adapterCallback.selector);
+    }
+
     function test_decodeArbitraryData_EmptyData() public  {
         bytes memory _data = new bytes(0);
 
-        (address _callReceiver, address _unwrapReceiver) = wrapAdapter.decodeArbitraryData(_data);
+        (address _callReceiver, address _unwrapReceiver, bytes4 _funcSelector) = wrapAdapter.decodeArbitraryData(_data);
         assertEq(_callReceiver, address(0));
         assertEq(_unwrapReceiver, address(0));
+        assertEq(_funcSelector, bytes4(0));
     }
 
     function test_decodeArbitraryData_Not160(uint256 _byteSize) public  {
@@ -731,18 +957,42 @@ contract Unit_WrapAdapter_DecodeArbitraryData is BaseTest {
         vm.assume(_byteSize != 160);
         bytes memory _data = new bytes(_byteSize);
 
-        (address _callReceiver, address _unwrapReceiver) = wrapAdapter.decodeArbitraryData(_data);
+        (address _callReceiver, address _unwrapReceiver, bytes4 _funcSelector) = wrapAdapter.decodeArbitraryData(_data);
         assertEq(_callReceiver, address(0));
         assertEq(_unwrapReceiver, address(0));
+        assertEq(_funcSelector, bytes4(0));
     }
 
-    function test_decodeArbitraryData_ValidBytes(address _unwrapReceiver) public  {
-        address _callReceiver = address(wrapAdapter);
+    function test_decodeArbitraryData_160BytesButCalldataNot36() public {
+    bytes memory data = new bytes(160);
 
-        bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _unwrapReceiver);
-        bytes memory _data = abi.encode(_callReceiver, _adapterCallbackCalldata);
-        (address _decodedCallReceiver, address _decodedUnwrapReceiver) = wrapAdapter.decodeArbitraryData(_data);
-        assertEq(_decodedCallReceiver, _callReceiver);
-        assertEq(_decodedUnwrapReceiver, _unwrapReceiver);
-    }
+    // Set dummy address and a nested length != 36 (say 37)
+    address dummyReceiver = address(0x12345678);
+    uint256 nestedLength = 37;
+
+        // Packing the 160 bytes
+        assembly {
+            // Store the address in the first 32 bytes:
+            //  - The 'add(data, 32)' is the start of the actual byte array in memory
+            mstore(add(data, 32), dummyReceiver)
+
+            // Next 32 bytes (offset pointer). 
+            // Typically the dynamic bytes portion starts immediately after these two words, so offset = 64.
+            mstore(add(data, 64), 64)
+
+            // Next 32 bytes (length of the nested bytes). Set it to 37 so it won't be 36
+            mstore(add(data, 96), nestedLength)
+
+            // The next 37 bytes are the nested bytes data. 
+        }
+
+        // Calling the decode function
+        (address callReceiver, address unwrapReceiver, bytes4 funcSelector) =
+            wrapAdapter.decodeArbitraryData(data);
+
+        // Verify returning zero values
+        assertEq(callReceiver, address(0), "Should return address(0)");
+        assertEq(unwrapReceiver, address(0), "Should return address(0)");
+        assertEq(funcSelector, bytes4(0), "Should return bytes4(0)");
+    }  
 }
