@@ -153,7 +153,6 @@ pub fn handle_account_metas(
 
             let mut ret = vec![
                 to_serializable_account_meta(spoke_state_pda, false),
-                // TODO: confirm these two. authority should be the spoke instead
                 to_serializable_account_meta(vault_token_account_pubkey, true),
                 to_serializable_account_meta(vault_authority_pubkey, false),
             ];
@@ -330,7 +329,6 @@ pub struct Settlement {
 
 impl AnchorDeserialize for Settlement {
     fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
-        // TODO: fix the implementation of Deserialization here as same in EVMs
         let mut intent_id: [u8; 32] = [0; 32];
         let mut amount: [u8; 32] = [0; 32];
         let mut asset: [u8; 32] = [0; 32];

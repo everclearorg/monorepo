@@ -29,7 +29,6 @@ pub struct SpokeState {
     pub bump: u8,
     // Mailbox address
     pub mailbox: Pubkey,
-    // TODO: do we need admin function to increment this?
     // Bump for mailbox dispatch authority
     pub mailbox_dispatch_authority_bump: u8,
     // IGP address
