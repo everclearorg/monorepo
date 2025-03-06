@@ -41,57 +41,7 @@ pub fn handle<'info>(
         SpokeError::InvalidSender
     );
 
-    require!(!handle.message.is_empty(), SpokeError::InvalidMessage);
-    // for emit_epi!
-    let authority_info = ctx.accounts.event_authority.to_account_info();
-    let authority_bump = ctx.bumps.event_authority;
-
-    let msg: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
-    match msg.message_type {
-        MessageType::Settlement => {
-            msg!("Processing settlement batch message");
-            let batch: Settlements = AnchorDeserialize::deserialize(&mut msg.rest.as_ref())
-                .map_err(|_| error!(SpokeError::InvalidMessage))?;
-
-            let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
-
-            handle_batch_settlement(ctx, batch, vault_bump)?;
-        }
-        MessageType::VarUpdate => {
-            // Var update
-            msg!("Skipping variable update message");
-        }
-        _ => {
-            return err!(SpokeError::InvalidMessage);
-        }
-    }
-    // HACK: expand emit_cpi! macro for reference issue
-    {
-        let disc = anchor_lang::event::EVENT_IX_TAG_LE;
-        // TODO: Test the address conversion works
-        let inner_data = anchor_lang::Event::data(&MessageReceivedEvent {
-            origin: handle.origin,
-            sender: h256_to_pub(handle.sender),
-        });
-        let ix_data: Vec<u8> = disc.into_iter().chain(inner_data).collect();
-        let ix = anchor_lang::solana_program::instruction::Instruction::new_with_bytes(
-            crate::ID,
-            &ix_data,
-            vec![
-                anchor_lang::solana_program::instruction::AccountMeta::new_readonly(
-                    *authority_info.key,
-                    true,
-                ),
-            ],
-        );
-        anchor_lang::solana_program::program::invoke_signed(
-            &ix,
-            &[authority_info],
-            &[&[b"__event_authority", &[authority_bump]]],
-        )
-        .map_err(anchor_lang::error::Error::from)?;
-    };
-    Ok(())
+    handle_message(ctx, handle)
 }
 
 /// Receive a cross‑chain message via Hyperlane.
@@ -100,13 +50,8 @@ pub fn handle_as_admin<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
     handle: HandleInstruction,
 ) -> Result<()> {
-    let (expected_process_authority_key, _expected_process_authority_bump) =
-        Pubkey::find_program_address(
-            mailbox_process_authority_pda_seeds!(ctx.program_id),
-            &ctx.accounts.spoke_state.mailbox,
-        );
     require!(
-        ctx.accounts.authority.key() == expected_process_authority_key,
+        ctx.accounts.authority.key() == ctx.accounts.spoke_state.owner,
         SpokeError::InvalidSender
     );
     require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
@@ -116,6 +61,13 @@ pub fn handle_as_admin<'info>(
         SpokeError::InvalidSender
     );
 
+    handle_message(ctx, handle)
+}
+
+fn handle_message<'info>(
+    ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
+    handle: HandleInstruction,
+) -> Result<()> {
     require!(!handle.message.is_empty(), SpokeError::InvalidMessage);
     // for emit_epi!
     let authority_info = ctx.accounts.event_authority.to_account_info();

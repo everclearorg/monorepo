@@ -114,21 +114,13 @@ pub mod everclear_spoke {
         instructions::handle_account_metas(ctx, handle)
     }
 
-    // Admin functions
-    #[interface(hyperlane_message_recipient::handle)]
+    // Admin functions, note this do not need to conform with hyperlane interfaces as this is manually triggered by admin.
     pub fn handle_as_admin<'info>(
         ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
         handle: HandleInstruction,
-    ) -> Result<()>{
-        let state = &mut ctx.accounts.spoke_state;
-        require!(
-            state.owner == ctx.accounts.authority.key(),
-            SpokeError::OnlyOwner
-        );
-
+    ) -> Result<()> {
         instructions::handle_as_admin(ctx, handle)
     }
-
 
     pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
         let state = &mut ctx.accounts.spoke_state;
