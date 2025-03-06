@@ -46,19 +46,18 @@ pub fn handle<'info>(
     let authority_info = ctx.accounts.event_authority.to_account_info();
     let authority_bump = ctx.bumps.event_authority;
 
-    let msg_type = handle.message[0];
-    match msg_type {
-        1 => {
+    let msg: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
+    match msg.message_type {
+        MessageType::Settlement => {
             msg!("Processing settlement batch message");
-            let settlement_data = &&handle.message[1..];
-            let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
+            let batch: Settlements = AnchorDeserialize::deserialize(&mut msg.rest.as_ref())
                 .map_err(|_| error!(SpokeError::InvalidMessage))?;
 
             let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
 
             handle_batch_settlement(ctx, batch, vault_bump)?;
         }
-        2 => {
+        MessageType::VarUpdate => {
             // Var update
             msg!("Skipping variable update message");
         }
@@ -194,11 +193,11 @@ pub struct HandleAccountMetas<'info> {
 
 fn handle_batch_settlement<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
-    batch: Vec<Settlement>,
+    batch: Settlements,
     vault_authority_bump: u8,
 ) -> Result<()> {
     // Create local references to avoid lifetime issues
-    for s in batch.iter() {
+    for s in batch.settlements {
         let vault_token_account = &ctx.accounts.vault_token_account;
         let vault_authority = &ctx.accounts.vault_authority;
         let token_program = &ctx.accounts.token_program;
@@ -210,7 +209,7 @@ fn handle_batch_settlement<'info>(
             token_program,
             remaining_accounts,
             spoke_state,
-            s,
+            &s,
             vault_authority_bump,
             ctx.program_id,
         )?;
