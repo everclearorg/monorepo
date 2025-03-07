@@ -244,7 +244,7 @@ pub struct Igp;
 pub const MAINNET_IGP: anchor_lang::prelude::Pubkey =
     pubkey!("BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv");
 pub const TESTNET_IGP: anchor_lang::prelude::Pubkey =
-    pubkey!("9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy");
+    pubkey!("5p7Hii6CJL4xGBYYTGEQmH9LnUSZteFJUu9AVLDExZX2");
 
 impl Ids for Igp {
     fn ids() -> &'static [Pubkey] {
