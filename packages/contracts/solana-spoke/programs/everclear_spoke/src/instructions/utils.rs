@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::error::SpokeError;
 
-use crate::intent::Intent;
+use crate::intent::EVMIntent;
 
 pub(crate) fn vault_authority_seeds(
     program_id: &Pubkey,
@@ -58,51 +58,98 @@ fn keccak_256(data: &[u8]) -> [u8; 32] {
     output
 }
 
-pub(crate) fn compute_intent_hash(intent: &Intent) -> [u8; 32] {
-    let mut hasher_input = Vec::new();
+pub fn compute_intent_hash(intent: &EVMIntent) -> [u8; 32] {
+    let encoded = encode_single_intent(intent);
+    keccak_256(&encoded)
+}
+
+pub(crate) fn encode_single_intent(intent: &EVMIntent) -> Vec<u8>  {
+    let mut out = Vec::new();
+    let mut head = Vec::new();
 
     // 1) Initiator
-    hasher_input.extend_from_slice(intent.initiator.as_ref());
+    head.extend_from_slice(intent.initiator.as_ref());
 
     // 2) Receiver
-    hasher_input.extend_from_slice(intent.receiver.as_ref());
+    head.extend_from_slice(intent.receiver.as_ref());
 
     // 3) InputAsset
-    hasher_input.extend_from_slice(intent.input_asset.as_ref());
+    head.extend_from_slice(intent.input_asset.as_ref());
 
     // 4) OutputAsset
-    hasher_input.extend_from_slice(intent.output_asset.as_ref());
+    head.extend_from_slice(intent.output_asset.as_ref());
 
     // 5) maxFee
-    hasher_input.extend_from_slice(&intent.max_fee.to_be_bytes());
+    head.extend_from_slice(&intent.max_fee.to_be_bytes());
 
     // 6) originDomain
-    hasher_input.extend_from_slice(&intent.origin_domain.to_be_bytes());
+    head.extend_from_slice(&intent.origin.to_be_bytes());
 
     // 7) nonce
-    hasher_input.extend_from_slice(&intent.nonce.to_be_bytes());
+    head.extend_from_slice(&intent.nonce.to_be_bytes());
 
     // 8) timestamp
-    hasher_input.extend_from_slice(&intent.timestamp.to_be_bytes());
+    head.extend_from_slice(&intent.timestamp.to_be_bytes());
 
     // 9) ttl
-    hasher_input.extend_from_slice(&intent.ttl.to_be_bytes());
+    head.extend_from_slice(&intent.ttl.to_be_bytes());
 
     // 10) normalizedAmount
-    hasher_input.extend_from_slice(&intent.normalized_amount.to_be_bytes());
+    head.extend_from_slice(&intent.amount);
 
-    // 11) destinations (Borsh or plain "Vec<u8>" for them).
-    //    If you want raw 4-byte concatenation for each, do it manually:
-    //    for d in intent.destinations.iter() { hasher_input.extend_from_slice(&d.to_be_bytes()); }
-    //
-    //    Or, if your original code used `.try_to_vec()`, replicate that:
-    //    let encoded_dest = intent.destinations.try_to_vec().unwrap();
-    let encoded_dest = intent.destinations.try_to_vec().unwrap();
-    hasher_input.extend_from_slice(&encoded_dest);
+    let (tail, dest_offset, data_offset) = encode_struct_tail(intent);
 
-    // 12) data
-    hasher_input.extend_from_slice(&intent.data);
+    // word10: offset to destinations
+    head.extend_from_slice(&u256_to_32bytes(dest_offset as u128));
 
-    // 13) Return keccak256
-    keccak_256(&hasher_input)
+    // word11: offset to data
+    head.extend_from_slice(&u256_to_32bytes(data_offset as u128));
+
+    // Now place the entire head (384 bytes) first
+    out.extend_from_slice(&head);
+    // Then place the tail
+    out.extend_from_slice(&tail);
+
+    out
+}
+
+fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
+    let mut tail = Vec::new();
+    // The offset for the first dynamic field is 384 bytes (12×32) from the start of the struct
+    let destinations_offset = 384;
+    // We'll encode the destinations first, then we know where the data will go
+    let mut destinations_bytes = Vec::new();
+
+    // 1) destinations: 
+    //   - 32 bytes array length
+    //   - each element occupies one full 32‐byte word
+    destinations_bytes.extend_from_slice(&u256_to_32bytes(intent.destinations.len() as u128));
+    for &val in intent.destinations.iter() {
+        destinations_bytes.extend_from_slice(&u256_to_32bytes(val as u128));
+    }
+
+    let data_offset = destinations_offset + destinations_bytes.len() as u64;
+
+    // 2) data (bytes)
+    let mut data_bytes = Vec::new();
+    // 32 bytes => length
+    data_bytes.extend_from_slice(&u256_to_32bytes(intent.data.len() as u128));
+    data_bytes.extend_from_slice(&intent.data);
+    // pad to multiple of 32
+    let padding = (32 - (intent.data.len() % 32)) % 32;
+    data_bytes.extend(std::iter::repeat(0u8).take(padding));
+
+    tail.extend_from_slice(&destinations_bytes);
+    tail.extend_from_slice(&data_bytes);
+
+    (tail, destinations_offset, data_offset)
+}
+
+fn u256_to_32bytes(val: u128) -> [u8; 32] {
+    let mut word = [0u8; 32];
+    // big-endian => fill from the right
+    for i in 0..16 {
+        word[31 - i] = (val >> (8 * i)) as u8;
+    }
+    word
 }

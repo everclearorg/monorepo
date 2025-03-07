@@ -11,7 +11,7 @@ use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::IntentAddedEvent,
-    intent::Intent,
+    intent::{EVMIntent, encode_full, u64_to_u256_be},
     state::SpokeState,
     state::{IntentStatus, IntentStatusAccount},
     utils::{compute_intent_hash, normalize_decimals},
@@ -76,23 +76,27 @@ pub fn new_intent(
     state.nonce = new_nonce;
     let clock = Clock::get()?;
 
-    // Create intent_id with all parameters
-    let new_intent_struct = Intent {
-        initiator: ctx.accounts.authority.key(),
-        receiver,
-        input_asset,
-        output_asset,
-        max_fee,
-        origin_domain: state.domain,
+    // Now create your EVMIntent
+    let evm_intent = EVMIntent {
+        initiator: ctx.accounts.authority.key().to_bytes(), 
+        receiver: receiver.to_bytes(),
+        input_asset: input_asset.to_bytes(),
+        output_asset: output_asset.to_bytes(),
+        max_fee,                 // watch out for 24-bit range if that matters
+        origin: state.domain,    // your "origin_domain"
         nonce: new_nonce,
         timestamp: clock.unix_timestamp as u64,
         ttl,
-        normalized_amount,
+        amount: u64_to_u256_be(normalized_amount),
         destinations: destinations.clone(),
         data: data.clone(),
     };
 
-    let intent_id = compute_intent_hash(&new_intent_struct);
+    // Hash the EVM intent information
+    let intent_id = compute_intent_hash(&evm_intent);
+
+    // Produce the EVM ABI message:
+    let evm_encoded_message = encode_full(1, &evm_intent);
 
     // Also, record a minimal status mapping (we only record the intent_id and its status).
     state.status.push(IntentStatusAccount {
@@ -100,14 +104,13 @@ pub fn new_intent(
         status: IntentStatus::Added,
     });
 
-    // Format message using proper message lib
-    let batch_message = format_intent_message_batch(&[new_intent_struct])?;
+    // Build your TransferRemote
     let xfer = TransferRemote {
         destination_domain: EVERCLEAR_DOMAIN,
         recipient: everclear_gateway(),
         amount_or_id: U256::from(normalized_amount),
         gas_amount: message_gas_limit,
-        message_body: batch_message,
+        message_body: evm_encoded_message, // now in EVM ABI format
     };
 
     // TODO: make this no_copy
@@ -157,17 +160,6 @@ pub fn new_intent(
         data,
     });
     Ok(())
-}
-
-fn format_intent_message_batch(intents: &[Intent]) -> Result<Vec<u8>> {
-    // Example:
-    let mut buffer = Vec::new();
-    // e.g. prefix a message type byte
-    buffer.push(1);
-    // then Borsh‐encode the `Vec<Intent>`
-    let encoded = intents.try_to_vec()?;
-    buffer.extend_from_slice(&encoded);
-    Ok(buffer)
 }
 
 #[event_cpi]
