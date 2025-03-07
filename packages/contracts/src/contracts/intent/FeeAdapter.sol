@@ -31,9 +31,6 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   /// @inheritdoc IFeeAdapter
   address public feeRecipient;
 
-  /// @inheritdoc IFeeAdapter
-  mapping(address => uint256) public approvals;
-
   ////////////////////
   /// Constructor ////
   ////////////////////
@@ -131,15 +128,19 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    */
   function _approveSpokeIfNeeded(address _asset, uint256 _minimum) internal {
     // Approve the spoke contract if needed
-    if (approvals[_asset] >= _minimum) {
+    IERC20 _token = IERC20(_asset);
+    uint256 _current = _token.allowance(address(this), address(spoke));
+    if (_current >= _minimum) {
       return;
     }
 
     // Approve to 0
-    IERC20(_asset).safeDecreaseAllowance(address(spoke), 0);
+    if (_current != 0) {
+      _token.safeDecreaseAllowance(address(spoke), _current);
+    }
 
     // Approve to max
-    IERC20(_asset).safeIncreaseAllowance(address(spoke), type(uint256).max);
+    _token.safeIncreaseAllowance(address(spoke), type(uint256).max);
   }
 
   /**

@@ -40,13 +40,6 @@ interface IFeeAdapter {
   function feeRecipient() external view returns (address);
 
   /**
-   * @notice Returns the approval amount for a specific asset
-   * @param _asset The token address to check approvals for
-   * @return The amount approved to the spoke contract
-   */
-  function approvals(address _asset) external view returns (uint256);
-
-  /**
    * @notice Creates a new intent with fees
    * @param _destinations Array of destination domains, preference ordered
    * @param _receiver Address of the receiver on the destination chain
