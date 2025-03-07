@@ -4,12 +4,15 @@ pragma solidity 0.8.25;
 import { Ownable } from '@openzeppelin/contracts/access/Ownable2Step.sol';
 import { IERC20Errors } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+
+import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
+import { IPermit2 } from 'interfaces/common/IPermit2.sol';
+
 import { StdStorage, stdStorage, Vm } from 'forge-std/Test.sol';
 import { Constants } from 'test/utils/Constants.sol';
 import { TestExtended } from 'test/utils/TestExtended.sol';
 
 import { TypeCasts } from 'contracts/common/TypeCasts.sol';
-import { EverclearSpoke, IEverclearSpoke } from 'contracts/intent/EverclearSpoke.sol';
 import { FeeAdapter, IFeeAdapter } from 'contracts/intent/FeeAdapter.sol';
 
 contract BaseTest is TestExtended {
@@ -324,6 +327,52 @@ contract Unit_NewIntent is BaseTest {
       0,
       0,
       hex'',
+      0
+    );
+    assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
+    assertEq(_returnedId, _intentId, 'returned id != id');
+    assertEq(adapter.feeRecipient().balance, _fee, 'recipient didnt get fee');
+    assertEq(address(adapter).balance, 0, 'adapter balance nonzero');
+  }
+
+  function test_NewIntent_Permit2(uint256 _amount, uint256 _fee, uint32 _destination) public {
+    vm.assume(_amount > 0);
+    vm.assume(_fee > 0);
+
+    // Fund user with eth
+    vm.deal(USER, _fee);
+
+    // Fund user with token
+    inputAsset = deployAndDeal(USER, _amount).toAddress();
+
+    // Approve amount to adapter using permit2
+    IEverclearSpoke.Permit2Params memory _permit2Params;
+    vm.mockCall(Constants.PERMIT2, abi.encodeWithSelector(IPermit2.permitTransferFrom.selector), abi.encode(true));
+    deal(inputAsset, address(adapter), _amount);
+
+    // Mock call to spoke
+    bytes32 _intentId = bytes32(uint(1));
+    IEverclearSpoke.Intent memory _intent;
+    mockNewIntentCall(_intentId, _intent);
+
+    // Generate intent params
+    uint32[] memory _destinations = new uint32[](1);
+    _destinations[0] = _destination;
+
+    vm.expectEmit();
+    emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), 0, _fee);
+
+    vm.prank(USER);
+    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{ value: _fee }(
+      _destinations,
+      USER,
+      inputAsset,
+      address(0),
+      _amount,
+      0,
+      0,
+      hex'',
+      _permit2Params,
       0
     );
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');

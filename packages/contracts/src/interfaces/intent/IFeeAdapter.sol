@@ -3,7 +3,7 @@ pragma solidity 0.8.25;
 
 import { IEverclear } from '../common/IEverclear.sol';
 import { IEverclearSpoke } from './IEverclearSpoke.sol';
-import { ISpokeGateway } from './ISpokeGateway.sol';
+import { IPermit2 } from 'interfaces/common/IPermit2.sol';
 
 interface IFeeAdapter {
   /**
@@ -34,6 +34,12 @@ interface IFeeAdapter {
   function spoke() external view returns (IEverclearSpoke);
 
   /**
+   * @notice returns the permit2 contract
+   * @return _permit2 The Permit2 singleton address
+   */
+  function PERMIT2() external view returns (IPermit2 _permit2);
+
+  /**
    * @notice Returns the current fee recipient address
    * @return The address that receives fees
    */
@@ -62,6 +68,35 @@ interface IFeeAdapter {
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
+    uint256 _fee
+  ) external payable returns (bytes32, IEverclear.Intent memory);
+
+  /**
+   * @notice Creates a new intent with fees using Permit2
+   * @dev Users will permit the adapter, which will then approve the spoke and call newIntent
+   * @param _destinations Array of destination domains, preference ordered
+   * @param _receiver Address of the receiver on the destination chain
+   * @param _inputAsset Address of the input asset
+   * @param _outputAsset Address of the output asset
+   * @param _amount Amount of input asset to use for the intent
+   * @param _maxFee Maximum fee percentage allowed for the intent
+   * @param _ttl Time-to-live for the intent in seconds
+   * @param _data Additional data for the intent
+   * @param _fee Token fee amount to be sent to the fee recipient
+   * @param _permit2Params Signed Permit2 payload, with adapter as spender
+   * @return _intentId The ID of the created intent
+   * @return _intent The created intent object
+   */
+  function newIntent(
+    uint32[] memory _destinations,
+    address _receiver,
+    address _inputAsset,
+    address _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    IEverclearSpoke.Permit2Params calldata _permit2Params,
     uint256 _fee
   ) external payable returns (bytes32, IEverclear.Intent memory);
 

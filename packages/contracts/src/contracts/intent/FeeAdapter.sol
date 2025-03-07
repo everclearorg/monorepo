@@ -11,7 +11,7 @@ import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 import { IEverclear } from 'interfaces/common/IEverclear.sol';
 import { IFeeAdapter } from 'interfaces/intent/IFeeAdapter.sol';
 import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
-import { ISpokeGateway } from 'interfaces/intent/ISpokeGateway.sol';
+import { IPermit2 } from 'interfaces/common/IPermit2.sol';
 
 contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
@@ -30,6 +30,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
   /// @inheritdoc IFeeAdapter
   address public feeRecipient;
+
+  /// @inheritdoc IFeeAdapter
+  IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
 
   ////////////////////
   /// Constructor ////
@@ -67,6 +70,79 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     // Transfer from caller
     _pullTokens(msg.sender, _inputAsset, _amount + _fee);
 
+    // Create intent
+    (_intentId, _intent) = _newIntent(
+      _destinations,
+      _receiver,
+      _inputAsset,
+      _outputAsset,
+      _amount,
+      _maxFee,
+      _ttl,
+      _data,
+      _fee
+    );
+  }
+
+  /// @inheritdoc IFeeAdapter
+  function newIntent(
+    uint32[] memory _destinations,
+    address _receiver,
+    address _inputAsset,
+    address _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    IEverclearSpoke.Permit2Params calldata _permit2Params,
+    uint256 _fee
+  ) external payable returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
+    // Transfer from caller using permit2
+    _pullWithPermit2(_inputAsset, _amount + _fee, _permit2Params);
+
+    // Call internal helper to create intent
+    (_intentId, _intent) = _newIntent(
+      _destinations,
+      _receiver,
+      _inputAsset,
+      _outputAsset,
+      _amount,
+      _maxFee,
+      _ttl,
+      _data,
+      _fee
+    );
+  }
+
+  ////////////////////
+  ///// Internal /////
+  ////////////////////
+
+  /**
+   * @notice Internal function to create a new intent
+   * @param _destinations Array of destination chain IDs
+   * @param _receiver Address of the receiver on the destination chain
+   * @param _inputAsset Address of the input asset
+   * @param _outputAsset Address of the output asset
+   * @param _amount Amount of input asset to transfer
+   * @param _maxFee Maximum fee in basis points that can be charged
+   * @param _ttl Time-to-live for the intent
+   * @param _data Additional data for the intent
+   * @param _fee Fee amount to be sent to the fee recipient
+   * @return _intentId The ID of the created intent
+   * @return _intent The created intent object
+   */
+  function _newIntent(
+    uint32[] memory _destinations,
+    address _receiver,
+    address _inputAsset,
+    address _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    uint256 _fee
+  ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     // Send fees to recipient
     _handleFees(_fee, msg.value, _inputAsset);
 
@@ -74,7 +150,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _approveSpokeIfNeeded(_inputAsset, _amount);
 
     // Create new intent
-    (bytes32 _intentId, IEverclear.Intent memory _intent) = spoke.newIntent(
+    (_intentId, _intent) = spoke.newIntent(
       _destinations,
       _receiver,
       _inputAsset,
@@ -89,10 +165,6 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _fee, msg.value);
     return (_intentId, _intent);
   }
-
-  ////////////////////
-  ///// Internal /////
-  ////////////////////
 
   /**
    * @notice Updates the fee recipient
@@ -141,6 +213,31 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
     // Approve to max
     _token.safeIncreaseAllowance(address(spoke), type(uint256).max);
+  }
+
+  /**
+   * @notice Transfers tokens from the caller to this contract using Permit2
+   * @dev Uses the Permit2 contract to transfer tokens with a signature
+   * @param _asset The token to transfer
+   * @param _amount The amount to transfer
+   * @param _permit2Params The permit2 parameters including nonce, deadline, and signature
+   */
+  function _pullWithPermit2(
+    address _asset,
+    uint256 _amount,
+    IEverclearSpoke.Permit2Params calldata _permit2Params
+  ) internal {
+    // Transfer from caller using permit2
+    PERMIT2.permitTransferFrom(
+      IPermit2.PermitTransferFrom({
+        permitted: IPermit2.TokenPermissions({ token: IERC20(_asset), amount: _amount }),
+        nonce: _permit2Params.nonce,
+        deadline: _permit2Params.deadline
+      }),
+      IPermit2.SignatureTransferDetails({ to: address(this), requestedAmount: _amount }),
+      msg.sender,
+      _permit2Params.signature
+    );
   }
 
   /**
