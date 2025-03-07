@@ -7,8 +7,18 @@ use anchor_lang::prelude::{
 };
 
 /// Instructions supported by the Mailbox program.
+/// It needs to have the exact order with the enum defined in hyperlane for ser/de to work
+/// ref: https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/7c95140fa923562f4ee6a4ba171e626999d9bf13/rust/sealevel/programs/mailbox/src/instruction.rs#L18
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
 pub enum MailboxInstruction {
+    /// Initializes the program.
+    Init(),
+    /// Processes a message.
+    InboxProcess(),
+    /// Sets the default ISM.
+    InboxSetDefaultIsm(Pubkey),
+    /// Gets the recipient's ISM.
+    InboxGetRecipientIsm(Pubkey),
     /// Dispatches a message.
     OutboxDispatch(OutboxDispatch),
 }

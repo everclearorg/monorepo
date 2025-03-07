@@ -9,9 +9,17 @@ use anchor_lang::solana_program::pubkey::Pubkey;
 
 use crate::{error::SpokeError, hyperlane::primitive_type::H256};
 
-/// The program instructions.
-#[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
+/// The program instructions for the Igp program. 
+/// They need to be the exact order (and with all the previous item) for enum ser/de to work.
+/// ref: https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/7c95140fa923562f4ee6a4ba171e626999d9bf13/rust/sealevel/programs/hyperlane-sealevel-igp/src/instruction.rs#L19
+#[derive(AnchorDeserialize, AnchorSerialize, Debug, PartialEq)]
 pub enum IgpInstruction {
+    /// Initializes the program.
+    Init,
+    /// Initializes an IGP.
+    InitIgp,
+    /// Initializes an overhead IGP.
+    InitOverheadIgp,
     /// Pays for gas.
     IgpPayForGas(IgpPayForGas),
     /// Quotes a gas payment.
@@ -24,28 +32,6 @@ impl IgpInstruction {
         self.try_to_vec()
             .map_err(|_| error!(SpokeError::InvalidMessage))
     }
-}
-
-/// Initializes an IGP.
-#[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
-pub struct InitIgp {
-    /// A salt used for deriving the IGP PDA.
-    pub salt: H256,
-    /// The owner of the IGP.
-    pub owner: Option<Pubkey>,
-    /// The beneficiary of the IGP.
-    pub beneficiary: Pubkey,
-}
-
-/// Initializes an overhead IGP.
-#[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
-pub struct InitOverheadIgp {
-    /// A salt used for deriving the overhead IGP PDA.
-    pub salt: H256,
-    /// The owner of the overhead IGP.
-    pub owner: Option<Pubkey>,
-    /// The inner IGP.
-    pub inner: Pubkey,
 }
 
 /// Pays for gas.
