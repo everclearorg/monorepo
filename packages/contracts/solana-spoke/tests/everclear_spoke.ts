@@ -17,7 +17,7 @@ describe('#everclear_spoke', () => {
     Buffer.from('dispatch_authority'),
   ], program.programId);
 
-  const hyperlaneMailbox = new anchor.web3.PublicKey('E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi');
+  const hyperlaneMailbox = new anchor.web3.PublicKey('75HBBLae3ddeneJVrZeyrDfv6vb7SMC3aCpBucSXS5aR'); // testnet
   const [mailboxOutbox] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane'),
     Buffer.from('-'),
@@ -32,7 +32,9 @@ describe('#everclear_spoke', () => {
     uniqueMessageAccountKeypair.publicKey.toBuffer(),
   ], hyperlaneMailbox);
 
-  const igpProgram = new anchor.web3.PublicKey('BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv');
+  const igpProgram = new anchor.web3.PublicKey('5p7Hii6CJL4xGBYYTGEQmH9LnUSZteFJUu9AVLDExZX2'); // testnet
+  const configuredIgpAccount = new anchor.web3.PublicKey('9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy'); // testnet
+  const innerIgpAccount = new anchor.web3.PublicKey('hBHAApi5ZoeCYHqDdCKkCzVKmBdwywdT3hMqe327eZB'); // testnet
   const [igpProgramData] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane_igp'),
     Buffer.from('-'),
@@ -59,7 +61,6 @@ describe('#everclear_spoke', () => {
 
   const lighthouseKeyPair = anchor.web3.Keypair.generate();
   const watchtowerKeyPair = anchor.web3.Keypair.generate();
-  const mailboxKeyPair = anchor.web3.Keypair.generate();
 
   describe('#initialize', () => {
     it('should work', async () => {
@@ -73,11 +74,11 @@ describe('#everclear_spoke', () => {
         messageReceiver: anchor.web3.Keypair.generate().publicKey,
         messageGasLimit: initialMessageGasLimit,
         owner: user.publicKey,
-        mailbox: mailboxKeyPair.publicKey,
+        mailbox: hyperlaneMailbox,
         igp: igpProgram,
         igpType: {
           igp: {
-            '0': igpProgram,
+            '0': configuredIgpAccount,
           },
         },
         mailboxDispatchAuthorityBump,
@@ -98,9 +99,12 @@ describe('#everclear_spoke', () => {
       expect(spokeState.messageReceiver.toBase58()).to.be.equal(params.messageReceiver.toBase58());
       expect(spokeState.messageGasLimit.toString()).to.be.equal(params.messageGasLimit.toString());
       expect(spokeState.owner.toBase58()).to.be.equal(user.publicKey.toBase58());
-      expect(spokeState.mailbox.toBase58()).to.be.equal(mailboxKeyPair.publicKey.toBase58());
+      expect(spokeState.mailbox.toBase58()).to.be.equal(hyperlaneMailbox.toBase58());
       expect(spokeState.nonce.toString()).to.be.equal(new anchor.BN(0).toString());
       expect(spokeState.status).to.be.empty;
+      expect(spokeState.mailboxDispatchAuthorityBump).to.be.equal(mailboxDispatchAuthorityBump);
+      expect(spokeState.igp.toBase58()).to.be.equal(igpProgram.toBase58());
+      expect(spokeState.igpType.igp['0'].toBase58()).to.be.equal(configuredIgpAccount.toBase58());
     });
   });
 
@@ -173,8 +177,8 @@ describe('#everclear_spoke', () => {
           dispatchedMessagePda,
           igpProgramData,
           igpPaymentPda,
-          configuredIgpAccount: igpProgram,
-          innerIgpAccount: igpProgram,
+          configuredIgpAccount,
+          innerIgpAccount,
         })
         .signers([
           uniqueMessageAccountKeypair,
@@ -285,7 +289,7 @@ describe('#everclear_spoke', () => {
 
       // Sanity check
       let spokeState = await program.account.spokeState.fetch(spokeStateAddress);
-      expect(spokeState.mailbox.toBase58()).to.be.equal(mailboxKeyPair.publicKey.toBase58());
+      expect(spokeState.mailbox.toBase58()).to.be.equal(hyperlaneMailbox.toBase58());
 
       // Act
       await program.methods.updateMailbox(newMailboxKeyPair.publicKey)
@@ -305,16 +309,17 @@ describe('#everclear_spoke', () => {
     it('should work', async () => {
       // Arrange
       const newIgp = anchor.web3.PublicKey.unique();
+      const newInnerIgpAccount = anchor.web3.PublicKey.unique();
       const newIgpType = {
         overheadIgp: {
-          '0': newIgp,
+          '0': newInnerIgpAccount,
         }
       };
 
       // Sanity check
       let spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.igp.toBase58()).to.be.equal(igpProgram.toBase58());
-      expect(spokeState.igpType.igp['0'].toBase58()).to.be.equal(igpProgram.toBase58());
+      expect(spokeState.igpType.igp['0'].toBase58()).to.be.equal(configuredIgpAccount.toBase58());
 
       // Act
       await program.methods.updateIgp(newIgp, newIgpType)
@@ -327,7 +332,7 @@ describe('#everclear_spoke', () => {
       // Assert
       spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.igp.toBase58()).to.be.equal(newIgp.toBase58());
-      expect(spokeState.igpType.overheadIgp['0'].toBase58()).to.be.equal(newIgp.toBase58());
+      expect(spokeState.igpType.overheadIgp['0'].toBase58()).to.be.equal(newInnerIgpAccount.toBase58());
     });
   });
 
