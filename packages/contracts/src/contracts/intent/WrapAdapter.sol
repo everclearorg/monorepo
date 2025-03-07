@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {Ownable2Step, Ownable} from '@openzeppelin/contracts/access/Ownable2Step.sol';
 import {IEverclear} from '../../interfaces/common/IEverclear.sol';
 import {IEverclearSpoke} from '../../interfaces/intent/IEverclearSpoke.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
@@ -12,7 +12,7 @@ import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {IWrapAdapter} from '../../interfaces/intent/IWrapAdapter.sol';
 
-contract WrapAdapter is IWrapAdapter, Ownable {
+contract WrapAdapter is IWrapAdapter, Ownable2Step {
     using SafeERC20 for IERC20;
     using TypeCasts for bytes32;
     
