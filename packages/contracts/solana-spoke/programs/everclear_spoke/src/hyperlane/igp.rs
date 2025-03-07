@@ -1,15 +1,10 @@
 //! Program instructions.
 
-use anchor_lang::prelude::{
-    borsh::{BorshDeserialize, BorshSerialize},
-    *,
-};
-
-use anchor_lang::solana_program::pubkey::Pubkey;
+use anchor_lang::prelude::*;
 
 use crate::{error::SpokeError, hyperlane::primitive_type::H256};
 
-/// The program instructions for the Igp program. 
+/// The program instructions for the Igp program.
 /// They need to be the exact order (and with all the previous item) for enum ser/de to work.
 /// ref: https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/7c95140fa923562f4ee6a4ba171e626999d9bf13/rust/sealevel/programs/hyperlane-sealevel-igp/src/instruction.rs#L19
 #[derive(AnchorDeserialize, AnchorSerialize, Debug, PartialEq)]
@@ -35,7 +30,7 @@ impl IgpInstruction {
 }
 
 /// Pays for gas.
-#[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Debug, PartialEq)]
 pub struct IgpPayForGas {
     /// The message ID.
     pub message_id: H256,
@@ -46,7 +41,7 @@ pub struct IgpPayForGas {
 }
 
 /// Quotes a gas payment.
-#[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Debug, PartialEq)]
 pub struct QuoteGasPayment {
     /// The destination domain.
     pub destination_domain: u32,
