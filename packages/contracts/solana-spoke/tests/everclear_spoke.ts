@@ -17,6 +17,7 @@ describe('#everclear_spoke', () => {
     Buffer.from('dispatch_authority'),
   ], program.programId);
 
+  // const hyperlaneMailbox = new anchor.web3.PublicKey('E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi'); // mainnet
   const hyperlaneMailbox = new anchor.web3.PublicKey('75HBBLae3ddeneJVrZeyrDfv6vb7SMC3aCpBucSXS5aR'); // testnet
   const [mailboxOutbox] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane'),
@@ -32,6 +33,9 @@ describe('#everclear_spoke', () => {
     uniqueMessageAccountKeypair.publicKey.toBuffer(),
   ], hyperlaneMailbox);
 
+  // const igpProgram = new anchor.web3.PublicKey('BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv'); // mainnet
+  // const configuredIgpAccount = new anchor.web3.PublicKey('JAvHW21tYXE9dtdG83DReqU2b4LUexFuCbtJT5tF8X6M'); // mainnet
+  // const innerIgpAccount = new anchor.web3.PublicKey('AkeHBbE5JkwVppujCQQ6WuxsVsJtruBAjUo6fDCFp6fF'); // mainnet
   const igpProgram = new anchor.web3.PublicKey('5p7Hii6CJL4xGBYYTGEQmH9LnUSZteFJUu9AVLDExZX2'); // testnet
   const configuredIgpAccount = new anchor.web3.PublicKey('9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy'); // testnet
   const innerIgpAccount = new anchor.web3.PublicKey('hBHAApi5ZoeCYHqDdCKkCzVKmBdwywdT3hMqe327eZB'); // testnet
@@ -40,13 +44,12 @@ describe('#everclear_spoke', () => {
     Buffer.from('-'),
     Buffer.from('program_data'),
   ], igpProgram);
-  const uniqueGasPaymentAccountKeypair = anchor.web3.Keypair.generate();
   const [igpPaymentPda] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane_igp'),
     Buffer.from('-'),
     Buffer.from('gas_payment'),
     Buffer.from('-'),
-    uniqueGasPaymentAccountKeypair.publicKey.toBuffer(),
+    uniqueMessageAccountKeypair.publicKey.toBuffer(),
   ], igpProgram);
 
   const mint = anchor.web3.Keypair.generate();
