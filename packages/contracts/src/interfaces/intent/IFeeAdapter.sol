@@ -6,6 +6,17 @@ import { IEverclearSpoke } from './IEverclearSpoke.sol';
 import { IPermit2 } from 'interfaces/common/IPermit2.sol';
 
 interface IFeeAdapter {
+  struct OrderParameters {
+    uint32[] destinations;
+    address receiver;
+    address inputAsset;
+    address outputAsset;
+    uint256 amount;
+    uint24 maxFee;
+    uint48 ttl;
+    bytes data;
+  }
+
   /**
    * @notice Emitted when a new intent is created with fees
    * @param _intentId The ID of the created intent
@@ -16,6 +27,22 @@ interface IFeeAdapter {
   event IntentWithFeesAdded(
     bytes32 indexed _intentId,
     bytes32 indexed _initiator,
+    uint256 _tokenFee,
+    uint256 _nativeFee
+  );
+
+  /**
+   * @notice Emitted when a new order containing multiple intents is created
+   * @param _orderId The unique identifier for the created order
+   * @param _initiator The address of the user who initiated the order
+   * @param _intentIds Array of intent IDs that make up this order
+   * @param _tokenFee The amount of token fees paid for the order
+   * @param _nativeFee The amount of native token fees paid for the order
+   */
+  event OrderCreated(
+    bytes32 indexed _orderId,
+    bytes32 indexed _initiator,
+    bytes32[] _intentIds,
     uint256 _tokenFee,
     uint256 _nativeFee
   );
@@ -99,6 +126,21 @@ interface IFeeAdapter {
     IEverclearSpoke.Permit2Params calldata _permit2Params,
     uint256 _fee
   ) external payable returns (bytes32, IEverclear.Intent memory);
+
+  /**
+   * @notice Creates multiple intents with the same parameters, splitting the amount evenly
+   * @dev Creates _numIntents intents with identical parameters but divides _amount equally among them
+   * @param _numIntents Number of intents to create
+   * @param _fee Token fee amount to be sent to the fee recipient
+   * @param _params Order parameters including destinations, receiver, assets, amount, maxFee, ttl, and data
+   * @return _orderId The ID of the created order (hash of all intent IDs)
+   * @return _intentIds Array of all created intent IDs
+   */
+  function newOrderSplitEvenly(
+    uint32 _numIntents,
+    uint256 _fee,
+    OrderParameters memory _params
+  ) external payable returns (bytes32, bytes32[] memory);
 
   /**
    * @notice Updates the fee recipient address

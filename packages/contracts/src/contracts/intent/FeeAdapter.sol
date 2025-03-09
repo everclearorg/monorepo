@@ -114,6 +114,64 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     );
   }
 
+  /// @inheritdoc IFeeAdapter
+  function newOrderSplitEvenly(
+    uint32 _numIntents,
+    uint256 _fee,
+    OrderParameters memory _params
+  ) external payable returns (bytes32 _orderId, bytes32[] memory _intentIds) {
+    // Transfer once from the user
+    _pullTokens(msg.sender, _params.inputAsset, _params.amount + _fee);
+
+    // Send fees to recipient
+    _handleFees(_fee, msg.value, _params.inputAsset);
+
+    // Approve the spoke contract if needed
+    _approveSpokeIfNeeded(_params.inputAsset, _params.amount);
+
+    // Create `_numIntents` intents with the same params and `_amount` divided
+    // equally across all created intents.
+    uint256 _toSend = _params.amount / _numIntents;
+    for (uint i; i < _numIntents - 1; i++) {
+      // Create new intent
+      (bytes32 _intentId, ) = spoke.newIntent(
+        _params.destinations,
+        _params.receiver,
+        _params.inputAsset,
+        _params.outputAsset,
+        _toSend,
+        _params.maxFee,
+        _params.ttl,
+        _params.data
+      );
+      _intentIds[i] = _intentId;
+    }
+
+    // Create a final intent here with the remainder of balance
+    (bytes32 _intentId, ) = spoke.newIntent(
+      _params.destinations,
+      _params.receiver,
+      _params.inputAsset,
+      _params.outputAsset,
+      _params.amount - (_toSend * (_numIntents - 1)), // handles remainder gracefully
+      _params.maxFee,
+      _params.ttl,
+      _params.data
+    );
+
+    // Emit event here with all fee info
+    emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _fee, msg.value);
+
+    // Add to array
+    _intentIds[_numIntents - 1] = _intentId;
+
+    // Calculate order id
+    _orderId = keccak256(abi.encode(_intentIds));
+
+    // Emit order information event
+    emit OrderCreated(_orderId, msg.sender.toBytes32(), _intentIds, _fee, msg.value);
+  }
+
   ////////////////////
   ///// Internal /////
   ////////////////////
