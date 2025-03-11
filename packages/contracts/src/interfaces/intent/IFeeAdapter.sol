@@ -55,6 +55,11 @@ interface IFeeAdapter {
   event FeeRecipientUpdated(address indexed _updated, address indexed _previous);
 
   /**
+   * @notice Thrown when there are multiple assets included in a single order request.
+   */
+  error MultipleOrderAssets();
+
+  /**
    * @notice Returns the spoke contract address
    * @return The EverclearSpoke contract interface
    */
@@ -140,6 +145,18 @@ interface IFeeAdapter {
     uint32 _numIntents,
     uint256 _fee,
     OrderParameters memory _params
+  ) external payable returns (bytes32, bytes32[] memory);
+
+  /**
+   * @notice Creates multiple intents with the supplied parameters
+   * @param _fee Token fee amount to be sent to the fee recipient
+   * @param _params Order parameters including destinations, receiver, assets, amount, maxFee, ttl, and data
+   * @return _orderId The ID of the created order (hash of all intent IDs)
+   * @return _intentIds Array of all created intent IDs
+   */
+  function newOrder(
+    uint256 _fee,
+    OrderParameters[] memory _params
   ) external payable returns (bytes32, bytes32[] memory);
 
   /**

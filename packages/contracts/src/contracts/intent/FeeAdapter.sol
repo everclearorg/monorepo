@@ -159,9 +159,6 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
       _params.data
     );
 
-    // Emit event here with all fee info
-    emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _fee, msg.value);
-
     // Add to array
     _intentIds[_numIntents - 1] = _intentId;
 
@@ -169,6 +166,58 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _orderId = keccak256(abi.encode(_intentIds));
 
     // Emit order information event
+    emit OrderCreated(_orderId, msg.sender.toBytes32(), _intentIds, _fee, msg.value);
+  }
+
+  /// @inheritdoc IFeeAdapter
+  function newOrder(
+    uint256 _fee,
+    OrderParameters[] memory _params
+  ) external payable returns (bytes32 _orderId, bytes32[] memory _intentIds) {
+    uint256 _numIntents = _params.length;
+
+    {
+      // Get the asset
+      address _asset = _params[0].inputAsset;
+
+      // Get the sum of the order amounts
+      uint256 _orderSum;
+      for (uint i; i < _numIntents - 1; i++) {
+        _orderSum += _params[i].amount;
+        if (_params[i].inputAsset != _asset) {
+          revert MultipleOrderAssets();
+        }
+      }
+
+      // Transfer once from the user
+      _pullTokens(msg.sender, _asset, _orderSum + _fee);
+
+      // Approve the spoke contract if needed
+      _approveSpokeIfNeeded(_asset, _orderSum);
+
+      // Send fees to recipient
+      _handleFees(_fee, msg.value, _asset);
+    }
+
+    for (uint i; i < _numIntents - 1; i++) {
+      // Create new intent
+      (bytes32 _intentId, ) = spoke.newIntent(
+        _params[i].destinations,
+        _params[i].receiver,
+        _params[i].inputAsset,
+        _params[i].outputAsset,
+        _params[i].amount,
+        _params[i].maxFee,
+        _params[i].ttl,
+        _params[i].data
+      );
+      _intentIds[i] = _intentId;
+    }
+
+    // Calculate order id
+    _orderId = keccak256(abi.encode(_intentIds));
+
+    // Emit order event
     emit OrderCreated(_orderId, msg.sender.toBytes32(), _intentIds, _fee, msg.value);
   }
 
