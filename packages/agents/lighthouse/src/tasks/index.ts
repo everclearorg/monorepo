@@ -14,6 +14,8 @@ export const makeLighthouse = async () => {
   switch (service) {
     case 'intent':
       return makeLighthouseTask(() => processMessageQueue(QueueType.Intent), config, service);
+    case 'intentAdded':
+      return makeLighthouseTask(() => processIntentAdded(config));
     case 'fill':
       return makeLighthouseTask(() => processMessageQueue(QueueType.Fill), config, service);
     case 'settlement':
