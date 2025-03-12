@@ -10,6 +10,8 @@ import {UnsafeUpgrades} from '@upgrades/Upgrades.sol';
 import {Gateway, IGateway} from 'contracts/common/Gateway.sol';
 
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import {MessageLib} from 'contracts/common/MessageLib.sol';
 
 contract TestGateway is Gateway {
   function initialize(address _owner, address _mailbox, address _receiver, address _interchainSecurityModule) external {
@@ -277,6 +279,117 @@ contract Unit_HandleMessage is BaseTest {
 
     vm.prank(_caller);
     gateway.handle(_origin, _sender, _message);
+  }
+}
+
+contract Unit_HandlePolymerProof is BaseTest {
+  using TypeCasts for address;
+  
+  address immutable POLYMER_PROVER = makeAddr('POLYMER_PROVER');
+  uint32 constant ORIGIN_CHAIN_ID = 42;
+  address constant EMITTING_CONTRACT = address(0x1234567890123456789012345678901234567890);
+  bytes constant SAMPLE_TOPICS = hex"abcd";
+  bytes constant SAMPLE_MESSAGE = hex"1234";
+  bytes constant SAMPLE_PROOF = hex"deadbeef";
+
+  /**
+   * @notice Test successful polymer proof handling
+   */
+  function test_HandlePolymerProof() public {
+      // Setup the polymer prover
+      vm.prank(RECEIVER);
+      gateway.updatePolymerProver(POLYMER_PROVER);
+  
+      // Create a sample Intent for the test
+      IEverclear.Intent memory sampleIntent = IEverclear.Intent({
+          initiator: bytes32(uint256(0x1)),
+          receiver: bytes32(uint256(0x2)),
+          inputAsset: bytes32(uint256(0x3)),
+          outputAsset: bytes32(uint256(0x4)),
+          maxFee: 100,
+          origin: ORIGIN_CHAIN_ID,
+          nonce: 1,
+          timestamp: 12345,
+          ttl: 600,
+          amount: 1000,
+          destinations: new uint32[](1),
+          data: ""
+          });
+      sampleIntent.destinations[0] = 1;
+    
+      // Encode the Intent as unindexedData from an event
+      bytes memory encodedIntent = abi.encode(sampleIntent);
+    
+      // Mock the polymer prover validateEvent call
+      vm.mockCall(
+          POLYMER_PROVER,
+          abi.encodeWithSignature("validateEvent(bytes)", SAMPLE_PROOF),
+          abi.encode(ORIGIN_CHAIN_ID, EMITTING_CONTRACT, SAMPLE_TOPICS, encodedIntent)
+      );
+    
+      // Mock the valid sender check
+      vm.mockCall(
+          address(gateway), 
+          abi.encodeWithSignature("_checkValidSender(uint32,bytes32)", ORIGIN_CHAIN_ID, EMITTING_CONTRACT.toBytes32()), 
+          abi.encode(true)
+      );
+    
+      // Create expected formatted message
+      IEverclear.Intent[] memory intents = new IEverclear.Intent[](1);
+      intents[0] = sampleIntent;
+      bytes memory expectedMessage = MessageLib.formatIntentMessageBatch(intents);
+    
+      // Mock the receiver call with the expected formatted message
+      vm.mockCall(
+          RECEIVER, 
+          abi.encodeWithSelector(IMessageReceiver.receiveMessage.selector, expectedMessage), 
+          abi.encode(true)
+      );
+      vm.expectCall(
+          RECEIVER, 
+          abi.encodeWithSelector(IMessageReceiver.receiveMessage.selector, expectedMessage)
+      );
+  
+      // Call handlePolymerProof
+      gateway.handlePolymerProof(SAMPLE_PROOF);
+  } 
+  
+  /**
+   * @notice Test revert when polymer prover is not set
+   */
+  function test_Revert_HandlePolymerProof_ProverNotSet() public {
+    vm.expectRevert(IGateway.Gateway_PolymerProverNotSet.selector);
+    gateway.handlePolymerProof(SAMPLE_PROOF);
+  }
+  
+  /**
+   * @notice Test updatePolymerProver function
+   */
+  function test_UpdatePolymerProver() public {
+    vm.prank(RECEIVER);
+    gateway.updatePolymerProver(POLYMER_PROVER);
+    
+    assertEq(address(gateway.polymerProver()), POLYMER_PROVER);
+  }
+  
+  /**
+   * @notice Test that updatePolymerProver reverts when called by non-receiver
+   */
+  function test_Revert_UpdatePolymerProver_NotReceiver(address _caller) public {
+    vm.assume(_caller != RECEIVER);
+    
+    vm.prank(_caller);
+    vm.expectRevert(IGateway.Gateway_SendMessage_UnauthorizedCaller.selector);
+    gateway.updatePolymerProver(POLYMER_PROVER);
+  }
+  
+  /**
+   * @notice Test that updatePolymerProver reverts when prover address is zero
+   */
+  function test_Revert_UpdatePolymerProver_ZeroAddress() public {
+    vm.prank(RECEIVER);
+    vm.expectRevert(IGateway.Gateway_ZeroAddress.selector);
+    gateway.updatePolymerProver(address(0));
   }
 }
 

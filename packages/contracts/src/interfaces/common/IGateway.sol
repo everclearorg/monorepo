@@ -23,6 +23,7 @@ interface IGateway {
    * @param _newSecurityModule The new security module address
    */
   event SecurityModuleUpdated(address _oldSecurityModule, address _newSecurityModule);
+  event PolymerProverUpdated(address _oldProver, address _newProver);
 
   /*///////////////////////////////////////////////////////////////
                               ERRORS
@@ -62,6 +63,7 @@ interface IGateway {
    * @notice Thrown when an address equals the address zero
    */
   error Gateway_ZeroAddress();
+  error Gateway_PolymerProverNotSet();
 
   /*///////////////////////////////////////////////////////////////
                               LOGIC
@@ -143,4 +145,17 @@ interface IGateway {
    * @return _fee The fee to send the message
    */
   function quoteMessage(uint32 _chainId, bytes memory _message, uint256 _gasLimit) external view returns (uint256 _fee);
+
+  /**
+   * @notice Handles a Polymer proof for cross-chain event verification
+   * @param proof The Polymer proof data
+   */
+  function handlePolymerProof(bytes calldata proof) external;
+
+  /**
+   * @notice Updates the Polymer prover
+   * @param _prover The new prover address
+   * @dev only called by the `receiver`
+   */
+  function updatePolymerProver(address _prover) external;
 }

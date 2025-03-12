@@ -8,12 +8,15 @@ import {
 } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
 import {IMessageRecipient} from '@hyperlane/interfaces/IMessageRecipient.sol';
+import {ICrossL2ProverV2} from '@polymerdao/prover-contracts/contracts/interfaces/ICrossL2ProverV2.sol';
 
 import {GasTank} from 'contracts/common/GasTank.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
 import {IGateway} from 'interfaces/common/IGateway.sol';
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import {MessageLib} from 'contracts/common/MessageLib.sol';
 
 /**
  * @title Gateway
@@ -31,6 +34,9 @@ abstract contract Gateway is GasTank, IGateway, IMessageRecipient, ISpecifiesInt
 
   /// @inheritdoc ISpecifiesInterchainSecurityModule
   IInterchainSecurityModule public interchainSecurityModule;
+
+  /// @notice The Polymer cross-L2 prover contract used to validate proofs
+  ICrossL2ProverV2 public polymerProver;
 
   /**
    * @notice Checks that the function is called by the local receiver
@@ -166,6 +172,48 @@ abstract contract Gateway is GasTank, IGateway, IMessageRecipient, ISpecifiesInt
     receiver = IMessageReceiver(_receiver);
     interchainSecurityModule = IInterchainSecurityModule(_interchainSecurityModule);
     __initializeGasTank(_owner);
+  }
+
+  /// @notice Updates the Polymer prover
+  /// @param _newProver The new prover address
+  /// @dev only called by the `receiver`
+  function updatePolymerProver(
+    address _newProver
+  ) external onlyReceiver validAddress(_newProver.toBytes32()) {
+    address _oldProver = address(polymerProver);
+    polymerProver = ICrossL2ProverV2(_newProver);
+    emit PolymerProverUpdated(_oldProver, _newProver);
+  }
+
+  /**
+   * @notice Handles a Polymer proof for cross-chain event verification
+   * @param proof The Polymer proof data
+   */
+  function handlePolymerProof(bytes calldata proof) external {
+      if (address(polymerProver) == address(0)) {
+          revert Gateway_PolymerProverNotSet();
+      }
+  
+      // Verify the proof using the Polymer prover
+      (uint32 chainId, address emittingContract, bytes memory topics, bytes memory unindexedData) = 
+          polymerProver.validateEvent(proof);
+    
+      // Validate the event is from a valid sender
+      bytes32 senderBytes = emittingContract.toBytes32();
+      _checkValidSender(chainId, senderBytes);
+  
+      // Parse the unindexedData to extract the Intent
+      IEverclear.Intent memory intent = abi.decode(unindexedData, (IEverclear.Intent));
+  
+      // Create an array with the single Intent
+      IEverclear.Intent[] memory intents = new IEverclear.Intent[](1);
+      intents[0] = intent;
+  
+      // Format the message as an INTENT type message with the intent array
+      bytes memory formattedMessage = MessageLib.formatIntentMessageBatch(intents);
+  
+      // Now pass the properly formatted message to the receiver
+      receiver.receiveMessage(formattedMessage);
   }
 
   /**
