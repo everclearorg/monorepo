@@ -178,8 +178,6 @@ export const processVolumeRewards = async (
     }
 
     // ======== Base rewards ========
-    // we calculate the base rewards for each volume generating user by baseRewardDbps
-    let totalBaseReward = BigNumber.from(0);
 
     // getting asset price based on epoch end time
     const assetConfig = assetConfigs.get(token.address);
@@ -200,6 +198,57 @@ export const processVolumeRewards = async (
       token,
     });
 
+    // Initialize rewards pool
+
+    // we calculate the total variable rewards pool by maxBpsUsdVolumeCap and epochVolumeReward in usd
+    const scaledEpochVolumeRewardUsd = scaledAssetPrice.mul(token.epochVolumeReward).div(assetMultiplier);
+    const scaledMaxVolumeCapUsd = BigNumber.from(token.maxBpsUsdVolumeCap).mul(USD_MULTIPLIER);
+    // For now, we round this off using dbps. We might need more precision as this is calculated
+    // maximumRewardsDbps = scaledEpochVolumeRewardPrice / scaledMaxVolumeCap * 100000
+    const maxRewardsDbps = scaledEpochVolumeRewardUsd.mul(DBPS_MULTIPLIER).div(scaledMaxVolumeCapUsd);
+
+    let baseRewardDbps = BigNumber.from(token.baseRewardDbps);
+    let scaledBaseRewardPoolUsd = totalScaledVolumeAcrossDomain.mul(baseRewardDbps).div(DBPS_MULTIPLIER);
+
+    // normally, this would be max rewards dbps * total volume
+    let scaledTotalRewardsPoolUsd = maxRewardsDbps.mul(totalScaledVolumeAcrossDomain).div(DBPS_MULTIPLIER);
+
+    // edge case: if base reward pool > epoch volume, we set total pool = base pool = epoch volume and bps accordingly
+    if (scaledBaseRewardPoolUsd.gt(scaledEpochVolumeRewardUsd)) {
+      scaledTotalRewardsPoolUsd = scaledEpochVolumeRewardUsd;
+      scaledBaseRewardPoolUsd = scaledEpochVolumeRewardUsd;
+      baseRewardDbps = scaledBaseRewardPoolUsd.mul(DBPS_MULTIPLIER).div(totalScaledVolumeAcrossDomain);
+    }
+
+    let scaledVariableRewardsPoolUsd = BigNumber.from(0);
+    // variable rewards dbps = max - base
+    let variableRewardsDbps = maxRewardsDbps.sub(baseRewardDbps);
+    scaledVariableRewardsPoolUsd = scaledTotalRewardsPoolUsd.sub(scaledBaseRewardPoolUsd);
+
+    // edge case: if variable rewards is negative, we force set variable rewards to be zero
+    // all rewards will be given out as base rewards
+    if (scaledVariableRewardsPoolUsd.lt(0)) {
+      variableRewardsDbps = BigNumber.from(0);
+      scaledVariableRewardsPoolUsd = BigNumber.from(0);
+      scaledTotalRewardsPoolUsd = scaledBaseRewardPoolUsd;
+    }
+
+    logger.info('rewards dbps given in this epoch', requestContext, methodContext, {
+      epoch,
+      token,
+      baseRewardDbps,
+      variableRewardsDbps,
+      maximumRewardsDbps: maxRewardsDbps,
+      scaledTotalRewardsPool: scaledTotalRewardsPoolUsd,
+      scaledBaseRewardPool: scaledBaseRewardPoolUsd,
+      scaledVariableRewardsPool: scaledVariableRewardsPoolUsd,
+      scaledAssetPrice,
+      totalScaledVolumeAcrossDomain,
+    });
+
+    // we calculate the base rewards for each volume generating user by baseRewardDbps
+    let totalBaseReward = BigNumber.from(0);
+
     for (const user in userVolume) {
       let baseReward = BigNumber.from(0);
       for (const epochResult of Object.values(userVolume[user].epochResult)) {
@@ -210,10 +259,7 @@ export const processVolumeRewards = async (
         //                       = scaledUserVolume * baseRewardsDbps * assetDecimal / (dbpsMultiplier * scaledAssetPrice)
         // Note the usdMultiplier is cancelled out in the process
         const divisor = scaledAssetPrice.mul(DBPS_MULTIPLIER);
-        const domainBaseReward = epochResult.scaledUserVolume
-          .mul(token.baseRewardDbps)
-          .mul(assetMultiplier)
-          .div(divisor);
+        const domainBaseReward = epochResult.scaledUserVolume.mul(baseRewardDbps).mul(assetMultiplier).div(divisor);
 
         if (domainBaseReward.lt(0)) {
           const error = new InvalidState({
@@ -241,7 +287,19 @@ export const processVolumeRewards = async (
     // epoch (which is too good to be true), or there is something wrong for the token price
     // that either it is an error or it drop to bottom.
     if (totalBaseReward.gt(token.epochVolumeReward)) {
-      const error = new InvalidState();
+      const error = new InvalidState({
+        epoch,
+        totalScaledVolumeAcrossDomain,
+        scaledMaxVolumeCapUsd,
+        scaledEpochVolumeRewardUsd,
+        scaledBaseRewardPoolUsd,
+        maxRewardsDbps,
+        baseRewardDbps,
+        totalBaseReward,
+        token,
+        epochVolumeReward: token.epochVolumeReward,
+        userVolume,
+      });
       logger.error('unexpected state: base reward greater than epoch reward', requestContext, methodContext, error, {
         epoch,
         totalBaseReward,
@@ -261,14 +319,6 @@ export const processVolumeRewards = async (
 
     // ======== variable rewards ========
     let totalVariableReward = BigNumber.from(0);
-    let variableRewardsPool = BigNumber.from(0);
-    let variableRewardsDbps = BigNumber.from(0);
-    // we calculate the total variable rewards pool by maxBpsUsdVolumeCap and epochVolumeReward in usd
-    const scaledEpochVolumeRewardPrice = scaledAssetPrice.mul(token.epochVolumeReward).div(assetMultiplier);
-    const scaledMaxVolumeCap = BigNumber.from(token.maxBpsUsdVolumeCap).mul(USD_MULTIPLIER);
-    // For now, we round this off using dbps. We might need more precision as this is calculated
-    // maximumRewardsDbps = scaledEpochVolumeRewardPrice / scaledMaxVolumeCap * 100000
-    const maxRewardsDbps = scaledEpochVolumeRewardPrice.mul(DBPS_MULTIPLIER).div(scaledMaxVolumeCap);
 
     // base case: if we do not have votes, there is no variable rewards
     if (totalVote.lte(0)) {
@@ -280,35 +330,6 @@ export const processVolumeRewards = async (
         totalScaledVolumeAcrossDomain,
       });
     } else {
-      let totalRewardsPool = BigNumber.from(0);
-      if (totalScaledVolumeAcrossDomain.gt(scaledMaxVolumeCap)) {
-        // if volume > max volume cap, we give out all epoch volume rewards (and thus not getting max rewards dbps)
-        totalRewardsPool = BigNumber.from(token.epochVolumeReward);
-      } else {
-        // else, this would be max rewards dbps * total volume, convert to token value
-        const scaledTotalRewardPoolUsd = maxRewardsDbps.mul(totalScaledVolumeAcrossDomain).div(DBPS_MULTIPLIER);
-        totalRewardsPool = scaledTotalRewardPoolUsd.mul(assetMultiplier).div(scaledAssetPrice);
-      }
-      variableRewardsPool = totalRewardsPool.sub(totalBaseReward);
-      // NOTE: the dbps here is for logging purpose only. only the variable rewards pool will be used to distribute rewards.
-      // scaledVariablePoolUsd = variableRewardsPool * scaledAssetPrice / ASSET_MULTIPLIER
-      // actual variable dbps = scaledVariablePoolUsd / scaledTotalVol * DBPS_MULTIPLIER
-      //                      = variableRewardsPool * scaledAssetPrice * DBPS_MULTIPLIER / ASSET_MULTIPLIER / scaledTotalVol
-      variableRewardsDbps = variableRewardsPool
-        .mul(scaledAssetPrice)
-        .mul(DBPS_MULTIPLIER)
-        .div(assetMultiplier)
-        .div(totalScaledVolumeAcrossDomain);
-      logger.info('volume rewards dbps given in this epoch', requestContext, methodContext, {
-        epoch,
-        token,
-        baseRewardDbps: token.baseRewardDbps,
-        variableRewardsDbps,
-        maximumRewardsDbps: maxRewardsDbps,
-        scaledAssetPrice,
-        totalScaledVolumeAcrossDomain,
-      });
-
       for (const user in userVolume) {
         let variableReward = BigNumber.from(0);
         for (const [domain, epochResult] of Object.entries(userVolume[user].epochResult)) {
@@ -316,11 +337,13 @@ export const processVolumeRewards = async (
           // chainRewardPercentage = domainVote / totalVote
           // userRewardPercentage = scaledUserVolume / scaledTotalDomainVolume
           // rewardPercentage = chainRewardPercentage * userRewardPercentage
+          // variablePool = sacledvariablePoolUsd * asset decimal / scaled asset price
           // variableReward (in token) = variablePool * rewardPercentage
-          const divisor = totalVote.mul(totalVolume[domain]);
-          const domainVariableReward = variableRewardsPool
+          const divisor = totalVote.mul(totalVolume[domain]).mul(scaledAssetPrice);
+          const domainVariableReward = scaledVariableRewardsPoolUsd
             .mul(epochResult.scaledUserVolume)
             .mul(domainVoteMap[domain] ?? 0)
+            .mul(assetMultiplier)
             .div(divisor);
 
           if (domainVariableReward.lt(0)) {
@@ -353,6 +376,30 @@ export const processVolumeRewards = async (
       }
     }
 
+    // sanity check
+    if (totalBaseReward.add(totalVariableReward).gt(token.epochVolumeReward)) {
+      const error = new InvalidState({
+        epoch,
+        totalScaledVolumeAcrossDomain,
+        scaledMaxVolumeCapUsd,
+        scaledEpochVolumeRewardUsd,
+        scaledBaseRewardPoolUsd,
+        maxRewardsDbps,
+        baseRewardDbps,
+        variableRewardsDbps,
+        totalBaseReward,
+        token,
+        epochVolumeReward: token.epochVolumeReward,
+      });
+      logger.error('unexpected state: total reward greater than epoch reward', requestContext, methodContext, error, {
+        epoch,
+        totalBaseReward,
+        token,
+        epochVolumeReward: token.epochVolumeReward,
+      });
+      throw error;
+    }
+
     // ======== saving reward results ========
     if (!rewards[token.address]) {
       rewards[token.address] = {};
@@ -373,7 +420,7 @@ export const processVolumeRewards = async (
       scaledAssetPrice,
       totalBaseReward,
       totalVariableReward,
-      variableRewardsPool,
+      variableRewardsPool: scaledVariableRewardsPoolUsd,
       totalReward: totalBaseReward.add(totalVariableReward),
       baseRewardDbps: token.baseRewardDbps,
       variableRewardsDbps,

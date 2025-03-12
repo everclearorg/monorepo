@@ -337,7 +337,7 @@ module "lighthouse_reward_cron" {
     LIGHTHOUSE_SERVICE = "reward"
     CONFIG_PARAMETER_NAME = local.lighthouse_reward_config_param_name
   })
-  schedule_expression    = "rate(1 day)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -358,7 +358,7 @@ module "lighthouse_reward_metadata_cron" {
     LIGHTHOUSE_SERVICE = "reward_metadata"
     CONFIG_PARAMETER_NAME = local.lighthouse_reward_metadata_config_param_name
   })
-  schedule_expression    = "rate(1 day)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
