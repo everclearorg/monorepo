@@ -205,54 +205,33 @@ export const processVolumeRewards = async (
     const scaledMaxVolumeCapUsd = BigNumber.from(token.maxBpsUsdVolumeCap).mul(USD_MULTIPLIER);
     // For now, we round this off using dbps. We might need more precision as this is calculated
     // maximumRewardsDbps = scaledEpochVolumeRewardPrice / scaledMaxVolumeCap * 100000
-    let maxRewardsDbps = scaledEpochVolumeRewardUsd.mul(DBPS_MULTIPLIER).div(scaledMaxVolumeCapUsd);
+    const maxRewardsDbps = scaledEpochVolumeRewardUsd.mul(DBPS_MULTIPLIER).div(scaledMaxVolumeCapUsd);
+
     let baseRewardDbps = BigNumber.from(token.baseRewardDbps);
     let scaledBaseRewardPoolUsd = totalScaledVolumeAcrossDomain.mul(baseRewardDbps).div(DBPS_MULTIPLIER);
 
-    let scaledTotalRewardsPoolUsd = BigNumber.from(0);
+    // normally, this would be max rewards dbps * total volume
+    let scaledTotalRewardsPoolUsd = maxRewardsDbps.mul(totalScaledVolumeAcrossDomain).div(DBPS_MULTIPLIER);
 
-    if (totalScaledVolumeAcrossDomain.gt(scaledMaxVolumeCapUsd)) {
-      // if volume > max volume cap, we give out all epoch volume rewards (and thus not getting max rewards dbps)
-      scaledTotalRewardsPoolUsd = scaledBaseRewardPoolUsd;
-    } else {
-      // else, this would be max rewards dbps * total volume
-      scaledTotalRewardsPoolUsd = maxRewardsDbps.mul(totalScaledVolumeAcrossDomain).div(DBPS_MULTIPLIER);
-    }
-
-    // edge case: if max rewards is less than base reward
-    if (maxRewardsDbps < baseRewardDbps) {
-      const beforeReset = {
-        scaledAllocableRewards: scaledEpochVolumeRewardUsd,
-        baseRewardPoolUsd: scaledBaseRewardPoolUsd,
-        totalRewardPoolUsd: scaledTotalRewardsPoolUsd,
-        maxRewardsDbps,
-        baseRewardDbps,
-      };
-
-      if (scaledBaseRewardPoolUsd.gt(scaledEpochVolumeRewardUsd)) {
-        // base pool > all allocable rewards in this epoch, set base to all epoch volume
-        scaledBaseRewardPoolUsd = scaledEpochVolumeRewardUsd;
-        baseRewardDbps = scaledBaseRewardPoolUsd.mul(DBPS_MULTIPLIER).div(totalScaledVolumeAcrossDomain);
-      }
-      // set maxRewardsDbps to the base dbps and total rewards pool to base pool
-      maxRewardsDbps = baseRewardDbps;
-      scaledTotalRewardsPoolUsd = scaledBaseRewardPoolUsd;
-      logger.info('reset base pool to all allocable rewards', requestContext, methodContext, {
-        beforeReset,
-        afterReset: {
-          scaledAllocableRewards: scaledEpochVolumeRewardUsd,
-          baseRewardPool: scaledBaseRewardPoolUsd,
-          totalRewardPoolUsd: scaledTotalRewardsPoolUsd,
-          maxRewardsDbps,
-          baseRewardDbps,
-        },
-      });
+    // edge case: if base reward pool > epoch volume, we set total pool = base pool = epoch volume and bps accordingly
+    if (scaledBaseRewardPoolUsd.gt(scaledEpochVolumeRewardUsd)) {
+      scaledTotalRewardsPoolUsd = scaledEpochVolumeRewardUsd;
+      scaledBaseRewardPoolUsd = scaledEpochVolumeRewardUsd;
+      baseRewardDbps = scaledBaseRewardPoolUsd.mul(DBPS_MULTIPLIER).div(totalScaledVolumeAcrossDomain);
     }
 
     let scaledVariableRewardsPoolUsd = BigNumber.from(0);
     // variable rewards dbps = max - base
-    const variableRewardsDbps = maxRewardsDbps.sub(baseRewardDbps);
+    let variableRewardsDbps = maxRewardsDbps.sub(baseRewardDbps);
     scaledVariableRewardsPoolUsd = scaledTotalRewardsPoolUsd.sub(scaledBaseRewardPoolUsd);
+
+    // edge case: if variable rewards is negative, we force set variable rewards to be zero
+    // all rewards will be given out as base rewards
+    if (scaledVariableRewardsPoolUsd.lt(0)) {
+      variableRewardsDbps = BigNumber.from(0);
+      scaledVariableRewardsPoolUsd = BigNumber.from(0);
+      scaledTotalRewardsPoolUsd = scaledBaseRewardPoolUsd;
+    }
 
     logger.info('rewards dbps given in this epoch', requestContext, methodContext, {
       epoch,
@@ -308,7 +287,19 @@ export const processVolumeRewards = async (
     // epoch (which is too good to be true), or there is something wrong for the token price
     // that either it is an error or it drop to bottom.
     if (totalBaseReward.gt(token.epochVolumeReward)) {
-      const error = new InvalidState();
+      const error = new InvalidState({
+        epoch,
+        totalScaledVolumeAcrossDomain,
+        scaledMaxVolumeCapUsd,
+        scaledEpochVolumeRewardUsd,
+        scaledBaseRewardPoolUsd,
+        maxRewardsDbps,
+        baseRewardDbps,
+        totalBaseReward,
+        token,
+        epochVolumeReward: token.epochVolumeReward,
+        userVolume,
+      });
       logger.error('unexpected state: base reward greater than epoch reward', requestContext, methodContext, error, {
         epoch,
         totalBaseReward,
@@ -383,6 +374,30 @@ export const processVolumeRewards = async (
 
         totalVariableReward = totalVariableReward.add(variableReward);
       }
+    }
+
+    // sanity check
+    if (totalBaseReward.add(totalVariableReward).gt(token.epochVolumeReward)) {
+      const error = new InvalidState({
+        epoch,
+        totalScaledVolumeAcrossDomain,
+        scaledMaxVolumeCapUsd,
+        scaledEpochVolumeRewardUsd,
+        scaledBaseRewardPoolUsd,
+        maxRewardsDbps,
+        baseRewardDbps,
+        variableRewardsDbps,
+        totalBaseReward,
+        token,
+        epochVolumeReward: token.epochVolumeReward,
+      });
+      logger.error('unexpected state: total reward greater than epoch reward', requestContext, methodContext, error, {
+        epoch,
+        totalBaseReward,
+        token,
+        epochVolumeReward: token.epochVolumeReward,
+      });
+      throw error;
     }
 
     // ======== saving reward results ========
