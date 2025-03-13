@@ -1,52 +1,54 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {Vm} from 'forge-std/Vm.sol';
-import {console} from 'forge-std/console.sol';
+import { Vm } from 'forge-std/Vm.sol';
+import { console } from 'forge-std/console.sol';
 
-import {MessageLib} from 'contracts/common/MessageLib.sol';
+import { MessageLib } from 'contracts/common/MessageLib.sol';
 
-import {TestDAI} from 'test/utils/TestDAI.sol';
+import { TestDAI } from 'test/utils/TestDAI.sol';
 
-import {TestExtended} from 'test/utils/TestExtended.sol';
-import {TestWETH} from 'test/utils/TestWETH.sol';
+import { TestExtended } from 'test/utils/TestExtended.sol';
+import { TestWETH } from 'test/utils/TestWETH.sol';
 
-import {XERC20Module} from 'contracts/intent/modules/XERC20Module.sol';
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
+import { XERC20Module } from 'contracts/intent/modules/XERC20Module.sol';
+import { ERC20, IXERC20, XERC20 } from 'test/utils/TestXToken.sol';
 
-import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+import { TypeCasts } from 'contracts/common/TypeCasts.sol';
+import { AssetUtils } from 'contracts/common/AssetUtils.sol';
 
-import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
-import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
+import { IInterchainSecurityModule } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
+import { IMailbox } from '@hyperlane/interfaces/IMailbox.sol';
 
-import {HubGateway, IHubGateway} from 'contracts/hub/HubGateway.sol';
+import { HubGateway, IHubGateway } from 'contracts/hub/HubGateway.sol';
 
-import {CallExecutor, ICallExecutor} from 'contracts/intent/CallExecutor.sol';
-import {EverclearSpoke, IEverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
-import {ISpokeGateway, SpokeGateway} from 'contracts/intent/SpokeGateway.sol';
+import { CallExecutor, ICallExecutor } from 'contracts/intent/CallExecutor.sol';
+import { EverclearSpoke, IEverclearSpoke } from 'contracts/intent/EverclearSpoke.sol';
+import { ISpokeGateway, SpokeGateway } from 'contracts/intent/SpokeGateway.sol';
+import { IFeeAdapter, FeeAdapter } from 'contracts/intent/FeeAdapter.sol';
 
-import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
+import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import { IMessageReceiver } from 'interfaces/common/IMessageReceiver.sol';
 
-import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';
+import { IHubStorage } from 'interfaces/hub/IHubStorage.sol';
 
-import {ISpokeStorage} from 'interfaces/intent/ISpokeStorage.sol';
-import {StdStorage, stdStorage} from 'test/utils/TestExtended.sol';
+import { ISpokeStorage } from 'interfaces/intent/ISpokeStorage.sol';
+import { StdStorage, stdStorage } from 'test/utils/TestExtended.sol';
 
-import {EverclearHub, IEverclearHub} from 'contracts/hub/EverclearHub.sol';
-import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import { EverclearHub, IEverclearHub } from 'contracts/hub/EverclearHub.sol';
+import { IEverclear } from 'interfaces/common/IEverclear.sol';
 
-import {Handler} from 'contracts/hub/modules/Handler.sol';
+import { Handler } from 'contracts/hub/modules/Handler.sol';
 
-import {HubMessageReceiver} from 'contracts/hub/modules/HubMessageReceiver.sol';
+import { HubMessageReceiver } from 'contracts/hub/modules/HubMessageReceiver.sol';
 
-import {Manager} from 'contracts/hub/modules/Manager.sol';
-import {Settler} from 'contracts/hub/modules/Settler.sol';
-import {SpokeMessageReceiver} from 'contracts/intent/modules/SpokeMessageReceiver.sol';
+import { Manager } from 'contracts/hub/modules/Manager.sol';
+import { Settler } from 'contracts/hub/modules/Settler.sol';
+import { SpokeMessageReceiver } from 'contracts/intent/modules/SpokeMessageReceiver.sol';
 
-import {Constants} from 'test/utils/Constants.sol';
+import { Constants } from 'test/utils/Constants.sol';
 
-import {Deploy} from 'utils/Deploy.sol';
+import { Deploy } from 'utils/Deploy.sol';
 
 struct HubDeploymentParams {
   address owner;
@@ -65,6 +67,7 @@ struct SpokeDeploymentParams {
   address ISM;
   uint32 hubDomainId;
   address hubGateway;
+  address feeRecipient;
 }
 
 struct SpokeChainValues {
@@ -75,8 +78,11 @@ struct SpokeChainValues {
   ISpokeGateway gateway;
   IMailbox mailbox;
   XERC20Module xerc20Module;
+  IFeeAdapter feeAdapter;
 }
 
+
+/// @dev BSC_TESTNET RPCs not working - converted to Arbitrum Sepolia and retained naming as temporary fix
 contract IntegrationBase is TestExtended {
   using stdStorage for StdStorage;
   using TypeCasts for address;
@@ -99,7 +105,7 @@ contract IntegrationBase is TestExtended {
   address internal SECURITY_MODULE = makeAddr('security_module');
 
   IERC20 internal oUSDT = IERC20(0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0); // sepolia ust, 6 decimals
-  IERC20 internal dUSDT = IERC20(0x221c5B1a293aAc1187ED3a7D7d2d9aD7fE1F3FB0); // bsc usdt, 18 decimals
+  IERC20 internal dUSDT = IERC20(0x30fA2FbE15c1EaDfbEF28C188b7B8dbd3c1Ff2eB); // bsc usdt, 18 decimals (Arb Sep: 0x30fA2FbE15c1EaDfbEF28C188b7B8dbd3c1Ff2eB)
   IERC20 internal sepoliaDAI;
   IERC20 internal bscDAI;
   IERC20 internal sepoliaWETH;
@@ -115,15 +121,17 @@ contract IntegrationBase is TestExtended {
   IMailbox public sepoliaMailbox = IMailbox(0xfFAEF09B3cd11D9b20d1a19bECca54EEC2884766); // sepolia mailbox
   address public sepoliaISM = makeAddr('origin_ism');
   XERC20Module public sepoliaXERC20Module;
+  IFeeAdapter public sepoliaFeeAdapter;
 
   // Destination domain
   IEverclearSpoke public bscEverclearSpoke;
   ISpokeGateway public bscSpokeGateway;
   ICallExecutor public destinationCallExecutor;
   IMessageReceiver public destinationMessageReceiver;
-  IMailbox public bscMailbox = IMailbox(0xF9F6F5646F478d5ab4e20B0F910C92F1CCC9Cc6D); // bsc mailbox
+  IMailbox public bscMailbox = IMailbox(0x598facE78a4302f11E3de0bee1894Da0b2Cb71F8); // bsc mailbox (Arb Sep: 0x598facE78a4302f11E3de0bee1894Da0b2Cb71F8, BSC:0xF9F6F5646F478d5ab4e20B0F910C92F1CCC9Cc6D)
   address public bscTestnetISM = makeAddr('destination_ism');
   XERC20Module public bscXERC20Module;
+  IFeeAdapter public bscFeeAdapter;
 
   // Hub
   IEverclearHub public hub;
@@ -137,12 +145,12 @@ contract IntegrationBase is TestExtended {
   uint256 BSC_TESTNET_FORK;
   uint256 HUB_FORK;
 
-  uint256 ETHEREUM_SEPOLIA_FORK_BLOCK = 5_439_617; // ethereum sepolia 11155111
-  uint256 BSC_TESTNET_FORK_BLOCK = 39_755_968; // bsc testnet 97
-  uint256 HUB_FORK_BLOCK = 3_761_339; // scroll sepolia 534351
+  uint256 ETHEREUM_SEPOLIA_FORK_BLOCK = 7_894_090; // ethereum sepolia 11155111
+  uint256 BSC_TESTNET_FORK_BLOCK = 132_009_583; // bsc testnet 97 (Arb Sep: 132009583)
+  uint256 HUB_FORK_BLOCK = 8_486_730; // scroll sepolia 534351
 
   uint32 ETHEREUM_SEPOLIA_ID = 11_155_111;
-  uint32 BSC_TESTNET_ID = 97;
+  uint32 BSC_TESTNET_ID = 421614; // (Arb: 421614, BSC: 97)
   uint32 HUB_CHAIN_ID = 534_351;
 
   // 10% default max discount discount
@@ -172,22 +180,29 @@ contract IntegrationBase is TestExtended {
       mailbox: address(sepoliaMailbox),
       ISM: sepoliaISM,
       hubDomainId: HUB_CHAIN_ID,
-      hubGateway: address(hubGateway)
+      hubGateway: address(hubGateway),
+      feeRecipient: _feeRecipient
     });
 
     SpokeDeploymentParams memory destinationParams = SpokeDeploymentParams({
       owner: _owner,
       deployer: DEPLOYER,
-      domain: 'bsc',
+      domain: 'arb-sepolia',
       mailbox: address(bscMailbox),
       ISM: bscTestnetISM,
       hubDomainId: HUB_CHAIN_ID,
-      hubGateway: address(hubGateway)
+      hubGateway: address(hubGateway),
+      feeRecipient: _feeRecipient
     });
 
     // deploy origin spoke contracts
-    (ETHEREUM_SEPOLIA_FORK, sepoliaEverclearSpoke, sepoliaSpokeGateway, originCallExecutor, originMessageReceiver) =
-      _deploySpokeContracts(originParams);
+    (
+      ETHEREUM_SEPOLIA_FORK,
+      sepoliaEverclearSpoke,
+      sepoliaSpokeGateway,
+      originCallExecutor,
+      originMessageReceiver
+    ) = _deploySpokeContracts(originParams);
 
     // configure xerc20
     vm.startPrank(DEPLOYER);
@@ -197,6 +212,11 @@ contract IntegrationBase is TestExtended {
     sepoliaEverclearSpoke.setStrategyForAsset(address(sepoliaXToken), IEverclear.Strategy.XERC20);
     sepoliaEverclearSpoke.setModuleForStrategy(IEverclear.Strategy.XERC20, sepoliaXERC20Module);
 
+    // Configure fee adapter
+    sepoliaFeeAdapter = IFeeAdapter(
+      address(new FeeAdapter(address(sepoliaEverclearSpoke), _feeRecipient, address(sepoliaXERC20Module), _owner))
+    );
+
     // deploy dai test contract for sepolia
     sepoliaDAI = new TestDAI('DAI', 'DAI');
 
@@ -205,8 +225,13 @@ contract IntegrationBase is TestExtended {
     vm.stopPrank();
 
     // deploy destination spoke contracts
-    (BSC_TESTNET_FORK, bscEverclearSpoke, bscSpokeGateway, destinationCallExecutor, destinationMessageReceiver) =
-      _deploySpokeContracts(destinationParams);
+    (
+      BSC_TESTNET_FORK,
+      bscEverclearSpoke,
+      bscSpokeGateway,
+      destinationCallExecutor,
+      destinationMessageReceiver
+    ) = _deploySpokeContracts(destinationParams);
 
     // configure xerc20
     vm.startPrank(DEPLOYER);
@@ -215,6 +240,11 @@ contract IntegrationBase is TestExtended {
     bscXToken.setLimits(address(bscXERC20Module), type(uint128).max, type(uint128).max);
     bscEverclearSpoke.setStrategyForAsset(address(bscXToken), IEverclear.Strategy.XERC20);
     bscEverclearSpoke.setModuleForStrategy(IEverclear.Strategy.XERC20, bscXERC20Module);
+
+    // Configure fee adapter
+    bscFeeAdapter = IFeeAdapter(
+      address(new FeeAdapter(address(bscEverclearSpoke), _feeRecipient, address(bscXERC20Module), _owner))
+    );
 
     // deploy dai test contract for bsc
     bscDAI = new TestDAI('DAI', 'DAI');
@@ -244,8 +274,8 @@ contract IntegrationBase is TestExtended {
 
     ////////////////////////////// START ASSET SETUP //////////////////////////////
     IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](2);
-    _fees[0] = IHubStorage.Fee({recipient: _feeRecipient, fee: 1000});
-    _fees[1] = IHubStorage.Fee({recipient: _feeRecipient2, fee: 2000});
+    _fees[0] = IHubStorage.Fee({ recipient: _feeRecipient, fee: 1000 });
+    _fees[1] = IHubStorage.Fee({ recipient: _feeRecipient2, fee: 2000 });
 
     for (uint256 _i; _i < _fees.length; _i++) {
       totalProtocolFees += _fees[_i].fee;
@@ -397,7 +427,8 @@ contract IntegrationBase is TestExtended {
       ism: sepoliaISM,
       gateway: sepoliaSpokeGateway,
       mailbox: sepoliaMailbox,
-      xerc20Module: sepoliaXERC20Module
+      xerc20Module: sepoliaXERC20Module,
+      feeAdapter: sepoliaFeeAdapter
     });
 
     spokeChainValues[BSC_TESTNET_ID] = SpokeChainValues({
@@ -407,7 +438,8 @@ contract IntegrationBase is TestExtended {
       ism: bscTestnetISM,
       gateway: bscSpokeGateway,
       mailbox: bscMailbox,
-      xerc20Module: bscXERC20Module
+      xerc20Module: bscXERC20Module,
+      feeAdapter: bscFeeAdapter
     });
   }
 
@@ -516,11 +548,14 @@ contract IntegrationBase is TestExtended {
     // deploy call executor
     _executor = new CallExecutor(); // 4 -> 5
     assertEq(
-      _predictedCallExecutor, address(_executor), string.concat(_params.domain, ' Call Executor address mismatch')
+      _predictedCallExecutor,
+      address(_executor),
+      string.concat(_params.domain, ' Call Executor address mismatch')
     );
 
     _messageReceiver = new SpokeMessageReceiver();
     assertEq(_predictedMessageReceiver, address(_messageReceiver), 'Message receiver addresses mismatch');
+
     vm.stopPrank();
 
     console.log('------------------------', _params.domain, '------------------------');
@@ -536,17 +571,13 @@ contract IntegrationBase is TestExtended {
                              HELPERS 
   //////////////////////////////////////////////////////////////*/
 
-  function _bytes32ToUint32(
-    bytes32 _input
-  ) public pure returns (uint32 _output) {
+  function _bytes32ToUint32(bytes32 _input) public pure returns (uint32 _output) {
     assembly {
       _output := mload(add(_input, 32))
     }
   }
 
-  function _body(
-    bytes memory _bytes
-  ) internal pure returns (bytes memory _result) {
+  function _body(bytes memory _bytes) internal pure returns (bytes memory _result) {
     _result = new bytes(_bytes.length - 77);
 
     for (uint256 _i; _i < _bytes.length - 77; _i++) {
@@ -635,9 +666,7 @@ contract IntegrationBase is TestExtended {
     hub.processDepositsAndInvoices(_tickerHash, _maxEpochs, _maxDeposits, _maxInvoices);
   }
 
-  function _processDepositsAndInvoices(
-    bytes32 _tickerHash
-  ) internal {
+  function _processDepositsAndInvoices(bytes32 _tickerHash) internal {
     _processDepositsAndInvoices(_tickerHash, 0, 0, 0);
   }
 
@@ -651,7 +680,7 @@ contract IntegrationBase is TestExtended {
     // process settlement queue
     vm.deal(LIGHTHOUSE, 100 ether);
     vm.prank(LIGHTHOUSE);
-    hub.processSettlementQueue{value: 1 ether}(_chainId, _amount);
+    hub.processSettlementQueue{ value: 1 ether }(_chainId, _amount);
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
 
@@ -666,15 +695,16 @@ contract IntegrationBase is TestExtended {
     uint32 _destination,
     uint256 _intentAmount
   ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
-    return _createIntentAndReceiveInHubWithTTL({
-      _user: _user,
-      _assetOrigin: _assetOrigin,
-      _assetDestination: _assetDestination,
-      _origin: _origin,
-      _destination: _destination,
-      _intentAmount: _intentAmount,
-      _ttl: 0
-    });
+    return
+      _createIntentAndReceiveInHubWithTTL({
+        _user: _user,
+        _assetOrigin: _assetOrigin,
+        _assetDestination: _assetDestination,
+        _origin: _origin,
+        _destination: _destination,
+        _intentAmount: _intentAmount,
+        _ttl: 0
+      });
   }
 
   function _createIntentAndReceiveInHubWithTTL(
@@ -690,9 +720,16 @@ contract IntegrationBase is TestExtended {
     uint32[] memory _destA = new uint32[](1);
     _destA[0] = _destination;
 
-    return _createIntentAndReceiveInHubWithTTLAndDestinations(
-      _user, _assetOrigin, _assetDestination, _origin, _destA, _intentAmount, _ttl
-    );
+    return
+      _createIntentAndReceiveInHubWithTTLAndDestinations(
+        _user,
+        _assetOrigin,
+        _assetDestination,
+        _origin,
+        _destA,
+        _intentAmount,
+        _ttl
+      );
   }
 
   function _createIntentAndReceiveInHubWithTTLAndDestinations(
@@ -744,7 +781,144 @@ contract IntegrationBase is TestExtended {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    _chainValues.spoke.processIntentQueue{value: 1 ether}(_intentsA);
+    _chainValues.spoke.processIntentQueue{ value: 1 ether }(_intentsA);
+
+    /*///////////////////////////////////////////////////////////////
+                            EVERCLEAR DOMAIN 
+  //////////////////////////////////////////////////////////////*/
+
+    // switch to everclear fork
+    vm.selectFork(HUB_FORK);
+
+    bytes memory _intentMessageBody = MessageLib.formatIntentMessageBatch(_intentsA);
+    bytes memory _intentMessage = _formatHLMessage(
+      3,
+      1337,
+      _origin,
+      address(_chainValues.gateway).toBytes32(),
+      HUB_CHAIN_ID,
+      address(hubGateway).toBytes32(),
+      _intentMessageBody
+    );
+
+    // mock call to ISM
+    vm.mockCall(
+      address(hubISM),
+      abi.encodeWithSelector(IInterchainSecurityModule.verify.selector, bytes(''), _intentMessage),
+      abi.encode(true)
+    );
+
+    // deliver intent message to hub
+    vm.prank(makeAddr('caller'));
+    hubMailbox.process(bytes(''), _intentMessage);
+  }
+
+  function _createIntentWithFeeAdapterAndReceiveInHub(
+    address _user,
+    IERC20 _assetOrigin,
+    IERC20 _assetDestination,
+    uint32 _origin,
+    uint32 _destination,
+    uint256 _intentAmount,
+    uint256 _tokenFee,
+    uint256 _ethFee
+  ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
+    return
+      _createIntentWithFeeAdapterAndReceiveInHubWithTTL({
+        _user: _user,
+        _assetOrigin: _assetOrigin,
+        _assetDestination: _assetDestination,
+        _origin: _origin,
+        _destination: _destination,
+        _intentAmount: _intentAmount,
+        _ttl: 0,
+        _tokenFee: _tokenFee,
+        _ethFee: _ethFee
+      });
+  }
+
+  function _createIntentWithFeeAdapterAndReceiveInHubWithTTL(
+    address _user,
+    IERC20 _assetOrigin,
+    IERC20 _assetDestination,
+    uint32 _origin,
+    uint32 _destination,
+    uint256 _intentAmount,
+    uint48 _ttl,
+    uint256 _tokenFee,
+    uint256 _ethFee
+  ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
+    // build destinations array
+    uint32[] memory _destA = new uint32[](1);
+    _destA[0] = _destination;
+
+    return
+      _createIntentWithFeeAdapterAndReceiveInHubWithTTLAndDestinations(
+        _user,
+        _assetOrigin,
+        _assetDestination,
+        _origin,
+        _destA,
+        _intentAmount,
+        _ttl,
+        _tokenFee,
+        _ethFee
+      );
+  }
+
+  function _createIntentWithFeeAdapterAndReceiveInHubWithTTLAndDestinations(
+    address _user,
+    IERC20 _assetOrigin,
+    IERC20 _assetDestination,
+    uint32 _origin,
+    uint32[] memory _destinations,
+    uint256 _intentAmount,
+    uint48 _ttl,
+    uint256 _tokenFee,
+    uint256 _ethFee
+  ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
+    SpokeChainValues memory _chainValues = spokeChainValues[_origin];
+
+    /*///////////////////////////////////////////////////////////////
+                            ORIGIN DOMAIN 
+  //////////////////////////////////////////////////////////////*/
+
+    // select origin fork
+    vm.selectFork(_chainValues.fork);
+
+    // deal to lighthouse
+    vm.deal(LIGHTHOUSE, 100 ether);
+    // deal origin usdt to user
+    deal(address(_assetOrigin), _user, _intentAmount + _tokenFee);
+    // deal the user the ethFee if needed
+    vm.deal(_user, _ethFee);
+
+    // approve tokens
+    vm.prank(_user);
+    _assetOrigin.approve(address(_chainValues.feeAdapter), type(uint256).max);
+
+    // create new intent
+    vm.prank(_user);
+
+    (_intentId, _intent) = _chainValues.feeAdapter.newIntent{ value: _ethFee }(
+      _destinations,
+      _user,
+      address(_assetOrigin),
+      address(_assetDestination),
+      _intentAmount,
+      Constants.MAX_FEE,
+      _ttl,
+      hex'00',
+      _tokenFee
+    );
+
+    // create intent message
+    IEverclear.Intent[] memory _intentsA = new IEverclear.Intent[](1);
+    _intentsA[0] = _intent;
+
+    // process intent queue
+    vm.prank(LIGHTHOUSE);
+    _chainValues.spoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     /*///////////////////////////////////////////////////////////////
                             EVERCLEAR DOMAIN 
@@ -814,7 +988,7 @@ contract IntegrationBase is TestExtended {
 
     // process fill queue
     vm.prank(LIGHTHOUSE);
-    _chainValues.spoke.processFillQueue{value: 1 ether}(1);
+    _chainValues.spoke.processFillQueue{ value: 1 ether }(1);
 
     /*///////////////////////////////////////////////////////////////
                          EVERCLEAR DOMAIN 
@@ -854,16 +1028,12 @@ contract IntegrationBase is TestExtended {
     hubMailbox.process(bytes(''), _fillMessageFormatted);
   }
 
-  function _rollEpochs(
-    uint48 _epochs
-  ) internal {
+  function _rollEpochs(uint48 _epochs) internal {
     vm.selectFork(HUB_FORK);
     vm.roll(block.number + hub.epochLength() * _epochs);
   }
 
-  function _switchFork(
-    uint256 _fork
-  ) internal {
+  function _switchFork(uint256 _fork) internal {
     vm.selectFork(_fork);
   }
 
@@ -913,22 +1083,16 @@ contract IntegrationBase is TestExtended {
     return hub.invoices(_tickerHash);
   }
 
-  function _closeEpochAndProcessDepositsAndInvoices(
-    bytes32 _tickerHash
-  ) internal {
+  function _closeEpochAndProcessDepositsAndInvoices(bytes32 _tickerHash) internal {
     _rollEpochs(1);
     _processDepositsAndInvoices(_tickerHash);
   }
 
-  function _elapseTimeInChains(
-    uint256 _time
-  ) internal {
+  function _elapseTimeInChains(uint256 _time) internal {
     _unifyUnixBlocktimestampInChains(block.timestamp + _time);
   }
 
-  function _unifyUnixBlocktimestampInChains(
-    uint256 _blocktimestamp
-  ) internal {
+  function _unifyUnixBlocktimestampInChains(uint256 _blocktimestamp) internal {
     _switchFork(ETHEREUM_SEPOLIA_FORK);
     vm.warp(_blocktimestamp);
 
@@ -939,9 +1103,7 @@ contract IntegrationBase is TestExtended {
     vm.warp(_blocktimestamp);
   }
 
-  function _setAdpotedForAsset(
-    IHubStorage.AssetConfig memory _config
-  ) internal {
+  function _setAdpotedForAsset(IHubStorage.AssetConfig memory _config) internal {
     _switchHubFork();
     vm.prank(_assetManager);
     hub.setAdoptedForAsset(_config);
@@ -978,5 +1140,149 @@ contract IntegrationBase is TestExtended {
     _switchHubFork();
     vm.prank(_withdrawer);
     hub.withdrawFees(_recipient.toBytes32(), _tickerHash, _amount, _destinations);
+  }
+
+  function _generateEvenSplitIntentsAndConfirmStatusIsAdded(
+    address _initiator,
+    uint64 _nonce,
+    uint256 _numOfIntents,
+    uint32 _domain,
+    IEverclearSpoke _spoke,
+    IFeeAdapter.OrderParameters memory _params
+  ) internal returns (IEverclear.Intent[] memory) {
+    // Calculating the normalised amount
+    uint256 _toSend = _params.amount / _numOfIntents;
+    uint256 _toSendNormalised = AssetUtils.normalizeDecimals(
+      ERC20(_params.inputAsset).decimals(),
+      Constants.DEFAULT_NORMALIZED_DECIMALS,
+      _toSend
+    );
+
+    // Initialising the intent and updating
+    IEverclear.Intent[] memory _intents = new IEverclear.Intent[](_numOfIntents);
+    for (uint256 i = 0; i < _numOfIntents - 1; i++) {
+      _intents[i] = IEverclear.Intent({
+        initiator: _initiator.toBytes32(),
+        receiver: _params.receiver.toBytes32(),
+        inputAsset: _params.inputAsset.toBytes32(),
+        outputAsset: _params.outputAsset.toBytes32(),
+        maxFee: _params.maxFee,
+        origin: _domain,
+        nonce: _nonce,
+        timestamp: uint48(block.timestamp),
+        ttl: _params.ttl,
+        amount: _toSendNormalised,
+        destinations: _params.destinations,
+        data: _params.data
+      });
+
+      // Iterating the nonce
+      _nonce++;
+    }
+
+    // Last intent
+    _toSend = _params.amount - (_toSend * (_numOfIntents - 1));
+    _toSendNormalised = AssetUtils.normalizeDecimals(
+      ERC20(_params.inputAsset).decimals(),
+      Constants.DEFAULT_NORMALIZED_DECIMALS,
+      _toSend
+    );
+    _intents[_numOfIntents - 1] = IEverclear.Intent({
+      initiator: _initiator.toBytes32(),
+      receiver: _params.receiver.toBytes32(),
+      inputAsset: _params.inputAsset.toBytes32(),
+      outputAsset: _params.outputAsset.toBytes32(),
+      maxFee: _params.maxFee,
+      origin: _domain,
+      nonce: _nonce,
+      timestamp: uint48(block.timestamp),
+      ttl: _params.ttl,
+      amount: _toSendNormalised,
+      destinations: _params.destinations,
+      data: _params.data
+    });
+
+    // Checking the status is added on the Spoke
+    for (uint256 i; i < _numOfIntents; i++) {
+      bytes32 _intentId = keccak256(abi.encode(_intents[i]));
+      assertEq(uint8(_spoke.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
+    }
+
+    return _intents;
+  }
+
+  function _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
+    address _initiator,
+    uint64 _nonce,
+    uint32 _domain,
+    IEverclearSpoke _spoke,
+    IFeeAdapter.OrderParameters[] memory _params
+  ) internal returns (IEverclear.Intent[] memory) {
+    // Initialising the intent and updating
+    IEverclear.Intent[] memory _intents = new IEverclear.Intent[](_params.length);
+    for (uint256 i = 0; i < _params.length; i++) {
+      // Normalising the amount
+      uint256 _toSendNormalised = AssetUtils.normalizeDecimals(
+        ERC20(_params[i].inputAsset).decimals(),
+        Constants.DEFAULT_NORMALIZED_DECIMALS,
+        _params[i].amount
+      );
+      _intents[i] = IEverclear.Intent({
+        initiator: _initiator.toBytes32(),
+        receiver: _params[i].receiver.toBytes32(),
+        inputAsset: _params[i].inputAsset.toBytes32(),
+        outputAsset: _params[i].outputAsset.toBytes32(),
+        maxFee: _params[i].maxFee,
+        origin: _domain,
+        nonce: _nonce,
+        timestamp: uint48(block.timestamp),
+        ttl: _params[i].ttl,
+        amount: _toSendNormalised,
+        destinations: _params[i].destinations,
+        data: _params[i].data
+      });
+
+      // Iterating the nonce
+      _nonce++;
+    }
+
+    // Checking the status is added on the Spoke
+    for (uint256 i; i < _params.length; i++) {
+      bytes32 _intentId = keccak256(abi.encode(_intents[i]));
+      assertEq(uint8(_spoke.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
+    }
+
+    return _intents;
+  }
+
+  function _normaliseAmount(uint256 _amount, address _asset) internal returns (uint256) {
+    return AssetUtils.normalizeDecimals(ERC20(_asset).decimals(), Constants.DEFAULT_NORMALIZED_DECIMALS, _amount);
+  }
+
+  function _calculateAmountAfterFeesForMultipleIntents(
+    uint256[] memory _normalizedAmounts,
+    address _outputAsset
+  ) internal returns (uint256 _amountAfterFees) {
+    for (uint256 i; i < _normalizedAmounts.length; i++) {
+      uint256 _amountFeesApplied = _normalizedAmounts[i] -
+        ((totalProtocolFees * _normalizedAmounts[i]) / Constants.DBPS_DENOMINATOR);
+      _amountAfterFees += AssetUtils.normalizeDecimals(
+        Constants.DEFAULT_NORMALIZED_DECIMALS,
+        ERC20(_outputAsset).decimals(),
+        _amountFeesApplied
+      );
+    }
+  }
+
+  function _calculateAmountAfterFeesForIntentArray(IEverclear.Intent[] memory _intents, address _outputAsset) internal returns (uint256 _amountAfterFees) {
+    for (uint256 i; i < _intents.length; i++) {
+      uint256 _amountFeesApplied = _intents[i].amount -
+        ((totalProtocolFees * _intents[i].amount) / Constants.DBPS_DENOMINATOR);
+      _amountAfterFees += AssetUtils.normalizeDecimals(
+        Constants.DEFAULT_NORMALIZED_DECIMALS,
+        ERC20(_outputAsset).decimals(),
+        _amountFeesApplied
+      );
+    }
   }
 }

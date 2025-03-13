@@ -26,7 +26,10 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
 
   /// @inheritdoc IFeeAdapter
-  IEverclearSpoke public spoke;
+  IEverclearSpoke public immutable spoke;
+
+  // @inheritdoc IFeeAdapter
+  address public immutable xerc20Module;
 
   /// @inheritdoc IFeeAdapter
   address public feeRecipient;
@@ -37,8 +40,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
   /// Constructor ////
   ////////////////////
-  constructor(address _spoke, address _feeRecipient, address _owner) Ownable(_owner) {
+  constructor(address _spoke, address _feeRecipient, address _xerc20Module, address _owner) Ownable(_owner) {
     spoke = IEverclearSpoke(_spoke);
+    xerc20Module = _xerc20Module;
     _updateFeeRecipient(_feeRecipient);
   }
 
@@ -49,6 +53,12 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   /// @inheritdoc IFeeAdapter
   function updateFeeRecipient(address _feeRecipient) external onlyOwner {
     _updateFeeRecipient(_feeRecipient);
+  }
+
+  /// @inheritdoc IFeeAdapter
+  function returnUnsupportedIntent(address _asset, uint256 _amount, address _recipient) external onlyOwner {
+    spoke.withdraw(_asset, _amount);
+    _pushTokens(_recipient, _asset, _amount);
   }
 
   ////////////////////
@@ -129,6 +139,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     // Approve the spoke contract if needed
     _approveSpokeIfNeeded(_params.inputAsset, _params.amount);
 
+    // Initialising array length
+    _intentIds = new bytes32[](_numIntents);
+
     // Create `_numIntents` intents with the same params and `_amount` divided
     // equally across all created intents.
     uint256 _toSend = _params.amount / _numIntents;
@@ -182,7 +195,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
       // Get the sum of the order amounts
       uint256 _orderSum;
-      for (uint i; i < _numIntents - 1; i++) {
+      for (uint i; i < _numIntents; i++) {
         _orderSum += _params[i].amount;
         if (_params[i].inputAsset != _asset) {
           revert MultipleOrderAssets();
@@ -199,7 +212,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
       _handleFees(_fee, msg.value, _asset);
     }
 
-    for (uint i; i < _numIntents - 1; i++) {
+    // Initialising array length
+    _intentIds = new bytes32[](_numIntents);
+    for (uint i; i < _numIntents; i++) {
       // Create new intent
       (bytes32 _intentId, ) = spoke.newIntent(
         _params[i].destinations,
@@ -306,20 +321,26 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @param _minimum Minimum required approval budget.
    */
   function _approveSpokeIfNeeded(address _asset, uint256 _minimum) internal {
+    // Checking if the strategy is default or not
+    address spender;
+    IEverclear.Strategy _strategy = spoke.strategies(_asset);
+    if(_strategy == IEverclear.Strategy.DEFAULT) spender = address(spoke);
+    else spender = xerc20Module;
+
     // Approve the spoke contract if needed
     IERC20 _token = IERC20(_asset);
-    uint256 _current = _token.allowance(address(this), address(spoke));
+    uint256 _current = _token.allowance(address(this), spender);
     if (_current >= _minimum) {
       return;
     }
 
     // Approve to 0
     if (_current != 0) {
-      _token.safeDecreaseAllowance(address(spoke), _current);
+      _token.safeDecreaseAllowance(spender, _current);
     }
 
     // Approve to max
-    _token.safeIncreaseAllowance(address(spoke), type(uint256).max);
+    _token.safeIncreaseAllowance(spender, type(uint256).max);
   }
 
   /**
