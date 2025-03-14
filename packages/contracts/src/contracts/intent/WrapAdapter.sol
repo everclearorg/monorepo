@@ -116,7 +116,7 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
                        EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
     /// @inheritdoc IWrapAdapter
-    function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _wrapAsset) external payable {
+    function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _wrapAsset, bool _shouldUnwrap) external payable returns (bytes32 _intentId) {
         if(_intent.amount == 0) revert Invalid_Input_Amount();
         if(_intent.outputAsset == bytes32(0)) revert Invalid_Output_Asset();
 
@@ -142,11 +142,12 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
         }
 
         // Executing the new intent on the Spoke
-        everclearSpoke.newIntent(_intent.destinations, _intent.receiver.toAddress(), _intent.inputAsset.toAddress(), _intent.outputAsset.toAddress(), _intent.amount, _intent.maxFee, _intent.ttl, _intent.data);
+        (_intentId, ) = everclearSpoke.newIntent(_intent.destinations, _intent.receiver.toAddress(), _intent.inputAsset.toAddress(), _intent.outputAsset.toAddress(), _intent.amount, _intent.maxFee, _intent.ttl, _intent.data);
+        if(_shouldUnwrap) emit UnwrapOpened(_intentId, _intent, msg.sender);
     }
 
     /// @inheritdoc IWrapAdapter
-    function sendUnwrapIntent(IEverclear.Intent memory _intent) external {
+    function sendUnwrapIntent(IEverclear.Intent memory _intent) external returns(bytes32 _intentId) {
         if(_intent.amount == 0) revert Invalid_Input_Amount();
         if(_intent.outputAsset == bytes32(0)) revert Invalid_Output_Asset();
 
@@ -159,10 +160,9 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
         _asset.approve(address(everclearSpoke), _intent.amount);
 
         // Executing the new intent on the Spoke
-        everclearSpoke.newIntent(_intent.destinations, _intent.receiver.toAddress(), _intent.inputAsset.toAddress(), _intent.outputAsset.toAddress(), _intent.amount, _intent.maxFee, _intent.ttl, _intent.data);
+        (_intentId, ) = everclearSpoke.newIntent(_intent.destinations, _intent.receiver.toAddress(), _intent.inputAsset.toAddress(), _intent.outputAsset.toAddress(), _intent.amount, _intent.maxFee, _intent.ttl, _intent.data);
 
         // Emitting an unwrap event with the intent info and Id
-        bytes32 _intentId = keccak256(abi.encode(_intent));
         emit UnwrapOpened(_intentId, _intent, msg.sender);
     }
 

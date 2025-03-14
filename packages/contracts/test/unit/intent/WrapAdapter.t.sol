@@ -763,6 +763,8 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
   using TypeCasts for address;
   using TypeCasts for bytes32;
 
+  event UnwrapOpened(bytes32 _intentId, IEverclear.Intent _intent, address _sender);
+
   /**
    * @notice Test that the wrap XERC20 call works
    * @param _intent The intent being forward to EverclearSpoke
@@ -797,7 +799,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
     // Sending the wrap transaction
     vm.startPrank(_caller);
     IERC20(_nativeToken.toAddress()).approve(address(wrapAdapter), _intent.amount);
-    wrapAdapter.wrapAndSendIntent(_intent, IERC20(_nativeToken.toAddress()));
+    wrapAdapter.wrapAndSendIntent(_intent, IERC20(_nativeToken.toAddress()), false);
     vm.stopPrank();
 
     // Checking balance state - no funds transferred as mocked i.e. XERC20 balance will be in wrapAdapter
@@ -833,7 +835,96 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
 
     // Sending the wrap transaction
     vm.startPrank(_caller);
-    wrapAdapter.wrapAndSendIntent{ value: _intent.amount }(_intent, IERC20(address(0)));
+    wrapAdapter.wrapAndSendIntent{ value: _intent.amount }(_intent, IERC20(address(0)), false);
+    vm.stopPrank();
+  }
+
+   /**
+   * @notice Test that the wrap XERC20 call works
+   * @param _intent The intent being forward to EverclearSpoke
+   * @param _caller The caller of the function
+   */
+  function test_wrapAndSendIntent_UnwrapOpenedEmitted_XERC20Success(IEverclear.Intent memory _intent, address _caller) public {
+    vm.assume(_intent.amount > 0);
+    vm.assume(_intent.amount < type(uint256).max / 2);
+    vm.assume(_caller != address(0));
+    vm.assume(_intent.outputAsset != bytes32(0));
+
+    // Deploy and deal XERC20 to be unwrapped
+    (bytes32 _nativeToken, bytes32 _xerc20token) = deployAndDealXERC20Native(
+      address(wrapAdapter),
+      _caller.toBytes32(),
+      _intent.amount
+    );
+    _intent.inputAsset = _xerc20token;
+
+    // Fetching the balances for the caller
+    assertEq(IERC20(_nativeToken.toAddress()).balanceOf(_caller), _intent.amount);
+    assertEq(IERC20(_xerc20token.toAddress()).balanceOf(_caller), 0);
+    uint256 _xerc20Balance = IERC20(_xerc20token.toAddress()).balanceOf(address(wrapAdapter));
+
+    // Construct valid calldata
+    bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _caller);
+    _intent.data = abi.encode(address(wrapAdapter), _adapterCallbackCalldata);
+
+    // Mocking the call to the newIntent function
+    mockNewIntent(_intent);
+
+    // Sending the wrap transaction
+    vm.startPrank(_caller);
+    IERC20(_nativeToken.toAddress()).approve(address(wrapAdapter), _intent.amount);
+
+    // Expecting emit as being set to true
+    bytes32 _intentId = keccak256(abi.encode(_intent));
+    vm.expectEmit(true, true, true, true);
+    emit UnwrapOpened(_intentId, _intent, _caller);
+
+    // Sending the intent
+    wrapAdapter.wrapAndSendIntent(_intent, IERC20(_nativeToken.toAddress()), true);
+    vm.stopPrank();
+
+    // Checking balance state - no funds transferred as mocked i.e. XERC20 balance will be in wrapAdapter
+    assertEq(IERC20(_nativeToken.toAddress()).balanceOf(address(wrapAdapter)), 0);
+    assertEq(IERC20(_xerc20token.toAddress()).balanceOf(address(wrapAdapter)), _xerc20Balance + _intent.amount);
+  }
+
+  /**
+   * @notice Test that the wrap ETH call works
+   * @param _intent The intent being forward to EverclearSpoke
+   * @param _caller The caller of the function
+   */
+  function test_wrapAndSendIntent_UnwrapOpenedEventEmitted_ETHSuccess(
+    IEverclear.Intent memory _intent,
+    address _caller
+  ) public {
+    vm.assume(_intent.amount > 0);
+    vm.assume(_caller != address(0));
+    vm.assume(_intent.outputAsset != bytes32(0));
+
+    // WETH info
+    _intent.inputAsset = WETH.toBytes32();
+
+    // Construct valid calldata
+    bytes memory _adapterCallbackCalldata = abi.encodeWithSelector(WrapAdapter.adapterCallback.selector, _caller);
+    _intent.data = abi.encode(address(wrapAdapter), _adapterCallbackCalldata);
+
+    // Fetching the balances for the caller
+    deal(_caller, _intent.amount);
+    assertEq(_caller.balance, _intent.amount);
+
+    // Mocking the call to the newIntent function
+    mockWETHDeposit(_intent.amount);
+    mockWETHApprove(address(wrapAdapter.everclearSpoke()), _intent.amount);
+    mockNewIntent(_intent);
+
+    // Expecting emit as being set to true
+    bytes32 _intentId = keccak256(abi.encode(_intent));
+    vm.expectEmit(true, true, true, true);
+    emit UnwrapOpened(_intentId, _intent, _caller);
+
+    // Sending the wrap transaction
+    vm.startPrank(_caller);
+    wrapAdapter.wrapAndSendIntent{ value: _intent.amount }(_intent, IERC20(address(0)), true);
     vm.stopPrank();
   }
 
@@ -851,7 +942,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
     _intent.amount = 0;
 
     vm.expectRevert(IWrapAdapter.Invalid_Input_Amount.selector);
-    wrapAdapter.wrapAndSendIntent(_intent, _assetToWrap);
+    wrapAdapter.wrapAndSendIntent(_intent, _assetToWrap, false);
   }
 
   function test_Revert_wrapAndSentIntent_InvalidOutputAsset(
@@ -864,7 +955,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
     _intent.outputAsset = bytes32(0);
 
     vm.expectRevert(IWrapAdapter.Invalid_Output_Asset.selector);
-    wrapAdapter.wrapAndSendIntent(_intent, _assetToWrap);
+    wrapAdapter.wrapAndSendIntent(_intent, _assetToWrap, false);
   }
 
   function test_Revert_wrapAndSendIntent_InvalidLockbox(IEverclear.Intent memory _intent, address _caller) public {
@@ -884,7 +975,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
     // Sending the wrap transaction - using an invalid native token to cause revert
     vm.startPrank(_caller);
     vm.expectRevert(IWrapAdapter.Invalid_Lockbox.selector);
-    wrapAdapter.wrapAndSendIntent(_intent, IERC20(address(0x123)));
+    wrapAdapter.wrapAndSendIntent(_intent, IERC20(address(0x123)), false);
   }
 
   function test_Revert_wrapAndSendIntent_InvalidMsgValue(IEverclear.Intent memory _intent, address _caller) public {
@@ -902,7 +993,7 @@ contract Unit_WrapAdapter_WrapAndSendIntent is BaseTest {
     // Sending the wrap transaction
     vm.startPrank(_caller);
     vm.expectRevert(IWrapAdapter.Invalid_Msg_Value.selector);
-    wrapAdapter.wrapAndSendIntent{ value: 0 }(_intent, IERC20(address(0)));
+    wrapAdapter.wrapAndSendIntent{ value: 0 }(_intent, IERC20(address(0)), false);
     vm.stopPrank();
   }
 }

@@ -167,14 +167,14 @@ interface IWrapAdapter {
     * @param _intent The intent to send to newIntent
     * @param _assetToWrap The asset to wrap
      */
-    function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _assetToWrap) external payable;
+    function wrapAndSendIntent(IEverclear.Intent calldata _intent, IERC20 _assetToWrap, bool _shouldUnwrap) external payable returns (bytes32 _intentId);
 
     /**
     * @notice Sends an unwrap intent to the spoke
     * @dev Checks calldata is valid and emits UnwrapOpened event
     * @param _intent The intent to send to newIntent
      */
-    function sendUnwrapIntent(IEverclear.Intent calldata _intent) external;
+    function sendUnwrapIntent(IEverclear.Intent calldata _intent) external returns (bytes32 _intentId);
 
     /**
     * @notice Callback function used by EverclearSpoke
