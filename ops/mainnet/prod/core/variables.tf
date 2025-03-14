@@ -85,6 +85,12 @@ variable "gelato_api_key" {
   type      = string
   sensitive = true
 }
+
+variable "gelato_everclear_rpc_key" {
+  type      = string
+  sensitive = true
+}
+
 variable "discord_webhook_token" {
   type      = string
   sensitive = true
