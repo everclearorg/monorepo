@@ -11,6 +11,7 @@ import {IXERC20Lockbox} from '../../interfaces/intent/IXERC20Lockbox.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {IWrapAdapter} from '../../interfaces/intent/IWrapAdapter.sol';
+import {ECDSA} from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 contract WrapAdapter is IWrapAdapter, Ownable2Step {
     using SafeERC20 for IERC20;
@@ -18,12 +19,20 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
     
     IWETH public immutable WETH;
     IEverclearSpoke public everclearSpoke;
+    uint256 public active;
 
     mapping(bytes32 => bool) public manuallyProcessed;
+    mapping(address => bool) public approvedRelayer;
 
     modifier onlySpoke() {
         if(msg.sender != address(everclearSpoke)) revert Invalid_Spoke_Caller(msg.sender);
         _;
+    }
+
+    modifier setAsActive() {
+        active = 1;
+        _;
+        delete active;
     }
 
     constructor(address _weth, address _spoke, address _owner) Ownable(_owner) {
@@ -45,25 +54,37 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
         emit SpokeUpdated(_oldSpoke, _newSpoke);
     }
 
+    function updateRelayer(address[] memory _relayer, bool[] calldata _approved) external onlyOwner {
+        for(uint256 i; i < _relayer.length; i++) {
+            approvedRelayer[_relayer[i]] = _approved[i];
+        }
+        emit RelayersUpdated(_relayer, _approved);
+    }
+
     /// @inheritdoc IWrapAdapter
-    function batchUnwrapIntent(IEverclear.Intent[] calldata _intents, uint256[] calldata _amountsOut) external onlyOwner {
+    function batchUnwrapIntent(IEverclear.Intent[] calldata _intents, uint256[] calldata _amountsOut, bytes[] calldata _signature) setAsActive external {
         if(_intents.length != _amountsOut.length) revert Invalid_Array_Length();
+        if(_intents.length != _signature.length) revert Invalid_Array_Length();
 
         for(uint256 i = 0; i < _intents.length; i++) {
-            _unwrapIntent(_intents[i], _amountsOut[i]);
+            _unwrapIntent(_intents[i], _amountsOut[i], _signature[i]);
         }
     }
 
     /// @inheritdoc IWrapAdapter
-    function unwrapIntent(IEverclear.Intent calldata _intent, uint256 _amountOut) external onlyOwner {
-        _unwrapIntent(_intent, _amountOut);
+    function unwrapIntent(IEverclear.Intent calldata _intent, uint256 _amountOut, bytes calldata _signature) setAsActive external {
+        _unwrapIntent(_intent, _amountOut, _signature);
     }
 
     /// @inheritdoc IWrapAdapter
-    function unwrapInvalidIntent(IEverclear.Intent calldata _intent, uint256 _amountOut, address _receiver) external onlyOwner {        
+    function unwrapInvalidIntent(IEverclear.Intent calldata _intent, uint256 _amountOut, address _receiver, bytes calldata _signature) external {        
         // Updating state and configure variables used
         address _outputAsset = _intent.outputAsset.toAddress();
         bytes32 _intentId = keccak256(abi.encode(_intent));
+
+        // Checking the signature - replay protected due to the manuallyProcessed mapping check
+        address _signer = ECDSA.recover(_intentId, _signature);
+        if(!approvedRelayer[_signer]) revert Invalid_Relayer(_signer);
 
         // Checking if already processed
         if(manuallyProcessed[_intentId]) revert Invalid_Already_Processed();
@@ -87,7 +108,9 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
     }
 
     /// @inheritdoc IWrapAdapter
-    function adapterCallback(bytes memory) external view onlySpoke {}
+    function adapterCallback(bytes memory) external view onlySpoke {
+        if(active == 0) revert Invalid_Activity();
+    }
 
     /*///////////////////////////////////////////////////////////////
                        EXTERNAL FUNCTIONS
@@ -140,7 +163,7 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
 
         // Emitting an unwrap event with the intent info and Id
         bytes32 _intentId = keccak256(abi.encode(_intent));
-        emit UnwrapOpened(_intentId, _intent);
+        emit UnwrapOpened(_intentId, _intent, msg.sender);
     }
 
     /// @inheritdoc IWrapAdapter
@@ -157,7 +180,12 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
     * @param _intent The intent to unwrap
     * @param _amountOut The amount of output asset to send to the unwrap receiver
     */
-    function _unwrapIntent(IEverclear.Intent calldata _intent, uint256 _amountOut) internal {
+    function _unwrapIntent(IEverclear.Intent calldata _intent, uint256 _amountOut, bytes calldata _signature) internal {
+        // Checking the signature - replay protected due to the executeIntentCalldata status check
+        bytes32 _intentId = keccak256(abi.encode(_intent));
+        address _signer = ECDSA.recover(_intentId, _signature);
+        if(!approvedRelayer[_signer]) revert Invalid_Relayer(_signer);
+
         // Updating state and configure variables used
         address _outputAsset = _intent.outputAsset.toAddress();
 
@@ -174,7 +202,6 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
         everclearSpoke.executeIntentCalldata(_intent);
 
         // Unwrapping and emitting
-        bytes32 _intentId = keccak256(abi.encode(_intent));
         _unwrap(_outputAsset, _amountOut, _unwrapReceiver, _intentId);
     }
 
@@ -202,7 +229,7 @@ contract WrapAdapter is IWrapAdapter, Ownable2Step {
             if(!success) revert Transfer_ETH_Failure();
         }
 
-        emit UnwrapClosed(_intentId, _outputAsset, _amountOut);
+        emit UnwrapClosed(_intentId, _outputAsset, _amountOut, _unwrapReceiver);
     }
 
     /**

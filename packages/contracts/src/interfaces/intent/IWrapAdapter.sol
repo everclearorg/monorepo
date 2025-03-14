@@ -17,19 +17,28 @@ interface IWrapAdapter {
     event SpokeUpdated(address _oldSpoke, address _newSpoke);
 
     /**
+    * @notice Emitted when relayers are updated
+    * @param _relayers The list of relayers being updated
+    * @param _status The status of the relayers
+     */
+    event RelayersUpdated(address[] _relayers, bool[] _status);
+
+    /**
     * @notice Emitted when an intent that needs to be unwrapped is opened i.e. via sendUnwrapIntent
     * @param _intentId The ID of the intent
     * @param _intent The intent that was opened
+    * @param _sender The address that sent the intent
      */
-    event UnwrapOpened(bytes32 _intentId, IEverclear.Intent _intent);
+    event UnwrapOpened(bytes32 _intentId, IEverclear.Intent _intent, address _sender);
 
     /**
     * @notice Emitted when an intent is unwrapped
     * @param _intentId The ID of the intent
     * @param _outputAsset The output asset
     * @param _amountOut The amount of output asset
+    * @param _receiver The address to send the output asset to
      */
-    event UnwrapClosed(bytes32 _intentId, address _outputAsset, uint256 _amountOut);
+    event UnwrapClosed(bytes32 _intentId, address _outputAsset, uint256 _amountOut, address _receiver);
 
     /*///////////////////////////////////////////////////////////////
                                 ERRORS
@@ -105,6 +114,11 @@ interface IWrapAdapter {
     error Invalid_Array_Length();
 
     /**
+    * @notice Thrown when the callback is called but active is zer
+     */
+     error Invalid_Activity();
+
+    /**
     * @notice Thrown when adapterCallback receives call from address that is not the configured spoke
      */
     error Invalid_Spoke_Caller(address _sender);
@@ -118,6 +132,11 @@ interface IWrapAdapter {
     * @notice Thrown when the address in the calldata is not the WrapAdapter
      */
     error Invalid_Callback(address _callback);
+
+    /**
+    *@notice Thrown when the signer recovered is not an approved relayer
+     */
+     error Invalid_Relayer(address _invalidSigner);
 
     /*///////////////////////////////////////////////////////////////
                               FUNCTIONS
@@ -133,14 +152,14 @@ interface IWrapAdapter {
     * @param _intents Array of intents
     * @param _amountsOut Array of amounts to send to the receiver
      */
-    function batchUnwrapIntent(IEverclear.Intent[] calldata _intents, uint256[] calldata _amountsOut) external;
+    function batchUnwrapIntent(IEverclear.Intent[] calldata _intents, uint256[] calldata _amountsOut, bytes[] calldata _signature) external;
 
     /**
     * @notice Unwrap an intent and send the output asset to the receiver
     * @param _intent The intent to unwrap
     * @param _amountOut The amount of output asset to send to the receiver
      */
-    function unwrapIntent(IEverclear.Intent calldata _intent, uint256 _amountOut) external;
+    function unwrapIntent(IEverclear.Intent calldata _intent, uint256 _amountOut, bytes calldata _signature) external;
 
     /**
     * @notice Wraps an intent and calls newIntent on the spoke
@@ -172,7 +191,7 @@ interface IWrapAdapter {
     * @param _amount The amount of input asset to send to the receiver
     * @param _receiver The address to send the output asset to
      */
-    function unwrapInvalidIntent(IEverclear.Intent calldata _intent, uint256 _amount, address _receiver) external;
+    function unwrapInvalidIntent(IEverclear.Intent calldata _intent, uint256 _amount, address _receiver, bytes calldata _signature) external;
 
     /**
     * @notice Validates the calldata in the intent
