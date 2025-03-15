@@ -38,6 +38,12 @@ locals {
       depositors  = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_depositors_heartbeat}"
       monitor     = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_monitor_heartbeat}"
     }
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
+    }
     chains = {
       "1" = {
         providers = [
