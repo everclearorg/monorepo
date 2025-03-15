@@ -164,7 +164,14 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     (x) => +x,
   );
 
-  const hubConfig = configJson.hub || configFile.hub || everclearConfig?.hub || {};
+  const hubConfig = {
+    domain: configJson?.hub?.domain || configFile?.hub?.domain || everclearConfig?.hub.domain,
+    providers: configJson?.hub?.providers || configFile?.hub?.providers || everclearConfig?.hub.providers,
+    deployments: configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments,
+    subgraphUrls:
+      configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [],
+    confirmations: configJson?.hub?.confirmations || configFile?.hub?.confirmations,
+  };
   const abiConfig =
     configJson.abis || configFile.abis || everclearConfig?.abis || getDefaultABIConfig(environment, hubConfig.domain);
 
