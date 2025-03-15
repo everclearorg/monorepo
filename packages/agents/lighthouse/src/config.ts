@@ -171,6 +171,7 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     subgraphUrls:
       configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [],
     confirmations: configJson?.hub?.confirmations || configFile?.hub?.confirmations,
+    assets: configJson?.hub?.assets || configFile?.hub?.assets || everclearConfig?.hub.assets,
   };
   const abiConfig =
     configJson.abis || configFile.abis || everclearConfig?.abis || getDefaultABIConfig(environment, hubConfig.domain);
