@@ -127,6 +127,7 @@ contract DeploySpokeBase is Script, ScriptUtils {
         // }
 
         // // deploy message receiver
+        // address messageReceiverAddr = address(new SpokeMessageReceiver());
         // _messageReceiver = new SpokeMessageReceiver();
         // if (address(_messageReceiver) != address(_params.messageReceiver)) {
         //     revert MessageReceiverAddressMismatch();
@@ -138,6 +139,7 @@ contract DeploySpokeBase is Script, ScriptUtils {
         console.log("Everclear Spoke:", address(_spoke));
         console.log("Spoke Gateway:", address(_gateway));
         // console.log("Message Receiver:", address(_messageReceiver));
+        // console.log("Message Receiver:", address(messageReceiverAddr));
         // NOTE: Not querying as the ISM is not set
         // console.log(
         //     "ISM:", address(ISpecifiesInterchainSecurityModule(address(_spoke.gateway())).interchainSecurityModule())

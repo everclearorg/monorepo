@@ -20,6 +20,7 @@ broadcast/*/*/*
 
 # Out dir
 out
+zk/out
 zk/out-zk
 zk/zkout
 
