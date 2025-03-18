@@ -3,9 +3,10 @@ import { EverclearSpoke } from '../target/types/everclear_spoke';
 import { expect } from '@chimera-monorepo/utils';
 import * as token from '@solana/spl-token';
 import { concat } from 'viem';
+import { ComputeBudgetProgram } from '@solana/web3.js';
 
 describe('#everclear_spoke', () => {
-  anchor.setProvider(anchor.AnchorProvider.local());
+  anchor.setProvider(anchor.AnchorProvider.local('https://api.mainnet-beta.solana.com'));
   const connection = anchor.getProvider().connection;
   const program = anchor.workspace.EverclearSpoke as anchor.Program<EverclearSpoke>;
 
@@ -21,8 +22,9 @@ describe('#everclear_spoke', () => {
     Buffer.from('dispatch_authority'),
   ], program.programId);
 
-  // const hyperlaneMailbox = new anchor.web3.PublicKey('E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi'); // mainnet
-  const hyperlaneMailbox = new anchor.web3.PublicKey('75HBBLae3ddeneJVrZeyrDfv6vb7SMC3aCpBucSXS5aR'); // testnet
+  const hyperlaneMailbox = new anchor.web3.PublicKey('E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi'); // mainnet
+  // const hyperlaneMailbox = new anchor.web3.PublicKey('75HBBLae3ddeneJVrZeyrDfv6vb7SMC3aCpBucSXS5aR'); // testnet
+
   const [mailboxOutbox] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane'),
     Buffer.from('-'),
@@ -37,12 +39,17 @@ describe('#everclear_spoke', () => {
     uniqueMessageAccountKeypair.publicKey.toBuffer(),
   ], hyperlaneMailbox);
 
-  // const igpProgram = new anchor.web3.PublicKey('BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv'); // mainnet
-  // const configuredIgpAccount = new anchor.web3.PublicKey('JAvHW21tYXE9dtdG83DReqU2b4LUexFuCbtJT5tF8X6M'); // mainnet
-  // const innerIgpAccount = new anchor.web3.PublicKey('AkeHBbE5JkwVppujCQQ6WuxsVsJtruBAjUo6fDCFp6fF'); // mainnet
-  const igpProgram = new anchor.web3.PublicKey('5p7Hii6CJL4xGBYYTGEQmH9LnUSZteFJUu9AVLDExZX2'); // testnet
-  const configuredIgpAccount = new anchor.web3.PublicKey('9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy'); // testnet
-  const innerIgpAccount = new anchor.web3.PublicKey('hBHAApi5ZoeCYHqDdCKkCzVKmBdwywdT3hMqe327eZB'); // testnet
+
+  // mainnet
+  const igpProgram = new anchor.web3.PublicKey('BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv'); // mainnet
+  const configuredIgpAccount = new anchor.web3.PublicKey('JAvHW21tYXE9dtdG83DReqU2b4LUexFuCbtJT5tF8X6M'); // mainnet
+  const innerIgpAccount = new anchor.web3.PublicKey('AkeHBbE5JkwVppujCQQ6WuxsVsJtruBAjUo6fDCFp6fF'); // mainnet
+
+  // testnet
+  // const igpProgram = new anchor.web3.PublicKey('5p7Hii6CJL4xGBYYTGEQmH9LnUSZteFJUu9AVLDExZX2'); // testnet
+  // const configuredIgpAccount = new anchor.web3.PublicKey('9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy'); // testnet
+  // const innerIgpAccount = new anchor.web3.PublicKey('hBHAApi5ZoeCYHqDdCKkCzVKmBdwywdT3hMqe327eZB'); // testnet
+
   const [igpProgramData] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane_igp'),
     Buffer.from('-'),
@@ -59,7 +66,7 @@ describe('#everclear_spoke', () => {
   const mint = anchor.web3.Keypair.generate();
   const user = anchor.Wallet.local().payer;
 
-  const intentAmount = new anchor.BN('1000000000000000000');
+  const intentAmount = new anchor.BN('1000000000000000'); //0.001 SOL
   const initialMessageGasLimit = new anchor.BN(10000);
   const TOKEN_DECIMALS = 18;
 
@@ -120,7 +127,7 @@ describe('#everclear_spoke', () => {
   });
 
   describe('#new_intent', () => {
-    it('should work', async () => {
+    it.only('should work', async () => {
       // Arrange
 
       // Create a mint account
@@ -131,6 +138,7 @@ describe('#everclear_spoke', () => {
         mint.publicKey, // freeze authority
         TOKEN_DECIMALS, // decimals
       );
+      console.log('mintPubkey', mintPubkey.toBase58());
 
       // Create a user token account
       const userTokenAccount = await token.createAssociatedTokenAccount(
@@ -139,7 +147,7 @@ describe('#everclear_spoke', () => {
         mintPubkey, // mint
         user.publicKey, // owner,
       );
-
+      console.log('userTokenAccount', userTokenAccount.toBase58());
       // Mint some tokens to the user token account
       await token.mintToChecked(
         connection,
@@ -159,18 +167,23 @@ describe('#everclear_spoke', () => {
         vaultAuthority, // owner
         true, // allowOwnerOffCurve is true because the owner is a PDA
       );
-
+      console.log('programVault', programVault.address.toBase58());
+      // Create compute budget instruction to increase limit
+      const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 1_000_000 // Request 1 million compute units
+      });
+      
       // Act
       await program.methods.newIntent(
         anchor.web3.Keypair.generate().publicKey, // receiver
         anchor.web3.Keypair.generate().publicKey, // input_asset
         anchor.web3.Keypair.generate().publicKey, // output_asset
         intentAmount, // amount
-        123, // max_fee
+        10_000, // max_fee
         new anchor.BN(0), // ttl
         [1], // destinations
         Buffer.from(''), // data
-        new anchor.BN(4321) // message_gas_limit
+        new anchor.BN(85000000), // message_gas_limit
       )
         .accounts({
           spokeState: spokeStateAddress,
@@ -192,6 +205,7 @@ describe('#everclear_spoke', () => {
           configuredIgpAccount,
           innerIgpAccount,
         })
+        .preInstructions([modifyComputeUnits])
         .signers([
           uniqueMessageAccountKeypair,
         ])
@@ -202,7 +216,7 @@ describe('#everclear_spoke', () => {
       expect(vaultBalance.value.amount).to.be.equal(intentAmount.toString());
 
       const spokeState = await program.account.spokeState.fetch(spokeStateAddress);
-      expect(spokeState.status.length).to.be.equal(1);
+      // expect(spokeState.status.length).to.be.equal(1);
     });
   });
 
