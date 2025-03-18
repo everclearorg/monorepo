@@ -4,19 +4,6 @@ use crate::error::SpokeError;
 
 use crate::intent::EVMIntent;
 
-pub(crate) fn vault_authority_seeds(
-    program_id: &Pubkey,
-    mint_pubkey: &Pubkey,
-    bump: u8,
-) -> [Vec<u8>; 4] {
-    [
-        b"vault".to_vec(),
-        mint_pubkey.to_bytes().to_vec(),
-        program_id.to_bytes().to_vec(),
-        vec![bump],
-    ]
-}
-
 pub(crate) fn normalize_decimals(
     amount: u64,
     minted_decimals: u8,

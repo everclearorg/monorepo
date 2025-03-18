@@ -2,6 +2,7 @@ import * as anchor from '@coral-xyz/anchor';
 import { EverclearSpoke } from '../target/types/everclear_spoke';
 import { expect } from '@chimera-monorepo/utils';
 import * as token from '@solana/spl-token';
+import { concat } from 'viem';
 
 describe('#everclear_spoke', () => {
   anchor.setProvider(anchor.AnchorProvider.local());
@@ -10,6 +11,9 @@ describe('#everclear_spoke', () => {
 
   const [spokeStateAddress] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('spoke-state'),
+  ], program.programId);
+  const [vaultAuthority, vaultAuthorityBump] = anchor.web3.PublicKey.findProgramAddressSync([
+    Buffer.from('vault'),
   ], program.programId);
   const [dispatchAuthority, mailboxDispatchAuthorityBump] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane_dispatcher'),
@@ -53,7 +57,6 @@ describe('#everclear_spoke', () => {
   ], igpProgram);
 
   const mint = anchor.web3.Keypair.generate();
-  const vault = anchor.web3.Keypair.generate();
   const user = anchor.Wallet.local().payer;
 
   const intentAmount = new anchor.BN('1000000000000000000');
@@ -64,6 +67,10 @@ describe('#everclear_spoke', () => {
 
   const lighthouseKeyPair = anchor.web3.Keypair.generate();
   const watchtowerKeyPair = anchor.web3.Keypair.generate();
+
+  const toBytes32 = (value: number | anchor.BN) => {
+    return new anchor.BN(value).toArray('be', 32)
+  }
 
   describe('#initialize', () => {
     it('should work', async () => {
@@ -85,6 +92,7 @@ describe('#everclear_spoke', () => {
           },
         },
         mailboxDispatchAuthorityBump,
+        vaultAuthorityBump,
       };
 
       // Act
@@ -144,11 +152,12 @@ describe('#everclear_spoke', () => {
       );
 
       // Create a program vault account
-      const programVaultAccount = await token.createAssociatedTokenAccount(
+      const programVault = await token.getOrCreateAssociatedTokenAccount(
         connection,
         user, // fee payer
         mintPubkey, // mint
-        vault.publicKey, // owner,
+        vaultAuthority, // owner
+        true, // allowOwnerOffCurve is true because the owner is a PDA
       );
 
       // Act
@@ -164,12 +173,11 @@ describe('#everclear_spoke', () => {
         new anchor.BN(4321) // message_gas_limit
       )
         .accounts({
-          igpProgram,
           spokeState: spokeStateAddress,
           authority: user.publicKey,
           mint: mintPubkey,
           userTokenAccount,
-          programVaultAccount,
+          programVaultAccount: programVault.address,
           tokenProgram: token.TOKEN_PROGRAM_ID,
           hyperlaneMailbox,
           systemProgram: anchor.web3.SystemProgram.programId,
@@ -178,6 +186,7 @@ describe('#everclear_spoke', () => {
           dispatchAuthority,
           uniqueMessageAccount: uniqueMessageAccountKeypair.publicKey,
           dispatchedMessagePda,
+          igpProgram,
           igpProgramData,
           igpPaymentPda,
           configuredIgpAccount,
@@ -189,11 +198,118 @@ describe('#everclear_spoke', () => {
         .rpc();
 
       // Assert
-      const vaultBalance = await connection.getTokenAccountBalance(programVaultAccount);
+      const vaultBalance = await connection.getTokenAccountBalance(programVault.address);
       expect(vaultBalance.value.amount).to.be.equal(intentAmount.toString());
 
       const spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.status.length).to.be.equal(1);
+    });
+  });
+
+  describe('#handle', () => {
+    it('should work', async () => {
+      // Arrange
+
+      // Create a mint account
+      const mintPubkey = await token.createMint(
+        connection,
+        user, // fee payer
+        mint.publicKey, // mint authority
+        mint.publicKey, // freeze authority
+        TOKEN_DECIMALS, // decimals
+      );
+
+      // Create a user token account
+      const userTokenAccount = await token.createAssociatedTokenAccount(
+        connection,
+        user, // fee payer
+        mintPubkey, // mint
+        user.publicKey, // owner,
+      );
+
+      // Create a program vault account
+      const programVault = await token.getOrCreateAssociatedTokenAccount(
+        connection,
+        user, // fee payer
+        mintPubkey, // mint
+        vaultAuthority, // owner
+        true, // allowOwnerOffCurve is true because the owner is a PDA
+      );
+
+      // Mint some tokens to the user token account
+      await token.mintToChecked(
+        connection,
+        user, // fee payer
+        mintPubkey, // mint
+        programVault.address, // receiver (should be a token account)
+        mint, // mint authority
+        5e18, // amount
+        TOKEN_DECIMALS, // decimals
+      );
+
+      const type = toBytes32(2); // Settlement
+      const ignored = toBytes32(0);
+      const size = toBytes32(1);
+      const header = concat([
+        type,
+        ignored,
+        ignored,
+        ignored,
+        size,
+      ]);
+
+      const intentAmount = new anchor.BN(5e18.toString());
+
+      const intentId = toBytes32(4);
+      const amount = toBytes32(intentAmount);
+      const asset = mintPubkey.toBuffer();
+      const recipient = user.publicKey.toBuffer();
+      const updateVirtualBalance = toBytes32(0);
+      const intent = concat([
+        intentId,
+        amount,
+        asset,
+        recipient,
+        updateVirtualBalance,
+      ]);
+
+      const handleIx = {
+        origin: 25327,
+        sender: { 0: [
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 229, 242, 244, 175, 173, 98, 17, 207, 189, 106, 136, 45,
+          90, 106, 67, 85, 48, 238, 57, 9,
+        ]},
+        message: Buffer.from(concat([
+          header,
+          intent,
+        ])),
+      };
+
+      // Act
+      try {
+        await program.methods.handleAsAdmin(
+          handleIx,
+        )
+          .accounts({
+            authority: user.publicKey,
+            spokeState: spokeStateAddress,
+            vaultAuthority,
+            tokenProgram: token.TOKEN_PROGRAM_ID,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          })
+          .remainingAccounts([
+            { pubkey: mintPubkey, isWritable: false, isSigner: false },
+            { pubkey: userTokenAccount, isWritable: true, isSigner: false },
+            { pubkey: programVault.address, isWritable: true, isSigner: false },
+          ])
+          .rpc();
+
+        // Assert
+        const userBalance = await connection.getTokenAccountBalance(userTokenAccount);
+        expect(userBalance.value.amount).to.be.equal(intentAmount.toString());
+      } catch (e) {
+        console.log(e);
+      }
     });
   });
 
@@ -382,6 +498,29 @@ describe('#everclear_spoke', () => {
       // Assert
       spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.mailboxDispatchAuthorityBump).to.be.equal(newBump);
+    });
+  });
+
+  describe('#update_mailbox_dispatch_authority_bump', () => {
+    it('should work', async () => {
+      // Arrange
+      const newBump = 150;
+
+      // Sanity check
+      let spokeState = await program.account.spokeState.fetch(spokeStateAddress);
+      expect(spokeState.vaultAuthorityBump).to.be.equal(vaultAuthorityBump);
+
+      // Act
+      await program.methods.updateVaultAuthorityBump(newBump)
+        .accounts({
+          spokeState: spokeStateAddress,
+          admin: user.publicKey,
+        })
+        .rpc();
+
+      // Assert
+      spokeState = await program.account.spokeState.fetch(spokeStateAddress);
+      expect(spokeState.vaultAuthorityBump).to.be.equal(newBump);
     });
   });
 });

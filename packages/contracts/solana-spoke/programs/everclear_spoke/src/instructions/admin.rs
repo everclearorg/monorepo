@@ -5,6 +5,7 @@ use crate::{
     events::{
         IgpUpdatedEvent, LighthouseUpdatedEvent, MailboxDispatchAuthorityBumpUpdatedEvent,
         MailboxUpdatedEvent, MessageGasLimitUpdatedEvent, WatchtowerUpdatedEvent,
+        VaultAuthorityBumpUpdatedEvent,
     },
     hyperlane::InterchainGasPaymasterType,
 };
@@ -74,5 +75,15 @@ pub fn update_mailbox_dispatch_authority_bump(
     let old_bump: u8 = ctx.accounts.spoke_state.mailbox_dispatch_authority_bump;
     ctx.accounts.spoke_state.mailbox_dispatch_authority_bump = new_bump;
     emit_cpi!(MailboxDispatchAuthorityBumpUpdatedEvent { old_bump, new_bump });
+    Ok(())
+}
+
+pub fn update_vault_authority_bump(
+    ctx: Context<AdminState>,
+    new_bump: u8,
+) -> Result<()> {
+    let old_bump: u8 = ctx.accounts.spoke_state.vault_authority_bump;
+    ctx.accounts.spoke_state.vault_authority_bump = new_bump;
+    emit_cpi!(VaultAuthorityBumpUpdatedEvent { old_bump, new_bump });
     Ok(())
 }

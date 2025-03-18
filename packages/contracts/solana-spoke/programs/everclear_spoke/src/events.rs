@@ -114,3 +114,9 @@ pub struct MailboxDispatchAuthorityBumpUpdatedEvent {
     pub old_bump: u8,
     pub new_bump: u8,
 }
+
+#[event]
+pub struct VaultAuthorityBumpUpdatedEvent {
+    pub old_bump: u8,
+    pub new_bump: u8,
+}

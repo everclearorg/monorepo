@@ -35,6 +35,8 @@ pub struct SpokeState {
     pub igp: Pubkey,
     // IGP Type which either contains igp address (as in `igp`) or the overhead IGP address if the IGP is an overhead IGP
     pub igp_type: InterchainGasPaymasterType,
+    // Bump for vault authority
+    pub vault_authority_bump: u8,
 }
 
 impl SpokeState {
@@ -51,7 +53,9 @@ impl SpokeState {
         + 32                     // mailbox: Pubkey
         + 1                      // mailbox_dispatch_authority_bump: u8
         + 32                     // igp: Pubkey
-        + 33; // igp_type: InterchainGasPaymasterType
+        + 33                     // igp_type: InterchainGasPaymasterType
+        + 1                      // vault_authority_bump: u8
+    ;
 }
 
 #[account]

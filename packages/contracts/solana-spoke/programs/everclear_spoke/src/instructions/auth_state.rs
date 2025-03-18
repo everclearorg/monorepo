@@ -9,16 +9,8 @@ pub struct AuthState<'info> {
     // NOTE: authority will have to be the first account for the usage in receive_message
     #[account(mut)]
     pub authority: Signer<'info>,
-    #[account(
-        init,
-        payer = authority,
-        space = 8 + SpokeState::SIZE,
-        seeds = [b"spoke-state"],
-        bump
-    )]
-    pub spoke_state: Account<'info, SpokeState>,
     #[account(mut)]
-    pub vault_token_account: Account<'info, TokenAccount>,
+    pub spoke_state: Account<'info, SpokeState>,
     /// CHECK: This is a PDA that signs for the vault
     pub vault_authority: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token>,

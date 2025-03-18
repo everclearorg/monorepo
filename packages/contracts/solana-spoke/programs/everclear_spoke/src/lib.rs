@@ -192,4 +192,17 @@ pub mod everclear_spoke {
 
         instructions::update_mailbox_dispatch_authority_bump(ctx, new_bump)
     }
+
+    pub fn update_vault_authority_bump(
+        ctx: Context<AdminState>,
+        new_bump: u8,
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+
+        instructions::update_vault_authority_bump(ctx, new_bump)
+    }
 }

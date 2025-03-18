@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
 use anchor_spl::{
     associated_token::get_associated_token_address,
-    token::{self, Mint, Token, TokenAccount},
+    token::{self, Mint, Token, TokenAccount, ID as TOKEN_PROGRAM_ID},
 };
 
 use crate::{
@@ -10,9 +10,10 @@ use crate::{
     events::{MessageReceivedEvent, SettledEvent},
     hyperlane::{to_serializable_account_meta, SerializableAccountMeta, U256},
     mailbox_process_authority_pda_seeds,
+    vault_authority_pda_seeds,
     program::EverclearSpoke,
     state::{IntentStatus, SpokeState},
-    utils::{normalize_decimals, vault_authority_seeds},
+    utils::{normalize_decimals},
 };
 
 use crate::hyperlane::mailbox::HandleInstruction;
@@ -34,12 +35,6 @@ pub fn handle<'info>(
         ctx.accounts.authority.key() == expected_process_authority_key,
         SpokeError::InvalidSender
     );
-    require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
-    require!(handle.origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
-    require!(
-        handle.sender == everclear_gateway(),
-        SpokeError::InvalidSender
-    );
 
     handle_message(ctx, handle)
 }
@@ -54,12 +49,6 @@ pub fn handle_as_admin<'info>(
         ctx.accounts.authority.key() == ctx.accounts.spoke_state.owner,
         SpokeError::InvalidSender
     );
-    require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
-    require!(handle.origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
-    require!(
-        handle.sender == everclear_gateway(),
-        SpokeError::InvalidSender
-    );
 
     handle_message(ctx, handle)
 }
@@ -68,6 +57,12 @@ fn handle_message<'info>(
     ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
     handle: HandleInstruction,
 ) -> Result<()> {
+    require!(!ctx.accounts.spoke_state.paused, SpokeError::ContractPaused);
+    require!(handle.origin == EVERCLEAR_DOMAIN, SpokeError::InvalidOrigin);
+    require!(
+        handle.sender == everclear_gateway(),
+        SpokeError::InvalidSender
+    );
     require!(!handle.message.is_empty(), SpokeError::InvalidMessage);
     // for emit_epi!
     let authority_info = ctx.accounts.event_authority.to_account_info();
@@ -80,8 +75,7 @@ fn handle_message<'info>(
             let batch: Settlements = AnchorDeserialize::deserialize(&mut msg.rest.as_ref())
                 .map_err(|_| error!(SpokeError::InvalidMessage))?;
 
-            let (_, vault_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
-
+            let vault_bump = ctx.accounts.spoke_state.vault_authority_bump;
             handle_batch_settlement(ctx, batch, vault_bump)?;
         }
         MessageType::VarUpdate => {
@@ -168,28 +162,27 @@ pub fn handle_account_metas(
             let settlement_data = &handle.message[1..];
             let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
                 .map_err(|_| error!(SpokeError::InvalidMessage))?;
-            let asset_pubkeys: Vec<Pubkey> =
-                batch.iter().map(|settlement| settlement.asset).collect();
 
             // Derive the vault authority PDA
             let (vault_authority_pubkey, _vault_authority_bump) =
                 Pubkey::find_program_address(&[b"vault"], ctx.program_id);
-            let (vault_token_account_pubkey, _vault_token_account_bump) =
-                Pubkey::find_program_address(&[b"vault-token"], ctx.program_id);
 
             let mut ret = vec![
                 to_serializable_account_meta(spoke_state_pda, false),
-                to_serializable_account_meta(vault_token_account_pubkey, true),
                 to_serializable_account_meta(vault_authority_pubkey, false),
+                to_serializable_account_meta(TOKEN_PROGRAM_ID, false),
+                to_serializable_account_meta(system_program::id(), false),
+                to_serializable_account_meta(event_authority_pubkey, false),
+                to_serializable_account_meta(*ctx.program_id, false),
             ];
-            ret.extend(
-                asset_pubkeys
-                    .iter()
-                    .map(|asset_pubkey| to_serializable_account_meta(*asset_pubkey, false)),
-            );
-            ret.push(to_serializable_account_meta(system_program::id(), false));
-            ret.push(to_serializable_account_meta(event_authority_pubkey, false));
-            ret.push(to_serializable_account_meta(*ctx.program_id, false));
+            // Add mint public key, recipient ATA and vault ATA per each settlement
+            for s in batch.iter() {
+                ret.push(to_serializable_account_meta(s.asset, false));
+                let recipient_token_account_pubkey = get_associated_token_address(&s.recipient, &s.asset);
+                ret.push(to_serializable_account_meta(recipient_token_account_pubkey, true));
+                let vault_account_pubkey = get_associated_token_address(&vault_authority_pubkey, &s.asset);
+                ret.push(to_serializable_account_meta(vault_account_pubkey, true));
+            }
             Ok(ret)
         }
         2 => {
@@ -224,21 +217,22 @@ fn handle_batch_settlement<'info>(
     vault_authority_bump: u8,
 ) -> Result<()> {
     // Create local references to avoid lifetime issues
-    for s in batch.settlements {
-        let vault_token_account = &ctx.accounts.vault_token_account;
-        let vault_authority = &ctx.accounts.vault_authority;
-        let token_program = &ctx.accounts.token_program;
-        let remaining_accounts = ctx.remaining_accounts;
-        let spoke_state = &mut ctx.accounts.spoke_state;
+    let vault_authority = &ctx.accounts.vault_authority;
+    let token_program = &ctx.accounts.token_program;
+    let spoke_state = &mut ctx.accounts.spoke_state;
+    for i in 0..batch.settlements.len() {
+        let mint_account = Account::<Mint>::try_from(&ctx.remaining_accounts[3 * i])?;
+        let recipient_token_account = Account::<TokenAccount>::try_from(&ctx.remaining_accounts[3 * i + 1])?;
+        let vault_token_account = Account::<TokenAccount>::try_from(&ctx.remaining_accounts[3 * i + 2])?;
         let res = handle_settlement(
-            vault_token_account,
+            &mint_account,
+            &recipient_token_account,
+            &vault_token_account,
             vault_authority,
             token_program,
-            remaining_accounts,
             spoke_state,
-            &s,
+            &batch.settlements[i],
             vault_authority_bump,
-            ctx.program_id,
         )?;
         if let Some(event) = res {
             emit_cpi!(event)
@@ -248,14 +242,14 @@ fn handle_batch_settlement<'info>(
 }
 
 fn handle_settlement<'info>(
+    mint_account: &Account<'info, Mint>,
+    recipient_token_account: &Account<'info, TokenAccount>,
     vault_token_account: &Account<'info, TokenAccount>,
     vault_authority: &UncheckedAccount<'info>,
     token_program: &Program<'info, Token>,
-    remaining_accounts: &'info [AccountInfo<'info>],
     spoke_state: &mut Account<SpokeState>,
     settlement: &Settlement,
     vault_authority_bump: u8,
-    self_program_id: &Pubkey,
 ) -> Result<Option<SettledEvent>> {
     // 1) Check if already settled
     let current_status = spoke_state
@@ -275,12 +269,6 @@ fn handle_settlement<'info>(
     }
 
     // 3) Normalise the settlement amount
-    let mint_info = remaining_accounts
-        .iter()
-        .find(|acc| acc.key() == vault_token_account.mint)
-        .ok_or(error!(SpokeError::InvalidOperation))?;
-
-    let mint_account = Account::<Mint>::try_from(mint_info)?;
     let minted_decimals = mint_account.decimals;
     let amount = normalize_decimals(
         // TODO: type check this amount properly for edge cases
@@ -292,22 +280,12 @@ fn handle_settlement<'info>(
         return Ok(None);
     }
 
-    // Attempt CPI transfer
-    let seeds = vault_authority_seeds(
-        self_program_id,
-        &vault_token_account.mint.key(),
-        vault_authority_bump,
-    );
-    let signer_seeds = [&seeds[0][..], &seeds[1][..], &seeds[2][..], &seeds[3][..]];
+    let signer_seeds: &[&[u8]] = vault_authority_pda_seeds!(vault_authority_bump);
     let signer = &[&signer_seeds[..]];
 
     let cpi_accounts = anchor_spl::token::Transfer {
         from: vault_token_account.to_account_info(),
-        to: make_recipient_token_account_info(
-            remaining_accounts,
-            settlement.recipient,
-            settlement.asset,
-        )?,
+        to: recipient_token_account.to_account_info(),
         authority: vault_authority.to_account_info(),
     };
     let cpi_ctx =
@@ -322,25 +300,6 @@ fn handle_settlement<'info>(
         asset: settlement.asset,
         amount,
     }))
-}
-
-fn make_recipient_token_account_info<'info>(
-    remaining_accounts: &'info [AccountInfo<'info>],
-    recipient: Pubkey,
-    asset_mint: Pubkey,
-) -> Result<AccountInfo<'info>> {
-    // 1) Derive the associated token account (ATA)
-    let expected_ata_key = get_associated_token_address(&recipient, &asset_mint);
-
-    // 2) Find that account in the remaining accounts
-    for acc_info in remaining_accounts.iter() {
-        if acc_info.key() == expected_ata_key {
-            return Ok(acc_info.clone());
-        }
-    }
-
-    // If we get here, we did not find the ATA in the remaining accounts
-    err!(SpokeError::InvalidOperation)
 }
 
 // Context for the settlements

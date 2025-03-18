@@ -41,3 +41,18 @@ macro_rules! mailbox_process_authority_pda_seeds {
         ]
     }};
 }
+
+/// The PDA seeds relating to the vault's authority.
+#[macro_export]
+macro_rules! vault_authority_pda_seeds {
+    () => {{
+        &[b"vault"]
+    }};
+
+    ($bump_seed:expr) => {{
+        &[
+            b"vault",
+            &[$bump_seed],
+        ]
+    }};
+}

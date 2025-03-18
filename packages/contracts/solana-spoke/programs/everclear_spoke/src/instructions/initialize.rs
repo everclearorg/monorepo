@@ -27,6 +27,7 @@ pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> 
     state.igp = init.igp;
     state.igp_type = init.igp_type;
     state.mailbox_dispatch_authority_bump = init.mailbox_dispatch_authority_bump;
+    state.vault_authority_bump = init.vault_authority_bump;
 
     // Set owner to the payer (deployer)
     state.owner = init.owner;
@@ -77,4 +78,5 @@ pub struct SpokeInitializationParams {
     pub igp: Pubkey,
     pub igp_type: InterchainGasPaymasterType,
     pub mailbox_dispatch_authority_bump: u8,
+    pub vault_authority_bump: u8,
 }
