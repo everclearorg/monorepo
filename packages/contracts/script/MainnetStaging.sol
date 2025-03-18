@@ -117,7 +117,20 @@ abstract contract Blast {
   ICallExecutor public BLAST_EXECUTOR = ICallExecutor(0x88F16B8Cc37f0b07794e6c720DBeA3E792043966);
 }
 
-abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum {}
+abstract contract Solana {
+  uint32 public constant SOLANA = 1399811149;
+  // Solana addresses are in a different format; these are Ethereum-compatible placeholders
+  // Original Solana Mailbox: E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi
+  IMailbox public SOLANA_MAILBOX = IMailbox(0x42d4bA5e542d9154f3CaF2a3e0f33B63A73E4C35);
+
+  // Original Solana Spoke: 4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL
+  IEverclearSpoke public SOLANA_SPOKE = IEverclearSpoke(0x327d37ebb263ada4331ec8ab919ca6bfa6745876fcd1893f76e6edc13939226f);
+  ISpokeGateway public SOLANA_SPOKE_GATEWAY = ISpokeGateway(0x327d37ebb263ada4331ec8ab919ca6bfa6745876fcd1893f76e6edc13939226f);
+  ICallExecutor public SOLANA_EXECUTOR = ICallExecutor(0x327d37ebb263ada4331ec8ab919ca6bfa6745876fcd1893f76e6edc13939226f);
+  address public SOLANA_SPOKE_IMPL = 0x327d37ebb263ada4331ec8ab919ca6bfa6745876fcd1893f76e6edc13939226f;
+}
+
+abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum, Solana {}
 
 abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDomains {
   using TypeCasts for address;
@@ -131,32 +144,36 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
   DomainAndGateway[] public SUPPORTED_DOMAINS_AND_GATEWAYS;
 
   constructor() {
-    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: OPTIMISM,
-        blockGasLimit: 30_000_000,
-        gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
-      })
-    );
+    // SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+    //   DomainAndGateway({
+    //     chainId: OPTIMISM,
+    //     blockGasLimit: 30_000_000,
+    //     gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
+    //   })
+    // );
 
-    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: ARBITRUM_ONE,
-        blockGasLimit: 30_000_000,
-        gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
-      })
-    );
+    // SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+    //   DomainAndGateway({
+    //     chainId: ARBITRUM_ONE,
+    //     blockGasLimit: 30_000_000,
+    //     gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
+    //   })
+    // );
 
-    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: ZIRCUIT,
-        blockGasLimit: 30_000_000,
-        gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
-      })
-    );
+    // SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+    //   DomainAndGateway({
+    //     chainId: ZIRCUIT,
+    //     blockGasLimit: 30_000_000,
+    //     gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
+    //   })
+    // );
 
+    // SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+    //   DomainAndGateway({chainId: BLAST, blockGasLimit: 30_000_000, gateway: address(BLAST_SPOKE_GATEWAY).toBytes32()})
+    // );
+    
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: BLAST, blockGasLimit: 30_000_000, gateway: address(BLAST_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({chainId: SOLANA, blockGasLimit: 30_000_000, gateway: address(SOLANA_SPOKE_GATEWAY).toBytes32()})
     );
   }
 }
@@ -167,7 +184,8 @@ abstract contract MainnetStagingEnvironment is
   MainnetAssets,
   MainnetStagingSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST];
+  // uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, SOLANA];
+  uint32[] public SUPPORTED_DOMAINS = [SOLANA];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed
