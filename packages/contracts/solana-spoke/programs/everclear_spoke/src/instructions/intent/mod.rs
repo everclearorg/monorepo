@@ -2,7 +2,7 @@ pub mod new_intent;
 
 pub use new_intent::*;
 
-use anchor_lang::prelude::*;
+use super::MessageType;
 
 /// Represents the 12 fields in our Intent struct, matching the Solidity layout.
 #[derive(Debug, Clone)]
@@ -11,12 +11,12 @@ pub struct EVMIntent {
     pub receiver: [u8; 32],
     pub input_asset: [u8; 32],
     pub output_asset: [u8; 32],
-    pub max_fee: u32,       // actually uint24 in Solidity
+    pub max_fee: u32, // actually uint24 in Solidity
     pub origin: u32,
     pub nonce: u64,
-    pub timestamp: u64,     // actually uint48 in Solidity
-    pub ttl: u64,           // actually uint48 in Solidity
-    pub amount: [u8; 32],   // big-endian, matching typical EVM usage
+    pub timestamp: u64,   // actually uint48 in Solidity
+    pub ttl: u64,         // actually uint48 in Solidity
+    pub amount: [u8; 32], // big-endian, matching typical EVM usage
     pub destinations: Vec<u32>,
     pub data: Vec<u8>,
 }
@@ -157,8 +157,9 @@ fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
     // 1) Encode destinations
     let mut destinations_bytes = Vec::new();
     //  - first 32 bytes => length of array
-    destinations_bytes
-    .extend_from_slice(&u256_to_32bytes(u128::from(intent.destinations.len() as u64)));
+    destinations_bytes.extend_from_slice(&u256_to_32bytes(u128::from(
+        intent.destinations.len() as u64
+    )));
 
     //  - then each element is a uint32 => in abi.encode, each element is still a full 32-byte word,
     //    with the value in the last 4 bytes (big-endian).
@@ -168,9 +169,7 @@ fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
 
     // 2) Encode data (bytes)
     let mut data_bytes = Vec::new();
-    data_bytes.extend_from_slice(
-        &u256_to_32bytes(u128::from(intent.data.len() as u64))
-    );    
+    data_bytes.extend_from_slice(&u256_to_32bytes(u128::from(intent.data.len() as u64)));
     // the raw bytes, then pad to multiple of 32
     data_bytes.extend_from_slice(&intent.data);
     // pad
@@ -184,7 +183,7 @@ fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
     tail.extend_from_slice(&destinations_bytes);
     tail.extend_from_slice(&data_bytes);
 
-    (tail, destinations_offset as u64, data_offset as u64)
+    (tail, destinations_offset as u64, data_offset)
 }
 
 /// Finally, wrap the single-intent-array encoding in abi.encode(uint8 messageType, bytes).
@@ -192,7 +191,7 @@ fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
 ///   [0]: messageType (uint8) => expanded to 32 bytes
 ///   [1]: the offset to the start of the dynamic bytes
 /// Then we store the length of that dynamic bytes + the bytes.
-fn encode_full(message_type: u8, intent: &EVMIntent) -> Vec<u8> {
+fn encode_full(message_type: MessageType, intent: &EVMIntent) -> Vec<u8> {
     // 1) encode the single-intent array
     let inner_data = encode_array_of_one_intent(intent);
 
@@ -210,7 +209,7 @@ fn encode_full(message_type: u8, intent: &EVMIntent) -> Vec<u8> {
     // slot0: 32 bytes => messageType in the last 1 byte
     {
         let mut word = [0u8; 32];
-        word[31] = message_type;
+        word[31] = message_type as u8;
         out.extend_from_slice(&word);
     }
 

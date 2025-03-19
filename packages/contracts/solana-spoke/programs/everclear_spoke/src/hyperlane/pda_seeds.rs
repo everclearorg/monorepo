@@ -50,9 +50,6 @@ macro_rules! vault_authority_pda_seeds {
     }};
 
     ($bump_seed:expr) => {{
-        &[
-            b"vault",
-            &[$bump_seed],
-        ]
+        &[b"vault", &[$bump_seed]]
     }};
 }

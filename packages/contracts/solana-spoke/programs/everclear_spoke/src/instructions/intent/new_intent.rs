@@ -3,6 +3,7 @@ use crate::{
     hyperlane::{
         transfer_remote, Igp, Mailbox, SplNoop, TransferRemote, TransferRemoteContext, U256,
     },
+    instructions::MessageType,
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
@@ -11,7 +12,7 @@ use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::IntentAddedEvent,
-    intent::{EVMIntent, encode_full, u64_to_u256_be},
+    intent::{encode_full, u64_to_u256_be, EVMIntent},
     state::SpokeState,
     state::{IntentStatus, IntentStatusAccount},
     utils::{compute_intent_hash, normalize_decimals},
@@ -78,12 +79,12 @@ pub fn new_intent(
 
     // Now create your EVMIntent
     let evm_intent = EVMIntent {
-        initiator: ctx.accounts.authority.key().to_bytes(), 
+        initiator: ctx.accounts.authority.key().to_bytes(),
         receiver: receiver.to_bytes(),
         input_asset: input_asset.to_bytes(),
         output_asset: output_asset.to_bytes(),
-        max_fee,                 // watch out for 24-bit range if that matters
-        origin: state.domain,    // your "origin_domain"
+        max_fee,              // watch out for 24-bit range if that matters
+        origin: state.domain, // your "origin_domain"
         nonce: new_nonce,
         timestamp: clock.unix_timestamp as u64,
         ttl,
@@ -96,7 +97,8 @@ pub fn new_intent(
     let intent_id = compute_intent_hash(&evm_intent);
 
     // Produce the EVM ABI message:
-    let evm_encoded_message = encode_full(1, &evm_intent);
+    // NOTE: message type should be
+    let evm_encoded_message = encode_full(MessageType::Intent, &evm_intent);
 
     // Also, record a minimal status mapping (we only record the intent_id and its status).
     state.status.push(IntentStatusAccount {

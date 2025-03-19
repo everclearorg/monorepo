@@ -50,7 +50,7 @@ pub fn compute_intent_hash(intent: &EVMIntent) -> [u8; 32] {
     keccak_256(&encoded)
 }
 
-pub(crate) fn encode_single_intent(intent: &EVMIntent) -> Vec<u8>  {
+pub(crate) fn encode_single_intent(intent: &EVMIntent) -> Vec<u8> {
     let mut out = Vec::new();
     let mut head = Vec::new();
 
@@ -107,7 +107,7 @@ fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
     // We'll encode the destinations first, then we know where the data will go
     let mut destinations_bytes = Vec::new();
 
-    // 1) destinations: 
+    // 1) destinations:
     //   - 32 bytes array length
     //   - each element occupies one full 32‐byte word
     destinations_bytes.extend_from_slice(&u256_to_32bytes(intent.destinations.len() as u128));

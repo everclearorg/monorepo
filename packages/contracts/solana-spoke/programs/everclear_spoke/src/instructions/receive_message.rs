@@ -10,10 +10,10 @@ use crate::{
     events::{MessageReceivedEvent, SettledEvent},
     hyperlane::{to_serializable_account_meta, SerializableAccountMeta, U256},
     mailbox_process_authority_pda_seeds,
-    vault_authority_pda_seeds,
     program::EverclearSpoke,
     state::{IntentStatus, SpokeState},
-    utils::{normalize_decimals},
+    utils::normalize_decimals,
+    vault_authority_pda_seeds,
 };
 
 use crate::hyperlane::mailbox::HandleInstruction;
@@ -178,9 +178,14 @@ pub fn handle_account_metas(
             // Add mint public key, recipient ATA and vault ATA per each settlement
             for s in batch.iter() {
                 ret.push(to_serializable_account_meta(s.asset, false));
-                let recipient_token_account_pubkey = get_associated_token_address(&s.recipient, &s.asset);
-                ret.push(to_serializable_account_meta(recipient_token_account_pubkey, true));
-                let vault_account_pubkey = get_associated_token_address(&vault_authority_pubkey, &s.asset);
+                let recipient_token_account_pubkey =
+                    get_associated_token_address(&s.recipient, &s.asset);
+                ret.push(to_serializable_account_meta(
+                    recipient_token_account_pubkey,
+                    true,
+                ));
+                let vault_account_pubkey =
+                    get_associated_token_address(&vault_authority_pubkey, &s.asset);
                 ret.push(to_serializable_account_meta(vault_account_pubkey, true));
             }
             Ok(ret)
@@ -222,8 +227,10 @@ fn handle_batch_settlement<'info>(
     let spoke_state = &mut ctx.accounts.spoke_state;
     for i in 0..batch.settlements.len() {
         let mint_account = Account::<Mint>::try_from(&ctx.remaining_accounts[3 * i])?;
-        let recipient_token_account = Account::<TokenAccount>::try_from(&ctx.remaining_accounts[3 * i + 1])?;
-        let vault_token_account = Account::<TokenAccount>::try_from(&ctx.remaining_accounts[3 * i + 2])?;
+        let recipient_token_account =
+            Account::<TokenAccount>::try_from(&ctx.remaining_accounts[3 * i + 1])?;
+        let vault_token_account =
+            Account::<TokenAccount>::try_from(&ctx.remaining_accounts[3 * i + 2])?;
         let res = handle_settlement(
             &mint_account,
             &recipient_token_account,
