@@ -210,7 +210,7 @@ abstract contract Avalanche {
   IEverclearSpoke public AVALANCHE_SPOKE = IEverclearSpoke(0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460);
   ISpokeGateway public AVALANCHE_SPOKE_GATEWAY = ISpokeGateway(0x7EB63a646721de65eBa79ffe91c55DCE52b73c12);
   ICallExecutor public AVALANCHE_EXECUTOR = ICallExecutor(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
-  IXERC20Module public AVALANCHE_XERC20_MODULE = IXERC20Module(address(0)); // TODO: Doesn't seem to be deployed
+  IXERC20Module public AVALANCHE_XERC20_MODULE = IXERC20Module(0x255aba6E7f08d40B19872D11313688c2ED65d1C9); 
 }
 
 abstract contract Scroll {
@@ -220,7 +220,7 @@ abstract contract Scroll {
   IEverclearSpoke public SCROLL_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public SCROLL_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public SCROLL_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
-  IXERC20Module public SCROLL_XERC20_MODULE = IXERC20Module(address(0)); // TODO: Doesn't seem to be deployed
+  IXERC20Module public SCROLL_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
 }
 
 abstract contract Taiko {
@@ -230,7 +230,7 @@ abstract contract Taiko {
   IEverclearSpoke public TAIKO_SPOKE = IEverclearSpoke(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ISpokeGateway public TAIKO_SPOKE_GATEWAY = ISpokeGateway(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
   ICallExecutor public TAIKO_EXECUTOR = ICallExecutor(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
-  IXERC20Module public TAIKO_XERC20_MODULE = IXERC20Module(address(0)); // TODO: Doesn't seem to be deployed
+  IXERC20Module public TAIKO_XERC20_MODULE = IXERC20Module(0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64);
 }
 
 abstract contract Apechain {
@@ -270,7 +270,7 @@ abstract contract Unichain {
   IEverclearSpoke public UNICHAIN_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public UNICHAIN_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public UNICHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
-  IXERC20Module public UNICHAIN_XERC20_MODULE = IXERC20Module(address(0)); // TODO: Not deployed
+  IXERC20Module public UNICHAIN_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4); 
 }
 
 abstract contract Ronin {
