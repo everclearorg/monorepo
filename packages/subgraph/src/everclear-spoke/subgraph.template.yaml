@@ -122,4 +122,7 @@ dataSources:
         # event event IntentWithFeesAdded(bytes32 indexed _intentId, bytes32 indexed _initiator, uint256 _tokenFee, uint256 _nativeFee);
         - event: IntentWithFeesAdded(indexed bytes32,indexed bytes32,uint256,uint256)
           handler: handleIntentFeesAdded
+        # event FeeRecipientUpdated(address indexed _updated, address indexed _previous);
+        - event: FeeRecipientUpdated(indexed address,indexed address)
+          handler: handleFeeRecipientUpdated
       file: ./src/everclear-spoke/mapping/index.ts

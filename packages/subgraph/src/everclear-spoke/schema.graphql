@@ -278,6 +278,7 @@ type Meta @entity {
   gateway: Bytes
   lighthouse: Bytes
   messageReceiver: Bytes
+  feeAdapterRecipient: Bytes
 }
 
 type StrategyForAsset @entity {
@@ -300,6 +301,23 @@ type IntentFeesAdded @entity(immutable: true) {
 
   nativeFee: BigInt!
   tokenFee: BigInt!
+
+  # Transaction info
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+type FeeRecipientUpdated @entity(immutable: true) {
+  id: Bytes!
+
+  updated: Bytes!
+  previous: Bytes!
 
   # Transaction info
   transactionHash: Bytes!
