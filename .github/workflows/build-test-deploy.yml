@@ -17,6 +17,7 @@ env:
   SEPOLIA_RPC: ${{ secrets.SEPOLIA_RPC }}
   BNB_TESTNET_RPC: ${{ secrets.BSC_RPC }}
   SCROLL_SEPOLIA_RPC: ${{ secrets.SCROLL_SEPOLIA_RPC }}
+  ARB_SEPOLIA_RPC: ${{ secrets.ARB_SEPOLIA_RPC }}
 
 jobs:
   set-aws-region:
@@ -364,6 +365,7 @@ jobs:
       SEPOLIA_RPC: ${{ secrets.SEPOLIA_RPC }}
       BNB_TESTNET_RPC: ${{ secrets.BSC_RPC }}
       SCROLL_SEPOLIA_RPC: ${{ secrets.SCROLL_SEPOLIA_RPC }}
+      ARB_SEPOLIA_RPC: ${{ secrets.ARB_SEPOLIA_RPC }}
 
     steps:
       - name: Checkout Repo
@@ -423,7 +425,7 @@ jobs:
       SCROLL_SEPOLIA_RPC: 'https://sepolia-rpc.scroll.io'
       SEPOLIA_RPC: 'https://ethereum-sepolia-rpc.publicnode.com'
       BNB_TESTNET_RPC: 'https://data-seed-prebsc-1-s1.bnbchain.org:8545'
-
+      ARB_SEPOLIA_RPC: 'https://sepolia-rollup.arbitrum.io/rpc'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
