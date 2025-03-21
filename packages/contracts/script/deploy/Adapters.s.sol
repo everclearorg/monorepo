@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { ScriptUtils } from '../utils/Utils.sol';
+import {ScriptUtils} from '../utils/Utils.sol';
 
-import { Script } from 'forge-std/Script.sol';
-import { console } from 'forge-std/console.sol';
+import {Script} from 'forge-std/Script.sol';
+import {console} from 'forge-std/console.sol';
 
-import { FeeAdapter } from 'contracts/intent/FeeAdapter.sol';
+import {FeeAdapter} from 'contracts/intent/FeeAdapter.sol';
 
 import {MainnetProductionEnvironment} from '../MainnetProduction.sol';
 
@@ -25,13 +25,13 @@ contract DeployAdapterBase is Script, ScriptUtils {
   error WrongChainId();
   error FeeAdapterMismatch();
 
-  function run(string memory _account) public {
+  function run(
+    string memory _account
+  ) public {
     DeploymentParams memory _params = _deploymentParams[block.chainid];
     if (
-      _params.spoke == address(0) ||
-      _params.xerc20Module == address(0) ||
-      _params.feeRecipient == address(0) ||
-      _params.owner == address(0)
+      _params.spoke == address(0) || _params.xerc20Module == address(0) || _params.feeRecipient == address(0)
+        || _params.owner == address(0)
     ) {
       revert WrongChainId();
     }
