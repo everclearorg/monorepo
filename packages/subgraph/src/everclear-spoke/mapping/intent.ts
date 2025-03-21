@@ -9,6 +9,7 @@ import {
   AssetTransferFailed,
   AssetMintFailed,
 } from '../../../generated/EverclearSpoke/EverclearSpoke';
+import { IntentWithFeesAdded } from '../../../generated/FeeAdapter/FeeAdapter';
 import {
   Balance,
   DestinationIntent,
@@ -25,6 +26,7 @@ import {
   SettlementIntent,
   AssetMintFailedEvent,
   AssetTransferFailedEvent,
+  IntentFeesAdded,
 } from '../../../generated/schema';
 import { BigIntToBytes, Bytes32ToAddress, generateIdFromTx, generateTxNonce } from '../../common';
 
@@ -441,4 +443,57 @@ export function handleAssetTransferFailed(event: AssetTransferFailed): void {
   log.txNonce = generateTxNonce(event);
 
   log.save();
+}
+
+/**
+ * Creates subgraph records when IntentWithFeesAdded events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
+ */
+export function handleIntentFeesAdded(event: IntentWithFeesAdded): void {
+  const intentId = event.params._intentId;
+  let intent = OriginIntent.load(intentId);
+  if (intent == null) {
+    // Create a new intent if it doesn't exist yet.
+    intent = new OriginIntent(intentId);
+    // Set default values that will be overwritten when IntentAdded is processed
+    intent.status = 'ADDED';
+    intent.initiator = event.params._initiator;
+    intent.queueIdx = BigInt.zero();
+    intent.maxFee = BigInt.zero();
+    intent.amount = BigInt.zero();
+    intent.timestamp = event.block.timestamp;
+    intent.ttl = BigInt.zero();
+    // Set empty values for required fields that will be populated by IntentAdded
+    intent.receiver = Bytes.empty();
+    intent.inputAsset = Bytes.empty();
+    intent.outputAsset = Bytes.empty();
+    intent.origin = BigInt.zero();
+    intent.nonce = BigInt.zero();
+    intent.data = Bytes.empty();
+    intent.destinations = [];
+  }
+
+  // Create the IntentFeesAdded entity
+  const log = new IntentFeesAdded(generateIdFromTx(event));
+
+  log.intent = intentId;
+  log.initiator = event.params._initiator;
+  log.nativeFee = event.params._nativeFee;
+  log.tokenFee = event.params._tokenFee;
+
+  // Add transaction info
+  log.blockNumber = event.block.number;
+  log.timestamp = event.block.timestamp;
+  log.transactionHash = event.transaction.hash;
+  log.gasPrice = event.transaction.gasPrice;
+  log.gasLimit = event.transaction.gasLimit;
+  log.txOrigin = event.transaction.from;
+  log.txNonce = generateTxNonce(event);
+
+  log.save();
+
+  // Update the intent with the fees information
+  intent.fees = log.id;
+  intent.save();
 }

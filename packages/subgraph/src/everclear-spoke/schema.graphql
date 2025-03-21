@@ -34,6 +34,9 @@ type OriginIntent @entity {
 
   # Add Intent Transaction
   addEvent: IntentAddEvent!
+
+  # Fees information
+  fees: IntentFeesAdded
 }
 
 type IntentAddEvent @entity(immutable: true) {
@@ -287,4 +290,24 @@ type ModuleForStrategy @entity {
   id: Bytes!
   strategy: BigInt!
   module: Bytes!
+}
+
+type IntentFeesAdded @entity(immutable: true) {
+  id: Bytes!
+
+  intent: OriginIntent!
+  initiator: Bytes!
+
+  nativeFee: BigInt!
+  tokenFee: BigInt!
+
+  # Transaction info
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
 }
