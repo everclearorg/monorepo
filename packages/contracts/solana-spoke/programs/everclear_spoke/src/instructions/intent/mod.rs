@@ -27,9 +27,12 @@ fn encode_array_of_one_intent(intent: &EVMIntent) -> Vec<u8> {
     //
     // The layout for abi.encode(EVMIntent[]) with length=1 is:
     //
-    // OFFSET 0:   32 bytes = length of the array => 1
-    // OFFSET 32:  "head" of struct #0, which is 12 * 32 = 384 bytes
-    // OFFSET 416: "tail" data for dynamic fields (destinations, data), appended sequentially
+    // OFFSET 0:   32 bytes = "head" of the array which is offset to the array length (=32)
+    // OFFSET 32:  32 bytes = length of the array => 1
+    // OFFSET 64:  32 bytes = "head" of the first (and single) element in the array
+    //             which is offset to the first element of the array (=32)
+    // OFFSET 96:  "head" of struct #0, which is 12 * 32 = 384 bytes
+    // OFFSET 480: "tail" data for dynamic fields (destinations, data), appended sequentially
     //
     // Inside that "head" (struct #0):
     //   word0: initiator (bytes32)
@@ -57,10 +60,16 @@ fn encode_array_of_one_intent(intent: &EVMIntent) -> Vec<u8> {
     // 1) Prepare a vector for the final output
     let mut out = Vec::new();
 
-    // 2) Write array length = 1 (32 bytes, big-endian)
+    // 2) Write array "head"
+    out.extend_from_slice(&u256_to_32bytes(32u64 as u128));
+
+    // 3) Write array length = 1 (32 bytes, big-endian)
     out.extend_from_slice(&u256_to_32bytes(1u128));
 
-    // 3) Now we write the struct #0 "head," which is 12 * 32 bytes
+    // 4) Write "head" of the first element
+    out.extend_from_slice(&u256_to_32bytes(32u64 as u128));
+
+    // 5) Now we write the struct #0 "head," which is 12 * 32 bytes
     let mut head = Vec::new();
 
     // word0: initiator (bytes32)
@@ -178,7 +187,7 @@ fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
 
     // We place "destinations_bytes" first, then "data_bytes" in the tail
     let destinations_offset = 384; // from start of struct #0
-    let data_offset = 384 + destinations_bytes.len() as u64; // from start of struct #0
+    let data_offset = destinations_offset + destinations_bytes.len() as u64; // from start of struct #0
 
     tail.extend_from_slice(&destinations_bytes);
     tail.extend_from_slice(&data_bytes);
