@@ -9,7 +9,10 @@ import {
   AssetTransferFailed,
   AssetMintFailed,
 } from '../../../generated/EverclearSpoke/EverclearSpoke';
-import { IntentWithFeesAdded } from '../../../generated/FeeAdapter/FeeAdapter';
+import {
+  IntentWithFeesAdded,
+  OrderCreated as OrderCreatedEvent,
+} from '../../../generated/FeeAdapter/FeeAdapter';
 import {
   Balance,
   DestinationIntent,
@@ -27,6 +30,7 @@ import {
   AssetMintFailedEvent,
   AssetTransferFailedEvent,
   IntentFeesAdded,
+  OrderCreated,
 } from '../../../generated/schema';
 import { BigIntToBytes, Bytes32ToAddress, generateIdFromTx, generateTxNonce } from '../../common';
 
@@ -496,4 +500,68 @@ export function handleIntentFeesAdded(event: IntentWithFeesAdded): void {
   // Update the intent with the fees information
   intent.fees = log.id;
   intent.save();
+}
+
+/**
+ * Creates subgraph records when OrderCreated events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
+ */
+export function handleOrderCreated(event: OrderCreatedEvent): void {
+  // Create the OrderCreated entity
+  const log = new OrderCreated(event.params._orderId);
+
+  log.initiator = event.params._initiator;
+  log.tokenFee = event.params._tokenFee;
+  log.nativeFee = event.params._nativeFee;
+
+  // Add transaction info
+  log.blockNumber = event.block.number;
+  log.timestamp = event.block.timestamp;
+  log.transactionHash = event.transaction.hash;
+  log.gasPrice = event.transaction.gasPrice;
+  log.gasLimit = event.transaction.gasLimit;
+  log.txOrigin = event.transaction.from;
+  log.txNonce = generateTxNonce(event);
+
+  // Create array to store intent references
+  const intents: Bytes[] = [];
+
+  // Load and update each intent
+  for (let i = 0; i < event.params._intentIds.length; i++) {
+    const intentId = event.params._intentIds[i];
+    let intent = OriginIntent.load(intentId);
+
+    // If intent doesn't exist yet (which can happen due to event ordering),
+    // create a placeholder that will be populated when IntentAdded is processed
+    if (intent == null) {
+      intent = new OriginIntent(intentId);
+      intent.status = 'ADDED';
+      intent.initiator = event.params._initiator;
+      intent.queueIdx = BigInt.zero();
+      intent.maxFee = BigInt.zero();
+      intent.amount = BigInt.zero();
+      intent.timestamp = event.block.timestamp;
+      intent.ttl = BigInt.zero();
+      // Set empty values for required fields that will be populated by IntentAdded
+      intent.receiver = Bytes.empty();
+      intent.inputAsset = Bytes.empty();
+      intent.outputAsset = Bytes.empty();
+      intent.origin = BigInt.zero();
+      intent.nonce = BigInt.zero();
+      intent.data = Bytes.empty();
+      intent.destinations = [];
+    }
+
+    // Link intent to order
+    intent.order = log.id;
+    intent.save();
+
+    intents.push(intentId);
+  }
+
+  // Add intents to order
+  log.intents = intents;
+
+  log.save();
 }

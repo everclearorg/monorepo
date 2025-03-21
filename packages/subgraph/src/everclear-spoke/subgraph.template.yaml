@@ -125,4 +125,7 @@ dataSources:
         # event FeeRecipientUpdated(address indexed _updated, address indexed _previous);
         - event: FeeRecipientUpdated(indexed address,indexed address)
           handler: handleFeeRecipientUpdated
+        # event OrderCreated(bytes32 indexed _orderId, bytes32 indexed _initiator, bytes32[] _intentIds, uint256 _tokenFee, uint256 _nativeFee);
+        - event: OrderCreated(indexed bytes32,indexed bytes32,bytes32[],uint256,uint256)
+          handler: handleOrderCreated
       file: ./src/everclear-spoke/mapping/index.ts
