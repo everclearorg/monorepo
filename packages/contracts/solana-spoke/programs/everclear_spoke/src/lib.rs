@@ -100,7 +100,7 @@ pub mod everclear_spoke {
     }
 
     #[interface(hyperlane_message_recipient::interchain_security_module_account_metas)]
-    pub fn interchain_security_module_acconut_metas(
+    pub fn interchain_security_module_account_metas(
         ctx: Context<InterchainSecurityModuleAccountMetas>,
     ) -> Result<Vec<SerializableAccountMeta>> {
         instructions::interchain_security_module_account_metas(ctx)
