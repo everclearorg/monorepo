@@ -329,11 +329,11 @@ pub struct TransferRemoteContext<'info> {
     /// CHECK:
     #[account(mut)]
     pub igp_program_data: AccountInfo<'info>,
-    
+
     /// CHECK:
     #[account(mut)]
     pub igp_payment_pda: AccountInfo<'info>,
-    
+
     /// CHECK:
     #[account(mut)]
     pub configured_igp_account: AccountInfo<'info>,

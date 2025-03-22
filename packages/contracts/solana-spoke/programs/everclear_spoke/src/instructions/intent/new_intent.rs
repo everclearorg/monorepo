@@ -182,9 +182,19 @@ pub struct NewIntent<'info> {
     pub authority: Signer<'info>,
 
     pub mint: Account<'info, Mint>,
-    #[account(mut, constraint = user_token_account.mint == mint.key())]
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = authority,
+        associated_token::token_program = token_program,
+    )]
     pub user_token_account: Account<'info, TokenAccount>,
-    #[account(mut, constraint = program_vault_account.mint == mint.key())]
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = crate::ID,
+        associated_token::token_program = token_program,
+    )]
     pub program_vault_account: Account<'info, TokenAccount>,
 
     #[account(address = TOKEN_PROGRAM_ID)]
