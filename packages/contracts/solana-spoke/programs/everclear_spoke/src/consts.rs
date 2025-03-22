@@ -1,7 +1,6 @@
 use crate::hyperlane::H256;
 use anchor_lang::prelude::Pubkey;
 
-pub const HYPERLANE_MAILBOX_PROGRAM_ID: Pubkey = Pubkey::new_from_array([0; 32]);
 // NOTE: use hyperlane's sol mainnet chain ID
 pub const THIS_DOMAIN: u32 = 1399811149; // This spoke's domain ID
 pub const EVERCLEAR_DOMAIN: u32 = 25327; // Hub's domain ID
