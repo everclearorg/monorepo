@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { ERC20, IXERC20, XERC20 } from 'test/utils/TestXToken.sol';
+import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
 
-import { Constants as Common } from 'contracts/common/Constants.sol';
+import {Constants as Common} from 'contracts/common/Constants.sol';
 
-import { IntegrationBase } from 'test/integration/IntegrationBase.t.sol';
+import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
 
-import { Constants } from 'test/utils/Constants.sol';
+import {Constants} from 'test/utils/Constants.sol';
 
 contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is IntegrationBase {
   function test_InvoiceWithoutDiscount_TTLZero_TransferZeroAfterDecimalConversion_FeeInTransacting() public {
@@ -53,14 +53,11 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID,
-      _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e6 the amount to transfer end up being 0
     assertEq(ERC20(address(sepoliaDAI)).balanceOf(_user2), 0);
@@ -69,7 +66,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after transfer the fee recipient on SEPLIA should have the fee
     _switchFork(ETHEREUM_SEPOLIA_FORK);
@@ -126,14 +123,11 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID,
-      _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(sepoliaWETH)).balanceOf(_user2), 1);
@@ -142,7 +136,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after transfer the fee recipient on SEPLIA should have the fee
     _switchFork(ETHEREUM_SEPOLIA_FORK);
@@ -199,14 +193,11 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID,
-      _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e6 the amount to transfer end up being 0
     assertEq(ERC20(address(sepoliaDAI)).balanceOf(_user2), 0);
@@ -215,7 +206,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after transfer the fee recipient on SEPLIA should have the fee in Eth
     _switchFork(ETHEREUM_SEPOLIA_FORK);
@@ -272,14 +263,11 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID,
-      _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(sepoliaWETH)).balanceOf(_user2), 1);
@@ -288,7 +276,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after transfer the fee recipient on SEPLIA should have the fee in ETH
     _switchFork(ETHEREUM_SEPOLIA_FORK);
@@ -348,14 +336,11 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID,
-      _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e6 the amount to transfer end up being 0
     assertEq(ERC20(address(sepoliaDAI)).balanceOf(_user2), 0);
@@ -364,7 +349,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after transfer the fee recipient on SEPLIA should have the fee in token and eth
     _switchFork(ETHEREUM_SEPOLIA_FORK);
@@ -426,14 +411,11 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID,
-      _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(sepoliaWETH)).balanceOf(_user2), 1);
@@ -442,7 +424,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after transfer the fee recipient on SEPLIA should have the fee in token and eth
     _switchFork(ETHEREUM_SEPOLIA_FORK);

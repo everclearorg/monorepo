@@ -21,9 +21,10 @@ env:
   SEPOLIA_RPC: ${{ secrets.SEPOLIA_RPC }}
   BNB_TESTNET_RPC: ${{ secrets.BSC_RPC }}
   SCROLL_SEPOLIA_RPC: ${{ secrets.SCROLL_SEPOLIA_RPC }}
+  ARB_SEPOLIA_RPC: ${{ secrets.ARB_SEPOLIA_RPC }}
 
 permissions:
-  contents: write 
+  contents: write
   pull-requests: write
 
 jobs:

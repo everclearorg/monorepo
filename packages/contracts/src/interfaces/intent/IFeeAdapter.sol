@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEverclear } from '../common/IEverclear.sol';
-import { IEverclearSpoke } from './IEverclearSpoke.sol';
-import { IPermit2 } from 'interfaces/common/IPermit2.sol';
+import {IEverclear} from '../common/IEverclear.sol';
+import {IEverclearSpoke} from './IEverclearSpoke.sol';
+import {IPermit2} from 'interfaces/common/IPermit2.sol';
 
 interface IFeeAdapter {
   struct OrderParameters {
@@ -25,10 +25,7 @@ interface IFeeAdapter {
    * @param _nativeFee The amount of native token fees paid
    */
   event IntentWithFeesAdded(
-    bytes32 indexed _intentId,
-    bytes32 indexed _initiator,
-    uint256 _tokenFee,
-    uint256 _nativeFee
+    bytes32 indexed _intentId, bytes32 indexed _initiator, uint256 _tokenFee, uint256 _nativeFee
   );
 
   /**
@@ -40,11 +37,7 @@ interface IFeeAdapter {
    * @param _nativeFee The amount of native token fees paid for the order
    */
   event OrderCreated(
-    bytes32 indexed _orderId,
-    bytes32 indexed _initiator,
-    bytes32[] _intentIds,
-    uint256 _tokenFee,
-    uint256 _nativeFee
+    bytes32 indexed _orderId, bytes32 indexed _initiator, bytes32[] _intentIds, uint256 _tokenFee, uint256 _nativeFee
   );
 
   /**
@@ -164,13 +157,15 @@ interface IFeeAdapter {
    * @dev Can only be called by the owner of the contract
    * @param _feeRecipient The new address that will receive fees
    */
-  function updateFeeRecipient(address _feeRecipient) external;
+  function updateFeeRecipient(
+    address _feeRecipient
+  ) external;
 
   /**
-  * @notice Send virtual balance to the original recipient
-  * @param _asset Address of the asset to return
-  * @param _amount Amount of the asset to return
-  * @param _recipient Address of the recipient
+   * @notice Send virtual balance to the original recipient
+   * @param _asset Address of the asset to return
+   * @param _amount Amount of the asset to return
+   * @param _recipient Address of the recipient
    */
   function returnUnsupportedIntent(address _asset, uint256 _amount, address _recipient) external;
 }

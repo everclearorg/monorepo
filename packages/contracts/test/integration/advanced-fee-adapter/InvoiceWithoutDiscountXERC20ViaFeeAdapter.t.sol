@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-import { Constants as Common } from 'contracts/common/Constants.sol';
+import {Constants as Common} from 'contracts/common/Constants.sol';
 
-import { IntegrationBase } from 'test/integration/IntegrationBase.t.sol';
-import { ERC20, IXERC20, XERC20 } from 'test/utils/TestXToken.sol';
+import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
+import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
 
 contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
-  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferZeroAfterDecimalConversion_FeeInTransacting() public {
+  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferZeroAfterDecimalConversion_FeeInTransacting()
+    public
+  {
     _switchFork(ETHEREUM_SEPOLIA_FORK);
 
     // Smallest intent amount 1 weth (1e-18)
@@ -40,14 +42,14 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     // In hub process deposits and invoices and the first intent is settled
     _processDepositsAndInvoices(keccak256('TXT'));
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // process settlement messages for bsc
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(bscXToken)).balanceOf(_user), 1);
@@ -57,7 +59,8 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(sepoliaFeeAdapter.feeRecipient()), _feeAmount);
   }
 
-  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferNotZeroAfterDecimalConversion_FeeInTransacting() public {
+  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferNotZeroAfterDecimalConversion_FeeInTransacting(
+  ) public {
     _switchFork(BSC_TESTNET_FORK);
 
     // reduce decimals to 6
@@ -96,14 +99,14 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     // In hub process deposits and invoices and the first intent is settled
     _processDepositsAndInvoices(keccak256('TXT'));
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // process settlement messages for bsc
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(bscXToken)).balanceOf(_user), 0);
@@ -113,7 +116,7 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(sepoliaFeeAdapter.feeRecipient()), _feeAmount);
   }
 
-   function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferZeroAfterDecimalConversion_FeeInEth() public {
+  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferZeroAfterDecimalConversion_FeeInEth() public {
     _switchFork(ETHEREUM_SEPOLIA_FORK);
 
     // Smallest intent amount 1 weth (1e-18)
@@ -145,14 +148,14 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     // In hub process deposits and invoices and the first intent is settled
     _processDepositsAndInvoices(keccak256('TXT'));
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // process settlement messages for bsc
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(bscXToken)).balanceOf(_user), 1);
@@ -162,7 +165,9 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     assertEq(sepoliaFeeAdapter.feeRecipient().balance, _feeAmount);
   }
 
-  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferNotZeroAfterDecimalConversion_FeeInEth() public {
+  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferNotZeroAfterDecimalConversion_FeeInEth()
+    public
+  {
     _switchFork(BSC_TESTNET_FORK);
 
     // reduce decimals to 6
@@ -202,14 +207,14 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     // In hub process deposits and invoices and the first intent is settled
     _processDepositsAndInvoices(keccak256('TXT'));
 
-    uint256 _amountAfterFees = _smallestIntentAmount -
-      ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees =
+      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // process settlement messages for bsc
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
     // deliver the settlement message to BSC
-    _processSettlementMessage({ _destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc });
+    _processSettlementMessage({_destination: BSC_TESTNET_ID, _settlementMessageBody: _settlementMessageBodyBsc});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(bscXToken)).balanceOf(_user), 0);

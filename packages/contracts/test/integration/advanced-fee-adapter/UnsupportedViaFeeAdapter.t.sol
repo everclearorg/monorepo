@@ -1,28 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { StdStorage, stdStorage } from 'forge-std/StdStorage.sol';
+import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
 
-import { IInterchainSecurityModule } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
+import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 
-import { Vm } from 'forge-std/Vm.sol';
-import { console } from 'forge-std/console.sol';
+import {Vm} from 'forge-std/Vm.sol';
+import {console} from 'forge-std/console.sol';
 
-import { MessageLib } from 'contracts/common/MessageLib.sol';
-import { TypeCasts } from 'contracts/common/TypeCasts.sol';
+import {MessageLib} from 'contracts/common/MessageLib.sol';
+import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
-import { IEverclear } from 'interfaces/common/IEverclear.sol';
-import { IEverclearHub } from 'interfaces/hub/IEverclearHub.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
 
-import { ISettler } from 'interfaces/hub/ISettler.sol';
+import {ISettler} from 'interfaces/hub/ISettler.sol';
 
-import { IntegrationBase } from 'test/integration/IntegrationBase.t.sol';
+import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
 
-import { Constants } from 'test/utils/Constants.sol';
+import {Constants} from 'test/utils/Constants.sol';
 
-import { TestERC20 } from '../../utils/TestERC20.sol';
-import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import { ERC20, IXERC20, XERC20 } from 'test/utils/TestXToken.sol';
+import {TestERC20} from '../../utils/TestERC20.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
 
 contract Intent_Integration is IntegrationBase {
   using stdStorage for StdStorage;
@@ -60,15 +60,7 @@ contract Intent_Integration is IntegrationBase {
     vm.prank(_user);
 
     (_intentId, _intent) = sepoliaFeeAdapter.newIntent(
-      _dest,
-      _user,
-      _unsupportedToken,
-      _unsupportedToken,
-      100 ether,
-      Constants.MAX_FEE,
-      uint48(1 days),
-      '',
-      _tokenFee
+      _dest, _user, _unsupportedToken, _unsupportedToken, 100 ether, Constants.MAX_FEE, uint48(1 days), '', _tokenFee
     );
 
     // create intent message
@@ -77,7 +69,7 @@ contract Intent_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intents);
+    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intents);
 
     // expect to send fee to fee recipient
     assertEq(IERC20(_unsupportedToken).balanceOf(sepoliaFeeAdapter.feeRecipient()), _tokenFee);
@@ -120,7 +112,7 @@ contract Intent_Integration is IntegrationBase {
     // user must claim unsupported intent
     deal(_user, 100 ether);
     vm.prank(_user);
-    hub.returnUnsupportedIntent{ value: 1 ether }(_intentId);
+    hub.returnUnsupportedIntent{value: 1 ether}(_intentId);
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
     bytes memory _settlementMessageBody = abi.decode(entries[0].data, (bytes));
@@ -157,8 +149,7 @@ contract Intent_Integration is IntegrationBase {
     assertEq(IERC20(_unsupportedToken).balanceOf(address(sepoliaFeeAdapter)), 0 ether);
     assertEq(IERC20(_unsupportedToken).balanceOf(_user), 0 ether);
     assertEq(
-      sepoliaEverclearSpoke.balances(_unsupportedToken.toBytes32(), address(sepoliaFeeAdapter).toBytes32()),
-      100 ether
+      sepoliaEverclearSpoke.balances(_unsupportedToken.toBytes32(), address(sepoliaFeeAdapter).toBytes32()), 100 ether
     );
 
     // returning the unsupported intent to the user
@@ -169,8 +160,7 @@ contract Intent_Integration is IntegrationBase {
     assertEq(IERC20(_unsupportedToken).balanceOf(_user), 100 ether);
     assertEq(IERC20(_unsupportedToken).balanceOf(address(sepoliaEverclearSpoke)), 0);
     assertEq(
-      sepoliaEverclearSpoke.balances(_unsupportedToken.toBytes32(), address(sepoliaFeeAdapter).toBytes32()),
-      0 ether
+      sepoliaEverclearSpoke.balances(_unsupportedToken.toBytes32(), address(sepoliaFeeAdapter).toBytes32()), 0 ether
     );
   }
 
@@ -222,7 +212,7 @@ contract Intent_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(sepoliaFeeAdapter.feeRecipient()), _feeAmount);
@@ -263,16 +253,14 @@ contract Intent_Integration is IntegrationBase {
 
     vm.deal(_user, 100 ether);
     vm.prank(_user);
-    hub.returnUnsupportedIntent{ value: 1 ether }(_intentId);
+    hub.returnUnsupportedIntent{value: 1 ether}(_intentId);
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
 
     bytes memory _settlementMessageBody = abi.decode(entries[0].data, (bytes));
 
     assertEq(
-      uint8(hub.contexts(_intentId).status),
-      uint8(IEverclear.IntentStatus.UNSUPPORTED_RETURNED),
-      'invalid status'
+      uint8(hub.contexts(_intentId).status), uint8(IEverclear.IntentStatus.UNSUPPORTED_RETURNED), 'invalid status'
     );
 
     /*///////////////////////////////////////////////////////////////
@@ -311,8 +299,7 @@ contract Intent_Integration is IntegrationBase {
     sepoliaFeeAdapter.returnUnsupportedIntent(address(sepoliaXToken), _intentAmount, _user);
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(_user), _intentAmount);
     assertEq(
-      sepoliaEverclearSpoke.balances(address(sepoliaXToken).toBytes32(), address(sepoliaFeeAdapter).toBytes32()),
-      0
+      sepoliaEverclearSpoke.balances(address(sepoliaXToken).toBytes32(), address(sepoliaFeeAdapter).toBytes32()), 0
     );
   }
 }
