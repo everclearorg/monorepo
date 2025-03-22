@@ -288,7 +288,7 @@ fn handle_settlement<'info>(
     }
 
     let signer_seeds: &[&[u8]] = vault_authority_pda_seeds!(vault_authority_bump);
-    let signer = &[&signer_seeds[..]];
+    let signer = &[signer_seeds];
 
     let cpi_accounts = anchor_spl::token::Transfer {
         from: vault_token_account.to_account_info(),

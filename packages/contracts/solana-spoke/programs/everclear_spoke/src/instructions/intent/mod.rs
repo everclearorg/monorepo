@@ -192,7 +192,7 @@ fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
     tail.extend_from_slice(&destinations_bytes);
     tail.extend_from_slice(&data_bytes);
 
-    (tail, destinations_offset as u64, data_offset)
+    (tail, destinations_offset, data_offset)
 }
 
 /// Finally, wrap the single-intent-array encoding in abi.encode(uint8 messageType, bytes).
