@@ -168,7 +168,11 @@ contract Intent_Integration is IntegrationBase {
       bscEverclearSpoke.deposit(address(dUSDT), _depositAmount);
 
       assertEq(dUSDT.balanceOf(_solver2), _prevSolverBalance - _depositAmount, 'post-deposit solver balance incorrect');
-      assertEq(dUSDT.balanceOf(address(bscEverclearSpoke)), _prevSpokeBalance + _depositAmount, 'post-deposit contract balance incorrect');
+      assertEq(
+        dUSDT.balanceOf(address(bscEverclearSpoke)),
+        _prevSpokeBalance + _depositAmount,
+        'post-deposit contract balance incorrect'
+      );
 
       vm.mockCall(makeAddr('target'), abi.encodeWithSignature('doSomething()'), abi.encode(true));
 
@@ -183,7 +187,9 @@ contract Intent_Integration is IntegrationBase {
 
       uint256 _out = _intentAmount - (_intentAmount * _intent.maxFee / 100_000);
       assertEq(
-        dUSDT.balanceOf(address(bscEverclearSpoke)), _prevSpokeBalance + _depositAmount - _out, 'post-fill contract balance incorrect'
+        dUSDT.balanceOf(address(bscEverclearSpoke)),
+        _prevSpokeBalance + _depositAmount - _out,
+        'post-fill contract balance incorrect'
       );
 
       vm.stopPrank();
