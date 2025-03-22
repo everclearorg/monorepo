@@ -28,6 +28,7 @@ dataSources:
         - RouterEvent
         - Message
         - Meta
+        - IntentFeesAdded
       abis:
         - name: EverclearSpoke
           # prettier-ignore
@@ -85,4 +86,46 @@ dataSources:
         # eevent AssetMintFailed(address indexed _asset, address indexed _recipient, uint256 _amount, Strategy _strategy);
         - event: AssetMintFailed(indexed address,indexed address,uint256,uint8)
           handler: handleAssetMintFailed
+      file: ./src/everclear-spoke/mapping/index.ts
+  # FEE ADAPTER events
+  - kind: ethereum/contract
+    name: FeeAdapter
+    network: '{{network}}'
+    source:
+      address: '{{address}}'
+      abi: FeeAdapter
+      # prettier-ignore
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - OriginIntent
+        - DestinationIntent
+        - IntentAddEvent
+        - IntentFillEvent
+        - IntentBumpedEvent
+        - Transfer
+        - Balance
+        - UnclaimedBalance
+        - Router
+        - RouterEvent
+        - Message
+        - Meta
+        - IntentFeesAdded
+      abis:
+        - name: FeeAdapter
+          # prettier-ignore
+          file: {{filePath}}
+      eventHandlers:
+        # event event IntentWithFeesAdded(bytes32 indexed _intentId, bytes32 indexed _initiator, uint256 _tokenFee, uint256 _nativeFee);
+        - event: IntentWithFeesAdded(indexed bytes32,indexed bytes32,uint256,uint256)
+          handler: handleIntentFeesAdded
+        # event FeeRecipientUpdated(address indexed _updated, address indexed _previous);
+        - event: FeeRecipientUpdated(indexed address,indexed address)
+          handler: handleFeeRecipientUpdated
+        # event OrderCreated(bytes32 indexed _orderId, bytes32 indexed _initiator, bytes32[] _intentIds, uint256 _tokenFee, uint256 _nativeFee);
+        - event: OrderCreated(indexed bytes32,indexed bytes32,bytes32[],uint256,uint256)
+          handler: handleOrderCreated
       file: ./src/everclear-spoke/mapping/index.ts

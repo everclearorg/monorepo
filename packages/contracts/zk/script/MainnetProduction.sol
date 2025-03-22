@@ -10,6 +10,7 @@ import {IHubGateway} from 'interfaces/hub/IHubGateway.sol';
 import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
 import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
+import {IXERC20Module} from 'interfaces/intent/modules/IXERC20Module.sol';
 
 abstract contract DefaultValues {
   ///////////////////// HUB ARGUMENTS /////////////////////////
@@ -219,9 +220,10 @@ abstract contract ZkSync {
   uint32 public constant ZKSYNC = 324;
   IMailbox public ZKSYNC_MAILBOX = IMailbox(0x6bD0A2214797Bc81e0b006F7B74d6221BcD8cb6E);
 
-  IEverclearSpoke public ZKSYNC_SPOKE = 0x7F5e085981C93C579c865554B9b723B058AaE4D3;
-  ISpokeGateway public ZKSYNC_SPOKE_GATEWAY = 0xbD82E5503461913a70566E66a454465a46F5C903;
-  ICallExecutor public ZKSYNC_EXECUTOR = 0xd2cC1a32430B1b81b0ed6327bc37670a26ca4568;
+  IEverclearSpoke public ZKSYNC_SPOKE = IEverclearSpoke(0x7F5e085981C93C579c865554B9b723B058AaE4D3);
+  ISpokeGateway public ZKSYNC_SPOKE_GATEWAY = ISpokeGateway(0xbD82E5503461913a70566E66a454465a46F5C903);
+  ICallExecutor public ZKSYNC_EXECUTOR = ICallExecutor(0xd2cC1a32430B1b81b0ed6327bc37670a26ca4568);
+  IXERC20Module public ZKSYNC_XERC20_MODULE = IXERC20Module(0x6ACf19603C8588885250F7a02F0EaFFa4FcafB04);
 }
 
 abstract contract MainnetProductionDomains is
