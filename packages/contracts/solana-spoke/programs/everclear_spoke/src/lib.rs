@@ -202,4 +202,14 @@ pub mod everclear_spoke {
 
         instructions::update_vault_authority_bump(ctx, new_bump)
     }
+
+    pub fn update_domain(ctx: Context<AdminState>, new_domain: u32) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+
+        instructions::update_domain(ctx, new_domain)
+    }
 }

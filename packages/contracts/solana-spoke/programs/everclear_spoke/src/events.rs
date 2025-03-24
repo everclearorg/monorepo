@@ -120,3 +120,9 @@ pub struct VaultAuthorityBumpUpdatedEvent {
     pub old_bump: u8,
     pub new_bump: u8,
 }
+
+#[event]
+pub struct DomainUpdatedEvent {
+    pub old_domain: u32,
+    pub new_domain: u32,
+}

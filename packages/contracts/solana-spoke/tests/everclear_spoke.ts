@@ -501,7 +501,7 @@ describe('#everclear_spoke', () => {
     });
   });
 
-  describe('#update_mailbox_dispatch_authority_bump', () => {
+  describe('#update_vault_authority_bump', () => {
     it('should work', async () => {
       // Arrange
       const newBump = 150;
@@ -521,6 +521,29 @@ describe('#everclear_spoke', () => {
       // Assert
       spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.vaultAuthorityBump).to.be.equal(newBump);
+    });
+  });
+
+  describe('#update_domain', () => {
+    it('should work', async () => {
+      // Arrange
+      const newDomain = 7;
+
+      // Sanity check
+      let spokeState = await program.account.spokeState.fetch(spokeStateAddress);
+      expect(spokeState.domain).to.be.equal(1);
+
+      // Act
+      await program.methods.updateDomain(newDomain)
+        .accounts({
+          spokeState: spokeStateAddress,
+          admin: user.publicKey,
+        })
+        .rpc();
+
+      // Assert
+      spokeState = await program.account.spokeState.fetch(spokeStateAddress);
+      expect(spokeState.domain).to.be.equal(newDomain);
     });
   });
 });
