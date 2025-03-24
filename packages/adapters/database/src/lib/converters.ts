@@ -21,7 +21,6 @@ import {
   TokenomicsEvent,
   Reward,
   EpochResult,
-  EarlyExitEvent,
   NewLockPositionEvent,
   LockPosition,
 } from '@chimera-monorepo/utils';
@@ -341,7 +340,7 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       nonce: +invoice.origin_nonce!,
       data: invoice.origin_data ?? '0x',
       ttl: +invoice.origin_ttl!,
-  
+
       transactionHash: invoice.origin_transaction_hash!,
       timestamp: +invoice.origin_timestamp!,
       blockNumber: +invoice.origin_block_number!,
@@ -634,10 +633,10 @@ export function fromNewLockPositionEvent(newLockPosition: tokenomics.new_lock_po
     vid: +newLockPosition.vid,
     // the database format is in `\\x00000000000000000000000039096a17ba70fe5c1eddb923f940b2e6deae5c3b`
     // cast it to address by ignoring the starting zeros
-    user: '0x'+newLockPosition.user.slice(26),
+    user: '0x' + newLockPosition.user.slice(26),
     // NOTE: zapatos only converts number having precision issues to string, and this allows numbers
     // appear in form of `4.5e+23`, which cannot be directly converted with `toString`
-    newTotalAmountLocked: newLockPosition.new_total_amount_locked.toLocaleString('fullwide',  { useGrouping: false }),
+    newTotalAmountLocked: newLockPosition.new_total_amount_locked.toLocaleString('fullwide', { useGrouping: false }),
     blockTimestamp: +newLockPosition.block_timestamp,
     expiry: +newLockPosition.expiry,
   };
