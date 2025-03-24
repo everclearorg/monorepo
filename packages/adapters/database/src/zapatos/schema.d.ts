@@ -7357,6 +7357,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations: string[] | null;
       /**
+      * **intents.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator: string | null;
+      /**
       * **intents.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -7393,11 +7399,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id: string | null;
       /**
+      * **intents.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee: string | null;
+      /**
       * **intents.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
       origin_nonce: db.Int8String | null;
+      /**
+      * **intents.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id: string | null;
       /**
       * **intents.origin_origin**
       * - `varchar` in database
@@ -7434,6 +7452,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp: db.Int8String | null;
+      /**
+      * **intents.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee: string | null;
       /**
       * **intents.origin_transaction_hash**
       * - `bpchar` in database
@@ -7833,6 +7857,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations: string[] | null;
       /**
+      * **intents.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator: string | null;
+      /**
       * **intents.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -7869,11 +7899,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id: string | null;
       /**
+      * **intents.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee: string | null;
+      /**
       * **intents.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
       origin_nonce: (number | db.Int8String) | null;
+      /**
+      * **intents.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id: string | null;
       /**
       * **intents.origin_origin**
       * - `varchar` in database
@@ -7910,6 +7952,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp: (number | db.Int8String) | null;
+      /**
+      * **intents.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee: string | null;
       /**
       * **intents.origin_transaction_hash**
       * - `bpchar` in database
@@ -8309,6 +8357,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **intents.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **intents.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -8345,11 +8399,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **intents.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **intents.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
       origin_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **intents.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_origin**
       * - `varchar` in database
@@ -8386,6 +8452,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **intents.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_transaction_hash**
       * - `bpchar` in database
@@ -14746,6 +14818,179 @@ declare module 'zapatos/schema' {
   }
 
   /**
+   * **orders**
+   * - Table in database
+   */
+  export namespace orders {
+    export type Table = 'orders';
+    export interface Selectable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id: number;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids: string[];
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee: string | null;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee: string | null;
+    }
+    export interface JSONSelectable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id: number;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids: string[];
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee: string | null;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee: string | null;
+    }
+    export interface Whereable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids: string[] | db.Parameter<string[]> | db.SQLFragment;
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids?: string[] | db.Parameter<string[]> | db.SQLFragment | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment>;
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'orders_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
    * **origin_intents**
    * - Table in database
    */
@@ -14782,6 +15027,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       destinations: string[];
+      /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator: string | null;
       /**
       * **origin_intents.gas_limit**
       * - `int8` in database
@@ -14825,11 +15076,23 @@ declare module 'zapatos/schema' {
       */
       message_id: string | null;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee: string | null;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
       nonce: db.Int8String;
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id: string | null;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -14866,6 +15129,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       timestamp: db.Int8String;
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee: string | null;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -14923,6 +15192,12 @@ declare module 'zapatos/schema' {
       */
       destinations: string[];
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator: string | null;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
@@ -14965,11 +15240,23 @@ declare module 'zapatos/schema' {
       */
       message_id: string | null;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee: string | null;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
       nonce: (number | db.Int8String);
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id: string | null;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15006,6 +15293,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       timestamp: (number | db.Int8String);
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee: string | null;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -15063,6 +15356,12 @@ declare module 'zapatos/schema' {
       */
       destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
@@ -15105,11 +15404,23 @@ declare module 'zapatos/schema' {
       */
       message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
       nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15146,6 +15457,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -15203,6 +15520,12 @@ declare module 'zapatos/schema' {
       */
       destinations: string[] | db.Parameter<string[]> | db.SQLFragment;
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
@@ -15245,11 +15568,23 @@ declare module 'zapatos/schema' {
       */
       message_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
       nonce: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15286,6 +15621,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       timestamp: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -15343,6 +15684,12 @@ declare module 'zapatos/schema' {
       */
       destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment>;
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
@@ -15385,11 +15732,23 @@ declare module 'zapatos/schema' {
       */
       message_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
       nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15426,6 +15785,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -18926,20 +19291,20 @@ declare module 'zapatos/schema' {
   /* --- aggregate types --- */
 
   export namespace public {  
-    export type Table = assets.Table | balances.Table | checkpoints.Table | closedepochsprocessed.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | deposit_enqueued_not_processed.Table | depositenqueued.Table | depositors.Table | depositprocessed.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | finddepositdomain.Table | findinvoicedomain.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | intents_with_shadow_data.Table | invoice_enqueued_not_settled.Table | invoiceenqueued.Table | invoices.Table | invoices_with_shadow_data.Table | lock_positions.Table | matchdeposit.Table | merkle_trees.Table | messages.Table | origin_intents.Table | origin_intents_status_log.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settledeposit.Table | settlement_intents.Table | settlementenqueued.Table | settlementqueueprocessed.Table | settlementsent.Table | tokens.Table;
-    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | closedepochsprocessed.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | deposit_enqueued_not_processed.Selectable | depositenqueued.Selectable | depositors.Selectable | depositprocessed.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | finddepositdomain.Selectable | findinvoicedomain.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | intents_with_shadow_data.Selectable | invoice_enqueued_not_settled.Selectable | invoiceenqueued.Selectable | invoices.Selectable | invoices_with_shadow_data.Selectable | lock_positions.Selectable | matchdeposit.Selectable | merkle_trees.Selectable | messages.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settledeposit.Selectable | settlement_intents.Selectable | settlementenqueued.Selectable | settlementqueueprocessed.Selectable | settlementsent.Selectable | tokens.Selectable;
-    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | closedepochsprocessed.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | deposit_enqueued_not_processed.JSONSelectable | depositenqueued.JSONSelectable | depositors.JSONSelectable | depositprocessed.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | finddepositdomain.JSONSelectable | findinvoicedomain.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | intents_with_shadow_data.JSONSelectable | invoice_enqueued_not_settled.JSONSelectable | invoiceenqueued.JSONSelectable | invoices.JSONSelectable | invoices_with_shadow_data.JSONSelectable | lock_positions.JSONSelectable | matchdeposit.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settledeposit.JSONSelectable | settlement_intents.JSONSelectable | settlementenqueued.JSONSelectable | settlementqueueprocessed.JSONSelectable | settlementsent.JSONSelectable | tokens.JSONSelectable;
-    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | closedepochsprocessed.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | deposit_enqueued_not_processed.Whereable | depositenqueued.Whereable | depositors.Whereable | depositprocessed.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | finddepositdomain.Whereable | findinvoicedomain.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intents.Whereable | intents_with_shadow_data.Whereable | invoice_enqueued_not_settled.Whereable | invoiceenqueued.Whereable | invoices.Whereable | invoices_with_shadow_data.Whereable | lock_positions.Whereable | matchdeposit.Whereable | merkle_trees.Whereable | messages.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settledeposit.Whereable | settlement_intents.Whereable | settlementenqueued.Whereable | settlementqueueprocessed.Whereable | settlementsent.Whereable | tokens.Whereable;
-    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | closedepochsprocessed.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | deposit_enqueued_not_processed.Insertable | depositenqueued.Insertable | depositors.Insertable | depositprocessed.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | finddepositdomain.Insertable | findinvoicedomain.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intents.Insertable | intents_with_shadow_data.Insertable | invoice_enqueued_not_settled.Insertable | invoiceenqueued.Insertable | invoices.Insertable | invoices_with_shadow_data.Insertable | lock_positions.Insertable | matchdeposit.Insertable | merkle_trees.Insertable | messages.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settledeposit.Insertable | settlement_intents.Insertable | settlementenqueued.Insertable | settlementqueueprocessed.Insertable | settlementsent.Insertable | tokens.Insertable;
-    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | closedepochsprocessed.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | deposit_enqueued_not_processed.Updatable | depositenqueued.Updatable | depositors.Updatable | depositprocessed.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | finddepositdomain.Updatable | findinvoicedomain.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | intents_with_shadow_data.Updatable | invoice_enqueued_not_settled.Updatable | invoiceenqueued.Updatable | invoices.Updatable | invoices_with_shadow_data.Updatable | lock_positions.Updatable | matchdeposit.Updatable | merkle_trees.Updatable | messages.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settledeposit.Updatable | settlement_intents.Updatable | settlementenqueued.Updatable | settlementqueueprocessed.Updatable | settlementsent.Updatable | tokens.Updatable;
-    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | closedepochsprocessed.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | deposit_enqueued_not_processed.UniqueIndex | depositenqueued.UniqueIndex | depositors.UniqueIndex | depositprocessed.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | finddepositdomain.UniqueIndex | findinvoicedomain.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | intents_with_shadow_data.UniqueIndex | invoice_enqueued_not_settled.UniqueIndex | invoiceenqueued.UniqueIndex | invoices.UniqueIndex | invoices_with_shadow_data.UniqueIndex | lock_positions.UniqueIndex | matchdeposit.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settledeposit.UniqueIndex | settlement_intents.UniqueIndex | settlementenqueued.UniqueIndex | settlementqueueprocessed.UniqueIndex | settlementsent.UniqueIndex | tokens.UniqueIndex;
-    export type Column = assets.Column | balances.Column | checkpoints.Column | closedepochsprocessed.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | deposit_enqueued_not_processed.Column | depositenqueued.Column | depositors.Column | depositprocessed.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | finddepositdomain.Column | findinvoicedomain.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | intents_with_shadow_data.Column | invoice_enqueued_not_settled.Column | invoiceenqueued.Column | invoices.Column | invoices_with_shadow_data.Column | lock_positions.Column | matchdeposit.Column | merkle_trees.Column | messages.Column | origin_intents.Column | origin_intents_status_log.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settledeposit.Column | settlement_intents.Column | settlementenqueued.Column | settlementqueueprocessed.Column | settlementsent.Column | tokens.Column;
+    export type Table = assets.Table | balances.Table | checkpoints.Table | closedepochsprocessed.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | deposit_enqueued_not_processed.Table | depositenqueued.Table | depositors.Table | depositprocessed.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | finddepositdomain.Table | findinvoicedomain.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | intents_with_shadow_data.Table | invoice_enqueued_not_settled.Table | invoiceenqueued.Table | invoices.Table | invoices_with_shadow_data.Table | lock_positions.Table | matchdeposit.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settledeposit.Table | settlement_intents.Table | settlementenqueued.Table | settlementqueueprocessed.Table | settlementsent.Table | tokens.Table;
+    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | closedepochsprocessed.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | deposit_enqueued_not_processed.Selectable | depositenqueued.Selectable | depositors.Selectable | depositprocessed.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | finddepositdomain.Selectable | findinvoicedomain.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | intents_with_shadow_data.Selectable | invoice_enqueued_not_settled.Selectable | invoiceenqueued.Selectable | invoices.Selectable | invoices_with_shadow_data.Selectable | lock_positions.Selectable | matchdeposit.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settledeposit.Selectable | settlement_intents.Selectable | settlementenqueued.Selectable | settlementqueueprocessed.Selectable | settlementsent.Selectable | tokens.Selectable;
+    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | closedepochsprocessed.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | deposit_enqueued_not_processed.JSONSelectable | depositenqueued.JSONSelectable | depositors.JSONSelectable | depositprocessed.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | finddepositdomain.JSONSelectable | findinvoicedomain.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | intents_with_shadow_data.JSONSelectable | invoice_enqueued_not_settled.JSONSelectable | invoiceenqueued.JSONSelectable | invoices.JSONSelectable | invoices_with_shadow_data.JSONSelectable | lock_positions.JSONSelectable | matchdeposit.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settledeposit.JSONSelectable | settlement_intents.JSONSelectable | settlementenqueued.JSONSelectable | settlementqueueprocessed.JSONSelectable | settlementsent.JSONSelectable | tokens.JSONSelectable;
+    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | closedepochsprocessed.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | deposit_enqueued_not_processed.Whereable | depositenqueued.Whereable | depositors.Whereable | depositprocessed.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | finddepositdomain.Whereable | findinvoicedomain.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intents.Whereable | intents_with_shadow_data.Whereable | invoice_enqueued_not_settled.Whereable | invoiceenqueued.Whereable | invoices.Whereable | invoices_with_shadow_data.Whereable | lock_positions.Whereable | matchdeposit.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settledeposit.Whereable | settlement_intents.Whereable | settlementenqueued.Whereable | settlementqueueprocessed.Whereable | settlementsent.Whereable | tokens.Whereable;
+    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | closedepochsprocessed.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | deposit_enqueued_not_processed.Insertable | depositenqueued.Insertable | depositors.Insertable | depositprocessed.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | finddepositdomain.Insertable | findinvoicedomain.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intents.Insertable | intents_with_shadow_data.Insertable | invoice_enqueued_not_settled.Insertable | invoiceenqueued.Insertable | invoices.Insertable | invoices_with_shadow_data.Insertable | lock_positions.Insertable | matchdeposit.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settledeposit.Insertable | settlement_intents.Insertable | settlementenqueued.Insertable | settlementqueueprocessed.Insertable | settlementsent.Insertable | tokens.Insertable;
+    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | closedepochsprocessed.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | deposit_enqueued_not_processed.Updatable | depositenqueued.Updatable | depositors.Updatable | depositprocessed.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | finddepositdomain.Updatable | findinvoicedomain.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | intents_with_shadow_data.Updatable | invoice_enqueued_not_settled.Updatable | invoiceenqueued.Updatable | invoices.Updatable | invoices_with_shadow_data.Updatable | lock_positions.Updatable | matchdeposit.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settledeposit.Updatable | settlement_intents.Updatable | settlementenqueued.Updatable | settlementqueueprocessed.Updatable | settlementsent.Updatable | tokens.Updatable;
+    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | closedepochsprocessed.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | deposit_enqueued_not_processed.UniqueIndex | depositenqueued.UniqueIndex | depositors.UniqueIndex | depositprocessed.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | finddepositdomain.UniqueIndex | findinvoicedomain.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | intents_with_shadow_data.UniqueIndex | invoice_enqueued_not_settled.UniqueIndex | invoiceenqueued.UniqueIndex | invoices.UniqueIndex | invoices_with_shadow_data.UniqueIndex | lock_positions.UniqueIndex | matchdeposit.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settledeposit.UniqueIndex | settlement_intents.UniqueIndex | settlementenqueued.UniqueIndex | settlementqueueprocessed.UniqueIndex | settlementsent.UniqueIndex | tokens.UniqueIndex;
+    export type Column = assets.Column | balances.Column | checkpoints.Column | closedepochsprocessed.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | deposit_enqueued_not_processed.Column | depositenqueued.Column | depositors.Column | depositprocessed.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | finddepositdomain.Column | findinvoicedomain.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | intents_with_shadow_data.Column | invoice_enqueued_not_settled.Column | invoiceenqueued.Column | invoices.Column | invoices_with_shadow_data.Column | lock_positions.Column | matchdeposit.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settledeposit.Column | settlement_intents.Column | settlementenqueued.Column | settlementqueueprocessed.Column | settlementsent.Column | tokens.Column;
   
-    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, tokens.Table];
+    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, tokens.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
     export type AllMaterializedViews = [closedepochsprocessed.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, deposit_enqueued_not_processed.Table, depositenqueued.Table, depositprocessed.Table, finddepositdomain.Table, findinvoicedomain.Table, intents.Table, intents_with_shadow_data.Table, invoice_enqueued_not_settled.Table, invoiceenqueued.Table, invoices.Table, invoices_with_shadow_data.Table, matchdeposit.Table, settledeposit.Table, settlementenqueued.Table, settlementqueueprocessed.Table, settlementsent.Table];
-    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, closedepochsprocessed.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, deposit_enqueued_not_processed.Table, depositenqueued.Table, depositors.Table, depositprocessed.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, finddepositdomain.Table, findinvoicedomain.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intents.Table, intents_with_shadow_data.Table, invoice_enqueued_not_settled.Table, invoiceenqueued.Table, invoices.Table, invoices_with_shadow_data.Table, lock_positions.Table, matchdeposit.Table, merkle_trees.Table, messages.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settledeposit.Table, settlement_intents.Table, settlementenqueued.Table, settlementqueueprocessed.Table, settlementsent.Table, tokens.Table];
+    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, closedepochsprocessed.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, deposit_enqueued_not_processed.Table, depositenqueued.Table, depositors.Table, depositprocessed.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, finddepositdomain.Table, findinvoicedomain.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intents.Table, intents_with_shadow_data.Table, invoice_enqueued_not_settled.Table, invoiceenqueued.Table, invoices.Table, invoices_with_shadow_data.Table, lock_positions.Table, matchdeposit.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settledeposit.Table, settlement_intents.Table, settlementenqueued.Table, settlementqueueprocessed.Table, settlementsent.Table, tokens.Table];
   }
 
 
@@ -19027,6 +19392,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Selectable;
     "merkle_trees": merkle_trees.Selectable;
     "messages": messages.Selectable;
+    "orders": orders.Selectable;
     "origin_intents": origin_intents.Selectable;
     "origin_intents_status_log": origin_intents_status_log.Selectable;
     "queues": queues.Selectable;
@@ -19071,6 +19437,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.JSONSelectable;
     "merkle_trees": merkle_trees.JSONSelectable;
     "messages": messages.JSONSelectable;
+    "orders": orders.JSONSelectable;
     "origin_intents": origin_intents.JSONSelectable;
     "origin_intents_status_log": origin_intents_status_log.JSONSelectable;
     "queues": queues.JSONSelectable;
@@ -19115,6 +19482,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Whereable;
     "merkle_trees": merkle_trees.Whereable;
     "messages": messages.Whereable;
+    "orders": orders.Whereable;
     "origin_intents": origin_intents.Whereable;
     "origin_intents_status_log": origin_intents_status_log.Whereable;
     "queues": queues.Whereable;
@@ -19159,6 +19527,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Insertable;
     "merkle_trees": merkle_trees.Insertable;
     "messages": messages.Insertable;
+    "orders": orders.Insertable;
     "origin_intents": origin_intents.Insertable;
     "origin_intents_status_log": origin_intents_status_log.Insertable;
     "queues": queues.Insertable;
@@ -19203,6 +19572,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Updatable;
     "merkle_trees": merkle_trees.Updatable;
     "messages": messages.Updatable;
+    "orders": orders.Updatable;
     "origin_intents": origin_intents.Updatable;
     "origin_intents_status_log": origin_intents_status_log.Updatable;
     "queues": queues.Updatable;
@@ -19247,6 +19617,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.UniqueIndex;
     "merkle_trees": merkle_trees.UniqueIndex;
     "messages": messages.UniqueIndex;
+    "orders": orders.UniqueIndex;
     "origin_intents": origin_intents.UniqueIndex;
     "origin_intents_status_log": origin_intents_status_log.UniqueIndex;
     "queues": queues.UniqueIndex;
@@ -19291,6 +19662,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Column;
     "merkle_trees": merkle_trees.Column;
     "messages": messages.Column;
+    "orders": orders.Column;
     "origin_intents": origin_intents.Column;
     "origin_intents_status_log": origin_intents_status_log.Column;
     "queues": queues.Column;
@@ -19335,6 +19707,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.SQL;
     "merkle_trees": merkle_trees.SQL;
     "messages": messages.SQL;
+    "orders": orders.SQL;
     "origin_intents": origin_intents.SQL;
     "origin_intents_status_log": origin_intents_status_log.SQL;
     "queues": queues.SQL;
