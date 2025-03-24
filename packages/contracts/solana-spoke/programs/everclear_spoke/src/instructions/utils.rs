@@ -9,29 +9,31 @@ pub(crate) fn normalize_decimals(
     minted_decimals: u8,
     target_decimals: u8,
 ) -> Result<u64> {
-    if minted_decimals == target_decimals {
+    match minted_decimals.cmp(&target_decimals) {
         // No scaling needed
-        Ok(amount)
-    } else if minted_decimals > target_decimals {
+        std::cmp::Ordering::Equal => Ok(amount),
         // e.g. minted_decimals=9, target_decimals=6 => downscale
-        let shift = minted_decimals - target_decimals;
-        // prevent potential divide-by-zero or overshoot
-        if shift > 12 {
-            // you might fail or just saturate for large differences
-            return err!(SpokeError::DecimalConversionOverflow);
+        std::cmp::Ordering::Greater => {
+            let shift = minted_decimals - target_decimals;
+            // prevent potential divide-by-zero or overshoot
+            if shift > 12 {
+                // you might fail or just saturate for large differences
+                return err!(SpokeError::DecimalConversionOverflow);
+            };
+            Ok(amount / 10u64.pow(shift as u32))
         }
-        Ok(amount / 10u64.pow(shift as u32))
-    } else {
         // minted_decimals < target_decimals => upscale
-        let shift = target_decimals - minted_decimals;
-        // watch for overflow if we do big multiplications
-        let factor = 10u64
-            .checked_pow(shift as u32)
-            .ok_or(error!(SpokeError::DecimalConversionOverflow))?;
-        let scaled = amount
-            .checked_mul(factor)
-            .ok_or(error!(SpokeError::DecimalConversionOverflow))?;
-        Ok(scaled)
+        std::cmp::Ordering::Less => {
+            let shift = target_decimals - minted_decimals;
+            // watch for overflow if we do big multiplications
+            let factor = 10u64
+                .checked_pow(shift as u32)
+                .ok_or(error!(SpokeError::DecimalConversionOverflow))?;
+            let scaled = amount
+                .checked_mul(factor)
+                .ok_or(error!(SpokeError::DecimalConversionOverflow))?;
+            Ok(scaled)
+        }
     }
 }
 
