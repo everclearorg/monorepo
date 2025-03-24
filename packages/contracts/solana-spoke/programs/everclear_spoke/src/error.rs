@@ -62,4 +62,6 @@ pub enum SpokeError {
     IntegerOverflow,
     #[msg("Invalid seeds for deriving pda")]
     InvalidSeeds,
+    #[msg("Invalid vault account")]
+    InvalidVaultAccount,
 }

@@ -4,6 +4,7 @@ use crate::{
         transfer_remote, Igp, Mailbox, SplNoop, TransferRemote, TransferRemoteContext, U256,
     },
     instructions::MessageType,
+    vault_authority_pda_seeds,
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
@@ -59,6 +60,15 @@ pub fn new_intent(
     let normalized_amount =
         normalize_decimals(amount, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
     require!(normalized_amount > 0, SpokeError::ZeroAmount); // Add zero amount check like Solidity
+
+    let vault_authority_seeds: &[&[u8]] = vault_authority_pda_seeds!(state.vault_authority_bump);
+    let vault_authority = Pubkey::create_program_address(vault_authority_seeds, ctx.program_id)
+        .map_err(|_| error!(SpokeError::InvalidArgument))?;
+    require!(
+        ctx.accounts.program_vault_account.mint == ctx.accounts.mint.key()
+            && ctx.accounts.program_vault_account.owner == vault_authority,
+        SpokeError::InvalidVaultAccount
+    );
 
     // Transfer from user's token account -> program's vault
     let cpi_accounts = Transfer {
@@ -189,12 +199,7 @@ pub struct NewIntent<'info> {
         associated_token::token_program = token_program,
     )]
     pub user_token_account: Account<'info, TokenAccount>,
-    #[account(
-        mut,
-        associated_token::mint = mint,
-        associated_token::authority = crate::ID,
-        associated_token::token_program = token_program,
-    )]
+    #[account(mut)]
     pub program_vault_account: Account<'info, TokenAccount>,
 
     #[account(address = TOKEN_PROGRAM_ID)]
