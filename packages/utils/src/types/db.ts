@@ -116,6 +116,16 @@ export const OriginIntentSchema = Type.Intersect([
     queueIdx: Type.Integer(),
     messageId: Type.Optional(Type.String({ maxLength: 66 })),
     status: Type.Enum(TIntentStatus),
+    nativeFee: Type.Optional(TIntegerString),
+    tokenFee: Type.Optional(TIntegerString),
+    feeAdapterInitiator: Type.Optional(TAddress),
+    order: Type.Optional(
+      Type.Object({
+        id: TBytes32,
+        nativeFee: TIntegerString,
+        tokenFee: TBytes32,
+      }),
+    ),
   }),
 ]);
 export type OriginIntent = Static<typeof OriginIntentSchema>;

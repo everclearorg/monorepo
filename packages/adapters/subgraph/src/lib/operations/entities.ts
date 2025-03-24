@@ -74,6 +74,72 @@ export const MESSAGE_ENTITY = `
     gasLimit
 `;
 
+export type FeesEntity = {
+  id: string;
+  intent: {
+    id: string;
+  };
+  initiator: string;
+  nativeFee: string;
+  tokenFee: string;
+  transactionHash: string;
+  timestamp: number;
+  gasPrice: string;
+  gasLimit: string;
+  blockNumber: number;
+  txOrigin: string;
+  txNonce: number;
+};
+export const FEES_ENTITY = `
+    id
+    intent {
+      id
+    }
+    initiator
+    nativeFee
+    tokenFee
+    transactionHash
+    timestamp
+    gasPrice
+    gasLimit
+    blockNumber
+    txOrigin
+    txNonce
+`;
+
+export type OrderEntity = {
+  id: string;
+  initiator: string;
+  intents: {
+    id: string;
+  }[];
+  tokenFee: string;
+  nativeFee: string;
+  transactionHash: string;
+  timestamp: number;
+  gasPrice: string;
+  gasLimit: string;
+  blockNumber: number;
+  txOrigin: string;
+  txNonce: number;
+};
+export const ORDER_ENTITY = `
+    id
+    initiator
+    intents {
+      id
+    }
+    tokenFee
+    nativeFee
+    transactionHash
+    timestamp
+    gasPrice
+    gasLimit
+    blockNumber
+    txOrigin
+    txNonce
+`;
+
 export type CalldataExecutedEventEntity = {
   id: string;
   returnData: string;
@@ -103,6 +169,8 @@ export type SpokeOriginIntentEntity = Intent & {
   id: string;
   queueIdx: number;
   message?: MessageEntity;
+  fees?: FeesEntity;
+  order?: OrderEntity;
   status: IntentStatus;
 };
 
@@ -111,6 +179,12 @@ export const SPOKE_ORIGIN_INTENT_ENTITY = `
     queueIdx
     message {
       ${MESSAGE_ENTITY}
+    }
+    fees {
+      ${FEES_ENTITY}
+    }
+    order {
+      ${ORDER_ENTITY}
     }
     status
     ${INTENT_FIELDS}
