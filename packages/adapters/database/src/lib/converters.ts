@@ -73,6 +73,11 @@ export function toOriginIntents(originIntent: OriginIntent): origin_intents.Inse
     gas_price: +originIntent.gasPrice,
     tx_origin: originIntent.txOrigin,
     tx_nonce: originIntent.txNonce,
+
+    native_fee: originIntent.nativeFee,
+    token_fee: originIntent.tokenFee,
+    fee_adapter_initiator: originIntent.feeAdapterInitiator,
+    order_id: originIntent.orderId ?? undefined,
   };
 }
 export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): OriginIntent {
@@ -100,6 +105,11 @@ export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): O
     gasPrice: String(originIntent.gas_price),
     txOrigin: originIntent.tx_origin,
     txNonce: +originIntent.tx_nonce,
+
+    nativeFee: originIntent.native_fee ?? undefined,
+    tokenFee: originIntent.token_fee ?? undefined,
+    feeAdapterInitiator: originIntent.fee_adapter_initiator ?? undefined,
+    orderId: originIntent.order_id ?? undefined,
   };
 }
 
@@ -132,6 +142,11 @@ export function originIntentFromIntent(intent: intents.JSONSelectable): OriginIn
     gasPrice: String(intent.origin_gas_price!),
     txOrigin: intent.origin_tx_origin!,
     txNonce: +intent.origin_tx_nonce!,
+
+    nativeFee: intent.origin_native_fee ?? undefined,
+    tokenFee: intent.origin_token_fee ?? undefined,
+    feeAdapterInitiator: intent.origin_fee_adapter_initiator ?? undefined,
+    orderId: intent.origin_order_id ?? undefined,
   };
 }
 

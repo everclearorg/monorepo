@@ -119,13 +119,7 @@ export const OriginIntentSchema = Type.Intersect([
     nativeFee: Type.Optional(TIntegerString),
     tokenFee: Type.Optional(TIntegerString),
     feeAdapterInitiator: Type.Optional(TAddress),
-    order: Type.Optional(
-      Type.Object({
-        id: TBytes32,
-        nativeFee: TIntegerString,
-        tokenFee: TBytes32,
-      }),
-    ),
+    orderId: Type.Optional(TBytes32),
   }),
 ]);
 export type OriginIntent = Static<typeof OriginIntentSchema>;

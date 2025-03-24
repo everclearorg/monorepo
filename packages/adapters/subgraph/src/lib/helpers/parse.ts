@@ -74,11 +74,7 @@ export const originIntent = (entity: SpokeAddIntentEventEntity): OriginIntent =>
     tokenFee: entity.intent.fees?.tokenFee ?? undefined,
     nativeFee: entity.intent.fees?.nativeFee ?? undefined,
     feeAdapterInitiator: entity.intent.fees?.initiator ?? undefined,
-    order: entity.intent.order ? {
-      id: entity.intent.order.id,
-      nativeFee: entity.intent.order.nativeFee,
-      tokenFee: entity.intent.order.tokenFee,
-    } : undefined,
+    orderId: entity.intent.order?.id ?? undefined,
   };
 };
 
