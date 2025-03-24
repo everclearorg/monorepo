@@ -19290,7 +19290,7 @@ declare module 'zapatos/schema' {
 
   /* --- aggregate types --- */
 
-  export namespace public {  
+  export namespace public {
     export type Table = assets.Table | balances.Table | checkpoints.Table | closedepochsprocessed.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | deposit_enqueued_not_processed.Table | depositenqueued.Table | depositors.Table | depositprocessed.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | finddepositdomain.Table | findinvoicedomain.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | intents_with_shadow_data.Table | invoice_enqueued_not_settled.Table | invoiceenqueued.Table | invoices.Table | invoices_with_shadow_data.Table | lock_positions.Table | matchdeposit.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settledeposit.Table | settlement_intents.Table | settlementenqueued.Table | settlementqueueprocessed.Table | settlementsent.Table | tokens.Table;
     export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | closedepochsprocessed.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | deposit_enqueued_not_processed.Selectable | depositenqueued.Selectable | depositors.Selectable | depositprocessed.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | finddepositdomain.Selectable | findinvoicedomain.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | intents_with_shadow_data.Selectable | invoice_enqueued_not_settled.Selectable | invoiceenqueued.Selectable | invoices.Selectable | invoices_with_shadow_data.Selectable | lock_positions.Selectable | matchdeposit.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settledeposit.Selectable | settlement_intents.Selectable | settlementenqueued.Selectable | settlementqueueprocessed.Selectable | settlementsent.Selectable | tokens.Selectable;
     export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | closedepochsprocessed.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | deposit_enqueued_not_processed.JSONSelectable | depositenqueued.JSONSelectable | depositors.JSONSelectable | depositprocessed.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | finddepositdomain.JSONSelectable | findinvoicedomain.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | intents_with_shadow_data.JSONSelectable | invoice_enqueued_not_settled.JSONSelectable | invoiceenqueued.JSONSelectable | invoices.JSONSelectable | invoices_with_shadow_data.JSONSelectable | lock_positions.JSONSelectable | matchdeposit.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settledeposit.JSONSelectable | settlement_intents.JSONSelectable | settlementenqueued.JSONSelectable | settlementqueueprocessed.JSONSelectable | settlementsent.JSONSelectable | tokens.JSONSelectable;
@@ -19299,7 +19299,7 @@ declare module 'zapatos/schema' {
     export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | closedepochsprocessed.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | deposit_enqueued_not_processed.Updatable | depositenqueued.Updatable | depositors.Updatable | depositprocessed.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | finddepositdomain.Updatable | findinvoicedomain.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | intents_with_shadow_data.Updatable | invoice_enqueued_not_settled.Updatable | invoiceenqueued.Updatable | invoices.Updatable | invoices_with_shadow_data.Updatable | lock_positions.Updatable | matchdeposit.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settledeposit.Updatable | settlement_intents.Updatable | settlementenqueued.Updatable | settlementqueueprocessed.Updatable | settlementsent.Updatable | tokens.Updatable;
     export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | closedepochsprocessed.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | deposit_enqueued_not_processed.UniqueIndex | depositenqueued.UniqueIndex | depositors.UniqueIndex | depositprocessed.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | finddepositdomain.UniqueIndex | findinvoicedomain.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | intents_with_shadow_data.UniqueIndex | invoice_enqueued_not_settled.UniqueIndex | invoiceenqueued.UniqueIndex | invoices.UniqueIndex | invoices_with_shadow_data.UniqueIndex | lock_positions.UniqueIndex | matchdeposit.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settledeposit.UniqueIndex | settlement_intents.UniqueIndex | settlementenqueued.UniqueIndex | settlementqueueprocessed.UniqueIndex | settlementsent.UniqueIndex | tokens.UniqueIndex;
     export type Column = assets.Column | balances.Column | checkpoints.Column | closedepochsprocessed.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | deposit_enqueued_not_processed.Column | depositenqueued.Column | depositors.Column | depositprocessed.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | finddepositdomain.Column | findinvoicedomain.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | intents_with_shadow_data.Column | invoice_enqueued_not_settled.Column | invoiceenqueued.Column | invoices.Column | invoices_with_shadow_data.Column | lock_positions.Column | matchdeposit.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settledeposit.Column | settlement_intents.Column | settlementenqueued.Column | settlementqueueprocessed.Column | settlementsent.Column | tokens.Column;
-  
+
     export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, tokens.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
@@ -19312,31 +19312,15339 @@ declare module 'zapatos/schema' {
   /* === schema: tokenomics === */
 
   export namespace tokenomics {
-  
+
     /* --- enums --- */
     /* (none) */
-  
+
     /* --- tables --- */
-    /* (none) */
-  
+
+    /**
+     * **tokenomics.bridge_in_error**
+     * - Table in database
+     */
+    export namespace bridge_in_error {
+      export type Table = 'tokenomics.bridge_in_error';
+      export interface Selectable {
+        /**
+        * **tokenomics.bridge_in_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridge_in_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridge_in_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.bridge_in_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridge_in_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.bridge_in_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.bridge_in_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: db.NumericString;
+        /**
+        * **tokenomics.bridge_in_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.bridge_in_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.bridge_in_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridge_in_error.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp: db.NumericString;
+        /**
+        * **tokenomics.bridge_in_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.bridge_in_error.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.bridge_in_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.bridge_in_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridge_in_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridge_in_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.bridge_in_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridge_in_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.bridge_in_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.bridge_in_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString);
+        /**
+        * **tokenomics.bridge_in_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.bridge_in_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.bridge_in_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridge_in_error.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.bridge_in_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.bridge_in_error.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.bridge_in_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.bridge_in_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_in_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.bridge_in_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_in_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.bridge_in_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_in_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'bridge_in_error_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.bridge_updated**
+     * - Table in database
+     */
+    export namespace bridge_updated {
+      export type Table = 'tokenomics.bridge_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.bridge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.bridge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.bridge_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: Buffer;
+        /**
+        * **tokenomics.bridge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.bridge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.bridge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridge_updated.new_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_bridge: Buffer;
+        /**
+        * **tokenomics.bridge_updated.old_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_bridge: Buffer;
+        /**
+        * **tokenomics.bridge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.bridge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.bridge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.bridge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.bridge_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: db.ByteArrayString;
+        /**
+        * **tokenomics.bridge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.bridge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.bridge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridge_updated.new_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_bridge: db.ByteArrayString;
+        /**
+        * **tokenomics.bridge_updated.old_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_bridge: db.ByteArrayString;
+        /**
+        * **tokenomics.bridge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.bridge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.bridge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.new_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_bridge?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.old_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_bridge?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.bridge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.new_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_bridge: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.old_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_bridge: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.bridge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.new_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_bridge?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.old_bridge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_bridge?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'bridge_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.bridged_in**
+     * - Table in database
+     */
+    export namespace bridged_in {
+      export type Table = 'tokenomics.bridged_in';
+      export interface Selectable {
+        /**
+        * **tokenomics.bridged_in._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridged_in._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridged_in.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.bridged_in.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridged_in.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.bridged_in.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.bridged_in.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.bridged_in.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.bridged_in.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridged_in.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: Buffer;
+        /**
+        * **tokenomics.bridged_in.src_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        src_chain_id: db.NumericString;
+        /**
+        * **tokenomics.bridged_in.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.bridged_in.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.bridged_in._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridged_in._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridged_in.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_in.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridged_in.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_in.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_in.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_in.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.bridged_in.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridged_in.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_in.src_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        src_chain_id: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_in.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_in.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.bridged_in._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.src_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        src_chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_in.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.bridged_in._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.src_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        src_chain_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_in.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.bridged_in._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.src_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        src_chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_in.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'bridged_in_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.bridged_lock**
+     * - Table in database
+     */
+    export namespace bridged_lock {
+      export type Table = 'tokenomics.bridged_lock';
+      export interface Selectable {
+        /**
+        * **tokenomics.bridged_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridged_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridged_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridged_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.bridged_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.bridged_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridged_lock.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: Buffer;
+        /**
+        * **tokenomics.bridged_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.bridged_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.bridged_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridged_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridged_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridged_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.bridged_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridged_lock.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.bridged_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.bridged_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.bridged_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'bridged_lock_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.bridged_lock_error**
+     * - Table in database
+     */
+    export namespace bridged_lock_error {
+      export type Table = 'tokenomics.bridged_lock_error';
+      export interface Selectable {
+        /**
+        * **tokenomics.bridged_lock_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridged_lock_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridged_lock_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridged_lock_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock_error.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: db.NumericString;
+        /**
+        * **tokenomics.bridged_lock_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.bridged_lock_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.bridged_lock_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridged_lock_error.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: Buffer;
+        /**
+        * **tokenomics.bridged_lock_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.bridged_lock_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.bridged_lock_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridged_lock_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridged_lock_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridged_lock_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock_error.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_lock_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_lock_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.bridged_lock_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridged_lock_error.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_lock_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_lock_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.bridged_lock_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_lock_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.bridged_lock_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_lock_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.bridged_lock_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_lock_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'bridged_lock_error_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.bridged_out**
+     * - Table in database
+     */
+    export namespace bridged_out {
+      export type Table = 'tokenomics.bridged_out';
+      export interface Selectable {
+        /**
+        * **tokenomics.bridged_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridged_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridged_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.bridged_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridged_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.bridged_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.bridged_out.bridge_user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        bridge_user: Buffer;
+        /**
+        * **tokenomics.bridged_out.dst_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        dst_chain_id: db.NumericString;
+        /**
+        * **tokenomics.bridged_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.bridged_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.bridged_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridged_out.token_receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token_receiver: Buffer;
+        /**
+        * **tokenomics.bridged_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.bridged_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.bridged_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.bridged_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.bridged_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.bridged_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_out.bridge_user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        bridge_user: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_out.dst_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        dst_chain_id: (number | db.NumericString);
+        /**
+        * **tokenomics.bridged_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.bridged_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.bridged_out.token_receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token_receiver: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.bridged_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.bridged_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.bridge_user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        bridge_user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.dst_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        dst_chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.token_receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token_receiver?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.bridged_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.bridged_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.bridge_user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        bridge_user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.dst_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        dst_chain_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.token_receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token_receiver: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.bridged_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.bridged_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.bridge_user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        bridge_user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.dst_chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        dst_chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.token_receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token_receiver?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.bridged_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'bridged_out_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.chain_gateway_added**
+     * - Table in database
+     */
+    export namespace chain_gateway_added {
+      export type Table = 'tokenomics.chain_gateway_added';
+      export interface Selectable {
+        /**
+        * **tokenomics.chain_gateway_added._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.chain_gateway_added._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.chain_gateway_added.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.chain_gateway_added.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.chain_gateway_added.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.chain_gateway_added.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: db.NumericString;
+        /**
+        * **tokenomics.chain_gateway_added.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: Buffer;
+        /**
+        * **tokenomics.chain_gateway_added.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway: Buffer;
+        /**
+        * **tokenomics.chain_gateway_added.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.chain_gateway_added.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.chain_gateway_added.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.chain_gateway_added.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.chain_gateway_added.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.chain_gateway_added._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.chain_gateway_added._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.chain_gateway_added.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.chain_gateway_added.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.chain_gateway_added.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.chain_gateway_added.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString);
+        /**
+        * **tokenomics.chain_gateway_added.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: db.ByteArrayString;
+        /**
+        * **tokenomics.chain_gateway_added.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway: db.ByteArrayString;
+        /**
+        * **tokenomics.chain_gateway_added.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.chain_gateway_added.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.chain_gateway_added.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.chain_gateway_added.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.chain_gateway_added.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.chain_gateway_added._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_added.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.chain_gateway_added._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_added.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.chain_gateway_added._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_added.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'chain_gateway_added_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.chain_gateway_removed**
+     * - Table in database
+     */
+    export namespace chain_gateway_removed {
+      export type Table = 'tokenomics.chain_gateway_removed';
+      export interface Selectable {
+        /**
+        * **tokenomics.chain_gateway_removed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.chain_gateway_removed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.chain_gateway_removed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.chain_gateway_removed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.chain_gateway_removed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.chain_gateway_removed.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: db.NumericString;
+        /**
+        * **tokenomics.chain_gateway_removed.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: Buffer;
+        /**
+        * **tokenomics.chain_gateway_removed.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway: Buffer;
+        /**
+        * **tokenomics.chain_gateway_removed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.chain_gateway_removed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.chain_gateway_removed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.chain_gateway_removed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.chain_gateway_removed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.chain_gateway_removed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.chain_gateway_removed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.chain_gateway_removed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.chain_gateway_removed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.chain_gateway_removed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.chain_gateway_removed.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString);
+        /**
+        * **tokenomics.chain_gateway_removed.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: db.ByteArrayString;
+        /**
+        * **tokenomics.chain_gateway_removed.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway: db.ByteArrayString;
+        /**
+        * **tokenomics.chain_gateway_removed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.chain_gateway_removed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.chain_gateway_removed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.chain_gateway_removed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.chain_gateway_removed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.chain_gateway_removed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.chain_gateway_removed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.chain_gateway_removed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.chain_gateway_removed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.chain_gateway_removed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        gateway?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.chain_gateway_removed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'chain_gateway_removed_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.early_exit**
+     * - Table in database
+     */
+    export namespace early_exit {
+      export type Table = 'tokenomics.early_exit';
+      export interface Selectable {
+        /**
+        * **tokenomics.early_exit._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.early_exit._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.early_exit.amount_received**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_received: db.NumericString;
+        /**
+        * **tokenomics.early_exit.amount_unlocked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_unlocked: db.NumericString;
+        /**
+        * **tokenomics.early_exit.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.early_exit.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.early_exit.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.early_exit.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.early_exit.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.early_exit.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.early_exit.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.early_exit.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.early_exit.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.early_exit._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.early_exit._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.early_exit.amount_received**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_received: (number | db.NumericString);
+        /**
+        * **tokenomics.early_exit.amount_unlocked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_unlocked: (number | db.NumericString);
+        /**
+        * **tokenomics.early_exit.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.early_exit.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.early_exit.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.early_exit.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.early_exit.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.early_exit.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.early_exit.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.early_exit.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.early_exit.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.early_exit._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.amount_received**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_received?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.amount_unlocked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_unlocked?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.early_exit.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.early_exit._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.amount_received**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_received: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.amount_unlocked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_unlocked: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.early_exit.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.early_exit._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.amount_received**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_received?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.amount_unlocked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount_unlocked?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.early_exit.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'early_exit_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.eip712_domain_changed**
+     * - Table in database
+     */
+    export namespace eip712_domain_changed {
+      export type Table = 'tokenomics.eip712_domain_changed';
+      export interface Selectable {
+        /**
+        * **tokenomics.eip712_domain_changed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.eip712_domain_changed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.eip712_domain_changed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.eip712_domain_changed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.eip712_domain_changed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.eip712_domain_changed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.eip712_domain_changed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.eip712_domain_changed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.eip712_domain_changed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.eip712_domain_changed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.eip712_domain_changed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.eip712_domain_changed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.eip712_domain_changed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.eip712_domain_changed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.eip712_domain_changed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.eip712_domain_changed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.eip712_domain_changed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.eip712_domain_changed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.eip712_domain_changed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.eip712_domain_changed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.eip712_domain_changed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eip712_domain_changed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.eip712_domain_changed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.eip712_domain_changed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.eip712_domain_changed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eip712_domain_changed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'eip712_domain_changed_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.epoch_rewards_updated**
+     * - Table in database
+     */
+    export namespace epoch_rewards_updated {
+      export type Table = 'tokenomics.epoch_rewards_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.epoch_rewards_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.epoch_rewards_updated.epoch**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: db.NumericString[];
+        /**
+        * **tokenomics.epoch_rewards_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.epoch_rewards_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.epoch_rewards_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.epoch_rewards_updated.rewards**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        rewards: db.NumericString[];
+        /**
+        * **tokenomics.epoch_rewards_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.epoch_rewards_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.epoch_rewards_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.epoch_rewards_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.epoch_rewards_updated.epoch**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: (number | db.NumericString)[];
+        /**
+        * **tokenomics.epoch_rewards_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.epoch_rewards_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.epoch_rewards_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.epoch_rewards_updated.rewards**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        rewards: (number | db.NumericString)[];
+        /**
+        * **tokenomics.epoch_rewards_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.epoch_rewards_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.epoch**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.rewards**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        rewards?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.epoch_rewards_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.epoch**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.rewards**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        rewards: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.epoch_rewards_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.epoch**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.rewards**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        rewards?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.epoch_rewards_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'epoch_rewards_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.eth_withdrawn**
+     * - Table in database
+     */
+    export namespace eth_withdrawn {
+      export type Table = 'tokenomics.eth_withdrawn';
+      export interface Selectable {
+        /**
+        * **tokenomics.eth_withdrawn._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.eth_withdrawn._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.eth_withdrawn.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.eth_withdrawn.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.eth_withdrawn.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.eth_withdrawn.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.eth_withdrawn.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.eth_withdrawn.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.eth_withdrawn.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.eth_withdrawn.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: Buffer;
+        /**
+        * **tokenomics.eth_withdrawn.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.eth_withdrawn.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+        /**
+        * **tokenomics.eth_withdrawn.withdraw_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        withdraw_id: db.NumericString;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.eth_withdrawn._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.eth_withdrawn._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.eth_withdrawn.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.eth_withdrawn.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.eth_withdrawn.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.eth_withdrawn.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.eth_withdrawn.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.eth_withdrawn.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.eth_withdrawn.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.eth_withdrawn.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: db.ByteArrayString;
+        /**
+        * **tokenomics.eth_withdrawn.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.eth_withdrawn.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+        /**
+        * **tokenomics.eth_withdrawn.withdraw_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        withdraw_id: (number | db.NumericString);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.eth_withdrawn._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.eth_withdrawn.withdraw_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        withdraw_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.eth_withdrawn._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        /**
+        * **tokenomics.eth_withdrawn.withdraw_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        withdraw_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.eth_withdrawn._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        /**
+        * **tokenomics.eth_withdrawn.withdraw_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        withdraw_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'eth_withdrawn_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.fee_info**
+     * - Table in database
+     */
+    export namespace fee_info {
+      export type Table = 'tokenomics.fee_info';
+      export interface Selectable {
+        /**
+        * **tokenomics.fee_info._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.fee_info._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.fee_info.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.fee_info.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string;
+        /**
+        * **tokenomics.fee_info.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.fee_info.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: db.NumericString;
+        /**
+        * **tokenomics.fee_info.fee**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee: db.NumericString;
+        /**
+        * **tokenomics.fee_info.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.fee_info.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.fee_info.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.fee_info.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.fee_info.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.fee_info._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.fee_info._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.fee_info.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.fee_info.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string;
+        /**
+        * **tokenomics.fee_info.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.fee_info.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString);
+        /**
+        * **tokenomics.fee_info.fee**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee: (number | db.NumericString);
+        /**
+        * **tokenomics.fee_info.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.fee_info.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.fee_info.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.fee_info.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.fee_info.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.fee_info._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.fee**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.fee_info.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.fee_info._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.fee**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.fee_info.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.fee_info._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.fee**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.fee_info.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'fee_info_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.gateway_updated**
+     * - Table in database
+     */
+    export namespace gateway_updated {
+      export type Table = 'tokenomics.gateway_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.gateway_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.gateway_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.gateway_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.gateway_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.gateway_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.gateway_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.gateway_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.gateway_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.gateway_updated.new_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_gateway: Buffer;
+        /**
+        * **tokenomics.gateway_updated.old_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_gateway: Buffer;
+        /**
+        * **tokenomics.gateway_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.gateway_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.gateway_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.gateway_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.gateway_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.gateway_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.gateway_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.gateway_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.gateway_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.gateway_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.gateway_updated.new_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_gateway: db.ByteArrayString;
+        /**
+        * **tokenomics.gateway_updated.old_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_gateway: db.ByteArrayString;
+        /**
+        * **tokenomics.gateway_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.gateway_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.gateway_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.new_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_gateway?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.old_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_gateway?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.gateway_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.gateway_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.new_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_gateway: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.old_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_gateway: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.gateway_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.gateway_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.new_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_gateway?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.old_gateway**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_gateway?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.gateway_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'gateway_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.hub_gauge_updated**
+     * - Table in database
+     */
+    export namespace hub_gauge_updated {
+      export type Table = 'tokenomics.hub_gauge_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.hub_gauge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.hub_gauge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.hub_gauge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.hub_gauge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.hub_gauge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.hub_gauge_updated.hub_gauge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        hub_gauge: Buffer;
+        /**
+        * **tokenomics.hub_gauge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.hub_gauge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.hub_gauge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.hub_gauge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.hub_gauge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.hub_gauge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.hub_gauge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.hub_gauge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.hub_gauge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.hub_gauge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.hub_gauge_updated.hub_gauge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        hub_gauge: db.ByteArrayString;
+        /**
+        * **tokenomics.hub_gauge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.hub_gauge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.hub_gauge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.hub_gauge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.hub_gauge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.hub_gauge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.hub_gauge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        hub_gauge?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.hub_gauge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.hub_gauge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.hub_gauge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        hub_gauge: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.hub_gauge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.hub_gauge_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.hub_gauge**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        hub_gauge?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.hub_gauge_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'hub_gauge_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.lock_position**
+     * - Table in database
+     */
+    export namespace lock_position {
+      export type Table = 'tokenomics.lock_position';
+      export interface Selectable {
+        /**
+        * **tokenomics.lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.lock_position.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.lock_position.bias**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        bias: db.NumericString;
+        /**
+        * **tokenomics.lock_position.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string;
+        /**
+        * **tokenomics.lock_position.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate: Buffer;
+        /**
+        * **tokenomics.lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: db.NumericString;
+        /**
+        * **tokenomics.lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.lock_position.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner: Buffer;
+        /**
+        * **tokenomics.lock_position.slope**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        slope: db.NumericString;
+        /**
+        * **tokenomics.lock_position.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp: db.NumericString;
+        /**
+        * **tokenomics.lock_position.vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        vb_balance: db.NumericString;
+        /**
+        * **tokenomics.lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.lock_position.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.lock_position.bias**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        bias: (number | db.NumericString);
+        /**
+        * **tokenomics.lock_position.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string;
+        /**
+        * **tokenomics.lock_position.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate: db.ByteArrayString;
+        /**
+        * **tokenomics.lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString);
+        /**
+        * **tokenomics.lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.lock_position.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner: db.ByteArrayString;
+        /**
+        * **tokenomics.lock_position.slope**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        slope: (number | db.NumericString);
+        /**
+        * **tokenomics.lock_position.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.lock_position.vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        vb_balance: (number | db.NumericString);
+        /**
+        * **tokenomics.lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.bias**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        bias?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.slope**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        slope?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        vb_balance?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.bias**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        bias: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.slope**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        slope: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        vb_balance: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.bias**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        bias?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.slope**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        slope?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        vb_balance?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'lock_position_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.mailbox_updated**
+     * - Table in database
+     */
+    export namespace mailbox_updated {
+      export type Table = 'tokenomics.mailbox_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.mailbox_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.mailbox_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.mailbox_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.mailbox_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.mailbox_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.mailbox_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: Buffer;
+        /**
+        * **tokenomics.mailbox_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.mailbox_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.mailbox_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.mailbox_updated.new_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_mailbox: Buffer;
+        /**
+        * **tokenomics.mailbox_updated.old_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_mailbox: Buffer;
+        /**
+        * **tokenomics.mailbox_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.mailbox_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.mailbox_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.mailbox_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.mailbox_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.mailbox_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.mailbox_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.mailbox_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: db.ByteArrayString;
+        /**
+        * **tokenomics.mailbox_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.mailbox_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.mailbox_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.mailbox_updated.new_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_mailbox: db.ByteArrayString;
+        /**
+        * **tokenomics.mailbox_updated.old_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_mailbox: db.ByteArrayString;
+        /**
+        * **tokenomics.mailbox_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.mailbox_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.mailbox_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.new_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_mailbox?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.old_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_mailbox?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mailbox_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.mailbox_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.new_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_mailbox: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.old_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_mailbox: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mailbox_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.mailbox_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.new_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_mailbox?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.old_mailbox**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_mailbox?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mailbox_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'mailbox_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.message_gas_limit_updated**
+     * - Table in database
+     */
+    export namespace message_gas_limit_updated {
+      export type Table = 'tokenomics.message_gas_limit_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.message_gas_limit_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.message_gas_limit_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: db.NumericString[];
+        /**
+        * **tokenomics.message_gas_limit_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.message_gas_limit_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.message_gas_limit_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.message_gas_limit_updated.new_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_gas_limit: db.NumericString[];
+        /**
+        * **tokenomics.message_gas_limit_updated.old_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_gas_limit: db.NumericString[];
+        /**
+        * **tokenomics.message_gas_limit_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.message_gas_limit_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.message_gas_limit_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.message_gas_limit_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.message_gas_limit_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString)[];
+        /**
+        * **tokenomics.message_gas_limit_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.message_gas_limit_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.message_gas_limit_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.message_gas_limit_updated.new_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_gas_limit: (number | db.NumericString)[];
+        /**
+        * **tokenomics.message_gas_limit_updated.old_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_gas_limit: (number | db.NumericString)[];
+        /**
+        * **tokenomics.message_gas_limit_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.message_gas_limit_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.new_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_gas_limit?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.old_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_gas_limit?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.message_gas_limit_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.new_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_gas_limit: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.old_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_gas_limit: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.message_gas_limit_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.new_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_gas_limit?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.old_gas_limit**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_gas_limit?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.message_gas_limit_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'message_gas_limit_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.mint_message_sent**
+     * - Table in database
+     */
+    export namespace mint_message_sent {
+      export type Table = 'tokenomics.mint_message_sent';
+      export interface Selectable {
+        /**
+        * **tokenomics.mint_message_sent._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.mint_message_sent._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.mint_message_sent.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.mint_message_sent.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.mint_message_sent.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.mint_message_sent.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.mint_message_sent.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: db.NumericString;
+        /**
+        * **tokenomics.mint_message_sent.fee_spent**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee_spent: db.NumericString;
+        /**
+        * **tokenomics.mint_message_sent.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.mint_message_sent.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.mint_message_sent.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.mint_message_sent.message_id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        message_id: Buffer;
+        /**
+        * **tokenomics.mint_message_sent.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: Buffer;
+        /**
+        * **tokenomics.mint_message_sent.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.mint_message_sent.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.mint_message_sent._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.mint_message_sent._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.mint_message_sent.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.mint_message_sent.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.mint_message_sent.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.mint_message_sent.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.mint_message_sent.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString);
+        /**
+        * **tokenomics.mint_message_sent.fee_spent**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee_spent: (number | db.NumericString);
+        /**
+        * **tokenomics.mint_message_sent.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.mint_message_sent.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.mint_message_sent.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.mint_message_sent.message_id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        message_id: db.ByteArrayString;
+        /**
+        * **tokenomics.mint_message_sent.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: db.ByteArrayString;
+        /**
+        * **tokenomics.mint_message_sent.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.mint_message_sent.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.mint_message_sent._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.fee_spent**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee_spent?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.message_id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        message_id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.mint_message_sent.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.mint_message_sent._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.fee_spent**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee_spent: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.message_id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        message_id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.mint_message_sent.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.mint_message_sent._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.fee_spent**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        fee_spent?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.message_id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        message_id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.mint_message_sent.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'mint_message_sent_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.new_lock_position**
+     * - Table in database
+     */
+    export namespace new_lock_position {
+      export type Table = 'tokenomics.new_lock_position';
+      export interface Selectable {
+        /**
+        * **tokenomics.new_lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.new_lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.new_lock_position.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.new_lock_position.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.new_lock_position.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.new_lock_position.caller**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        caller: Buffer;
+        /**
+        * **tokenomics.new_lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: db.NumericString;
+        /**
+        * **tokenomics.new_lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.new_lock_position.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.new_lock_position.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.new_lock_position.new_total_amount_locked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_total_amount_locked: db.NumericString;
+        /**
+        * **tokenomics.new_lock_position.new_vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_vb_balance: db.NumericString;
+        /**
+        * **tokenomics.new_lock_position.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.new_lock_position.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.new_lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.new_lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.new_lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.new_lock_position.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.new_lock_position.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.new_lock_position.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.new_lock_position.caller**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        caller: db.ByteArrayString;
+        /**
+        * **tokenomics.new_lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString);
+        /**
+        * **tokenomics.new_lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.new_lock_position.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.new_lock_position.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.new_lock_position.new_total_amount_locked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_total_amount_locked: (number | db.NumericString);
+        /**
+        * **tokenomics.new_lock_position.new_vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_vb_balance: (number | db.NumericString);
+        /**
+        * **tokenomics.new_lock_position.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.new_lock_position.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.new_lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.new_lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.caller**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        caller?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.new_total_amount_locked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_total_amount_locked?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.new_vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_vb_balance?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.new_lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.new_lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.caller**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        caller: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.new_total_amount_locked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_total_amount_locked: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.new_vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_vb_balance: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.new_lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.new_lock_position._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.caller**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        caller?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.new_total_amount_locked**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_total_amount_locked?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.new_vb_balance**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_vb_balance?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.new_lock_position.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'new_lock_position_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.ownership_transferred**
+     * - Table in database
+     */
+    export namespace ownership_transferred {
+      export type Table = 'tokenomics.ownership_transferred';
+      export interface Selectable {
+        /**
+        * **tokenomics.ownership_transferred._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.ownership_transferred._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.ownership_transferred.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.ownership_transferred.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.ownership_transferred.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.ownership_transferred.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: Buffer;
+        /**
+        * **tokenomics.ownership_transferred.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.ownership_transferred.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.ownership_transferred.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.ownership_transferred.new_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_owner: Buffer;
+        /**
+        * **tokenomics.ownership_transferred.previous_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        previous_owner: Buffer;
+        /**
+        * **tokenomics.ownership_transferred.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.ownership_transferred.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.ownership_transferred._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.ownership_transferred._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.ownership_transferred.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.ownership_transferred.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.ownership_transferred.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.ownership_transferred.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: db.ByteArrayString;
+        /**
+        * **tokenomics.ownership_transferred.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.ownership_transferred.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.ownership_transferred.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.ownership_transferred.new_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_owner: db.ByteArrayString;
+        /**
+        * **tokenomics.ownership_transferred.previous_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        previous_owner: db.ByteArrayString;
+        /**
+        * **tokenomics.ownership_transferred.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.ownership_transferred.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.ownership_transferred._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.new_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_owner?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.previous_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        previous_owner?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.ownership_transferred.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.ownership_transferred._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.new_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_owner: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.previous_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        previous_owner: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.ownership_transferred.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.ownership_transferred._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.new_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_owner?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.previous_owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        previous_owner?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.ownership_transferred.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'ownership_transferred_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.process_error**
+     * - Table in database
+     */
+    export namespace process_error {
+      export type Table = 'tokenomics.process_error';
+      export interface Selectable {
+        /**
+        * **tokenomics.process_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.process_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.process_error.active**
+        * - `bool` in database
+        * - `NOT NULL`, no default
+        */
+        active: boolean;
+        /**
+        * **tokenomics.process_error.additional_data**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        additional_data: db.NumericString;
+        /**
+        * **tokenomics.process_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.process_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.process_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.process_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.process_error.error_id**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: number;
+        /**
+        * **tokenomics.process_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.process_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.process_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.process_error.nonce**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        nonce: db.NumericString;
+        /**
+        * **tokenomics.process_error.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: Buffer;
+        /**
+        * **tokenomics.process_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.process_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.process_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.process_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.process_error.active**
+        * - `bool` in database
+        * - `NOT NULL`, no default
+        */
+        active: boolean;
+        /**
+        * **tokenomics.process_error.additional_data**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        additional_data: (number | db.NumericString);
+        /**
+        * **tokenomics.process_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.process_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.process_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.process_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.process_error.error_id**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: number;
+        /**
+        * **tokenomics.process_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.process_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.process_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.process_error.nonce**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        nonce: (number | db.NumericString);
+        /**
+        * **tokenomics.process_error.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: db.ByteArrayString;
+        /**
+        * **tokenomics.process_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.process_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.process_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.active**
+        * - `bool` in database
+        * - `NOT NULL`, no default
+        */
+        active?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.additional_data**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        additional_data?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.error_id**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.nonce**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        nonce?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.process_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.process_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.active**
+        * - `bool` in database
+        * - `NOT NULL`, no default
+        */
+        active: boolean | db.Parameter<boolean> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.additional_data**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        additional_data: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.error_id**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.nonce**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        nonce: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.process_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.process_error._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.active**
+        * - `bool` in database
+        * - `NOT NULL`, no default
+        */
+        active?: boolean | db.Parameter<boolean> | db.SQLFragment | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.additional_data**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        additional_data?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.error_id**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.nonce**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        nonce?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.sender**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        sender?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.process_error.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'process_error_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.retry_bridge_out**
+     * - Table in database
+     */
+    export namespace retry_bridge_out {
+      export type Table = 'tokenomics.retry_bridge_out';
+      export interface Selectable {
+        /**
+        * **tokenomics.retry_bridge_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_bridge_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_bridge_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.retry_bridge_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_bridge_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.retry_bridge_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.retry_bridge_out.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: db.NumericString;
+        /**
+        * **tokenomics.retry_bridge_out.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: db.NumericString;
+        /**
+        * **tokenomics.retry_bridge_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.retry_bridge_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.retry_bridge_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_bridge_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.retry_bridge_out.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.retry_bridge_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.retry_bridge_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_bridge_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_bridge_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_bridge_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_bridge_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_bridge_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_bridge_out.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_bridge_out.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_bridge_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_bridge_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.retry_bridge_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_bridge_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_bridge_out.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_bridge_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.retry_bridge_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_bridge_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.retry_bridge_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_bridge_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.retry_bridge_out._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_bridge_out.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'retry_bridge_out_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.retry_lock**
+     * - Table in database
+     */
+    export namespace retry_lock {
+      export type Table = 'tokenomics.retry_lock';
+      export interface Selectable {
+        /**
+        * **tokenomics.retry_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.retry_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.retry_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.retry_lock.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: db.NumericString;
+        /**
+        * **tokenomics.retry_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: db.NumericString;
+        /**
+        * **tokenomics.retry_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.retry_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.retry_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_lock.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: Buffer;
+        /**
+        * **tokenomics.retry_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.retry_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.retry_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_lock.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.retry_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_lock.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.retry_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.retry_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.retry_lock._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.expiry**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        expiry?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_lock.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'retry_lock_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.retry_message**
+     * - Table in database
+     */
+    export namespace retry_message {
+      export type Table = 'tokenomics.retry_message';
+      export interface Selectable {
+        /**
+        * **tokenomics.retry_message._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_message._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_message.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.retry_message.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_message.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.retry_message.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.retry_message.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: db.NumericString;
+        /**
+        * **tokenomics.retry_message.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: db.NumericString;
+        /**
+        * **tokenomics.retry_message.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.retry_message.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.retry_message.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_message.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.retry_message.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.retry_message.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.retry_message._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_message._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_message.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_message.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_message.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_message.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_message.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_message.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_message.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_message.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.retry_message.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_message.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_message.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_message.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.retry_message._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_message.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.retry_message._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_message.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.retry_message._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_message.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'retry_message_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.retry_mint**
+     * - Table in database
+     */
+    export namespace retry_mint {
+      export type Table = 'tokenomics.retry_mint';
+      export interface Selectable {
+        /**
+        * **tokenomics.retry_mint._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_mint._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_mint.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.retry_mint.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_mint.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.retry_mint.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.retry_mint.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: db.NumericString;
+        /**
+        * **tokenomics.retry_mint.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: db.NumericString;
+        /**
+        * **tokenomics.retry_mint.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.retry_mint.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.retry_mint.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_mint.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.retry_mint.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.retry_mint.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.retry_mint._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_mint._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_mint.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_mint.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_mint.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_mint.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_mint.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_mint.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_mint.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_mint.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.retry_mint.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_mint.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_mint.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_mint.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.retry_mint._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_mint.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.retry_mint._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_mint.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.retry_mint._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_mint.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'retry_mint_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.retry_transfer**
+     * - Table in database
+     */
+    export namespace retry_transfer {
+      export type Table = 'tokenomics.retry_transfer';
+      export interface Selectable {
+        /**
+        * **tokenomics.retry_transfer._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_transfer._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_transfer.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.retry_transfer.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_transfer.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.retry_transfer.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.retry_transfer.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: db.NumericString;
+        /**
+        * **tokenomics.retry_transfer.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: db.NumericString;
+        /**
+        * **tokenomics.retry_transfer.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.retry_transfer.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.retry_transfer.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_transfer.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.retry_transfer.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.retry_transfer.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.retry_transfer._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.retry_transfer._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.retry_transfer.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_transfer.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.retry_transfer.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_transfer.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_transfer.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_transfer.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString);
+        /**
+        * **tokenomics.retry_transfer.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_transfer.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.retry_transfer.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.retry_transfer.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_transfer.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.retry_transfer.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.retry_transfer._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.retry_transfer.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.retry_transfer._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.retry_transfer.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.retry_transfer._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.chain_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        chain_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.error_id**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        error_id?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.retry_transfer.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'retry_transfer_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.return_fee_updated**
+     * - Table in database
+     */
+    export namespace return_fee_updated {
+      export type Table = 'tokenomics.return_fee_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.return_fee_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.return_fee_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.return_fee_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.return_fee_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.return_fee_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.return_fee_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: db.NumericString[];
+        /**
+        * **tokenomics.return_fee_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.return_fee_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.return_fee_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.return_fee_updated.new_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_fee: db.NumericString[];
+        /**
+        * **tokenomics.return_fee_updated.old_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_fee: db.NumericString[];
+        /**
+        * **tokenomics.return_fee_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.return_fee_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.return_fee_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.return_fee_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.return_fee_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.return_fee_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.return_fee_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.return_fee_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString)[];
+        /**
+        * **tokenomics.return_fee_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.return_fee_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.return_fee_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.return_fee_updated.new_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_fee: (number | db.NumericString)[];
+        /**
+        * **tokenomics.return_fee_updated.old_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_fee: (number | db.NumericString)[];
+        /**
+        * **tokenomics.return_fee_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.return_fee_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.return_fee_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.new_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_fee?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.old_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_fee?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.return_fee_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.return_fee_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.new_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_fee: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.old_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_fee: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.return_fee_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.return_fee_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.domain**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.new_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        new_fee?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.old_fee**
+        * - `_numeric` in database
+        * - `NOT NULL`, no default
+        */
+        old_fee?: (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString)[] | db.Parameter<(number | db.NumericString)[]> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.return_fee_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'return_fee_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.reward_claimed**
+     * - Table in database
+     */
+    export namespace reward_claimed {
+      export type Table = 'tokenomics.reward_claimed';
+      export interface Selectable {
+        /**
+        * **tokenomics.reward_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.reward_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.reward_claimed.account**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        account: Buffer;
+        /**
+        * **tokenomics.reward_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.reward_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.reward_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.reward_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.reward_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.reward_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.reward_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.reward_claimed.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token: Buffer;
+        /**
+        * **tokenomics.reward_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.reward_claimed.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count: db.NumericString;
+        /**
+        * **tokenomics.reward_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.reward_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.reward_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.reward_claimed.account**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        account: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.reward_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.reward_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.reward_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.reward_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.reward_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.reward_claimed.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_claimed.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count: (number | db.NumericString);
+        /**
+        * **tokenomics.reward_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.reward_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.account**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        account?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.reward_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.account**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        account: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.reward_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.account**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        account?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'reward_claimed_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.reward_metadata_updated**
+     * - Table in database
+     */
+    export namespace reward_metadata_updated {
+      export type Table = 'tokenomics.reward_metadata_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.reward_metadata_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.reward_metadata_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.reward_metadata_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.reward_metadata_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.reward_metadata_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.reward_metadata_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.reward_metadata_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.reward_metadata_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.reward_metadata_updated.merkle_root**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        merkle_root: Buffer;
+        /**
+        * **tokenomics.reward_metadata_updated.proof**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        proof: Buffer;
+        /**
+        * **tokenomics.reward_metadata_updated.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token: Buffer;
+        /**
+        * **tokenomics.reward_metadata_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.reward_metadata_updated.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count: db.NumericString;
+        /**
+        * **tokenomics.reward_metadata_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.reward_metadata_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.reward_metadata_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.reward_metadata_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.reward_metadata_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.reward_metadata_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.reward_metadata_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_metadata_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.reward_metadata_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.reward_metadata_updated.merkle_root**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        merkle_root: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_metadata_updated.proof**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        proof: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_metadata_updated.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_metadata_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.reward_metadata_updated.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count: (number | db.NumericString);
+        /**
+        * **tokenomics.reward_metadata_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.reward_metadata_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.merkle_root**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        merkle_root?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.proof**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        proof?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.reward_metadata_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.reward_metadata_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.merkle_root**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        merkle_root: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.proof**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        proof: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.reward_metadata_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.reward_metadata_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.merkle_root**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        merkle_root?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.proof**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        proof?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.token**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        token?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.update_count**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        update_count?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.reward_metadata_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'reward_metadata_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.rewards_claimed**
+     * - Table in database
+     */
+    export namespace rewards_claimed {
+      export type Table = 'tokenomics.rewards_claimed';
+      export interface Selectable {
+        /**
+        * **tokenomics.rewards_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.rewards_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.rewards_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.rewards_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.rewards_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.rewards_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.rewards_claimed.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: db.NumericString;
+        /**
+        * **tokenomics.rewards_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.rewards_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.rewards_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.rewards_claimed.recipient**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        recipient: Buffer;
+        /**
+        * **tokenomics.rewards_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.rewards_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.rewards_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.rewards_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.rewards_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.rewards_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.rewards_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.rewards_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.rewards_claimed.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: (number | db.NumericString);
+        /**
+        * **tokenomics.rewards_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.rewards_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.rewards_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.rewards_claimed.recipient**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        recipient: db.ByteArrayString;
+        /**
+        * **tokenomics.rewards_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.rewards_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.rewards_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.recipient**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        recipient?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.rewards_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.rewards_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.recipient**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        recipient: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.rewards_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.rewards_claimed._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.recipient**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        recipient?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.rewards_claimed.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'rewards_claimed_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.security_module_updated**
+     * - Table in database
+     */
+    export namespace security_module_updated {
+      export type Table = 'tokenomics.security_module_updated';
+      export interface Selectable {
+        /**
+        * **tokenomics.security_module_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.security_module_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.security_module_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.security_module_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.security_module_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.security_module_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: Buffer;
+        /**
+        * **tokenomics.security_module_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.security_module_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.security_module_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.security_module_updated.new_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_security_module: Buffer;
+        /**
+        * **tokenomics.security_module_updated.old_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_security_module: Buffer;
+        /**
+        * **tokenomics.security_module_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.security_module_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.security_module_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.security_module_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.security_module_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.security_module_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.security_module_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.security_module_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: db.ByteArrayString;
+        /**
+        * **tokenomics.security_module_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.security_module_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.security_module_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.security_module_updated.new_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_security_module: db.ByteArrayString;
+        /**
+        * **tokenomics.security_module_updated.old_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_security_module: db.ByteArrayString;
+        /**
+        * **tokenomics.security_module_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.security_module_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.security_module_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.new_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_security_module?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.old_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_security_module?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.security_module_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.security_module_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.new_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_security_module: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.old_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_security_module: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.security_module_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.security_module_updated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.contract**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        contract?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.new_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        new_security_module?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.old_security_module**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        old_security_module?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.security_module_updated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'security_module_updated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.user**
+     * - Table in database
+     */
+    export namespace user {
+      export type Table = 'tokenomics.user';
+      export interface Selectable {
+        /**
+        * **tokenomics.user._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.user._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.user.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string;
+        /**
+        * **tokenomics.user.claimed**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        claimed: db.NumericString;
+        /**
+        * **tokenomics.user.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.user.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.user._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.user._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.user.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string;
+        /**
+        * **tokenomics.user.claimed**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        claimed: (number | db.NumericString);
+        /**
+        * **tokenomics.user.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.user.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.user._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.user._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.user.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.user.claimed**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        claimed?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.user.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.user.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.user._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.user._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.user.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.user.claimed**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        claimed: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.user.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.user.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.user._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.user._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.user.block_range**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        block_range?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.user.claimed**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        claimed?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.user.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.user.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'user_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.vote_cast**
+     * - Table in database
+     */
+    export namespace vote_cast {
+      export type Table = 'tokenomics.vote_cast';
+      export interface Selectable {
+        /**
+        * **tokenomics.vote_cast._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.vote_cast._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.vote_cast.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.vote_cast.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.vote_cast.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.vote_cast.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: db.NumericString;
+        /**
+        * **tokenomics.vote_cast.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: db.NumericString;
+        /**
+        * **tokenomics.vote_cast.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.vote_cast.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.vote_cast.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.vote_cast.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner: Buffer;
+        /**
+        * **tokenomics.vote_cast.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.vote_cast.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+        /**
+        * **tokenomics.vote_cast.votes**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        votes: db.NumericString;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.vote_cast._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.vote_cast._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.vote_cast.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.vote_cast.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.vote_cast.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.vote_cast.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString);
+        /**
+        * **tokenomics.vote_cast.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: (number | db.NumericString);
+        /**
+        * **tokenomics.vote_cast.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.vote_cast.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.vote_cast.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.vote_cast.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner: db.ByteArrayString;
+        /**
+        * **tokenomics.vote_cast.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.vote_cast.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+        /**
+        * **tokenomics.vote_cast.votes**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        votes: (number | db.NumericString);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.vote_cast._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_cast.votes**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        votes?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.vote_cast._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_cast.votes**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        votes: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.vote_cast._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.domain**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        domain?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.epoch**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        epoch?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.owner**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        owner?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_cast.votes**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        votes?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'vote_cast_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.vote_delegated**
+     * - Table in database
+     */
+    export namespace vote_delegated {
+      export type Table = 'tokenomics.vote_delegated';
+      export interface Selectable {
+        /**
+        * **tokenomics.vote_delegated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.vote_delegated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.vote_delegated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.vote_delegated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.vote_delegated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.vote_delegated.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate: Buffer;
+        /**
+        * **tokenomics.vote_delegated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.vote_delegated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.vote_delegated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.vote_delegated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.vote_delegated.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.vote_delegated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.vote_delegated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.vote_delegated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.vote_delegated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.vote_delegated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.vote_delegated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.vote_delegated.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate: db.ByteArrayString;
+        /**
+        * **tokenomics.vote_delegated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.vote_delegated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.vote_delegated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.vote_delegated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.vote_delegated.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.vote_delegated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.vote_delegated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.vote_delegated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.vote_delegated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.vote_delegated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.vote_delegated._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.delegate**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        delegate?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.vote_delegated.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'vote_delegated_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.withdraw**
+     * - Table in database
+     */
+    export namespace withdraw {
+      export type Table = 'tokenomics.withdraw';
+      export interface Selectable {
+        /**
+        * **tokenomics.withdraw._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.withdraw._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.withdraw.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.withdraw.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.withdraw.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.withdraw.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.withdraw.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.withdraw.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.withdraw.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.withdraw.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.withdraw.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: Buffer;
+        /**
+        * **tokenomics.withdraw.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.withdraw._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.withdraw._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.withdraw.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.withdraw.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.withdraw.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.withdraw.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.withdraw.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.withdraw.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.withdraw.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.withdraw.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.withdraw.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: db.ByteArrayString;
+        /**
+        * **tokenomics.withdraw.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.withdraw._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.withdraw._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.withdraw._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.user**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        user?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'withdraw_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
+    /**
+     * **tokenomics.withdraw_eth**
+     * - Table in database
+     */
+    export namespace withdraw_eth {
+      export type Table = 'tokenomics.withdraw_eth';
+      export interface Selectable {
+        /**
+        * **tokenomics.withdraw_eth._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.withdraw_eth._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.withdraw_eth.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: db.NumericString;
+        /**
+        * **tokenomics.withdraw_eth.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.withdraw_eth.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: db.NumericString;
+        /**
+        * **tokenomics.withdraw_eth.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: db.NumericString;
+        /**
+        * **tokenomics.withdraw_eth.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: Buffer;
+        /**
+        * **tokenomics.withdraw_eth.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: Date | null;
+        /**
+        * **tokenomics.withdraw_eth.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.withdraw_eth.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: Buffer;
+        /**
+        * **tokenomics.withdraw_eth.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: Buffer;
+        /**
+        * **tokenomics.withdraw_eth.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: db.Int8String;
+      }
+      export interface JSONSelectable {
+        /**
+        * **tokenomics.withdraw_eth._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string;
+        /**
+        * **tokenomics.withdraw_eth._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string;
+        /**
+        * **tokenomics.withdraw_eth.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString);
+        /**
+        * **tokenomics.withdraw_eth.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number;
+        /**
+        * **tokenomics.withdraw_eth.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString);
+        /**
+        * **tokenomics.withdraw_eth.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString);
+        /**
+        * **tokenomics.withdraw_eth.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: db.ByteArrayString;
+        /**
+        * **tokenomics.withdraw_eth.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp: db.TimestampString | null;
+        /**
+        * **tokenomics.withdraw_eth.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency: string | null;
+        /**
+        * **tokenomics.withdraw_eth.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: db.ByteArrayString;
+        /**
+        * **tokenomics.withdraw_eth.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: db.ByteArrayString;
+        /**
+        * **tokenomics.withdraw_eth.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String);
+      }
+      export interface Whereable {
+        /**
+        * **tokenomics.withdraw_eth._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.ParentColumn>;
+        /**
+        * **tokenomics.withdraw_eth.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      }
+      export interface Insertable {
+        /**
+        * **tokenomics.withdraw_eth._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid: string | db.Parameter<string> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block: number | db.Parameter<number> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment;
+        /**
+        * **tokenomics.withdraw_eth.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      }
+      export interface Updatable {
+        /**
+        * **tokenomics.withdraw_eth._gs_chain**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth._gs_gid**
+        * - `text` in database
+        * - `NOT NULL`, no default
+        */
+        _gs_gid?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.amount**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.block**
+        * - `int4` in database
+        * - `NOT NULL`, no default
+        */
+        block?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.block_number**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_number?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.block_timestamp**
+        * - `numeric` in database
+        * - `NOT NULL`, no default
+        */
+        block_timestamp?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.id**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        id?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.insert_timestamp**
+        * - `timestamp` in database
+        * - Nullable, no default
+        */
+        insert_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.latency**
+        * - `interval` in database
+        * - Nullable, no default
+        */
+        latency?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.receiver**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        receiver?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.transaction_hash**
+        * - `bytea` in database
+        * - `NOT NULL`, no default
+        */
+        transaction_hash?: (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment | db.SQLFragment<any, (db.ByteArrayString | Buffer) | db.Parameter<(db.ByteArrayString | Buffer)> | db.SQLFragment>;
+        /**
+        * **tokenomics.withdraw_eth.vid**
+        * - `int8` in database
+        * - `NOT NULL`, no default
+        */
+        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      }
+      export type UniqueIndex = 'withdraw_eth_pkey';
+      export type Column = keyof Selectable;
+      export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+      export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+      export type SQL = SQLExpression | SQLExpression[];
+    }
+
     /* --- aggregate types --- */
-  
-    // `never` rather than `any` types would be more accurate in this no-tables case, but they stop `shortcuts.ts` compiling
-  
-    export type Table = never;
-    export type Selectable = never;
-    export type JSONSelectable = never;
-    export type Whereable = never;
-    export type Insertable = never;
-    export type Updatable = never;
-    export type UniqueIndex = never;
-    export type Column = never;
-  
-    export type AllBaseTables = [];
+
+    export type Table = bridge_in_error.Table | bridge_updated.Table | bridged_in.Table | bridged_lock.Table | bridged_lock_error.Table | bridged_out.Table | chain_gateway_added.Table | chain_gateway_removed.Table | early_exit.Table | eip712_domain_changed.Table | epoch_rewards_updated.Table | eth_withdrawn.Table | fee_info.Table | gateway_updated.Table | hub_gauge_updated.Table | lock_position.Table | mailbox_updated.Table | message_gas_limit_updated.Table | mint_message_sent.Table | new_lock_position.Table | ownership_transferred.Table | process_error.Table | retry_bridge_out.Table | retry_lock.Table | retry_message.Table | retry_mint.Table | retry_transfer.Table | return_fee_updated.Table | reward_claimed.Table | reward_metadata_updated.Table | rewards_claimed.Table | security_module_updated.Table | user.Table | vote_cast.Table | vote_delegated.Table | withdraw.Table | withdraw_eth.Table;
+    export type Selectable = bridge_in_error.Selectable | bridge_updated.Selectable | bridged_in.Selectable | bridged_lock.Selectable | bridged_lock_error.Selectable | bridged_out.Selectable | chain_gateway_added.Selectable | chain_gateway_removed.Selectable | early_exit.Selectable | eip712_domain_changed.Selectable | epoch_rewards_updated.Selectable | eth_withdrawn.Selectable | fee_info.Selectable | gateway_updated.Selectable | hub_gauge_updated.Selectable | lock_position.Selectable | mailbox_updated.Selectable | message_gas_limit_updated.Selectable | mint_message_sent.Selectable | new_lock_position.Selectable | ownership_transferred.Selectable | process_error.Selectable | retry_bridge_out.Selectable | retry_lock.Selectable | retry_message.Selectable | retry_mint.Selectable | retry_transfer.Selectable | return_fee_updated.Selectable | reward_claimed.Selectable | reward_metadata_updated.Selectable | rewards_claimed.Selectable | security_module_updated.Selectable | user.Selectable | vote_cast.Selectable | vote_delegated.Selectable | withdraw.Selectable | withdraw_eth.Selectable;
+    export type JSONSelectable = bridge_in_error.JSONSelectable | bridge_updated.JSONSelectable | bridged_in.JSONSelectable | bridged_lock.JSONSelectable | bridged_lock_error.JSONSelectable | bridged_out.JSONSelectable | chain_gateway_added.JSONSelectable | chain_gateway_removed.JSONSelectable | early_exit.JSONSelectable | eip712_domain_changed.JSONSelectable | epoch_rewards_updated.JSONSelectable | eth_withdrawn.JSONSelectable | fee_info.JSONSelectable | gateway_updated.JSONSelectable | hub_gauge_updated.JSONSelectable | lock_position.JSONSelectable | mailbox_updated.JSONSelectable | message_gas_limit_updated.JSONSelectable | mint_message_sent.JSONSelectable | new_lock_position.JSONSelectable | ownership_transferred.JSONSelectable | process_error.JSONSelectable | retry_bridge_out.JSONSelectable | retry_lock.JSONSelectable | retry_message.JSONSelectable | retry_mint.JSONSelectable | retry_transfer.JSONSelectable | return_fee_updated.JSONSelectable | reward_claimed.JSONSelectable | reward_metadata_updated.JSONSelectable | rewards_claimed.JSONSelectable | security_module_updated.JSONSelectable | user.JSONSelectable | vote_cast.JSONSelectable | vote_delegated.JSONSelectable | withdraw.JSONSelectable | withdraw_eth.JSONSelectable;
+    export type Whereable = bridge_in_error.Whereable | bridge_updated.Whereable | bridged_in.Whereable | bridged_lock.Whereable | bridged_lock_error.Whereable | bridged_out.Whereable | chain_gateway_added.Whereable | chain_gateway_removed.Whereable | early_exit.Whereable | eip712_domain_changed.Whereable | epoch_rewards_updated.Whereable | eth_withdrawn.Whereable | fee_info.Whereable | gateway_updated.Whereable | hub_gauge_updated.Whereable | lock_position.Whereable | mailbox_updated.Whereable | message_gas_limit_updated.Whereable | mint_message_sent.Whereable | new_lock_position.Whereable | ownership_transferred.Whereable | process_error.Whereable | retry_bridge_out.Whereable | retry_lock.Whereable | retry_message.Whereable | retry_mint.Whereable | retry_transfer.Whereable | return_fee_updated.Whereable | reward_claimed.Whereable | reward_metadata_updated.Whereable | rewards_claimed.Whereable | security_module_updated.Whereable | user.Whereable | vote_cast.Whereable | vote_delegated.Whereable | withdraw.Whereable | withdraw_eth.Whereable;
+    export type Insertable = bridge_in_error.Insertable | bridge_updated.Insertable | bridged_in.Insertable | bridged_lock.Insertable | bridged_lock_error.Insertable | bridged_out.Insertable | chain_gateway_added.Insertable | chain_gateway_removed.Insertable | early_exit.Insertable | eip712_domain_changed.Insertable | epoch_rewards_updated.Insertable | eth_withdrawn.Insertable | fee_info.Insertable | gateway_updated.Insertable | hub_gauge_updated.Insertable | lock_position.Insertable | mailbox_updated.Insertable | message_gas_limit_updated.Insertable | mint_message_sent.Insertable | new_lock_position.Insertable | ownership_transferred.Insertable | process_error.Insertable | retry_bridge_out.Insertable | retry_lock.Insertable | retry_message.Insertable | retry_mint.Insertable | retry_transfer.Insertable | return_fee_updated.Insertable | reward_claimed.Insertable | reward_metadata_updated.Insertable | rewards_claimed.Insertable | security_module_updated.Insertable | user.Insertable | vote_cast.Insertable | vote_delegated.Insertable | withdraw.Insertable | withdraw_eth.Insertable;
+    export type Updatable = bridge_in_error.Updatable | bridge_updated.Updatable | bridged_in.Updatable | bridged_lock.Updatable | bridged_lock_error.Updatable | bridged_out.Updatable | chain_gateway_added.Updatable | chain_gateway_removed.Updatable | early_exit.Updatable | eip712_domain_changed.Updatable | epoch_rewards_updated.Updatable | eth_withdrawn.Updatable | fee_info.Updatable | gateway_updated.Updatable | hub_gauge_updated.Updatable | lock_position.Updatable | mailbox_updated.Updatable | message_gas_limit_updated.Updatable | mint_message_sent.Updatable | new_lock_position.Updatable | ownership_transferred.Updatable | process_error.Updatable | retry_bridge_out.Updatable | retry_lock.Updatable | retry_message.Updatable | retry_mint.Updatable | retry_transfer.Updatable | return_fee_updated.Updatable | reward_claimed.Updatable | reward_metadata_updated.Updatable | rewards_claimed.Updatable | security_module_updated.Updatable | user.Updatable | vote_cast.Updatable | vote_delegated.Updatable | withdraw.Updatable | withdraw_eth.Updatable;
+    export type UniqueIndex = bridge_in_error.UniqueIndex | bridge_updated.UniqueIndex | bridged_in.UniqueIndex | bridged_lock.UniqueIndex | bridged_lock_error.UniqueIndex | bridged_out.UniqueIndex | chain_gateway_added.UniqueIndex | chain_gateway_removed.UniqueIndex | early_exit.UniqueIndex | eip712_domain_changed.UniqueIndex | epoch_rewards_updated.UniqueIndex | eth_withdrawn.UniqueIndex | fee_info.UniqueIndex | gateway_updated.UniqueIndex | hub_gauge_updated.UniqueIndex | lock_position.UniqueIndex | mailbox_updated.UniqueIndex | message_gas_limit_updated.UniqueIndex | mint_message_sent.UniqueIndex | new_lock_position.UniqueIndex | ownership_transferred.UniqueIndex | process_error.UniqueIndex | retry_bridge_out.UniqueIndex | retry_lock.UniqueIndex | retry_message.UniqueIndex | retry_mint.UniqueIndex | retry_transfer.UniqueIndex | return_fee_updated.UniqueIndex | reward_claimed.UniqueIndex | reward_metadata_updated.UniqueIndex | rewards_claimed.UniqueIndex | security_module_updated.UniqueIndex | user.UniqueIndex | vote_cast.UniqueIndex | vote_delegated.UniqueIndex | withdraw.UniqueIndex | withdraw_eth.UniqueIndex;
+    export type Column = bridge_in_error.Column | bridge_updated.Column | bridged_in.Column | bridged_lock.Column | bridged_lock_error.Column | bridged_out.Column | chain_gateway_added.Column | chain_gateway_removed.Column | early_exit.Column | eip712_domain_changed.Column | epoch_rewards_updated.Column | eth_withdrawn.Column | fee_info.Column | gateway_updated.Column | hub_gauge_updated.Column | lock_position.Column | mailbox_updated.Column | message_gas_limit_updated.Column | mint_message_sent.Column | new_lock_position.Column | ownership_transferred.Column | process_error.Column | retry_bridge_out.Column | retry_lock.Column | retry_message.Column | retry_mint.Column | retry_transfer.Column | return_fee_updated.Column | reward_claimed.Column | reward_metadata_updated.Column | rewards_claimed.Column | security_module_updated.Column | user.Column | vote_cast.Column | vote_delegated.Column | withdraw.Column | withdraw_eth.Column;
+
+    export type AllBaseTables = [bridge_in_error.Table, bridge_updated.Table, bridged_in.Table, bridged_lock.Table, bridged_lock_error.Table, bridged_out.Table, chain_gateway_added.Table, chain_gateway_removed.Table, early_exit.Table, eip712_domain_changed.Table, epoch_rewards_updated.Table, eth_withdrawn.Table, fee_info.Table, gateway_updated.Table, hub_gauge_updated.Table, lock_position.Table, mailbox_updated.Table, message_gas_limit_updated.Table, mint_message_sent.Table, new_lock_position.Table, ownership_transferred.Table, process_error.Table, retry_bridge_out.Table, retry_lock.Table, retry_message.Table, retry_mint.Table, retry_transfer.Table, return_fee_updated.Table, reward_claimed.Table, reward_metadata_updated.Table, rewards_claimed.Table, security_module_updated.Table, user.Table, vote_cast.Table, vote_delegated.Table, withdraw.Table, withdraw_eth.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
     export type AllMaterializedViews = [];
-    export type AllTablesAndViews = [];
+    export type AllTablesAndViews = [bridge_in_error.Table, bridge_updated.Table, bridged_in.Table, bridged_lock.Table, bridged_lock_error.Table, bridged_out.Table, chain_gateway_added.Table, chain_gateway_removed.Table, early_exit.Table, eip712_domain_changed.Table, epoch_rewards_updated.Table, eth_withdrawn.Table, fee_info.Table, gateway_updated.Table, hub_gauge_updated.Table, lock_position.Table, mailbox_updated.Table, message_gas_limit_updated.Table, mint_message_sent.Table, new_lock_position.Table, ownership_transferred.Table, process_error.Table, retry_bridge_out.Table, retry_lock.Table, retry_message.Table, retry_mint.Table, retry_transfer.Table, return_fee_updated.Table, reward_claimed.Table, reward_metadata_updated.Table, rewards_claimed.Table, security_module_updated.Table, user.Table, vote_cast.Table, vote_delegated.Table, withdraw.Table, withdraw_eth.Table];
   }
 
 
@@ -19382,6 +34690,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Selectable;
     "hub_intents_status_log": hub_intents_status_log.Selectable;
     "hub_invoices": hub_invoices.Selectable;
+    "intentprocessed": intentprocessed.Selectable;
     "intents": intents.Selectable;
     "intents_with_shadow_data": intents_with_shadow_data.Selectable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Selectable;
@@ -19392,7 +34701,6 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Selectable;
     "merkle_trees": merkle_trees.Selectable;
     "messages": messages.Selectable;
-    "orders": orders.Selectable;
     "origin_intents": origin_intents.Selectable;
     "origin_intents_status_log": origin_intents_status_log.Selectable;
     "queues": queues.Selectable;
@@ -19405,6 +34713,43 @@ declare module 'zapatos/schema' {
     "settlementqueueprocessed": settlementqueueprocessed.Selectable;
     "settlementsent": settlementsent.Selectable;
     "tokens": tokens.Selectable;
+    "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Selectable;
+    "tokenomics.bridge_updated": tokenomics.bridge_updated.Selectable;
+    "tokenomics.bridged_in": tokenomics.bridged_in.Selectable;
+    "tokenomics.bridged_lock": tokenomics.bridged_lock.Selectable;
+    "tokenomics.bridged_lock_error": tokenomics.bridged_lock_error.Selectable;
+    "tokenomics.bridged_out": tokenomics.bridged_out.Selectable;
+    "tokenomics.chain_gateway_added": tokenomics.chain_gateway_added.Selectable;
+    "tokenomics.chain_gateway_removed": tokenomics.chain_gateway_removed.Selectable;
+    "tokenomics.early_exit": tokenomics.early_exit.Selectable;
+    "tokenomics.eip712_domain_changed": tokenomics.eip712_domain_changed.Selectable;
+    "tokenomics.epoch_rewards_updated": tokenomics.epoch_rewards_updated.Selectable;
+    "tokenomics.eth_withdrawn": tokenomics.eth_withdrawn.Selectable;
+    "tokenomics.fee_info": tokenomics.fee_info.Selectable;
+    "tokenomics.gateway_updated": tokenomics.gateway_updated.Selectable;
+    "tokenomics.hub_gauge_updated": tokenomics.hub_gauge_updated.Selectable;
+    "tokenomics.lock_position": tokenomics.lock_position.Selectable;
+    "tokenomics.mailbox_updated": tokenomics.mailbox_updated.Selectable;
+    "tokenomics.message_gas_limit_updated": tokenomics.message_gas_limit_updated.Selectable;
+    "tokenomics.mint_message_sent": tokenomics.mint_message_sent.Selectable;
+    "tokenomics.new_lock_position": tokenomics.new_lock_position.Selectable;
+    "tokenomics.ownership_transferred": tokenomics.ownership_transferred.Selectable;
+    "tokenomics.process_error": tokenomics.process_error.Selectable;
+    "tokenomics.retry_bridge_out": tokenomics.retry_bridge_out.Selectable;
+    "tokenomics.retry_lock": tokenomics.retry_lock.Selectable;
+    "tokenomics.retry_message": tokenomics.retry_message.Selectable;
+    "tokenomics.retry_mint": tokenomics.retry_mint.Selectable;
+    "tokenomics.retry_transfer": tokenomics.retry_transfer.Selectable;
+    "tokenomics.return_fee_updated": tokenomics.return_fee_updated.Selectable;
+    "tokenomics.reward_claimed": tokenomics.reward_claimed.Selectable;
+    "tokenomics.reward_metadata_updated": tokenomics.reward_metadata_updated.Selectable;
+    "tokenomics.rewards_claimed": tokenomics.rewards_claimed.Selectable;
+    "tokenomics.security_module_updated": tokenomics.security_module_updated.Selectable;
+    "tokenomics.user": tokenomics.user.Selectable;
+    "tokenomics.vote_cast": tokenomics.vote_cast.Selectable;
+    "tokenomics.vote_delegated": tokenomics.vote_delegated.Selectable;
+    "tokenomics.withdraw": tokenomics.withdraw.Selectable;
+    "tokenomics.withdraw_eth": tokenomics.withdraw_eth.Selectable;
   }[T];
 
   export type JSONSelectableForTable<T extends Table> = {
@@ -19427,6 +34772,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.JSONSelectable;
     "hub_intents_status_log": hub_intents_status_log.JSONSelectable;
     "hub_invoices": hub_invoices.JSONSelectable;
+    "intentprocessed": intentprocessed.JSONSelectable;
     "intents": intents.JSONSelectable;
     "intents_with_shadow_data": intents_with_shadow_data.JSONSelectable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.JSONSelectable;
@@ -19437,7 +34783,6 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.JSONSelectable;
     "merkle_trees": merkle_trees.JSONSelectable;
     "messages": messages.JSONSelectable;
-    "orders": orders.JSONSelectable;
     "origin_intents": origin_intents.JSONSelectable;
     "origin_intents_status_log": origin_intents_status_log.JSONSelectable;
     "queues": queues.JSONSelectable;
@@ -19450,6 +34795,43 @@ declare module 'zapatos/schema' {
     "settlementqueueprocessed": settlementqueueprocessed.JSONSelectable;
     "settlementsent": settlementsent.JSONSelectable;
     "tokens": tokens.JSONSelectable;
+    "tokenomics.bridge_in_error": tokenomics.bridge_in_error.JSONSelectable;
+    "tokenomics.bridge_updated": tokenomics.bridge_updated.JSONSelectable;
+    "tokenomics.bridged_in": tokenomics.bridged_in.JSONSelectable;
+    "tokenomics.bridged_lock": tokenomics.bridged_lock.JSONSelectable;
+    "tokenomics.bridged_lock_error": tokenomics.bridged_lock_error.JSONSelectable;
+    "tokenomics.bridged_out": tokenomics.bridged_out.JSONSelectable;
+    "tokenomics.chain_gateway_added": tokenomics.chain_gateway_added.JSONSelectable;
+    "tokenomics.chain_gateway_removed": tokenomics.chain_gateway_removed.JSONSelectable;
+    "tokenomics.early_exit": tokenomics.early_exit.JSONSelectable;
+    "tokenomics.eip712_domain_changed": tokenomics.eip712_domain_changed.JSONSelectable;
+    "tokenomics.epoch_rewards_updated": tokenomics.epoch_rewards_updated.JSONSelectable;
+    "tokenomics.eth_withdrawn": tokenomics.eth_withdrawn.JSONSelectable;
+    "tokenomics.fee_info": tokenomics.fee_info.JSONSelectable;
+    "tokenomics.gateway_updated": tokenomics.gateway_updated.JSONSelectable;
+    "tokenomics.hub_gauge_updated": tokenomics.hub_gauge_updated.JSONSelectable;
+    "tokenomics.lock_position": tokenomics.lock_position.JSONSelectable;
+    "tokenomics.mailbox_updated": tokenomics.mailbox_updated.JSONSelectable;
+    "tokenomics.message_gas_limit_updated": tokenomics.message_gas_limit_updated.JSONSelectable;
+    "tokenomics.mint_message_sent": tokenomics.mint_message_sent.JSONSelectable;
+    "tokenomics.new_lock_position": tokenomics.new_lock_position.JSONSelectable;
+    "tokenomics.ownership_transferred": tokenomics.ownership_transferred.JSONSelectable;
+    "tokenomics.process_error": tokenomics.process_error.JSONSelectable;
+    "tokenomics.retry_bridge_out": tokenomics.retry_bridge_out.JSONSelectable;
+    "tokenomics.retry_lock": tokenomics.retry_lock.JSONSelectable;
+    "tokenomics.retry_message": tokenomics.retry_message.JSONSelectable;
+    "tokenomics.retry_mint": tokenomics.retry_mint.JSONSelectable;
+    "tokenomics.retry_transfer": tokenomics.retry_transfer.JSONSelectable;
+    "tokenomics.return_fee_updated": tokenomics.return_fee_updated.JSONSelectable;
+    "tokenomics.reward_claimed": tokenomics.reward_claimed.JSONSelectable;
+    "tokenomics.reward_metadata_updated": tokenomics.reward_metadata_updated.JSONSelectable;
+    "tokenomics.rewards_claimed": tokenomics.rewards_claimed.JSONSelectable;
+    "tokenomics.security_module_updated": tokenomics.security_module_updated.JSONSelectable;
+    "tokenomics.user": tokenomics.user.JSONSelectable;
+    "tokenomics.vote_cast": tokenomics.vote_cast.JSONSelectable;
+    "tokenomics.vote_delegated": tokenomics.vote_delegated.JSONSelectable;
+    "tokenomics.withdraw": tokenomics.withdraw.JSONSelectable;
+    "tokenomics.withdraw_eth": tokenomics.withdraw_eth.JSONSelectable;
   }[T];
 
   export type WhereableForTable<T extends Table> = {
@@ -19472,6 +34854,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Whereable;
     "hub_intents_status_log": hub_intents_status_log.Whereable;
     "hub_invoices": hub_invoices.Whereable;
+    "intentprocessed": intentprocessed.Whereable;
     "intents": intents.Whereable;
     "intents_with_shadow_data": intents_with_shadow_data.Whereable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Whereable;
@@ -19482,7 +34865,6 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Whereable;
     "merkle_trees": merkle_trees.Whereable;
     "messages": messages.Whereable;
-    "orders": orders.Whereable;
     "origin_intents": origin_intents.Whereable;
     "origin_intents_status_log": origin_intents_status_log.Whereable;
     "queues": queues.Whereable;
@@ -19495,6 +34877,43 @@ declare module 'zapatos/schema' {
     "settlementqueueprocessed": settlementqueueprocessed.Whereable;
     "settlementsent": settlementsent.Whereable;
     "tokens": tokens.Whereable;
+    "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Whereable;
+    "tokenomics.bridge_updated": tokenomics.bridge_updated.Whereable;
+    "tokenomics.bridged_in": tokenomics.bridged_in.Whereable;
+    "tokenomics.bridged_lock": tokenomics.bridged_lock.Whereable;
+    "tokenomics.bridged_lock_error": tokenomics.bridged_lock_error.Whereable;
+    "tokenomics.bridged_out": tokenomics.bridged_out.Whereable;
+    "tokenomics.chain_gateway_added": tokenomics.chain_gateway_added.Whereable;
+    "tokenomics.chain_gateway_removed": tokenomics.chain_gateway_removed.Whereable;
+    "tokenomics.early_exit": tokenomics.early_exit.Whereable;
+    "tokenomics.eip712_domain_changed": tokenomics.eip712_domain_changed.Whereable;
+    "tokenomics.epoch_rewards_updated": tokenomics.epoch_rewards_updated.Whereable;
+    "tokenomics.eth_withdrawn": tokenomics.eth_withdrawn.Whereable;
+    "tokenomics.fee_info": tokenomics.fee_info.Whereable;
+    "tokenomics.gateway_updated": tokenomics.gateway_updated.Whereable;
+    "tokenomics.hub_gauge_updated": tokenomics.hub_gauge_updated.Whereable;
+    "tokenomics.lock_position": tokenomics.lock_position.Whereable;
+    "tokenomics.mailbox_updated": tokenomics.mailbox_updated.Whereable;
+    "tokenomics.message_gas_limit_updated": tokenomics.message_gas_limit_updated.Whereable;
+    "tokenomics.mint_message_sent": tokenomics.mint_message_sent.Whereable;
+    "tokenomics.new_lock_position": tokenomics.new_lock_position.Whereable;
+    "tokenomics.ownership_transferred": tokenomics.ownership_transferred.Whereable;
+    "tokenomics.process_error": tokenomics.process_error.Whereable;
+    "tokenomics.retry_bridge_out": tokenomics.retry_bridge_out.Whereable;
+    "tokenomics.retry_lock": tokenomics.retry_lock.Whereable;
+    "tokenomics.retry_message": tokenomics.retry_message.Whereable;
+    "tokenomics.retry_mint": tokenomics.retry_mint.Whereable;
+    "tokenomics.retry_transfer": tokenomics.retry_transfer.Whereable;
+    "tokenomics.return_fee_updated": tokenomics.return_fee_updated.Whereable;
+    "tokenomics.reward_claimed": tokenomics.reward_claimed.Whereable;
+    "tokenomics.reward_metadata_updated": tokenomics.reward_metadata_updated.Whereable;
+    "tokenomics.rewards_claimed": tokenomics.rewards_claimed.Whereable;
+    "tokenomics.security_module_updated": tokenomics.security_module_updated.Whereable;
+    "tokenomics.user": tokenomics.user.Whereable;
+    "tokenomics.vote_cast": tokenomics.vote_cast.Whereable;
+    "tokenomics.vote_delegated": tokenomics.vote_delegated.Whereable;
+    "tokenomics.withdraw": tokenomics.withdraw.Whereable;
+    "tokenomics.withdraw_eth": tokenomics.withdraw_eth.Whereable;
   }[T];
 
   export type InsertableForTable<T extends Table> = {
@@ -19517,6 +34936,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Insertable;
     "hub_intents_status_log": hub_intents_status_log.Insertable;
     "hub_invoices": hub_invoices.Insertable;
+    "intentprocessed": intentprocessed.Insertable;
     "intents": intents.Insertable;
     "intents_with_shadow_data": intents_with_shadow_data.Insertable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Insertable;
@@ -19527,7 +34947,6 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Insertable;
     "merkle_trees": merkle_trees.Insertable;
     "messages": messages.Insertable;
-    "orders": orders.Insertable;
     "origin_intents": origin_intents.Insertable;
     "origin_intents_status_log": origin_intents_status_log.Insertable;
     "queues": queues.Insertable;
@@ -19540,6 +34959,43 @@ declare module 'zapatos/schema' {
     "settlementqueueprocessed": settlementqueueprocessed.Insertable;
     "settlementsent": settlementsent.Insertable;
     "tokens": tokens.Insertable;
+    "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Insertable;
+    "tokenomics.bridge_updated": tokenomics.bridge_updated.Insertable;
+    "tokenomics.bridged_in": tokenomics.bridged_in.Insertable;
+    "tokenomics.bridged_lock": tokenomics.bridged_lock.Insertable;
+    "tokenomics.bridged_lock_error": tokenomics.bridged_lock_error.Insertable;
+    "tokenomics.bridged_out": tokenomics.bridged_out.Insertable;
+    "tokenomics.chain_gateway_added": tokenomics.chain_gateway_added.Insertable;
+    "tokenomics.chain_gateway_removed": tokenomics.chain_gateway_removed.Insertable;
+    "tokenomics.early_exit": tokenomics.early_exit.Insertable;
+    "tokenomics.eip712_domain_changed": tokenomics.eip712_domain_changed.Insertable;
+    "tokenomics.epoch_rewards_updated": tokenomics.epoch_rewards_updated.Insertable;
+    "tokenomics.eth_withdrawn": tokenomics.eth_withdrawn.Insertable;
+    "tokenomics.fee_info": tokenomics.fee_info.Insertable;
+    "tokenomics.gateway_updated": tokenomics.gateway_updated.Insertable;
+    "tokenomics.hub_gauge_updated": tokenomics.hub_gauge_updated.Insertable;
+    "tokenomics.lock_position": tokenomics.lock_position.Insertable;
+    "tokenomics.mailbox_updated": tokenomics.mailbox_updated.Insertable;
+    "tokenomics.message_gas_limit_updated": tokenomics.message_gas_limit_updated.Insertable;
+    "tokenomics.mint_message_sent": tokenomics.mint_message_sent.Insertable;
+    "tokenomics.new_lock_position": tokenomics.new_lock_position.Insertable;
+    "tokenomics.ownership_transferred": tokenomics.ownership_transferred.Insertable;
+    "tokenomics.process_error": tokenomics.process_error.Insertable;
+    "tokenomics.retry_bridge_out": tokenomics.retry_bridge_out.Insertable;
+    "tokenomics.retry_lock": tokenomics.retry_lock.Insertable;
+    "tokenomics.retry_message": tokenomics.retry_message.Insertable;
+    "tokenomics.retry_mint": tokenomics.retry_mint.Insertable;
+    "tokenomics.retry_transfer": tokenomics.retry_transfer.Insertable;
+    "tokenomics.return_fee_updated": tokenomics.return_fee_updated.Insertable;
+    "tokenomics.reward_claimed": tokenomics.reward_claimed.Insertable;
+    "tokenomics.reward_metadata_updated": tokenomics.reward_metadata_updated.Insertable;
+    "tokenomics.rewards_claimed": tokenomics.rewards_claimed.Insertable;
+    "tokenomics.security_module_updated": tokenomics.security_module_updated.Insertable;
+    "tokenomics.user": tokenomics.user.Insertable;
+    "tokenomics.vote_cast": tokenomics.vote_cast.Insertable;
+    "tokenomics.vote_delegated": tokenomics.vote_delegated.Insertable;
+    "tokenomics.withdraw": tokenomics.withdraw.Insertable;
+    "tokenomics.withdraw_eth": tokenomics.withdraw_eth.Insertable;
   }[T];
 
   export type UpdatableForTable<T extends Table> = {
@@ -19562,6 +35018,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Updatable;
     "hub_intents_status_log": hub_intents_status_log.Updatable;
     "hub_invoices": hub_invoices.Updatable;
+    "intentprocessed": intentprocessed.Updatable;
     "intents": intents.Updatable;
     "intents_with_shadow_data": intents_with_shadow_data.Updatable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Updatable;
@@ -19572,7 +35029,6 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Updatable;
     "merkle_trees": merkle_trees.Updatable;
     "messages": messages.Updatable;
-    "orders": orders.Updatable;
     "origin_intents": origin_intents.Updatable;
     "origin_intents_status_log": origin_intents_status_log.Updatable;
     "queues": queues.Updatable;
@@ -19585,6 +35041,43 @@ declare module 'zapatos/schema' {
     "settlementqueueprocessed": settlementqueueprocessed.Updatable;
     "settlementsent": settlementsent.Updatable;
     "tokens": tokens.Updatable;
+    "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Updatable;
+    "tokenomics.bridge_updated": tokenomics.bridge_updated.Updatable;
+    "tokenomics.bridged_in": tokenomics.bridged_in.Updatable;
+    "tokenomics.bridged_lock": tokenomics.bridged_lock.Updatable;
+    "tokenomics.bridged_lock_error": tokenomics.bridged_lock_error.Updatable;
+    "tokenomics.bridged_out": tokenomics.bridged_out.Updatable;
+    "tokenomics.chain_gateway_added": tokenomics.chain_gateway_added.Updatable;
+    "tokenomics.chain_gateway_removed": tokenomics.chain_gateway_removed.Updatable;
+    "tokenomics.early_exit": tokenomics.early_exit.Updatable;
+    "tokenomics.eip712_domain_changed": tokenomics.eip712_domain_changed.Updatable;
+    "tokenomics.epoch_rewards_updated": tokenomics.epoch_rewards_updated.Updatable;
+    "tokenomics.eth_withdrawn": tokenomics.eth_withdrawn.Updatable;
+    "tokenomics.fee_info": tokenomics.fee_info.Updatable;
+    "tokenomics.gateway_updated": tokenomics.gateway_updated.Updatable;
+    "tokenomics.hub_gauge_updated": tokenomics.hub_gauge_updated.Updatable;
+    "tokenomics.lock_position": tokenomics.lock_position.Updatable;
+    "tokenomics.mailbox_updated": tokenomics.mailbox_updated.Updatable;
+    "tokenomics.message_gas_limit_updated": tokenomics.message_gas_limit_updated.Updatable;
+    "tokenomics.mint_message_sent": tokenomics.mint_message_sent.Updatable;
+    "tokenomics.new_lock_position": tokenomics.new_lock_position.Updatable;
+    "tokenomics.ownership_transferred": tokenomics.ownership_transferred.Updatable;
+    "tokenomics.process_error": tokenomics.process_error.Updatable;
+    "tokenomics.retry_bridge_out": tokenomics.retry_bridge_out.Updatable;
+    "tokenomics.retry_lock": tokenomics.retry_lock.Updatable;
+    "tokenomics.retry_message": tokenomics.retry_message.Updatable;
+    "tokenomics.retry_mint": tokenomics.retry_mint.Updatable;
+    "tokenomics.retry_transfer": tokenomics.retry_transfer.Updatable;
+    "tokenomics.return_fee_updated": tokenomics.return_fee_updated.Updatable;
+    "tokenomics.reward_claimed": tokenomics.reward_claimed.Updatable;
+    "tokenomics.reward_metadata_updated": tokenomics.reward_metadata_updated.Updatable;
+    "tokenomics.rewards_claimed": tokenomics.rewards_claimed.Updatable;
+    "tokenomics.security_module_updated": tokenomics.security_module_updated.Updatable;
+    "tokenomics.user": tokenomics.user.Updatable;
+    "tokenomics.vote_cast": tokenomics.vote_cast.Updatable;
+    "tokenomics.vote_delegated": tokenomics.vote_delegated.Updatable;
+    "tokenomics.withdraw": tokenomics.withdraw.Updatable;
+    "tokenomics.withdraw_eth": tokenomics.withdraw_eth.Updatable;
   }[T];
 
   export type UniqueIndexForTable<T extends Table> = {
@@ -19607,6 +35100,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.UniqueIndex;
     "hub_intents_status_log": hub_intents_status_log.UniqueIndex;
     "hub_invoices": hub_invoices.UniqueIndex;
+    "intentprocessed": intentprocessed.UniqueIndex;
     "intents": intents.UniqueIndex;
     "intents_with_shadow_data": intents_with_shadow_data.UniqueIndex;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.UniqueIndex;
@@ -19617,7 +35111,6 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.UniqueIndex;
     "merkle_trees": merkle_trees.UniqueIndex;
     "messages": messages.UniqueIndex;
-    "orders": orders.UniqueIndex;
     "origin_intents": origin_intents.UniqueIndex;
     "origin_intents_status_log": origin_intents_status_log.UniqueIndex;
     "queues": queues.UniqueIndex;
@@ -19630,6 +35123,43 @@ declare module 'zapatos/schema' {
     "settlementqueueprocessed": settlementqueueprocessed.UniqueIndex;
     "settlementsent": settlementsent.UniqueIndex;
     "tokens": tokens.UniqueIndex;
+    "tokenomics.bridge_in_error": tokenomics.bridge_in_error.UniqueIndex;
+    "tokenomics.bridge_updated": tokenomics.bridge_updated.UniqueIndex;
+    "tokenomics.bridged_in": tokenomics.bridged_in.UniqueIndex;
+    "tokenomics.bridged_lock": tokenomics.bridged_lock.UniqueIndex;
+    "tokenomics.bridged_lock_error": tokenomics.bridged_lock_error.UniqueIndex;
+    "tokenomics.bridged_out": tokenomics.bridged_out.UniqueIndex;
+    "tokenomics.chain_gateway_added": tokenomics.chain_gateway_added.UniqueIndex;
+    "tokenomics.chain_gateway_removed": tokenomics.chain_gateway_removed.UniqueIndex;
+    "tokenomics.early_exit": tokenomics.early_exit.UniqueIndex;
+    "tokenomics.eip712_domain_changed": tokenomics.eip712_domain_changed.UniqueIndex;
+    "tokenomics.epoch_rewards_updated": tokenomics.epoch_rewards_updated.UniqueIndex;
+    "tokenomics.eth_withdrawn": tokenomics.eth_withdrawn.UniqueIndex;
+    "tokenomics.fee_info": tokenomics.fee_info.UniqueIndex;
+    "tokenomics.gateway_updated": tokenomics.gateway_updated.UniqueIndex;
+    "tokenomics.hub_gauge_updated": tokenomics.hub_gauge_updated.UniqueIndex;
+    "tokenomics.lock_position": tokenomics.lock_position.UniqueIndex;
+    "tokenomics.mailbox_updated": tokenomics.mailbox_updated.UniqueIndex;
+    "tokenomics.message_gas_limit_updated": tokenomics.message_gas_limit_updated.UniqueIndex;
+    "tokenomics.mint_message_sent": tokenomics.mint_message_sent.UniqueIndex;
+    "tokenomics.new_lock_position": tokenomics.new_lock_position.UniqueIndex;
+    "tokenomics.ownership_transferred": tokenomics.ownership_transferred.UniqueIndex;
+    "tokenomics.process_error": tokenomics.process_error.UniqueIndex;
+    "tokenomics.retry_bridge_out": tokenomics.retry_bridge_out.UniqueIndex;
+    "tokenomics.retry_lock": tokenomics.retry_lock.UniqueIndex;
+    "tokenomics.retry_message": tokenomics.retry_message.UniqueIndex;
+    "tokenomics.retry_mint": tokenomics.retry_mint.UniqueIndex;
+    "tokenomics.retry_transfer": tokenomics.retry_transfer.UniqueIndex;
+    "tokenomics.return_fee_updated": tokenomics.return_fee_updated.UniqueIndex;
+    "tokenomics.reward_claimed": tokenomics.reward_claimed.UniqueIndex;
+    "tokenomics.reward_metadata_updated": tokenomics.reward_metadata_updated.UniqueIndex;
+    "tokenomics.rewards_claimed": tokenomics.rewards_claimed.UniqueIndex;
+    "tokenomics.security_module_updated": tokenomics.security_module_updated.UniqueIndex;
+    "tokenomics.user": tokenomics.user.UniqueIndex;
+    "tokenomics.vote_cast": tokenomics.vote_cast.UniqueIndex;
+    "tokenomics.vote_delegated": tokenomics.vote_delegated.UniqueIndex;
+    "tokenomics.withdraw": tokenomics.withdraw.UniqueIndex;
+    "tokenomics.withdraw_eth": tokenomics.withdraw_eth.UniqueIndex;
   }[T];
 
   export type ColumnForTable<T extends Table> = {
@@ -19652,6 +35182,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Column;
     "hub_intents_status_log": hub_intents_status_log.Column;
     "hub_invoices": hub_invoices.Column;
+    "intentprocessed": intentprocessed.Column;
     "intents": intents.Column;
     "intents_with_shadow_data": intents_with_shadow_data.Column;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Column;
@@ -19662,7 +35193,6 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Column;
     "merkle_trees": merkle_trees.Column;
     "messages": messages.Column;
-    "orders": orders.Column;
     "origin_intents": origin_intents.Column;
     "origin_intents_status_log": origin_intents_status_log.Column;
     "queues": queues.Column;
@@ -19675,6 +35205,43 @@ declare module 'zapatos/schema' {
     "settlementqueueprocessed": settlementqueueprocessed.Column;
     "settlementsent": settlementsent.Column;
     "tokens": tokens.Column;
+    "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Column;
+    "tokenomics.bridge_updated": tokenomics.bridge_updated.Column;
+    "tokenomics.bridged_in": tokenomics.bridged_in.Column;
+    "tokenomics.bridged_lock": tokenomics.bridged_lock.Column;
+    "tokenomics.bridged_lock_error": tokenomics.bridged_lock_error.Column;
+    "tokenomics.bridged_out": tokenomics.bridged_out.Column;
+    "tokenomics.chain_gateway_added": tokenomics.chain_gateway_added.Column;
+    "tokenomics.chain_gateway_removed": tokenomics.chain_gateway_removed.Column;
+    "tokenomics.early_exit": tokenomics.early_exit.Column;
+    "tokenomics.eip712_domain_changed": tokenomics.eip712_domain_changed.Column;
+    "tokenomics.epoch_rewards_updated": tokenomics.epoch_rewards_updated.Column;
+    "tokenomics.eth_withdrawn": tokenomics.eth_withdrawn.Column;
+    "tokenomics.fee_info": tokenomics.fee_info.Column;
+    "tokenomics.gateway_updated": tokenomics.gateway_updated.Column;
+    "tokenomics.hub_gauge_updated": tokenomics.hub_gauge_updated.Column;
+    "tokenomics.lock_position": tokenomics.lock_position.Column;
+    "tokenomics.mailbox_updated": tokenomics.mailbox_updated.Column;
+    "tokenomics.message_gas_limit_updated": tokenomics.message_gas_limit_updated.Column;
+    "tokenomics.mint_message_sent": tokenomics.mint_message_sent.Column;
+    "tokenomics.new_lock_position": tokenomics.new_lock_position.Column;
+    "tokenomics.ownership_transferred": tokenomics.ownership_transferred.Column;
+    "tokenomics.process_error": tokenomics.process_error.Column;
+    "tokenomics.retry_bridge_out": tokenomics.retry_bridge_out.Column;
+    "tokenomics.retry_lock": tokenomics.retry_lock.Column;
+    "tokenomics.retry_message": tokenomics.retry_message.Column;
+    "tokenomics.retry_mint": tokenomics.retry_mint.Column;
+    "tokenomics.retry_transfer": tokenomics.retry_transfer.Column;
+    "tokenomics.return_fee_updated": tokenomics.return_fee_updated.Column;
+    "tokenomics.reward_claimed": tokenomics.reward_claimed.Column;
+    "tokenomics.reward_metadata_updated": tokenomics.reward_metadata_updated.Column;
+    "tokenomics.rewards_claimed": tokenomics.rewards_claimed.Column;
+    "tokenomics.security_module_updated": tokenomics.security_module_updated.Column;
+    "tokenomics.user": tokenomics.user.Column;
+    "tokenomics.vote_cast": tokenomics.vote_cast.Column;
+    "tokenomics.vote_delegated": tokenomics.vote_delegated.Column;
+    "tokenomics.withdraw": tokenomics.withdraw.Column;
+    "tokenomics.withdraw_eth": tokenomics.withdraw_eth.Column;
   }[T];
 
   export type SQLForTable<T extends Table> = {
@@ -19697,6 +35264,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.SQL;
     "hub_intents_status_log": hub_intents_status_log.SQL;
     "hub_invoices": hub_invoices.SQL;
+    "intentprocessed": intentprocessed.SQL;
     "intents": intents.SQL;
     "intents_with_shadow_data": intents_with_shadow_data.SQL;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.SQL;
@@ -19707,7 +35275,6 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.SQL;
     "merkle_trees": merkle_trees.SQL;
     "messages": messages.SQL;
-    "orders": orders.SQL;
     "origin_intents": origin_intents.SQL;
     "origin_intents_status_log": origin_intents_status_log.SQL;
     "queues": queues.SQL;
@@ -19720,6 +35287,43 @@ declare module 'zapatos/schema' {
     "settlementqueueprocessed": settlementqueueprocessed.SQL;
     "settlementsent": settlementsent.SQL;
     "tokens": tokens.SQL;
+    "tokenomics.bridge_in_error": tokenomics.bridge_in_error.SQL;
+    "tokenomics.bridge_updated": tokenomics.bridge_updated.SQL;
+    "tokenomics.bridged_in": tokenomics.bridged_in.SQL;
+    "tokenomics.bridged_lock": tokenomics.bridged_lock.SQL;
+    "tokenomics.bridged_lock_error": tokenomics.bridged_lock_error.SQL;
+    "tokenomics.bridged_out": tokenomics.bridged_out.SQL;
+    "tokenomics.chain_gateway_added": tokenomics.chain_gateway_added.SQL;
+    "tokenomics.chain_gateway_removed": tokenomics.chain_gateway_removed.SQL;
+    "tokenomics.early_exit": tokenomics.early_exit.SQL;
+    "tokenomics.eip712_domain_changed": tokenomics.eip712_domain_changed.SQL;
+    "tokenomics.epoch_rewards_updated": tokenomics.epoch_rewards_updated.SQL;
+    "tokenomics.eth_withdrawn": tokenomics.eth_withdrawn.SQL;
+    "tokenomics.fee_info": tokenomics.fee_info.SQL;
+    "tokenomics.gateway_updated": tokenomics.gateway_updated.SQL;
+    "tokenomics.hub_gauge_updated": tokenomics.hub_gauge_updated.SQL;
+    "tokenomics.lock_position": tokenomics.lock_position.SQL;
+    "tokenomics.mailbox_updated": tokenomics.mailbox_updated.SQL;
+    "tokenomics.message_gas_limit_updated": tokenomics.message_gas_limit_updated.SQL;
+    "tokenomics.mint_message_sent": tokenomics.mint_message_sent.SQL;
+    "tokenomics.new_lock_position": tokenomics.new_lock_position.SQL;
+    "tokenomics.ownership_transferred": tokenomics.ownership_transferred.SQL;
+    "tokenomics.process_error": tokenomics.process_error.SQL;
+    "tokenomics.retry_bridge_out": tokenomics.retry_bridge_out.SQL;
+    "tokenomics.retry_lock": tokenomics.retry_lock.SQL;
+    "tokenomics.retry_message": tokenomics.retry_message.SQL;
+    "tokenomics.retry_mint": tokenomics.retry_mint.SQL;
+    "tokenomics.retry_transfer": tokenomics.retry_transfer.SQL;
+    "tokenomics.return_fee_updated": tokenomics.return_fee_updated.SQL;
+    "tokenomics.reward_claimed": tokenomics.reward_claimed.SQL;
+    "tokenomics.reward_metadata_updated": tokenomics.reward_metadata_updated.SQL;
+    "tokenomics.rewards_claimed": tokenomics.rewards_claimed.SQL;
+    "tokenomics.security_module_updated": tokenomics.security_module_updated.SQL;
+    "tokenomics.user": tokenomics.user.SQL;
+    "tokenomics.vote_cast": tokenomics.vote_cast.SQL;
+    "tokenomics.vote_delegated": tokenomics.vote_delegated.SQL;
+    "tokenomics.withdraw": tokenomics.withdraw.SQL;
+    "tokenomics.withdraw_eth": tokenomics.withdraw_eth.SQL;
   }[T];
 
 }
