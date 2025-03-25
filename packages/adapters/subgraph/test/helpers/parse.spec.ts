@@ -66,7 +66,7 @@ describe('Subgraph Adapter - parse', () => {
       tokenFee: undefined,
       nativeFee: undefined,
       feeAdapterInitiator: undefined,
-      order: undefined,
+      orderId: undefined,
     };
 
     it('should work for added intents', async () => {
@@ -131,11 +131,7 @@ describe('Subgraph Adapter - parse', () => {
       });
       expect(parsed).to.be.deep.eq({
         ...expected,
-        order: {
-          id: order.id,
-          nativeFee: order.nativeFee,
-          tokenFee: order.tokenFee,
-        },
+        orderId: order.id,
       });
     });
 
@@ -177,11 +173,7 @@ describe('Subgraph Adapter - parse', () => {
         tokenFee: fees.tokenFee,
         nativeFee: fees.nativeFee,
         feeAdapterInitiator: fees.initiator,
-        order: {
-          id: order.id,
-          nativeFee: order.nativeFee,
-          tokenFee: order.tokenFee,
-        },
+        orderId: order.id,
       });
     });
   });
