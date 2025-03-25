@@ -1,5 +1,5 @@
 import { Interface } from 'ethers/lib/utils';
-import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { SinonStub, SinonStubbedInstance, stub, createStubInstance } from 'sinon';
 import { expect, HyperlaneMessageResponse, HyperlaneStatus, Message, mkHash } from '@chimera-monorepo/utils';
 import * as Mockable from '../../src/mockable';
 
@@ -43,6 +43,12 @@ describe('Helpers:hyperlane', () => {
     beforeEach(() => {
       getHyperlaneMsgDeliveredStub = stub(Mockable, 'getHyperlaneMsgDelivered').resolves(false);
       getHyperlaneMessageStatusStub = stub(Mockable, 'getHyperlaneMessageStatus').resolves(message);
+      stub(Mockable, 'getMailboxInterface').returns(createStubInstance(Interface, {
+        getEvent: stub().returns({} as any) as any,
+        getEventTopic: stub().returns(mkHash('0xtopic')) as any,
+        parseLog: stub().returns({ args: { message: message.body } } as any) as any,
+        encodeFunctionData: stub().returns('0x1234') as any,
+      }));
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
 
       chainreader.readTx.resolves('0x1234');
@@ -103,6 +109,7 @@ describe('Helpers:hyperlane', () => {
       database.getMessagesByIds.resolves([mock.message()]);
       decodeStub.onFirstCall().returns(['0x1234']);
       decodeStub.onSecondCall().returns([false]);
+
       const ret = await getMessageStatus(id, true);
       expect(ret).to.be.deep.eq({
         status: 'relayable',
@@ -159,9 +166,11 @@ describe('Helpers:hyperlane', () => {
         logs: [{ topics: [mkHash('0xtopic')] }],
       } as any);
 
-      stub(Interface.prototype, 'getEvent').returns({} as any);
-      stub(Interface.prototype, 'getEventTopic').returns(mkHash('0xtopic'));
-      stub(Interface.prototype, 'parseLog').returns({ args: { message: message.body } } as any);
+      stub(Mockable, 'getMailboxInterface').returns(createStubInstance(Interface, {
+        getEvent: stub().returns({} as any) as any,
+        getEventTopic: stub().returns(mkHash('0xtopic')) as any,
+        parseLog: stub().returns({ args: { message: message.body } } as any) as any,
+      }));
     });
 
     it('should throw if cannot find Dispatch event', async () => {
