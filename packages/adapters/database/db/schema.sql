@@ -2062,9 +2062,15 @@ ALTER SEQUENCE public.messages_auto_id_seq OWNED BY public.messages.auto_id;
 CREATE TABLE public.orders (
     id character varying(66) NOT NULL,
     auto_id integer NOT NULL,
-    token_fee character varying(255),
-    native_fee character varying(255),
-    intent_ids character varying(66)[] NOT NULL
+    token_fee character varying(255) NOT NULL,
+    native_fee character varying(255) NOT NULL,
+    intent_ids character varying(66)[] NOT NULL,
+    initiator character varying(66) NOT NULL,
+    transaction_hash character(66) NOT NULL,
+    "timestamp" bigint NOT NULL,
+    block_number bigint NOT NULL,
+    tx_origin character varying(66) NOT NULL,
+    tx_nonce bigint NOT NULL
 );
 
 

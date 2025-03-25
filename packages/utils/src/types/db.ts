@@ -441,3 +441,16 @@ export const LockPositionSchema = Type.Object({
   expiry: Type.Number(),
 });
 export type LockPosition = Static<typeof LockPositionSchema>;
+
+export const OrderSchema = Type.Intersect([
+  OnchainTransactionContextSchema,
+  Type.Object({
+    id: Type.String({ maxLength: 66 }),
+    autoId: Type.Number(),
+    tokenFee: TIntegerString,
+    nativeFee: TIntegerString,
+    intentIds: Type.Array(TBytes32),
+    initiator: TAddress,
+  }),
+]);
+export type Order = Static<typeof OrderSchema>;

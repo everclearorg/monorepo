@@ -14831,11 +14831,23 @@ declare module 'zapatos/schema' {
       */
       auto_id: number;
       /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number: db.Int8String;
+      /**
       * **orders.id**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       id: string;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator: string;
       /**
       * **orders.intent_ids**
       * - `_varchar` in database
@@ -14845,15 +14857,51 @@ declare module 'zapatos/schema' {
       /**
       * **orders.native_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
-      native_fee: string | null;
+      native_fee: string;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: db.Int8String;
       /**
       * **orders.token_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
-      token_fee: string | null;
+      token_fee: string;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash: string;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce: db.Int8String;
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin: string;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: db.Int8String;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: db.Int8String;
     }
     export interface JSONSelectable {
       /**
@@ -14863,11 +14911,23 @@ declare module 'zapatos/schema' {
       */
       auto_id: number;
       /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number: (number | db.Int8String);
+      /**
       * **orders.id**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       id: string;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator: string;
       /**
       * **orders.intent_ids**
       * - `_varchar` in database
@@ -14877,15 +14937,51 @@ declare module 'zapatos/schema' {
       /**
       * **orders.native_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
-      native_fee: string | null;
+      native_fee: string;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: (number | db.Int8String);
       /**
       * **orders.token_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
-      token_fee: string | null;
+      token_fee: string;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash: string;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce: (number | db.Int8String);
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin: string;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: (number | db.Int8String);
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: (number | db.Int8String);
     }
     export interface Whereable {
       /**
@@ -14895,11 +14991,23 @@ declare module 'zapatos/schema' {
       */
       auto_id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **orders.id**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **orders.intent_ids**
       * - `_varchar` in database
@@ -14909,15 +15017,51 @@ declare module 'zapatos/schema' {
       /**
       * **orders.native_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
       native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **orders.token_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
       token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
     }
     export interface Insertable {
       /**
@@ -14927,11 +15071,23 @@ declare module 'zapatos/schema' {
       */
       auto_id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
       /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
       * **orders.id**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       id: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator: string | db.Parameter<string> | db.SQLFragment;
       /**
       * **orders.intent_ids**
       * - `_varchar` in database
@@ -14941,15 +15097,51 @@ declare module 'zapatos/schema' {
       /**
       * **orders.native_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
-      native_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      native_fee: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **orders.token_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
-      token_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      token_fee: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
     }
     export interface Updatable {
       /**
@@ -14959,11 +15151,23 @@ declare module 'zapatos/schema' {
       */
       auto_id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
       /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
       * **orders.id**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
       /**
       * **orders.intent_ids**
       * - `_varchar` in database
@@ -14973,15 +15177,51 @@ declare module 'zapatos/schema' {
       /**
       * **orders.native_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
-      native_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      native_fee?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **orders.token_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - `NOT NULL`, no default
       */
-      token_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      token_fee?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
     }
     export type UniqueIndex = 'orders_pkey';
     export type Column = keyof Selectable;
