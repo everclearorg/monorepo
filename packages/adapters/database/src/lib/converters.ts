@@ -23,6 +23,7 @@ import {
   EpochResult,
   NewLockPositionEvent,
   LockPosition,
+  Order,
 } from '@chimera-monorepo/utils';
 import { toDate } from 'zapatos/db';
 import {
@@ -45,6 +46,7 @@ import {
   epoch_results,
   tokenomics,
   lock_positions,
+  orders,
 } from 'zapatos/schema';
 import { db } from '..';
 
@@ -672,5 +674,41 @@ export function toLockPosition(lockPosition: LockPosition): lock_positions.JSONS
     amount_locked: lockPosition.amountLocked,
     start: +lockPosition.start,
     expiry: +lockPosition.expiry,
+  };
+}
+
+export function toOrders(order: Order): orders.Insertable {
+  return {
+    id: order.id,
+    token_fee: order.tokenFee,
+    native_fee: order.nativeFee,
+    intent_ids: order.intentIds,
+    initiator: order.initiator,
+
+    transaction_hash: order.transactionHash,
+    timestamp: order.timestamp,
+    block_number: order.blockNumber,
+    gas_limit: +order.gasLimit,
+    gas_price: +order.gasPrice,
+    tx_origin: order.txOrigin,
+    tx_nonce: order.txNonce,
+  };
+}
+
+export function fromOrders(order: orders.JSONSelectable): Order {
+  return {
+    id: order.id,
+    autoId: +order.auto_id,
+    tokenFee: order.token_fee ?? undefined,
+    nativeFee: order.native_fee ?? undefined,
+    intentIds: order.intent_ids,
+    initiator: order.initiator,
+    transactionHash: order.transaction_hash,
+    timestamp: +order.timestamp,
+    blockNumber: +order.block_number,
+    gasLimit: String(order.gas_limit),
+    gasPrice: String(order.gas_price),
+    txOrigin: order.tx_origin,
+    txNonce: +order.tx_nonce,
   };
 }

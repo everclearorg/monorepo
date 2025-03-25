@@ -21,6 +21,7 @@ import {
   Reward,
   EpochResult,
   LockPosition,
+  Order,
 } from '@chimera-monorepo/utils';
 
 import { BigNumber } from 'ethers';
@@ -814,4 +815,16 @@ export const saveLockPositions = async (
     await db.upsert('lock_positions', toAdd.map(converters.toLockPosition), ['user', 'start']).run(client);
     return true;
   });
+};
+
+export const saveOrders = async (_orders: Order[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<void> => {
+  const poolToUse = _pool ?? pool;
+  const orders = _orders.map(converters.toOrders);
+  await db.upsert('orders', orders, ['id']).run(poolToUse);
+};
+
+export const getOrders = async (ids: string[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<Order[]> => {
+  const poolToUse = _pool ?? pool;
+  const result = await db.select('orders', { id: db.conditions.isIn(ids.map((i) => i.toLowerCase())) }).run(poolToUse);
+  return result.map(converters.fromOrders);
 };
