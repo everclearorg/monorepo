@@ -2070,7 +2070,9 @@ CREATE TABLE public.orders (
     "timestamp" bigint NOT NULL,
     block_number bigint NOT NULL,
     tx_origin character varying(66) NOT NULL,
-    tx_nonce bigint NOT NULL
+    tx_nonce bigint NOT NULL,
+    gas_limit bigint NOT NULL,
+    gas_price bigint NOT NULL
 );
 
 
