@@ -393,13 +393,13 @@ export class SubgraphReader {
     for (const domain of domains) {
       const param = queryParams.get(domain)!;
       requests.push(
-        this.query<{ orders: OrderEntity[]; _meta: MetaEntity }>(domain, [
+        this.query<{ orderCreateds: OrderEntity[]; _meta: MetaEntity }>(domain, [
           getOrdersByNonce(param.latestNonce, param.maxBlockNumber, param.orderDirection),
         ]),
       );
     }
 
     const response = (await Promise.allSettled(requests)).filter(isFulfilled).map((r) => r.value);
-    return response.flatMap((data, idx) => (data?.data?.orders ?? []).map((e) => parser.order(domains[idx], e)));
+    return response.flatMap((data, idx) => (data?.data?.orderCreateds ?? []).map((e) => parser.order(domains[idx], e)));
   }
 }

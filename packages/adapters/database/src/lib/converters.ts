@@ -79,7 +79,7 @@ export function toOriginIntents(originIntent: OriginIntent): origin_intents.Inse
     native_fee: originIntent.nativeFee,
     token_fee: originIntent.tokenFee,
     fee_adapter_initiator: originIntent.feeAdapterInitiator,
-    order_id: originIntent.orderId ?? undefined,
+    order_id: originIntent.orderId,
   };
 }
 export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): OriginIntent {

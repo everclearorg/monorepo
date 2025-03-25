@@ -415,7 +415,7 @@ export const getOrdersByNonce = (
   limit?: number,
 ): string => {
   return `
-    orders(
+    orderCreateds(
       where: {
         txNonce_gte: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}

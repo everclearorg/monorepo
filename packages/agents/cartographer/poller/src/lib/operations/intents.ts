@@ -360,7 +360,7 @@ export const updateOrders = async () => {
 
   // Get orders for all domains in the mapping
   const orders = await subgraph.getOrdersByNonce(queryMetaParams);
-  logger.info('Retrieved orders', requestContext, methodContext, { orders: orders.length });
+  logger.info('Retrieved orders', requestContext, methodContext, { domains, orders: orders.length });
   orders.forEach((order) => {
     const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(updateOrders.name);
     logger.debug('Retrieved order', _requestContext, _methodContext, { order });

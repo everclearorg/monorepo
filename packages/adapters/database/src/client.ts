@@ -43,7 +43,9 @@ export const saveOriginIntents = async (
 ): Promise<void> => {
   const poolToUse = _pool ?? pool;
   const intents = _intents.map(converters.toOriginIntents);
-  await db.upsert('origin_intents', intents, ['id'], { noNullUpdateColumns: ['message_id'] }).run(poolToUse);
+  await db
+    .upsert('origin_intents', intents, ['id'], { noNullUpdateColumns: ['message_id', 'order_id'] })
+    .run(poolToUse);
 };
 
 export const saveDestinationIntents = async (
