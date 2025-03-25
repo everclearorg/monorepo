@@ -110,9 +110,7 @@ export const FEES_ENTITY = `
 export type OrderEntity = {
   id: string;
   initiator: string;
-  intents: {
-    id: string;
-  }[];
+  intents: { id: string }[];
   tokenFee: string;
   nativeFee: string;
   transactionHash: string;

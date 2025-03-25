@@ -18,6 +18,7 @@ import {
   DEPOSIT_PROCESSED_EVENT_ENTITY,
   DEPOSIT_QUEUE_ENTITY,
   INTENT_SETTLEMENT_EVENT_ENTITY,
+  ORDER_ENTITY,
 } from './entities';
 
 export const getBlockNumberQuery = (): string => {
@@ -109,12 +110,11 @@ export const getSpokeMessagesQuery = (
 export const getDestinationIntentsByIdsQuery = (ids: string[]): string => {
   return `
     intentFillEvents(
-      ${
-        ids.length
-          ? `where: {
+      ${ids.length
+      ? `where: {
         intent_: {id_in: ["${ids.join('","')}"] }}`
-          : ''
-      }
+      : ''
+    }
     ){
       ${SPOKE_FILL_INTENT_EVENT_ENTITY}
     }
@@ -148,13 +148,12 @@ export const getSpokeQueueQuery = (type?: string): string => {
   return `
     queues (
       first: 5
-      ${
-        type
-          ? `,where: {
+      ${type
+      ? `,where: {
                 type: ${type}
               }`
-          : ''
-      } 
+      : ''
+    } 
     ){
       ${SPOKE_QUEUE_ENTITY}
     }
@@ -405,6 +404,27 @@ export const getHubMetaQuery = (): string => {
   return `
     meta (id: "HUB_META_ID"){
       ${HUB_META_ENTITY}
+    }
+  `;
+};
+
+export const getOrdersByNonce = (
+  fromNonce: number,
+  maxBlockNumber?: number,
+  orderDirection: 'asc' | 'desc' = 'asc',
+  limit?: number,
+): string => {
+  return `
+    orders(
+      where: {
+        txNonce_gte: ${fromNonce}
+        ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
+      },
+      first: ${limit ?? 200},
+      orderBy: txNonce,
+      orderDirection: ${orderDirection}
+    ){
+      ${ORDER_ENTITY}
     }
   `;
 };
