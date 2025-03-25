@@ -7,7 +7,10 @@ use crate::{
     vault_authority_pda_seeds,
 };
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
+use anchor_spl::{
+    associated_token,
+    token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID},
+};
 
 use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
@@ -61,12 +64,19 @@ pub fn new_intent(
         normalize_decimals(amount, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
     require!(normalized_amount > 0, SpokeError::ZeroAmount); // Add zero amount check like Solidity
 
+    // Validate program vault account is an ATA owned by vault authority:
     let vault_authority_seeds: &[&[u8]] = vault_authority_pda_seeds!(state.vault_authority_bump);
     let vault_authority = Pubkey::create_program_address(vault_authority_seeds, ctx.program_id)
         .map_err(|_| error!(SpokeError::InvalidArgument))?;
+    let vault_ata = associated_token::get_associated_token_address_with_program_id(
+        &vault_authority,
+        &ctx.accounts.mint.key(),
+        ctx.accounts.token_program.key,
+    );
     require!(
         ctx.accounts.program_vault_account.mint == ctx.accounts.mint.key()
-            && ctx.accounts.program_vault_account.owner == vault_authority,
+            && ctx.accounts.program_vault_account.owner == vault_authority
+            && ctx.accounts.program_vault_account.key() == vault_ata,
         SpokeError::InvalidVaultAccount
     );
 
@@ -192,20 +202,24 @@ pub struct NewIntent<'info> {
     pub authority: Signer<'info>,
 
     pub mint: Account<'info, Mint>,
+    
+    // NOTE: we allow any token account (not just ATA) to send in asset.
     #[account(
         mut,
-        associated_token::mint = mint,
-        associated_token::authority = authority,
-        associated_token::token_program = token_program,
+        token::mint = mint,
+        token::authority = authority,
+        token::token_program = token_program,
     )]
     pub user_token_account: Account<'info, TokenAccount>,
+
+    // NOTE: validation of the program vauult account is done inside the call
     #[account(mut)]
     pub program_vault_account: Account<'info, TokenAccount>,
 
     #[account(address = TOKEN_PROGRAM_ID)]
     pub token_program: Program<'info, Token>,
 
-    /// CHECK: The Hyperlane Mailbox program (by address only).
+    // The Hyperlane Mailbox program (by address only).
     #[account(address = spoke_state.mailbox)]
     pub hyperlane_mailbox: Interface<'info, Mailbox>,
 
@@ -223,9 +237,9 @@ pub struct NewIntent<'info> {
     #[account(mut)]
     pub dispatch_authority: AccountInfo<'info>,
 
-    /// CHECK: A unique message / gas payment account (signer)
-    #[account(mut, signer)]
-    pub unique_message_account: AccountInfo<'info>,
+    // A unique message / gas payment account (signer)
+    #[account(mut)]
+    pub unique_message_account: Signer<'info>,
 
     /// CHECK: The message storage PDA
     #[account(mut)]
