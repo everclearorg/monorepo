@@ -312,3 +312,76 @@ export const updateSettlementIntents = async () => {
   // Log the successful update
   logger.debug('Updated SettlementIntents in database', requestContext, methodContext, { intents });
 };
+
+export const updateOrders = async () => {
+  const {
+    adapters: { subgraph, database },
+    config,
+    logger,
+  } = getContext();
+  const { requestContext, methodContext } = createLoggingContext(updateOrders.name);
+  const domains = Object.keys(config.chains).filter((domain) => domain !== config.hub.domain);
+
+  logger.debug('Method start', requestContext, methodContext, { domains, chains: Object.keys(config.chains) });
+
+  const queryMetaParams: Map<string, SubgraphQueryMetaParams> = new Map();
+  const latestBlockNumbers: Map<string, number> = await subgraph.getLatestBlockNumber(domains);
+  await Promise.all(
+    domains.map(async (domain) => {
+      let latestBlockNumber: number | undefined = undefined;
+      if (latestBlockNumbers.has(domain)) {
+        latestBlockNumber = latestBlockNumbers.get(domain)!;
+      }
+
+      if (!latestBlockNumber) {
+        logger.error('Error getting the latestBlockNumber for domain.', requestContext, methodContext, undefined, {
+          domain,
+          latestBlockNumber,
+          latestBlockNumbers,
+        });
+        return;
+      }
+
+      // Retrieve the most recent order nonce we've saved for this domain
+      const latestNonce = await database.getCheckPoint('order_' + domain);
+      const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
+      queryMetaParams.set(domain, {
+        maxBlockNumber: latestBlockNumber - safeConfirmations,
+        latestNonce: latestNonce,
+        orderDirection: 'asc',
+      });
+    }),
+  );
+
+  if (queryMetaParams.size === 0) {
+    logger.debug('No domains to update', requestContext, methodContext, { domains });
+    return;
+  }
+
+  // Get orders for all domains in the mapping
+  const orders = await subgraph.getOrdersByNonce(queryMetaParams);
+  logger.info('Retrieved orders', requestContext, methodContext, { orders: orders.length });
+  orders.forEach((order) => {
+    const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(updateOrders.name);
+    logger.debug('Retrieved order', _requestContext, _methodContext, { order });
+  });
+
+  const checkpoints = domains
+    .map((domain) => {
+      const domainOrders = orders.filter((order) => order.domain === domain);
+      const max = getMaxTxNonce(domainOrders);
+      const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
+      if (domainOrders.length > 0 && max > latest) {
+        return { domain, checkpoint: max };
+      }
+      return undefined;
+    })
+    .filter((x) => !!x) as { domain: string; checkpoint: number }[];
+
+  await database.saveOrders(orders);
+  for (const checkpoint of checkpoints) {
+    await database.saveCheckPoint('order_' + checkpoint.domain, checkpoint.checkpoint);
+  }
+  // Log the successful update
+  logger.debug('Updated Orders in database', requestContext, methodContext, { orders });
+};
