@@ -11683,7 +11683,7 @@ declare module 'zapatos/schema' {
       /**
       * **invoices.origin_fee_adapter_initiator**
       * - `varchar` in database
-      * - Nullable, no default
+      * - Materialized view column
       */
       origin_fee_adapter_initiator: string | null;
       /**
@@ -11725,7 +11725,7 @@ declare module 'zapatos/schema' {
       /**
       * **invoices.origin_native_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - Materialized view column
       */
       origin_native_fee: string | null;
       /**
@@ -11734,6 +11734,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_nonce: db.Int8String | null;
+      /**
+      * **invoices.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id: string | null;
       /**
       * **invoices.origin_origin**
       * - `varchar` in database
@@ -11773,7 +11779,7 @@ declare module 'zapatos/schema' {
       /**
       * **invoices.origin_token_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - Materialized view column
       */
       origin_token_fee: string | null;
       /**
@@ -11907,7 +11913,7 @@ declare module 'zapatos/schema' {
       /**
       * **invoices.origin_fee_adapter_initiator**
       * - `varchar` in database
-      * - Nullable, no default
+      * - Materialized view column
       */
       origin_fee_adapter_initiator: string | null;
       /**
@@ -11949,7 +11955,7 @@ declare module 'zapatos/schema' {
       /**
       * **invoices.origin_native_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - Materialized view column
       */
       origin_native_fee: string | null;
       /**
@@ -11959,17 +11965,17 @@ declare module 'zapatos/schema' {
       */
       origin_nonce: (number | db.Int8String) | null;
       /**
-      * **invoices.origin_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_origin: string | null;
-      /**
       * **invoices.origin_order_id**
       * - `varchar` in database
       * - Materialized view column
       */
       origin_order_id: string | null;
+      /**
+      * **invoices.origin_origin**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_origin: string | null;
       /**
       * **invoices.origin_output_asset**
       * - `varchar` in database
@@ -12003,7 +12009,7 @@ declare module 'zapatos/schema' {
       /**
       * **invoices.origin_token_fee**
       * - `varchar` in database
-      * - Nullable, no default
+      * - Materialized view column
       */
       origin_token_fee: string | null;
       /**
@@ -12135,6 +12141,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **invoices.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **invoices.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -12171,11 +12183,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **invoices.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **invoices.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
       origin_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **invoices.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_origin**
       * - `varchar` in database
@@ -12212,6 +12236,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **invoices.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_transaction_hash**
       * - `bpchar` in database
@@ -14879,6 +14909,18 @@ declare module 'zapatos/schema' {
       */
       block_number: db.Int8String;
       /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: db.Int8String;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: db.Int8String;
+      /**
       * **orders.id**
       * - `varchar` in database
       * - `NOT NULL`, no default
@@ -14932,18 +14974,6 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       tx_origin: string;
-      /**
-      * **orders.gas_limit**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_limit: db.Int8String;
-      /**
-      * **orders.gas_price**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_price: db.Int8String;
     }
     export interface JSONSelectable {
       /**
@@ -14958,6 +14988,18 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       block_number: (number | db.Int8String);
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: (number | db.Int8String);
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: (number | db.Int8String);
       /**
       * **orders.id**
       * - `varchar` in database
@@ -15012,18 +15054,6 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       tx_origin: string;
-      /**
-      * **orders.gas_limit**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_limit: (number | db.Int8String);
-      /**
-      * **orders.gas_price**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_price: (number | db.Int8String);
     }
     export interface Whereable {
       /**
@@ -15038,6 +15068,18 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **orders.id**
       * - `varchar` in database
@@ -15092,18 +15134,6 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **orders.gas_limit**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **orders.gas_price**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
     }
     export interface Insertable {
       /**
@@ -15118,6 +15148,18 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       block_number: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **orders.id**
       * - `varchar` in database
@@ -15172,18 +15214,6 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       tx_origin: string | db.Parameter<string> | db.SQLFragment;
-      /**
-      * **orders.gas_limit**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_limit: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
-      /**
-      * **orders.gas_price**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_price: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
     }
     export interface Updatable {
       /**
@@ -15198,6 +15228,18 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **orders.id**
       * - `varchar` in database
@@ -15252,18 +15294,6 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
-      /**
-      * **orders.gas_limit**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
-      /**
-      * **orders.gas_price**
-      * - `int8` in database
-      * - `NOT NULL`, no default
-      */
-      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
     }
     export type UniqueIndex = 'orders_pkey';
     export type Column = keyof Selectable;
@@ -19572,7 +19602,7 @@ declare module 'zapatos/schema' {
 
   /* --- aggregate types --- */
 
-  export namespace public {
+  export namespace public {  
     export type Table = assets.Table | balances.Table | checkpoints.Table | closedepochsprocessed.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | deposit_enqueued_not_processed.Table | depositenqueued.Table | depositors.Table | depositprocessed.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | finddepositdomain.Table | findinvoicedomain.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | intents_with_shadow_data.Table | invoice_enqueued_not_settled.Table | invoiceenqueued.Table | invoices.Table | invoices_with_shadow_data.Table | lock_positions.Table | matchdeposit.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settledeposit.Table | settlement_intents.Table | settlementenqueued.Table | settlementqueueprocessed.Table | settlementsent.Table | tokens.Table;
     export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | closedepochsprocessed.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | deposit_enqueued_not_processed.Selectable | depositenqueued.Selectable | depositors.Selectable | depositprocessed.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | finddepositdomain.Selectable | findinvoicedomain.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | intents_with_shadow_data.Selectable | invoice_enqueued_not_settled.Selectable | invoiceenqueued.Selectable | invoices.Selectable | invoices_with_shadow_data.Selectable | lock_positions.Selectable | matchdeposit.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settledeposit.Selectable | settlement_intents.Selectable | settlementenqueued.Selectable | settlementqueueprocessed.Selectable | settlementsent.Selectable | tokens.Selectable;
     export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | closedepochsprocessed.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | deposit_enqueued_not_processed.JSONSelectable | depositenqueued.JSONSelectable | depositors.JSONSelectable | depositprocessed.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | finddepositdomain.JSONSelectable | findinvoicedomain.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | intents_with_shadow_data.JSONSelectable | invoice_enqueued_not_settled.JSONSelectable | invoiceenqueued.JSONSelectable | invoices.JSONSelectable | invoices_with_shadow_data.JSONSelectable | lock_positions.JSONSelectable | matchdeposit.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settledeposit.JSONSelectable | settlement_intents.JSONSelectable | settlementenqueued.JSONSelectable | settlementqueueprocessed.JSONSelectable | settlementsent.JSONSelectable | tokens.JSONSelectable;
@@ -19581,7 +19611,7 @@ declare module 'zapatos/schema' {
     export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | closedepochsprocessed.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | deposit_enqueued_not_processed.Updatable | depositenqueued.Updatable | depositors.Updatable | depositprocessed.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | finddepositdomain.Updatable | findinvoicedomain.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | intents_with_shadow_data.Updatable | invoice_enqueued_not_settled.Updatable | invoiceenqueued.Updatable | invoices.Updatable | invoices_with_shadow_data.Updatable | lock_positions.Updatable | matchdeposit.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settledeposit.Updatable | settlement_intents.Updatable | settlementenqueued.Updatable | settlementqueueprocessed.Updatable | settlementsent.Updatable | tokens.Updatable;
     export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | closedepochsprocessed.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | deposit_enqueued_not_processed.UniqueIndex | depositenqueued.UniqueIndex | depositors.UniqueIndex | depositprocessed.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | finddepositdomain.UniqueIndex | findinvoicedomain.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | intents_with_shadow_data.UniqueIndex | invoice_enqueued_not_settled.UniqueIndex | invoiceenqueued.UniqueIndex | invoices.UniqueIndex | invoices_with_shadow_data.UniqueIndex | lock_positions.UniqueIndex | matchdeposit.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settledeposit.UniqueIndex | settlement_intents.UniqueIndex | settlementenqueued.UniqueIndex | settlementqueueprocessed.UniqueIndex | settlementsent.UniqueIndex | tokens.UniqueIndex;
     export type Column = assets.Column | balances.Column | checkpoints.Column | closedepochsprocessed.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | deposit_enqueued_not_processed.Column | depositenqueued.Column | depositors.Column | depositprocessed.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | finddepositdomain.Column | findinvoicedomain.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | intents_with_shadow_data.Column | invoice_enqueued_not_settled.Column | invoiceenqueued.Column | invoices.Column | invoices_with_shadow_data.Column | lock_positions.Column | matchdeposit.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settledeposit.Column | settlement_intents.Column | settlementenqueued.Column | settlementqueueprocessed.Column | settlementsent.Column | tokens.Column;
-
+  
     export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, tokens.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
@@ -19594,12 +19624,12 @@ declare module 'zapatos/schema' {
   /* === schema: tokenomics === */
 
   export namespace tokenomics {
-
+  
     /* --- enums --- */
     /* (none) */
-
+  
     /* --- tables --- */
-
+  
     /**
      * **tokenomics.bridge_in_error**
      * - Table in database
@@ -19862,7 +19892,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -19948,7 +19978,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -20034,7 +20064,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridge_in_error_pkey';
       export type Column = keyof Selectable;
@@ -20042,7 +20072,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.bridge_updated**
      * - Table in database
@@ -20287,7 +20317,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -20367,7 +20397,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -20447,7 +20477,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridge_updated_pkey';
       export type Column = keyof Selectable;
@@ -20455,7 +20485,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.bridged_in**
      * - Table in database
@@ -20700,7 +20730,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -20780,7 +20810,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -20860,7 +20890,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridged_in_pkey';
       export type Column = keyof Selectable;
@@ -20868,7 +20898,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.bridged_lock**
      * - Table in database
@@ -21131,7 +21161,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -21217,7 +21247,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -21303,7 +21333,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridged_lock_pkey';
       export type Column = keyof Selectable;
@@ -21311,7 +21341,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.bridged_lock_error**
      * - Table in database
@@ -21574,7 +21604,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -21660,7 +21690,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -21746,7 +21776,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridged_lock_error_pkey';
       export type Column = keyof Selectable;
@@ -21754,7 +21784,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.bridged_out**
      * - Table in database
@@ -22017,7 +22047,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -22103,7 +22133,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -22189,7 +22219,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridged_out_pkey';
       export type Column = keyof Selectable;
@@ -22197,7 +22227,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.chain_gateway_added**
      * - Table in database
@@ -22442,7 +22472,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -22522,7 +22552,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -22602,7 +22632,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'chain_gateway_added_pkey';
       export type Column = keyof Selectable;
@@ -22610,7 +22640,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.chain_gateway_removed**
      * - Table in database
@@ -22855,7 +22885,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -22935,7 +22965,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -23015,7 +23045,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'chain_gateway_removed_pkey';
       export type Column = keyof Selectable;
@@ -23023,7 +23053,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.early_exit**
      * - Table in database
@@ -23268,7 +23298,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -23348,7 +23378,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -23428,7 +23458,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'early_exit_pkey';
       export type Column = keyof Selectable;
@@ -23436,7 +23466,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.eip712_domain_changed**
      * - Table in database
@@ -23627,7 +23657,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -23689,7 +23719,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -23751,7 +23781,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'eip712_domain_changed_pkey';
       export type Column = keyof Selectable;
@@ -23759,7 +23789,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.epoch_rewards_updated**
      * - Table in database
@@ -23986,7 +24016,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -24060,7 +24090,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -24134,7 +24164,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'epoch_rewards_updated_pkey';
       export type Column = keyof Selectable;
@@ -24142,7 +24172,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.eth_withdrawn**
      * - Table in database
@@ -24381,7 +24411,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
         /**
         * **tokenomics.eth_withdrawn.withdraw_id**
         * - `numeric` in database
@@ -24461,7 +24491,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
         /**
         * **tokenomics.eth_withdrawn.withdraw_id**
         * - `numeric` in database
@@ -24541,7 +24571,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
         /**
         * **tokenomics.eth_withdrawn.withdraw_id**
         * - `numeric` in database
@@ -24555,7 +24585,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.fee_info**
      * - Table in database
@@ -24782,7 +24812,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -24856,7 +24886,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -24930,7 +24960,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'fee_info_pkey';
       export type Column = keyof Selectable;
@@ -24938,7 +24968,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.gateway_updated**
      * - Table in database
@@ -25165,7 +25195,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -25239,7 +25269,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -25313,7 +25343,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'gateway_updated_pkey';
       export type Column = keyof Selectable;
@@ -25321,7 +25351,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.hub_gauge_updated**
      * - Table in database
@@ -25530,7 +25560,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -25598,7 +25628,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -25666,7 +25696,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'hub_gauge_updated_pkey';
       export type Column = keyof Selectable;
@@ -25674,7 +25704,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.lock_position**
      * - Table in database
@@ -25919,7 +25949,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -25999,7 +26029,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -26079,7 +26109,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'lock_position_pkey';
       export type Column = keyof Selectable;
@@ -26087,7 +26117,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.mailbox_updated**
      * - Table in database
@@ -26332,7 +26362,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -26412,7 +26442,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -26492,7 +26522,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'mailbox_updated_pkey';
       export type Column = keyof Selectable;
@@ -26500,7 +26530,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.message_gas_limit_updated**
      * - Table in database
@@ -26745,7 +26775,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -26825,7 +26855,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -26905,7 +26935,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'message_gas_limit_updated_pkey';
       export type Column = keyof Selectable;
@@ -26913,7 +26943,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.mint_message_sent**
      * - Table in database
@@ -27194,7 +27224,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -27286,7 +27316,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -27378,7 +27408,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'mint_message_sent_pkey';
       export type Column = keyof Selectable;
@@ -27386,7 +27416,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.new_lock_position**
      * - Table in database
@@ -27667,7 +27697,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -27759,7 +27789,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -27851,7 +27881,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'new_lock_position_pkey';
       export type Column = keyof Selectable;
@@ -27859,7 +27889,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.ownership_transferred**
      * - Table in database
@@ -28104,7 +28134,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -28184,7 +28214,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -28264,7 +28294,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'ownership_transferred_pkey';
       export type Column = keyof Selectable;
@@ -28272,7 +28302,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.process_error**
      * - Table in database
@@ -28571,7 +28601,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -28669,7 +28699,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -28767,7 +28797,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'process_error_pkey';
       export type Column = keyof Selectable;
@@ -28775,7 +28805,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.retry_bridge_out**
      * - Table in database
@@ -29038,7 +29068,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -29124,7 +29154,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -29210,7 +29240,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_bridge_out_pkey';
       export type Column = keyof Selectable;
@@ -29218,7 +29248,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.retry_lock**
      * - Table in database
@@ -29481,7 +29511,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -29567,7 +29597,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -29653,7 +29683,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_lock_pkey';
       export type Column = keyof Selectable;
@@ -29661,7 +29691,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.retry_message**
      * - Table in database
@@ -29924,7 +29954,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -30010,7 +30040,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -30096,7 +30126,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_message_pkey';
       export type Column = keyof Selectable;
@@ -30104,7 +30134,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.retry_mint**
      * - Table in database
@@ -30367,7 +30397,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -30453,7 +30483,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -30539,7 +30569,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_mint_pkey';
       export type Column = keyof Selectable;
@@ -30547,7 +30577,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.retry_transfer**
      * - Table in database
@@ -30810,7 +30840,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -30896,7 +30926,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -30982,7 +31012,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_transfer_pkey';
       export type Column = keyof Selectable;
@@ -30990,7 +31020,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.return_fee_updated**
      * - Table in database
@@ -31235,7 +31265,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -31315,7 +31345,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -31395,7 +31425,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'return_fee_updated_pkey';
       export type Column = keyof Selectable;
@@ -31403,7 +31433,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.reward_claimed**
      * - Table in database
@@ -31666,7 +31696,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -31752,7 +31782,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -31838,7 +31868,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'reward_claimed_pkey';
       export type Column = keyof Selectable;
@@ -31846,7 +31876,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.reward_metadata_updated**
      * - Table in database
@@ -32109,7 +32139,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -32195,7 +32225,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -32281,7 +32311,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'reward_metadata_updated_pkey';
       export type Column = keyof Selectable;
@@ -32289,7 +32319,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.rewards_claimed**
      * - Table in database
@@ -32534,7 +32564,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -32614,7 +32644,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -32694,7 +32724,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'rewards_claimed_pkey';
       export type Column = keyof Selectable;
@@ -32702,7 +32732,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.security_module_updated**
      * - Table in database
@@ -32947,7 +32977,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -33027,7 +33057,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -33107,7 +33137,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'security_module_updated_pkey';
       export type Column = keyof Selectable;
@@ -33115,7 +33145,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.user**
      * - Table in database
@@ -33234,7 +33264,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -33272,7 +33302,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -33310,7 +33340,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'user_pkey';
       export type Column = keyof Selectable;
@@ -33318,7 +33348,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.vote_cast**
      * - Table in database
@@ -33575,7 +33605,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
         /**
         * **tokenomics.vote_cast.votes**
         * - `numeric` in database
@@ -33661,7 +33691,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
         /**
         * **tokenomics.vote_cast.votes**
         * - `numeric` in database
@@ -33747,7 +33777,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
         /**
         * **tokenomics.vote_cast.votes**
         * - `numeric` in database
@@ -33761,7 +33791,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.vote_delegated**
      * - Table in database
@@ -33988,7 +34018,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -34062,7 +34092,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -34136,7 +34166,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'vote_delegated_pkey';
       export type Column = keyof Selectable;
@@ -34144,7 +34174,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.withdraw**
      * - Table in database
@@ -34371,7 +34401,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -34445,7 +34475,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -34519,7 +34549,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'withdraw_pkey';
       export type Column = keyof Selectable;
@@ -34527,7 +34557,7 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /**
      * **tokenomics.withdraw_eth**
      * - Table in database
@@ -34754,7 +34784,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -34828,7 +34858,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -34902,7 +34932,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'withdraw_eth_pkey';
       export type Column = keyof Selectable;
@@ -34910,9 +34940,9 @@ declare module 'zapatos/schema' {
       export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
       export type SQL = SQLExpression | SQLExpression[];
     }
-
+  
     /* --- aggregate types --- */
-
+  
     export type Table = bridge_in_error.Table | bridge_updated.Table | bridged_in.Table | bridged_lock.Table | bridged_lock_error.Table | bridged_out.Table | chain_gateway_added.Table | chain_gateway_removed.Table | early_exit.Table | eip712_domain_changed.Table | epoch_rewards_updated.Table | eth_withdrawn.Table | fee_info.Table | gateway_updated.Table | hub_gauge_updated.Table | lock_position.Table | mailbox_updated.Table | message_gas_limit_updated.Table | mint_message_sent.Table | new_lock_position.Table | ownership_transferred.Table | process_error.Table | retry_bridge_out.Table | retry_lock.Table | retry_message.Table | retry_mint.Table | retry_transfer.Table | return_fee_updated.Table | reward_claimed.Table | reward_metadata_updated.Table | rewards_claimed.Table | security_module_updated.Table | user.Table | vote_cast.Table | vote_delegated.Table | withdraw.Table | withdraw_eth.Table;
     export type Selectable = bridge_in_error.Selectable | bridge_updated.Selectable | bridged_in.Selectable | bridged_lock.Selectable | bridged_lock_error.Selectable | bridged_out.Selectable | chain_gateway_added.Selectable | chain_gateway_removed.Selectable | early_exit.Selectable | eip712_domain_changed.Selectable | epoch_rewards_updated.Selectable | eth_withdrawn.Selectable | fee_info.Selectable | gateway_updated.Selectable | hub_gauge_updated.Selectable | lock_position.Selectable | mailbox_updated.Selectable | message_gas_limit_updated.Selectable | mint_message_sent.Selectable | new_lock_position.Selectable | ownership_transferred.Selectable | process_error.Selectable | retry_bridge_out.Selectable | retry_lock.Selectable | retry_message.Selectable | retry_mint.Selectable | retry_transfer.Selectable | return_fee_updated.Selectable | reward_claimed.Selectable | reward_metadata_updated.Selectable | rewards_claimed.Selectable | security_module_updated.Selectable | user.Selectable | vote_cast.Selectable | vote_delegated.Selectable | withdraw.Selectable | withdraw_eth.Selectable;
     export type JSONSelectable = bridge_in_error.JSONSelectable | bridge_updated.JSONSelectable | bridged_in.JSONSelectable | bridged_lock.JSONSelectable | bridged_lock_error.JSONSelectable | bridged_out.JSONSelectable | chain_gateway_added.JSONSelectable | chain_gateway_removed.JSONSelectable | early_exit.JSONSelectable | eip712_domain_changed.JSONSelectable | epoch_rewards_updated.JSONSelectable | eth_withdrawn.JSONSelectable | fee_info.JSONSelectable | gateway_updated.JSONSelectable | hub_gauge_updated.JSONSelectable | lock_position.JSONSelectable | mailbox_updated.JSONSelectable | message_gas_limit_updated.JSONSelectable | mint_message_sent.JSONSelectable | new_lock_position.JSONSelectable | ownership_transferred.JSONSelectable | process_error.JSONSelectable | retry_bridge_out.JSONSelectable | retry_lock.JSONSelectable | retry_message.JSONSelectable | retry_mint.JSONSelectable | retry_transfer.JSONSelectable | return_fee_updated.JSONSelectable | reward_claimed.JSONSelectable | reward_metadata_updated.JSONSelectable | rewards_claimed.JSONSelectable | security_module_updated.JSONSelectable | user.JSONSelectable | vote_cast.JSONSelectable | vote_delegated.JSONSelectable | withdraw.JSONSelectable | withdraw_eth.JSONSelectable;
@@ -34921,7 +34951,7 @@ declare module 'zapatos/schema' {
     export type Updatable = bridge_in_error.Updatable | bridge_updated.Updatable | bridged_in.Updatable | bridged_lock.Updatable | bridged_lock_error.Updatable | bridged_out.Updatable | chain_gateway_added.Updatable | chain_gateway_removed.Updatable | early_exit.Updatable | eip712_domain_changed.Updatable | epoch_rewards_updated.Updatable | eth_withdrawn.Updatable | fee_info.Updatable | gateway_updated.Updatable | hub_gauge_updated.Updatable | lock_position.Updatable | mailbox_updated.Updatable | message_gas_limit_updated.Updatable | mint_message_sent.Updatable | new_lock_position.Updatable | ownership_transferred.Updatable | process_error.Updatable | retry_bridge_out.Updatable | retry_lock.Updatable | retry_message.Updatable | retry_mint.Updatable | retry_transfer.Updatable | return_fee_updated.Updatable | reward_claimed.Updatable | reward_metadata_updated.Updatable | rewards_claimed.Updatable | security_module_updated.Updatable | user.Updatable | vote_cast.Updatable | vote_delegated.Updatable | withdraw.Updatable | withdraw_eth.Updatable;
     export type UniqueIndex = bridge_in_error.UniqueIndex | bridge_updated.UniqueIndex | bridged_in.UniqueIndex | bridged_lock.UniqueIndex | bridged_lock_error.UniqueIndex | bridged_out.UniqueIndex | chain_gateway_added.UniqueIndex | chain_gateway_removed.UniqueIndex | early_exit.UniqueIndex | eip712_domain_changed.UniqueIndex | epoch_rewards_updated.UniqueIndex | eth_withdrawn.UniqueIndex | fee_info.UniqueIndex | gateway_updated.UniqueIndex | hub_gauge_updated.UniqueIndex | lock_position.UniqueIndex | mailbox_updated.UniqueIndex | message_gas_limit_updated.UniqueIndex | mint_message_sent.UniqueIndex | new_lock_position.UniqueIndex | ownership_transferred.UniqueIndex | process_error.UniqueIndex | retry_bridge_out.UniqueIndex | retry_lock.UniqueIndex | retry_message.UniqueIndex | retry_mint.UniqueIndex | retry_transfer.UniqueIndex | return_fee_updated.UniqueIndex | reward_claimed.UniqueIndex | reward_metadata_updated.UniqueIndex | rewards_claimed.UniqueIndex | security_module_updated.UniqueIndex | user.UniqueIndex | vote_cast.UniqueIndex | vote_delegated.UniqueIndex | withdraw.UniqueIndex | withdraw_eth.UniqueIndex;
     export type Column = bridge_in_error.Column | bridge_updated.Column | bridged_in.Column | bridged_lock.Column | bridged_lock_error.Column | bridged_out.Column | chain_gateway_added.Column | chain_gateway_removed.Column | early_exit.Column | eip712_domain_changed.Column | epoch_rewards_updated.Column | eth_withdrawn.Column | fee_info.Column | gateway_updated.Column | hub_gauge_updated.Column | lock_position.Column | mailbox_updated.Column | message_gas_limit_updated.Column | mint_message_sent.Column | new_lock_position.Column | ownership_transferred.Column | process_error.Column | retry_bridge_out.Column | retry_lock.Column | retry_message.Column | retry_mint.Column | retry_transfer.Column | return_fee_updated.Column | reward_claimed.Column | reward_metadata_updated.Column | rewards_claimed.Column | security_module_updated.Column | user.Column | vote_cast.Column | vote_delegated.Column | withdraw.Column | withdraw_eth.Column;
-
+  
     export type AllBaseTables = [bridge_in_error.Table, bridge_updated.Table, bridged_in.Table, bridged_lock.Table, bridged_lock_error.Table, bridged_out.Table, chain_gateway_added.Table, chain_gateway_removed.Table, early_exit.Table, eip712_domain_changed.Table, epoch_rewards_updated.Table, eth_withdrawn.Table, fee_info.Table, gateway_updated.Table, hub_gauge_updated.Table, lock_position.Table, mailbox_updated.Table, message_gas_limit_updated.Table, mint_message_sent.Table, new_lock_position.Table, ownership_transferred.Table, process_error.Table, retry_bridge_out.Table, retry_lock.Table, retry_message.Table, retry_mint.Table, retry_transfer.Table, return_fee_updated.Table, reward_claimed.Table, reward_metadata_updated.Table, rewards_claimed.Table, security_module_updated.Table, user.Table, vote_cast.Table, vote_delegated.Table, withdraw.Table, withdraw_eth.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
@@ -34972,7 +35002,6 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Selectable;
     "hub_intents_status_log": hub_intents_status_log.Selectable;
     "hub_invoices": hub_invoices.Selectable;
-    "intentprocessed": intentprocessed.Selectable;
     "intents": intents.Selectable;
     "intents_with_shadow_data": intents_with_shadow_data.Selectable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Selectable;
@@ -35055,7 +35084,6 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.JSONSelectable;
     "hub_intents_status_log": hub_intents_status_log.JSONSelectable;
     "hub_invoices": hub_invoices.JSONSelectable;
-    "intentprocessed": intentprocessed.JSONSelectable;
     "intents": intents.JSONSelectable;
     "intents_with_shadow_data": intents_with_shadow_data.JSONSelectable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.JSONSelectable;
@@ -35138,7 +35166,6 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Whereable;
     "hub_intents_status_log": hub_intents_status_log.Whereable;
     "hub_invoices": hub_invoices.Whereable;
-    "intentprocessed": intentprocessed.Whereable;
     "intents": intents.Whereable;
     "intents_with_shadow_data": intents_with_shadow_data.Whereable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Whereable;
@@ -35221,7 +35248,6 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Insertable;
     "hub_intents_status_log": hub_intents_status_log.Insertable;
     "hub_invoices": hub_invoices.Insertable;
-    "intentprocessed": intentprocessed.Insertable;
     "intents": intents.Insertable;
     "intents_with_shadow_data": intents_with_shadow_data.Insertable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Insertable;
@@ -35304,7 +35330,6 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Updatable;
     "hub_intents_status_log": hub_intents_status_log.Updatable;
     "hub_invoices": hub_invoices.Updatable;
-    "intentprocessed": intentprocessed.Updatable;
     "intents": intents.Updatable;
     "intents_with_shadow_data": intents_with_shadow_data.Updatable;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Updatable;
@@ -35387,7 +35412,6 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.UniqueIndex;
     "hub_intents_status_log": hub_intents_status_log.UniqueIndex;
     "hub_invoices": hub_invoices.UniqueIndex;
-    "intentprocessed": intentprocessed.UniqueIndex;
     "intents": intents.UniqueIndex;
     "intents_with_shadow_data": intents_with_shadow_data.UniqueIndex;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.UniqueIndex;
@@ -35470,7 +35494,6 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Column;
     "hub_intents_status_log": hub_intents_status_log.Column;
     "hub_invoices": hub_invoices.Column;
-    "intentprocessed": intentprocessed.Column;
     "intents": intents.Column;
     "intents_with_shadow_data": intents_with_shadow_data.Column;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Column;
@@ -35553,7 +35576,6 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.SQL;
     "hub_intents_status_log": hub_intents_status_log.SQL;
     "hub_invoices": hub_invoices.SQL;
-    "intentprocessed": intentprocessed.SQL;
     "intents": intents.SQL;
     "intents_with_shadow_data": intents_with_shadow_data.SQL;
     "invoice_enqueued_not_settled": invoice_enqueued_not_settled.SQL;

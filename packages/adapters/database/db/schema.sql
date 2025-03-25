@@ -2397,6 +2397,784 @@ CREATE TABLE public.tokens (
 
 
 --
+-- Name: bridge_in_error; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.bridge_in_error (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    error_id numeric NOT NULL,
+    "user" bytea NOT NULL,
+    amount numeric NOT NULL,
+    "timestamp" numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: bridge_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.bridge_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    contract bytea NOT NULL,
+    old_bridge bytea NOT NULL,
+    new_bridge bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: bridged_in; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.bridged_in (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    src_chain_id numeric NOT NULL,
+    sender bytea NOT NULL,
+    amount numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: bridged_lock; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.bridged_lock (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    chain_id numeric NOT NULL,
+    sender bytea NOT NULL,
+    amount numeric NOT NULL,
+    expiry numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: bridged_lock_error; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.bridged_lock_error (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    error_id numeric NOT NULL,
+    receiver bytea NOT NULL,
+    amount numeric NOT NULL,
+    expiry numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: bridged_out; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.bridged_out (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    dst_chain_id numeric NOT NULL,
+    bridge_user bytea NOT NULL,
+    token_receiver bytea NOT NULL,
+    amount numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: chain_gateway_added; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.chain_gateway_added (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    contract bytea NOT NULL,
+    chain_id numeric NOT NULL,
+    gateway bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: chain_gateway_removed; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.chain_gateway_removed (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    contract bytea NOT NULL,
+    chain_id numeric NOT NULL,
+    gateway bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: early_exit; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.early_exit (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    "user" bytea NOT NULL,
+    amount_unlocked numeric NOT NULL,
+    amount_received numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: eip712_domain_changed; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.eip712_domain_changed (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: epoch_rewards_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.epoch_rewards_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    epoch numeric[] NOT NULL,
+    rewards numeric[] NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: eth_withdrawn; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.eth_withdrawn (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    sender bytea NOT NULL,
+    amount numeric NOT NULL,
+    withdraw_id numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: fee_info; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.fee_info (
+    vid bigint NOT NULL,
+    block_range text NOT NULL,
+    id bytea NOT NULL,
+    domain numeric NOT NULL,
+    fee numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: gateway_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.gateway_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    old_gateway bytea NOT NULL,
+    new_gateway bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: hub_gauge_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.hub_gauge_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    hub_gauge bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: lock_position; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.lock_position (
+    vid bigint NOT NULL,
+    block_range text NOT NULL,
+    id bytea NOT NULL,
+    owner bytea NOT NULL,
+    delegate bytea NOT NULL,
+    amount numeric NOT NULL,
+    expiry numeric NOT NULL,
+    vb_balance numeric NOT NULL,
+    bias numeric NOT NULL,
+    slope numeric NOT NULL,
+    "timestamp" numeric NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL
+);
+
+
+--
+-- Name: mailbox_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.mailbox_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    contract bytea NOT NULL,
+    old_mailbox bytea NOT NULL,
+    new_mailbox bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: message_gas_limit_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.message_gas_limit_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    domain numeric[] NOT NULL,
+    old_gas_limit numeric[] NOT NULL,
+    new_gas_limit numeric[] NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: mint_message_sent; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.mint_message_sent (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    sender bytea NOT NULL,
+    amount numeric NOT NULL,
+    domain numeric NOT NULL,
+    message_id bytea NOT NULL,
+    fee_spent numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: new_lock_position; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.new_lock_position (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    caller bytea NOT NULL,
+    "user" bytea NOT NULL,
+    new_total_amount_locked numeric NOT NULL,
+    expiry numeric NOT NULL,
+    new_vb_balance numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: ownership_transferred; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.ownership_transferred (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    contract bytea NOT NULL,
+    previous_owner bytea NOT NULL,
+    new_owner bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: process_error; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.process_error (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    nonce numeric NOT NULL,
+    error_id integer NOT NULL,
+    sender bytea NOT NULL,
+    amount numeric NOT NULL,
+    additional_data numeric NOT NULL,
+    active boolean NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: retry_bridge_out; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.retry_bridge_out (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    error_id numeric NOT NULL,
+    "user" bytea NOT NULL,
+    amount numeric NOT NULL,
+    domain numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: retry_lock; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.retry_lock (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    error_id numeric NOT NULL,
+    receiver bytea NOT NULL,
+    amount numeric NOT NULL,
+    expiry numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: retry_message; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.retry_message (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    error_id numeric NOT NULL,
+    "user" bytea NOT NULL,
+    amount numeric NOT NULL,
+    domain numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: retry_mint; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.retry_mint (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    error_id numeric NOT NULL,
+    chain_id numeric NOT NULL,
+    "user" bytea NOT NULL,
+    amount numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: retry_transfer; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.retry_transfer (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    error_id numeric NOT NULL,
+    chain_id numeric NOT NULL,
+    "user" bytea NOT NULL,
+    amount numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: return_fee_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.return_fee_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    domain numeric[] NOT NULL,
+    old_fee numeric[] NOT NULL,
+    new_fee numeric[] NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: reward_claimed; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.reward_claimed (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    token bytea NOT NULL,
+    account bytea NOT NULL,
+    amount numeric NOT NULL,
+    update_count numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: reward_metadata_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.reward_metadata_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    token bytea NOT NULL,
+    merkle_root bytea NOT NULL,
+    proof bytea NOT NULL,
+    update_count numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: rewards_claimed; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.rewards_claimed (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    recipient bytea NOT NULL,
+    epoch numeric NOT NULL,
+    amount numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: security_module_updated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.security_module_updated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    contract bytea NOT NULL,
+    old_security_module bytea NOT NULL,
+    new_security_module bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: user; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics."user" (
+    vid bigint NOT NULL,
+    block_range text NOT NULL,
+    id bytea NOT NULL,
+    claimed numeric NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL
+);
+
+
+--
+-- Name: vote_cast; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.vote_cast (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    owner bytea NOT NULL,
+    domain numeric NOT NULL,
+    votes numeric NOT NULL,
+    epoch numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: vote_delegated; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.vote_delegated (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    "user" bytea NOT NULL,
+    delegate bytea NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: withdraw; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.withdraw (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    "user" bytea NOT NULL,
+    amount numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
+-- Name: withdraw_eth; Type: TABLE; Schema: tokenomics; Owner: -
+--
+
+CREATE TABLE tokenomics.withdraw_eth (
+    vid bigint NOT NULL,
+    block integer NOT NULL,
+    id bytea NOT NULL,
+    receiver bytea NOT NULL,
+    amount numeric NOT NULL,
+    block_number numeric NOT NULL,
+    block_timestamp numeric NOT NULL,
+    transaction_hash bytea NOT NULL,
+    _gs_chain text NOT NULL,
+    _gs_gid text NOT NULL,
+    insert_timestamp timestamp without time zone,
+    latency interval
+);
+
+
+--
 -- Name: destination_intents auto_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2771,6 +3549,302 @@ ALTER TABLE ONLY shadow.settlementqueueprocessed_17786ebb_73f6f386
 
 ALTER TABLE ONLY shadow.settlementsent_dac85f08_73f6f386
     ADD CONSTRAINT settlementsent_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+
+
+--
+-- Name: bridge_in_error bridge_in_error_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.bridge_in_error
+    ADD CONSTRAINT bridge_in_error_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: bridge_updated bridge_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.bridge_updated
+    ADD CONSTRAINT bridge_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: bridged_in bridged_in_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.bridged_in
+    ADD CONSTRAINT bridged_in_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: bridged_lock_error bridged_lock_error_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.bridged_lock_error
+    ADD CONSTRAINT bridged_lock_error_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: bridged_lock bridged_lock_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.bridged_lock
+    ADD CONSTRAINT bridged_lock_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: bridged_out bridged_out_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.bridged_out
+    ADD CONSTRAINT bridged_out_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: chain_gateway_added chain_gateway_added_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.chain_gateway_added
+    ADD CONSTRAINT chain_gateway_added_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: chain_gateway_removed chain_gateway_removed_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.chain_gateway_removed
+    ADD CONSTRAINT chain_gateway_removed_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: early_exit early_exit_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.early_exit
+    ADD CONSTRAINT early_exit_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: eip712_domain_changed eip712_domain_changed_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.eip712_domain_changed
+    ADD CONSTRAINT eip712_domain_changed_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: epoch_rewards_updated epoch_rewards_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.epoch_rewards_updated
+    ADD CONSTRAINT epoch_rewards_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: eth_withdrawn eth_withdrawn_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.eth_withdrawn
+    ADD CONSTRAINT eth_withdrawn_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: fee_info fee_info_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.fee_info
+    ADD CONSTRAINT fee_info_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: gateway_updated gateway_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.gateway_updated
+    ADD CONSTRAINT gateway_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: hub_gauge_updated hub_gauge_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.hub_gauge_updated
+    ADD CONSTRAINT hub_gauge_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: lock_position lock_position_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.lock_position
+    ADD CONSTRAINT lock_position_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: mailbox_updated mailbox_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.mailbox_updated
+    ADD CONSTRAINT mailbox_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: message_gas_limit_updated message_gas_limit_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.message_gas_limit_updated
+    ADD CONSTRAINT message_gas_limit_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: mint_message_sent mint_message_sent_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.mint_message_sent
+    ADD CONSTRAINT mint_message_sent_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: new_lock_position new_lock_position_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.new_lock_position
+    ADD CONSTRAINT new_lock_position_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: ownership_transferred ownership_transferred_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.ownership_transferred
+    ADD CONSTRAINT ownership_transferred_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: process_error process_error_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.process_error
+    ADD CONSTRAINT process_error_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: retry_bridge_out retry_bridge_out_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.retry_bridge_out
+    ADD CONSTRAINT retry_bridge_out_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: retry_lock retry_lock_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.retry_lock
+    ADD CONSTRAINT retry_lock_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: retry_message retry_message_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.retry_message
+    ADD CONSTRAINT retry_message_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: retry_mint retry_mint_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.retry_mint
+    ADD CONSTRAINT retry_mint_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: retry_transfer retry_transfer_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.retry_transfer
+    ADD CONSTRAINT retry_transfer_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: return_fee_updated return_fee_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.return_fee_updated
+    ADD CONSTRAINT return_fee_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: reward_claimed reward_claimed_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.reward_claimed
+    ADD CONSTRAINT reward_claimed_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: reward_metadata_updated reward_metadata_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.reward_metadata_updated
+    ADD CONSTRAINT reward_metadata_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: rewards_claimed rewards_claimed_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.rewards_claimed
+    ADD CONSTRAINT rewards_claimed_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: security_module_updated security_module_updated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.security_module_updated
+    ADD CONSTRAINT security_module_updated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: user user_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics."user"
+    ADD CONSTRAINT user_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: vote_cast vote_cast_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.vote_cast
+    ADD CONSTRAINT vote_cast_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: vote_delegated vote_delegated_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.vote_delegated
+    ADD CONSTRAINT vote_delegated_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: withdraw_eth withdraw_eth_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.withdraw_eth
+    ADD CONSTRAINT withdraw_eth_pkey PRIMARY KEY (_gs_gid);
+
+
+--
+-- Name: withdraw withdraw_pkey; Type: CONSTRAINT; Schema: tokenomics; Owner: -
+--
+
+ALTER TABLE ONLY tokenomics.withdraw
+    ADD CONSTRAINT withdraw_pkey PRIMARY KEY (_gs_gid);
 
 
 --
@@ -3337,4 +4411,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20241217225034'),
     ('20250107062058'),
     ('20250108140315'),
-    ('20250322012505');
+    ('20250322012505'),
+    ('20250325230805');
