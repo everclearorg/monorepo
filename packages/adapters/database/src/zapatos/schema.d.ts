@@ -34701,6 +34701,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Selectable;
     "merkle_trees": merkle_trees.Selectable;
     "messages": messages.Selectable;
+    "orders": orders.Selectable;
     "origin_intents": origin_intents.Selectable;
     "origin_intents_status_log": origin_intents_status_log.Selectable;
     "queues": queues.Selectable;
@@ -34783,6 +34784,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.JSONSelectable;
     "merkle_trees": merkle_trees.JSONSelectable;
     "messages": messages.JSONSelectable;
+    "orders": orders.JSONSelectable;
     "origin_intents": origin_intents.JSONSelectable;
     "origin_intents_status_log": origin_intents_status_log.JSONSelectable;
     "queues": queues.JSONSelectable;
@@ -34865,6 +34867,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Whereable;
     "merkle_trees": merkle_trees.Whereable;
     "messages": messages.Whereable;
+    "orders": orders.Whereable;
     "origin_intents": origin_intents.Whereable;
     "origin_intents_status_log": origin_intents_status_log.Whereable;
     "queues": queues.Whereable;
@@ -34947,6 +34950,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Insertable;
     "merkle_trees": merkle_trees.Insertable;
     "messages": messages.Insertable;
+    "orders": orders.Insertable;
     "origin_intents": origin_intents.Insertable;
     "origin_intents_status_log": origin_intents_status_log.Insertable;
     "queues": queues.Insertable;
@@ -35029,6 +35033,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Updatable;
     "merkle_trees": merkle_trees.Updatable;
     "messages": messages.Updatable;
+    "orders": orders.Updatable;
     "origin_intents": origin_intents.Updatable;
     "origin_intents_status_log": origin_intents_status_log.Updatable;
     "queues": queues.Updatable;
@@ -35111,6 +35116,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.UniqueIndex;
     "merkle_trees": merkle_trees.UniqueIndex;
     "messages": messages.UniqueIndex;
+    "orders": orders.UniqueIndex;
     "origin_intents": origin_intents.UniqueIndex;
     "origin_intents_status_log": origin_intents_status_log.UniqueIndex;
     "queues": queues.UniqueIndex;
@@ -35193,6 +35199,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.Column;
     "merkle_trees": merkle_trees.Column;
     "messages": messages.Column;
+    "orders": orders.Column;
     "origin_intents": origin_intents.Column;
     "origin_intents_status_log": origin_intents_status_log.Column;
     "queues": queues.Column;
@@ -35275,6 +35282,7 @@ declare module 'zapatos/schema' {
     "matchdeposit": matchdeposit.SQL;
     "merkle_trees": merkle_trees.SQL;
     "messages": messages.SQL;
+    "orders": orders.SQL;
     "origin_intents": origin_intents.SQL;
     "origin_intents_status_log": origin_intents_status_log.SQL;
     "queues": queues.SQL;
