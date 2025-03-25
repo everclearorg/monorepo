@@ -110,6 +110,10 @@ export const createOriginIntent = (overrides: Partial<OriginIntent> = {}): Origi
   gasPrice: '12234234',
   txOrigin: mkAddress('0x123'),
   txNonce: 1,
+  tokenFee: undefined,
+  nativeFee: undefined,
+  feeAdapterInitiator: undefined,
+  orderId: undefined,
   ...overrides,
 });
 
@@ -289,7 +293,7 @@ export const createInvoices = (num: number, overrides: Partial<Invoice>[] = []):
   let a = overrides[0].originIntent;
   return Array(num)
     .fill(0)
-    .map((_, i) => 
+    .map((_, i) =>
       createInvoice({
         id: mkBytes32(`0xaa`),
         originIntent: createOriginIntent(overrides[i].originIntent),

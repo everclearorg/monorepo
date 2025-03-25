@@ -11681,6 +11681,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations: string[] | null;
       /**
+      * **invoices.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      origin_fee_adapter_initiator: string | null;
+      /**
       * **invoices.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -11716,6 +11722,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_message_id: string | null;
+      /**
+      * **invoices.origin_native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      origin_native_fee: string | null;
       /**
       * **invoices.origin_nonce**
       * - `int8` in database
@@ -11758,6 +11770,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp: db.Int8String | null;
+      /**
+      * **invoices.origin_token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      origin_token_fee: string | null;
       /**
       * **invoices.origin_transaction_hash**
       * - `bpchar` in database
@@ -11887,6 +11905,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations: string[] | null;
       /**
+      * **invoices.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      origin_fee_adapter_initiator: string | null;
+      /**
       * **invoices.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -11923,6 +11947,12 @@ declare module 'zapatos/schema' {
       */
       origin_message_id: string | null;
       /**
+      * **invoices.origin_native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      origin_native_fee: string | null;
+      /**
       * **invoices.origin_nonce**
       * - `int8` in database
       * - Materialized view column
@@ -11934,6 +11964,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_origin: string | null;
+      /**
+      * **invoices.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id: string | null;
       /**
       * **invoices.origin_output_asset**
       * - `varchar` in database
@@ -11964,6 +12000,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp: (number | db.Int8String) | null;
+      /**
+      * **invoices.origin_token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      origin_token_fee: string | null;
       /**
       * **invoices.origin_transaction_hash**
       * - `bpchar` in database

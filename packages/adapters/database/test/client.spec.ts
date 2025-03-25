@@ -785,8 +785,8 @@ describe('Database Adapter:Client', () => {
   const saveTokenomicsEvent = async (event: TokenomicsEvent, table: string) => {
     await pool.query({
       text: `INSERT INTO tokenomics.${table} (block_number, block_timestamp, transaction_hash) VALUES ($1, $2, $3)`,
-      values: [ event.blockNumber, event.blockTimestamp, Buffer.from(event.transactionHash.slice(2), 'hex') ],
-  });
+      values: [event.blockNumber, event.blockTimestamp, Buffer.from(event.transactionHash.slice(2), 'hex')],
+    });
   };
 
   describe('#getTokenomicsEvents', () => {
@@ -926,13 +926,13 @@ describe('Database Adapter:Client', () => {
 
       await saveLockPositions('lock_position_test', 1, lockPositions, pool);
       expect(await getLockPositions(undefined, undefined, undefined, pool)).to.be.deep.eq(lockPositions);
-      expect(await getLockPositions(undefined, lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[2], lockPositions[3], lockPositions[4] ]);
-      expect(await getLockPositions(mkAddress(`0x1`), undefined, undefined, pool)).to.be.deep.eq([ lockPositions[1], lockPositions[3] ]);
-      expect(await getLockPositions(mkAddress(`0x1`), lockPositions[2].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[3] ]);
-      expect(await getLockPositions(mkAddress(`0x2`), undefined, undefined, pool)).to.be.deep.eq([ lockPositions[0], lockPositions[2], lockPositions[4] ]);
-      expect(await getLockPositions(mkAddress(`0x2`), lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[2], lockPositions[4] ]);
+      expect(await getLockPositions(undefined, lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([lockPositions[2], lockPositions[3], lockPositions[4]]);
+      expect(await getLockPositions(mkAddress(`0x1`), undefined, undefined, pool)).to.be.deep.eq([lockPositions[1], lockPositions[3]]);
+      expect(await getLockPositions(mkAddress(`0x1`), lockPositions[2].expiry, undefined, pool)).to.be.deep.eq([lockPositions[3]]);
+      expect(await getLockPositions(mkAddress(`0x2`), undefined, undefined, pool)).to.be.deep.eq([lockPositions[0], lockPositions[2], lockPositions[4]]);
+      expect(await getLockPositions(mkAddress(`0x2`), lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([lockPositions[2], lockPositions[4]]);
       expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[2].start, pool)).to.be.deep.eq([]);
-      expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[3].start, pool)).to.be.deep.eq([ lockPositions[2] ]);
+      expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[3].start, pool)).to.be.deep.eq([lockPositions[2]]);
 
 
       lockPositions[0].amountLocked = '0';
