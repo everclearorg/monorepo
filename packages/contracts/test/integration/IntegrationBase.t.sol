@@ -55,7 +55,6 @@ struct HubDeploymentParams {
   address owner;
   address deployer;
   string domain;
-  uint256 forkBlock;
   address mailbox;
   address ISM;
 }
@@ -165,7 +164,6 @@ contract IntegrationBase is TestExtended {
       owner: _owner,
       deployer: HUB_DEPLOYER,
       domain: 'scroll-sepolia',
-      forkBlock: HUB_FORK_BLOCK,
       mailbox: address(hubMailbox),
       ISM: hubISM
     });
@@ -435,7 +433,7 @@ contract IntegrationBase is TestExtended {
   function _deployHubContracts(
     HubDeploymentParams memory _params
   ) internal returns (uint256 _forkId, IEverclearHub _hub, HubGateway _gateway) {
-    _forkId = vm.createSelectFork(vm.rpcUrl(_params.domain), _params.forkBlock);
+    _forkId = vm.createSelectFork(vm.rpcUrl(_params.domain));
 
     vm.setNonce(_params.deployer, 0); // set 0
 
