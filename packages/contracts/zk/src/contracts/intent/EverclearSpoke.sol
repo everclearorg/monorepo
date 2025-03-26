@@ -112,9 +112,9 @@ contract EverclearSpoke is
   /// @inheritdoc IEverclearSpoke
   function newIntent(
     uint32[] memory _destinations,
-    address _receiver,
+    bytes32 _receiver,
     address _inputAsset,
-    address _outputAsset,
+    bytes32 _outputAsset,
     uint256 _amount,
     uint24 _maxFee,
     uint48 _ttl,
@@ -137,9 +137,9 @@ contract EverclearSpoke is
   /// @inheritdoc IEverclearSpoke
   function newIntent(
     uint32[] memory _destinations,
-    address _receiver,
+    bytes32 _receiver,
     address _inputAsset,
-    address _outputAsset,
+    bytes32 _outputAsset,
     uint256 _amount,
     uint24 _maxFee,
     uint48 _ttl,
@@ -374,9 +374,9 @@ contract EverclearSpoke is
    */
   function _newIntent(
     uint32[] memory _destinations,
-    address _receiver,
+    bytes32 _receiver,
     address _inputAsset,
-    address _outputAsset,
+    bytes32 _outputAsset,
     uint256 _amount,
     uint24 _maxFee,
     uint48 _ttl,
@@ -385,11 +385,11 @@ contract EverclearSpoke is
   ) internal returns (bytes32 _intentId, Intent memory _intent) {
     if (_destinations.length == 1) {
       // output asset should not be null if the intent has a single destination and ttl != 0
-      if (_ttl != 0 && _outputAsset == address(0)) revert EverclearSpoke_NewIntent_InvalidIntent();
+      if (_ttl != 0 && _outputAsset == 0) revert EverclearSpoke_NewIntent_InvalidIntent();
     } else {
       // output asset should be null if the intent has multiple destinations
       // ttl should be 0 if the intent has multiple destinations
-      if (_ttl != 0 || _outputAsset != address(0)) revert EverclearSpoke_NewIntent_InvalidIntent();
+      if (_ttl != 0 || _outputAsset != 0) revert EverclearSpoke_NewIntent_InvalidIntent();
     }
 
     if (_maxFee > Common.DBPS_DENOMINATOR) {
@@ -420,9 +420,9 @@ contract EverclearSpoke is
 
     _intent = Intent({
       initiator: msg.sender.toBytes32(),
-      receiver: _receiver.toBytes32(),
+      receiver: _receiver,
       inputAsset: _inputAsset.toBytes32(),
-      outputAsset: _outputAsset.toBytes32(),
+      outputAsset: _outputAsset,
       maxFee: _maxFee,
       origin: DOMAIN,
       nonce: ++nonce,
