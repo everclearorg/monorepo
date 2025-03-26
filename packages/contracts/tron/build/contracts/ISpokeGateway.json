@@ -1,0 +1,1167 @@
+{
+  "contractName": "ISpokeGateway",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Gateway_Handle_InvalidOriginDomain",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_Handle_InvalidSender",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_Handle_NotCalledByMailbox",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_SendMessage_InsufficientBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_SendMessage_UnauthorizedCaller",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_SendMessage_UnsuccessfulRebate",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_ZeroAddress",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_oldMailbox",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_newMailbox",
+          "type": "address"
+        }
+      ],
+      "name": "MailboxUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_oldSecurityModule",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_newSecurityModule",
+          "type": "address"
+        }
+      ],
+      "name": "SecurityModuleUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "EVERCLEAR_GATEWAY",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_hubGateway",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "EVERCLEAR_ID",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "_hubChainId",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_owner",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_mailbox",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_interchainSecurityModule",
+          "type": "address"
+        },
+        {
+          "internalType": "uint32",
+          "name": "_everclearId",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_hubGateway",
+          "type": "bytes32"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "mailbox",
+      "outputs": [
+        {
+          "internalType": "contract IMailbox",
+          "name": "_mailbox",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_chainId",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_gasLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "quoteMessage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_fee",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "receiver",
+      "outputs": [
+        {
+          "internalType": "contract IMessageReceiver",
+          "name": "_receiver",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_chainId",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_fee",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_gasLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "sendMessage",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_messageId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_feeSpent",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_chainId",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_gasLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "sendMessage",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_messageId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_feeSpent",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_mailbox",
+          "type": "address"
+        }
+      ],
+      "name": "updateMailbox",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_securityModule",
+          "type": "address"
+        }
+      ],
+      "name": "updateSecurityModule",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\nimport {IGateway} from 'interfaces/common/IGateway.sol';\n\n/**\n * @title ISpokeGateway\n * @notice Interface for the SpokeGateway contract, sends and receives messages to and from the transport layer\n */\ninterface ISpokeGateway is IGateway {\n  /*///////////////////////////////////////////////////////////////\n                              LOGIC\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Initialize Gateway variables\n   * @param _owner The address of the owner\n   * @param _mailbox The address of the local mailbox\n   * @param _receiver The address of the local message receiver (EverclearSpoke)\n   * @param _interchainSecurityModule The address of the chosen interchain security module\n   * @param _everclearId The id of the Everclear domain\n   * @param _hubGateway The bytes32 representation of the Hub gateway\n   * @dev Only called once on initialization\n   */\n  function initialize(\n    address _owner,\n    address _mailbox,\n    address _receiver,\n    address _interchainSecurityModule,\n    uint32 _everclearId,\n    bytes32 _hubGateway\n  ) external;\n\n  /*///////////////////////////////////////////////////////////////\n                              VIEWS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Returns the Everclear hub chain id\n   * @return _hubChainId The Everclear chain id\n   */\n  function EVERCLEAR_ID() external view returns (uint32 _hubChainId);\n\n  /**\n   * @notice Returns the `HubGateway` gateway address\n   * @return _hubGateway The `HubGateway` address\n   */\n  function EVERCLEAR_GATEWAY() external view returns (bytes32 _hubGateway);\n}\n",
+  "sourcePath": "interfaces/intent/ISpokeGateway.sol",
+  "ast": {
+    "absolutePath": "interfaces/intent/ISpokeGateway.sol",
+    "exportedSymbols": {
+      "IGateway": [
+        3198
+      ],
+      "ISpokeGateway": [
+        3340
+      ]
+    },
+    "id": 3341,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3306,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:28"
+      },
+      {
+        "absolutePath": "interfaces/common/IGateway.sol",
+        "file": "interfaces/common/IGateway.sol",
+        "id": 3308,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 3341,
+        "sourceUnit": 3199,
+        "src": "57:56:28",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 3307,
+              "name": "IGateway",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 3198,
+              "src": "65:8:28",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 3310,
+              "name": "IGateway",
+              "nameLocations": [
+                "286:8:28"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 3198,
+              "src": "286:8:28"
+            },
+            "id": 3311,
+            "nodeType": "InheritanceSpecifier",
+            "src": "286:8:28"
+          }
+        ],
+        "canonicalName": "ISpokeGateway",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 3309,
+          "nodeType": "StructuredDocumentation",
+          "src": "115:143:28",
+          "text": " @title ISpokeGateway\n @notice Interface for the SpokeGateway contract, sends and receives messages to and from the transport layer"
+        },
+        "fullyImplemented": false,
+        "id": 3340,
+        "linearizedBaseContracts": [
+          3340,
+          3198
+        ],
+        "name": "ISpokeGateway",
+        "nameLocation": "269:13:28",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 3312,
+              "nodeType": "StructuredDocumentation",
+              "src": "471:492:28",
+              "text": " @notice Initialize Gateway variables\n @param _owner The address of the owner\n @param _mailbox The address of the local mailbox\n @param _receiver The address of the local message receiver (EverclearSpoke)\n @param _interchainSecurityModule The address of the chosen interchain security module\n @param _everclearId The id of the Everclear domain\n @param _hubGateway The bytes32 representation of the Hub gateway\n @dev Only called once on initialization"
+            },
+            "functionSelector": "8e06fb01",
+            "id": 3327,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initialize",
+            "nameLocation": "975:10:28",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3325,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3314,
+                  "mutability": "mutable",
+                  "name": "_owner",
+                  "nameLocation": "999:6:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "991:14:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3313,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "991:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3316,
+                  "mutability": "mutable",
+                  "name": "_mailbox",
+                  "nameLocation": "1019:8:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1011:16:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3315,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1011:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3318,
+                  "mutability": "mutable",
+                  "name": "_receiver",
+                  "nameLocation": "1041:9:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1033:17:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3317,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1033:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3320,
+                  "mutability": "mutable",
+                  "name": "_interchainSecurityModule",
+                  "nameLocation": "1064:25:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1056:33:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3319,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1056:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3322,
+                  "mutability": "mutable",
+                  "name": "_everclearId",
+                  "nameLocation": "1102:12:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1095:19:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3321,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1095:6:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3324,
+                  "mutability": "mutable",
+                  "name": "_hubGateway",
+                  "nameLocation": "1128:11:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1120:19:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3323,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1120:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "985:158:28"
+            },
+            "returnParameters": {
+              "id": 3326,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1152:0:28"
+            },
+            "scope": 3340,
+            "src": "966:187:28",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3328,
+              "nodeType": "StructuredDocumentation",
+              "src": "1329:105:28",
+              "text": " @notice Returns the Everclear hub chain id\n @return _hubChainId The Everclear chain id"
+            },
+            "functionSelector": "5ff9a874",
+            "id": 3333,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "EVERCLEAR_ID",
+            "nameLocation": "1446:12:28",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3329,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1458:2:28"
+            },
+            "returnParameters": {
+              "id": 3332,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3331,
+                  "mutability": "mutable",
+                  "name": "_hubChainId",
+                  "nameLocation": "1491:11:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3333,
+                  "src": "1484:18:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3330,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1484:6:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1483:20:28"
+            },
+            "scope": 3340,
+            "src": "1437:67:28",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3334,
+              "nodeType": "StructuredDocumentation",
+              "src": "1508:113:28",
+              "text": " @notice Returns the `HubGateway` gateway address\n @return _hubGateway The `HubGateway` address"
+            },
+            "functionSelector": "a197da4d",
+            "id": 3339,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "EVERCLEAR_GATEWAY",
+            "nameLocation": "1633:17:28",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3335,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1650:2:28"
+            },
+            "returnParameters": {
+              "id": 3338,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3337,
+                  "mutability": "mutable",
+                  "name": "_hubGateway",
+                  "nameLocation": "1684:11:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3339,
+                  "src": "1676:19:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3336,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1676:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1675:21:28"
+            },
+            "scope": 3340,
+            "src": "1624:73:28",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3341,
+        "src": "259:1440:28",
+        "usedErrors": [
+          3111,
+          3114,
+          3117,
+          3120,
+          3123,
+          3126,
+          3129
+        ],
+        "usedEvents": [
+          3101,
+          3108
+        ]
+      }
+    ],
+    "src": "32:1668:28"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/intent/ISpokeGateway.sol",
+    "exportedSymbols": {
+      "IGateway": [
+        3198
+      ],
+      "ISpokeGateway": [
+        3340
+      ]
+    },
+    "id": 3341,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3306,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:28"
+      },
+      {
+        "absolutePath": "interfaces/common/IGateway.sol",
+        "file": "interfaces/common/IGateway.sol",
+        "id": 3308,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 3341,
+        "sourceUnit": 3199,
+        "src": "57:56:28",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 3307,
+              "name": "IGateway",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 3198,
+              "src": "65:8:28",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 3310,
+              "name": "IGateway",
+              "nameLocations": [
+                "286:8:28"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 3198,
+              "src": "286:8:28"
+            },
+            "id": 3311,
+            "nodeType": "InheritanceSpecifier",
+            "src": "286:8:28"
+          }
+        ],
+        "canonicalName": "ISpokeGateway",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 3309,
+          "nodeType": "StructuredDocumentation",
+          "src": "115:143:28",
+          "text": " @title ISpokeGateway\n @notice Interface for the SpokeGateway contract, sends and receives messages to and from the transport layer"
+        },
+        "fullyImplemented": false,
+        "id": 3340,
+        "linearizedBaseContracts": [
+          3340,
+          3198
+        ],
+        "name": "ISpokeGateway",
+        "nameLocation": "269:13:28",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 3312,
+              "nodeType": "StructuredDocumentation",
+              "src": "471:492:28",
+              "text": " @notice Initialize Gateway variables\n @param _owner The address of the owner\n @param _mailbox The address of the local mailbox\n @param _receiver The address of the local message receiver (EverclearSpoke)\n @param _interchainSecurityModule The address of the chosen interchain security module\n @param _everclearId The id of the Everclear domain\n @param _hubGateway The bytes32 representation of the Hub gateway\n @dev Only called once on initialization"
+            },
+            "functionSelector": "8e06fb01",
+            "id": 3327,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initialize",
+            "nameLocation": "975:10:28",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3325,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3314,
+                  "mutability": "mutable",
+                  "name": "_owner",
+                  "nameLocation": "999:6:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "991:14:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3313,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "991:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3316,
+                  "mutability": "mutable",
+                  "name": "_mailbox",
+                  "nameLocation": "1019:8:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1011:16:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3315,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1011:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3318,
+                  "mutability": "mutable",
+                  "name": "_receiver",
+                  "nameLocation": "1041:9:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1033:17:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3317,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1033:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3320,
+                  "mutability": "mutable",
+                  "name": "_interchainSecurityModule",
+                  "nameLocation": "1064:25:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1056:33:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3319,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1056:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3322,
+                  "mutability": "mutable",
+                  "name": "_everclearId",
+                  "nameLocation": "1102:12:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1095:19:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3321,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1095:6:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3324,
+                  "mutability": "mutable",
+                  "name": "_hubGateway",
+                  "nameLocation": "1128:11:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3327,
+                  "src": "1120:19:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3323,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1120:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "985:158:28"
+            },
+            "returnParameters": {
+              "id": 3326,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1152:0:28"
+            },
+            "scope": 3340,
+            "src": "966:187:28",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3328,
+              "nodeType": "StructuredDocumentation",
+              "src": "1329:105:28",
+              "text": " @notice Returns the Everclear hub chain id\n @return _hubChainId The Everclear chain id"
+            },
+            "functionSelector": "5ff9a874",
+            "id": 3333,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "EVERCLEAR_ID",
+            "nameLocation": "1446:12:28",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3329,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1458:2:28"
+            },
+            "returnParameters": {
+              "id": 3332,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3331,
+                  "mutability": "mutable",
+                  "name": "_hubChainId",
+                  "nameLocation": "1491:11:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3333,
+                  "src": "1484:18:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3330,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1484:6:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1483:20:28"
+            },
+            "scope": 3340,
+            "src": "1437:67:28",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3334,
+              "nodeType": "StructuredDocumentation",
+              "src": "1508:113:28",
+              "text": " @notice Returns the `HubGateway` gateway address\n @return _hubGateway The `HubGateway` address"
+            },
+            "functionSelector": "a197da4d",
+            "id": 3339,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "EVERCLEAR_GATEWAY",
+            "nameLocation": "1633:17:28",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3335,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1650:2:28"
+            },
+            "returnParameters": {
+              "id": 3338,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3337,
+                  "mutability": "mutable",
+                  "name": "_hubGateway",
+                  "nameLocation": "1684:11:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3339,
+                  "src": "1676:19:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3336,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1676:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1675:21:28"
+            },
+            "scope": 3340,
+            "src": "1624:73:28",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3341,
+        "src": "259:1440:28",
+        "usedErrors": [
+          3111,
+          3114,
+          3117,
+          3120,
+          3123,
+          3126,
+          3129
+        ],
+        "usedEvents": [
+          3101,
+          3108
+        ]
+      }
+    ],
+    "src": "32:1668:28"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-20T14:23:32.538Z"
+}

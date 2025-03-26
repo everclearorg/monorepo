@@ -1,0 +1,1926 @@
+{
+  "contractName": "IXERC20Module",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_limit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "XERC20Module_HandleBurnStrategy_InsufficientBurningLimit",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "XERC20Module_HandleStrategy_OnlySpoke",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_limit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "XERC20Module_MintDebt_InsufficientMintingLimit",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_recipient",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "DebtMinted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_recipient",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "HandleMintStrategyFailed",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_data",
+          "type": "bytes"
+        }
+      ],
+      "name": "handleBurnStrategy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_fallbackRecipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_data",
+          "type": "bytes"
+        }
+      ],
+      "name": "handleMintStrategy",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "_success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "mintDebt",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        }
+      ],
+      "name": "mintable",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "spoke",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "_spoke",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\nimport {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';\n\n/**\n * @title Interface\n * @notice Interface for\n */\ninterface IXERC20Module is ISettlementModule {\n  /*///////////////////////////////////////////////////////////////\n                              EVENTS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Emitted when debt is minted in favor of a user\n   * @param _asset The address of the minted asset\n   * @param _recipient The address of the minted tokens recipient\n   * @param _amount The amount of tokens minted\n   */\n  event DebtMinted(address indexed _asset, address indexed _recipient, uint256 _amount);\n\n  /**\n   * @notice Emitted when the handle mint strategy fails\n   * @param _asset The address of the minted asset\n   * @param _recipient The address of the minted tokens recipient\n   * @param _amount The amount of tokens minted\n   */\n  event HandleMintStrategyFailed(address indexed _asset, address indexed _recipient, uint256 _amount);\n\n  /*///////////////////////////////////////////////////////////////\n                              ERRORS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Thrown when the XERC20 minting limit is lower than the amount being minted\n   * @param _asset The address of the asset\n   * @param _limit The hit limit\n   * @param _amount The amount trying to be minted\n   */\n  error XERC20Module_MintDebt_InsufficientMintingLimit(address _asset, uint256 _limit, uint256 _amount);\n\n  /**\n   * @notice Thrown when the XERC20 burning limit is lower than the amount being burned\n   * @param _asset The address of the asset\n   * @param _limit The hit limit\n   * @param _amount The amount trying to be burned\n   */\n  error XERC20Module_HandleBurnStrategy_InsufficientBurningLimit(address _asset, uint256 _limit, uint256 _amount);\n\n  /**\n   * @notice Thrown when the caller is not the `EverclearSpoke`\n   */\n  error XERC20Module_HandleStrategy_OnlySpoke();\n\n  /*///////////////////////////////////////////////////////////////\n                              LOGIC\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Mints owed assets to an account\n   * @param _asset The address of the asset to mint\n   * @param _recipient The recipient of the minted assets\n   * @param _amount The amount to mint\n   */\n  function mintDebt(address _asset, address _recipient, uint256 _amount) external;\n\n  /*///////////////////////////////////////////////////////////////\n                              VIEWS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Returns the address of the local `EverclearSpoke`\n   * @return _spoke The address of the `EverclearSpoke`\n   */\n  function spoke() external view returns (address _spoke);\n\n  /**\n   * @notice Returns the amount of tokens mintable by a user\n   * @param _account The address of the owed user\n   * @param _asset The address of the mintable asset\n   * @return _amount The total mintable amount\n   */\n  function mintable(address _account, address _asset) external view returns (uint256 _amount);\n}\n",
+  "sourcePath": "interfaces/intent/modules/IXERC20Module.sol",
+  "ast": {
+    "absolutePath": "interfaces/intent/modules/IXERC20Module.sol",
+    "exportedSymbols": {
+      "ISettlementModule": [
+        11173
+      ],
+      "IXERC20Module": [
+        12070
+      ]
+    },
+    "id": 12071,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11999,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:62"
+      },
+      {
+        "absolutePath": "interfaces/common/ISettlementModule.sol",
+        "file": "interfaces/common/ISettlementModule.sol",
+        "id": 12001,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 12071,
+        "sourceUnit": 11174,
+        "src": "57:74:62",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 12000,
+              "name": "ISettlementModule",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 11173,
+              "src": "65:17:62",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 12003,
+              "name": "ISettlementModule",
+              "nameLocations": [
+                "213:17:62"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 11173,
+              "src": "213:17:62"
+            },
+            "id": 12004,
+            "nodeType": "InheritanceSpecifier",
+            "src": "213:17:62"
+          }
+        ],
+        "canonicalName": "IXERC20Module",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 12002,
+          "nodeType": "StructuredDocumentation",
+          "src": "133:52:62",
+          "text": " @title Interface\n @notice Interface for"
+        },
+        "fullyImplemented": false,
+        "id": 12070,
+        "linearizedBaseContracts": [
+          12070,
+          11173
+        ],
+        "name": "IXERC20Module",
+        "nameLocation": "196:13:62",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 12005,
+              "nodeType": "StructuredDocumentation",
+              "src": "408:234:62",
+              "text": " @notice Emitted when debt is minted in favor of a user\n @param _asset The address of the minted asset\n @param _recipient The address of the minted tokens recipient\n @param _amount The amount of tokens minted"
+            },
+            "eventSelector": "582189f7394b93e93476738fd1de7cf483e1f99dfb27e00a7c345a393eefe18c",
+            "id": 12013,
+            "name": "DebtMinted",
+            "nameLocation": "651:10:62",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 12012,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12007,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "678:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12013,
+                  "src": "662:22:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12006,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "662:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12009,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_recipient",
+                  "nameLocation": "702:10:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12013,
+                  "src": "686:26:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12008,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "686:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12011,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "722:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12013,
+                  "src": "714:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12010,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "714:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "661:69:62"
+            },
+            "src": "645:86:62"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 12014,
+              "nodeType": "StructuredDocumentation",
+              "src": "735:231:62",
+              "text": " @notice Emitted when the handle mint strategy fails\n @param _asset The address of the minted asset\n @param _recipient The address of the minted tokens recipient\n @param _amount The amount of tokens minted"
+            },
+            "eventSelector": "471d6aaacf1235d0caa925387363751a53c3eae2c8fc2f0a39cc89d23f717004",
+            "id": 12022,
+            "name": "HandleMintStrategyFailed",
+            "nameLocation": "975:24:62",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 12021,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12016,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "1016:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12022,
+                  "src": "1000:22:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12015,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1000:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12018,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_recipient",
+                  "nameLocation": "1040:10:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12022,
+                  "src": "1024:26:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12017,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1024:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12020,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "1060:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12022,
+                  "src": "1052:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12019,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1052:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "999:69:62"
+            },
+            "src": "969:100:62"
+          },
+          {
+            "documentation": {
+              "id": 12023,
+              "nodeType": "StructuredDocumentation",
+              "src": "1246:225:62",
+              "text": " @notice Thrown when the XERC20 minting limit is lower than the amount being minted\n @param _asset The address of the asset\n @param _limit The hit limit\n @param _amount The amount trying to be minted"
+            },
+            "errorSelector": "29b06068",
+            "id": 12031,
+            "name": "XERC20Module_MintDebt_InsufficientMintingLimit",
+            "nameLocation": "1480:46:62",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 12030,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12025,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "1535:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12031,
+                  "src": "1527:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12024,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1527:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12027,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "1551:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12031,
+                  "src": "1543:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12026,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1543:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12029,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "1567:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12031,
+                  "src": "1559:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12028,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1559:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1526:49:62"
+            },
+            "src": "1474:102:62"
+          },
+          {
+            "documentation": {
+              "id": 12032,
+              "nodeType": "StructuredDocumentation",
+              "src": "1580:225:62",
+              "text": " @notice Thrown when the XERC20 burning limit is lower than the amount being burned\n @param _asset The address of the asset\n @param _limit The hit limit\n @param _amount The amount trying to be burned"
+            },
+            "errorSelector": "2609e7ff",
+            "id": 12040,
+            "name": "XERC20Module_HandleBurnStrategy_InsufficientBurningLimit",
+            "nameLocation": "1814:56:62",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 12039,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12034,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "1879:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12040,
+                  "src": "1871:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12033,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1871:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12036,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "1895:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12040,
+                  "src": "1887:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12035,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1887:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12038,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "1911:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12040,
+                  "src": "1903:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12037,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1903:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1870:49:62"
+            },
+            "src": "1808:112:62"
+          },
+          {
+            "documentation": {
+              "id": 12041,
+              "nodeType": "StructuredDocumentation",
+              "src": "1924:73:62",
+              "text": " @notice Thrown when the caller is not the `EverclearSpoke`"
+            },
+            "errorSelector": "5e28321b",
+            "id": 12043,
+            "name": "XERC20Module_HandleStrategy_OnlySpoke",
+            "nameLocation": "2006:37:62",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 12042,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2043:2:62"
+            },
+            "src": "2000:46:62"
+          },
+          {
+            "documentation": {
+              "id": 12044,
+              "nodeType": "StructuredDocumentation",
+              "src": "2222:203:62",
+              "text": " @notice Mints owed assets to an account\n @param _asset The address of the asset to mint\n @param _recipient The recipient of the minted assets\n @param _amount The amount to mint"
+            },
+            "functionSelector": "8cad6e77",
+            "id": 12053,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintDebt",
+            "nameLocation": "2437:8:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 12051,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12046,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "2454:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12053,
+                  "src": "2446:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12045,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2446:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12048,
+                  "mutability": "mutable",
+                  "name": "_recipient",
+                  "nameLocation": "2470:10:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12053,
+                  "src": "2462:18:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12047,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2462:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12050,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "2490:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12053,
+                  "src": "2482:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12049,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2482:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2445:53:62"
+            },
+            "returnParameters": {
+              "id": 12052,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2507:0:62"
+            },
+            "scope": 12070,
+            "src": "2428:80:62",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 12054,
+              "nodeType": "StructuredDocumentation",
+              "src": "2684:128:62",
+              "text": " @notice Returns the address of the local `EverclearSpoke`\n @return _spoke The address of the `EverclearSpoke`"
+            },
+            "functionSelector": "47bfbcc6",
+            "id": 12059,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "spoke",
+            "nameLocation": "2824:5:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 12055,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2829:2:62"
+            },
+            "returnParameters": {
+              "id": 12058,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12057,
+                  "mutability": "mutable",
+                  "name": "_spoke",
+                  "nameLocation": "2863:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12059,
+                  "src": "2855:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12056,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2855:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2854:16:62"
+            },
+            "scope": 12070,
+            "src": "2815:56:62",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 12060,
+              "nodeType": "StructuredDocumentation",
+              "src": "2875:220:62",
+              "text": " @notice Returns the amount of tokens mintable by a user\n @param _account The address of the owed user\n @param _asset The address of the mintable asset\n @return _amount The total mintable amount"
+            },
+            "functionSelector": "04b4d1fb",
+            "id": 12069,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintable",
+            "nameLocation": "3107:8:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 12065,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12062,
+                  "mutability": "mutable",
+                  "name": "_account",
+                  "nameLocation": "3124:8:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12069,
+                  "src": "3116:16:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12061,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3116:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12064,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "3142:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12069,
+                  "src": "3134:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12063,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3134:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3115:34:62"
+            },
+            "returnParameters": {
+              "id": 12068,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12067,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "3181:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12069,
+                  "src": "3173:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12066,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3173:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3172:17:62"
+            },
+            "scope": 12070,
+            "src": "3098:92:62",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 12071,
+        "src": "186:3006:62",
+        "usedErrors": [
+          12031,
+          12040,
+          12043
+        ],
+        "usedEvents": [
+          12013,
+          12022
+        ]
+      }
+    ],
+    "src": "32:3161:62"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/intent/modules/IXERC20Module.sol",
+    "exportedSymbols": {
+      "ISettlementModule": [
+        11173
+      ],
+      "IXERC20Module": [
+        12070
+      ]
+    },
+    "id": 12071,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11999,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:62"
+      },
+      {
+        "absolutePath": "interfaces/common/ISettlementModule.sol",
+        "file": "interfaces/common/ISettlementModule.sol",
+        "id": 12001,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 12071,
+        "sourceUnit": 11174,
+        "src": "57:74:62",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 12000,
+              "name": "ISettlementModule",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 11173,
+              "src": "65:17:62",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 12003,
+              "name": "ISettlementModule",
+              "nameLocations": [
+                "213:17:62"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 11173,
+              "src": "213:17:62"
+            },
+            "id": 12004,
+            "nodeType": "InheritanceSpecifier",
+            "src": "213:17:62"
+          }
+        ],
+        "canonicalName": "IXERC20Module",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 12002,
+          "nodeType": "StructuredDocumentation",
+          "src": "133:52:62",
+          "text": " @title Interface\n @notice Interface for"
+        },
+        "fullyImplemented": false,
+        "id": 12070,
+        "linearizedBaseContracts": [
+          12070,
+          11173
+        ],
+        "name": "IXERC20Module",
+        "nameLocation": "196:13:62",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 12005,
+              "nodeType": "StructuredDocumentation",
+              "src": "408:234:62",
+              "text": " @notice Emitted when debt is minted in favor of a user\n @param _asset The address of the minted asset\n @param _recipient The address of the minted tokens recipient\n @param _amount The amount of tokens minted"
+            },
+            "eventSelector": "582189f7394b93e93476738fd1de7cf483e1f99dfb27e00a7c345a393eefe18c",
+            "id": 12013,
+            "name": "DebtMinted",
+            "nameLocation": "651:10:62",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 12012,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12007,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "678:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12013,
+                  "src": "662:22:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12006,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "662:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12009,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_recipient",
+                  "nameLocation": "702:10:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12013,
+                  "src": "686:26:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12008,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "686:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12011,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "722:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12013,
+                  "src": "714:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12010,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "714:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "661:69:62"
+            },
+            "src": "645:86:62"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 12014,
+              "nodeType": "StructuredDocumentation",
+              "src": "735:231:62",
+              "text": " @notice Emitted when the handle mint strategy fails\n @param _asset The address of the minted asset\n @param _recipient The address of the minted tokens recipient\n @param _amount The amount of tokens minted"
+            },
+            "eventSelector": "471d6aaacf1235d0caa925387363751a53c3eae2c8fc2f0a39cc89d23f717004",
+            "id": 12022,
+            "name": "HandleMintStrategyFailed",
+            "nameLocation": "975:24:62",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 12021,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12016,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "1016:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12022,
+                  "src": "1000:22:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12015,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1000:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12018,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_recipient",
+                  "nameLocation": "1040:10:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12022,
+                  "src": "1024:26:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12017,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1024:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12020,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "1060:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12022,
+                  "src": "1052:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12019,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1052:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "999:69:62"
+            },
+            "src": "969:100:62"
+          },
+          {
+            "documentation": {
+              "id": 12023,
+              "nodeType": "StructuredDocumentation",
+              "src": "1246:225:62",
+              "text": " @notice Thrown when the XERC20 minting limit is lower than the amount being minted\n @param _asset The address of the asset\n @param _limit The hit limit\n @param _amount The amount trying to be minted"
+            },
+            "errorSelector": "29b06068",
+            "id": 12031,
+            "name": "XERC20Module_MintDebt_InsufficientMintingLimit",
+            "nameLocation": "1480:46:62",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 12030,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12025,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "1535:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12031,
+                  "src": "1527:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12024,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1527:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12027,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "1551:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12031,
+                  "src": "1543:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12026,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1543:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12029,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "1567:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12031,
+                  "src": "1559:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12028,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1559:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1526:49:62"
+            },
+            "src": "1474:102:62"
+          },
+          {
+            "documentation": {
+              "id": 12032,
+              "nodeType": "StructuredDocumentation",
+              "src": "1580:225:62",
+              "text": " @notice Thrown when the XERC20 burning limit is lower than the amount being burned\n @param _asset The address of the asset\n @param _limit The hit limit\n @param _amount The amount trying to be burned"
+            },
+            "errorSelector": "2609e7ff",
+            "id": 12040,
+            "name": "XERC20Module_HandleBurnStrategy_InsufficientBurningLimit",
+            "nameLocation": "1814:56:62",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 12039,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12034,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "1879:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12040,
+                  "src": "1871:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12033,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1871:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12036,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "1895:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12040,
+                  "src": "1887:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12035,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1887:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12038,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "1911:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12040,
+                  "src": "1903:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12037,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1903:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1870:49:62"
+            },
+            "src": "1808:112:62"
+          },
+          {
+            "documentation": {
+              "id": 12041,
+              "nodeType": "StructuredDocumentation",
+              "src": "1924:73:62",
+              "text": " @notice Thrown when the caller is not the `EverclearSpoke`"
+            },
+            "errorSelector": "5e28321b",
+            "id": 12043,
+            "name": "XERC20Module_HandleStrategy_OnlySpoke",
+            "nameLocation": "2006:37:62",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 12042,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2043:2:62"
+            },
+            "src": "2000:46:62"
+          },
+          {
+            "documentation": {
+              "id": 12044,
+              "nodeType": "StructuredDocumentation",
+              "src": "2222:203:62",
+              "text": " @notice Mints owed assets to an account\n @param _asset The address of the asset to mint\n @param _recipient The recipient of the minted assets\n @param _amount The amount to mint"
+            },
+            "functionSelector": "8cad6e77",
+            "id": 12053,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintDebt",
+            "nameLocation": "2437:8:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 12051,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12046,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "2454:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12053,
+                  "src": "2446:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12045,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2446:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12048,
+                  "mutability": "mutable",
+                  "name": "_recipient",
+                  "nameLocation": "2470:10:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12053,
+                  "src": "2462:18:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12047,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2462:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12050,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "2490:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12053,
+                  "src": "2482:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12049,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2482:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2445:53:62"
+            },
+            "returnParameters": {
+              "id": 12052,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2507:0:62"
+            },
+            "scope": 12070,
+            "src": "2428:80:62",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 12054,
+              "nodeType": "StructuredDocumentation",
+              "src": "2684:128:62",
+              "text": " @notice Returns the address of the local `EverclearSpoke`\n @return _spoke The address of the `EverclearSpoke`"
+            },
+            "functionSelector": "47bfbcc6",
+            "id": 12059,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "spoke",
+            "nameLocation": "2824:5:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 12055,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2829:2:62"
+            },
+            "returnParameters": {
+              "id": 12058,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12057,
+                  "mutability": "mutable",
+                  "name": "_spoke",
+                  "nameLocation": "2863:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12059,
+                  "src": "2855:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12056,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2855:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2854:16:62"
+            },
+            "scope": 12070,
+            "src": "2815:56:62",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 12060,
+              "nodeType": "StructuredDocumentation",
+              "src": "2875:220:62",
+              "text": " @notice Returns the amount of tokens mintable by a user\n @param _account The address of the owed user\n @param _asset The address of the mintable asset\n @return _amount The total mintable amount"
+            },
+            "functionSelector": "04b4d1fb",
+            "id": 12069,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintable",
+            "nameLocation": "3107:8:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 12065,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12062,
+                  "mutability": "mutable",
+                  "name": "_account",
+                  "nameLocation": "3124:8:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12069,
+                  "src": "3116:16:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12061,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3116:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12064,
+                  "mutability": "mutable",
+                  "name": "_asset",
+                  "nameLocation": "3142:6:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12069,
+                  "src": "3134:14:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12063,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3134:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3115:34:62"
+            },
+            "returnParameters": {
+              "id": 12068,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12067,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "3181:7:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 12069,
+                  "src": "3173:15:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12066,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3173:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3172:17:62"
+            },
+            "scope": 12070,
+            "src": "3098:92:62",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 12071,
+        "src": "186:3006:62",
+        "usedErrors": [
+          12031,
+          12040,
+          12043
+        ],
+        "usedEvents": [
+          12013,
+          12022
+        ]
+      }
+    ],
+    "src": "32:3161:62"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-20T14:22:53.871Z"
+}

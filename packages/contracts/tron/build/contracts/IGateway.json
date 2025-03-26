@@ -1,0 +1,2623 @@
+{
+  "contractName": "IGateway",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Gateway_Handle_InvalidOriginDomain",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_Handle_InvalidSender",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_Handle_NotCalledByMailbox",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_SendMessage_InsufficientBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_SendMessage_UnauthorizedCaller",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_SendMessage_UnsuccessfulRebate",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Gateway_ZeroAddress",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_oldMailbox",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_newMailbox",
+          "type": "address"
+        }
+      ],
+      "name": "MailboxUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_oldSecurityModule",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_newSecurityModule",
+          "type": "address"
+        }
+      ],
+      "name": "SecurityModuleUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "mailbox",
+      "outputs": [
+        {
+          "internalType": "contract IMailbox",
+          "name": "_mailbox",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_chainId",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_gasLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "quoteMessage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_fee",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "receiver",
+      "outputs": [
+        {
+          "internalType": "contract IMessageReceiver",
+          "name": "_receiver",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_chainId",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_fee",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_gasLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "sendMessage",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_messageId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_feeSpent",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_chainId",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_gasLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "sendMessage",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_messageId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_feeSpent",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_mailbox",
+          "type": "address"
+        }
+      ],
+      "name": "updateMailbox",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_securityModule",
+          "type": "address"
+        }
+      ],
+      "name": "updateSecurityModule",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.4;\n\nimport {IMailbox} from '@hyperlane-xyz/core/contracts/interfaces/IMailbox.sol';\n\nimport {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';\n\ninterface IGateway {\n  /*///////////////////////////////////////////////////////////////\n                              EVENTS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Emitted when the mailbox is updated\n   * @param _oldMailbox The old mailbox address\n   * @param _newMailbox The new mailbox address\n   */\n  event MailboxUpdated(address _oldMailbox, address _newMailbox);\n\n  /**\n   * @notice Emitted when the security module is updated\n   * @param _oldSecurityModule The old security module address\n   * @param _newSecurityModule The new security module address\n   */\n  event SecurityModuleUpdated(address _oldSecurityModule, address _newSecurityModule);\n\n  /*///////////////////////////////////////////////////////////////\n                              ERRORS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Thrown when the message origin is invalid\n   */\n  error Gateway_Handle_InvalidOriginDomain();\n\n  /**\n   * @notice Thrown when the sender is not the appropriate remote Gateway\n   */\n  error Gateway_Handle_InvalidSender();\n\n  /**\n   * @notice Thrown when the caller is not the local mailbox\n   */\n  error Gateway_Handle_NotCalledByMailbox();\n\n  /**\n   * @notice Thrown when the GasTank does not have enough native asset to cover the fee\n   */\n  error Gateway_SendMessage_InsufficientBalance();\n\n  /**\n   * @notice Thrown when the message dispatcher is not the local receiver\n   */\n  error Gateway_SendMessage_UnauthorizedCaller();\n\n  /**\n   * @notice Thrown when the call returning the unused fee fails\n   */\n  error Gateway_SendMessage_UnsuccessfulRebate();\n\n  /**\n   * @notice Thrown when an address equals the address zero\n   */\n  error Gateway_ZeroAddress();\n\n  /*///////////////////////////////////////////////////////////////\n                              LOGIC\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Send a message to the transport layer using the gas tank\n   * @param _chainId The id of the destination chain\n   * @param _message The message to send\n   * @param _fee The fee to send the message\n   * @param _gasLimit The gas limit to use on destination\n   * @return _messageId The id message of the transport layer\n   * @return _feeSpent The fee spent to send the message\n   * @dev only called by the spoke contract\n   */\n  function sendMessage(\n    uint32 _chainId,\n    bytes memory _message,\n    uint256 _fee,\n    uint256 _gasLimit\n  ) external returns (bytes32 _messageId, uint256 _feeSpent);\n\n  /**\n   * @notice Send a message to the transport layer\n   * @param _chainId The id of the destination chain\n   * @param _message The message to send\n   * @param _gasLimit The gas limit to use on destination\n   * @return _messageId The id message of the transport layer\n   * @return _feeSpent The fee spent to send the message\n   * @dev only called by the spoke contract\n   */\n  function sendMessage(\n    uint32 _chainId,\n    bytes memory _message,\n    uint256 _gasLimit\n  ) external payable returns (bytes32 _messageId, uint256 _feeSpent);\n\n  /**\n   * @notice Updates the mailbox\n   * @param _mailbox The new mailbox address\n   * @dev only called by the `receiver`\n   */\n  function updateMailbox(\n    address _mailbox\n  ) external;\n\n  /**\n   * @notice Updates the gateway security module\n   * @param _securityModule The address of the new security module\n   * @dev only called by the `receiver`\n   */\n  function updateSecurityModule(\n    address _securityModule\n  ) external;\n\n  /*///////////////////////////////////////////////////////////////\n                              VIEWS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Returns the transport layer message routing smart contract\n   * @dev this is independent of the transport layer used, adopting mailbox name because its descriptive enough\n   *      using address instead of specific interface to be independent from HL or any other TL\n   * @return _mailbox The mailbox contract\n   */\n  function mailbox() external view returns (IMailbox _mailbox);\n\n  /**\n   * @notice Returns the message receiver for this Gateway (EverclearHub / EverclearSpoke)\n   * @return _receiver The message receiver\n   */\n  function receiver() external view returns (IMessageReceiver _receiver);\n\n  /**\n   * @notice Quotes cost of sending a message to the transport layer\n   * @param _chainId The id of the destination chain\n   * @param _message The message to send\n   * @param _gasLimit The gas limit for delivering the message\n   * @return _fee The fee to send the message\n   */\n  function quoteMessage(uint32 _chainId, bytes memory _message, uint256 _gasLimit) external view returns (uint256 _fee);\n}\n",
+  "sourcePath": "interfaces/common/IGateway.sol",
+  "ast": {
+    "absolutePath": "interfaces/common/IGateway.sol",
+    "exportedSymbols": {
+      "IGateway": [
+        3198
+      ],
+      "IMailbox": [
+        1972
+      ],
+      "IMessageReceiver": [
+        3208
+      ]
+    },
+    "id": 3199,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3090,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".4"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:23"
+      },
+      {
+        "absolutePath": "@hyperlane-xyz/core/contracts/interfaces/IMailbox.sol",
+        "file": "@hyperlane-xyz/core/contracts/interfaces/IMailbox.sol",
+        "id": 3092,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 3199,
+        "sourceUnit": 1973,
+        "src": "57:79:23",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 3091,
+              "name": "IMailbox",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 1972,
+              "src": "65:8:23",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "interfaces/common/IMessageReceiver.sol",
+        "file": "interfaces/common/IMessageReceiver.sol",
+        "id": 3094,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 3199,
+        "sourceUnit": 3209,
+        "src": "138:72:23",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 3093,
+              "name": "IMessageReceiver",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 3208,
+              "src": "146:16:23",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IGateway",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 3198,
+        "linearizedBaseContracts": [
+          3198
+        ],
+        "name": "IGateway",
+        "nameLocation": "222:8:23",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 3095,
+              "nodeType": "StructuredDocumentation",
+              "src": "408:154:23",
+              "text": " @notice Emitted when the mailbox is updated\n @param _oldMailbox The old mailbox address\n @param _newMailbox The new mailbox address"
+            },
+            "eventSelector": "c9f808ed2d4877daa57900b86147cc4d4c05e37ac36bc6d417d387dfc3f3e6a7",
+            "id": 3101,
+            "name": "MailboxUpdated",
+            "nameLocation": "571:14:23",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 3100,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3097,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_oldMailbox",
+                  "nameLocation": "594:11:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3101,
+                  "src": "586:19:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3096,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "586:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3099,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_newMailbox",
+                  "nameLocation": "615:11:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3101,
+                  "src": "607:19:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3098,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "607:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "585:42:23"
+            },
+            "src": "565:63:23"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 3102,
+              "nodeType": "StructuredDocumentation",
+              "src": "632:192:23",
+              "text": " @notice Emitted when the security module is updated\n @param _oldSecurityModule The old security module address\n @param _newSecurityModule The new security module address"
+            },
+            "eventSelector": "9261756417ba2a99d4ba8e96f1e45b7b17e5ebeee305c9d44945ce6f46d73734",
+            "id": 3108,
+            "name": "SecurityModuleUpdated",
+            "nameLocation": "833:21:23",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 3107,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3104,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_oldSecurityModule",
+                  "nameLocation": "863:18:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3108,
+                  "src": "855:26:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3103,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "855:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3106,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_newSecurityModule",
+                  "nameLocation": "891:18:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3108,
+                  "src": "883:26:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3105,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "883:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "854:56:23"
+            },
+            "src": "827:84:23"
+          },
+          {
+            "documentation": {
+              "id": 3109,
+              "nodeType": "StructuredDocumentation",
+              "src": "1088:64:23",
+              "text": " @notice Thrown when the message origin is invalid"
+            },
+            "errorSelector": "4808c181",
+            "id": 3111,
+            "name": "Gateway_Handle_InvalidOriginDomain",
+            "nameLocation": "1161:34:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3110,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1195:2:23"
+            },
+            "src": "1155:43:23"
+          },
+          {
+            "documentation": {
+              "id": 3112,
+              "nodeType": "StructuredDocumentation",
+              "src": "1202:83:23",
+              "text": " @notice Thrown when the sender is not the appropriate remote Gateway"
+            },
+            "errorSelector": "4da19d70",
+            "id": 3114,
+            "name": "Gateway_Handle_InvalidSender",
+            "nameLocation": "1294:28:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3113,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1322:2:23"
+            },
+            "src": "1288:37:23"
+          },
+          {
+            "documentation": {
+              "id": 3115,
+              "nodeType": "StructuredDocumentation",
+              "src": "1329:70:23",
+              "text": " @notice Thrown when the caller is not the local mailbox"
+            },
+            "errorSelector": "4b46abf5",
+            "id": 3117,
+            "name": "Gateway_Handle_NotCalledByMailbox",
+            "nameLocation": "1408:33:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3116,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1441:2:23"
+            },
+            "src": "1402:42:23"
+          },
+          {
+            "documentation": {
+              "id": 3118,
+              "nodeType": "StructuredDocumentation",
+              "src": "1448:97:23",
+              "text": " @notice Thrown when the GasTank does not have enough native asset to cover the fee"
+            },
+            "errorSelector": "e996a600",
+            "id": 3120,
+            "name": "Gateway_SendMessage_InsufficientBalance",
+            "nameLocation": "1554:39:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3119,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1593:2:23"
+            },
+            "src": "1548:48:23"
+          },
+          {
+            "documentation": {
+              "id": 3121,
+              "nodeType": "StructuredDocumentation",
+              "src": "1600:83:23",
+              "text": " @notice Thrown when the message dispatcher is not the local receiver"
+            },
+            "errorSelector": "1d5ae817",
+            "id": 3123,
+            "name": "Gateway_SendMessage_UnauthorizedCaller",
+            "nameLocation": "1692:38:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3122,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1730:2:23"
+            },
+            "src": "1686:47:23"
+          },
+          {
+            "documentation": {
+              "id": 3124,
+              "nodeType": "StructuredDocumentation",
+              "src": "1737:74:23",
+              "text": " @notice Thrown when the call returning the unused fee fails"
+            },
+            "errorSelector": "303a6d6d",
+            "id": 3126,
+            "name": "Gateway_SendMessage_UnsuccessfulRebate",
+            "nameLocation": "1820:38:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3125,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1858:2:23"
+            },
+            "src": "1814:47:23"
+          },
+          {
+            "documentation": {
+              "id": 3127,
+              "nodeType": "StructuredDocumentation",
+              "src": "1865:69:23",
+              "text": " @notice Thrown when an address equals the address zero"
+            },
+            "errorSelector": "a0061556",
+            "id": 3129,
+            "name": "Gateway_ZeroAddress",
+            "nameLocation": "1943:19:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3128,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1962:2:23"
+            },
+            "src": "1937:28:23"
+          },
+          {
+            "documentation": {
+              "id": 3130,
+              "nodeType": "StructuredDocumentation",
+              "src": "2141:439:23",
+              "text": " @notice Send a message to the transport layer using the gas tank\n @param _chainId The id of the destination chain\n @param _message The message to send\n @param _fee The fee to send the message\n @param _gasLimit The gas limit to use on destination\n @return _messageId The id message of the transport layer\n @return _feeSpent The fee spent to send the message\n @dev only called by the spoke contract"
+            },
+            "functionSelector": "04e77a66",
+            "id": 3145,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sendMessage",
+            "nameLocation": "2592:11:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3139,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3132,
+                  "mutability": "mutable",
+                  "name": "_chainId",
+                  "nameLocation": "2616:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2609:15:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3131,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2609:6:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3134,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "2643:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2630:21:23",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3133,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2630:5:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3136,
+                  "mutability": "mutable",
+                  "name": "_fee",
+                  "nameLocation": "2665:4:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2657:12:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3135,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2657:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3138,
+                  "mutability": "mutable",
+                  "name": "_gasLimit",
+                  "nameLocation": "2683:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2675:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3137,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2675:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2603:93:23"
+            },
+            "returnParameters": {
+              "id": 3144,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3141,
+                  "mutability": "mutable",
+                  "name": "_messageId",
+                  "nameLocation": "2723:10:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2715:18:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3140,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2715:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3143,
+                  "mutability": "mutable",
+                  "name": "_feeSpent",
+                  "nameLocation": "2743:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2735:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3142,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2735:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2714:39:23"
+            },
+            "scope": 3198,
+            "src": "2583:171:23",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3146,
+              "nodeType": "StructuredDocumentation",
+              "src": "2758:375:23",
+              "text": " @notice Send a message to the transport layer\n @param _chainId The id of the destination chain\n @param _message The message to send\n @param _gasLimit The gas limit to use on destination\n @return _messageId The id message of the transport layer\n @return _feeSpent The fee spent to send the message\n @dev only called by the spoke contract"
+            },
+            "functionSelector": "3e8c4294",
+            "id": 3159,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sendMessage",
+            "nameLocation": "3145:11:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3153,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3148,
+                  "mutability": "mutable",
+                  "name": "_chainId",
+                  "nameLocation": "3169:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3162:15:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3147,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3162:6:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3150,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "3196:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3183:21:23",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3149,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3183:5:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3152,
+                  "mutability": "mutable",
+                  "name": "_gasLimit",
+                  "nameLocation": "3218:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3210:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3151,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3210:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3156:75:23"
+            },
+            "returnParameters": {
+              "id": 3158,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3155,
+                  "mutability": "mutable",
+                  "name": "_messageId",
+                  "nameLocation": "3266:10:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3258:18:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3154,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3258:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3157,
+                  "mutability": "mutable",
+                  "name": "_feeSpent",
+                  "nameLocation": "3286:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3278:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3156,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3278:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3257:39:23"
+            },
+            "scope": 3198,
+            "src": "3136:161:23",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3160,
+              "nodeType": "StructuredDocumentation",
+              "src": "3301:127:23",
+              "text": " @notice Updates the mailbox\n @param _mailbox The new mailbox address\n @dev only called by the `receiver`"
+            },
+            "functionSelector": "8a901b9f",
+            "id": 3165,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateMailbox",
+            "nameLocation": "3440:13:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3163,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3162,
+                  "mutability": "mutable",
+                  "name": "_mailbox",
+                  "nameLocation": "3467:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3165,
+                  "src": "3459:16:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3161,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3459:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3453:26:23"
+            },
+            "returnParameters": {
+              "id": 3164,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3488:0:23"
+            },
+            "scope": 3198,
+            "src": "3431:58:23",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3166,
+              "nodeType": "StructuredDocumentation",
+              "src": "3493:165:23",
+              "text": " @notice Updates the gateway security module\n @param _securityModule The address of the new security module\n @dev only called by the `receiver`"
+            },
+            "functionSelector": "91a3ef8e",
+            "id": 3171,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateSecurityModule",
+            "nameLocation": "3670:20:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3169,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3168,
+                  "mutability": "mutable",
+                  "name": "_securityModule",
+                  "nameLocation": "3704:15:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3171,
+                  "src": "3696:23:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3167,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3696:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3690:33:23"
+            },
+            "returnParameters": {
+              "id": 3170,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3732:0:23"
+            },
+            "scope": 3198,
+            "src": "3661:72:23",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3172,
+              "nodeType": "StructuredDocumentation",
+              "src": "3909:332:23",
+              "text": " @notice Returns the transport layer message routing smart contract\n @dev this is independent of the transport layer used, adopting mailbox name because its descriptive enough\n      using address instead of specific interface to be independent from HL or any other TL\n @return _mailbox The mailbox contract"
+            },
+            "functionSelector": "d5438eae",
+            "id": 3178,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mailbox",
+            "nameLocation": "4253:7:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3173,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4260:2:23"
+            },
+            "returnParameters": {
+              "id": 3177,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3176,
+                  "mutability": "mutable",
+                  "name": "_mailbox",
+                  "nameLocation": "4295:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3178,
+                  "src": "4286:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IMailbox_$1972",
+                    "typeString": "contract IMailbox"
+                  },
+                  "typeName": {
+                    "id": 3175,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 3174,
+                      "name": "IMailbox",
+                      "nameLocations": [
+                        "4286:8:23"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 1972,
+                      "src": "4286:8:23"
+                    },
+                    "referencedDeclaration": 1972,
+                    "src": "4286:8:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IMailbox_$1972",
+                      "typeString": "contract IMailbox"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4285:19:23"
+            },
+            "scope": 3198,
+            "src": "4244:61:23",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3179,
+              "nodeType": "StructuredDocumentation",
+              "src": "4309:144:23",
+              "text": " @notice Returns the message receiver for this Gateway (EverclearHub / EverclearSpoke)\n @return _receiver The message receiver"
+            },
+            "functionSelector": "f7260d3e",
+            "id": 3185,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "receiver",
+            "nameLocation": "4465:8:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3180,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4473:2:23"
+            },
+            "returnParameters": {
+              "id": 3184,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3183,
+                  "mutability": "mutable",
+                  "name": "_receiver",
+                  "nameLocation": "4516:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3185,
+                  "src": "4499:26:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IMessageReceiver_$3208",
+                    "typeString": "contract IMessageReceiver"
+                  },
+                  "typeName": {
+                    "id": 3182,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 3181,
+                      "name": "IMessageReceiver",
+                      "nameLocations": [
+                        "4499:16:23"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 3208,
+                      "src": "4499:16:23"
+                    },
+                    "referencedDeclaration": 3208,
+                    "src": "4499:16:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IMessageReceiver_$3208",
+                      "typeString": "contract IMessageReceiver"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4498:28:23"
+            },
+            "scope": 3198,
+            "src": "4456:71:23",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3186,
+              "nodeType": "StructuredDocumentation",
+              "src": "4531:281:23",
+              "text": " @notice Quotes cost of sending a message to the transport layer\n @param _chainId The id of the destination chain\n @param _message The message to send\n @param _gasLimit The gas limit for delivering the message\n @return _fee The fee to send the message"
+            },
+            "functionSelector": "0278681b",
+            "id": 3197,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "quoteMessage",
+            "nameLocation": "4824:12:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3193,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3188,
+                  "mutability": "mutable",
+                  "name": "_chainId",
+                  "nameLocation": "4844:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3197,
+                  "src": "4837:15:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3187,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4837:6:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3190,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "4867:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3197,
+                  "src": "4854:21:23",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3189,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4854:5:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3192,
+                  "mutability": "mutable",
+                  "name": "_gasLimit",
+                  "nameLocation": "4885:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3197,
+                  "src": "4877:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3191,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4877:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4836:59:23"
+            },
+            "returnParameters": {
+              "id": 3196,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3195,
+                  "mutability": "mutable",
+                  "name": "_fee",
+                  "nameLocation": "4927:4:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3197,
+                  "src": "4919:12:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3194,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4919:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4918:14:23"
+            },
+            "scope": 3198,
+            "src": "4815:118:23",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3199,
+        "src": "212:4723:23",
+        "usedErrors": [
+          3111,
+          3114,
+          3117,
+          3120,
+          3123,
+          3126,
+          3129
+        ],
+        "usedEvents": [
+          3101,
+          3108
+        ]
+      }
+    ],
+    "src": "32:4904:23"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/common/IGateway.sol",
+    "exportedSymbols": {
+      "IGateway": [
+        3198
+      ],
+      "IMailbox": [
+        1972
+      ],
+      "IMessageReceiver": [
+        3208
+      ]
+    },
+    "id": 3199,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3090,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".4"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:23"
+      },
+      {
+        "absolutePath": "@hyperlane-xyz/core/contracts/interfaces/IMailbox.sol",
+        "file": "@hyperlane-xyz/core/contracts/interfaces/IMailbox.sol",
+        "id": 3092,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 3199,
+        "sourceUnit": 1973,
+        "src": "57:79:23",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 3091,
+              "name": "IMailbox",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 1972,
+              "src": "65:8:23",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "interfaces/common/IMessageReceiver.sol",
+        "file": "interfaces/common/IMessageReceiver.sol",
+        "id": 3094,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 3199,
+        "sourceUnit": 3209,
+        "src": "138:72:23",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 3093,
+              "name": "IMessageReceiver",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 3208,
+              "src": "146:16:23",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IGateway",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 3198,
+        "linearizedBaseContracts": [
+          3198
+        ],
+        "name": "IGateway",
+        "nameLocation": "222:8:23",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 3095,
+              "nodeType": "StructuredDocumentation",
+              "src": "408:154:23",
+              "text": " @notice Emitted when the mailbox is updated\n @param _oldMailbox The old mailbox address\n @param _newMailbox The new mailbox address"
+            },
+            "eventSelector": "c9f808ed2d4877daa57900b86147cc4d4c05e37ac36bc6d417d387dfc3f3e6a7",
+            "id": 3101,
+            "name": "MailboxUpdated",
+            "nameLocation": "571:14:23",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 3100,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3097,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_oldMailbox",
+                  "nameLocation": "594:11:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3101,
+                  "src": "586:19:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3096,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "586:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3099,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_newMailbox",
+                  "nameLocation": "615:11:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3101,
+                  "src": "607:19:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3098,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "607:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "585:42:23"
+            },
+            "src": "565:63:23"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 3102,
+              "nodeType": "StructuredDocumentation",
+              "src": "632:192:23",
+              "text": " @notice Emitted when the security module is updated\n @param _oldSecurityModule The old security module address\n @param _newSecurityModule The new security module address"
+            },
+            "eventSelector": "9261756417ba2a99d4ba8e96f1e45b7b17e5ebeee305c9d44945ce6f46d73734",
+            "id": 3108,
+            "name": "SecurityModuleUpdated",
+            "nameLocation": "833:21:23",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 3107,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3104,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_oldSecurityModule",
+                  "nameLocation": "863:18:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3108,
+                  "src": "855:26:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3103,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "855:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3106,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_newSecurityModule",
+                  "nameLocation": "891:18:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3108,
+                  "src": "883:26:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3105,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "883:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "854:56:23"
+            },
+            "src": "827:84:23"
+          },
+          {
+            "documentation": {
+              "id": 3109,
+              "nodeType": "StructuredDocumentation",
+              "src": "1088:64:23",
+              "text": " @notice Thrown when the message origin is invalid"
+            },
+            "errorSelector": "4808c181",
+            "id": 3111,
+            "name": "Gateway_Handle_InvalidOriginDomain",
+            "nameLocation": "1161:34:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3110,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1195:2:23"
+            },
+            "src": "1155:43:23"
+          },
+          {
+            "documentation": {
+              "id": 3112,
+              "nodeType": "StructuredDocumentation",
+              "src": "1202:83:23",
+              "text": " @notice Thrown when the sender is not the appropriate remote Gateway"
+            },
+            "errorSelector": "4da19d70",
+            "id": 3114,
+            "name": "Gateway_Handle_InvalidSender",
+            "nameLocation": "1294:28:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3113,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1322:2:23"
+            },
+            "src": "1288:37:23"
+          },
+          {
+            "documentation": {
+              "id": 3115,
+              "nodeType": "StructuredDocumentation",
+              "src": "1329:70:23",
+              "text": " @notice Thrown when the caller is not the local mailbox"
+            },
+            "errorSelector": "4b46abf5",
+            "id": 3117,
+            "name": "Gateway_Handle_NotCalledByMailbox",
+            "nameLocation": "1408:33:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3116,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1441:2:23"
+            },
+            "src": "1402:42:23"
+          },
+          {
+            "documentation": {
+              "id": 3118,
+              "nodeType": "StructuredDocumentation",
+              "src": "1448:97:23",
+              "text": " @notice Thrown when the GasTank does not have enough native asset to cover the fee"
+            },
+            "errorSelector": "e996a600",
+            "id": 3120,
+            "name": "Gateway_SendMessage_InsufficientBalance",
+            "nameLocation": "1554:39:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3119,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1593:2:23"
+            },
+            "src": "1548:48:23"
+          },
+          {
+            "documentation": {
+              "id": 3121,
+              "nodeType": "StructuredDocumentation",
+              "src": "1600:83:23",
+              "text": " @notice Thrown when the message dispatcher is not the local receiver"
+            },
+            "errorSelector": "1d5ae817",
+            "id": 3123,
+            "name": "Gateway_SendMessage_UnauthorizedCaller",
+            "nameLocation": "1692:38:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3122,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1730:2:23"
+            },
+            "src": "1686:47:23"
+          },
+          {
+            "documentation": {
+              "id": 3124,
+              "nodeType": "StructuredDocumentation",
+              "src": "1737:74:23",
+              "text": " @notice Thrown when the call returning the unused fee fails"
+            },
+            "errorSelector": "303a6d6d",
+            "id": 3126,
+            "name": "Gateway_SendMessage_UnsuccessfulRebate",
+            "nameLocation": "1820:38:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3125,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1858:2:23"
+            },
+            "src": "1814:47:23"
+          },
+          {
+            "documentation": {
+              "id": 3127,
+              "nodeType": "StructuredDocumentation",
+              "src": "1865:69:23",
+              "text": " @notice Thrown when an address equals the address zero"
+            },
+            "errorSelector": "a0061556",
+            "id": 3129,
+            "name": "Gateway_ZeroAddress",
+            "nameLocation": "1943:19:23",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 3128,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1962:2:23"
+            },
+            "src": "1937:28:23"
+          },
+          {
+            "documentation": {
+              "id": 3130,
+              "nodeType": "StructuredDocumentation",
+              "src": "2141:439:23",
+              "text": " @notice Send a message to the transport layer using the gas tank\n @param _chainId The id of the destination chain\n @param _message The message to send\n @param _fee The fee to send the message\n @param _gasLimit The gas limit to use on destination\n @return _messageId The id message of the transport layer\n @return _feeSpent The fee spent to send the message\n @dev only called by the spoke contract"
+            },
+            "functionSelector": "04e77a66",
+            "id": 3145,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sendMessage",
+            "nameLocation": "2592:11:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3139,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3132,
+                  "mutability": "mutable",
+                  "name": "_chainId",
+                  "nameLocation": "2616:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2609:15:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3131,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2609:6:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3134,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "2643:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2630:21:23",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3133,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2630:5:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3136,
+                  "mutability": "mutable",
+                  "name": "_fee",
+                  "nameLocation": "2665:4:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2657:12:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3135,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2657:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3138,
+                  "mutability": "mutable",
+                  "name": "_gasLimit",
+                  "nameLocation": "2683:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2675:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3137,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2675:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2603:93:23"
+            },
+            "returnParameters": {
+              "id": 3144,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3141,
+                  "mutability": "mutable",
+                  "name": "_messageId",
+                  "nameLocation": "2723:10:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2715:18:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3140,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2715:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3143,
+                  "mutability": "mutable",
+                  "name": "_feeSpent",
+                  "nameLocation": "2743:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3145,
+                  "src": "2735:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3142,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2735:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2714:39:23"
+            },
+            "scope": 3198,
+            "src": "2583:171:23",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3146,
+              "nodeType": "StructuredDocumentation",
+              "src": "2758:375:23",
+              "text": " @notice Send a message to the transport layer\n @param _chainId The id of the destination chain\n @param _message The message to send\n @param _gasLimit The gas limit to use on destination\n @return _messageId The id message of the transport layer\n @return _feeSpent The fee spent to send the message\n @dev only called by the spoke contract"
+            },
+            "functionSelector": "3e8c4294",
+            "id": 3159,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sendMessage",
+            "nameLocation": "3145:11:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3153,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3148,
+                  "mutability": "mutable",
+                  "name": "_chainId",
+                  "nameLocation": "3169:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3162:15:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3147,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3162:6:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3150,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "3196:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3183:21:23",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3149,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3183:5:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3152,
+                  "mutability": "mutable",
+                  "name": "_gasLimit",
+                  "nameLocation": "3218:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3210:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3151,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3210:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3156:75:23"
+            },
+            "returnParameters": {
+              "id": 3158,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3155,
+                  "mutability": "mutable",
+                  "name": "_messageId",
+                  "nameLocation": "3266:10:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3258:18:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 3154,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3258:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3157,
+                  "mutability": "mutable",
+                  "name": "_feeSpent",
+                  "nameLocation": "3286:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3159,
+                  "src": "3278:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3156,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3278:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3257:39:23"
+            },
+            "scope": 3198,
+            "src": "3136:161:23",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3160,
+              "nodeType": "StructuredDocumentation",
+              "src": "3301:127:23",
+              "text": " @notice Updates the mailbox\n @param _mailbox The new mailbox address\n @dev only called by the `receiver`"
+            },
+            "functionSelector": "8a901b9f",
+            "id": 3165,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateMailbox",
+            "nameLocation": "3440:13:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3163,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3162,
+                  "mutability": "mutable",
+                  "name": "_mailbox",
+                  "nameLocation": "3467:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3165,
+                  "src": "3459:16:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3161,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3459:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3453:26:23"
+            },
+            "returnParameters": {
+              "id": 3164,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3488:0:23"
+            },
+            "scope": 3198,
+            "src": "3431:58:23",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3166,
+              "nodeType": "StructuredDocumentation",
+              "src": "3493:165:23",
+              "text": " @notice Updates the gateway security module\n @param _securityModule The address of the new security module\n @dev only called by the `receiver`"
+            },
+            "functionSelector": "91a3ef8e",
+            "id": 3171,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateSecurityModule",
+            "nameLocation": "3670:20:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3169,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3168,
+                  "mutability": "mutable",
+                  "name": "_securityModule",
+                  "nameLocation": "3704:15:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3171,
+                  "src": "3696:23:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3167,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3696:7:23",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3690:33:23"
+            },
+            "returnParameters": {
+              "id": 3170,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3732:0:23"
+            },
+            "scope": 3198,
+            "src": "3661:72:23",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3172,
+              "nodeType": "StructuredDocumentation",
+              "src": "3909:332:23",
+              "text": " @notice Returns the transport layer message routing smart contract\n @dev this is independent of the transport layer used, adopting mailbox name because its descriptive enough\n      using address instead of specific interface to be independent from HL or any other TL\n @return _mailbox The mailbox contract"
+            },
+            "functionSelector": "d5438eae",
+            "id": 3178,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mailbox",
+            "nameLocation": "4253:7:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3173,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4260:2:23"
+            },
+            "returnParameters": {
+              "id": 3177,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3176,
+                  "mutability": "mutable",
+                  "name": "_mailbox",
+                  "nameLocation": "4295:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3178,
+                  "src": "4286:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IMailbox_$1972",
+                    "typeString": "contract IMailbox"
+                  },
+                  "typeName": {
+                    "id": 3175,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 3174,
+                      "name": "IMailbox",
+                      "nameLocations": [
+                        "4286:8:23"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 1972,
+                      "src": "4286:8:23"
+                    },
+                    "referencedDeclaration": 1972,
+                    "src": "4286:8:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IMailbox_$1972",
+                      "typeString": "contract IMailbox"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4285:19:23"
+            },
+            "scope": 3198,
+            "src": "4244:61:23",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3179,
+              "nodeType": "StructuredDocumentation",
+              "src": "4309:144:23",
+              "text": " @notice Returns the message receiver for this Gateway (EverclearHub / EverclearSpoke)\n @return _receiver The message receiver"
+            },
+            "functionSelector": "f7260d3e",
+            "id": 3185,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "receiver",
+            "nameLocation": "4465:8:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3180,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4473:2:23"
+            },
+            "returnParameters": {
+              "id": 3184,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3183,
+                  "mutability": "mutable",
+                  "name": "_receiver",
+                  "nameLocation": "4516:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3185,
+                  "src": "4499:26:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IMessageReceiver_$3208",
+                    "typeString": "contract IMessageReceiver"
+                  },
+                  "typeName": {
+                    "id": 3182,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 3181,
+                      "name": "IMessageReceiver",
+                      "nameLocations": [
+                        "4499:16:23"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 3208,
+                      "src": "4499:16:23"
+                    },
+                    "referencedDeclaration": 3208,
+                    "src": "4499:16:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IMessageReceiver_$3208",
+                      "typeString": "contract IMessageReceiver"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4498:28:23"
+            },
+            "scope": 3198,
+            "src": "4456:71:23",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 3186,
+              "nodeType": "StructuredDocumentation",
+              "src": "4531:281:23",
+              "text": " @notice Quotes cost of sending a message to the transport layer\n @param _chainId The id of the destination chain\n @param _message The message to send\n @param _gasLimit The gas limit for delivering the message\n @return _fee The fee to send the message"
+            },
+            "functionSelector": "0278681b",
+            "id": 3197,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "quoteMessage",
+            "nameLocation": "4824:12:23",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3193,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3188,
+                  "mutability": "mutable",
+                  "name": "_chainId",
+                  "nameLocation": "4844:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3197,
+                  "src": "4837:15:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3187,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4837:6:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3190,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "4867:8:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3197,
+                  "src": "4854:21:23",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3189,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4854:5:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3192,
+                  "mutability": "mutable",
+                  "name": "_gasLimit",
+                  "nameLocation": "4885:9:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3197,
+                  "src": "4877:17:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3191,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4877:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4836:59:23"
+            },
+            "returnParameters": {
+              "id": 3196,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3195,
+                  "mutability": "mutable",
+                  "name": "_fee",
+                  "nameLocation": "4927:4:23",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3197,
+                  "src": "4919:12:23",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3194,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4919:7:23",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4918:14:23"
+            },
+            "scope": 3198,
+            "src": "4815:118:23",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3199,
+        "src": "212:4723:23",
+        "usedErrors": [
+          3111,
+          3114,
+          3117,
+          3120,
+          3123,
+          3126,
+          3129
+        ],
+        "usedEvents": [
+          3101,
+          3108
+        ]
+      }
+    ],
+    "src": "32:4904:23"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-20T14:23:32.537Z"
+}

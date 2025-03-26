@@ -1,0 +1,811 @@
+{
+  "contractName": "IInterchainSecurityModule",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "moduleType",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "_metadata",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        }
+      ],
+      "name": "verify",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT OR Apache-2.0\npragma solidity >=0.6.11;\n\ninterface IInterchainSecurityModule {\n    enum Types {\n        UNUSED,\n        ROUTING,\n        AGGREGATION,\n        LEGACY_MULTISIG,\n        MERKLE_ROOT_MULTISIG,\n        MESSAGE_ID_MULTISIG,\n        NULL, // used with relayer carrying no metadata\n        CCIP_READ\n    }\n\n    /**\n     * @notice Returns an enum that represents the type of security model\n     * encoded by this ISM.\n     * @dev Relayers infer how to fetch and format metadata.\n     */\n    function moduleType() external view returns (uint8);\n\n    /**\n     * @notice Defines a security model responsible for verifying interchain\n     * messages based on the provided metadata.\n     * @param _metadata Off-chain metadata provided by a relayer, specific to\n     * the security model encoded by the module (e.g. validator signatures)\n     * @param _message Hyperlane encoded interchain message\n     * @return True if the message was verified\n     */\n    function verify(\n        bytes calldata _metadata,\n        bytes calldata _message\n    ) external returns (bool);\n}\n\ninterface ISpecifiesInterchainSecurityModule {\n    function interchainSecurityModule()\n        external\n        view\n        returns (IInterchainSecurityModule);\n}\n",
+  "sourcePath": "@hyperlane-xyz/core/contracts/interfaces/IInterchainSecurityModule.sol",
+  "ast": {
+    "absolutePath": "@hyperlane-xyz/core/contracts/interfaces/IInterchainSecurityModule.sol",
+    "exportedSymbols": {
+      "IInterchainSecurityModule": [
+        1798
+      ],
+      "ISpecifiesInterchainSecurityModule": [
+        1805
+      ]
+    },
+    "id": 1806,
+    "license": "MIT OR Apache-2.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1772,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.6",
+          ".11"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "46:25:10"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IInterchainSecurityModule",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1798,
+        "linearizedBaseContracts": [
+          1798
+        ],
+        "name": "IInterchainSecurityModule",
+        "nameLocation": "83:25:10",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IInterchainSecurityModule.Types",
+            "id": 1781,
+            "members": [
+              {
+                "id": 1773,
+                "name": "UNUSED",
+                "nameLocation": "136:6:10",
+                "nodeType": "EnumValue",
+                "src": "136:6:10"
+              },
+              {
+                "id": 1774,
+                "name": "ROUTING",
+                "nameLocation": "152:7:10",
+                "nodeType": "EnumValue",
+                "src": "152:7:10"
+              },
+              {
+                "id": 1775,
+                "name": "AGGREGATION",
+                "nameLocation": "169:11:10",
+                "nodeType": "EnumValue",
+                "src": "169:11:10"
+              },
+              {
+                "id": 1776,
+                "name": "LEGACY_MULTISIG",
+                "nameLocation": "190:15:10",
+                "nodeType": "EnumValue",
+                "src": "190:15:10"
+              },
+              {
+                "id": 1777,
+                "name": "MERKLE_ROOT_MULTISIG",
+                "nameLocation": "215:20:10",
+                "nodeType": "EnumValue",
+                "src": "215:20:10"
+              },
+              {
+                "id": 1778,
+                "name": "MESSAGE_ID_MULTISIG",
+                "nameLocation": "245:19:10",
+                "nodeType": "EnumValue",
+                "src": "245:19:10"
+              },
+              {
+                "id": 1779,
+                "name": "NULL",
+                "nameLocation": "274:4:10",
+                "nodeType": "EnumValue",
+                "src": "274:4:10"
+              },
+              {
+                "id": 1780,
+                "name": "CCIP_READ",
+                "nameLocation": "330:9:10",
+                "nodeType": "EnumValue",
+                "src": "330:9:10"
+              }
+            ],
+            "name": "Types",
+            "nameLocation": "120:5:10",
+            "nodeType": "EnumDefinition",
+            "src": "115:230:10"
+          },
+          {
+            "documentation": {
+              "id": 1782,
+              "nodeType": "StructuredDocumentation",
+              "src": "351:174:10",
+              "text": " @notice Returns an enum that represents the type of security model\n encoded by this ISM.\n @dev Relayers infer how to fetch and format metadata."
+            },
+            "functionSelector": "6465e69f",
+            "id": 1787,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "moduleType",
+            "nameLocation": "539:10:10",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1783,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "549:2:10"
+            },
+            "returnParameters": {
+              "id": 1786,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1785,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1787,
+                  "src": "575:5:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 1784,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "575:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "574:7:10"
+            },
+            "scope": 1798,
+            "src": "530:52:10",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1788,
+              "nodeType": "StructuredDocumentation",
+              "src": "588:398:10",
+              "text": " @notice Defines a security model responsible for verifying interchain\n messages based on the provided metadata.\n @param _metadata Off-chain metadata provided by a relayer, specific to\n the security model encoded by the module (e.g. validator signatures)\n @param _message Hyperlane encoded interchain message\n @return True if the message was verified"
+            },
+            "functionSelector": "f7e83aee",
+            "id": 1797,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "verify",
+            "nameLocation": "1000:6:10",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1793,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1790,
+                  "mutability": "mutable",
+                  "name": "_metadata",
+                  "nameLocation": "1031:9:10",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1797,
+                  "src": "1016:24:10",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 1789,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1016:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1792,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "1065:8:10",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1797,
+                  "src": "1050:23:10",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 1791,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1050:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1006:73:10"
+            },
+            "returnParameters": {
+              "id": 1796,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1795,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1797,
+                  "src": "1098:4:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1794,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1098:4:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1097:6:10"
+            },
+            "scope": 1798,
+            "src": "991:113:10",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1806,
+        "src": "73:1033:10",
+        "usedErrors": [],
+        "usedEvents": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ISpecifiesInterchainSecurityModule",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1805,
+        "linearizedBaseContracts": [
+          1805
+        ],
+        "name": "ISpecifiesInterchainSecurityModule",
+        "nameLocation": "1118:34:10",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "de523cf3",
+            "id": 1804,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "interchainSecurityModule",
+            "nameLocation": "1168:24:10",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1799,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1192:2:10"
+            },
+            "returnParameters": {
+              "id": 1803,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1802,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1804,
+                  "src": "1242:25:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IInterchainSecurityModule_$1798",
+                    "typeString": "contract IInterchainSecurityModule"
+                  },
+                  "typeName": {
+                    "id": 1801,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 1800,
+                      "name": "IInterchainSecurityModule",
+                      "nameLocations": [
+                        "1242:25:10"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 1798,
+                      "src": "1242:25:10"
+                    },
+                    "referencedDeclaration": 1798,
+                    "src": "1242:25:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IInterchainSecurityModule_$1798",
+                      "typeString": "contract IInterchainSecurityModule"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1241:27:10"
+            },
+            "scope": 1805,
+            "src": "1159:110:10",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1806,
+        "src": "1108:163:10",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "46:1226:10"
+  },
+  "legacyAST": {
+    "absolutePath": "@hyperlane-xyz/core/contracts/interfaces/IInterchainSecurityModule.sol",
+    "exportedSymbols": {
+      "IInterchainSecurityModule": [
+        1798
+      ],
+      "ISpecifiesInterchainSecurityModule": [
+        1805
+      ]
+    },
+    "id": 1806,
+    "license": "MIT OR Apache-2.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1772,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.6",
+          ".11"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "46:25:10"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IInterchainSecurityModule",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1798,
+        "linearizedBaseContracts": [
+          1798
+        ],
+        "name": "IInterchainSecurityModule",
+        "nameLocation": "83:25:10",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IInterchainSecurityModule.Types",
+            "id": 1781,
+            "members": [
+              {
+                "id": 1773,
+                "name": "UNUSED",
+                "nameLocation": "136:6:10",
+                "nodeType": "EnumValue",
+                "src": "136:6:10"
+              },
+              {
+                "id": 1774,
+                "name": "ROUTING",
+                "nameLocation": "152:7:10",
+                "nodeType": "EnumValue",
+                "src": "152:7:10"
+              },
+              {
+                "id": 1775,
+                "name": "AGGREGATION",
+                "nameLocation": "169:11:10",
+                "nodeType": "EnumValue",
+                "src": "169:11:10"
+              },
+              {
+                "id": 1776,
+                "name": "LEGACY_MULTISIG",
+                "nameLocation": "190:15:10",
+                "nodeType": "EnumValue",
+                "src": "190:15:10"
+              },
+              {
+                "id": 1777,
+                "name": "MERKLE_ROOT_MULTISIG",
+                "nameLocation": "215:20:10",
+                "nodeType": "EnumValue",
+                "src": "215:20:10"
+              },
+              {
+                "id": 1778,
+                "name": "MESSAGE_ID_MULTISIG",
+                "nameLocation": "245:19:10",
+                "nodeType": "EnumValue",
+                "src": "245:19:10"
+              },
+              {
+                "id": 1779,
+                "name": "NULL",
+                "nameLocation": "274:4:10",
+                "nodeType": "EnumValue",
+                "src": "274:4:10"
+              },
+              {
+                "id": 1780,
+                "name": "CCIP_READ",
+                "nameLocation": "330:9:10",
+                "nodeType": "EnumValue",
+                "src": "330:9:10"
+              }
+            ],
+            "name": "Types",
+            "nameLocation": "120:5:10",
+            "nodeType": "EnumDefinition",
+            "src": "115:230:10"
+          },
+          {
+            "documentation": {
+              "id": 1782,
+              "nodeType": "StructuredDocumentation",
+              "src": "351:174:10",
+              "text": " @notice Returns an enum that represents the type of security model\n encoded by this ISM.\n @dev Relayers infer how to fetch and format metadata."
+            },
+            "functionSelector": "6465e69f",
+            "id": 1787,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "moduleType",
+            "nameLocation": "539:10:10",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1783,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "549:2:10"
+            },
+            "returnParameters": {
+              "id": 1786,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1785,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1787,
+                  "src": "575:5:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 1784,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "575:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "574:7:10"
+            },
+            "scope": 1798,
+            "src": "530:52:10",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1788,
+              "nodeType": "StructuredDocumentation",
+              "src": "588:398:10",
+              "text": " @notice Defines a security model responsible for verifying interchain\n messages based on the provided metadata.\n @param _metadata Off-chain metadata provided by a relayer, specific to\n the security model encoded by the module (e.g. validator signatures)\n @param _message Hyperlane encoded interchain message\n @return True if the message was verified"
+            },
+            "functionSelector": "f7e83aee",
+            "id": 1797,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "verify",
+            "nameLocation": "1000:6:10",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1793,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1790,
+                  "mutability": "mutable",
+                  "name": "_metadata",
+                  "nameLocation": "1031:9:10",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1797,
+                  "src": "1016:24:10",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 1789,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1016:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1792,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "1065:8:10",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1797,
+                  "src": "1050:23:10",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 1791,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1050:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1006:73:10"
+            },
+            "returnParameters": {
+              "id": 1796,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1795,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1797,
+                  "src": "1098:4:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1794,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1098:4:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1097:6:10"
+            },
+            "scope": 1798,
+            "src": "991:113:10",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1806,
+        "src": "73:1033:10",
+        "usedErrors": [],
+        "usedEvents": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ISpecifiesInterchainSecurityModule",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1805,
+        "linearizedBaseContracts": [
+          1805
+        ],
+        "name": "ISpecifiesInterchainSecurityModule",
+        "nameLocation": "1118:34:10",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "de523cf3",
+            "id": 1804,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "interchainSecurityModule",
+            "nameLocation": "1168:24:10",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1799,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1192:2:10"
+            },
+            "returnParameters": {
+              "id": 1803,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1802,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1804,
+                  "src": "1242:25:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IInterchainSecurityModule_$1798",
+                    "typeString": "contract IInterchainSecurityModule"
+                  },
+                  "typeName": {
+                    "id": 1801,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 1800,
+                      "name": "IInterchainSecurityModule",
+                      "nameLocations": [
+                        "1242:25:10"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 1798,
+                      "src": "1242:25:10"
+                    },
+                    "referencedDeclaration": 1798,
+                    "src": "1242:25:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IInterchainSecurityModule_$1798",
+                      "typeString": "contract IInterchainSecurityModule"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1241:27:10"
+            },
+            "scope": 1805,
+            "src": "1159:110:10",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1806,
+        "src": "1108:163:10",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "46:1226:10"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-20T14:23:32.530Z"
+}

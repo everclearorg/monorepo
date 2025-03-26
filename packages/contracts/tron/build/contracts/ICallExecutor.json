@@ -1,0 +1,614 @@
+{
+  "contractName": "ICallExecutor",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_target",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_gas",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_maxCopy",
+          "type": "uint16"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_calldata",
+          "type": "bytes"
+        }
+      ],
+      "name": "excessivelySafeCall",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "_success",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_returnData",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\n/**\n * @title ICallExecutor\n * @notice Interface for the CallExecutor contract, executes calls to external contracts\n */\ninterface ICallExecutor {\n  /**\n   * @notice Safely call a target contract, use when you _really_ really _really_ don't trust the called\n   * contract. This prevents the called contract from causing reversion of the caller in as many ways as we can.\n   * @param _target The address to call\n   * @param _gas The amount of gas to forward to the remote contract\n   * @param _value The value in wei to send to the remote contract\n   * @param _maxCopy The maximum number of bytes of returndata to copy to memory\n   * @param _calldata The data to send to the remote contract\n   * @return _success Whether the call was successful\n   * @return _returnData Returndata as `.call()`. Returndata is capped to `_maxCopy` bytes.\n   */\n  function excessivelySafeCall(\n    address _target,\n    uint256 _gas,\n    uint256 _value,\n    uint16 _maxCopy,\n    bytes memory _calldata\n  ) external returns (bool _success, bytes memory _returnData);\n}\n",
+  "sourcePath": "interfaces/intent/ICallExecutor.sol",
+  "ast": {
+    "absolutePath": "interfaces/intent/ICallExecutor.sol",
+    "exportedSymbols": {
+      "ICallExecutor": [
+        3304
+      ]
+    },
+    "id": 3305,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3284,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:27"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ICallExecutor",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 3285,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:120:27",
+          "text": " @title ICallExecutor\n @notice Interface for the CallExecutor contract, executes calls to external contracts"
+        },
+        "fullyImplemented": false,
+        "id": 3304,
+        "linearizedBaseContracts": [
+          3304
+        ],
+        "name": "ICallExecutor",
+        "nameLocation": "188:13:27",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 3286,
+              "nodeType": "StructuredDocumentation",
+              "src": "206:692:27",
+              "text": " @notice Safely call a target contract, use when you _really_ really _really_ don't trust the called\n contract. This prevents the called contract from causing reversion of the caller in as many ways as we can.\n @param _target The address to call\n @param _gas The amount of gas to forward to the remote contract\n @param _value The value in wei to send to the remote contract\n @param _maxCopy The maximum number of bytes of returndata to copy to memory\n @param _calldata The data to send to the remote contract\n @return _success Whether the call was successful\n @return _returnData Returndata as `.call()`. Returndata is capped to `_maxCopy` bytes."
+            },
+            "functionSelector": "6dc63837",
+            "id": 3303,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "excessivelySafeCall",
+            "nameLocation": "910:19:27",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3297,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3288,
+                  "mutability": "mutable",
+                  "name": "_target",
+                  "nameLocation": "943:7:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "935:15:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3287,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "935:7:27",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3290,
+                  "mutability": "mutable",
+                  "name": "_gas",
+                  "nameLocation": "964:4:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "956:12:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3289,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "956:7:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3292,
+                  "mutability": "mutable",
+                  "name": "_value",
+                  "nameLocation": "982:6:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "974:14:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3291,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "974:7:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3294,
+                  "mutability": "mutable",
+                  "name": "_maxCopy",
+                  "nameLocation": "1001:8:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "994:15:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 3293,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "994:6:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3296,
+                  "mutability": "mutable",
+                  "name": "_calldata",
+                  "nameLocation": "1028:9:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "1015:22:27",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3295,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1015:5:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "929:112:27"
+            },
+            "returnParameters": {
+              "id": 3302,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3299,
+                  "mutability": "mutable",
+                  "name": "_success",
+                  "nameLocation": "1065:8:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "1060:13:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 3298,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1060:4:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3301,
+                  "mutability": "mutable",
+                  "name": "_returnData",
+                  "nameLocation": "1088:11:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "1075:24:27",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3300,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1075:5:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1059:41:27"
+            },
+            "scope": 3304,
+            "src": "901:200:27",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3305,
+        "src": "178:925:27",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:1072:27"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/intent/ICallExecutor.sol",
+    "exportedSymbols": {
+      "ICallExecutor": [
+        3304
+      ]
+    },
+    "id": 3305,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3284,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:27"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ICallExecutor",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 3285,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:120:27",
+          "text": " @title ICallExecutor\n @notice Interface for the CallExecutor contract, executes calls to external contracts"
+        },
+        "fullyImplemented": false,
+        "id": 3304,
+        "linearizedBaseContracts": [
+          3304
+        ],
+        "name": "ICallExecutor",
+        "nameLocation": "188:13:27",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 3286,
+              "nodeType": "StructuredDocumentation",
+              "src": "206:692:27",
+              "text": " @notice Safely call a target contract, use when you _really_ really _really_ don't trust the called\n contract. This prevents the called contract from causing reversion of the caller in as many ways as we can.\n @param _target The address to call\n @param _gas The amount of gas to forward to the remote contract\n @param _value The value in wei to send to the remote contract\n @param _maxCopy The maximum number of bytes of returndata to copy to memory\n @param _calldata The data to send to the remote contract\n @return _success Whether the call was successful\n @return _returnData Returndata as `.call()`. Returndata is capped to `_maxCopy` bytes."
+            },
+            "functionSelector": "6dc63837",
+            "id": 3303,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "excessivelySafeCall",
+            "nameLocation": "910:19:27",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3297,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3288,
+                  "mutability": "mutable",
+                  "name": "_target",
+                  "nameLocation": "943:7:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "935:15:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3287,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "935:7:27",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3290,
+                  "mutability": "mutable",
+                  "name": "_gas",
+                  "nameLocation": "964:4:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "956:12:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3289,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "956:7:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3292,
+                  "mutability": "mutable",
+                  "name": "_value",
+                  "nameLocation": "982:6:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "974:14:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3291,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "974:7:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3294,
+                  "mutability": "mutable",
+                  "name": "_maxCopy",
+                  "nameLocation": "1001:8:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "994:15:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 3293,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "994:6:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3296,
+                  "mutability": "mutable",
+                  "name": "_calldata",
+                  "nameLocation": "1028:9:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "1015:22:27",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3295,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1015:5:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "929:112:27"
+            },
+            "returnParameters": {
+              "id": 3302,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3299,
+                  "mutability": "mutable",
+                  "name": "_success",
+                  "nameLocation": "1065:8:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "1060:13:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 3298,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1060:4:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3301,
+                  "mutability": "mutable",
+                  "name": "_returnData",
+                  "nameLocation": "1088:11:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3303,
+                  "src": "1075:24:27",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3300,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1075:5:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1059:41:27"
+            },
+            "scope": 3304,
+            "src": "901:200:27",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3305,
+        "src": "178:925:27",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:1072:27"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-20T14:23:32.538Z"
+}
