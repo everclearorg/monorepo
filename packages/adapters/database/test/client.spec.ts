@@ -761,15 +761,15 @@ describe('Database Adapter:Client', () => {
   });
 
   describe('#getVotes', () => {
-    it('no data', async () => {
+    beforeEach(async () => {
       await pool.query('DELETE FROM tokenomics.vote_cast');
+    })
+    it('no data', async () => {
       const votes = await getVotes(1, pool);
       expect(votes).to.be.empty;
     });
 
     it('happy case', async () => {
-      await pool.query('DELETE FROM tokenomics.vote_cast');
-
       const saveVotes = async (domain: number, epoch: number, votes: number, index: number) => {
         const uniqueId = mkBytes32(index.toString());
         await pool.query(`INSERT INTO tokenomics.vote_cast (domain, epoch, votes, vid, block, id, block_number, block_timestamp, transaction_hash, _gs_chain, _gs_gid, owner) 
@@ -787,9 +787,9 @@ describe('Database Adapter:Client', () => {
 
       const votes = await getVotes(1, pool);
 
-      expect(votes).to.be.deep.eq([
-        { domain: 421614, votes: "19246" },
+      expect(votes.sort((a, b) => a.domain - b.domain)).to.be.deep.eq([
         { domain: 10, votes: "4690" },
+        { domain: 421614, votes: "19246" },
       ]);
     });
   });
