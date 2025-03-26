@@ -96,19 +96,25 @@ describe('Database Adapter:Client', () => {
       idleTimeoutMillis: 3000,
       allowExitOnIdle: true,
     });
-    await pool.query('CREATE TABLE tokenomics.vote_cast(domain numeric, votes numeric, epoch numeric)');
 
-    await pool.query('CREATE TABLE tokenomics.reward_claimed(block_number numeric, block_timestamp numeric, transaction_hash bytea, insert_timestamp timestamp, latency interval)');
-    await pool.query('CREATE TRIGGER reward_claimed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.reward_claimed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency()');
-    await pool.query('CREATE INDEX reward_claimed_timestamp_idx ON tokenomics.reward_claimed(insert_timestamp)');
-
-    await pool.query('CREATE TABLE tokenomics.new_lock_position(vid bigint, "user" bytea, new_total_amount_locked numeric, block_timestamp numeric, expiry numeric)');
+    await pool.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM pg_trigger WHERE tgname = 'reward_claimed_set_timestamp_and_latency'
+          ) THEN
+            CREATE TRIGGER reward_claimed_set_timestamp_and_latency
+            BEFORE INSERT ON tokenomics.reward_claimed
+            FOR EACH ROW
+            EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
+          END IF;
+        END;
+        $$
+      `)
+    await pool.query('CREATE INDEX IF NOT EXISTS reward_claimed_timestamp_idx ON tokenomics.reward_claimed(insert_timestamp)');
   });
 
   after(async () => {
-    await pool.query('DROP TABLE tokenomics.vote_cast');
-    await pool.query('DROP TABLE tokenomics.reward_claimed');
-    await pool.query('DROP TABLE tokenomics.new_lock_position');
     await pool.end();
   });
 
@@ -755,27 +761,33 @@ describe('Database Adapter:Client', () => {
   });
 
   describe('#getVotes', () => {
+    beforeEach(async () => {
+      await pool.query('DELETE FROM tokenomics.vote_cast');
+    })
     it('no data', async () => {
       const votes = await getVotes(1, pool);
-
       expect(votes).to.be.empty;
     });
 
     it('happy case', async () => {
-      const saveVotes = async (domain: number, epoch: number, votes: number) => {
-        await pool.query(`INSERT INTO tokenomics.vote_cast (domain, epoch, votes) VALUES (${domain}, ${epoch}, ${votes})`);
+      const saveVotes = async (domain: number, epoch: number, votes: number, index: number) => {
+        const uniqueId = mkBytes32(index.toString());
+        await pool.query(`INSERT INTO tokenomics.vote_cast (domain, epoch, votes, vid, block, id, block_number, block_timestamp, transaction_hash, _gs_chain, _gs_gid, owner) 
+          VALUES (${domain}, ${epoch}, ${votes}, ${10}, ${1}, '${uniqueId}', ${1}, ${Date.now()}, '\\x0000000000000000000000000000000000000000000000000000000000000001', 'test', '${uniqueId}', '${uniqueId}')`);
       };
-      await saveVotes(10, 1, 1234);
-      await saveVotes(10, 2, 2345);
-      await saveVotes(10, 1, 3456);
-      await saveVotes(421614, 1, 4567);
-      await saveVotes(421614, 2, 5678);
-      await saveVotes(421614, 1, 6789);
-      await saveVotes(421614, 1, 7890);
+
+      let index = 0;
+      await saveVotes(10, 1, 1234, index++);
+      await saveVotes(10, 2, 2345, index++);
+      await saveVotes(10, 1, 3456, index++);
+      await saveVotes(421614, 1, 4567, index++);
+      await saveVotes(421614, 2, 5678, index++);
+      await saveVotes(421614, 1, 6789, index++);
+      await saveVotes(421614, 1, 7890, index++);
 
       const votes = await getVotes(1, pool);
 
-      expect(votes).to.be.deep.eq([
+      expect(votes.sort((a, b) => a.domain - b.domain)).to.be.deep.eq([
         { domain: 10, votes: "4690" },
         { domain: 421614, votes: "19246" },
       ]);
@@ -783,13 +795,24 @@ describe('Database Adapter:Client', () => {
   });
 
   const saveTokenomicsEvent = async (event: TokenomicsEvent, table: string) => {
+    const uniqueId = `\\x${event.blockNumber.toString(16).padStart(32, '0')}${event.transactionHash.slice(2).padStart(32, '0')}`;
     await pool.query({
-      text: `INSERT INTO tokenomics.${table} (block_number, block_timestamp, transaction_hash) VALUES ($1, $2, $3)`,
-      values: [ event.blockNumber, event.blockTimestamp, Buffer.from(event.transactionHash.slice(2), 'hex') ],
-  });
+      text: `INSERT INTO tokenomics.${table} (vid, block, id, block_number, block_timestamp, transaction_hash, _gs_chain, _gs_gid, token, account, amount, update_count) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+      values: [10, 1, Buffer.from(uniqueId.slice(2), 'hex'),
+        event.blockNumber, event.blockTimestamp, Buffer.from(event.transactionHash.slice(2), 'hex'),
+        'test', uniqueId, Buffer.from('0000000000000000000000000000000000000002', 'hex'),
+        Buffer.from('0000000000000000000000000000000000000003', 'hex'),
+        '1000000000000000000',
+        1
+      ],
+    });
   };
 
   describe('#getTokenomicsEvents', () => {
+    afterEach(async () => {
+      await pool.query('DELETE FROM tokenomics.reward_claimed');
+    })
     it('respects timestamp and limit', async () => {
       const event = createTokenomicsEvent();
       await saveTokenomicsEvent(event, 'reward_claimed');
@@ -804,7 +827,7 @@ describe('Database Adapter:Client', () => {
       event.transactionHash = mkBytes32('0x4');
       await saveTokenomicsEvent(event, 'reward_claimed');
       event.transactionHash = mkBytes32('0x5');
-      event.blockTimestamp = Date.now() / 1000 - 5000;
+      event.blockTimestamp = Math.floor(Date.now() / 1000) - 5000;
       await saveTokenomicsEvent(event, 'reward_claimed');
 
       const events = await getTokenomicsEvents('reward_claimed', from, 2, pool);
@@ -875,11 +898,16 @@ describe('Database Adapter:Client', () => {
   })
 
   describe('#getNewLockPositionEvents', () => {
+    beforeEach(async () => {
+      await pool.query('DELETE from tokenomics.new_lock_position');
+    })
     const saveNewLockPositionEvent = async (event: NewLockPositionEvent) => {
       const user = '\\x000000000000000000000000' + event.user.slice(2)
+      const uniqueId = `\\x${event.vid.toString(16).padStart(32, '0')}${Math.floor(event.blockTimestamp).toString(16).padStart(32, '0')}`;
       await pool.query(`INSERT INTO tokenomics.new_lock_position
-        (vid, "user", new_total_amount_locked, block_timestamp, expiry)
-        VALUES ('${event.vid}', '${user}', '${event.newTotalAmountLocked}', '${event.blockTimestamp}', '${event.expiry}')`);
+        (vid, "user", new_total_amount_locked, block_timestamp, expiry, block, id, block_number, transaction_hash, _gs_chain, _gs_gid, caller, new_vb_balance)
+        VALUES ('${event.vid}', '${user}', '${event.newTotalAmountLocked}', '${event.blockTimestamp}', '${event.expiry}', '${1}', 
+        '${uniqueId}', ${1}, '\\x0000000000000000000000000000000000000000000000000000000000000001', 'test', '${uniqueId}', '${user}', '${event.newTotalAmountLocked}')`);
     };
     const saveNewLockPositionEvents = async (count: number) => {
       let events: NewLockPositionEvent[] = [];
@@ -926,13 +954,13 @@ describe('Database Adapter:Client', () => {
 
       await saveLockPositions('lock_position_test', 1, lockPositions, pool);
       expect(await getLockPositions(undefined, undefined, undefined, pool)).to.be.deep.eq(lockPositions);
-      expect(await getLockPositions(undefined, lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[2], lockPositions[3], lockPositions[4] ]);
-      expect(await getLockPositions(mkAddress(`0x1`), undefined, undefined, pool)).to.be.deep.eq([ lockPositions[1], lockPositions[3] ]);
-      expect(await getLockPositions(mkAddress(`0x1`), lockPositions[2].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[3] ]);
-      expect(await getLockPositions(mkAddress(`0x2`), undefined, undefined, pool)).to.be.deep.eq([ lockPositions[0], lockPositions[2], lockPositions[4] ]);
-      expect(await getLockPositions(mkAddress(`0x2`), lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[2], lockPositions[4] ]);
+      expect(await getLockPositions(undefined, lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([lockPositions[2], lockPositions[3], lockPositions[4]]);
+      expect(await getLockPositions(mkAddress(`0x1`), undefined, undefined, pool)).to.be.deep.eq([lockPositions[1], lockPositions[3]]);
+      expect(await getLockPositions(mkAddress(`0x1`), lockPositions[2].expiry, undefined, pool)).to.be.deep.eq([lockPositions[3]]);
+      expect(await getLockPositions(mkAddress(`0x2`), undefined, undefined, pool)).to.be.deep.eq([lockPositions[0], lockPositions[2], lockPositions[4]]);
+      expect(await getLockPositions(mkAddress(`0x2`), lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([lockPositions[2], lockPositions[4]]);
       expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[2].start, pool)).to.be.deep.eq([]);
-      expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[3].start, pool)).to.be.deep.eq([ lockPositions[2] ]);
+      expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[3].start, pool)).to.be.deep.eq([lockPositions[2]]);
 
 
       lockPositions[0].amountLocked = '0';

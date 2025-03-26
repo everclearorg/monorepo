@@ -21,9 +21,9 @@ import {
   TokenomicsEvent,
   Reward,
   EpochResult,
-  EarlyExitEvent,
   NewLockPositionEvent,
   LockPosition,
+  Order,
 } from '@chimera-monorepo/utils';
 import { toDate } from 'zapatos/db';
 import {
@@ -46,6 +46,7 @@ import {
   epoch_results,
   tokenomics,
   lock_positions,
+  orders,
 } from 'zapatos/schema';
 import { db } from '..';
 
@@ -74,6 +75,11 @@ export function toOriginIntents(originIntent: OriginIntent): origin_intents.Inse
     gas_price: +originIntent.gasPrice,
     tx_origin: originIntent.txOrigin,
     tx_nonce: originIntent.txNonce,
+
+    native_fee: originIntent.nativeFee,
+    token_fee: originIntent.tokenFee,
+    fee_adapter_initiator: originIntent.feeAdapterInitiator,
+    order_id: originIntent.orderId,
   };
 }
 export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): OriginIntent {
@@ -101,6 +107,11 @@ export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): O
     gasPrice: String(originIntent.gas_price),
     txOrigin: originIntent.tx_origin,
     txNonce: +originIntent.tx_nonce,
+
+    nativeFee: originIntent.native_fee ?? undefined,
+    tokenFee: originIntent.token_fee ?? undefined,
+    feeAdapterInitiator: originIntent.fee_adapter_initiator ?? undefined,
+    orderId: originIntent.order_id ?? undefined,
   };
 }
 
@@ -133,6 +144,11 @@ export function originIntentFromIntent(intent: intents.JSONSelectable): OriginIn
     gasPrice: String(intent.origin_gas_price!),
     txOrigin: intent.origin_tx_origin!,
     txNonce: +intent.origin_tx_nonce!,
+
+    nativeFee: intent.origin_native_fee ?? undefined,
+    tokenFee: intent.origin_token_fee ?? undefined,
+    feeAdapterInitiator: intent.origin_fee_adapter_initiator ?? undefined,
+    orderId: intent.origin_order_id ?? undefined,
   };
 }
 
@@ -341,7 +357,12 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       nonce: +invoice.origin_nonce!,
       data: invoice.origin_data ?? '0x',
       ttl: +invoice.origin_ttl!,
-  
+      nativeFee: invoice.origin_native_fee ?? undefined,
+      tokenFee: invoice.origin_token_fee ?? undefined,
+      feeAdapterInitiator: invoice.origin_fee_adapter_initiator ?? undefined,
+      orderId: invoice.origin_order_id ?? undefined,
+
+
       transactionHash: invoice.origin_transaction_hash!,
       timestamp: +invoice.origin_timestamp!,
       blockNumber: +invoice.origin_block_number!,
@@ -634,10 +655,10 @@ export function fromNewLockPositionEvent(newLockPosition: tokenomics.new_lock_po
     vid: +newLockPosition.vid,
     // the database format is in `\\x00000000000000000000000039096a17ba70fe5c1eddb923f940b2e6deae5c3b`
     // cast it to address by ignoring the starting zeros
-    user: '0x'+newLockPosition.user.slice(26),
+    user: '0x' + newLockPosition.user.slice(26),
     // NOTE: zapatos only converts number having precision issues to string, and this allows numbers
     // appear in form of `4.5e+23`, which cannot be directly converted with `toString`
-    newTotalAmountLocked: newLockPosition.new_total_amount_locked.toLocaleString('fullwide',  { useGrouping: false }),
+    newTotalAmountLocked: newLockPosition.new_total_amount_locked.toLocaleString('fullwide', { useGrouping: false }),
     blockTimestamp: +newLockPosition.block_timestamp,
     expiry: +newLockPosition.expiry,
   };
@@ -658,5 +679,41 @@ export function toLockPosition(lockPosition: LockPosition): lock_positions.JSONS
     amount_locked: lockPosition.amountLocked,
     start: +lockPosition.start,
     expiry: +lockPosition.expiry,
+  };
+}
+
+export function toOrders(order: Order): orders.Insertable {
+  return {
+    id: order.id,
+    token_fee: order.tokenFee,
+    native_fee: order.nativeFee,
+    intent_ids: order.intentIds,
+    initiator: order.initiator,
+
+    transaction_hash: order.transactionHash,
+    timestamp: order.timestamp,
+    block_number: order.blockNumber,
+    gas_limit: +order.gasLimit,
+    gas_price: +order.gasPrice,
+    tx_origin: order.txOrigin,
+    tx_nonce: order.txNonce,
+  };
+}
+
+export function fromOrders(order: orders.JSONSelectable): Order {
+  return {
+    id: order.id,
+    autoId: +order.auto_id,
+    tokenFee: order.token_fee ?? undefined,
+    nativeFee: order.native_fee ?? undefined,
+    intentIds: order.intent_ids,
+    initiator: order.initiator,
+    transactionHash: order.transaction_hash,
+    timestamp: +order.timestamp,
+    blockNumber: +order.block_number,
+    gasLimit: String(order.gas_limit),
+    gasPrice: String(order.gas_price),
+    txOrigin: order.tx_origin,
+    txNonce: +order.tx_nonce,
   };
 }

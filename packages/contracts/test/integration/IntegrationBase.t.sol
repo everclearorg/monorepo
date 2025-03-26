@@ -55,7 +55,6 @@ struct HubDeploymentParams {
   address owner;
   address deployer;
   string domain;
-  uint256 forkBlock;
   address mailbox;
   address ISM;
 }
@@ -147,7 +146,7 @@ contract IntegrationBase is TestExtended {
 
   uint256 ETHEREUM_SEPOLIA_FORK_BLOCK = 7_894_090; // ethereum sepolia 11155111
   uint256 BSC_TESTNET_FORK_BLOCK = 132_009_583; // bsc testnet 97 (Arb Sep: 132009583)
-  uint256 HUB_FORK_BLOCK = 8_486_730; // scroll sepolia 534351
+  uint256 HUB_FORK_BLOCK = 8_672_496; // scroll sepolia 534351
 
   uint32 ETHEREUM_SEPOLIA_ID = 11_155_111;
   uint32 BSC_TESTNET_ID = 421_614; // (Arb: 421614, BSC: 97)
@@ -165,7 +164,6 @@ contract IntegrationBase is TestExtended {
       owner: _owner,
       deployer: HUB_DEPLOYER,
       domain: 'scroll-sepolia',
-      forkBlock: HUB_FORK_BLOCK,
       mailbox: address(hubMailbox),
       ISM: hubISM
     });
@@ -435,7 +433,7 @@ contract IntegrationBase is TestExtended {
   function _deployHubContracts(
     HubDeploymentParams memory _params
   ) internal returns (uint256 _forkId, IEverclearHub _hub, HubGateway _gateway) {
-    _forkId = vm.createSelectFork(vm.rpcUrl(_params.domain), _params.forkBlock);
+    _forkId = vm.createSelectFork(vm.rpcUrl(_params.domain));
 
     vm.setNonce(_params.deployer, 0); // set 0
 

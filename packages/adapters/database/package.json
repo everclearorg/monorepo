@@ -27,7 +27,7 @@
     "dependencies": {
         "@chimera-monorepo/utils": "workspace:*",
         "pg": "8.9.0",
-        "zapatos": "6.4.0"
+        "zapatos": "6.5.0"
     },
     "devDependencies": {
         "@types/pg": "8.6.6",

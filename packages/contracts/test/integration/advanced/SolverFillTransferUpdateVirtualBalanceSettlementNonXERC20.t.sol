@@ -45,7 +45,7 @@ contract FillIntent_UpdateVirtualBalanceSettlement_Integration is IntegrationBas
       _origin: ETHEREUM_SEPOLIA_ID,
       _destination: BSC_TESTNET_ID,
       _intentAmount: 100 ether,
-      _ttl: 1 days
+      _ttl: 100 days
     });
 
     _fillIntentAndReceiveInHub(_intentId, _intent, dUSDT, BSC_TESTNET_ID, 100 ether * 1e12, _solver2);
