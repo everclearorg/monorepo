@@ -444,13 +444,17 @@ export const createShadowEvent = (overrides: Partial<ShadowEvent> = {}): ShadowE
   transactionHash: mkBytes32('0x1'),
   transactionIndex: 0,
   transactionLogIndex: 0,
+  timestamp: new Date(),
+  latency: '0',
   ...overrides,
 });
 
-export const createTokenomicsEvent = (overrides: Partial<TokenomicsEvent> = {}): TokenomicsEvent => ({
+export const createTokenomicsEvent = (overrides: Partial<TokenomicsEvent> = {}): TokenomicsEvent & { vid: number } => ({
+  vid: 1,
   blockNumber: 1,
-  blockTimestamp: Date.now() / 1000,
+  blockTimestamp: Math.floor(Date.now() / 1000),
   transactionHash: mkBytes32('0x1'),
+  insertTimestamp: Math.floor(Date.now() / 1000),
   ...overrides,
 });
 
