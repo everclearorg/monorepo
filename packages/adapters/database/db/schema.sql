@@ -4177,6 +4177,13 @@ CREATE INDEX settlementsent_timestamp_idx ON public.settlementsent USING btree (
 
 
 --
+-- Name: reward_claimed_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
+--
+
+CREATE INDEX reward_claimed_timestamp_idx ON tokenomics.reward_claimed USING btree (insert_timestamp);
+
+
+--
 -- Name: destination_intents destination_intent_status_change_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -4279,6 +4286,13 @@ CREATE TRIGGER settlementqueueprocessed_set_timestamp_and_latency BEFORE INSERT 
 --
 
 CREATE TRIGGER settlementsent_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementsent_dac85f08_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+
+
+--
+-- Name: reward_claimed reward_claimed_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
+--
+
+CREATE TRIGGER reward_claimed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.reward_claimed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
 
 
 --
