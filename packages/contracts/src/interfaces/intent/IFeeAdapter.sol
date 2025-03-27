@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IEverclear} from '../common/IEverclear.sol';
-import {IEverclearSpoke} from './IEverclearSpoke.sol';
-import {IPermit2} from 'interfaces/common/IPermit2.sol';
+import { IEverclear } from '../common/IEverclear.sol';
+import { IEverclearSpoke } from './IEverclearSpoke.sol';
+import { IPermit2 } from 'interfaces/common/IPermit2.sol';
 
 interface IFeeAdapter {
   struct OrderParameters {
@@ -25,7 +25,10 @@ interface IFeeAdapter {
    * @param _nativeFee The amount of native token fees paid
    */
   event IntentWithFeesAdded(
-    bytes32 indexed _intentId, bytes32 indexed _initiator, uint256 _tokenFee, uint256 _nativeFee
+    bytes32 indexed _intentId,
+    bytes32 indexed _initiator,
+    uint256 _tokenFee,
+    uint256 _nativeFee
   );
 
   /**
@@ -37,7 +40,11 @@ interface IFeeAdapter {
    * @param _nativeFee The amount of native token fees paid for the order
    */
   event OrderCreated(
-    bytes32 indexed _orderId, bytes32 indexed _initiator, bytes32[] _intentIds, uint256 _tokenFee, uint256 _nativeFee
+    bytes32 indexed _orderId,
+    bytes32 indexed _initiator,
+    bytes32[] _intentIds,
+    uint256 _tokenFee,
+    uint256 _nativeFee
   );
 
   /**
@@ -46,6 +53,13 @@ interface IFeeAdapter {
    * @param _previous The previous fee recipient address
    */
   event FeeRecipientUpdated(address indexed _updated, address indexed _previous);
+
+  /**
+   * @notice Emitted when the fee signer is updated
+   * @param _updated The new fee signer address
+   * @param _previous The previous fee signer address
+   */
+  event FeeSignerUpdated(address indexed _updated, address indexed _previous);
 
   /**
    * @notice Thrown when there are multiple assets included in a single order request.
@@ -69,6 +83,12 @@ interface IFeeAdapter {
    * @return The address that receives fees
    */
   function feeRecipient() external view returns (address);
+
+  /**
+   * @notice Returns the current fee signer address
+   * @return The address whos signature is verified
+   */
+  function feeSigner() external view returns (address);
 
   /**
    * @notice Creates a new intent with fees
@@ -157,9 +177,14 @@ interface IFeeAdapter {
    * @dev Can only be called by the owner of the contract
    * @param _feeRecipient The new address that will receive fees
    */
-  function updateFeeRecipient(
-    address _feeRecipient
-  ) external;
+  function updateFeeRecipient(address _feeRecipient) external;
+
+  /**
+   * @notice Updates the fee signer address
+   * @dev Can only be called by the owner of the contract
+   * @param _feeSigner The new address that will sign for fees
+   */
+  function updateFeeSigner(address _feeSigner) external;
 
   /**
    * @notice Send virtual balance to the original recipient

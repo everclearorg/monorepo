@@ -35,15 +35,25 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   address public feeRecipient;
 
   /// @inheritdoc IFeeAdapter
+  address public feeSigner;
+
+  /// @inheritdoc IFeeAdapter
   IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
 
   ////////////////////
   /// Constructor ////
   ////////////////////
-  constructor(address _spoke, address _feeRecipient, address _xerc20Module, address _owner) Ownable(_owner) {
+  constructor(
+    address _spoke,
+    address _feeRecipient,
+    address _feeSigner,
+    address _xerc20Module,
+    address _owner
+  ) Ownable(_owner) {
     spoke = IEverclearSpoke(_spoke);
     xerc20Module = _xerc20Module;
     _updateFeeRecipient(_feeRecipient);
+    _updateFeeSigner(_feeSigner);
   }
 
   ////////////////////
@@ -53,6 +63,11 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   /// @inheritdoc IFeeAdapter
   function updateFeeRecipient(address _feeRecipient) external onlyOwner {
     _updateFeeRecipient(_feeRecipient);
+  }
+
+  /// @inheritdoc IFeeAdapter
+  function updateFeeSigner(address _feeSigner) external onlyOwner {
+    _updateFeeSigner(_feeSigner);
   }
 
   /// @inheritdoc IFeeAdapter
@@ -145,7 +160,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     // Create `_numIntents` intents with the same params and `_amount` divided
     // equally across all created intents.
     uint256 _toSend = _params.amount / _numIntents;
-    for (uint i; i < _numIntents - 1; i++) {
+    for (uint256 i; i < _numIntents - 1; i++) {
       // Create new intent
       (bytes32 _intentId, ) = spoke.newIntent(
         _params.destinations,
@@ -195,7 +210,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
       // Get the sum of the order amounts
       uint256 _orderSum;
-      for (uint i; i < _numIntents; i++) {
+      for (uint256 i; i < _numIntents; i++) {
         _orderSum += _params[i].amount;
         if (_params[i].inputAsset != _asset) {
           revert MultipleOrderAssets();
@@ -214,7 +229,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
     // Initialising array length
     _intentIds = new bytes32[](_numIntents);
-    for (uint i; i < _numIntents; i++) {
+    for (uint256 i; i < _numIntents; i++) {
       // Create new intent
       (bytes32 _intentId, ) = spoke.newIntent(
         _params[i].destinations,
@@ -298,6 +313,15 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   }
 
   /**
+   * @notice Updates the fee signer
+   * @param _feeSigner New signer
+   */
+  function _updateFeeSigner(address _feeSigner) internal {
+    emit FeeSignerUpdated(_feeSigner, feeSigner);
+    feeSigner = _feeSigner;
+  }
+
+  /**
    * @notice Sends fees to recipient
    * @param _tokenFee Amount in transacting asset to send to recipient
    * @param _nativeFee Amount in native asset to send to recipient
@@ -324,7 +348,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     // Checking if the strategy is default or not
     address spender;
     IEverclear.Strategy _strategy = spoke.strategies(_asset);
-    if(_strategy == IEverclear.Strategy.DEFAULT) spender = address(spoke);
+    if (_strategy == IEverclear.Strategy.DEFAULT) spender = address(spoke);
     else spender = xerc20Module;
 
     // Approve the spoke contract if needed
