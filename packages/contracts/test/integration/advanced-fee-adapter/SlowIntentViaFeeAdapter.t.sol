@@ -1,30 +1,30 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
+import { StdStorage, stdStorage } from 'forge-std/StdStorage.sol';
 
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
+import { ERC20, IXERC20, XERC20 } from 'test/utils/TestXToken.sol';
 
-import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
+import { IInterchainSecurityModule } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 
-import {Vm} from 'forge-std/Vm.sol';
-import {console} from 'forge-std/console.sol';
+import { Vm } from 'forge-std/Vm.sol';
+import { console } from 'forge-std/console.sol';
 
-import {AssetUtils} from 'contracts/common/AssetUtils.sol';
-import {MessageLib} from 'contracts/common/MessageLib.sol';
-import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+import { AssetUtils } from 'contracts/common/AssetUtils.sol';
+import { MessageLib } from 'contracts/common/MessageLib.sol';
+import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 
-import {IEverclear} from 'interfaces/common/IEverclear.sol';
-import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
-import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
+import { IEverclear } from 'interfaces/common/IEverclear.sol';
+import { IEverclearHub } from 'interfaces/hub/IEverclearHub.sol';
+import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
 
-import {ISettler} from 'interfaces/hub/ISettler.sol';
+import { ISettler } from 'interfaces/hub/ISettler.sol';
 
-import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
+import { IntegrationBase } from 'test/integration/IntegrationBase.t.sol';
 
-import {Constants} from 'test/utils/Constants.sol';
+import { Constants } from 'test/utils/Constants.sol';
 
-import {IFeeAdapter} from 'interfaces/intent/IFeeAdapter.sol';
+import { IFeeAdapter } from 'interfaces/intent/IFeeAdapter.sol';
 
 contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
   using stdStorage for StdStorage;
@@ -62,7 +62,15 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     bytes memory _intentCalldata = abi.encode(makeAddr('target'), abi.encodeWithSignature('doSomething()'));
     // creating intent w/ ttl == 0 (slow path intent)
     (_intentId, _intent) = sepoliaFeeAdapter.newIntent(
-      _destA, _user, address(oUSDT), address(dUSDT), 100 ether, Constants.MAX_FEE, 0, _intentCalldata, _tokenFee
+      _destA,
+      _user,
+      address(oUSDT),
+      address(dUSDT),
+      100 ether,
+      Constants.MAX_FEE,
+      0,
+      _intentCalldata,
+      _tokenFee
     );
 
     // create intent message
@@ -71,7 +79,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(oUSDT.balanceOf(sepoliaFeeAdapter.feeRecipient()), _tokenFee);
@@ -133,7 +141,15 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // creating intent w/ ttl == 0 (slow path intent)
     (_intentId, _intent) = bscFeeAdapter.newIntent(
-      _destB, _user2, address(dUSDT), address(oUSDT), 100 ether, Constants.MAX_FEE, 0, '', _tokenFee
+      _destB,
+      _user2,
+      address(dUSDT),
+      address(oUSDT),
+      100 ether,
+      Constants.MAX_FEE,
+      0,
+      '',
+      _tokenFee
     );
 
     // create intent message
@@ -142,7 +158,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    bscEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsB);
+    bscEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsB);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(dUSDT.balanceOf(bscFeeAdapter.feeRecipient()), _tokenFee);
@@ -188,7 +204,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     // process settlement queue
     vm.deal(LIGHTHOUSE, 100 ether);
     vm.prank(LIGHTHOUSE);
-    hub.processSettlementQueue{value: 1 ether}(ETHEREUM_SEPOLIA_ID, 1);
+    hub.processSettlementQueue{ value: 1 ether }(ETHEREUM_SEPOLIA_ID, 1);
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
 
@@ -259,8 +275,16 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint256 _intentAmount = 100 ether;
     bytes memory _intentCalldata = abi.encode(makeAddr('target'), abi.encodeWithSignature('doSomething()'));
     // creating intent w/ ttl == 0 (slow path intent)
-    (_intentId, _intent) = sepoliaFeeAdapter.newIntent{value: _ethFee}(
-      _destA, _user, address(oUSDT), address(dUSDT), _intentAmount, Constants.MAX_FEE, 0, _intentCalldata, 0
+    (_intentId, _intent) = sepoliaFeeAdapter.newIntent{ value: _ethFee }(
+      _destA,
+      _user,
+      address(oUSDT),
+      address(dUSDT),
+      _intentAmount,
+      Constants.MAX_FEE,
+      0,
+      _intentCalldata,
+      0
     );
 
     // create intent message
@@ -269,7 +293,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(sepoliaFeeAdapter.feeRecipient().balance, _ethFee);
@@ -332,8 +356,16 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     vm.prank(_user2);
 
     // creating intent w/ ttl == 0 (slow path intent)
-    (_intentId, _intent) = bscFeeAdapter.newIntent{value: _ethFee}(
-      _destB, _user2, address(dUSDT), address(oUSDT), _intentAmount, Constants.MAX_FEE, 0, '', 0
+    (_intentId, _intent) = bscFeeAdapter.newIntent{ value: _ethFee }(
+      _destB,
+      _user2,
+      address(dUSDT),
+      address(oUSDT),
+      _intentAmount,
+      Constants.MAX_FEE,
+      0,
+      '',
+      0
     );
 
     // create intent message
@@ -342,7 +374,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    bscEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsB);
+    bscEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsB);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(bscFeeAdapter.feeRecipient().balance, _ethFee);
@@ -388,7 +420,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     // process settlement queue
     vm.deal(LIGHTHOUSE, 100 ether);
     vm.prank(LIGHTHOUSE);
-    hub.processSettlementQueue{value: 1 ether}(ETHEREUM_SEPOLIA_ID, 1);
+    hub.processSettlementQueue{ value: 1 ether }(ETHEREUM_SEPOLIA_ID, 1);
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
 
@@ -474,7 +506,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(sepoliaFeeAdapter.feeRecipient()), _feeAmount);
@@ -523,7 +555,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     // process settlement queue
     vm.deal(LIGHTHOUSE, 100 ether);
     vm.prank(LIGHTHOUSE);
-    hub.processSettlementQueue{value: 1 ether}(BSC_TESTNET_ID, 1);
+    hub.processSettlementQueue{ value: 1 ether }(BSC_TESTNET_ID, 1);
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
 
@@ -595,8 +627,16 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     bytes memory _intentCalldata = abi.encode(makeAddr('target'), abi.encodeWithSignature('doSomething()'));
     // creating intent w/ ttl == 0 (slow path intent)
-    (_intentId, _intent) = sepoliaFeeAdapter.newIntent{value: _feeAmount}(
-      _destA, _user, address(sepoliaXToken), address(bscXToken), _intentAmount, Constants.MAX_FEE, 0, _intentCalldata, 0
+    (_intentId, _intent) = sepoliaFeeAdapter.newIntent{ value: _feeAmount }(
+      _destA,
+      _user,
+      address(sepoliaXToken),
+      address(bscXToken),
+      _intentAmount,
+      Constants.MAX_FEE,
+      0,
+      _intentCalldata,
+      0
     );
 
     // create intent message
@@ -605,7 +645,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(sepoliaFeeAdapter.feeRecipient().balance, _feeAmount);
@@ -654,7 +694,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     // process settlement queue
     vm.deal(LIGHTHOUSE, 100 ether);
     vm.prank(LIGHTHOUSE);
-    hub.processSettlementQueue{value: 1 ether}(BSC_TESTNET_ID, 1);
+    hub.processSettlementQueue{ value: 1 ether }(BSC_TESTNET_ID, 1);
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
 
@@ -744,7 +784,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(sepoliaFeeAdapter.feeRecipient()), _feeAmount);
@@ -793,7 +833,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     // process settlement queue
     vm.deal(LIGHTHOUSE, 100 ether);
     vm.prank(LIGHTHOUSE);
-    hub.processSettlementQueue{value: 1 ether}(BSC_TESTNET_ID, 1);
+    hub.processSettlementQueue{ value: 1 ether }(BSC_TESTNET_ID, 1);
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
 
@@ -840,9 +880,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 contract NewOrderSplitEvenly_Integration is IntegrationBase {
   using TypeCasts for address;
 
-  function test_NewOrderSplitEvenly_HappyPath_FeeInTransacting(
-    uint32 _numOfIntents
-  ) public {
+  function test_NewOrderSplitEvenly_HappyPath_FeeInTransacting(uint32 _numOfIntents) public {
     /*///////////////////////////////////////////////////////////////
                           ORIGIN DOMAIN 
   //////////////////////////////////////////////////////////////*/
@@ -891,12 +929,17 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
 
     // create intent message
     IEverclear.Intent[] memory _intentsA = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
-      address(sepoliaFeeAdapter), _nonce, _numOfIntents, sepoliaEverclearSpoke.DOMAIN(), sepoliaEverclearSpoke, _params
+      address(sepoliaFeeAdapter),
+      _nonce,
+      _numOfIntents,
+      sepoliaEverclearSpoke.DOMAIN(),
+      sepoliaEverclearSpoke,
+      _params
     );
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(_intentIds.length, _numOfIntents);
@@ -967,12 +1010,17 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
-      address(sepoliaFeeAdapter), _nonce, _numOfIntents, bscEverclearSpoke.DOMAIN(), bscEverclearSpoke, _params
+      address(sepoliaFeeAdapter),
+      _nonce,
+      _numOfIntents,
+      bscEverclearSpoke.DOMAIN(),
+      bscEverclearSpoke,
+      _params
     );
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    bscEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsB);
+    bscEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsB);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(_intentIds.length, _numOfIntents);
@@ -1020,7 +1068,7 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
       // process settlement queue
       vm.deal(LIGHTHOUSE, 100 ether);
       vm.prank(LIGHTHOUSE);
-      hub.processSettlementQueue{value: 1 ether}(ETHEREUM_SEPOLIA_ID, _numOfIntents);
+      hub.processSettlementQueue{ value: 1 ether }(ETHEREUM_SEPOLIA_ID, _numOfIntents);
     }
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -1062,9 +1110,7 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     assertEq(oUSDT.balanceOf(address(sepoliaEverclearSpoke)), 100 ether - _amountAfterFees);
   }
 
-  function test_NewOrderSplitEvenly_HappyPath_FeeInEth(
-    uint32 _numOfIntents
-  ) public {
+  function test_NewOrderSplitEvenly_HappyPath_FeeInEth(uint32 _numOfIntents) public {
     /*///////////////////////////////////////////////////////////////
                           ORIGIN DOMAIN 
   //////////////////////////////////////////////////////////////*/
@@ -1106,7 +1152,7 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     uint64 _nonce = sepoliaEverclearSpoke.nonce() + 1;
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrderSplitEvenly{value: 1 ether}(
+    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrderSplitEvenly{ value: 1 ether }(
       _numOfIntents,
       0, // token fee
       _params
@@ -1114,12 +1160,17 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
 
     // create intent message
     IEverclear.Intent[] memory _intentsA = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
-      address(sepoliaFeeAdapter), _nonce, _numOfIntents, sepoliaEverclearSpoke.DOMAIN(), sepoliaEverclearSpoke, _params
+      address(sepoliaFeeAdapter),
+      _nonce,
+      _numOfIntents,
+      sepoliaEverclearSpoke.DOMAIN(),
+      sepoliaEverclearSpoke,
+      _params
     );
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(_intentIds.length, _numOfIntents);
@@ -1188,16 +1239,21 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     _params.receiver = _user2;
 
     vm.prank(_user2);
-    (, _intentIds) = bscFeeAdapter.newOrderSplitEvenly{value: 1 ether}(_numOfIntents, 0, _params);
+    (, _intentIds) = bscFeeAdapter.newOrderSplitEvenly{ value: 1 ether }(_numOfIntents, 0, _params);
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
-      address(sepoliaFeeAdapter), _nonce, _numOfIntents, bscEverclearSpoke.DOMAIN(), bscEverclearSpoke, _params
+      address(sepoliaFeeAdapter),
+      _nonce,
+      _numOfIntents,
+      bscEverclearSpoke.DOMAIN(),
+      bscEverclearSpoke,
+      _params
     );
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    bscEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsB);
+    bscEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsB);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(_intentIds.length, _numOfIntents);
@@ -1245,7 +1301,7 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
       // process settlement queue
       vm.deal(LIGHTHOUSE, 100 ether);
       vm.prank(LIGHTHOUSE);
-      hub.processSettlementQueue{value: 1 ether}(ETHEREUM_SEPOLIA_ID, _numOfIntents);
+      hub.processSettlementQueue{ value: 1 ether }(ETHEREUM_SEPOLIA_ID, _numOfIntents);
     }
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -1351,12 +1407,16 @@ contract NewOrder_Integration is IntegrationBase {
 
     // create intent message
     IEverclear.Intent[] memory _intentsA = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
-      address(sepoliaFeeAdapter), _nonce, sepoliaEverclearSpoke.DOMAIN(), sepoliaEverclearSpoke, _params
+      address(sepoliaFeeAdapter),
+      _nonce,
+      sepoliaEverclearSpoke.DOMAIN(),
+      sepoliaEverclearSpoke,
+      _params
     );
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(_intentIds.length, 2);
@@ -1432,7 +1492,11 @@ contract NewOrder_Integration is IntegrationBase {
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
-      address(bscFeeAdapter), _nonce, bscEverclearSpoke.DOMAIN(), bscEverclearSpoke, _params
+      address(bscFeeAdapter),
+      _nonce,
+      bscEverclearSpoke.DOMAIN(),
+      bscEverclearSpoke,
+      _params
     );
 
     // Normalised amounts and calculating expected amountAfter fees
@@ -1442,7 +1506,7 @@ contract NewOrder_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    bscEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsB);
+    bscEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsB);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(_intentIds.length, 2);
@@ -1490,7 +1554,7 @@ contract NewOrder_Integration is IntegrationBase {
       // process settlement queue
       vm.deal(LIGHTHOUSE, 100 ether);
       vm.prank(LIGHTHOUSE);
-      hub.processSettlementQueue{value: 1 ether}(ETHEREUM_SEPOLIA_ID, 2);
+      hub.processSettlementQueue{ value: 1 ether }(ETHEREUM_SEPOLIA_ID, 2);
     }
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -1589,19 +1653,23 @@ contract NewOrder_Integration is IntegrationBase {
     uint64 _nonce = sepoliaEverclearSpoke.nonce() + 1;
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder{value: 1 ether}(
+    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder{ value: 1 ether }(
       0, // token fee
       _params
     );
 
     // create intent message
     IEverclear.Intent[] memory _intentsA = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
-      address(sepoliaFeeAdapter), _nonce, sepoliaEverclearSpoke.DOMAIN(), sepoliaEverclearSpoke, _params
+      address(sepoliaFeeAdapter),
+      _nonce,
+      sepoliaEverclearSpoke.DOMAIN(),
+      sepoliaEverclearSpoke,
+      _params
     );
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsA);
+    sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(_intentIds.length, 2);
@@ -1674,11 +1742,15 @@ contract NewOrder_Integration is IntegrationBase {
     _params[1].receiver = _user2;
 
     vm.prank(_user2);
-    (, _intentIds) = bscFeeAdapter.newOrder{value: 1 ether}(0, _params);
+    (, _intentIds) = bscFeeAdapter.newOrder{ value: 1 ether }(0, _params);
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
-      address(bscFeeAdapter), _nonce, bscEverclearSpoke.DOMAIN(), bscEverclearSpoke, _params
+      address(bscFeeAdapter),
+      _nonce,
+      bscEverclearSpoke.DOMAIN(),
+      bscEverclearSpoke,
+      _params
     );
 
     // Normalised amounts and calculating expected amountAfter fees
@@ -1688,7 +1760,7 @@ contract NewOrder_Integration is IntegrationBase {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    bscEverclearSpoke.processIntentQueue{value: 1 ether}(_intentsB);
+    bscEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsB);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
     assertEq(_intentIds.length, 2);
@@ -1736,7 +1808,7 @@ contract NewOrder_Integration is IntegrationBase {
       // process settlement queue
       vm.deal(LIGHTHOUSE, 100 ether);
       vm.prank(LIGHTHOUSE);
-      hub.processSettlementQueue{value: 1 ether}(ETHEREUM_SEPOLIA_ID, 2);
+      hub.processSettlementQueue{ value: 1 ether }(ETHEREUM_SEPOLIA_ID, 2);
     }
 
     Vm.Log[] memory entries = vm.getRecordedLogs();
