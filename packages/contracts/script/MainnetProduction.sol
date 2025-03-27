@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 
-import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
+import { IMailbox } from '@hyperlane/interfaces/IMailbox.sol';
 
-import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
-import {IHubGateway} from 'interfaces/hub/IHubGateway.sol';
-import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
-import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
-import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
-import {IXERC20Module} from 'interfaces/intent/modules/IXERC20Module.sol';
+import { IEverclearHub } from 'interfaces/hub/IEverclearHub.sol';
+import { IHubGateway } from 'interfaces/hub/IHubGateway.sol';
+import { ICallExecutor } from 'interfaces/intent/ICallExecutor.sol';
+import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
+import { ISpokeGateway } from 'interfaces/intent/ISpokeGateway.sol';
+import { IXERC20Module } from 'interfaces/intent/modules/IXERC20Module.sol';
 
 abstract contract DefaultValues {
   ///////////////////// HUB ARGUMENTS /////////////////////////
@@ -32,6 +32,7 @@ abstract contract DefaultValues {
   address public constant ROUTER = 0xe9Ed3751665930c112cF8e0b278C025A13C041c2;
   address public constant L1_FEE_RECIPIENT = 0xa02a88F0bbD47045001Bd460Ad186C30F9a974d6;
   address public constant L2_FEE_RECIPIENT = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant L2_FEE_SIGNER = address(0); // must be set when configured on API
 }
 
 abstract contract MainnetAssets {
@@ -325,7 +326,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: BNB, blockGasLimit: 120_000_000, gateway: address(BNB_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: BNB, blockGasLimit: 120_000_000, gateway: address(BNB_SPOKE_GATEWAY).toBytes32() })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
@@ -345,7 +346,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32() })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
@@ -357,11 +358,11 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: BLAST, blockGasLimit: 30_000_000, gateway: address(BLAST_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: BLAST, blockGasLimit: 30_000_000, gateway: address(BLAST_SPOKE_GATEWAY).toBytes32() })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: LINEA, blockGasLimit: 24_000_000, gateway: address(LINEA_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: LINEA, blockGasLimit: 24_000_000, gateway: address(LINEA_SPOKE_GATEWAY).toBytes32() })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
@@ -381,11 +382,15 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: SCROLL, blockGasLimit: 10_000_000, gateway: address(SCROLL_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({
+        chainId: SCROLL,
+        blockGasLimit: 10_000_000,
+        gateway: address(SCROLL_SPOKE_GATEWAY).toBytes32()
+      })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: TAIKO, blockGasLimit: 30_000_000, gateway: address(TAIKO_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: TAIKO, blockGasLimit: 30_000_000, gateway: address(TAIKO_SPOKE_GATEWAY).toBytes32() })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
@@ -397,7 +402,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: MODE, blockGasLimit: 30_000_000, gateway: address(MODE_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: MODE, blockGasLimit: 30_000_000, gateway: address(MODE_SPOKE_GATEWAY).toBytes32() })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
@@ -409,11 +414,15 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: ZKSYNC, blockGasLimit: 30_000_000, gateway: address(ZKSYNC_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({
+        chainId: ZKSYNC,
+        blockGasLimit: 30_000_000,
+        gateway: address(ZKSYNC_SPOKE_GATEWAY).toBytes32()
+      })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: RONIN, blockGasLimit: 30_000_000, gateway: address(RONIN_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: RONIN, blockGasLimit: 30_000_000, gateway: address(RONIN_SPOKE_GATEWAY).toBytes32() })
     );
   }
 }
@@ -449,22 +458,23 @@ abstract contract MainnetProductionEnvironment is
    * in the same batch as the `EverclearSpoke`. `discountPerEpoch` is
    * not being used anymore on the Hub as it's now set per asset.
    */
-  IEverclearHub.HubInitializationParams hubParams = IEverclearHub.HubInitializationParams({
-    owner: OWNER,
-    admin: ADMIN,
-    manager: address(0), // to be deployed
-    settler: address(0), // to be deployed
-    handler: address(0), // to be deployed
-    messageReceiver: address(0), // to be deployed
-    lighthouse: LIGHTHOUSE,
-    hubGateway: IHubGateway(address(0)), // to be deployed
-    acceptanceDelay: ACCEPTANCE_DELAY,
-    expiryTimeBuffer: EXPIRY_TIME_BUFFER,
-    epochLength: EPOCH_LENGTH_BLOCKS,
-    discountPerEpoch: 0, // not being used
-    minSolverSupportedDomains: MIN_ROUTER_SUPPORTED_DOMAINS,
-    settlementBaseGasUnits: SETTLEMENT_BASE_GAS_UNITS,
-    averageGasUnitsPerSettlement: AVG_GAS_UNITS_PER_SETTLEMENT,
-    bufferDBPS: BUFFER_DBPS
-  });
+  IEverclearHub.HubInitializationParams hubParams =
+    IEverclearHub.HubInitializationParams({
+      owner: OWNER,
+      admin: ADMIN,
+      manager: address(0), // to be deployed
+      settler: address(0), // to be deployed
+      handler: address(0), // to be deployed
+      messageReceiver: address(0), // to be deployed
+      lighthouse: LIGHTHOUSE,
+      hubGateway: IHubGateway(address(0)), // to be deployed
+      acceptanceDelay: ACCEPTANCE_DELAY,
+      expiryTimeBuffer: EXPIRY_TIME_BUFFER,
+      epochLength: EPOCH_LENGTH_BLOCKS,
+      discountPerEpoch: 0, // not being used
+      minSolverSupportedDomains: MIN_ROUTER_SUPPORTED_DOMAINS,
+      settlementBaseGasUnits: SETTLEMENT_BASE_GAS_UNITS,
+      averageGasUnitsPerSettlement: AVG_GAS_UNITS_PER_SETTLEMENT,
+      bufferDBPS: BUFFER_DBPS
+    });
 }
