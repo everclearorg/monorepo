@@ -278,10 +278,9 @@ fn handle_settlement<'info>(
     // 3) Normalise the settlement amount
     let minted_decimals = mint_account.decimals;
     let amount = normalize_decimals(
-        // TODO: type check this amount properly for edge cases
         settlement.amount.low_u64(),
-        minted_decimals,
         DEFAULT_NORMALIZED_DECIMALS,
+        minted_decimals,
     )?;
     if amount == 0 {
         return Ok(None);
