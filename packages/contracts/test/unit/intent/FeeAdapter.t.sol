@@ -40,7 +40,7 @@ contract BaseTest is TestExtended {
     vm.deal(USER, 1000 ether);
   }
 
-  function getRecipientBalance(address _asset) public returns (uint256 balance) {
+  function getRecipientBalance(address _asset) public view returns (uint256 balance) {
     balance = _asset == address(0) ? FEE_RECIPIENT.balance : IERC20(_asset).balanceOf(FEE_RECIPIENT);
   }
 
@@ -187,9 +187,12 @@ contract Unit_NewIntent is BaseTest {
     uint32[] memory _destinations = new uint32[](1);
     _destinations[0] = 1;
 
+    // Generate empty fee params
+    IFeeAdapter.FeeParams memory _feeParams;
+
     vm.expectRevert(abi.encodeWithSelector(IERC20Errors.ERC20InsufficientBalance.selector, USER, _amount / 2, _amount));
     vm.prank(USER);
-    adapter.newIntent(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', 0, 0, hex'');
+    adapter.newIntent(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
   }
 
   function test_Revert_NewIntent_InsufficientAllowance(uint256 _amount) public {
@@ -202,11 +205,14 @@ contract Unit_NewIntent is BaseTest {
     uint32[] memory _destinations = new uint32[](1);
     _destinations[0] = 1;
 
+    // Generate empty fee params
+    IFeeAdapter.FeeParams memory _feeParams;
+
     vm.expectRevert(
       abi.encodeWithSelector(IERC20Errors.ERC20InsufficientAllowance.selector, address(adapter), 0, _amount)
     );
     vm.prank(USER);
-    adapter.newIntent(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', 0, 0, hex'');
+    adapter.newIntent(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
   }
 
   function test_NewIntent_FeeInNative_ERC20(uint256 _amount, uint256 _fee, uint32 _destination) public {
@@ -234,10 +240,9 @@ contract Unit_NewIntent is BaseTest {
     _destinations[0] = _destination;
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(0, _fee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _feeParams.deadline));
 
     vm.expectEmit();
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), 0, _fee);
@@ -252,9 +257,7 @@ contract Unit_NewIntent is BaseTest {
       0,
       0,
       hex'',
-      0,
-      _deadline,
-      _sig
+      _feeParams
     );
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
@@ -285,10 +288,10 @@ contract Unit_NewIntent is BaseTest {
     _destinations[0] = _destination;
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_fee, 0, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = _fee;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, inputAsset, _feeParams.deadline));
 
     vm.expectEmit();
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), _fee, 0);
@@ -303,9 +306,7 @@ contract Unit_NewIntent is BaseTest {
       0,
       0,
       hex'',
-      _fee,
-      _deadline,
-      _sig
+      _feeParams
     );
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
@@ -343,10 +344,10 @@ contract Unit_NewIntent is BaseTest {
       _destinations[0] = _destination;
 
       // generate signature
-      uint256 _deadline = block.timestamp + 3 days;
-      bytes32 _digest = keccak256(abi.encode(_nativeFee, _fee, inputAsset, _deadline)).toEthSignedMessageHash();
-      (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-      bytes memory _sig = abi.encodePacked(_r, _s, _v);
+      IFeeAdapter.FeeParams memory _feeParams;
+      _feeParams.fee = _fee;
+      _feeParams.deadline = block.timestamp + 3 days;
+      _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_feeParams.fee, _nativeFee, inputAsset, _feeParams.deadline));
 
       vm.expectEmit();
       emit IFeeAdapter.IntentWithFeesAdded(bytes32(uint256(1)), USER.toBytes32(), _fee, _nativeFee);
@@ -361,9 +362,7 @@ contract Unit_NewIntent is BaseTest {
         0,
         0,
         hex'',
-        _fee,
-        _deadline,
-        _sig
+        _feeParams
       );
       assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
       assertEq(_returnedId, bytes32(uint256(1)), 'returned id != id');
@@ -408,10 +407,9 @@ contract Unit_NewIntent is BaseTest {
     _destinations[0] = _destination;
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(0, _fee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _feeParams.deadline));
 
     vm.expectEmit();
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), 0, _fee);
@@ -429,9 +427,7 @@ contract Unit_NewIntent is BaseTest {
       0,
       0,
       hex'',
-      0,
-      _deadline,
-      _sig
+      _feeParams
     );
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
@@ -450,7 +446,6 @@ contract Unit_NewIntent is BaseTest {
     inputAsset = deployAndDeal(USER, _amount).toAddress();
 
     // Approve amount to adapter using permit2
-    IEverclearSpoke.Permit2Params memory _permit2Params;
     vm.mockCall(Constants.PERMIT2, abi.encodeWithSelector(IPermit2.permitTransferFrom.selector), abi.encode(true));
     deal(inputAsset, address(adapter), _amount);
 
@@ -465,33 +460,35 @@ contract Unit_NewIntent is BaseTest {
     _destinations[0] = _destination;
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(0, _fee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _feeParams.deadline));
 
     vm.expectEmit();
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), 0, _fee);
 
     vm.prank(USER);
-    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{ value: _fee }(
+    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = _newIntentPermit2(_destinations, inputAsset, _amount, _feeParams, _fee);
+    assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
+    assertEq(_returnedId, _intentId, 'returned id != id');
+    assertEq(adapter.feeRecipient().balance, _fee, 'recipient didnt get fee');
+    assertEq(address(adapter).balance, 0, 'adapter balance nonzero');
+  }
+
+  function _newIntentPermit2(uint32[] memory _destinations, address _inputAsset, uint256 _amount,  IFeeAdapter.FeeParams memory _feeParams, uint256 _fee) internal returns (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) {
+    IEverclearSpoke.Permit2Params memory _permit2Params;
+    (_returnedId, _returnedIntent) = adapter.newIntent{ value: _fee }(
       _destinations,
       USER,
-      inputAsset,
+      _inputAsset,
       address(0),
       _amount,
       0,
       0,
       hex'',
       _permit2Params,
-      0,
-      _deadline,
-      _sig
+      _feeParams
     );
-    assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
-    assertEq(_returnedId, _intentId, 'returned id != id');
-    assertEq(adapter.feeRecipient().balance, _fee, 'recipient didnt get fee');
-    assertEq(address(adapter).balance, 0, 'adapter balance nonzero');
   }
 
   function test_NewIntent_FeeInTransacting_XERC20(uint256 _amountWithFee, uint32 _destination) public {
@@ -517,10 +514,9 @@ contract Unit_NewIntent is BaseTest {
     _destinations[0] = _destination;
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(0, _fee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _feeParams.deadline));
 
     vm.expectEmit();
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), _fee, 0);
@@ -535,9 +531,7 @@ contract Unit_NewIntent is BaseTest {
       0,
       0,
       hex'',
-      _fee,
-      _deadline,
-      _sig
+      _feeParams
     );
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
@@ -575,10 +569,9 @@ contract Unit_NewIntent is BaseTest {
     _destinations[0] = _destination;
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(0, _fee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _feeParams.deadline)); 
 
     vm.expectEmit();
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), 0, _fee);
@@ -596,9 +589,7 @@ contract Unit_NewIntent is BaseTest {
       0,
       0,
       hex'',
-      0,
-      _deadline,
-      _sig
+      _feeParams
     );
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
@@ -657,9 +648,7 @@ contract Unit_NewOrderSplitEvenly is BaseTest {
 
     // generate signature
     uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_fee, 0, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    bytes memory _sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_fee, 0, inputAsset, _deadline));
 
     // Sending the order
     vm.prank(USER);
@@ -721,9 +710,7 @@ contract Unit_NewOrderSplitEvenly is BaseTest {
 
     // generate signature
     uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(0, _fee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    bytes memory _sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _deadline));
 
     // Sending the order
     vm.prank(USER);
@@ -788,9 +775,7 @@ contract Unit_NewOrderSplitEvenly is BaseTest {
 
     // generate signature
     uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_fee, _ethFee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    bytes memory _sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_fee, _ethFee, inputAsset, _deadline));
 
     // Sending the order
     vm.prank(USER);
@@ -826,9 +811,7 @@ contract Unit_NewOrder is BaseTest {
 
     // generate signature
     uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_fee, 0, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    bytes memory _sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_fee, 0, inputAsset, _deadline));
 
     vm.expectRevert(abi.encodeWithSelector(IFeeAdapter.MultipleOrderAssets.selector));
     vm.prank(USER);
@@ -882,9 +865,7 @@ contract Unit_NewOrder is BaseTest {
 
     // generate signature
     uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_fee, 0, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    bytes memory _sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_fee, 0, inputAsset, _deadline));
 
     // Sending the order
     vm.prank(USER);
@@ -940,9 +921,7 @@ contract Unit_NewOrder is BaseTest {
 
     // generate signature
     uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(0, _fee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    bytes memory _sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _deadline));
 
     // Sending the order
     vm.prank(USER);
@@ -1007,9 +986,7 @@ contract Unit_NewOrder is BaseTest {
 
     // generate signature
     uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_fee, _ethFee, inputAsset, _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(FEE_SIGNER_PK, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    bytes memory _sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_fee, _ethFee, inputAsset, _deadline));
 
     // Sending the order
     vm.prank(USER);

@@ -887,37 +887,37 @@ contract IntegrationBase is TestExtended {
     uint256 _tokenFee,
     uint256 _ethFee
   ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
-    SpokeChainValues memory _chainValues = spokeChainValues[_origin];
-
     /*///////////////////////////////////////////////////////////////
                             ORIGIN DOMAIN 
   //////////////////////////////////////////////////////////////*/
 
     // select origin fork
-    vm.selectFork(_chainValues.fork);
+    vm.selectFork(spokeChainValues[_origin].fork);
 
     // deal to lighthouse
     vm.deal(LIGHTHOUSE, 100 ether);
     // deal origin usdt to user
     deal(address(_assetOrigin), _user, _intentAmount + _tokenFee);
-    // deal the user the ethFee if needed
+    // deal the _user the ethFee if needed
     vm.deal(_user, _ethFee);
 
     // approve tokens
     vm.prank(_user);
-    _assetOrigin.approve(address(_chainValues.feeAdapter), type(uint256).max);
+    _assetOrigin.approve(address(spokeChainValues[_origin].feeAdapter), type(uint256).max);
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_tokenFee, _ethFee, address(_assetOrigin), _deadline))
-      .toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = _tokenFee;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(
+      _feeSignerPk,
+      abi.encode(_tokenFee, _ethFee, address(_assetOrigin), _feeParams.deadline)
+    );
 
     // create new intent
     vm.prank(_user);
 
-    (_intentId, _intent) = _chainValues.feeAdapter.newIntent{ value: _ethFee }(
+    (_intentId, _intent) = spokeChainValues[_origin].feeAdapter.newIntent{ value: _ethFee }(
       _destinations,
       _user,
       address(_assetOrigin),
@@ -926,9 +926,7 @@ contract IntegrationBase is TestExtended {
       Constants.MAX_FEE,
       _ttl,
       hex'00',
-      _tokenFee,
-      _deadline,
-      _sig
+      _feeParams
     );
 
     // create intent message
@@ -937,7 +935,7 @@ contract IntegrationBase is TestExtended {
 
     // process intent queue
     vm.prank(LIGHTHOUSE);
-    _chainValues.spoke.processIntentQueue{ value: 1 ether }(_intentsA);
+    spokeChainValues[_origin].spoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     /*///////////////////////////////////////////////////////////////
                             EVERCLEAR DOMAIN 
@@ -946,12 +944,13 @@ contract IntegrationBase is TestExtended {
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
 
+    bytes32 spokeGateway = address(spokeChainValues[_origin].gateway).toBytes32();
     bytes memory _intentMessageBody = MessageLib.formatIntentMessageBatch(_intentsA);
     bytes memory _intentMessage = _formatHLMessage(
       3,
       1337,
       _origin,
-      address(_chainValues.gateway).toBytes32(),
+      spokeGateway,
       HUB_CHAIN_ID,
       address(hubGateway).toBytes32(),
       _intentMessageBody
@@ -1168,7 +1167,7 @@ contract IntegrationBase is TestExtended {
     uint32 _domain,
     IEverclearSpoke _spoke,
     IFeeAdapter.OrderParameters memory _params
-  ) internal returns (IEverclear.Intent[] memory) {
+  ) internal view returns (IEverclear.Intent[] memory) {
     // Calculating the normalised amount
     uint256 _toSend = _params.amount / _numOfIntents;
     uint256 _toSendNormalised = AssetUtils.normalizeDecimals(
@@ -1236,7 +1235,7 @@ contract IntegrationBase is TestExtended {
     uint32 _domain,
     IEverclearSpoke _spoke,
     IFeeAdapter.OrderParameters[] memory _params
-  ) internal returns (IEverclear.Intent[] memory) {
+  ) internal view returns (IEverclear.Intent[] memory) {
     // Initialising the intent and updating
     IEverclear.Intent[] memory _intents = new IEverclear.Intent[](_params.length);
     for (uint256 i = 0; i < _params.length; i++) {
@@ -1274,14 +1273,14 @@ contract IntegrationBase is TestExtended {
     return _intents;
   }
 
-  function _normaliseAmount(uint256 _amount, address _asset) internal returns (uint256) {
+  function _normaliseAmount(uint256 _amount, address _asset) internal view returns (uint256) {
     return AssetUtils.normalizeDecimals(ERC20(_asset).decimals(), Constants.DEFAULT_NORMALIZED_DECIMALS, _amount);
   }
 
   function _calculateAmountAfterFeesForMultipleIntents(
     uint256[] memory _normalizedAmounts,
     address _outputAsset
-  ) internal returns (uint256 _amountAfterFees) {
+  ) internal view returns (uint256 _amountAfterFees) {
     for (uint256 i; i < _normalizedAmounts.length; i++) {
       uint256 _amountFeesApplied = _normalizedAmounts[i] -
         ((totalProtocolFees * _normalizedAmounts[i]) / Constants.DBPS_DENOMINATOR);
@@ -1296,7 +1295,7 @@ contract IntegrationBase is TestExtended {
   function _calculateAmountAfterFeesForIntentArray(
     IEverclear.Intent[] memory _intents,
     address _outputAsset
-  ) internal returns (uint256 _amountAfterFees) {
+  ) internal view returns (uint256 _amountAfterFees) {
     for (uint256 i; i < _intents.length; i++) {
       uint256 _amountFeesApplied = _intents[i].amount -
         ((totalProtocolFees * _intents[i].amount) / Constants.DBPS_DENOMINATOR);
@@ -1306,5 +1305,9 @@ contract IntegrationBase is TestExtended {
         _amountFeesApplied
       );
     }
+  }
+
+  function _calculateFee(uint256 _intentAmount, uint256 _totalProtocolFees) internal pure returns (uint256) {
+    return _intentAmount - ((_totalProtocolFees * _intentAmount) / Constants.DBPS_DENOMINATOR);
   }
 }

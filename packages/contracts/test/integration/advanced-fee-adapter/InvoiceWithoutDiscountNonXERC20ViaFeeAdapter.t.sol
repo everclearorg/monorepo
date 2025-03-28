@@ -53,9 +53,6 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
-
     // deliver the settlement message to SEPOLIA
     _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
@@ -122,9 +119,6 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
 
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
     _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
@@ -193,9 +187,6 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
-
     // deliver the settlement message to SEPOLIA
     _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
@@ -262,9 +253,6 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
 
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
     _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
@@ -335,9 +323,6 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
 
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
     _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
@@ -410,9 +395,6 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
 
     // process settlement messages for sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
     _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});

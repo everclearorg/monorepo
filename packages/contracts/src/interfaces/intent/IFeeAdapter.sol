@@ -17,6 +17,12 @@ interface IFeeAdapter {
     bytes data;
   }
 
+  struct FeeParams {
+    uint256 fee;
+    uint256 deadline;
+    bytes sig;
+  }
+
   /**
    * @notice Emitted when a new intent is created with fees
    * @param _intentId The ID of the created intent
@@ -110,7 +116,7 @@ interface IFeeAdapter {
    * @param _maxFee Maximum fee percentage allowed for the intent
    * @param _ttl Time-to-live for the intent in seconds
    * @param _data Additional data for the intent
-   * @param _fee Token fee amount to be sent to the fee recipient
+   * @param _feeParams Fee parameters including fee amount, deadline, and signature
    * @return _intentId The ID of the created intent
    * @return _intent The created intent object
    */
@@ -123,9 +129,7 @@ interface IFeeAdapter {
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
-    uint256 _fee,
-    uint256 _deadline,
-    bytes calldata _sig
+    FeeParams calldata _feeParams
   ) external payable returns (bytes32, IEverclear.Intent memory);
 
   /**
@@ -139,8 +143,8 @@ interface IFeeAdapter {
    * @param _maxFee Maximum fee percentage allowed for the intent
    * @param _ttl Time-to-live for the intent in seconds
    * @param _data Additional data for the intent
-   * @param _fee Token fee amount to be sent to the fee recipient
    * @param _permit2Params Signed Permit2 payload, with adapter as spender
+   * @param _feeParams Token fee amount to be sent to the fee recipient
    * @return _intentId The ID of the created intent
    * @return _intent The created intent object
    */
@@ -154,9 +158,7 @@ interface IFeeAdapter {
     uint48 _ttl,
     bytes calldata _data,
     IEverclearSpoke.Permit2Params calldata _permit2Params,
-    uint256 _fee,
-    uint256 _deadline,
-    bytes calldata _sig
+    FeeParams calldata _feeParams
   ) external payable returns (bytes32, IEverclear.Intent memory);
 
   /**

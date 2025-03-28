@@ -11,6 +11,7 @@ import { MessageLib } from 'contracts/common/MessageLib.sol';
 import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 
 import { IEverclear } from 'interfaces/common/IEverclear.sol';
+import {IFeeAdapter} from 'interfaces/intent/IFeeAdapter.sol';
 
 import { IntegrationBase } from 'test/integration/IntegrationBase.t.sol';
 
@@ -55,11 +56,10 @@ contract Intent_Integration is IntegrationBase {
     _dest[0] = BSC_TESTNET_ID;
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_tokenFee, 0, address(_unsupportedToken), _deadline))
-      .toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = _tokenFee;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(_feeSignerPk, abi.encode(_feeParams.fee, 0, address(_unsupportedToken), _feeParams.deadline));
 
     // create new intent
     vm.prank(_user);
@@ -73,9 +73,7 @@ contract Intent_Integration is IntegrationBase {
       Constants.MAX_FEE,
       uint48(1 days),
       '',
-      _tokenFee,
-      _deadline,
-      _sig
+      _feeParams
     );
 
     // create intent message
@@ -207,10 +205,10 @@ contract Intent_Integration is IntegrationBase {
     _destA[0] = 422;
 
     // generate signature
-    uint256 _deadline = block.timestamp + 3 days;
-    bytes32 _digest = keccak256(abi.encode(_feeAmount, 0, address(sepoliaXToken), _deadline)).toEthSignedMessageHash();
-    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
-    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = _feeAmount;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig = _generateSignature(_feeSignerPk, abi.encode(_feeParams.fee, 0, address(sepoliaXToken), _feeParams.deadline));
 
     // create new intent
     vm.prank(_user);
@@ -226,9 +224,7 @@ contract Intent_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       _intentCalldata,
-      _feeAmount,
-      _deadline,
-      _sig
+      _feeParams
     );
 
     // create intent message

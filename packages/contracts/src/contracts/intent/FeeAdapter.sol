@@ -93,12 +93,10 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
-    uint256 _fee,
-    uint256 _deadline,
-    bytes calldata _sig
+    IFeeAdapter.FeeParams calldata _feeParams
   ) external payable returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     // Transfer from caller
-    _pullTokens(msg.sender, _inputAsset, _amount + _fee);
+    _pullTokens(msg.sender, _inputAsset, _amount + _feeParams.fee);
 
     // Create intent
     (_intentId, _intent) = _newIntent(
@@ -110,9 +108,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
       _maxFee,
       _ttl,
       _data,
-      _fee,
-      _deadline,
-      _sig
+      _feeParams
     );
   }
 
@@ -127,13 +123,11 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     uint48 _ttl,
     bytes calldata _data,
     IEverclearSpoke.Permit2Params calldata _permit2Params,
-    uint256 _fee,
-    uint256 _deadline,
-    bytes calldata _sig
+    IFeeAdapter.FeeParams calldata _feeParams
   ) external payable returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     // Transfer from caller using permit2
     {
-      _pullWithPermit2(_inputAsset, _amount + _fee, _permit2Params);
+      _pullWithPermit2(_inputAsset, _amount + _feeParams.fee, _permit2Params);
     }
 
     // Call internal helper to create intent
@@ -146,9 +140,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
       _maxFee,
       _ttl,
       _data,
-      _fee,
-      _deadline,
-      _sig
+      _feeParams
     );
   }
 
@@ -288,7 +280,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @param _maxFee Maximum fee in basis points that can be charged
    * @param _ttl Time-to-live for the intent
    * @param _data Additional data for the intent
-   * @param _fee Fee amount to be sent to the fee recipient
+   * @param _feeParams Fee parameters including fee amount, deadline, and signature
    * @return _intentId The ID of the created intent
    * @return _intent The created intent object
    */
@@ -301,12 +293,10 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
-    uint256 _fee,
-    uint256 _deadline,
-    bytes calldata _sig
+    IFeeAdapter.FeeParams calldata _feeParams
   ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     // Send fees to recipient
-    _handleFees(_fee, msg.value, _inputAsset, _deadline, _sig);
+    _handleFees(_feeParams.fee, msg.value, _inputAsset, _feeParams.deadline, _feeParams.sig);
 
     // Approve the spoke contract if needed
     _approveSpokeIfNeeded(_inputAsset, _amount);
@@ -324,7 +314,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     );
 
     // Emit event
-    emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _fee, msg.value);
+    emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _feeParams.fee, msg.value);
     return (_intentId, _intent);
   }
 
@@ -351,7 +341,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @param _data The data of the message
    * @param _signature The signature of the message
    */
-  function _verifySignature(bytes memory _data, bytes calldata _signature) internal {
+  function _verifySignature(bytes memory _data, bytes calldata _signature) internal view {
     bytes32 _hash = keccak256(_data);
     address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
     if (_recoveredSigner != feeSigner) {

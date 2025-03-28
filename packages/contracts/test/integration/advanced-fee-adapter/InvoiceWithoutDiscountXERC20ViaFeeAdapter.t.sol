@@ -42,9 +42,6 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     // In hub process deposits and invoices and the first intent is settled
     _processDepositsAndInvoices(keccak256('TXT'));
 
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
-
     // process settlement messages for bsc
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
@@ -99,9 +96,6 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     // In hub process deposits and invoices and the first intent is settled
     _processDepositsAndInvoices(keccak256('TXT'));
 
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
-
     // process settlement messages for bsc
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
 
@@ -147,9 +141,6 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
 
     // In hub process deposits and invoices and the first intent is settled
     _processDepositsAndInvoices(keccak256('TXT'));
-
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // process settlement messages for bsc
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);
@@ -206,9 +197,6 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
 
     // In hub process deposits and invoices and the first intent is settled
     _processDepositsAndInvoices(keccak256('TXT'));
-
-    uint256 _amountAfterFees =
-      _smallestIntentAmount - ((_smallestIntentAmount * totalProtocolFees) / Common.DBPS_DENOMINATOR);
 
     // process settlement messages for bsc
     bytes memory _settlementMessageBodyBsc = _processSettlementQueue(BSC_TESTNET_ID, 1);

@@ -1,36 +1,35 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {TestERC20} from './TestERC20.sol';
-import {Mocker} from './mocks/Mocker.sol';
-import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
+import { TestERC20 } from './TestERC20.sol';
+import { Mocker } from './mocks/Mocker.sol';
+import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import { MessageHashUtils } from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 
-import {TypeCasts} from 'contracts/common/TypeCasts.sol';
-import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
-import {VmSafe} from 'forge-std/Vm.sol';
+import { TypeCasts } from 'contracts/common/TypeCasts.sol';
+import { StdStorage, stdStorage } from 'forge-std/StdStorage.sol';
+import { VmSafe } from 'forge-std/Vm.sol';
 
-import {Mocker} from './mocks/Mocker.sol';
+import { Mocker } from './mocks/Mocker.sol';
 
-import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import { IEverclear } from 'interfaces/common/IEverclear.sol';
+
+import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 contract TestExtended is Mocker {
   using TypeCasts for address;
   using TypeCasts for bytes32;
+  using MessageHashUtils for bytes32;
 
   uint256 public constant BLOCK_TIME = 12 seconds;
   uint256 public constant MAX_FUZZED_ARRAY_LENGTH = 10;
 
-  modifier validAddress(
-    address _address
-  ) {
+  modifier validAddress(address _address) {
     vm.assume(_address != address(0));
     _;
   }
 
-  modifier nonContract(
-    address _address
-  ) {
+  modifier nonContract(address _address) {
     uint32 size;
     assembly {
       size := extcodesize(_address)
@@ -48,16 +47,12 @@ contract TestExtended is Mocker {
     _mineBlocks(1);
   }
 
-  function _mineBlocks(
-    uint256 _blocks
-  ) internal {
+  function _mineBlocks(uint256 _blocks) internal {
     vm.warp(block.timestamp + _blocks * BLOCK_TIME);
     vm.roll(block.number + _blocks);
   }
 
-  function _expectEmit(
-    address _contract
-  ) internal {
+  function _expectEmit(address _contract) internal {
     vm.expectEmit(true, true, true, true, _contract);
   }
 
@@ -130,5 +125,11 @@ contract TestExtended is Mocker {
 
     _intent.destinations = _destinations;
     return _intent;
+  }
+
+  function _generateSignature(uint256 _feeSignerPk, bytes memory _data) internal pure returns (bytes memory) {
+    bytes32 _digest = keccak256(_data).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    return abi.encodePacked(_r, _s, _v);
   }
 }
