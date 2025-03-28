@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { Ownable, Ownable2Step } from '@openzeppelin/contracts/access/Ownable2Step.sol';
-import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import { SafeERC20 } from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import { Address } from '@openzeppelin/contracts/utils/Address.sol';
-import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-import { MessageHashUtils } from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
+import {Ownable, Ownable2Step} from '@openzeppelin/contracts/access/Ownable2Step.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+import {Address} from '@openzeppelin/contracts/utils/Address.sol';
+import {ECDSA} from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 
-import { TypeCasts } from 'contracts/common/TypeCasts.sol';
+import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
-import { IEverclear } from 'interfaces/common/IEverclear.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
 
-import { IPermit2 } from 'interfaces/common/IPermit2.sol';
-import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
-import { IEverclearSpokeV3 } from 'interfaces/intent/IEverclearSpokeV3.sol';
-import { IFeeAdapter } from 'interfaces/intent/IFeeAdapter.sol';
+import {IPermit2} from 'interfaces/common/IPermit2.sol';
+import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
+import {IEverclearSpokeV3} from 'interfaces/intent/IEverclearSpokeV3.sol';
+import {IFeeAdapter} from 'interfaces/intent/IFeeAdapter.sol';
 
 contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
@@ -65,12 +65,16 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
 
   /// @inheritdoc IFeeAdapter
-  function updateFeeRecipient(address _feeRecipient) external onlyOwner {
+  function updateFeeRecipient(
+    address _feeRecipient
+  ) external onlyOwner {
     _updateFeeRecipient(_feeRecipient);
   }
 
   /// @inheritdoc IFeeAdapter
-  function updateFeeSigner(address _feeSigner) external onlyOwner {
+  function updateFeeSigner(
+    address _feeSigner
+  ) external onlyOwner {
     _updateFeeSigner(_feeSigner);
   }
 
@@ -100,20 +104,11 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _pullTokens(msg.sender, _inputAsset, _amount + _feeParams.fee);
 
     // Create intent
-    (_intentId, _intent) = _newIntent(
-      _destinations,
-      _receiver,
-      _inputAsset,
-      _outputAsset,
-      _amount,
-      _maxFee,
-      _ttl,
-      _data,
-      _feeParams
-    );
+    (_intentId, _intent) =
+      _newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data, _feeParams);
   }
 
-   /// @inheritdoc IFeeAdapter
+  /// @inheritdoc IFeeAdapter
   function newIntent(
     uint32[] memory _destinations,
     address _receiver,
@@ -129,17 +124,8 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _pullTokens(msg.sender, _inputAsset, _amount + _feeParams.fee);
 
     // Create intent
-    (_intentId, _intent) = _newIntent(
-      _destinations,
-      _receiver,
-      _inputAsset,
-      _outputAsset,
-      _amount,
-      _maxFee,
-      _ttl,
-      _data,
-      _feeParams
-    );
+    (_intentId, _intent) =
+      _newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data, _feeParams);
   }
 
   /// @inheritdoc IFeeAdapter
@@ -159,17 +145,8 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _pullWithPermit2(_inputAsset, _amount + _feeParams.fee, _permit2Params);
 
     // Call internal helper to create intent
-    (_intentId, _intent) = _newIntent(
-      _destinations,
-      _receiver,
-      _inputAsset,
-      _outputAsset,
-      _amount,
-      _maxFee,
-      _ttl,
-      _data,
-      _feeParams
-    );
+    (_intentId, _intent) =
+      _newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data, _feeParams);
   }
 
   /// @inheritdoc IFeeAdapter
@@ -198,7 +175,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
     for (uint256 i; i < _numIntents - 1; i++) {
       // Create new intent
-      (bytes32 _intentId, ) = spoke.newIntent(
+      (bytes32 _intentId,) = spoke.newIntent(
         _params.destinations,
         _params.receiver,
         _params.inputAsset,
@@ -213,7 +190,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
     // Create a final intent here with the remainder of balance
     _toSend = _toSend * (_numIntents - 1);
-    (bytes32 _intentId, ) = spoke.newIntent(
+    (bytes32 _intentId,) = spoke.newIntent(
       _params.destinations,
       _params.receiver,
       _params.inputAsset,
@@ -270,7 +247,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _intentIds = new bytes32[](_numIntents);
     for (uint256 i; i < _numIntents; i++) {
       // Create new intent
-      (bytes32 _intentId, ) = spoke.newIntent(
+      (bytes32 _intentId,) = spoke.newIntent(
         _params[i].destinations,
         _params[i].receiver,
         _params[i].inputAsset,
@@ -326,23 +303,15 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _approveSpokeIfNeeded(_inputAsset, _amount);
 
     // Create new intent
-    (_intentId, _intent) = spoke.newIntent(
-      _destinations,
-      _receiver,
-      _inputAsset,
-      _outputAsset,
-      _amount,
-      _maxFee,
-      _ttl,
-      _data
-    );
+    (_intentId, _intent) =
+      spoke.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data);
 
     // Emit event
     emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _feeParams.fee, msg.value);
     return (_intentId, _intent);
   }
 
-   /**
+  /**
    * @notice Internal function to create a new intent
    * @param _destinations Array of destination chain IDs
    * @param _receiver Address of the receiver on the destination chain
@@ -374,16 +343,8 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _approveSpokeIfNeeded(_inputAsset, _amount);
 
     // Create new intent
-    (_intentId, _intent) = spoke.newIntent(
-      _destinations,
-      _receiver,
-      _inputAsset,
-      _outputAsset,
-      _amount,
-      _maxFee,
-      _ttl,
-      _data
-    );
+    (_intentId, _intent) =
+      spoke.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data);
 
     // Emit event
     emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _feeParams.fee, msg.value);
@@ -394,7 +355,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @notice Updates the fee recipient
    * @param _feeRecipient New recipient
    */
-  function _updateFeeRecipient(address _feeRecipient) internal {
+  function _updateFeeRecipient(
+    address _feeRecipient
+  ) internal {
     emit FeeRecipientUpdated(_feeRecipient, feeRecipient);
     feeRecipient = _feeRecipient;
   }
@@ -403,7 +366,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @notice Updates the fee signer
    * @param _feeSigner New signer
    */
-  function _updateFeeSigner(address _feeSigner) internal {
+  function _updateFeeSigner(
+    address _feeSigner
+  ) internal {
     emit FeeSignerUpdated(_feeSigner, feeSigner);
     feeSigner = _feeSigner;
   }
@@ -496,11 +461,11 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     // Transfer from caller using permit2
     PERMIT2.permitTransferFrom(
       IPermit2.PermitTransferFrom({
-        permitted: IPermit2.TokenPermissions({ token: IERC20(_asset), amount: _amount }),
+        permitted: IPermit2.TokenPermissions({token: IERC20(_asset), amount: _amount}),
         nonce: _permit2Params.nonce,
         deadline: _permit2Params.deadline
       }),
-      IPermit2.SignatureTransferDetails({ to: address(this), requestedAmount: _amount }),
+      IPermit2.SignatureTransferDetails({to: address(this), requestedAmount: _amount}),
       msg.sender,
       _permit2Params.signature
     );

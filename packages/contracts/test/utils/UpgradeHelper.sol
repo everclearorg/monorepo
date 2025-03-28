@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { EverclearSpoke, IEverclearSpoke } from 'contracts/intent/EverclearSpoke.sol';
-import { EverclearSpokeV3, IEverclearSpokeV3 } from 'contracts/intent/EverclearSpokeV3.sol';
-import { IEverclear } from 'interfaces/common/IEverclear.sol';
-import { SafeTxBuilder } from 'test/utils/SafeTxBuilder.sol';
+import {EverclearSpoke, IEverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
+import {EverclearSpokeV3, IEverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import {SafeTxBuilder} from 'test/utils/SafeTxBuilder.sol';
 
 interface ICREATE3 {
   function deploy(bytes32 _salt, bytes calldata _creationCode) external payable returns (address _deployed);
@@ -14,11 +14,7 @@ contract UpgradeHelper is SafeTxBuilder {
   event IntentQueueProcessed(bytes32 indexed _messageId, uint256 _firstIdx, uint256 _lastIdx, uint256 _quote);
   event FillQueueProcessed(bytes32 indexed _messageId, uint256 _firstIdx, uint256 _lastIdx, uint256 _quote);
   event IntentExecuted(
-    bytes32 indexed _intentId,
-    address indexed _executor,
-    address _asset,
-    uint256 _amount,
-    uint24 _fee
+    bytes32 indexed _intentId, address indexed _executor, address _asset, uint256 _amount, uint24 _fee
   );
 
   struct FillIntentParams {
@@ -125,6 +121,7 @@ contract UpgradeHelper is SafeTxBuilder {
     state.nonce = spokeProxy.nonce();
     state.messageGasLimit = spokeProxy.messageGasLimit();
   }
+
   function _cacheSpokeStateV3() internal view returns (CachedSpokeState memory state) {
     state.permit = address(spokeProxyV3.PERMIT2());
     state.EVERCLEAR = spokeProxyV3.EVERCLEAR();

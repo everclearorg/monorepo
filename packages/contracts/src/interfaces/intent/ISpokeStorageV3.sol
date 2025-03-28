@@ -178,7 +178,7 @@ interface ISpokeStorageV3 is IEverclear {
    */
   error EverclearSpoke_Pause_NotAuthorized();
 
-    /**
+  /**
    * @notice Thrown when the caller is not authorized to pause the spoke
    */
   error EverclearSpoke_FeeAdapter_NotAuthorized();
@@ -254,8 +254,8 @@ interface ISpokeStorageV3 is IEverclear {
   function callExecutor() external view returns (ICallExecutor _callExecutor);
 
   /**
-  * @notice returns the fee adapter
-  * @return _feeAdapter The address of the fee adapter
+   * @notice returns the fee adapter
+   * @return _feeAdapter The address of the fee adapter
    */
   function feeAdapter() external view returns (address _feeAdapter);
 
