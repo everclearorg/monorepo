@@ -29,6 +29,7 @@ pub struct WithdrawnEvent {
 #[event]
 pub struct IntentAddedEvent {
     pub intent_id: [u8; 32],
+    pub message_id: [u8; 32],
     pub initiator: Pubkey,
     pub receiver: Pubkey,
     pub input_asset: Pubkey,
@@ -36,6 +37,7 @@ pub struct IntentAddedEvent {
     pub normalized_amount: u64,
     pub max_fee: u32,
     pub origin_domain: u32,
+    pub nonce: u64,
     pub ttl: u64,
     pub timestamp: u64,
     pub destinations: Vec<u32>,
@@ -101,6 +103,7 @@ pub struct SettledEvent {
     pub recipient: Pubkey,
     pub asset: Pubkey,
     pub amount: u64,
+    pub domain: u32,
 }
 
 #[event]

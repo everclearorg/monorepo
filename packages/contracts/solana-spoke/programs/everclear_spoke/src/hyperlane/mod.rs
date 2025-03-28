@@ -346,7 +346,7 @@ pub struct TransferRemoteContext<'info> {
     pub inner_igp_account: Option<AccountInfo<'info>>, // or handle how you want to handle this
 }
 
-pub fn transfer_remote(ctx: Context<TransferRemoteContext>, xfer: TransferRemote) -> Result<()> {
+pub fn transfer_remote(ctx: Context<TransferRemoteContext>, xfer: TransferRemote) -> Result<H256> {
     let program_id = ctx.program_id;
 
     // Account 0: System program.
@@ -480,7 +480,7 @@ pub fn transfer_remote(ctx: Context<TransferRemoteContext>, xfer: TransferRemote
         igp_payment_accounts;
 
     // Dispatch the message and pay for gas.
-    dispatch_with_gas(
+    let message_id = dispatch_with_gas(
         program_id,
         dispatch_authority_seeds,
         xfer.destination_domain,
@@ -501,5 +501,5 @@ pub fn transfer_remote(ctx: Context<TransferRemoteContext>, xfer: TransferRemote
         xfer.recipient
     );
 
-    Ok(())
+    Ok(message_id)
 }

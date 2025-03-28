@@ -164,11 +164,12 @@ pub fn new_intent(
     );
 
     // 3) Use `transfer_ctx` safely
-    transfer_remote(transfer_ctx, xfer)?;
+    let message_id = transfer_remote(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
     emit_cpi!(IntentAddedEvent {
         intent_id,
+        message_id: message_id.into(),
         initiator: ctx.accounts.authority.key(),
         receiver,
         input_asset,
@@ -176,6 +177,7 @@ pub fn new_intent(
         normalized_amount,
         max_fee,
         origin_domain: state.domain,
+        nonce: new_nonce,
         ttl,
         timestamp: clock.unix_timestamp as u64,
         destinations,

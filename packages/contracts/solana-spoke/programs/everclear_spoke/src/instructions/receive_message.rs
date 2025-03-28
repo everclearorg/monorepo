@@ -240,6 +240,7 @@ fn handle_batch_settlement<'info>(
             spoke_state,
             &batch.settlements[i],
             vault_authority_bump,
+            spoke_state.domain,
         )?;
         if let Some(event) = res {
             emit_cpi!(event)
@@ -257,6 +258,7 @@ fn handle_settlement<'info>(
     spoke_state: &mut Account<SpokeState>,
     settlement: &Settlement,
     vault_authority_bump: u8,
+    domain: u32,
 ) -> Result<Option<SettledEvent>> {
     // 1) Check if already settled
     let current_status = spoke_state
@@ -305,6 +307,7 @@ fn handle_settlement<'info>(
         recipient: settlement.recipient,
         asset: settlement.asset,
         amount,
+        domain,
     }))
 }
 
