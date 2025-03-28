@@ -160,6 +160,9 @@ contract Unit_ReturnUnsupportedIntent is BaseTest {
   }
 
   function test_ReturnUnsupportedIntent_FeeAdapter(address _asset, uint256 _amount, address _receiver) public {
+    vm.assume(_asset != address(0));
+    vm.assume(_asset != address(vm));
+
     mockReturnUnsupportedIntent(_asset, _amount);
     mockTransferCall(_asset, _receiver, _amount);
 
@@ -515,8 +518,9 @@ contract Unit_NewIntent is BaseTest {
 
     // generate signature
     IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = _fee; 
     _feeParams.deadline = block.timestamp + 3 days;
-    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _feeParams.deadline));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_fee, 0, inputAsset, _feeParams.deadline));
 
     vm.expectEmit();
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), _fee, 0);

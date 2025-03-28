@@ -144,7 +144,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     _feeParams.deadline = block.timestamp + 3 days;
     _feeParams.sig = _generateSignature(
       _feeSignerPk,
-      abi.encode(_feeParams.fee, 0, address(oUSDT), _feeParams.deadline)
+      abi.encode(_feeParams.fee, 0, address(dUSDT), _feeParams.deadline)
     );
 
     // create new intent
@@ -282,6 +282,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // generate signature
     IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = 0;
     _feeParams.deadline = block.timestamp + 3 days;
     _feeParams.sig = _generateSignature(_feeSignerPk, abi.encode(0, _ethFee, address(oUSDT), _feeParams.deadline));
 
@@ -370,7 +371,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // generate signature
     _feeParams.deadline = block.timestamp + 3 days;
-    _feeParams.sig = _generateSignature(_feeSignerPk, abi.encode(0, _ethFee, address(oUSDT), _feeParams.deadline));
+    _feeParams.sig = _generateSignature(_feeSignerPk, abi.encode(0, _ethFee, address(dUSDT), _feeParams.deadline));
 
     // create new intent
     vm.prank(_user2);
@@ -803,6 +804,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     // generate signature
     IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = _feeAmount;
     _feeParams.deadline = block.timestamp + 3 days;
     bytes32 _digest = keccak256(abi.encode(_feeParams.fee, 0, address(sepoliaXToken), _feeParams.deadline))
       .toEthSignedMessageHash();
@@ -835,7 +837,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     sepoliaEverclearSpoke.processIntentQueue{ value: 1 ether }(_intentsA);
 
     // asserting the fee was sent to the adapter recipient and spoke balances are updated
-    assertEq(ERC20(address(sepoliaXToken)).balanceOf(sepoliaFeeAdapter.feeRecipient()), _feeAmount);
+    assertEq(ERC20(address(sepoliaXToken)).balanceOf(sepoliaFeeAdapter.feeRecipient()), _feeAmount, 'FeeRecipient Sepolia balance incorrect');
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(address(sepoliaEverclearSpoke)), 0);
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(_user), 110 ether - _intentAmount - _feeAmount);
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(address(sepoliaFeeAdapter)), 0);
@@ -923,7 +925,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     vm.prank(makeAddr('caller'));
     bscMailbox.process(bytes(''), _settlementMessageFormatted);
 
-    assertEq(ERC20(address(bscXToken)).balanceOf(_user), _amountAfterFees);
+    assertEq(ERC20(address(bscXToken)).balanceOf(_user), _amountAfterFees, 'Amount after fees incorrect');
   }
 }
 
@@ -1592,6 +1594,12 @@ contract NewOrder_Integration is IntegrationBase {
     assertEq(dUSDT.balanceOf(_user2), 0);
     assertEq(dUSDT.balanceOf(address(bscFeeAdapter)), 0);
 
+    /*///////////////////////////////////////////////////////////////
+                          ORIGIN DOMAIN 
+  //////////////////////////////////////////////////////////////*/
+    // switch to everclear fork
+    vm.selectFork(ETHEREUM_SEPOLIA_FORK);
+
     // Calculating the amountAfter fees
     uint256 _amountAfterFees = _calculateAmountAfterFeesForMultipleIntents(_normalisedAmounts, address(oUSDT));
     uint256 _spokeBalance = _intentSum - _amountAfterFees;
@@ -1728,7 +1736,7 @@ contract NewOrder_Integration is IntegrationBase {
 
     // generate signature
     uint256 _deadline = block.timestamp + 3 days;
-    bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(0, 1 ether, address(dUSDT), _deadline));
+    bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(0, 1 ether, address(oUSDT), _deadline));
 
     vm.prank(_user);
     (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder{ value: 1 ether }(
@@ -1852,6 +1860,12 @@ contract NewOrder_Integration is IntegrationBase {
     assertEq(dUSDT.balanceOf(address(bscEverclearSpoke)), _intentSum);
     assertEq(dUSDT.balanceOf(_user2), 0);
     assertEq(dUSDT.balanceOf(address(bscFeeAdapter)), 0);
+
+    /*///////////////////////////////////////////////////////////////
+                          ORIGIN DOMAIN 
+  //////////////////////////////////////////////////////////////*/
+    // switch to everclear fork
+    vm.selectFork(ETHEREUM_SEPOLIA_FORK);
 
     // Calculating the amountAfter fees
     uint256 _amountAfterFees = _calculateAmountAfterFeesForMultipleIntents(_normalisedAmounts, address(oUSDT));
