@@ -381,7 +381,7 @@ BEGIN
 	pos := pos + 8;
 	origin_domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
-	nonce := to_bigint(SUBSTRING(hex_data, pos, 16));
+	nonce := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
 	ttl := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
