@@ -204,7 +204,7 @@ pub struct NewIntent<'info> {
     pub authority: Signer<'info>,
 
     pub mint: Account<'info, Mint>,
-    
+
     // NOTE: we allow any token account (not just ATA) to send in asset.
     #[account(
         mut,

@@ -20,13 +20,6 @@ pub struct PausedEvent {}
 pub struct UnpausedEvent {}
 
 #[event]
-pub struct WithdrawnEvent {
-    pub user: Pubkey,
-    pub asset: Pubkey,
-    pub amount: u64,
-}
-
-#[event]
 pub struct IntentAddedEvent {
     pub intent_id: [u8; 32],
     pub message_id: [u8; 32],
@@ -42,20 +35,6 @@ pub struct IntentAddedEvent {
     pub timestamp: u64,
     pub destinations: Vec<u32>,
     pub data: Vec<u8>,
-}
-
-#[event]
-pub struct IntentQueueProcessedEvent {
-    pub message_id: [u8; 32],
-    pub first_index: u64,
-    pub last_index: u64,
-    pub fee_spent: u64,
-}
-
-#[event]
-pub struct GatewayUpdatedEvent {
-    pub old_gateway: Pubkey,
-    pub new_gateway: Pubkey,
 }
 
 #[event]
@@ -88,13 +67,6 @@ pub struct WatchtowerUpdatedEvent {
 pub struct MessageReceivedEvent {
     pub origin: u32,
     pub sender: Pubkey,
-}
-
-#[event]
-pub struct AssetTransferFailed {
-    pub asset: Pubkey,
-    pub recipient: Pubkey,
-    pub amount: u64,
 }
 
 #[event]
