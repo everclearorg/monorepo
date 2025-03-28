@@ -14,6 +14,7 @@ import { IEverclear } from 'interfaces/common/IEverclear.sol';
 
 import { IPermit2 } from 'interfaces/common/IPermit2.sol';
 import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
+import { IEverclearSpokeV3 } from 'interfaces/intent/IEverclearSpokeV3.sol';
 import { IFeeAdapter } from 'interfaces/intent/IFeeAdapter.sol';
 
 contract FeeAdapter is IFeeAdapter, Ownable2Step {
@@ -29,7 +30,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
 
   /// @inheritdoc IFeeAdapter
-  IEverclearSpoke public immutable spoke;
+  IEverclearSpokeV3 public immutable spoke;
 
   // @inheritdoc IFeeAdapter
   address public immutable xerc20Module;
@@ -53,7 +54,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     address _xerc20Module,
     address _owner
   ) Ownable(_owner) {
-    spoke = IEverclearSpoke(_spoke);
+    spoke = IEverclearSpokeV3(_spoke);
     xerc20Module = _xerc20Module;
     _updateFeeRecipient(_feeRecipient);
     _updateFeeSigner(_feeSigner);
@@ -84,6 +85,35 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
 
   /// @inheritdoc IFeeAdapter
+  function newIntent(
+    uint32[] memory _destinations,
+    bytes32 _receiver,
+    address _inputAsset,
+    bytes32 _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    IFeeAdapter.FeeParams calldata _feeParams
+  ) external payable returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
+    // Transfer from caller
+    _pullTokens(msg.sender, _inputAsset, _amount + _feeParams.fee);
+
+    // Create intent
+    (_intentId, _intent) = _newIntent(
+      _destinations,
+      _receiver,
+      _inputAsset,
+      _outputAsset,
+      _amount,
+      _maxFee,
+      _ttl,
+      _data,
+      _feeParams
+    );
+  }
+
+   /// @inheritdoc IFeeAdapter
   function newIntent(
     uint32[] memory _destinations,
     address _receiver,
@@ -265,6 +295,54 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
 
   /**
+   * @notice Internal function to create a new intent
+   * @param _destinations Array of destination chain IDs
+   * @param _receiver Address of the receiver on the destination chain
+   * @param _inputAsset Address of the input asset
+   * @param _outputAsset Address of the output asset
+   * @param _amount Amount of input asset to transfer
+   * @param _maxFee Maximum fee in basis points that can be charged
+   * @param _ttl Time-to-live for the intent
+   * @param _data Additional data for the intent
+   * @param _feeParams Fee parameters including fee amount, deadline, and signature
+   * @return _intentId The ID of the created intent
+   * @return _intent The created intent object
+   */
+  function _newIntent(
+    uint32[] memory _destinations,
+    bytes32 _receiver,
+    address _inputAsset,
+    bytes32 _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    IFeeAdapter.FeeParams calldata _feeParams
+  ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
+    // Send fees to recipient
+    _handleFees(_feeParams.fee, msg.value, _inputAsset, _feeParams.deadline, _feeParams.sig);
+
+    // Approve the spoke contract if needed
+    _approveSpokeIfNeeded(_inputAsset, _amount);
+
+    // Create new intent
+    (_intentId, _intent) = spoke.newIntent(
+      _destinations,
+      _receiver,
+      _inputAsset,
+      _outputAsset,
+      _amount,
+      _maxFee,
+      _ttl,
+      _data
+    );
+
+    // Emit event
+    emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _feeParams.fee, msg.value);
+    return (_intentId, _intent);
+  }
+
+   /**
    * @notice Internal function to create a new intent
    * @param _destinations Array of destination chain IDs
    * @param _receiver Address of the receiver on the destination chain

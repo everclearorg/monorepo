@@ -25,8 +25,6 @@ contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
   using TypeCasts for address;
   using TypeCasts for bytes32;
 
-  address public HUB_GATEWAY = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
-
   // ============ Upgrade ============ //
   function test_spokeArrayUpgrade_upgrade() public {
     vm.createSelectFork(vm.envString('MAINNET_RPC'), FIXED_MAIN_BLOCK);
@@ -227,7 +225,7 @@ contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
       abi.encodeWithSignature(
         'dispatch(uint32,bytes32,bytes,bytes)',
         HUB_ID,
-        HUB_GATEWAY,
+        HUB_GATEWAY_PROD,
         _batchIntentmessage,
         metadata
       )
@@ -238,6 +236,7 @@ contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
     assertEq(lightHouse.balance, _initialLighthouseBal - _messageFee);
   }
 
+  // ============ Public ============ //
   function _upgradeSpoke() internal {
     vm.createSelectFork(vm.envString('MAINNET_RPC'), FIXED_MAIN_BLOCK);
     // Checking implementation correct and caching the state variables

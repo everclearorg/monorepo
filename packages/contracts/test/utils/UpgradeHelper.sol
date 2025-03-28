@@ -69,6 +69,13 @@ contract UpgradeHelper is SafeTxBuilder {
     address spokeImpl;
   }
 
+  struct DeploymentParamsV3 {
+    address owner;
+    address spokeProxy;
+    address spokeImpl;
+    address feeAdapter;
+  }
+
   error Create3DeploymentFailed();
   error UpgradeFailed();
 
@@ -83,22 +90,27 @@ contract UpgradeHelper is SafeTxBuilder {
   address public MAILBOX_MAINNET = 0xc005dc82818d67AF737725bD4bf75435d065D239;
   uint256 public FIXED_MAIN_BLOCK = 21_244_576;
   uint32 constant HUB_ID = 25_327;
+  address public HUB_GATEWAY_PROD = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
 
   EverclearSpoke public spokeProxy;
   DeploymentParams public _params;
+  DeploymentParamsV3 public _paramsV3;
 
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
+  mapping(uint256 _chainId => DeploymentParamsV3 _params) internal _deploymentParamsV3;
 
   /**
    * **********************  FeeAdapter Upgrade  **********************
    */
-   EverclearSpokeV3 public spokeProxyV3;
+  EverclearSpokeV3 public spokeProxyV3;
 
-   address public FEE_RECIPIENT_MAINNET = SPOKE_PROXY_MAINNET_OWNER;
-   uint256 public FEE_SIGNER_PK = 1;
-   address public FEE_SIGNER = vm.addr(FEE_SIGNER_PK);
-   address XERC20_MODULE_MAINNET;
-   uint256 public FIXED_MAIN_BLOCK_UP2;
+  address public SPOKE_IMPL_MAINNET_V2 = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+
+  address public FEE_RECIPIENT_MAINNET = SPOKE_PROXY_MAINNET_OWNER;
+  uint256 public FEE_SIGNER_PK = 1;
+  address public FEE_SIGNER = vm.addr(FEE_SIGNER_PK);
+  address XERC20_MODULE_MAINNET;
+  uint256 public FIXED_MAIN_BLOCK_UP2 = 22_146_318;
 
   function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
     state.permit = address(spokeProxy.PERMIT2());
@@ -112,5 +124,18 @@ contract UpgradeHelper is SafeTxBuilder {
     state.paused = spokeProxy.paused();
     state.nonce = spokeProxy.nonce();
     state.messageGasLimit = spokeProxy.messageGasLimit();
+  }
+  function _cacheSpokeStateV3() internal view returns (CachedSpokeState memory state) {
+    state.permit = address(spokeProxyV3.PERMIT2());
+    state.EVERCLEAR = spokeProxyV3.EVERCLEAR();
+    state.DOMAIN = spokeProxyV3.DOMAIN();
+    state.lighthouse = spokeProxyV3.lighthouse();
+    state.watchtower = spokeProxyV3.watchtower();
+    state.messageReceiver = spokeProxyV3.messageReceiver();
+    state.gateway = address(spokeProxyV3.gateway());
+    state.callExecutor = address(spokeProxyV3.callExecutor());
+    state.paused = spokeProxyV3.paused();
+    state.nonce = spokeProxyV3.nonce();
+    state.messageGasLimit = spokeProxyV3.messageGasLimit();
   }
 }

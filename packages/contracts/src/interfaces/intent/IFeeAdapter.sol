@@ -3,6 +3,7 @@ pragma solidity 0.8.25;
 
 import { IEverclear } from '../common/IEverclear.sol';
 import { IEverclearSpoke } from './IEverclearSpoke.sol';
+import { IEverclearSpokeV3 } from './IEverclearSpokeV3.sol';
 import { IPermit2 } from 'interfaces/common/IPermit2.sol';
 
 interface IFeeAdapter {
@@ -86,7 +87,7 @@ interface IFeeAdapter {
    * @notice Returns the spoke contract address
    * @return The EverclearSpoke contract interface
    */
-  function spoke() external view returns (IEverclearSpoke);
+  function spoke() external view returns (IEverclearSpokeV3);
 
   /**
    * @notice returns the permit2 contract
@@ -105,6 +106,32 @@ interface IFeeAdapter {
    * @return The address whos signature is verified
    */
   function feeSigner() external view returns (address);
+
+   /**
+   * @notice Creates a new intent with fees
+   * @param _destinations Array of destination domains, preference ordered
+   * @param _receiver Address of the receiver on the destination chain
+   * @param _inputAsset Address of the input asset
+   * @param _outputAsset Address of the output asset
+   * @param _amount Amount of input asset to use for the intent
+   * @param _maxFee Maximum fee percentage allowed for the intent
+   * @param _ttl Time-to-live for the intent in seconds
+   * @param _data Additional data for the intent
+   * @param _feeParams Fee parameters including fee amount, deadline, and signature
+   * @return _intentId The ID of the created intent
+   * @return _intent The created intent object
+   */
+  function newIntent(
+    uint32[] memory _destinations,
+    bytes32 _receiver,
+    address _inputAsset,
+    bytes32 _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    FeeParams calldata _feeParams
+  ) external payable returns (bytes32, IEverclear.Intent memory);
 
   /**
    * @notice Creates a new intent with fees
