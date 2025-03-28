@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS solana.solana_spoke_instructions
 );
 
 ALTER TABLE solana.solana_spoke_instructions OWNER to "sol-ingestor";
-ALTER TABLE solana.solana_spoke_instructions ADD COLUMN IF NOT EXISTS processed BOOLEAN NOT NULL DEFAULT FALSE;
 
 CREATE OR REPLACE FUNCTION public.base58_decode(base58_str TEXT) RETURNS numeric AS $$
 DECLARE
@@ -66,8 +65,6 @@ BEGIN
 END;$$
 LANGUAGE PLPGSQL;
 
-
-
 CREATE OR REPLACE FUNCTION public.to_hex(n NUMERIC) RETURNS TEXT AS $$
 DECLARE
     b INT;
@@ -82,8 +79,6 @@ BEGIN
 END;$$
 LANGUAGE PLPGSQL;
 
-
-
 CREATE OR REPLACE FUNCTION public.reverse_bytes(hex_str TEXT) RETURNS TEXT AS $$
 DECLARE
     reversed TEXT := '';
@@ -95,15 +90,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-
 CREATE OR REPLACE FUNCTION public.to_int(hex_str TEXT) RETURNS INT AS $$
 BEGIN
     RETURN CAST(CAST(('x' || hex_str) AS bit(32)) AS INT);
 END;
 $$ LANGUAGE plpgsql;
-
-
 
 CREATE OR REPLACE FUNCTION public.to_bigint(hex_str TEXT) RETURNS BIGINT AS $$
 BEGIN
@@ -111,22 +102,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-
-CREATE OR REPLACE FUNCTION public.process_cpi_events() RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION public.process_cpi_events() RETURNS TRIGGER AS $$
 DECLARE
-    rec record;
-	res BOOLEAN;BEGIN
-    FOR rec IN (SELECT id, block_slot, block_timestamp, tx_signature, tx_fee, data
-		FROM solana.solana_spoke_instructions WHERE accounts = '["HoUvmo3eC8gwMknYvyhto8S8iT8xZryUdErfXhawoHeG"]'
-		AND tx_status = 1 AND tx_err = 'null' AND processed = FALSE) LOOP
-			res := parse_and_insert_cpi_event(rec);
-	        UPDATE solana.solana_spoke_instructions SET processed = TRUE WHERE id = rec.id;
-    END LOOP;
+	res BOOLEAN;
+BEGIN
+    IF NEW.accounts = '["HoUvmo3eC8gwMknYvyhto8S8iT8xZryUdErfXhawoHeG"]'
+           AND NEW.tx_status = 1 AND NEW.tx_err = 'null' THEN
+        res := parse_and_insert_cpi_event(NEW);
+        IF res IS FALSE THEN
+            RAISE WARNING 'Failed to parse and insert CPI event for transaction %', NEW.tx_signature;
+        END IF;
+    END IF;
+
+    RETURN NEW;
 END;$$
-LANGUAGE PLPGSQL;
+LANGUAGE PLPGSQL
+SECURITY DEFINER
+SET search_path = solana, public;
 
-
+CREATE TRIGGER process_cpi_events_trigger BEFORE INSERT OR UPDATE ON solana.solana_spoke_instructions
+FOR EACH ROW EXECUTE FUNCTION public.process_cpi_events();
 
 CREATE OR REPLACE FUNCTION public.parse_and_insert_cpi_event(rec record) RETURNS BOOLEAN AS $$
 DECLARE
@@ -158,8 +153,6 @@ BEGIN
     RETURN FALSE;
 END;$$
 LANGUAGE PLPGSQL;
-
-
 
 CREATE OR REPLACE FUNCTION public.parse_and_insert_new_intent_cpi_event(hex_data TEXT, rec record) RETURNS BOOLEAN AS $$
 DECLARE
@@ -269,13 +262,35 @@ BEGIN
 		initiator,
 		ttl,
 		destinations
-	);
+	)
+	ON CONFLICT (id)
+	DO UPDATE SET
+		queue_idx = EXCLUDED.queue_idx,
+		message_id = EXCLUDED.message_id,
+		receiver = EXCLUDED.receiver,
+		input_asset = EXCLUDED.input_asset,
+		output_asset = EXCLUDED.output_asset,
+		amount = EXCLUDED.amount,
+		max_fee = EXCLUDED.max_fee,
+		origin = EXCLUDED.origin,
+		nonce = EXCLUDED.nonce,
+		data = EXCLUDED.data,
+		transaction_hash = EXCLUDED.transaction_hash,
+		"timestamp" = EXCLUDED."timestamp",
+		block_number = EXCLUDED.block_number,
+		tx_origin = EXCLUDED.tx_origin,
+		tx_nonce = EXCLUDED.tx_nonce,
+		auto_id = EXCLUDED.auto_id,
+		gas_limit = EXCLUDED.gas_limit,
+		gas_price = EXCLUDED.gas_price,
+		status = EXCLUDED.status,
+		initiator = EXCLUDED.initiator,
+		ttl = EXCLUDED.ttl,
+		destinations = EXCLUDED.destinations;
 
     RETURN TRUE;
 END;$$
 LANGUAGE PLPGSQL;
-
-
 
 CREATE OR REPLACE FUNCTION public.parse_and_insert_settled_cpi_event(hex_data TEXT, rec record) RETURNS BOOLEAN AS $$
 DECLARE
@@ -330,18 +345,31 @@ BEGIN
 		1,
 		'0x',
 		'SETTLED'
-	);
+	)
+	ON CONFLICT (id)
+	DO UPDATE SET
+		amount = EXCLUDED.amount,
+		asset = EXCLUDED.asset,
+		recipient = EXCLUDED.recipient,
+		domain = EXCLUDED.domain,
+		transaction_hash = EXCLUDED.transaction_hash,
+		"timestamp" = EXCLUDED."timestamp",
+		block_number = EXCLUDED.block_number,
+		tx_origin = EXCLUDED.tx_origin,
+		tx_nonce = EXCLUDED.tx_nonce,
+		auto_id = EXCLUDED.auto_id,
+		gas_limit = EXCLUDED.gas_limit,
+		gas_price = EXCLUDED.gas_price,
+		return_data = EXCLUDED.return_data,
+		status = EXCLUDED.status;
 
     RETURN TRUE;
 END;$$
 LANGUAGE PLPGSQL;
 
-CREATE EXTENSION IF NOT EXISTS pg_cron;
-SELECT cron.schedule('* * * * *', $$SELECT process_cpi_events();$$);
-
 -- migrate:down
 
-SELECT cron.unschedule(jobid) FROM cron.job WHERE command = 'SELECT process_cpi_events();';
+DROP TRIGGER process_cpi_events_trigger ON solana.solana_spoke_instructions;
 
 DROP FUNCTION IF EXISTS public.parse_and_insert_settled_cpi_event(hex_data TEXT, rec record);
 DROP FUNCTION IF EXISTS public.parse_and_insert_new_intent_cpi_event(hex_data TEXT, rec record);
@@ -352,6 +380,4 @@ DROP FUNCTION IF EXISTS public.to_int(hex_str TEXT);
 DROP FUNCTION IF EXISTS public.reverse_bytes(hex_str TEXT);
 DROP FUNCTION IF EXISTS public.to_hex(n NUMERIC);
 DROP FUNCTION IF EXISTS public.base58_decode(base58_str TEXT);
-
-ALTER TABLE solana.solana_spoke_instructions DROP COLUMN processed;
 

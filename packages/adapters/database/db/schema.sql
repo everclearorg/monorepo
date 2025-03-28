@@ -450,7 +450,31 @@ BEGIN
 		initiator,
 		ttl,
 		destinations
-	);
+	)
+	ON CONFLICT (id)
+	DO UPDATE SET
+		queue_idx = EXCLUDED.queue_idx,
+		message_id = EXCLUDED.message_id,
+		receiver = EXCLUDED.receiver,
+		input_asset = EXCLUDED.input_asset,
+		output_asset = EXCLUDED.output_asset,
+		amount = EXCLUDED.amount,
+		max_fee = EXCLUDED.max_fee,
+		origin = EXCLUDED.origin,
+		nonce = EXCLUDED.nonce,
+		data = EXCLUDED.data,
+		transaction_hash = EXCLUDED.transaction_hash,
+		"timestamp" = EXCLUDED."timestamp",
+		block_number = EXCLUDED.block_number,
+		tx_origin = EXCLUDED.tx_origin,
+		tx_nonce = EXCLUDED.tx_nonce,
+		auto_id = EXCLUDED.auto_id,
+		gas_limit = EXCLUDED.gas_limit,
+		gas_price = EXCLUDED.gas_price,
+		status = EXCLUDED.status,
+		initiator = EXCLUDED.initiator,
+		ttl = EXCLUDED.ttl,
+		destinations = EXCLUDED.destinations;
 
     RETURN TRUE;
 END;$$;
@@ -515,7 +539,23 @@ BEGIN
 		1,
 		'0x',
 		'SETTLED'
-	);
+	)
+	ON CONFLICT (id)
+	DO UPDATE SET
+		amount = EXCLUDED.amount,
+		asset = EXCLUDED.asset,
+		recipient = EXCLUDED.recipient,
+		domain = EXCLUDED.domain,
+		transaction_hash = EXCLUDED.transaction_hash,
+		"timestamp" = EXCLUDED."timestamp",
+		block_number = EXCLUDED.block_number,
+		tx_origin = EXCLUDED.tx_origin,
+		tx_nonce = EXCLUDED.tx_nonce,
+		auto_id = EXCLUDED.auto_id,
+		gas_limit = EXCLUDED.gas_limit,
+		gas_price = EXCLUDED.gas_price,
+		return_data = EXCLUDED.return_data,
+		status = EXCLUDED.status;
 
     RETURN TRUE;
 END;$$;
@@ -525,18 +565,22 @@ END;$$;
 -- Name: process_cpi_events(); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.process_cpi_events() RETURNS void
-    LANGUAGE plpgsql
+CREATE FUNCTION public.process_cpi_events() RETURNS trigger
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'solana', 'public'
     AS $$
 DECLARE
-    rec record;
-	res BOOLEAN;BEGIN
-    FOR rec IN (SELECT id, block_slot, block_timestamp, tx_signature, tx_fee, data
-		FROM solana.solana_spoke_instructions WHERE accounts = '["HoUvmo3eC8gwMknYvyhto8S8iT8xZryUdErfXhawoHeG"]'
-		AND tx_status = 1 AND tx_err = 'null' AND processed = FALSE) LOOP
-			res := parse_and_insert_cpi_event(rec);
-	        UPDATE solana.solana_spoke_instructions SET processed = TRUE WHERE id = rec.id;
-    END LOOP;
+	res BOOLEAN;
+BEGIN
+    IF NEW.accounts = '["HoUvmo3eC8gwMknYvyhto8S8iT8xZryUdErfXhawoHeG"]'
+           AND NEW.tx_status = 1 AND NEW.tx_err = 'null' THEN
+        res := parse_and_insert_cpi_event(NEW);
+        IF res IS FALSE THEN
+            RAISE WARNING 'Failed to parse and insert CPI event for transaction %', NEW.tx_signature;
+        END IF;
+    END IF;
+
+    RETURN NEW;
 END;$$;
 
 
@@ -4080,8 +4124,7 @@ CREATE TABLE solana.solana_spoke_instructions (
     program_id text,
     instruction_type text,
     params text,
-    parsed text,
-    processed boolean DEFAULT false NOT NULL
+    parsed text
 );
 
 
