@@ -6,15 +6,11 @@ import { StdStorage, stdStorage } from 'forge-std/StdStorage.sol';
 import { IInterchainSecurityModule } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 
 import { Vm } from 'forge-std/Vm.sol';
-import { console } from 'forge-std/console.sol';
 
 import { MessageLib } from 'contracts/common/MessageLib.sol';
 import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 
 import { IEverclear } from 'interfaces/common/IEverclear.sol';
-import { IEverclearHub } from 'interfaces/hub/IEverclearHub.sol';
-
-import { ISettler } from 'interfaces/hub/ISettler.sol';
 
 import { IntegrationBase } from 'test/integration/IntegrationBase.t.sol';
 
@@ -22,11 +18,13 @@ import { Constants } from 'test/utils/Constants.sol';
 
 import { TestERC20 } from '../../utils/TestERC20.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import { ERC20, IXERC20, XERC20 } from 'test/utils/TestXToken.sol';
+import { ERC20, XERC20 } from 'test/utils/TestXToken.sol';
+import { MessageHashUtils } from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 
 contract Intent_Integration is IntegrationBase {
   using stdStorage for StdStorage;
   using TypeCasts for address;
+  using MessageHashUtils for bytes32;
 
   bytes32 internal _intentId;
   IEverclear.Intent internal _intent;
@@ -56,6 +54,13 @@ contract Intent_Integration is IntegrationBase {
     uint32[] memory _dest = new uint32[](1);
     _dest[0] = BSC_TESTNET_ID;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(_tokenFee, 0, address(_unsupportedToken), _deadline))
+      .toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user);
 
@@ -68,7 +73,9 @@ contract Intent_Integration is IntegrationBase {
       Constants.MAX_FEE,
       uint48(1 days),
       '',
-      _tokenFee
+      _tokenFee,
+      _deadline,
+      _sig
     );
 
     // create intent message
@@ -199,6 +206,12 @@ contract Intent_Integration is IntegrationBase {
     // setting unsupported destination
     _destA[0] = 422;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(_feeAmount, 0, address(sepoliaXToken), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user);
 
@@ -213,7 +226,9 @@ contract Intent_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       _intentCalldata,
-      _feeAmount
+      _feeAmount,
+      _deadline,
+      _sig
     );
 
     // create intent message

@@ -67,6 +67,16 @@ interface IFeeAdapter {
   error MultipleOrderAssets();
 
   /**
+   * @notice Thrown when the signature is invalid on fees
+   */
+  error FeeAdapter_InvalidSignature();
+
+  /**
+   * @notice Thrown when the deadline has elapsed
+   */
+  error FeeAdapter_InvalidDeadline();
+
+  /**
    * @notice Returns the spoke contract address
    * @return The EverclearSpoke contract interface
    */
@@ -113,7 +123,9 @@ interface IFeeAdapter {
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
-    uint256 _fee
+    uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig
   ) external payable returns (bytes32, IEverclear.Intent memory);
 
   /**
@@ -142,7 +154,9 @@ interface IFeeAdapter {
     uint48 _ttl,
     bytes calldata _data,
     IEverclearSpoke.Permit2Params calldata _permit2Params,
-    uint256 _fee
+    uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig
   ) external payable returns (bytes32, IEverclear.Intent memory);
 
   /**
@@ -157,6 +171,8 @@ interface IFeeAdapter {
   function newOrderSplitEvenly(
     uint32 _numIntents,
     uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig,
     OrderParameters memory _params
   ) external payable returns (bytes32, bytes32[] memory);
 
@@ -169,6 +185,8 @@ interface IFeeAdapter {
    */
   function newOrder(
     uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig,
     OrderParameters[] memory _params
   ) external payable returns (bytes32, bytes32[] memory);
 

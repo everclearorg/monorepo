@@ -5,6 +5,8 @@ import { Ownable, Ownable2Step } from '@openzeppelin/contracts/access/Ownable2St
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { SafeERC20 } from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import { Address } from '@openzeppelin/contracts/utils/Address.sol';
+import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import { MessageHashUtils } from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 
 import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 
@@ -91,7 +93,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
-    uint256 _fee
+    uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig
   ) external payable returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     // Transfer from caller
     _pullTokens(msg.sender, _inputAsset, _amount + _fee);
@@ -106,7 +110,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
       _maxFee,
       _ttl,
       _data,
-      _fee
+      _fee,
+      _deadline,
+      _sig
     );
   }
 
@@ -121,10 +127,14 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     uint48 _ttl,
     bytes calldata _data,
     IEverclearSpoke.Permit2Params calldata _permit2Params,
-    uint256 _fee
+    uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig
   ) external payable returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     // Transfer from caller using permit2
-    _pullWithPermit2(_inputAsset, _amount + _fee, _permit2Params);
+    {
+      _pullWithPermit2(_inputAsset, _amount + _fee, _permit2Params);
+    }
 
     // Call internal helper to create intent
     (_intentId, _intent) = _newIntent(
@@ -136,7 +146,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
       _maxFee,
       _ttl,
       _data,
-      _fee
+      _fee,
+      _deadline,
+      _sig
     );
   }
 
@@ -144,45 +156,53 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   function newOrderSplitEvenly(
     uint32 _numIntents,
     uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig,
     OrderParameters memory _params
   ) external payable returns (bytes32 _orderId, bytes32[] memory _intentIds) {
-    // Transfer once from the user
-    _pullTokens(msg.sender, _params.inputAsset, _params.amount + _fee);
+    {
+      // Transfer once from the user
+      _pullTokens(msg.sender, _params.inputAsset, _params.amount + _fee);
 
-    // Send fees to recipient
-    _handleFees(_fee, msg.value, _params.inputAsset);
+      // Send fees to recipient
+      _handleFees(_fee, msg.value, _params.inputAsset, _deadline, _sig);
 
-    // Approve the spoke contract if needed
-    _approveSpokeIfNeeded(_params.inputAsset, _params.amount);
-
-    // Initialising array length
-    _intentIds = new bytes32[](_numIntents);
+      // Approve the spoke contract if needed
+      _approveSpokeIfNeeded(_params.inputAsset, _params.amount);
+    }
 
     // Create `_numIntents` intents with the same params and `_amount` divided
     // equally across all created intents.
     uint256 _toSend = _params.amount / _numIntents;
-    for (uint256 i; i < _numIntents - 1; i++) {
-      // Create new intent
-      (bytes32 _intentId, ) = spoke.newIntent(
-        _params.destinations,
-        _params.receiver,
-        _params.inputAsset,
-        _params.outputAsset,
-        _toSend,
-        _params.maxFee,
-        _params.ttl,
-        _params.data
-      );
-      _intentIds[i] = _intentId;
+
+    {
+      // Initialising array length
+      _intentIds = new bytes32[](_numIntents);
+
+      for (uint256 i; i < _numIntents - 1; i++) {
+        // Create new intent
+        (bytes32 _intentId, ) = spoke.newIntent(
+          _params.destinations,
+          _params.receiver,
+          _params.inputAsset,
+          _params.outputAsset,
+          _toSend,
+          _params.maxFee,
+          _params.ttl,
+          _params.data
+        );
+        _intentIds[i] = _intentId;
+      }
     }
 
     // Create a final intent here with the remainder of balance
+    _toSend = _toSend * (_numIntents - 1);
     (bytes32 _intentId, ) = spoke.newIntent(
       _params.destinations,
       _params.receiver,
       _params.inputAsset,
       _params.outputAsset,
-      _params.amount - (_toSend * (_numIntents - 1)), // handles remainder gracefully
+      _params.amount - _toSend, // handles remainder gracefully
       _params.maxFee,
       _params.ttl,
       _params.data
@@ -201,6 +221,8 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   /// @inheritdoc IFeeAdapter
   function newOrder(
     uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig,
     OrderParameters[] memory _params
   ) external payable returns (bytes32 _orderId, bytes32[] memory _intentIds) {
     uint256 _numIntents = _params.length;
@@ -225,7 +247,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
       _approveSpokeIfNeeded(_asset, _orderSum);
 
       // Send fees to recipient
-      _handleFees(_fee, msg.value, _asset);
+      _handleFees(_fee, msg.value, _asset, _deadline, _sig);
     }
 
     // Initialising array length
@@ -279,10 +301,12 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
-    uint256 _fee
+    uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig
   ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     // Send fees to recipient
-    _handleFees(_fee, msg.value, _inputAsset);
+    _handleFees(_fee, msg.value, _inputAsset, _deadline, _sig);
 
     // Approve the spoke contract if needed
     _approveSpokeIfNeeded(_inputAsset, _amount);
@@ -323,11 +347,38 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   }
 
   /**
+   * @notice Verifies a signature
+   * @param _data The data of the message
+   * @param _signature The signature of the message
+   */
+  function _verifySignature(bytes memory _data, bytes calldata _signature) internal {
+    bytes32 _hash = keccak256(_data);
+    address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
+    if (_recoveredSigner != feeSigner) {
+      revert FeeAdapter_InvalidSignature();
+    }
+  }
+
+  /**
    * @notice Sends fees to recipient
    * @param _tokenFee Amount in transacting asset to send to recipient
    * @param _nativeFee Amount in native asset to send to recipient
    */
-  function _handleFees(uint256 _tokenFee, uint256 _nativeFee, address _inputAsset) internal {
+  function _handleFees(
+    uint256 _tokenFee,
+    uint256 _nativeFee,
+    address _inputAsset,
+    uint256 _deadline,
+    bytes calldata _sig
+  ) internal {
+    // Verify the signature on the fee
+    _verifySignature(abi.encode(_tokenFee, _nativeFee, _inputAsset, _deadline), _sig);
+
+    // Verify the ttl is valid
+    if (block.timestamp > _deadline) {
+      revert FeeAdapter_InvalidDeadline();
+    }
+
     // Handle token fees if exist
     if (_tokenFee > 0) {
       _pushTokens(feeRecipient, _inputAsset, _tokenFee);

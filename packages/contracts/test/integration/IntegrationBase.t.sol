@@ -30,6 +30,8 @@ import { ISpokeGateway, SpokeGateway } from 'contracts/intent/SpokeGateway.sol';
 
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { IMessageReceiver } from 'interfaces/common/IMessageReceiver.sol';
+import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import { MessageHashUtils } from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 
 import { IHubStorage } from 'interfaces/hub/IHubStorage.sol';
 
@@ -86,6 +88,8 @@ struct SpokeChainValues {
 contract IntegrationBase is TestExtended {
   using stdStorage for StdStorage;
   using TypeCasts for address;
+  using ECDSA for bytes32;
+  using MessageHashUtils for bytes32;
 
   address internal _user = makeAddr('user');
   address internal _user2 = makeAddr('user2');
@@ -96,7 +100,9 @@ contract IntegrationBase is TestExtended {
   address internal _solver = makeAddr('solver');
   address internal _solverOwner2 = makeAddr('solver_owner_2');
   address internal _solver2 = makeAddr('solver_2');
-  address internal _feeSigner = makeAddr('fee_signer');
+  uint256 internal _feeSignerPk = uint256(keccak256(abi.encodePacked('fee_signer')));
+  address internal _feeSigner = vm.addr(_feeSignerPk);
+  // vm.label(_feeSigner, 'fee_signer');
   address internal _feeRecipient = makeAddr('fee_recipient');
   address internal _feeRecipient2 = makeAddr('fee_recipient_2');
   address internal DEPLOYER = makeAddr('everclear_deployer');
@@ -901,6 +907,13 @@ contract IntegrationBase is TestExtended {
     vm.prank(_user);
     _assetOrigin.approve(address(_chainValues.feeAdapter), type(uint256).max);
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(_tokenFee, _ethFee, address(_assetOrigin), _deadline))
+      .toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user);
 
@@ -913,7 +926,9 @@ contract IntegrationBase is TestExtended {
       Constants.MAX_FEE,
       _ttl,
       hex'00',
-      _tokenFee
+      _tokenFee,
+      _deadline,
+      _sig
     );
 
     // create intent message

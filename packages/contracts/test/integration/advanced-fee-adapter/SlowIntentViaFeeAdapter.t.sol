@@ -2,23 +2,16 @@
 pragma solidity 0.8.25;
 
 import { StdStorage, stdStorage } from 'forge-std/StdStorage.sol';
-
-import { ERC20, IXERC20, XERC20 } from 'test/utils/TestXToken.sol';
-
+import { MessageHashUtils } from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
+import { ERC20, XERC20 } from 'test/utils/TestXToken.sol';
 import { IInterchainSecurityModule } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 
 import { Vm } from 'forge-std/Vm.sol';
-import { console } from 'forge-std/console.sol';
 
-import { AssetUtils } from 'contracts/common/AssetUtils.sol';
 import { MessageLib } from 'contracts/common/MessageLib.sol';
 import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 
 import { IEverclear } from 'interfaces/common/IEverclear.sol';
-import { IEverclearHub } from 'interfaces/hub/IEverclearHub.sol';
-import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
-
-import { ISettler } from 'interfaces/hub/ISettler.sol';
 
 import { IntegrationBase } from 'test/integration/IntegrationBase.t.sol';
 
@@ -29,6 +22,7 @@ import { IFeeAdapter } from 'interfaces/intent/IFeeAdapter.sol';
 contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
   using stdStorage for StdStorage;
   using TypeCasts for address;
+  using MessageHashUtils for bytes32;
 
   bytes32 internal _intentId;
   IEverclear.Intent internal _intent;
@@ -56,6 +50,12 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint32[] memory _destA = new uint32[](1);
     _destA[0] = BSC_TESTNET_ID;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(_tokenFee, 0, address(oUSDT), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user);
 
@@ -70,7 +70,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       _intentCalldata,
-      _tokenFee
+      _tokenFee,
+      _deadline,
+      _sig
     );
 
     // create intent message
@@ -136,6 +138,12 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint32[] memory _destB = new uint32[](1);
     _destB[0] = ETHEREUM_SEPOLIA_ID;
 
+    // generate signature
+    _deadline = block.timestamp + 3 days;
+    _digest = keccak256(abi.encode(_tokenFee, 0, address(oUSDT), _deadline)).toEthSignedMessageHash();
+    (_v, _r, _s) = vm.sign(_feeSignerPk, _digest);
+    _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user2);
 
@@ -149,7 +157,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       '',
-      _tokenFee
+      _tokenFee,
+      _deadline,
+      _sig
     );
 
     // create intent message
@@ -269,6 +279,12 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint32[] memory _destA = new uint32[](1);
     _destA[0] = BSC_TESTNET_ID;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(0, _ethFee, address(oUSDT), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user);
 
@@ -284,7 +300,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       _intentCalldata,
-      0
+      0,
+      _deadline,
+      _sig
     );
 
     // create intent message
@@ -352,6 +370,12 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint32[] memory _destB = new uint32[](1);
     _destB[0] = ETHEREUM_SEPOLIA_ID;
 
+    // generate signature
+    _deadline = block.timestamp + 3 days;
+    _digest = keccak256(abi.encode(0, _ethFee, address(oUSDT), _deadline)).toEthSignedMessageHash();
+    (_v, _r, _s) = vm.sign(_feeSignerPk, _digest);
+    _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user2);
 
@@ -365,7 +389,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       '',
-      0
+      0,
+      _deadline,
+      _sig
     );
 
     // create intent message
@@ -483,6 +509,12 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint32[] memory _destA = new uint32[](1);
     _destA[0] = BSC_TESTNET_ID;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(_feeAmount, 0, address(sepoliaXToken), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user);
 
@@ -497,7 +529,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       _intentCalldata,
-      _feeAmount
+      _feeAmount,
+      _deadline,
+      _sig
     );
 
     // create intent message
@@ -622,6 +656,12 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint32[] memory _destA = new uint32[](1);
     _destA[0] = BSC_TESTNET_ID;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(0, _feeAmount, address(sepoliaXToken), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user);
 
@@ -636,7 +676,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       _intentCalldata,
-      0
+      0,
+      _deadline,
+      _sig
     );
 
     // create intent message
@@ -761,6 +803,12 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     _destA[0] = BSC_TESTNET_ID;
     _destA[1] = BSC_TESTNET_ID;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(_feeAmount, 0, address(sepoliaXToken), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     // create new intent
     vm.prank(_user);
 
@@ -775,7 +823,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       _intentCalldata,
-      _feeAmount
+      _feeAmount,
+      _deadline,
+      _sig
     );
 
     // create intent message
@@ -878,6 +928,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 }
 
 contract NewOrderSplitEvenly_Integration is IntegrationBase {
+  using MessageHashUtils for bytes32;
   using TypeCasts for address;
 
   function test_NewOrderSplitEvenly_HappyPath_FeeInTransacting(uint32 _numOfIntents) public {
@@ -920,10 +971,18 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     // creating intent w/ ttl == 0 (slow path intent)
     uint64 _nonce = sepoliaEverclearSpoke.nonce() + 1;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(1 ether, 0, address(oUSDT), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     vm.prank(_user);
     (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrderSplitEvenly(
       _numOfIntents,
       1 ether, // token fee
+      _deadline,
+      _sig,
       _params
     );
 
@@ -1005,8 +1064,14 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     _params.outputAsset = address(oUSDT);
     _params.receiver = _user2;
 
+    // generate signature
+    _deadline = block.timestamp + 3 days;
+    _digest = keccak256(abi.encode(1 ether, 0, address(dUSDT), _deadline)).toEthSignedMessageHash();
+    (_v, _r, _s) = vm.sign(_feeSignerPk, _digest);
+    _sig = abi.encodePacked(_r, _s, _v);
+
     vm.prank(_user2);
-    (, _intentIds) = bscFeeAdapter.newOrderSplitEvenly(_numOfIntents, 1 ether, _params);
+    (, _intentIds) = bscFeeAdapter.newOrderSplitEvenly(_numOfIntents, 1 ether, _deadline, _sig, _params);
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
@@ -1151,10 +1216,18 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     // creating intent w/ ttl == 0 (slow path intent)
     uint64 _nonce = sepoliaEverclearSpoke.nonce() + 1;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(0, 1 ether, address(oUSDT), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     vm.prank(_user);
     (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrderSplitEvenly{ value: 1 ether }(
       _numOfIntents,
       0, // token fee
+      _deadline,
+      _sig,
       _params
     );
 
@@ -1238,8 +1311,14 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     _params.outputAsset = address(oUSDT);
     _params.receiver = _user2;
 
+    // generate signature
+    _deadline = block.timestamp + 3 days;
+    _digest = keccak256(abi.encode(0, 1 ether, address(dUSDT), _deadline)).toEthSignedMessageHash();
+    (_v, _r, _s) = vm.sign(_feeSignerPk, _digest);
+    _sig = abi.encodePacked(_r, _s, _v);
+
     vm.prank(_user2);
-    (, _intentIds) = bscFeeAdapter.newOrderSplitEvenly{ value: 1 ether }(_numOfIntents, 0, _params);
+    (, _intentIds) = bscFeeAdapter.newOrderSplitEvenly{ value: 1 ether }(_numOfIntents, 0, _deadline, _sig, _params);
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
@@ -1346,6 +1425,7 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
 
 contract NewOrder_Integration is IntegrationBase {
   using TypeCasts for address;
+  using MessageHashUtils for bytes32;
 
   function test_NewOrder_HappyPath_FeeInTransacting() public {
     /*///////////////////////////////////////////////////////////////
@@ -1399,9 +1479,17 @@ contract NewOrder_Integration is IntegrationBase {
     // creating intent w/ ttl == 0 (slow path intent)
     uint64 _nonce = sepoliaEverclearSpoke.nonce() + 1;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(1 ether, 0, address(oUSDT), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     vm.prank(_user);
     (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder(
       1 ether, // token fee
+      _deadline,
+      _sig,
       _params
     );
 
@@ -1487,8 +1575,14 @@ contract NewOrder_Integration is IntegrationBase {
     _params[1].outputAsset = address(oUSDT);
     _params[1].receiver = _user2;
 
+    // generate signature
+    _deadline = block.timestamp + 3 days;
+    _digest = keccak256(abi.encode(1 ether, 0, address(dUSDT), _deadline)).toEthSignedMessageHash();
+    (_v, _r, _s) = vm.sign(_feeSignerPk, _digest);
+    _sig = abi.encodePacked(_r, _s, _v);
+
     vm.prank(_user2);
-    (, _intentIds) = bscFeeAdapter.newOrder(1 ether, _params);
+    (, _intentIds) = bscFeeAdapter.newOrder(1 ether, _deadline, _sig, _params);
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
@@ -1652,9 +1746,17 @@ contract NewOrder_Integration is IntegrationBase {
     // creating intent w/ ttl == 0 (slow path intent)
     uint64 _nonce = sepoliaEverclearSpoke.nonce() + 1;
 
+    // generate signature
+    uint256 _deadline = block.timestamp + 3 days;
+    bytes32 _digest = keccak256(abi.encode(0, 1 ether, address(dUSDT), _deadline)).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    bytes memory _sig = abi.encodePacked(_r, _s, _v);
+
     vm.prank(_user);
     (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder{ value: 1 ether }(
       0, // token fee
+      _deadline,
+      _sig,
       _params
     );
 
@@ -1741,8 +1843,14 @@ contract NewOrder_Integration is IntegrationBase {
     _params[1].outputAsset = address(oUSDT);
     _params[1].receiver = _user2;
 
+    // generate signature
+    _deadline = block.timestamp + 3 days;
+    _digest = keccak256(abi.encode(0, 1 ether, address(dUSDT), _deadline)).toEthSignedMessageHash();
+    (_v, _r, _s) = vm.sign(_feeSignerPk, _digest);
+    _sig = abi.encodePacked(_r, _s, _v);
+
     vm.prank(_user2);
-    (, _intentIds) = bscFeeAdapter.newOrder{ value: 1 ether }(0, _params);
+    (, _intentIds) = bscFeeAdapter.newOrder{ value: 1 ether }(0, _deadline, _sig, _params);
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
