@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { Ownable } from '@openzeppelin/contracts/access/Ownable2Step.sol';
-import { IERC20Errors } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import { MessageHashUtils } from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
+import {Ownable} from '@openzeppelin/contracts/access/Ownable2Step.sol';
+import {IERC20Errors} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 
-import { IPermit2 } from 'interfaces/common/IPermit2.sol';
-import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
-import { ISpokeStorage } from 'interfaces/intent/ISpokeStorage.sol';
+import {IPermit2} from 'interfaces/common/IPermit2.sol';
+import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
+import {ISpokeStorage} from 'interfaces/intent/ISpokeStorage.sol';
 
-import { StdStorage, Vm, stdStorage } from 'forge-std/Test.sol';
-import { Constants } from 'test/utils/Constants.sol';
-import { TestExtended } from 'test/utils/TestExtended.sol';
+import {StdStorage, Vm, stdStorage} from 'forge-std/Test.sol';
+import {Constants} from 'test/utils/Constants.sol';
+import {TestExtended} from 'test/utils/TestExtended.sol';
 
-import { TypeCasts } from 'contracts/common/TypeCasts.sol';
-import { FeeAdapter, IFeeAdapter } from 'contracts/intent/FeeAdapter.sol';
+import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+import {FeeAdapter, IFeeAdapter} from 'contracts/intent/FeeAdapter.sol';
 
 contract BaseTest is TestExtended {
   using TypeCasts for address;
@@ -40,7 +40,9 @@ contract BaseTest is TestExtended {
     vm.deal(USER, 1000 ether);
   }
 
-  function getRecipientBalance(address _asset) public view returns (uint256 balance) {
+  function getRecipientBalance(
+    address _asset
+  ) public view returns (uint256 balance) {
     balance = _asset == address(0) ? FEE_RECIPIENT.balance : IERC20(_asset).balanceOf(FEE_RECIPIENT);
   }
 
@@ -104,7 +106,9 @@ contract BaseTest is TestExtended {
 }
 
 contract Unit_UpdateFeeSigner is BaseTest {
-  function test_Revert_UpdateFeeSigner_NotOwner(address _newSigner) public {
+  function test_Revert_UpdateFeeSigner_NotOwner(
+    address _newSigner
+  ) public {
     vm.assume(_newSigner != OWNER);
 
     vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, _newSigner));
@@ -112,7 +116,9 @@ contract Unit_UpdateFeeSigner is BaseTest {
     adapter.updateFeeSigner(_newSigner);
   }
 
-  function test_UpdateFeeSigner(address _newSigner) public {
+  function test_UpdateFeeSigner(
+    address _newSigner
+  ) public {
     vm.expectEmit();
     emit IFeeAdapter.FeeSignerUpdated(_newSigner, FEE_SIGNER);
 
@@ -125,7 +131,9 @@ contract Unit_UpdateFeeSigner is BaseTest {
 }
 
 contract Unit_UpdateFeeRecipient is BaseTest {
-  function test_Revert_UpdateFeeRecipient_NotOwner(address _newRecipient) public {
+  function test_Revert_UpdateFeeRecipient_NotOwner(
+    address _newRecipient
+  ) public {
     vm.assume(_newRecipient != OWNER);
 
     vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, _newRecipient));
@@ -133,7 +141,9 @@ contract Unit_UpdateFeeRecipient is BaseTest {
     adapter.updateFeeRecipient(_newRecipient);
   }
 
-  function test_UpdateFeeRecipient(address _newRecipient) public {
+  function test_UpdateFeeRecipient(
+    address _newRecipient
+  ) public {
     vm.expectEmit();
     emit IFeeAdapter.FeeRecipientUpdated(_newRecipient, FEE_RECIPIENT);
 
@@ -176,7 +186,9 @@ contract Unit_NewIntent is BaseTest {
   using TypeCasts for bytes32;
   using MessageHashUtils for bytes32;
 
-  function test_Revert_NewIntent_InsufficientBalance(uint256 _amount) public {
+  function test_Revert_NewIntent_InsufficientBalance(
+    uint256 _amount
+  ) public {
     vm.assume(_amount > 0);
 
     // fund user with asset
@@ -198,7 +210,9 @@ contract Unit_NewIntent is BaseTest {
     adapter.newIntent(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
   }
 
-  function test_Revert_NewIntent_InsufficientAllowance(uint256 _amount) public {
+  function test_Revert_NewIntent_InsufficientAllowance(
+    uint256 _amount
+  ) public {
     vm.assume(_amount > 0);
 
     // fund user with asset
@@ -251,17 +265,8 @@ contract Unit_NewIntent is BaseTest {
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), 0, _fee);
 
     vm.prank(USER);
-    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{ value: _fee }(
-      _destinations,
-      USER,
-      inputAsset,
-      address(0),
-      _amount,
-      0,
-      0,
-      hex'',
-      _feeParams
-    );
+    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) =
+      adapter.newIntent{value: _fee}(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
     assertEq(adapter.feeRecipient().balance, _fee, 'recipient didnt get fee');
@@ -300,17 +305,8 @@ contract Unit_NewIntent is BaseTest {
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), _fee, 0);
 
     vm.prank(USER);
-    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent(
-      _destinations,
-      USER,
-      inputAsset,
-      address(0),
-      _amount,
-      0,
-      0,
-      hex'',
-      _feeParams
-    );
+    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) =
+      adapter.newIntent(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
     assertEq(IERC20(inputAsset).balanceOf(adapter.feeRecipient()), _fee, 'recipient didnt get fee');
@@ -350,22 +346,15 @@ contract Unit_NewIntent is BaseTest {
       IFeeAdapter.FeeParams memory _feeParams;
       _feeParams.fee = _fee;
       _feeParams.deadline = block.timestamp + 3 days;
-      _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_feeParams.fee, _nativeFee, inputAsset, _feeParams.deadline));
+      _feeParams.sig =
+        _generateSignature(FEE_SIGNER_PK, abi.encode(_feeParams.fee, _nativeFee, inputAsset, _feeParams.deadline));
 
       vm.expectEmit();
       emit IFeeAdapter.IntentWithFeesAdded(bytes32(uint256(1)), USER.toBytes32(), _fee, _nativeFee);
 
       vm.prank(USER);
-      (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{ value: _nativeFee }(
-        _destinations,
-        USER,
-        inputAsset,
-        address(0),
-        _amount,
-        0,
-        0,
-        hex'',
-        _feeParams
+      (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{value: _nativeFee}(
+        _destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams
       );
       assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
       assertEq(_returnedId, bytes32(uint256(1)), 'returned id != id');
@@ -374,9 +363,7 @@ contract Unit_NewIntent is BaseTest {
     assertEq(address(adapter).balance, 0, 'adapter eth balance != 0');
     assertEq(IERC20(inputAsset).balanceOf(adapter.feeRecipient()), _fee, 'recipient didnt get token fee');
     assertEq(
-      IERC20(inputAsset).balanceOf(address(adapter)),
-      _tokenAmountWithFee - _fee,
-      'adapter token balance != amount'
+      IERC20(inputAsset).balanceOf(address(adapter)), _tokenAmountWithFee - _fee, 'adapter token balance != amount'
     );
   }
 
@@ -421,17 +408,8 @@ contract Unit_NewIntent is BaseTest {
     vm.expectCall(address(adapter), 0, abi.encodeWithSelector(IERC20.approve.selector, SPOKE, _amount), 0);
 
     vm.prank(USER);
-    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{ value: _fee }(
-      _destinations,
-      USER,
-      inputAsset,
-      address(0),
-      _amount,
-      0,
-      0,
-      hex'',
-      _feeParams
-    );
+    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) =
+      adapter.newIntent{value: _fee}(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
     assertEq(adapter.feeRecipient().balance, _fee, 'recipient didnt get fee');
@@ -471,26 +449,24 @@ contract Unit_NewIntent is BaseTest {
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), 0, _fee);
 
     vm.prank(USER);
-    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = _newIntentPermit2(_destinations, inputAsset, _amount, _feeParams, _fee);
+    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) =
+      _newIntentPermit2(_destinations, inputAsset, _amount, _feeParams, _fee);
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
     assertEq(adapter.feeRecipient().balance, _fee, 'recipient didnt get fee');
     assertEq(address(adapter).balance, 0, 'adapter balance nonzero');
   }
 
-  function _newIntentPermit2(uint32[] memory _destinations, address _inputAsset, uint256 _amount,  IFeeAdapter.FeeParams memory _feeParams, uint256 _fee) internal returns (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) {
+  function _newIntentPermit2(
+    uint32[] memory _destinations,
+    address _inputAsset,
+    uint256 _amount,
+    IFeeAdapter.FeeParams memory _feeParams,
+    uint256 _fee
+  ) internal returns (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) {
     IEverclearSpoke.Permit2Params memory _permit2Params;
-    (_returnedId, _returnedIntent) = adapter.newIntent{ value: _fee }(
-      _destinations,
-      USER,
-      _inputAsset,
-      address(0),
-      _amount,
-      0,
-      0,
-      hex'',
-      _permit2Params,
-      _feeParams
+    (_returnedId, _returnedIntent) = adapter.newIntent{value: _fee}(
+      _destinations, USER, _inputAsset, address(0), _amount, 0, 0, hex'', _permit2Params, _feeParams
     );
   }
 
@@ -518,7 +494,7 @@ contract Unit_NewIntent is BaseTest {
 
     // generate signature
     IFeeAdapter.FeeParams memory _feeParams;
-    _feeParams.fee = _fee; 
+    _feeParams.fee = _fee;
     _feeParams.deadline = block.timestamp + 3 days;
     _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_fee, 0, inputAsset, _feeParams.deadline));
 
@@ -526,17 +502,8 @@ contract Unit_NewIntent is BaseTest {
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), _fee, 0);
 
     vm.prank(USER);
-    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent(
-      _destinations,
-      USER,
-      inputAsset,
-      address(0),
-      _amount,
-      0,
-      0,
-      hex'',
-      _feeParams
-    );
+    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) =
+      adapter.newIntent(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
     assertEq(IERC20(inputAsset).balanceOf(adapter.feeRecipient()), _fee, 'recipient didnt get fee');
@@ -575,7 +542,7 @@ contract Unit_NewIntent is BaseTest {
     // generate signature
     IFeeAdapter.FeeParams memory _feeParams;
     _feeParams.deadline = block.timestamp + 3 days;
-    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _feeParams.deadline)); 
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(0, _fee, inputAsset, _feeParams.deadline));
 
     vm.expectEmit();
     emit IFeeAdapter.IntentWithFeesAdded(_intentId, USER.toBytes32(), 0, _fee);
@@ -584,17 +551,8 @@ contract Unit_NewIntent is BaseTest {
     vm.expectCall(address(adapter), 0, abi.encodeWithSelector(IERC20.approve.selector, SPOKE, _amount), 0);
 
     vm.prank(USER);
-    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{ value: _fee }(
-      _destinations,
-      USER,
-      inputAsset,
-      address(0),
-      _amount,
-      0,
-      0,
-      hex'',
-      _feeParams
-    );
+    (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) =
+      adapter.newIntent{value: _fee}(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
     assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
     assertEq(_returnedId, _intentId, 'returned id != id');
     assertEq(adapter.feeRecipient().balance, _fee, 'recipient didnt get fee');
@@ -656,13 +614,8 @@ contract Unit_NewOrderSplitEvenly is BaseTest {
 
     // Sending the order
     vm.prank(USER);
-    (bytes32 _orderId, bytes32[] memory _intentIds) = adapter.newOrderSplitEvenly(
-      _numOfIntents,
-      _fee,
-      _deadline,
-      _sig,
-      _params
-    );
+    (bytes32 _orderId, bytes32[] memory _intentIds) =
+      adapter.newOrderSplitEvenly(_numOfIntents, _fee, _deadline, _sig, _params);
 
     assertEq(_intentIds.length, _numOfIntents, 'intentIds length != numOfIntents');
     assertEq(_orderId, keccak256(abi.encode(_intentIds)), 'returned id != id');
@@ -718,13 +671,8 @@ contract Unit_NewOrderSplitEvenly is BaseTest {
 
     // Sending the order
     vm.prank(USER);
-    (bytes32 _orderId, bytes32[] memory _intentIds) = adapter.newOrderSplitEvenly{ value: _fee }(
-      _numOfIntents,
-      0,
-      _deadline,
-      _sig,
-      _params
-    );
+    (bytes32 _orderId, bytes32[] memory _intentIds) =
+      adapter.newOrderSplitEvenly{value: _fee}(_numOfIntents, 0, _deadline, _sig, _params);
 
     assertEq(_intentIds.length, _numOfIntents, 'intentIds length != numOfIntents');
     assertEq(_orderId, keccak256(abi.encode(_intentIds)), 'returned id != id');
@@ -783,13 +731,8 @@ contract Unit_NewOrderSplitEvenly is BaseTest {
 
     // Sending the order
     vm.prank(USER);
-    (bytes32 _orderId, bytes32[] memory _intentIds) = adapter.newOrderSplitEvenly{ value: _ethFee }(
-      _numOfIntents,
-      _fee,
-      _deadline,
-      _sig,
-      _params
-    );
+    (bytes32 _orderId, bytes32[] memory _intentIds) =
+      adapter.newOrderSplitEvenly{value: _ethFee}(_numOfIntents, _fee, _deadline, _sig, _params);
 
     assertEq(_intentIds.length, _numOfIntents, 'intentIds length != numOfIntents');
     assertEq(_orderId, keccak256(abi.encode(_intentIds)), 'returned id != id');
@@ -929,7 +872,7 @@ contract Unit_NewOrder is BaseTest {
 
     // Sending the order
     vm.prank(USER);
-    (bytes32 _orderId, bytes32[] memory _intentIds) = adapter.newOrder{ value: _fee }(0, _deadline, _sig, _params);
+    (bytes32 _orderId, bytes32[] memory _intentIds) = adapter.newOrder{value: _fee}(0, _deadline, _sig, _params);
 
     assertEq(_intentIds.length, _params.length, 'intentIds length != numOfIntents');
     assertEq(_orderId, keccak256(abi.encode(_intentIds)), 'returned id != id');
@@ -994,12 +937,7 @@ contract Unit_NewOrder is BaseTest {
 
     // Sending the order
     vm.prank(USER);
-    (bytes32 _orderId, bytes32[] memory _intentIds) = adapter.newOrder{ value: _ethFee }(
-      _fee,
-      _deadline,
-      _sig,
-      _params
-    );
+    (bytes32 _orderId, bytes32[] memory _intentIds) = adapter.newOrder{value: _ethFee}(_fee, _deadline, _sig, _params);
 
     assertEq(_intentIds.length, _params.length, 'intentIds length != numOfIntents');
     assertEq(_orderId, keccak256(abi.encode(_intentIds)), 'returned id != id');

@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { UUPSUpgradeable } from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
-import { MessageLib } from 'contracts/common/MessageLib.sol';
-import { TypeCasts } from 'contracts/common/TypeCasts.sol';
+import {UUPSUpgradeable} from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
+import {MessageLib} from 'contracts/common/MessageLib.sol';
+import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
-import { ISpecifiesInterchainSecurityModule } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
-import { EverclearSpoke, IEverclearSpoke } from 'contracts/intent/EverclearSpoke.sol';
-import { IEverclear } from 'interfaces/common/IEverclear.sol';
+import {ISpecifiesInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
+import {EverclearSpoke, IEverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
 
-import { ISettlementModule } from 'interfaces/common/ISettlementModule.sol';
-import { ISpokeGateway } from 'interfaces/intent/ISpokeGateway.sol';
+import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
+import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
-import { Deploy } from 'script/utils/Deploy.sol';
-import { BaseTest } from 'test/unit/intent/EverclearSpoke.t.sol';
-import { Constants } from 'test/utils/Constants.sol';
+import {Deploy} from 'script/utils/Deploy.sol';
+import {BaseTest} from 'test/unit/intent/EverclearSpoke.t.sol';
+import {Constants} from 'test/utils/Constants.sol';
 
-import { StandardHookMetadata } from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
-import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import 'forge-std/console.sol';
-import { ICREATE3, UpgradeHelper } from 'test//utils/UpgradeHelper.sol';
+import {ICREATE3, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
 
 contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
   using TypeCasts for address;
@@ -51,14 +51,11 @@ contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
 
     // Deploying impl and upgrading the contract
     success = false;
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      ''
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, '');
 
     vm.prank(SPOKE_PROXY_MAINNET_OWNER);
-    (success, ) = address(spokeProxy).call(upgradeCalldata);
+    (success,) = address(spokeProxy).call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -223,16 +220,12 @@ contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
     vm.expectCall(
       address(MAILBOX_MAINNET),
       abi.encodeWithSignature(
-        'dispatch(uint32,bytes32,bytes,bytes)',
-        HUB_ID,
-        HUB_GATEWAY_PROD,
-        _batchIntentmessage,
-        metadata
+        'dispatch(uint32,bytes32,bytes,bytes)', HUB_ID, HUB_GATEWAY_PROD, _batchIntentmessage, metadata
       )
     );
 
     vm.startPrank(lightHouse);
-    spokeProxy.processIntentQueue{ value: _messageFee }(_intentsToProcess);
+    spokeProxy.processIntentQueue{value: _messageFee}(_intentsToProcess);
     assertEq(lightHouse.balance, _initialLighthouseBal - _messageFee);
   }
 

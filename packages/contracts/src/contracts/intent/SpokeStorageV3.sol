@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { QueueLib } from 'contracts/common/QueueLib.sol';
+import {QueueLib} from 'contracts/common/QueueLib.sol';
 
-import { IPermit2 } from 'interfaces/common/IPermit2.sol';
+import {IPermit2} from 'interfaces/common/IPermit2.sol';
 
-import { ISettlementModule } from 'interfaces/common/ISettlementModule.sol';
-import { ICallExecutor } from 'interfaces/intent/ICallExecutor.sol';
-import { ISpokeGateway } from 'interfaces/intent/ISpokeGateway.sol';
-import { ISpokeStorageV3 } from 'interfaces/intent/ISpokeStorageV3.sol';
+import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
+import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
+import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
+import {ISpokeStorageV3} from 'interfaces/intent/ISpokeStorageV3.sol';
 
 /**
  * @title SpokeStorage
@@ -16,22 +16,19 @@ import { ISpokeStorageV3 } from 'interfaces/intent/ISpokeStorageV3.sol';
  */
 abstract contract SpokeStorageV3 is ISpokeStorageV3 {
   /// @inheritdoc ISpokeStorageV3
-  bytes32 public constant FILL_INTENT_FOR_SOLVER_TYPEHASH =
-    keccak256(
-      'function fillIntentForSolver(address _solver, Intent calldata _intent, uint256 _nonce, uint24 _fee, bytes memory _signature)'
-    );
+  bytes32 public constant FILL_INTENT_FOR_SOLVER_TYPEHASH = keccak256(
+    'function fillIntentForSolver(address _solver, Intent calldata _intent, uint256 _nonce, uint24 _fee, bytes memory _signature)'
+  );
 
   /// @inheritdoc ISpokeStorageV3
-  bytes32 public constant PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH =
-    keccak256(
-      'function processIntentQueueViaRelayer(uint32 _domain, Intent[] memory _intents, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes memory _signature)'
-    );
+  bytes32 public constant PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
+    'function processIntentQueueViaRelayer(uint32 _domain, Intent[] memory _intents, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes memory _signature)'
+  );
 
   /// @inheritdoc ISpokeStorageV3
-  bytes32 public constant PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH =
-    keccak256(
-      'function processFillQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes memory _signature)'
-    );
+  bytes32 public constant PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
+    'function processFillQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes memory _signature)'
+  );
 
   /// @inheritdoc ISpokeStorageV3
   IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
@@ -96,7 +93,9 @@ abstract contract SpokeStorageV3 is ISpokeStorageV3 {
   /**
    * @notice Checks that the address is valid
    */
-  modifier validAddress(address _address) {
+  modifier validAddress(
+    address _address
+  ) {
     if (_address == address(0)) {
       revert EverclearSpoke_ZeroAddress();
     }
@@ -107,7 +106,9 @@ abstract contract SpokeStorageV3 is ISpokeStorageV3 {
    * @notice Checks that the local domain is included in the destinations
    * @param _intent The intent to check
    */
-  modifier validDestination(Intent calldata _intent) {
+  modifier validDestination(
+    Intent calldata _intent
+  ) {
     // when it's an xcall executable, destinations.length is always 1
     if (_intent.destinations[0] != DOMAIN) {
       revert EverclearSpoke_WrongDestination();
@@ -121,11 +122,7 @@ abstract contract SpokeStorageV3 is ISpokeStorageV3 {
    * @param _last The last index of the queue
    * @param _amount The amount to process
    */
-  modifier validQueueAmount(
-    uint256 _first,
-    uint256 _last,
-    uint256 _amount
-  ) {
+  modifier validQueueAmount(uint256 _first, uint256 _last, uint256 _amount) {
     if (_amount == 0) {
       revert EverclearSpoke_ProcessQueue_ZeroAmount();
     }
@@ -158,12 +155,12 @@ abstract contract SpokeStorageV3 is ISpokeStorageV3 {
   }
 
   /**
-  * @notice Checks the caller is the fee adapter
+   * @notice Checks the caller is the fee adapter
    */
-   modifier onlyFeeAdapter() {
-    if(msg.sender != feeAdapter) {
+  modifier onlyFeeAdapter() {
+    if (msg.sender != feeAdapter) {
       revert EverclearSpoke_FeeAdapter_NotAuthorized();
     }
     _;
-   }
+  }
 }

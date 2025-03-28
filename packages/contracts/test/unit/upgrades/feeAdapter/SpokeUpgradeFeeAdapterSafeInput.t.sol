@@ -1,31 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { UUPSUpgradeable } from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
-import { MessageLib } from 'contracts/common/MessageLib.sol';
-import { TypeCasts } from 'contracts/common/TypeCasts.sol';
+import {UUPSUpgradeable} from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
+import {MessageLib} from 'contracts/common/MessageLib.sol';
+import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
-import { ISpecifiesInterchainSecurityModule } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
-import { EverclearSpokeV3, IEverclearSpokeV3 } from 'contracts/intent/EverclearSpokeV3.sol';
-import { IEverclear } from 'interfaces/common/IEverclear.sol';
+import {ISpecifiesInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
+import {EverclearSpokeV3, IEverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
+
 import {ISpokeStorageV3} from 'contracts/intent/SpokeStorageV3.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
 
-import { ISettlementModule } from 'interfaces/common/ISettlementModule.sol';
-import { ISpokeGateway } from 'interfaces/intent/ISpokeGateway.sol';
+import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
+import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
-import { Deploy } from 'script/utils/Deploy.sol';
-import { BaseTest } from 'test/unit/intent/EverclearSpoke.t.sol';
-import { Constants } from 'test/utils/Constants.sol';
-import { SafeTxBuilder } from 'test/utils/SafeTxBuilder.sol';
+import {Deploy} from 'script/utils/Deploy.sol';
+import {BaseTest} from 'test/unit/intent/EverclearSpoke.t.sol';
+import {Constants} from 'test/utils/Constants.sol';
+import {SafeTxBuilder} from 'test/utils/SafeTxBuilder.sol';
 
-import { StandardHookMetadata } from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
-import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import 'forge-std/console.sol';
 
-import { MainnetProductionEnvironment } from 'script/MainnetProduction.sol';
-import { MainnetStagingEnvironment } from 'script/MainnetStaging.sol';
-import { TestnetStagingEnvironment } from 'script/TestnetStaging.sol';
-import { ICREATE3, UpgradeHelper } from 'test//utils/UpgradeHelper.sol';
+import {MainnetProductionEnvironment} from 'script/MainnetProduction.sol';
+import {MainnetStagingEnvironment} from 'script/MainnetStaging.sol';
+import {TestnetStagingEnvironment} from 'script/TestnetStaging.sol';
+import {ICREATE3, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
 
 contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, UpgradeHelper {
   using TypeCasts for address;
@@ -119,14 +120,11 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -192,14 +190,11 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -265,14 +260,11 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -338,14 +330,11 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -411,14 +400,11 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -484,14 +470,11 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -622,14 +605,11 @@ contract SpokeUpgradeFeeAdapterMainnetStagingSafeInput is MainnetStagingEnvironm
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -695,14 +675,11 @@ contract SpokeUpgradeFeeAdapterMainnetStagingSafeInput is MainnetStagingEnvironm
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -768,14 +745,11 @@ contract SpokeUpgradeFeeAdapterMainnetStagingSafeInput is MainnetStagingEnvironm
     // Deploying impl and upgrading the contract
     bool success = false;
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, _paramsV3.feeAdapter);
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(_paramsV3.owner);
-    (success, ) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated

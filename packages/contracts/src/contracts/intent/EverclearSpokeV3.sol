@@ -102,7 +102,9 @@ contract EverclearSpokeV3 is
     gateway.updateSecurityModule(_newSecurityModule);
   }
 
-  function updateFeeAdapter(address _feeAdapter) external onlyOwner {
+  function updateFeeAdapter(
+    address _feeAdapter
+  ) external onlyOwner {
     feeAdapter = _feeAdapter;
     emit FeeAdapterUpdated(_feeAdapter);
   }

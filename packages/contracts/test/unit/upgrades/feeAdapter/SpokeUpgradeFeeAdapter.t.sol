@@ -1,28 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { UUPSUpgradeable } from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
-import { MessageLib } from 'contracts/common/MessageLib.sol';
-import { TypeCasts } from 'contracts/common/TypeCasts.sol';
-import { FeeAdapter, IFeeAdapter } from 'contracts/intent/FeeAdapter.sol';
+import {UUPSUpgradeable} from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
+import {MessageLib} from 'contracts/common/MessageLib.sol';
+import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+import {FeeAdapter, IFeeAdapter} from 'contracts/intent/FeeAdapter.sol';
 
-import { ISpecifiesInterchainSecurityModule } from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
-import { EverclearSpokeV3, IEverclearSpokeV3 } from 'contracts/intent/EverclearSpokeV3.sol';
-import { ISpokeStorageV3 } from 'interfaces/intent/ISpokeStorageV3.sol';
-import { FeeAdapter } from 'contracts/intent/FeeAdapter.sol';
-import { IEverclear } from 'interfaces/common/IEverclear.sol';
+import {ISpecifiesInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
+import {EverclearSpokeV3, IEverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
 
-import { ISettlementModule } from 'interfaces/common/ISettlementModule.sol';
-import { ISpokeGateway } from 'interfaces/intent/ISpokeGateway.sol';
+import {FeeAdapter} from 'contracts/intent/FeeAdapter.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import {ISpokeStorageV3} from 'interfaces/intent/ISpokeStorageV3.sol';
 
-import { Deploy } from 'script/utils/Deploy.sol';
-import { BaseTest } from 'test/unit/intent/EverclearSpoke.t.sol';
-import { Constants } from 'test/utils/Constants.sol';
+import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
+import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
-import { StandardHookMetadata } from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
-import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import {Deploy} from 'script/utils/Deploy.sol';
+import {BaseTest} from 'test/unit/intent/EverclearSpoke.t.sol';
+import {Constants} from 'test/utils/Constants.sol';
+
+import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import 'forge-std/console.sol';
-import { ICREATE3, UpgradeHelper } from 'test//utils/UpgradeHelper.sol';
+import {ICREATE3, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
 
 contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
   using TypeCasts for address;
@@ -36,11 +37,7 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
 
     // Deploying the feeAdapter
     feeAdapter = new FeeAdapter(
-      SPOKE_PROXY_MAINNET,
-      FEE_RECIPIENT_MAINNET,
-      FEE_SIGNER,
-      XERC20_MODULE_MAINNET,
-      SPOKE_PROXY_MAINNET_OWNER
+      SPOKE_PROXY_MAINNET, FEE_RECIPIENT_MAINNET, FEE_SIGNER, XERC20_MODULE_MAINNET, SPOKE_PROXY_MAINNET_OWNER
     );
 
     // Checking implementation correct and caching the state variables
@@ -66,14 +63,11 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     // Deploying feeAdapter, impl and upgrading the contract
     bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV3.initialize.selector, address(feeAdapter));
     success = false;
-    bytes memory upgradeCalldata = abi.encodeWithSelector(
-      UUPSUpgradeable.upgradeToAndCall.selector,
-      newEverclearSpoke,
-      initializeCalldata
-    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(SPOKE_PROXY_MAINNET_OWNER);
-    (success, ) = address(spokeProxyV3).call(upgradeCalldata);
+    (success,) = address(spokeProxyV3).call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -243,7 +237,7 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
   function test_spokeUpgradeFeeAdapter_newIntentBytes(uint256 _amount, bytes32 _receiver) public {
     vm.assume(_receiver != 0);
     _amount = bound(_amount, 1, type(uint128).max);
-    
+
     uint32[] memory destinations = _getDestinations(10);
     address _sender = address(0x123);
 
@@ -267,15 +261,7 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     IERC20(_inputAsset).approve(address(feeAdapter), _amount + _feeParams.fee);
 
     (, IEverclear.Intent memory _intent) = feeAdapter.newIntent(
-      destinations,
-      _receiver,
-      _inputAsset,
-      _outputAsset.toBytes32(),
-      _amount,
-      0,
-      0,
-      hex'00',
-      _feeParams
+      destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00', _feeParams
     );
 
     vm.stopPrank();
@@ -315,16 +301,12 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     vm.expectCall(
       address(MAILBOX_MAINNET),
       abi.encodeWithSignature(
-        'dispatch(uint32,bytes32,bytes,bytes)',
-        HUB_ID,
-        HUB_GATEWAY_PROD,
-        _batchIntentmessage,
-        metadata
+        'dispatch(uint32,bytes32,bytes,bytes)', HUB_ID, HUB_GATEWAY_PROD, _batchIntentmessage, metadata
       )
     );
 
     vm.startPrank(lightHouse);
-    spokeProxyV3.processIntentQueue{ value: _messageFee }(_intentsToProcess);
+    spokeProxyV3.processIntentQueue{value: _messageFee}(_intentsToProcess);
     assertEq(lightHouse.balance, _initialLighthouseBal - _messageFee);
   }
 
@@ -338,11 +320,7 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
 
     // Deploying the feeAdapter
     feeAdapter = new FeeAdapter(
-      SPOKE_PROXY_MAINNET,
-      FEE_RECIPIENT_MAINNET,
-      FEE_SIGNER,
-      XERC20_MODULE_MAINNET,
-      SPOKE_PROXY_MAINNET_OWNER
+      SPOKE_PROXY_MAINNET, FEE_RECIPIENT_MAINNET, FEE_SIGNER, XERC20_MODULE_MAINNET, SPOKE_PROXY_MAINNET_OWNER
     );
 
     // Deploying impl and upgrading the contract
