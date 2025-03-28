@@ -126,9 +126,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     IFeeAdapter.FeeParams calldata _feeParams
   ) external payable returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     // Transfer from caller using permit2
-    {
-      _pullWithPermit2(_inputAsset, _amount + _feeParams.fee, _permit2Params);
-    }
+    _pullWithPermit2(_inputAsset, _amount + _feeParams.fee, _permit2Params);
 
     // Call internal helper to create intent
     (_intentId, _intent) = _newIntent(
@@ -152,39 +150,35 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     bytes calldata _sig,
     OrderParameters memory _params
   ) external payable returns (bytes32 _orderId, bytes32[] memory _intentIds) {
-    {
-      // Transfer once from the user
-      _pullTokens(msg.sender, _params.inputAsset, _params.amount + _fee);
+    // Transfer once from the user
+    _pullTokens(msg.sender, _params.inputAsset, _params.amount + _fee);
 
-      // Send fees to recipient
-      _handleFees(_fee, msg.value, _params.inputAsset, _deadline, _sig);
+    // Send fees to recipient
+    _handleFees(_fee, msg.value, _params.inputAsset, _deadline, _sig);
 
-      // Approve the spoke contract if needed
-      _approveSpokeIfNeeded(_params.inputAsset, _params.amount);
-    }
+    // Approve the spoke contract if needed
+    _approveSpokeIfNeeded(_params.inputAsset, _params.amount);
 
     // Create `_numIntents` intents with the same params and `_amount` divided
     // equally across all created intents.
     uint256 _toSend = _params.amount / _numIntents;
 
-    {
-      // Initialising array length
-      _intentIds = new bytes32[](_numIntents);
+    // Initialising array length
+    _intentIds = new bytes32[](_numIntents);
 
-      for (uint256 i; i < _numIntents - 1; i++) {
-        // Create new intent
-        (bytes32 _intentId, ) = spoke.newIntent(
-          _params.destinations,
-          _params.receiver,
-          _params.inputAsset,
-          _params.outputAsset,
-          _toSend,
-          _params.maxFee,
-          _params.ttl,
-          _params.data
-        );
-        _intentIds[i] = _intentId;
-      }
+    for (uint256 i; i < _numIntents - 1; i++) {
+      // Create new intent
+      (bytes32 _intentId, ) = spoke.newIntent(
+        _params.destinations,
+        _params.receiver,
+        _params.inputAsset,
+        _params.outputAsset,
+        _toSend,
+        _params.maxFee,
+        _params.ttl,
+        _params.data
+      );
+      _intentIds[i] = _intentId;
     }
 
     // Create a final intent here with the remainder of balance

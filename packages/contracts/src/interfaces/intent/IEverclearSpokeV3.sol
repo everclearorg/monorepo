@@ -4,13 +4,13 @@ pragma solidity 0.8.25;
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 
-import {ISpokeStorage} from './ISpokeStorage.sol';
+import {ISpokeStorageV3} from './ISpokeStorageV3.sol';
 
 /**
  * @title IEverclearSpoke
  * @notice Interface for the EverclearSpoke contract
  */
-interface IEverclearSpoke is ISpokeStorage {
+interface IEverclearSpokeV3 is ISpokeStorageV3 {
   /*///////////////////////////////////////////////////////////////
                               STRUCTS
   //////////////////////////////////////////////////////////////*/
@@ -227,11 +227,35 @@ interface IEverclearSpoke is ISpokeStorage {
 
   /**
    * @notice Initialize the EverclearSpoke contract
-   * @param _init The spoke initialization parameters
+   * @param _feeAdapter The fee adapter
    */
   function initialize(
-    SpokeInitializationParams calldata _init
+    address _feeAdapter
   ) external;
+
+  /**
+   * @notice Creates a new intent
+   * @param _destinations The possible destination chains of the intent
+   * @param _receiver The destinantion address of the intent
+   * @param _inputAsset The asset address on origin
+   * @param _outputAsset The asset address on destination
+   * @param _amount The amount of the asset
+   * @param _maxFee The maximum fee that can be taken by solvers
+   * @param _ttl The time to live of the intent
+   * @param _data The data of the intent
+   * @return _intentId The ID of the intent
+   * @return _intent The intent object
+   */
+  function newIntent(
+    uint32[] memory _destinations,
+    bytes32 _receiver,
+    address _inputAsset,
+    bytes32 _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data
+  ) external returns (bytes32 _intentId, Intent calldata _intent);
 
   /**
    * @notice Creates a new intent
