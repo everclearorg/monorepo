@@ -22,7 +22,6 @@ import {Constants} from 'test/utils/Constants.sol';
 
 import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import 'forge-std/console.sol';
 import {ICREATE3, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
 
 contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
@@ -49,7 +48,7 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     CachedSpokeState memory state = _cacheSpokeStateV3();
 
     // Generating the inputs for CREATE3
-    uint8 version = 3;
+    uint8 version = 4;
     bytes32 _salt = keccak256(abi.encodePacked(SPOKE_PROXY_MAINNET, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
     bytes memory _creation = type(EverclearSpokeV3).creationCode;
@@ -76,7 +75,6 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
 
     // Creating intent
     IEverclear.Intent memory _intent;
-    _intent.destinations = new uint32[](11);
 
     // Checking the new intent function (bytes32) reverts if the caller is not the feeAdapter
     vm.expectRevert(ISpokeStorageV3.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
@@ -131,6 +129,7 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     assertEq(state.paused, spokeProxyV3.paused());
     assertEq(state.nonce, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
+    assertEq(address(feeAdapter), spokeProxyV3.feeAdapter());
   }
 
   // ============ Admin Unit ============ //
@@ -196,6 +195,10 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     assertEq(spokeProxyV3.messageGasLimit(), 1000);
   }
 
+  /**
+   * @notice Tests the updateFeeAdapter function of the spoke proxy
+   * @dev This function is newly added to the spoke proxy
+   */
   function test_spokeUpgradeFeeAdapter_updateFeeAdapter() public {
     _upgradeSpoke();
 
@@ -205,6 +208,10 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
   }
 
   // ============ Public ============ //
+  /**
+   * @notice Tests the deposit function of the spoke proxy
+   * @dev This function is used to deposit tokens into the spoke proxy
+   */
   function test_spokeUpgradeFeeAdapter_deposit() public {
     _upgradeSpoke();
 
@@ -217,6 +224,10 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     assertEq(spokeProxyV3.balances(USDC_MAINNET.toBytes32(), address(this).toBytes32()), amount);
   }
 
+  /**
+   * @notice Tests the withdraw function of the spoke proxy
+   * @dev This function is used to withdraw tokens from the spoke proxy
+   */
   function test_spokeUpgradeFeeAdapter_withdraw() public {
     _upgradeSpoke();
 
@@ -234,6 +245,11 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     assertEq(IERC20(USDC_MAINNET).balanceOf(address(this)), amount);
   }
 
+  /**
+   * @notice Tests the newIntent function that has bytes32 inputs for receiver and outputAsset
+   * @param _amount The amount to send
+   * @param _receiver The receiver address
+   */
   function test_spokeUpgradeFeeAdapter_newIntentBytes(uint256 _amount, bytes32 _receiver) public {
     vm.assume(_receiver != 0);
     _amount = bound(_amount, 1, type(uint128).max);
@@ -243,7 +259,6 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
 
     // upgrading the spoke
     _upgradeSpoke();
-    console.log(address(feeAdapter));
 
     // configuring the feeparams
     IFeeAdapter.FeeParams memory _feeParams;
@@ -260,9 +275,11 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapter), _amount + _feeParams.fee);
 
-    (, IEverclear.Intent memory _intent) = feeAdapter.newIntent(
+    (bytes32 _intentId,) = feeAdapter.newIntent(
       destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00', _feeParams
     );
+
+    assertEq(uint8(spokeProxyV3.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
 
     vm.stopPrank();
   }
@@ -270,13 +287,11 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
   /**
    * @notice Tests the processIntentQueue function using the newIntent function with address input
    * @param _intents The intents to process
-   * @param _amount The amount of intents to process
    * @param _messageFee The message fee to process the intents
    */
   function test_spokeUpgradeFeeAdapter_ProcessIntentQueue(
     IEverclear.Intent[MAX_FUZZED_ARRAY_LENGTH] memory _intents,
     uint32 _destination,
-    uint32 _amount,
     uint256 _messageFee
   ) public validDestination(_destination) {
     _upgradeSpoke();
@@ -285,18 +300,16 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     _messageFee = bound(_messageFee, 1, 10 ether);
     deal(lightHouse, _messageFee);
 
-    _amount = uint32(bound(uint256(_amount), 1, MAX_FUZZED_ARRAY_LENGTH));
-    IEverclear.Intent[] memory _intentsToProcess = new IEverclear.Intent[](_amount);
+    IEverclear.Intent[] memory _intentsToProcess = new IEverclear.Intent[](_intents.length);
+    bytes32[] memory _intentIds = new bytes32[](_intents.length);
 
-    for (uint256 _i; _i < _amount; _i++) {
-      _intentsToProcess[_i] = _newIntentAndAssert(_intents[_i], AdditionalParams(_destination, _i, _amount));
+    for (uint256 _i; _i < _intents.length; _i++) {
+      (_intentIds[_i], _intentsToProcess[_i]) =
+        _newIntentAndAssert(_intents[_i], AdditionalParams(_destination, _i, uint32(_intents.length)));
     }
 
     bytes memory _batchIntentmessage = MessageLib.formatIntentMessageBatch(_intentsToProcess);
-
-    uint256 _initialLighthouseBal = lightHouse.balance;
     metadata = StandardHookMetadata.formatMetadata(0, MESSAGE_GAS_LIMIT, SPOKE_GATEWAY_MAINNET, '');
-    bytes32 _messageId = _mockDispatch(SPOKE_GATEWAY_MAINNET, MAILBOX_MAINNET, _batchIntentmessage, metadata);
 
     vm.expectCall(
       address(MAILBOX_MAINNET),
@@ -307,7 +320,117 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
 
     vm.startPrank(lightHouse);
     spokeProxyV3.processIntentQueue{value: _messageFee}(_intentsToProcess);
-    assertEq(lightHouse.balance, _initialLighthouseBal - _messageFee);
+    assertEq(lightHouse.balance, 0);
+  }
+
+  // ============ Revert ============ //
+  /**
+   * @notice Tests the revert of the newIntent function when caller is not feeAdapter
+   */
+  function testRevert_newIntent_addressInput_EverclearSpokeFeeAdapterNotAuthorized() public {
+    _upgradeSpoke();
+
+    vm.expectRevert(abi.encodeWithSelector(ISpokeStorageV3.EverclearSpoke_FeeAdapter_NotAuthorized.selector));
+    spokeProxyV3.newIntent(new uint32[](0), address(0), address(0), address(0), 0, 0, 0, hex'00');
+  }
+
+  /**
+   * @notice Tests the revert of the newIntent function with bytes32 inputs when caller is not feeAdapter
+   */
+  function testRevert_newIntent_bytes32Input_EverclearSpokeFeeAdapterNotAuthorized() public {
+    _upgradeSpoke();
+
+    vm.expectRevert(abi.encodeWithSelector(ISpokeStorageV3.EverclearSpoke_FeeAdapter_NotAuthorized.selector));
+    spokeProxyV3.newIntent(new uint32[](0), bytes32(0), address(0), bytes32(0), 0, 0, 0, hex'00');
+  }
+
+  /**
+   * @notice Tests the revert of the newIntent function with permit2 inputs when caller is not feeAdapter
+   */
+  function testRevert_newIntent_permit2Input_EverclearSpokeFeeAdapterNotAuthorized() public {
+    _upgradeSpoke();
+
+    IEverclearSpokeV3.Permit2Params memory permit2Params;
+    vm.expectRevert(abi.encodeWithSelector(ISpokeStorageV3.EverclearSpoke_FeeAdapter_NotAuthorized.selector));
+    spokeProxyV3.newIntent(new uint32[](0), address(0), address(0), address(0), 0, 0, 0, hex'00', permit2Params);
+  }
+
+  function testRevert_newIntent_OutputAssetZero_EverclearSpokeNewIntentInvalidIntent() public {
+    _upgradeSpoke();
+
+    // Configuring inputs
+    address _sender = address(0x123);
+    address _receiver = address(0);
+    address _outputAsset = address(0);
+    uint32[] memory destinations = _getDestinations(10);
+    uint256 _amount = 1e18;
+
+    // configuring the feeparams
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = 1e8;
+    _feeParams.deadline = block.timestamp + 1 days;
+
+    // dealing to the user
+    address _inputAsset = deployAndDeal(_sender, _amount + _feeParams.fee).toAddress();
+
+    // generating signature after asset is created
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline));
+
+    vm.startPrank(_sender);
+    IERC20(_inputAsset).approve(address(feeAdapter), _amount + _feeParams.fee);
+
+    vm.expectRevert(abi.encodeWithSelector(IEverclearSpokeV3.EverclearSpoke_NewIntent_InvalidIntent.selector));
+    feeAdapter.newIntent(
+      destinations,
+      _receiver, // receiver
+      _inputAsset,
+      _outputAsset, // outputAsset --> should revert as address(0) not valid when ttl != 0
+      _amount,
+      0,
+      3600, // ttl
+      hex'00',
+      _feeParams
+    );
+  }
+
+  function testRevert_newIntent_OutputAssetNonZero_EverclearSpokeNewIntentInvalidIntent() public {
+    _upgradeSpoke();
+
+    // Configuring inputs
+    address _sender = address(0x123);
+    address _receiver = address(0);
+    uint32[] memory destinations = new uint32[](2);
+    destinations[0] = 10;
+    destinations[1] = 20;
+    uint256 _amount = 1e18;
+
+    // configuring the feeparams
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = 1e8;
+    _feeParams.deadline = block.timestamp + 1 days;
+
+    // dealing to the user
+    address _inputAsset = deployAndDeal(_sender, _amount + _feeParams.fee).toAddress();
+    address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
+
+    // generating signature after asset is created
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline));
+
+    vm.startPrank(_sender);
+    IERC20(_inputAsset).approve(address(feeAdapter), _amount + _feeParams.fee);
+
+    vm.expectRevert(abi.encodeWithSelector(IEverclearSpokeV3.EverclearSpoke_NewIntent_InvalidIntent.selector));
+    feeAdapter.newIntent(
+      destinations,
+      _receiver, // receiver
+      _inputAsset,
+      _outputAsset, // outputAsset --> should revert as it should be null when destination array length > 1
+      _amount,
+      0,
+      0, // ttl
+      hex'00',
+      _feeParams
+    );
   }
 
   // ============ Helpers ============ //
@@ -338,8 +461,9 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
   function _newIntentAndAssert(
     IEverclear.Intent memory _intentParam,
     AdditionalParams memory _params
-  ) internal returns (IEverclear.Intent memory _returnIntent) {
-    vm.assume(_intentParam.amount > 0);
+  ) internal returns (bytes32 _intentId, IEverclear.Intent memory _returnIntent) {
+    // vm.assume(_intentParam.amount > 0);
+    _intentParam.amount = bound(_intentParam.amount, 1, type(uint128).max);
     vm.assume(_intentParam.receiver.toAddress() != address(0));
     _getDestinations(_intentParam, _params.destination);
 
@@ -358,7 +482,7 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
     vm.startPrank(_intentParam.receiver.toAddress());
     IERC20(_inputAsset).approve(address(feeAdapter), _intentParam.amount + _feeParams.fee);
 
-    (, _returnIntent) = feeAdapter.newIntent(
+    (_intentId, _returnIntent) = feeAdapter.newIntent(
       _intentParam.destinations,
       _intentParam.receiver.toAddress(),
       _inputAsset,
@@ -369,6 +493,8 @@ contract SpokeUpgradeFeeAdapterTest is BaseTest, UpgradeHelper {
       _intentParam.data,
       _feeParams
     );
+
+    assertEq(uint8(spokeProxyV3.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
 
     vm.stopPrank();
   }

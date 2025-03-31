@@ -74,6 +74,7 @@ contract UpgradeHelper is SafeTxBuilder {
 
   error Create3DeploymentFailed();
   error UpgradeFailed();
+  error NoFeeAdapter();
 
   bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
   address constant CREATE_3 = 0x9fBB3DF7C40Da2e5A0dE984fFE2CCB7C47cd0ABf;
@@ -106,7 +107,7 @@ contract UpgradeHelper is SafeTxBuilder {
   uint256 public FEE_SIGNER_PK = 1;
   address public FEE_SIGNER = vm.addr(FEE_SIGNER_PK);
   address XERC20_MODULE_MAINNET;
-  uint256 public FIXED_MAIN_BLOCK_UP2 = 22_146_318;
+  uint256 public FIXED_MAIN_BLOCK_UP2 = 22_146_818;
 
   function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
     state.permit = address(spokeProxy.PERMIT2());

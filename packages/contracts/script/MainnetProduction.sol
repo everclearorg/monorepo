@@ -182,6 +182,7 @@ abstract contract Blast {
   ISpokeGateway public BLAST_SPOKE_GATEWAY = ISpokeGateway(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
   ICallExecutor public BLAST_EXECUTOR = ICallExecutor(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
   IXERC20Module public BLAST_XERC20_MODULE = IXERC20Module(0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64);
+  address public BLAST_SPOKE_IMPL = 0xe0F010e465f15dcD42098dF9b99F1038c11B3056;
 }
 
 abstract contract Linea {
@@ -192,6 +193,7 @@ abstract contract Linea {
   ISpokeGateway public LINEA_SPOKE_GATEWAY = ISpokeGateway(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
   ICallExecutor public LINEA_EXECUTOR = ICallExecutor(0x7480BAeD22695AeA229fDD280a5194d51dc54A21);
   IXERC20Module public LINEA_XERC20_MODULE = IXERC20Module(0xBBd3546f8FB1A335E2Cc1AeE5d7f3FC696D853aB);
+  address public LINEA_SPOKE_IMPL = 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460;
 }
 
 abstract contract Polygon {
@@ -202,6 +204,7 @@ abstract contract Polygon {
   ISpokeGateway public POLYGON_SPOKE_GATEWAY = ISpokeGateway(0x26CFF54f11608Cd3060408690803AB4a43f462f2);
   ICallExecutor public POLYGON_EXECUTOR = ICallExecutor(0xd08c4718A58bf1f13F540dAEB170f22533d292b7);
   IXERC20Module public POLYGON_XERC20_MODULE = IXERC20Module(0x4aade9F812d2160A1b3c6e77f30f1bF14eC7e2a5);
+  address public POLYGON_SPOKE_IMPL = 0x5d81D204FbbC606526A73C11d02C127Ce46B488F;
 }
 
 abstract contract Avalanche {
@@ -212,6 +215,7 @@ abstract contract Avalanche {
   ISpokeGateway public AVALANCHE_SPOKE_GATEWAY = ISpokeGateway(0x7EB63a646721de65eBa79ffe91c55DCE52b73c12);
   ICallExecutor public AVALANCHE_EXECUTOR = ICallExecutor(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
   IXERC20Module public AVALANCHE_XERC20_MODULE = IXERC20Module(0x255aba6E7f08d40B19872D11313688c2ED65d1C9);
+  address public AVALANCHE_SPOKE_IMPL = 0xD385Af1A209890AEE184BDf75f328aC396d52fB6;
 }
 
 abstract contract Scroll {
@@ -222,6 +226,7 @@ abstract contract Scroll {
   ISpokeGateway public SCROLL_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public SCROLL_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   IXERC20Module public SCROLL_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public SCROLL_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 }
 
 abstract contract Taiko {
@@ -232,6 +237,7 @@ abstract contract Taiko {
   ISpokeGateway public TAIKO_SPOKE_GATEWAY = ISpokeGateway(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
   ICallExecutor public TAIKO_EXECUTOR = ICallExecutor(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
   IXERC20Module public TAIKO_XERC20_MODULE = IXERC20Module(0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64);
+  address public TAIKO_SPOKE_IMPL = 0xe0F010e465f15dcD42098dF9b99F1038c11B3056;
 }
 
 abstract contract Apechain {
@@ -242,6 +248,7 @@ abstract contract Apechain {
   ISpokeGateway public APECHAIN_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public APECHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   IXERC20Module public APECHAIN_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public APECHAIN_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 }
 
 abstract contract ZkSync {
@@ -262,6 +269,7 @@ abstract contract Mode {
   ISpokeGateway public MODE_SPOKE_GATEWAY = ISpokeGateway(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
   ICallExecutor public MODE_EXECUTOR = ICallExecutor(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
   IXERC20Module public MODE_XERC20_MODULE = IXERC20Module(0x7B435CCF350DBC773e077410e8FEFcd46A1cDfAA);
+  address public MODE_SPOKE_IMPL = 0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7;
 }
 
 abstract contract Unichain {
@@ -272,6 +280,7 @@ abstract contract Unichain {
   ISpokeGateway public UNICHAIN_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public UNICHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   IXERC20Module public UNICHAIN_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public UNICHAIN_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 }
 
 abstract contract Ronin {
@@ -282,6 +291,7 @@ abstract contract Ronin {
   ISpokeGateway public RONIN_SPOKE_GATEWAY = ISpokeGateway(0x1FC1f47a6a7c61f53321643A14bEc044213AbF95);
   ICallExecutor public RONIN_EXECUTOR = ICallExecutor(0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71);
   IXERC20Module public RONIN_XERC20_MODULE = IXERC20Module(0x92dcaf947DB325ac023b105591d76315743883eD);
+  address public RONIN_SPOKE_IMPL = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
 }
 
 abstract contract MainnetProductionDomains is
