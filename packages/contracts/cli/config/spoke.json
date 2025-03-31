@@ -154,5 +154,11 @@
     "domainName": "Ronin",
     "domainId": 2020,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xe0F010e465f15dcD42098dF9b99F1038c11B3056",
+    "domainName": "Gnosis",
+    "domainId": 100,
+    "environment": "MainnetProduction"
   }
 ]

@@ -114,6 +114,10 @@ import ProductionSpokeGatewayUnichain from './production/130/SpokeGateway.json';
 import ProductionEverclearSpokeRonin from './production/2020/EverclearSpoke.json';
 import ProductionSpokeGatewayRonin from './production/2020/SpokeGateway.json';
 
+// Add Gnosis deployment imports
+import ProductionEverclearSpokeGnosis from './production/100/EverclearSpoke.json';
+import ProductionSpokeGatewayGnosis from './production/100/SpokeGateway.json';
+
 export const Deployments = {
   local: {},
   production: {
@@ -216,6 +220,9 @@ export const Deployments = {
     2020: {
       everclear: ProductionEverclearSpokeRonin,
       gateway: ProductionSpokeGatewayRonin,
+    100: {
+      everclear: ProductionEverclearSpokeGnosis,
+      gateway: ProductionSpokeGatewayGnosis,
     },
   },
   staging: {

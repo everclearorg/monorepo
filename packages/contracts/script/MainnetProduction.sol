@@ -343,6 +343,17 @@ abstract contract Ronin {
   address public constant RONIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
+abstract contract Gnosis {
+  uint32 public constant GNOSIS = 100;
+  IMailbox public GNOSIS_MAILBOX = IMailbox(0xaD09d78f4c6b9dA2Ae82b1D34107802d380Bb74f);
+
+  IEverclearSpoke public GNOSIS_SPOKE = IEverclearSpoke(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
+  ISpokeGateway public GNOSIS_SPOKE_GATEWAY = ISpokeGateway(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  ICallExecutor public GNOSIS_EXECUTOR = ICallExecutor(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
+
+  address public GNOSIS_SPOKE_IMPL = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+}
+
 abstract contract MainnetProductionDomains is
   Everclear,
   Ethereum,
@@ -361,7 +372,8 @@ abstract contract MainnetProductionDomains is
   Scroll,
   Apechain,
   Unichain,
-  Ronin
+  Ronin,
+  Gnosis
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {

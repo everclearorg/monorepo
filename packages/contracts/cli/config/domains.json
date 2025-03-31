@@ -159,6 +159,14 @@
     "realm": "spoke"
   },
   {
+    "name": "Gnosis",
+    "id": 100,
+    "rpc": "https://gnosis-rpc.publicnode.com",
+    "verifierUrl": "https://api.gnosisscan.io/api",
+    "environments": ["MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
     "name": "Scroll Sepolia",
     "id": 534351,
     "rpc": "https://scroll-testnet-public.unifra.io",
