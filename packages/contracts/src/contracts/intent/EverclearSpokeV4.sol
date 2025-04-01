@@ -40,21 +40,21 @@ import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
 import {IPermit2} from 'interfaces/common/IPermit2.sol';
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
-import {IEverclearSpokeV3} from 'interfaces/intent/IEverclearSpokeV3.sol';
+import {IEverclearSpokeV4} from 'interfaces/intent/IEverclearSpokeV4.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
-import {SpokeStorage} from 'contracts/intent/SpokeStorage.sol';
+import {SpokeStorageV4} from 'contracts/intent/SpokeStorageV4.sol';
 /**
  * @title EverclearSpoke
  * @notice Spoke contract for Everclear
  */
 
-contract EverclearSpokeV3 is
-  SpokeStorage,
+contract EverclearSpokeV4 is
+  SpokeStorageV4,
   UUPSUpgradeable,
   OwnableUpgradeable,
   NoncesUpgradeable,
-  IEverclearSpokeV3,
+  IEverclearSpokeV4,
   IMessageReceiver
 {
   using QueueLib for QueueLib.IntentQueue;
@@ -71,35 +71,43 @@ contract EverclearSpokeV3 is
                        EXTERNAL FUNCTIONS
   //////////////////////////////////////////////////////////////*/
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function pause() external hasPauseAccess {
     paused = true;
     emit Paused();
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function unpause() external hasPauseAccess {
     paused = false;
     emit Unpaused();
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function setStrategyForAsset(address _asset, IEverclear.Strategy _strategy) external onlyOwner {
     strategies[_asset] = _strategy;
     emit StrategySetForAsset(_asset, _strategy);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function setModuleForStrategy(IEverclear.Strategy _strategy, ISettlementModule _module) external onlyOwner {
     modules[_strategy] = _module;
     emit ModuleSetForStrategy(_strategy, _module);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function updateSecurityModule(
     address _newSecurityModule
   ) external onlyOwner {
     gateway.updateSecurityModule(_newSecurityModule);
+  }
+
+  /// @inheritdoc IEverclearSpokeV4
+  function updateFeeAdapter(
+    address _feeAdapter
+  ) external onlyOwner {
+    feeAdapter = _feeAdapter;
+    emit FeeAdapterUpdated(_feeAdapter);
   }
 
   /// @inheritdoc IMessageReceiver
@@ -109,7 +117,7 @@ contract EverclearSpokeV3 is
     _delegate(messageReceiver);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function newIntent(
     uint32[] memory _destinations,
     bytes32 _receiver,
@@ -119,7 +127,7 @@ contract EverclearSpokeV3 is
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data
-  ) external whenNotPaused returns (bytes32 _intentId, Intent memory _intent) {
+  ) external whenNotPaused onlyFeeAdapter returns (bytes32 _intentId, Intent memory _intent) {
     if (_destinations.length > 10) revert EverclearSpoke_NewIntent_InvalidIntent();
     (_intentId, _intent) = _newIntent({
       _destinations: _destinations,
@@ -134,7 +142,7 @@ contract EverclearSpokeV3 is
     });
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function newIntent(
     uint32[] memory _destinations,
     address _receiver,
@@ -144,7 +152,7 @@ contract EverclearSpokeV3 is
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data
-  ) external whenNotPaused returns (bytes32 _intentId, Intent memory _intent) {
+  ) external whenNotPaused onlyFeeAdapter returns (bytes32 _intentId, Intent memory _intent) {
     if (_destinations.length > 10) revert EverclearSpoke_NewIntent_InvalidIntent();
     (_intentId, _intent) = _newIntent({
       _destinations: _destinations,
@@ -159,7 +167,7 @@ contract EverclearSpokeV3 is
     });
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function newIntent(
     uint32[] memory _destinations,
     address _receiver,
@@ -170,7 +178,7 @@ contract EverclearSpokeV3 is
     uint48 _ttl,
     bytes calldata _data,
     Permit2Params calldata _permit2Params
-  ) external whenNotPaused returns (bytes32 _intentId, Intent memory _intent) {
+  ) external whenNotPaused onlyFeeAdapter returns (bytes32 _intentId, Intent memory _intent) {
     if (_destinations.length > 10) revert EverclearSpoke_NewIntent_InvalidIntent();
     PERMIT2.permitTransferFrom(
       IPermit2.PermitTransferFrom({
@@ -196,7 +204,7 @@ contract EverclearSpokeV3 is
     });
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function fillIntent(
     Intent calldata _intent,
     uint24 _fee
@@ -204,7 +212,7 @@ contract EverclearSpokeV3 is
     _fillMessage = _fillIntent(_intent, msg.sender, _fee);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function fillIntentForSolver(
     address _solver,
     Intent calldata _intent,
@@ -218,7 +226,7 @@ contract EverclearSpokeV3 is
     _fillMessage = _fillIntent(_intent, _solver, _fee);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function processIntentQueue(
     Intent[] calldata _intents
   ) external payable whenNotPaused {
@@ -230,7 +238,7 @@ contract EverclearSpokeV3 is
     emit IntentQueueProcessed(_messageId, _firstIdx, _firstIdx + _intents.length, _feeSpent);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function processFillQueue(
     uint32 _amount
   ) external payable whenNotPaused {
@@ -242,7 +250,7 @@ contract EverclearSpokeV3 is
     emit FillQueueProcessed(_messageId, _firstIdx, _firstIdx + _amount, _feeSpent);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function processIntentQueueViaRelayer(
     uint32 _domain,
     Intent[] calldata _intents,
@@ -269,7 +277,7 @@ contract EverclearSpokeV3 is
     emit IntentQueueProcessed(_messageId, _firstIdx, _firstIdx + _amount, _feeSpent);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function processFillQueueViaRelayer(
     uint32 _domain,
     uint32 _amount,
@@ -295,7 +303,7 @@ contract EverclearSpokeV3 is
     emit FillQueueProcessed(_messageId, _firstIdx, _firstIdx + _amount, _feeSpent);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function deposit(address _asset, uint256 _amount) external whenNotPaused {
     _pullTokens(msg.sender, _asset, _amount);
     balances[_asset.toBytes32()][msg.sender.toBytes32()] += _amount;
@@ -303,7 +311,7 @@ contract EverclearSpokeV3 is
     emit Deposited(msg.sender, _asset, _amount);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function withdraw(address _asset, uint256 _amount) external whenNotPaused {
     balances[_asset.toBytes32()][msg.sender.toBytes32()] -= _amount;
 
@@ -311,7 +319,7 @@ contract EverclearSpokeV3 is
     emit Withdrawn(msg.sender, _asset, _amount);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function updateGateway(
     address _newGateway
   ) external onlyOwner {
@@ -321,7 +329,7 @@ contract EverclearSpokeV3 is
     emit GatewayUpdated(_oldGateway, _newGateway);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function updateMessageReceiver(
     address _newMessageReceiver
   ) external onlyOwner {
@@ -330,7 +338,7 @@ contract EverclearSpokeV3 is
     emit MessageReceiverUpdated(_oldMessageReceiver, _newMessageReceiver);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function updateMessageGasLimit(
     uint256 _newGasLimit
   ) external onlyOwner {
@@ -339,7 +347,7 @@ contract EverclearSpokeV3 is
     emit MessageGasLimitUpdated(_oldGasLimit, _newGasLimit);
   }
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function executeIntentCalldata(
     Intent calldata _intent
   ) external whenNotPaused validDestination(_intent) {
@@ -359,24 +367,11 @@ contract EverclearSpokeV3 is
                            INITIALIZER
   //////////////////////////////////////////////////////////////*/
 
-  /// @inheritdoc IEverclearSpokeV3
+  /// @inheritdoc IEverclearSpokeV4
   function initialize(
-    SpokeInitializationParams calldata _init
-  ) public initializer {
-    DOMAIN = uint32(block.chainid);
-    gateway = _init.gateway;
-    messageReceiver = _init.messageReceiver;
-    lighthouse = _init.lighthouse;
-    watchtower = _init.watchtower;
-    callExecutor = _init.callExecutor;
-    EVERCLEAR = _init.hubDomain;
-    messageGasLimit = 20_000_000;
-
-    __Ownable_init(_init.owner);
-
-    // Intialize the queues
-    intentQueue.first = 1;
-    fillQueue.first = 1;
+    address _feeAdapter
+  ) public reinitializer(2) {
+    feeAdapter = _feeAdapter;
   }
 
   /*///////////////////////////////////////////////////////////////

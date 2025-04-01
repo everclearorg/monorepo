@@ -9,10 +9,10 @@ import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
 /**
- * @title ISpokeStorageV3
+ * @title ISpokeStorageV4
  * @notice Interface for the SpokeStorage contract
  */
-interface ISpokeStorageV3 is IEverclear {
+interface ISpokeStorageV4 is IEverclear {
   /*///////////////////////////////////////////////////////////////
                               STRUCTS
   //////////////////////////////////////////////////////////////*/

@@ -7,7 +7,7 @@ import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {Script} from 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
 
-import {EverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
+import {EverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
 
 import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 import {MainnetStagingEnvironment} from '../../MainnetStaging.sol';
@@ -37,10 +37,10 @@ contract DeploySpokeArrayUpgrade is Script, ScriptUtils {
     address newEverclearSpoke;
 
     // Generating the inputs for CREATE3
-    uint8 version = 5;
+    uint8 version = 4;
     bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
-    bytes memory _creation = type(EverclearSpokeV4).creationCode;
+    bytes memory _creation = type(EverclearSpokeV3).creationCode;
 
     // Deploying the new implementation via CREATE3
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);

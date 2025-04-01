@@ -30,8 +30,6 @@ abstract contract DefaultValues {
   address public constant WATCHTOWER = 0x6281ea3060B26352b558C4F45767C90db482c4fd;
   address public constant ASSET_MANAGER = 0xBF67dfcdC720E7bcaAdca6e1092f3A65207b7874;
   address public constant ROUTER = 0xe9Ed3751665930c112cF8e0b278C025A13C041c2;
-  // address public constant L1_ENG_MULTISIG = 0xa02a88F0bbD47045001Bd460Ad186C30F9a974d6;
-  // address public constant L2_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
   address public constant L2_FEE_SIGNER = 0xd148C7f37b346a4bD8e14f8c1f181f5f640481C8;
 }
 
@@ -287,7 +285,7 @@ abstract contract Apechain {
   address public APECHAIN_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 
   // Fee adapter constants
-  address public constant APECHAIN_ENG_MULTISIG = 0x8F69e318F788eD869f5ea8b78c7C24f0Ad12B7B0;
+  address public constant APECHAIN_ENG_MULTISIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
 }
 // load_cli_owners 0x9692d38bed86e7c86a32316b17cbbf06e28a3eef7bd1abe5bec3f694bb3d1eda
 // add_owner 0x7fB1B8D2C4a8186426Fb12a4Ae483f0093ED2315

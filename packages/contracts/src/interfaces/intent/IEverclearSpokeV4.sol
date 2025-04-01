@@ -4,13 +4,13 @@ pragma solidity 0.8.25;
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 
-import {ISpokeStorage} from './ISpokeStorage.sol';
+import {ISpokeStorageV4} from './ISpokeStorageV4.sol';
 
 /**
  * @title IEverclearSpoke
  * @notice Interface for the EverclearSpoke contract
  */
-interface IEverclearSpokeV3 is ISpokeStorage {
+interface IEverclearSpokeV4 is ISpokeStorageV4 {
   /*///////////////////////////////////////////////////////////////
                               STRUCTS
   //////////////////////////////////////////////////////////////*/
@@ -90,7 +90,13 @@ interface IEverclearSpokeV3 is ISpokeStorage {
    * @param _returnData The return data of the call
    */
   event ExternalCalldataExecuted(bytes32 indexed _intentId, bytes _returnData);
-  
+
+  /**
+   * @notice Emitted when feeAdapter is updated
+   * @param _newFeeAdapter The new fee adapter
+   */
+  event FeeAdapterUpdated(address _newFeeAdapter);
+
   /*///////////////////////////////////////////////////////////////
                               ERRORS
   //////////////////////////////////////////////////////////////*/
@@ -220,11 +226,19 @@ interface IEverclearSpokeV3 is ISpokeStorage {
   ) external;
 
   /**
+   * @notice Update the fee adapter
+   * @param _newFeeAdapter The address of the new fee adapter
+   */
+  function updateFeeAdapter(
+    address _newFeeAdapter
+  ) external;
+
+  /**
    * @notice Initialize the EverclearSpoke contract
-   * @param _init The spoke initialization parameters
+   * @param _feeAdapter The fee adapter
    */
   function initialize(
-    SpokeInitializationParams calldata _init
+    address _feeAdapter
   ) external;
 
   /**

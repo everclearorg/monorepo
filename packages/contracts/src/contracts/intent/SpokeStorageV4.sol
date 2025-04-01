@@ -8,71 +8,71 @@ import {IPermit2} from 'interfaces/common/IPermit2.sol';
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
-import {ISpokeStorageV3} from 'interfaces/intent/ISpokeStorageV3.sol';
+import {ISpokeStorageV4} from 'interfaces/intent/ISpokeStorageV4.sol';
 
 /**
  * @title SpokeStorage
  * @notice Storage layout and modifiers for the `EverclearSpoke`
  */
-abstract contract SpokeStorageV3 is ISpokeStorageV3 {
-  /// @inheritdoc ISpokeStorageV3
+abstract contract SpokeStorageV4 is ISpokeStorageV4 {
+  /// @inheritdoc ISpokeStorageV4
   bytes32 public constant FILL_INTENT_FOR_SOLVER_TYPEHASH = keccak256(
     'function fillIntentForSolver(address _solver, Intent calldata _intent, uint256 _nonce, uint24 _fee, bytes memory _signature)'
   );
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   bytes32 public constant PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
     'function processIntentQueueViaRelayer(uint32 _domain, Intent[] memory _intents, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes memory _signature)'
   );
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   bytes32 public constant PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
     'function processFillQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes memory _signature)'
   );
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   uint32 public EVERCLEAR;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   uint32 public DOMAIN;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   address public lighthouse;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   address public watchtower;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   address public messageReceiver;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   ISpokeGateway public gateway;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   ICallExecutor public callExecutor;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   bool public paused;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   uint64 public nonce;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   uint256 public messageGasLimit;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   mapping(bytes32 _asset => mapping(bytes32 _user => uint256 _amount)) public balances;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   mapping(bytes32 _intentId => IntentStatus status) public status;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   mapping(address _asset => Strategy _strategy) public strategies;
 
-  /// @inheritdoc ISpokeStorageV3
+  /// @inheritdoc ISpokeStorageV4
   mapping(Strategy _strategy => ISettlementModule _module) public modules;
 
   /**

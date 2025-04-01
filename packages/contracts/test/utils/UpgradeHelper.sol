@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {EverclearSpoke, IEverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
-import {EverclearSpokeV3, IEverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
+import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
+import {EverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
+import {EverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {SafeTxBuilder} from 'test/utils/SafeTxBuilder.sol';
 
@@ -65,7 +66,7 @@ contract UpgradeHelper is SafeTxBuilder {
     address spokeImpl;
   }
 
-  struct DeploymentParamsV3 {
+  struct DeploymentParamsV4 {
     address owner;
     address spokeProxy;
     address spokeImpl;
@@ -91,15 +92,19 @@ contract UpgradeHelper is SafeTxBuilder {
 
   EverclearSpoke public spokeProxy;
   DeploymentParams public _params;
-  DeploymentParamsV3 public _paramsV3;
+  DeploymentParamsV4 public _paramsV3;
 
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
-  mapping(uint256 _chainId => DeploymentParamsV3 _params) internal _deploymentParamsV3;
+
+  /**
+   * **********************  Solana Upgrade  **********************
+   */
+  EverclearSpokeV3 public spokeProxyV3;
 
   /**
    * **********************  FeeAdapter Upgrade  **********************
    */
-  EverclearSpokeV3 public spokeProxyV3;
+  EverclearSpokeV4 public spokeProxyV4;
 
   address public SPOKE_IMPL_MAINNET_V2 = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
 
@@ -108,6 +113,8 @@ contract UpgradeHelper is SafeTxBuilder {
   address public FEE_SIGNER = vm.addr(FEE_SIGNER_PK);
   address XERC20_MODULE_MAINNET;
   uint256 public FIXED_MAIN_BLOCK_UP2 = 22_146_818;
+
+  mapping(uint256 _chainId => DeploymentParamsV4 _params) internal _deploymentParamsV4;
 
   function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
     state.permit = address(spokeProxy.PERMIT2());
@@ -135,5 +142,19 @@ contract UpgradeHelper is SafeTxBuilder {
     state.paused = spokeProxyV3.paused();
     state.nonce = spokeProxyV3.nonce();
     state.messageGasLimit = spokeProxyV3.messageGasLimit();
+  }
+
+  function _cacheSpokeStateV4() internal view returns (CachedSpokeState memory state) {
+    state.permit = address(spokeProxyV4.PERMIT2());
+    state.EVERCLEAR = spokeProxyV4.EVERCLEAR();
+    state.DOMAIN = spokeProxyV4.DOMAIN();
+    state.lighthouse = spokeProxyV4.lighthouse();
+    state.watchtower = spokeProxyV4.watchtower();
+    state.messageReceiver = spokeProxyV4.messageReceiver();
+    state.gateway = address(spokeProxyV4.gateway());
+    state.callExecutor = address(spokeProxyV4.callExecutor());
+    state.paused = spokeProxyV4.paused();
+    state.nonce = spokeProxyV4.nonce();
+    state.messageGasLimit = spokeProxyV4.messageGasLimit();
   }
 }
