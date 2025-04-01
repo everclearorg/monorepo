@@ -65,153 +65,153 @@ contract MainnetProduction is DeployAdapterBase, MainnetProductionEnvironment {
     _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
       spoke: address(ARBITRUM_ONE_SPOKE),
       xerc20Module: address(ARBITRUM_ONE_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: ARBITRUM_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: ARBITRUM_ENG_MULTISIG
     });
 
     //// Optimism
     _deploymentParams[OPTIMISM] = DeploymentParams({ // set domain id as mapping key
       spoke: address(OPTIMISM_SPOKE),
       xerc20Module: address(OPTIMISM_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: OPTIMISM_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: OPTIMISM_ENG_MULTISIG
     });
 
     //// Base
     _deploymentParams[BASE] = DeploymentParams({ // set domain id as mapping key
       spoke: address(BASE_SPOKE),
       xerc20Module: address(BASE_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: BASE_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: BASE_ENG_MULTISIG
     });
 
     //// Bnb
     _deploymentParams[BNB] = DeploymentParams({ // set domain id as mapping key
       spoke: address(BNB_SPOKE),
       xerc20Module: address(BNB_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: BNB_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: BNB_ENG_MULTISIG
     });
 
     //// Ethereum
     _deploymentParams[ETHEREUM] = DeploymentParams({ // set domain id as mapping key
       spoke: address(ETHEREUM_SPOKE),
       xerc20Module: address(ETHEREUM_XERC20_MODULE),
-      feeRecipient: L1_FEE_RECIPIENT,
+      feeRecipient: ETHEREUM_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L1_FEE_RECIPIENT
+      owner: ETHEREUM_ENG_MULTISIG
     });
 
     //// Zircuit
     _deploymentParams[ZIRCUIT] = DeploymentParams({ // set domain id as mapping key
       spoke: address(ZIRCUIT_SPOKE),
       xerc20Module: address(ZIRCUIT_XERC20_MODULE),
-      feeRecipient: address(0),
+      feeRecipient: ZIRCUIT_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: address(0)
+      owner: ZIRCUIT_ENG_MULTISIG
     });
 
     //// Blast
     _deploymentParams[BLAST] = DeploymentParams({ // set domain id as mapping key
       spoke: address(BLAST_SPOKE),
       xerc20Module: address(BLAST_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: BLAST_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: BLAST_ENG_MULTISIG
     });
 
     /// Linea
     _deploymentParams[LINEA] = DeploymentParams({ // set domain id as mapping key
       spoke: address(LINEA_SPOKE),
       xerc20Module: address(LINEA_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: LINEA_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: LINEA_ENG_MULTISIG
     });
 
     /// Polygon
     _deploymentParams[POLYGON] = DeploymentParams({ // set domain id as mapping key
       spoke: address(POLYGON_SPOKE),
       xerc20Module: address(POLYGON_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: POLYGON_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: POLYGON_ENG_MULTISIG
     });
 
     /// Avalanche
     _deploymentParams[AVALANCHE] = DeploymentParams({ // set domain id as mapping key
       spoke: address(AVALANCHE_SPOKE),
       xerc20Module: address(AVALANCHE_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: AVALANCHE_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: AVALANCHE_ENG_MULTISIG
     });
 
     /// zkSync
     _deploymentParams[ZKSYNC] = DeploymentParams({ // set domain id as mapping key
       spoke: address(ZKSYNC_SPOKE),
       xerc20Module: address(ZKSYNC_XERC20_MODULE),
-      feeRecipient: address(0),
+      feeRecipient: ZKSYNC_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: address(0)
+      owner: ZKSYNC_ENG_MULTISIG
     });
 
     // scroll
     _deploymentParams[SCROLL] = DeploymentParams({ // set domain id as mapping key
       spoke: address(SCROLL_SPOKE),
       xerc20Module: address(SCROLL_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: SCROLL_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: SCROLL_ENG_MULTISIG
     });
 
     // taiko
     _deploymentParams[TAIKO] = DeploymentParams({ // set domain id as mapping key
       spoke: address(TAIKO_SPOKE),
       xerc20Module: address(TAIKO_XERC20_MODULE),
-      feeRecipient: address(0),
+      feeRecipient: TAIKO_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: address(0)
+      owner: TAIKO_ENG_MULTISIG
     });
 
     // apechain
     _deploymentParams[APECHAIN] = DeploymentParams({ // set domain id as mapping key
       spoke: address(APECHAIN_SPOKE),
       xerc20Module: address(APECHAIN_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: APECHAIN_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: APECHAIN_ENG_MULTISIG
     });
 
     // unichain
     _deploymentParams[UNICHAIN] = DeploymentParams({ // set domain id as mapping key
       spoke: address(UNICHAIN_SPOKE),
       xerc20Module: address(UNICHAIN_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: UNICHAIN_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: UNICHAIN_ENG_MULTISIG
     });
 
     // ronin
     _deploymentParams[RONIN] = DeploymentParams({
       spoke: address(RONIN_SPOKE),
       xerc20Module: address(RONIN_XERC20_MODULE),
-      feeRecipient: address(0),
+      feeRecipient: RONIN_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: address(0)
+      owner: RONIN_ENG_MULTISIG
     });
 
     // mode
     _deploymentParams[MODE] = DeploymentParams({
       spoke: address(MODE_SPOKE),
       xerc20Module: address(MODE_XERC20_MODULE),
-      feeRecipient: L2_FEE_RECIPIENT,
+      feeRecipient: MODE_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
-      owner: L2_FEE_RECIPIENT
+      owner: MODE_ENG_MULTISIG
     });
   }
 }
