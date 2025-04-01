@@ -25,6 +25,10 @@ contract DeployAdapterBase is Script, ScriptUtils {
 
   error WrongChainId();
   error FeeAdapterMismatch();
+  error OwnerMismatch();
+  error FeeRecipientMismatch();
+  error FeeSignerMismatch();
+  error SpokeMismatch();
 
   function run(
     string memory _account
@@ -49,6 +53,22 @@ contract DeployAdapterBase is Script, ScriptUtils {
     _feeAdapter =
       new FeeAdapter(_params.spoke, _params.feeRecipient, _params.feeSigner, _params.xerc20Module, _params.owner);
     if (address(_feeAdapter) != _expectedFeeAdapter) revert FeeAdapterMismatch();
+
+    if (_feeAdapter.owner() != _params.owner) {
+      revert OwnerMismatch();
+    }
+
+    if (_feeAdapter.feeRecipient() != _params.feeRecipient) {
+      revert FeeRecipientMismatch();
+    }
+
+    if (address(_feeAdapter.spoke()) != _params.spoke) {
+      revert SpokeMismatch();
+    }
+
+    if (_feeAdapter.feeSigner() != _params.feeSigner) {
+      revert FeeSignerMismatch();
+    }
 
     vm.stopBroadcast();
 
