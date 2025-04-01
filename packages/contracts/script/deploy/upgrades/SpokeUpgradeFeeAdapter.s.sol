@@ -11,7 +11,6 @@ import {EverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
 
 import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 import {MainnetStagingEnvironment} from '../../MainnetStaging.sol';
-import {TestnetStagingEnvironment} from '../../TestnetStaging.sol';
 import {ICREATE3} from './ICREATE3.sol';
 
 contract DeploySpokeArrayUpgrade is Script, ScriptUtils {

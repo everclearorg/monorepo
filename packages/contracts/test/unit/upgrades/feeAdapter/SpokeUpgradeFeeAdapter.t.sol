@@ -14,7 +14,6 @@ import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {ISpokeStorageV3} from 'interfaces/intent/ISpokeStorageV3.sol';
 
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
-import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
 import {Deploy} from 'script/utils/Deploy.sol';
 import {BaseTest} from 'test/unit/intent/EverclearSpoke.t.sol';
