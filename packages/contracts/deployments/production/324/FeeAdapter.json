@@ -1,6 +1,6 @@
 {
-    "address": "0xE7Da6038be64A47eBCfdC69dE430040741d2CBdf",
-    "startBlock": 57903481,
+    "address": "0x80EF3ee093aE3B5aDd1B213628875A4C73F640AF",
+    "startBlock": 58556349,
     "abi": [
         {
             "type": "constructor",
