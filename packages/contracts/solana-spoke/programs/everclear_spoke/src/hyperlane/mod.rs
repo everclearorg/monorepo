@@ -29,8 +29,6 @@ pub mod primitive_type;
 pub use account_meta::*;
 pub use primitive_type::*;
 
-use spl_noop; // Import the spl_noop module
-
 pub struct TransferRemote {
     /// The destination domain.
     pub destination_domain: u32,
@@ -220,7 +218,7 @@ pub struct SplNoop;
 
 impl Id for SplNoop {
     fn id() -> Pubkey {
-        spl_noop::ID
+        Pubkey::from_str_const("noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV")
     }
 }
 
@@ -458,7 +456,7 @@ pub fn transfer_remote(ctx: Context<TransferRemoteContext>, xfer: TransferRemote
         AccountMeta::new(*mailbox_outbox_account.key, false),
         AccountMeta::new_readonly(*dispatch_authority_account.key, true),
         AccountMeta::new_readonly(system_program::ID.to_bytes().into(), false),
-        AccountMeta::new_readonly(spl_noop::id(), false),
+        AccountMeta::new_readonly(SplNoop::id(), false),
         AccountMeta::new(*sender_wallet.key, true),
         AccountMeta::new_readonly(*unique_message_account.key, true),
         AccountMeta::new(*dispatched_message_pda.key, false),
