@@ -299,7 +299,7 @@ abstract contract ZkSync {
   IXERC20Module public ZKSYNC_XERC20_MODULE = IXERC20Module(0x6ACf19603C8588885250F7a02F0EaFFa4FcafB04);
 
   // Fee adapter constants
-  address public constant ZKSYNC_ENG_MULTISIG = 0x352338ABE6a204A07c9ffa549fdb7802c91d9761;
+  address public constant ZKSYNC_ENG_MULTISIG = 0x227a7aC43503c15fe7ab31901468DA07108eA967;
 }
 
 abstract contract Mode {

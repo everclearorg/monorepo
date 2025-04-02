@@ -37,7 +37,7 @@ contract DeploySpokeArrayUpgrade is Script, ScriptUtils {
     address newEverclearSpoke;
 
     // Generating the inputs for CREATE3
-    uint8 version = 4;
+    uint8 version = 5;
     bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
     bytes memory _creation = type(EverclearSpokeV3).creationCode;
