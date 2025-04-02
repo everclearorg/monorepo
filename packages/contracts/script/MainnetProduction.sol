@@ -487,6 +487,9 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: RONIN, blockGasLimit: 30_000_000, gateway: address(RONIN_SPOKE_GATEWAY).toBytes32()})
     );
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: GNOSIS, blockGasLimit: 17_000_000, gateway: address(GNOSIS_SPOKE_GATEWAY).toBytes32()})
+    );
   }
 }
 
@@ -513,8 +516,10 @@ abstract contract MainnetProductionEnvironment is
     MODE,
     UNICHAIN,
     ZKSYNC,
-    RONIN
+    RONIN,
+    GNOSIS
   ];
+
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed

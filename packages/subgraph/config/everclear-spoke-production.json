@@ -200,5 +200,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-gnosis",
+    "domain": "100",
+    "environment": "production",
+    "network": "gnosis",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]
