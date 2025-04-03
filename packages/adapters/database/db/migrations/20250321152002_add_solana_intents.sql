@@ -16,7 +16,6 @@ BEGIN
 END $$;
 
 CREATE SCHEMA IF NOT EXISTS solana;
-GRANT ALL ON SCHEMA solana TO everclear;
 GRANT ALL ON SCHEMA solana TO "sol-ingestor";
 
 CREATE TABLE IF NOT EXISTS solana.solana_spoke_instructions
