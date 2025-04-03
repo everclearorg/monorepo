@@ -1,22 +1,22 @@
 ## prerequisties
 
-- `anchor 0.30.1`
-
-// NOTE: because of dependency resolving issue, I couldnt make `patch-crate` work in the build chain (`build.rs`) directly. Therefore, a seperate
-command is required in the build chain.
-
-Install cargo patch crate with this specific hash (the current main on 28 Feb 2025, manually reviewed code for security):
-`cargo install --git https://github.com/mokeyish/cargo-patch-crate.git --rev ddbb58591d81daf6272ace7d66a7426999b42adf`
-
-Run `patch-crate` to patch `anchor-syn`. This is required as `anchor 0.30.1` does not have support for discriminator:
-
-`cargo patch-crate`
+- `anchor 0.31.0`
 
 ## build
 
 Build the contract code locally to ebpf using:
 
 `anchor build`
+
+If you need a verifiable build (for crosschecking and contract verification), use:
+`anchor build --verifiable`
+
+NOTE:
+The upstream image is not pushed yet (it will be updated to `solanafoundation/anchor:v0.31.1`) and this is blocked (due to some perm issue  and docker org/image changes from the anchor side).
+
+To temporary resolve this, the `docker/` in `anchor@v0.31.0` git is copied here.
+
+Go to the `docker/` and run `make build`. This will create a local build for `backpackapp/build:v0.31.0` which is used in the verifiable build commands.
 
 ## deploy
 `Anchor.toml` was set to be deployed on devnet.

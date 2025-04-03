@@ -86,7 +86,7 @@ pub mod everclear_spoke {
 
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
-    #[interface(hyperlane_message_recipient::handle)]
+    #[instruction(discriminator = [33, 210, 5, 66, 196, 212, 239, 142])]
     pub fn handle<'info>(
         ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
         handle: HandleInstruction,
@@ -94,19 +94,19 @@ pub mod everclear_spoke {
         instructions::handle(ctx, handle)
     }
 
-    #[interface(hyperlane_message_recipient::interchain_security_module)]
+    #[instruction(discriminator = [45, 18, 245, 87, 234, 46, 246, 15])]
     pub fn interchain_security_module(ctx: Context<InterchainSecurityModule>) -> Result<()> {
         instructions::interchain_security_module(ctx)
     }
 
-    #[interface(hyperlane_message_recipient::interchain_security_module_account_metas)]
+    #[instruction(discriminator = [190, 214, 218, 129, 67, 97, 4, 76])]
     pub fn interchain_security_module_account_metas(
         ctx: Context<InterchainSecurityModuleAccountMetas>,
     ) -> Result<Vec<SerializableAccountMeta>> {
         instructions::interchain_security_module_account_metas(ctx)
     }
 
-    #[interface(hyperlane_message_recipient::handle_account_metas)]
+    #[instruction(discriminator = [194, 141, 30, 82, 241, 41, 169, 52])]
     pub fn handle_account_metas(
         ctx: Context<HandleAccountMetas>,
         handle: HandleInstruction,

@@ -88,7 +88,7 @@ fn handle_message<'info>(
     }
     // HACK: expand emit_cpi! macro for reference issue
     {
-        let disc = anchor_lang::event::EVENT_IX_TAG_LE;
+        let disc = anchor_lang::event::EVENT_IX_TAG_LE.to_vec();
         // TODO: Test the address conversion works
         let inner_data = anchor_lang::Event::data(&MessageReceivedEvent {
             origin: handle.origin,
