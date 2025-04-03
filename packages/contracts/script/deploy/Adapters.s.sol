@@ -9,6 +9,7 @@ import {console} from 'forge-std/console.sol';
 import {FeeAdapter} from 'contracts/intent/FeeAdapter.sol';
 
 import {MainnetProductionEnvironment} from '../MainnetProduction.sol';
+import {MainnetStagingEnvironment} from '../MainnetStaging.sol';
 
 contract DeployAdapterBase is Script, ScriptUtils {
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
@@ -232,6 +233,37 @@ contract MainnetProduction is DeployAdapterBase, MainnetProductionEnvironment {
       feeRecipient: MODE_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
       owner: MODE_ENG_MULTISIG
+    });
+  }
+}
+
+contract MainnetStaging is DeployAdapterBase, MainnetStagingEnvironment {
+  function setUp() public {
+    //// Arbitrum One
+    _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(ARBITRUM_ONE_SPOKE),
+      xerc20Module: address(ARBITRUM_ONE_XERC20_MODULE),
+      feeRecipient: ARBITRUM_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: ARBITRUM_ENG_MULTISIG
+    });
+
+    //// Optimism
+    _deploymentParams[OPTIMISM] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(OPTIMISM_SPOKE),
+      xerc20Module: address(OPTIMISM_XERC20_MODULE),
+      feeRecipient: OPTIMISM_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: OPTIMISM_ENG_MULTISIG
+    });
+
+    //// Base
+    _deploymentParams[BASE] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(BASE_SPOKE),
+      xerc20Module: address(BASE_XERC20_MODULE),
+      feeRecipient: BASE_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: BASE_ENG_MULTISIG
     });
   }
 }

@@ -30,22 +30,22 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
   address public constant APECHAIN_MULTI_SIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
 
   // Deployed upgrade contracts //
-  address public constant ETHEREUM_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant ARB_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant OP_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant BNB_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant BASE_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant ZIRCUIT_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant BLAST_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant LINEA_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant POLYGON_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant AVALANCHE_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant SCROLL_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant APECHAIN_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant TAIKO_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant MODE_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant UNICHAIN_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant RONIN_SPOKE_UPGRADE_IMPL = address(0);
+  address public constant ETHEREUM_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
+  address public constant ARB_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
+  address public constant OP_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
+  address public constant BNB_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
+  address public constant BASE_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
+  address public constant ZIRCUIT_SPOKE_UPGRADE_IMPL = 0x5c2AFE0Bae15dCE018A7517d89d61124dD37A392;
+  address public constant BLAST_SPOKE_UPGRADE_IMPL = 0x5157F2536ED861f15C59026f91D018914f317D84;
+  address public constant LINEA_SPOKE_UPGRADE_IMPL = 0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99;
+  address public constant POLYGON_SPOKE_UPGRADE_IMPL = 0xe020b568c12e045f93172561f48677fA83cf0B86;
+  address public constant AVALANCHE_SPOKE_UPGRADE_IMPL = 0xAe6e59eB86ccccc17165Bd83a27c3904Ccd1A782;
+  address public constant SCROLL_SPOKE_UPGRADE_IMPL = 0x92dcaf947DB325ac023b105591d76315743883eD;
+  address public constant APECHAIN_SPOKE_UPGRADE_IMPL = 0x92dcaf947DB325ac023b105591d76315743883eD;
+  address public constant TAIKO_SPOKE_UPGRADE_IMPL = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
+  address public constant MODE_SPOKE_UPGRADE_IMPL = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
+  address public constant UNICHAIN_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
+  address public constant RONIN_SPOKE_UPGRADE_IMPL = 0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541;
 
   function setUp() public {
     //// Arbitrum One
@@ -178,7 +178,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
   // ============ Upgrade ============ //
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeMainnetProd() public {
     vm.createSelectFork(vm.envString('MAINNET_RPC'));
-    vm.rollFork(22_146_318);
+    vm.rollFork(22_189_045);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -187,7 +187,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = ETHEREUM_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -228,7 +228,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -244,7 +244,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeArbitrumProd() public {
     vm.createSelectFork(vm.envString('ARBITRUM_RPC'));
-    vm.rollFork(320_483_553);
+    vm.rollFork(322_525_550);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -253,7 +253,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = ARB_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -294,7 +294,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -310,7 +310,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeOptimismProd() public {
     vm.createSelectFork(vm.envString('OPTIMISM_RPC'));
-    vm.rollFork(133_790_742);
+    vm.rollFork(134_046_273);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -319,7 +319,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = OP_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -360,14 +360,14 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '10';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-optimismMainnetProd.json',
+      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-optimismMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Optimism | Mainnet Prod',
       safeTransactions,
       chainId
@@ -376,7 +376,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeBaseProd() public {
     vm.createSelectFork(vm.envString('BASE_RPC'));
-    vm.rollFork(28_195_511);
+    vm.rollFork(28_450_996);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -385,7 +385,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = BASE_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -426,7 +426,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -442,7 +442,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeBNBProd() public {
     vm.createSelectFork(vm.envString('BNB_RPC'));
-    vm.rollFork(47_866_210);
+    vm.rollFork(48_036_507);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -451,7 +451,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = BNB_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -492,7 +492,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -508,7 +508,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeZircuitProd() public {
     vm.createSelectFork(vm.envString('ZIRCUIT_RPC'));
-    vm.rollFork(11_622_098);
+    vm.rollFork(11_877_576);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -517,7 +517,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = ZIRCUIT_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -558,7 +558,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -574,7 +574,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeBlastProd() public {
     vm.createSelectFork(vm.envString('BLAST_RPC'));
-    vm.rollFork(17_303_775);
+    vm.rollFork(17_440_786);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -583,7 +583,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = BLAST_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -624,7 +624,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -640,7 +640,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeLineaProd() public {
     vm.createSelectFork(vm.envString('LINEA_RPC'));
-    vm.rollFork(17_564_832);
+    vm.rollFork(17_675_179);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -649,7 +649,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = LINEA_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -690,7 +690,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -706,7 +706,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradePolygonProd() public {
     vm.createSelectFork(vm.envString('POLYGON_RPC'));
-    vm.rollFork(69_723_951);
+    vm.rollFork(69_849_461);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -715,7 +715,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = POLYGON_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -756,14 +756,14 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '137';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-lineaMainnetProd.json',
+      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-polygonMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Polygon | Mainnet Prod',
       safeTransactions,
       chainId
@@ -772,7 +772,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeAvalancheProd() public {
     vm.createSelectFork(vm.envString('AVALANCHE_RPC'));
-    vm.rollFork(21_053_270);
+    vm.rollFork(59_660_127);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -781,7 +781,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = AVALANCHE_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -822,7 +822,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -838,7 +838,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeScrollProd() public {
     vm.createSelectFork(vm.envString('SCROLL_RPC'));
-    vm.rollFork(14_331_080);
+    vm.rollFork(14_411_178);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -847,7 +847,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = SCROLL_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -888,7 +888,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -904,7 +904,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeApeProd() public {
     vm.createSelectFork(vm.envString('APE_RPC'));
-    vm.rollFork(12_543_894);
+    vm.rollFork(12_678_704);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -913,7 +913,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = APECHAIN_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -954,7 +954,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -970,7 +970,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeTaikoProd() public {
     vm.createSelectFork(vm.envString('TAIKO_RPC'));
-    vm.rollFork(1_028_472);
+    vm.rollFork(1_038_091);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -979,7 +979,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = TAIKO_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1020,7 +1020,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -1036,7 +1036,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeModeProd() public {
     vm.createSelectFork(vm.envString('MODE_RPC'));
-    vm.rollFork(21_628_204);
+    vm.rollFork(21_761_999);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -1045,7 +1045,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = MODE_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1086,7 +1086,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -1102,7 +1102,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeUniProd() public {
     vm.createSelectFork(vm.envString('UNI_RPC'));
-    vm.rollFork(12_675_697);
+    vm.rollFork(12_943_247);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -1111,7 +1111,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = UNICHAIN_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1152,7 +1152,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //
@@ -1168,7 +1168,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeRoninProd() public {
     vm.createSelectFork(vm.envString('RONIN_RPC'));
-    vm.rollFork(43_857_109);
+    vm.rollFork(43_947_375);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -1177,7 +1177,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(oldImplementation, _params.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV3();
     address newEverclearSpoke = RONIN_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1218,7 +1218,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     assertEq(state.gateway, address(spokeProxyV3.gateway()));
     assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
     assertEq(state.paused, spokeProxyV3.paused());
-    assertEq(state.nonce, spokeProxyV3.nonce());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
     assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
 
     // Pushing data to safe tx json //

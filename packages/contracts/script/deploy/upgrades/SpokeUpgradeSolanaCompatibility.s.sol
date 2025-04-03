@@ -37,16 +37,21 @@ contract DeploySolanaCompatibilityUpgrade is Script, ScriptUtils {
     address newEverclearSpoke;
 
     // Generating the inputs for CREATE3
-    uint8 version = 5;
-    bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
-    bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
-    bytes memory _creation = type(EverclearSpokeV3).creationCode;
+    bool useCreate3 = true;
+    if (useCreate3) {
+      uint8 version = 5;
+      bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
+      bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
+      bytes memory _creation = type(EverclearSpokeV3).creationCode;
 
-    // Deploying the new implementation via CREATE3
-    bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
-    (bool success, bytes memory returnData) = CREATE_3.call(create3Calldata);
-    if (!success) revert Create3DeploymentFailed();
-    newEverclearSpoke = abi.decode(returnData, (address));
+      // Deploying the new implementation via CREATE3
+      bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
+      (bool success, bytes memory returnData) = CREATE_3.call(create3Calldata);
+      if (!success) revert Create3DeploymentFailed();
+      newEverclearSpoke = abi.decode(returnData, (address));
+    } else {
+      newEverclearSpoke = address(new EverclearSpokeV3());
+    }
 
     vm.stopBroadcast();
 

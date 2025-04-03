@@ -10,6 +10,7 @@ import {IHubGateway} from 'interfaces/hub/IHubGateway.sol';
 import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
 import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
+import {IXERC20Module} from 'interfaces/intent/modules/IXERC20Module.sol';
 
 abstract contract DefaultValues {
   ///////////////////// HUB ARGUMENTS /////////////////////////
@@ -67,6 +68,7 @@ abstract contract Everclear {
   address public HANDLER = address(0x4faba0EB79E710C58C568090c08157D34b4367ED);
   address public MESSAGE_RECEIVER = address(0xd66338f1DEc85f7012c4B31F02b22bb01a9EAC3f);
   address public EVERCLEAR_ISM = address(0); // using default ISM
+  address public L2_FEE_SIGNER = 0xd148C7f37b346a4bD8e14f8c1f181f5f640481C8;
 }
 
 abstract contract Ethereum {
@@ -86,7 +88,9 @@ abstract contract ArbitrumOne {
   IEverclearSpoke public ARBITRUM_ONE_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
   ISpokeGateway public ARBITRUM_ONE_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
   ICallExecutor public ARBITRUM_ONE_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
+  IXERC20Module public ARBITRUM_ONE_XERC20_MODULE = IXERC20Module(0x315bCf956e887378836f6E57bC735F0cf7022352);
   address public ARBITRUM_SPOKE_IMPL = 0x172A786fA844A3fa0aEE2031D7955F82f7a8a984;
+  address public constant ARBITRUM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Optimism {
@@ -96,7 +100,9 @@ abstract contract Optimism {
   IEverclearSpoke public OPTIMISM_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
   ISpokeGateway public OPTIMISM_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
   ICallExecutor public OPTIMISM_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
+  IXERC20Module public OPTIMISM_XERC20_MODULE = IXERC20Module(0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541);
   address public OPTIMISM_SPOKE_IMPL = 0x172A786fA844A3fa0aEE2031D7955F82f7a8a984;
+  address public constant OPTIMISM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Zircuit {
@@ -125,7 +131,9 @@ abstract contract Base {
   ISpokeGateway public BASE_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
   ICallExecutor public BASE_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
 
+  IXERC20Module public BASE_XERC20_MODULE = IXERC20Module(0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541);
   address public BASE_SPOKE_IMPL = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
+  address public constant BASE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum, Base {}
@@ -169,6 +177,10 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: BLAST, blockGasLimit: 30_000_000, gateway: address(BLAST_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32()})
+    );
   }
 }
 
@@ -178,7 +190,7 @@ abstract contract MainnetStagingEnvironment is
   MainnetAssets,
   MainnetStagingSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST];
+  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed
