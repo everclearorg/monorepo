@@ -13,7 +13,7 @@ import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 import {MainnetStagingEnvironment} from '../../MainnetStaging.sol';
 import {ICREATE3} from './ICREATE3.sol';
 
-contract DeploySpokeArrayUpgrade is Script, ScriptUtils {
+contract DeploySolanaCompatibilityUpgrade is Script, ScriptUtils {
   using TypeCasts for bytes32;
 
   struct DeploymentParams {
@@ -57,17 +57,20 @@ contract DeploySpokeArrayUpgrade is Script, ScriptUtils {
   }
 }
 
-contract MainnetStaging is DeploySpokeArrayUpgrade, MainnetStagingEnvironment {
+contract MainnetStaging is DeploySolanaCompatibilityUpgrade, MainnetStagingEnvironment {
   function setUp() public {
     //// Arbitrum One
     _deploymentParams[ARBITRUM_ONE] = DeploymentParams({owner: OWNER, spokeProxy: address(ARBITRUM_ONE_SPOKE)}); // set domain id as mapping key
 
     //// Optimism
     _deploymentParams[OPTIMISM] = DeploymentParams({owner: OWNER, spokeProxy: address(OPTIMISM_SPOKE)}); // set domain id as mapping key
+
+    //// Base
+    _deploymentParams[BASE] = DeploymentParams({owner: OWNER, spokeProxy: address(BASE_SPOKE)}); // set domain id as mapping key
   }
 }
 
-contract MainnetProduction is DeploySpokeArrayUpgrade, MainnetProductionEnvironment {
+contract MainnetProduction is DeploySolanaCompatibilityUpgrade, MainnetProductionEnvironment {
   function setUp() public {
     //// Arbitrum One
     _deploymentParams[ARBITRUM_ONE] = DeploymentParams({owner: OWNER, spokeProxy: address(ARBITRUM_ONE_SPOKE)}); // set domain id as mapping key

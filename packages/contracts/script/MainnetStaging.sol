@@ -23,7 +23,7 @@ abstract contract DefaultValues {
   uint256 constant BUFFER_DBPS = 10_000; // 10%
 
   ///////////////////// ACCOUNTS /////////////////////////
-  address public constant OWNER = 0xeb19B3Bdad53A775EB2d94d57D5a46c5260B0044;
+  address public constant OWNER = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
   address public constant ADMIN = 0xbBc0a29458eD4b2d489F2B564fE482C9086006F6;
   address public constant LIGHTHOUSE = 0x68F44CD6b4cd9c4F723E00b1734E667bfaF72042;
   address public constant WATCHTOWER = 0xc687BadC2CD8Da70eCACC748D6c27D06115a7de6;
@@ -117,7 +117,18 @@ abstract contract Blast {
   ICallExecutor public BLAST_EXECUTOR = ICallExecutor(0x88F16B8Cc37f0b07794e6c720DBeA3E792043966);
 }
 
-abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum {}
+abstract contract Base {
+  uint32 public constant BASE = 8453;
+  IMailbox public BASE_MAILBOX = IMailbox(0xeA87ae93Fa0019a82A727bfd3eBd1cFCa8f64f1D); // https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/cfb890dc6bf66c62e7d3176cc01197f334ba96cf/rust/config/mainnet_config.json#L238C19-L238C61
+
+  IEverclearSpoke public BASE_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30); 
+  ISpokeGateway public BASE_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
+  ICallExecutor public BASE_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
+  
+  address public BASE_SPOKE_IMPL = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
+}
+
+abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum, Base {}
 
 abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDomains {
   using TypeCasts for address;
