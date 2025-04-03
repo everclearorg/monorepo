@@ -121,10 +121,10 @@ abstract contract Base {
   uint32 public constant BASE = 8453;
   IMailbox public BASE_MAILBOX = IMailbox(0xeA87ae93Fa0019a82A727bfd3eBd1cFCa8f64f1D); // https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/cfb890dc6bf66c62e7d3176cc01197f334ba96cf/rust/config/mainnet_config.json#L238C19-L238C61
 
-  IEverclearSpoke public BASE_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30); 
+  IEverclearSpoke public BASE_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
   ISpokeGateway public BASE_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
   ICallExecutor public BASE_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
-  
+
   address public BASE_SPOKE_IMPL = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
 }
 
