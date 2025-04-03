@@ -110,11 +110,12 @@ export const getSpokeMessagesQuery = (
 export const getDestinationIntentsByIdsQuery = (ids: string[]): string => {
   return `
     intentFillEvents(
-      ${ids.length
-      ? `where: {
+      ${
+        ids.length
+          ? `where: {
         intent_: {id_in: ["${ids.join('","')}"] }}`
-      : ''
-    }
+          : ''
+      }
     ){
       ${SPOKE_FILL_INTENT_EVENT_ENTITY}
     }
@@ -148,12 +149,13 @@ export const getSpokeQueueQuery = (type?: string): string => {
   return `
     queues (
       first: 5
-      ${type
-      ? `,where: {
+      ${
+        type
+          ? `,where: {
                 type: ${type}
               }`
-      : ''
-    } 
+          : ''
+      } 
     ){
       ${SPOKE_QUEUE_ENTITY}
     }

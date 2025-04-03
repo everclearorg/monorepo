@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEverclear } from '../common/IEverclear.sol';
-import { IEverclearSpoke } from './IEverclearSpoke.sol';
-import { IPermit2 } from 'interfaces/common/IPermit2.sol';
+import {IEverclear} from '../common/IEverclear.sol';
+import {IEverclearSpoke} from './IEverclearSpoke.sol';
+import {IEverclearSpokeV3} from './IEverclearSpokeV3.sol';
+import {IPermit2} from 'interfaces/common/IPermit2.sol';
 
 interface IFeeAdapter {
   struct OrderParameters {
@@ -17,6 +18,12 @@ interface IFeeAdapter {
     bytes data;
   }
 
+  struct FeeParams {
+    uint256 fee;
+    uint256 deadline;
+    bytes sig;
+  }
+
   /**
    * @notice Emitted when a new intent is created with fees
    * @param _intentId The ID of the created intent
@@ -25,10 +32,7 @@ interface IFeeAdapter {
    * @param _nativeFee The amount of native token fees paid
    */
   event IntentWithFeesAdded(
-    bytes32 indexed _intentId,
-    bytes32 indexed _initiator,
-    uint256 _tokenFee,
-    uint256 _nativeFee
+    bytes32 indexed _intentId, bytes32 indexed _initiator, uint256 _tokenFee, uint256 _nativeFee
   );
 
   /**
@@ -40,11 +44,7 @@ interface IFeeAdapter {
    * @param _nativeFee The amount of native token fees paid for the order
    */
   event OrderCreated(
-    bytes32 indexed _orderId,
-    bytes32 indexed _initiator,
-    bytes32[] _intentIds,
-    uint256 _tokenFee,
-    uint256 _nativeFee
+    bytes32 indexed _orderId, bytes32 indexed _initiator, bytes32[] _intentIds, uint256 _tokenFee, uint256 _nativeFee
   );
 
   /**
@@ -55,15 +55,32 @@ interface IFeeAdapter {
   event FeeRecipientUpdated(address indexed _updated, address indexed _previous);
 
   /**
+   * @notice Emitted when the fee signer is updated
+   * @param _updated The new fee signer address
+   * @param _previous The previous fee signer address
+   */
+  event FeeSignerUpdated(address indexed _updated, address indexed _previous);
+
+  /**
    * @notice Thrown when there are multiple assets included in a single order request.
    */
   error MultipleOrderAssets();
 
   /**
+   * @notice Thrown when the signature is invalid on fees
+   */
+  error FeeAdapter_InvalidSignature();
+
+  /**
+   * @notice Thrown when the deadline has elapsed
+   */
+  error FeeAdapter_InvalidDeadline();
+
+  /**
    * @notice Returns the spoke contract address
    * @return The EverclearSpoke contract interface
    */
-  function spoke() external view returns (IEverclearSpoke);
+  function spoke() external view returns (IEverclearSpokeV3);
 
   /**
    * @notice returns the permit2 contract
@@ -78,6 +95,12 @@ interface IFeeAdapter {
   function feeRecipient() external view returns (address);
 
   /**
+   * @notice Returns the current fee signer address
+   * @return The address whos signature is verified
+   */
+  function feeSigner() external view returns (address);
+
+  /**
    * @notice Creates a new intent with fees
    * @param _destinations Array of destination domains, preference ordered
    * @param _receiver Address of the receiver on the destination chain
@@ -87,7 +110,33 @@ interface IFeeAdapter {
    * @param _maxFee Maximum fee percentage allowed for the intent
    * @param _ttl Time-to-live for the intent in seconds
    * @param _data Additional data for the intent
-   * @param _fee Token fee amount to be sent to the fee recipient
+   * @param _feeParams Fee parameters including fee amount, deadline, and signature
+   * @return _intentId The ID of the created intent
+   * @return _intent The created intent object
+   */
+  function newIntent(
+    uint32[] memory _destinations,
+    bytes32 _receiver,
+    address _inputAsset,
+    bytes32 _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    FeeParams calldata _feeParams
+  ) external payable returns (bytes32, IEverclear.Intent memory);
+
+  /**
+   * @notice Creates a new intent with fees
+   * @param _destinations Array of destination domains, preference ordered
+   * @param _receiver Address of the receiver on the destination chain
+   * @param _inputAsset Address of the input asset
+   * @param _outputAsset Address of the output asset
+   * @param _amount Amount of input asset to use for the intent
+   * @param _maxFee Maximum fee percentage allowed for the intent
+   * @param _ttl Time-to-live for the intent in seconds
+   * @param _data Additional data for the intent
+   * @param _feeParams Fee parameters including fee amount, deadline, and signature
    * @return _intentId The ID of the created intent
    * @return _intent The created intent object
    */
@@ -100,7 +149,7 @@ interface IFeeAdapter {
     uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
-    uint256 _fee
+    FeeParams calldata _feeParams
   ) external payable returns (bytes32, IEverclear.Intent memory);
 
   /**
@@ -114,8 +163,8 @@ interface IFeeAdapter {
    * @param _maxFee Maximum fee percentage allowed for the intent
    * @param _ttl Time-to-live for the intent in seconds
    * @param _data Additional data for the intent
-   * @param _fee Token fee amount to be sent to the fee recipient
    * @param _permit2Params Signed Permit2 payload, with adapter as spender
+   * @param _feeParams Token fee amount to be sent to the fee recipient
    * @return _intentId The ID of the created intent
    * @return _intent The created intent object
    */
@@ -129,7 +178,7 @@ interface IFeeAdapter {
     uint48 _ttl,
     bytes calldata _data,
     IEverclearSpoke.Permit2Params calldata _permit2Params,
-    uint256 _fee
+    FeeParams calldata _feeParams
   ) external payable returns (bytes32, IEverclear.Intent memory);
 
   /**
@@ -144,6 +193,8 @@ interface IFeeAdapter {
   function newOrderSplitEvenly(
     uint32 _numIntents,
     uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig,
     OrderParameters memory _params
   ) external payable returns (bytes32, bytes32[] memory);
 
@@ -156,6 +207,8 @@ interface IFeeAdapter {
    */
   function newOrder(
     uint256 _fee,
+    uint256 _deadline,
+    bytes calldata _sig,
     OrderParameters[] memory _params
   ) external payable returns (bytes32, bytes32[] memory);
 
@@ -164,13 +217,24 @@ interface IFeeAdapter {
    * @dev Can only be called by the owner of the contract
    * @param _feeRecipient The new address that will receive fees
    */
-  function updateFeeRecipient(address _feeRecipient) external;
+  function updateFeeRecipient(
+    address _feeRecipient
+  ) external;
 
   /**
-  * @notice Send virtual balance to the original recipient
-  * @param _asset Address of the asset to return
-  * @param _amount Amount of the asset to return
-  * @param _recipient Address of the recipient
+   * @notice Updates the fee signer address
+   * @dev Can only be called by the owner of the contract
+   * @param _feeSigner The new address that will sign for fees
+   */
+  function updateFeeSigner(
+    address _feeSigner
+  ) external;
+
+  /**
+   * @notice Send virtual balance to the original recipient
+   * @param _asset Address of the asset to return
+   * @param _amount Amount of the asset to return
+   * @param _recipient Address of the recipient
    */
   function returnUnsupportedIntent(address _asset, uint256 _amount, address _recipient) external;
 }

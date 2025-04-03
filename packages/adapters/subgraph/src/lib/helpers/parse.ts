@@ -388,7 +388,7 @@ export const order = (domain: string, entity: OrderEntity): Order & { domain: st
     domain,
     id: entity.id,
     autoId: StringToNumber(entity.txNonce),
-    intentIds: entity.intents.map(i => i.id),
+    intentIds: entity.intents.map((i) => i.id),
     tokenFee: entity.tokenFee,
     nativeFee: entity.nativeFee,
     initiator: entity.initiator,

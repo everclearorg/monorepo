@@ -1,6 +1,6 @@
 {
-    "address": "0xE7Da6038be64A47eBCfdC69dE430040741d2CBdf",
-    "startBlock": 57903481,
+    "address": "0x80EF3ee093aE3B5aDd1B213628875A4C73F640AF",
+    "startBlock": 58556349,
     "abi": [
         {
             "type": "constructor",
@@ -12,6 +12,11 @@
                 },
                 {
                     "name": "_feeRecipient",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "_feeSigner",
                     "type": "address",
                     "internalType": "address"
                 },
@@ -63,6 +68,19 @@
         },
         {
             "type": "function",
+            "name": "feeSigner",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
             "name": "newIntent",
             "inputs": [
                 {
@@ -72,8 +90,8 @@
                 },
                 {
                     "name": "_receiver",
-                    "type": "address",
-                    "internalType": "address"
+                    "type": "bytes32",
+                    "internalType": "bytes32"
                 },
                 {
                     "name": "_inputAsset",
@@ -82,8 +100,8 @@
                 },
                 {
                     "name": "_outputAsset",
-                    "type": "address",
-                    "internalType": "address"
+                    "type": "bytes32",
+                    "internalType": "bytes32"
                 },
                 {
                     "name": "_amount",
@@ -106,9 +124,26 @@
                     "internalType": "bytes"
                 },
                 {
-                    "name": "_fee",
-                    "type": "uint256",
-                    "internalType": "uint256"
+                    "name": "_feeParams",
+                    "type": "tuple",
+                    "internalType": "struct IFeeAdapter.FeeParams",
+                    "components": [
+                        {
+                            "name": "fee",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "deadline",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "sig",
+                            "type": "bytes",
+                            "internalType": "bytes"
+                        }
+                    ]
                 }
             ],
             "outputs": [
@@ -254,9 +289,169 @@
                     ]
                 },
                 {
-                    "name": "_fee",
+                    "name": "_feeParams",
+                    "type": "tuple",
+                    "internalType": "struct IFeeAdapter.FeeParams",
+                    "components": [
+                        {
+                            "name": "fee",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "deadline",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "sig",
+                            "type": "bytes",
+                            "internalType": "bytes"
+                        }
+                    ]
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "_intentId",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                },
+                {
+                    "name": "_intent",
+                    "type": "tuple",
+                    "internalType": "struct IEverclear.Intent",
+                    "components": [
+                        {
+                            "name": "initiator",
+                            "type": "bytes32",
+                            "internalType": "bytes32"
+                        },
+                        {
+                            "name": "receiver",
+                            "type": "bytes32",
+                            "internalType": "bytes32"
+                        },
+                        {
+                            "name": "inputAsset",
+                            "type": "bytes32",
+                            "internalType": "bytes32"
+                        },
+                        {
+                            "name": "outputAsset",
+                            "type": "bytes32",
+                            "internalType": "bytes32"
+                        },
+                        {
+                            "name": "maxFee",
+                            "type": "uint24",
+                            "internalType": "uint24"
+                        },
+                        {
+                            "name": "origin",
+                            "type": "uint32",
+                            "internalType": "uint32"
+                        },
+                        {
+                            "name": "nonce",
+                            "type": "uint64",
+                            "internalType": "uint64"
+                        },
+                        {
+                            "name": "timestamp",
+                            "type": "uint48",
+                            "internalType": "uint48"
+                        },
+                        {
+                            "name": "ttl",
+                            "type": "uint48",
+                            "internalType": "uint48"
+                        },
+                        {
+                            "name": "amount",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "destinations",
+                            "type": "uint32[]",
+                            "internalType": "uint32[]"
+                        },
+                        {
+                            "name": "data",
+                            "type": "bytes",
+                            "internalType": "bytes"
+                        }
+                    ]
+                }
+            ],
+            "stateMutability": "payable"
+        },
+        {
+            "type": "function",
+            "name": "newIntent",
+            "inputs": [
+                {
+                    "name": "_destinations",
+                    "type": "uint32[]",
+                    "internalType": "uint32[]"
+                },
+                {
+                    "name": "_receiver",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "_inputAsset",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "_outputAsset",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "_amount",
                     "type": "uint256",
                     "internalType": "uint256"
+                },
+                {
+                    "name": "_maxFee",
+                    "type": "uint24",
+                    "internalType": "uint24"
+                },
+                {
+                    "name": "_ttl",
+                    "type": "uint48",
+                    "internalType": "uint48"
+                },
+                {
+                    "name": "_data",
+                    "type": "bytes",
+                    "internalType": "bytes"
+                },
+                {
+                    "name": "_feeParams",
+                    "type": "tuple",
+                    "internalType": "struct IFeeAdapter.FeeParams",
+                    "components": [
+                        {
+                            "name": "fee",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "deadline",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        },
+                        {
+                            "name": "sig",
+                            "type": "bytes",
+                            "internalType": "bytes"
+                        }
+                    ]
                 }
             ],
             "outputs": [
@@ -345,6 +540,16 @@
                     "internalType": "uint256"
                 },
                 {
+                    "name": "_deadline",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "_sig",
+                    "type": "bytes",
+                    "internalType": "bytes"
+                },
+                {
                     "name": "_params",
                     "type": "tuple[]",
                     "internalType": "struct IFeeAdapter.OrderParameters[]",
@@ -419,6 +624,16 @@
                     "name": "_fee",
                     "type": "uint256",
                     "internalType": "uint256"
+                },
+                {
+                    "name": "_deadline",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "_sig",
+                    "type": "bytes",
+                    "internalType": "bytes"
                 },
                 {
                     "name": "_params",
@@ -546,7 +761,7 @@
                 {
                     "name": "",
                     "type": "address",
-                    "internalType": "contract IEverclearSpoke"
+                    "internalType": "contract IEverclearSpokeV3"
                 }
             ],
             "stateMutability": "view"
@@ -579,6 +794,19 @@
         },
         {
             "type": "function",
+            "name": "updateFeeSigner",
+            "inputs": [
+                {
+                    "name": "_feeSigner",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
             "name": "xerc20Module",
             "inputs": [],
             "outputs": [
@@ -593,6 +821,25 @@
         {
             "type": "event",
             "name": "FeeRecipientUpdated",
+            "inputs": [
+                {
+                    "name": "_updated",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "_previous",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "FeeSignerUpdated",
             "inputs": [
                 {
                     "name": "_updated",
@@ -739,7 +986,44 @@
         },
         {
             "type": "error",
+            "name": "ECDSAInvalidSignature",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "ECDSAInvalidSignatureLength",
+            "inputs": [
+                {
+                    "name": "length",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ]
+        },
+        {
+            "type": "error",
+            "name": "ECDSAInvalidSignatureS",
+            "inputs": [
+                {
+                    "name": "s",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                }
+            ]
+        },
+        {
+            "type": "error",
             "name": "FailedInnerCall",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "FeeAdapter_InvalidDeadline",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "FeeAdapter_InvalidSignature",
             "inputs": []
         },
         {

@@ -6,15 +6,12 @@ import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
 import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 
 import {Vm} from 'forge-std/Vm.sol';
-import {console} from 'forge-std/console.sol';
 
 import {MessageLib} from 'contracts/common/MessageLib.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
-import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
-
-import {ISettler} from 'interfaces/hub/ISettler.sol';
+import {IFeeAdapter} from 'interfaces/intent/IFeeAdapter.sol';
 
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
 
@@ -22,11 +19,14 @@ import {Constants} from 'test/utils/Constants.sol';
 
 import {TestERC20} from '../../utils/TestERC20.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
+
+import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
+import {ERC20, XERC20} from 'test/utils/TestXToken.sol';
 
 contract Intent_Integration is IntegrationBase {
   using stdStorage for StdStorage;
   using TypeCasts for address;
+  using MessageHashUtils for bytes32;
 
   bytes32 internal _intentId;
   IEverclear.Intent internal _intent;
@@ -56,11 +56,18 @@ contract Intent_Integration is IntegrationBase {
     uint32[] memory _dest = new uint32[](1);
     _dest[0] = BSC_TESTNET_ID;
 
+    // generate signature
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = _tokenFee;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig =
+      _generateSignature(_feeSignerPk, abi.encode(_feeParams.fee, 0, address(_unsupportedToken), _feeParams.deadline));
+
     // create new intent
     vm.prank(_user);
 
     (_intentId, _intent) = sepoliaFeeAdapter.newIntent(
-      _dest, _user, _unsupportedToken, _unsupportedToken, 100 ether, Constants.MAX_FEE, uint48(1 days), '', _tokenFee
+      _dest, _user, _unsupportedToken, _unsupportedToken, 100 ether, Constants.MAX_FEE, uint48(1 days), '', _feeParams
     );
 
     // create intent message
@@ -189,6 +196,13 @@ contract Intent_Integration is IntegrationBase {
     // setting unsupported destination
     _destA[0] = 422;
 
+    // generate signature
+    IFeeAdapter.FeeParams memory _feeParams;
+    _feeParams.fee = _feeAmount;
+    _feeParams.deadline = block.timestamp + 3 days;
+    _feeParams.sig =
+      _generateSignature(_feeSignerPk, abi.encode(_feeParams.fee, 0, address(sepoliaXToken), _feeParams.deadline));
+
     // create new intent
     vm.prank(_user);
 
@@ -203,7 +217,7 @@ contract Intent_Integration is IntegrationBase {
       Constants.MAX_FEE,
       0,
       _intentCalldata,
-      _feeAmount
+      _feeParams
     );
 
     // create intent message

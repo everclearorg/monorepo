@@ -17,7 +17,7 @@ export async function deployAdapters() {
   }
 
   // if no verification details, choose to continue without verifying
-  if (domain.verifierAPIKey == undefined) {
+  if (!domain.verifierAPIKey) {
     if (
       await confirm({
         message: 'Verification details not found. Continue without verifying?',
@@ -33,7 +33,9 @@ export async function deployAdapters() {
   let script = `deploy/Adapters.s.sol:MainnetProduction --rpc-url ${domain.rpc} --chain ${domain.id} --slow`;
 
   // if verifying, add verification arguments
-  if (verify) script += ` --etherscan-api-key ${domain.verifierAPIKey!} --verify`;
+  if (verify) {
+    script += ` --etherscan-api-key ${domain.verifierAPIKey!} --verify`;
+  }
 
   // choose account to broadcast from
   script += ` --sig "run(string)" ${await c.chooseAccount()}`;

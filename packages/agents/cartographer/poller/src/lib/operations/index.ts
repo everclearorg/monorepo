@@ -1,4 +1,10 @@
-export { updateOriginIntents, updateDestinationIntents, updateSettlementIntents, updateHubIntents, updateOrders } from './intents';
+export {
+  updateOriginIntents,
+  updateDestinationIntents,
+  updateSettlementIntents,
+  updateHubIntents,
+  updateOrders,
+} from './intents';
 export { updateHubInvoices, updateHubDeposits } from './invoices';
 export { updateAssets, updateDepositors } from './depositors';
 export { updateMessages, updateQueues, updateMessageStatus } from './monitor';

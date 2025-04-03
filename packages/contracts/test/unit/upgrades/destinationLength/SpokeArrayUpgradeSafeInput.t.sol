@@ -502,21 +502,6 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
       chainId
     );
   }
-
-  // ============ Helpers ============ //
-  function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
-    state.permit = address(spokeProxy.PERMIT2());
-    state.EVERCLEAR = spokeProxy.EVERCLEAR();
-    state.DOMAIN = spokeProxy.DOMAIN();
-    state.lighthouse = spokeProxy.lighthouse();
-    state.watchtower = spokeProxy.watchtower();
-    state.messageReceiver = spokeProxy.messageReceiver();
-    state.gateway = address(spokeProxy.gateway());
-    state.callExecutor = address(spokeProxy.callExecutor());
-    state.paused = spokeProxy.paused();
-    state.nonce = spokeProxy.nonce();
-    state.messageGasLimit = spokeProxy.messageGasLimit();
-  }
 }
 
 contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, UpgradeHelper {
@@ -759,21 +744,6 @@ contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, 
       safeTransactions,
       chainId
     );
-  }
-
-  // ============ Helpers ============ //
-  function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
-    state.permit = address(spokeProxy.PERMIT2());
-    state.EVERCLEAR = spokeProxy.EVERCLEAR();
-    state.DOMAIN = spokeProxy.DOMAIN();
-    state.lighthouse = spokeProxy.lighthouse();
-    state.watchtower = spokeProxy.watchtower();
-    state.messageReceiver = spokeProxy.messageReceiver();
-    state.gateway = address(spokeProxy.gateway());
-    state.callExecutor = address(spokeProxy.callExecutor());
-    state.paused = spokeProxy.paused();
-    state.nonce = spokeProxy.nonce();
-    state.messageGasLimit = spokeProxy.messageGasLimit();
   }
 }
 
@@ -1086,20 +1056,5 @@ contract SpokeArrayUpgradeTestnetStagingSafeInput is TestnetStagingEnvironment, 
     _writeSafeTransactionInput(
       'safeTransactionInputs/upgradeSpokeArray-bnbTestnet.json', 'Spoke Upgrade BNB Testnet', safeTransactions, chainId
     );
-  }
-
-  // ============ Helpers ============ //
-  function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
-    state.permit = address(spokeProxy.PERMIT2());
-    state.EVERCLEAR = spokeProxy.EVERCLEAR();
-    state.DOMAIN = spokeProxy.DOMAIN();
-    state.lighthouse = spokeProxy.lighthouse();
-    state.watchtower = spokeProxy.watchtower();
-    state.messageReceiver = spokeProxy.messageReceiver();
-    state.gateway = address(spokeProxy.gateway());
-    state.callExecutor = address(spokeProxy.callExecutor());
-    state.paused = spokeProxy.paused();
-    state.nonce = spokeProxy.nonce();
-    state.messageGasLimit = spokeProxy.messageGasLimit();
   }
 }
