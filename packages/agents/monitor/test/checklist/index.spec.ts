@@ -14,6 +14,7 @@ import * as invoice from './../../src/checklist/queue/invoice';
 import * as message from './../../src/checklist/queue/message';
 import * as shadow from "./../../src/checklist/shadow";
 import * as tokenomics from "./../../src/checklist/tokenomics";
+import * as solana from "./../../src/checklist/solana";
 
 describe('runChecks', () => {
   let sandbox: sinon.SinonSandbox;
@@ -60,6 +61,7 @@ describe('runChecks', () => {
     const checkShadowExportLatencyStub = sandbox.stub(shadow, 'checkShadowExportLatency').resolves();
     const checkTokenomicsExportStatusStub = sandbox.stub(tokenomics, 'checkTokenomicsExportStatus').resolves();
     const checkTokenomicsExportLatencyStub = sandbox.stub(tokenomics, 'checkTokenomicsExportLatency').resolves();
+    const checkSolanaPipelineStatusStub = sandbox.stub(solana, 'checkSolanaPipelineStatus').resolves();
     
 
     await runChecks();
@@ -86,5 +88,6 @@ describe('runChecks', () => {
     expect(checkShadowExportLatencyStub.calledOnce).to.be.true;
     expect(checkTokenomicsExportStatusStub.calledOnce).to.be.true;
     expect(checkTokenomicsExportLatencyStub.calledOnce).to.be.true;
+    expect(checkSolanaPipelineStatusStub.calledOnce).to.be.true;
   });
 });

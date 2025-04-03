@@ -48,6 +48,7 @@ import {
   getNewLockPositionEvents,
   saveLockPositions,
   getLockPositions,
+  getOriginIntentsLastNonce,
 } from '../src/client';
 import {
   expect,
@@ -940,6 +941,20 @@ describe('Database Adapter:Client', () => {
 
       await saveLockPositions('lock_position_test', 2, lockPositions, pool);
       expect(await getLockPositions(undefined, undefined, undefined, pool)).to.be.deep.eq(lockPositions.slice(2));
+    });
+  });
+
+  describe('#getOriginIntentsLastNonce', () => {
+    const intents = createOriginIntents(3, [
+      { nonce: 1, origin: '12345' },
+      { nonce: 3, origin: '12345' },
+      { nonce: 7, origin: '12345' },
+    ]);
+
+    it('should work', async () => {
+      expect(await getOriginIntentsLastNonce('12345', pool)).to.be.deep.eq(0);
+      await saveOriginIntents(intents, pool);
+      expect(await getOriginIntentsLastNonce('12345', pool)).to.be.deep.eq(7);
     });
   });
 });

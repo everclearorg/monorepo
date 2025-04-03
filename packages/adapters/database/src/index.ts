@@ -80,6 +80,7 @@ import {
   getNewLockPositionEvents,
   getLockPositions,
   saveLockPositions,
+  getOriginIntentsLastNonce,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
@@ -230,7 +231,11 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<TokenomicsEvent[]>;
   getMerkleTrees: (epochEnd: number, _pool?: Pool | TxnClientForRepeatableRead) => Promise<MerkleTree[]>;
-  getLatestMerkleTree: (asset: string, epochEndMillis: number, _pool?: Pool | TxnClientForRepeatableRead) => Promise<MerkleTree[]>;
+  getLatestMerkleTree: (
+    asset: string,
+    epochEndMillis: number,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<MerkleTree[]>;
   saveMerkleTrees: (merkleTree: MerkleTree[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveRewards: (rewards: Reward[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveEpochResults: (epochResult: EpochResult[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
@@ -251,6 +256,7 @@ export type Database = {
     lockPositions: LockPosition[],
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
+  getOriginIntentsLastNonce: (origin: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
 };
 
 export let pool: Pool;
@@ -318,6 +324,7 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getNewLockPositionEvents,
     getLockPositions,
     saveLockPositions,
+    getOriginIntentsLastNonce,
   };
 };
 

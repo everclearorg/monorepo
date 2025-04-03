@@ -59,6 +59,8 @@ const DEVNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [31339, 31339],
 ]);
 
+export const SOLANA_CHAINID = '1399811149';
+
 // Hex domains calculated using `getHexDomainFromString`
 // alternative: ethers.BigNumber.from(ethers.utils.toUtf8Bytes("some string")).toNumber()
 export const chainIdToDomainMapping: Map<number, number> = new Map([

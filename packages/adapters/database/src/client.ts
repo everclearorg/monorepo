@@ -815,3 +815,21 @@ export const saveLockPositions = async (
     return true;
   });
 };
+
+export const getOriginIntentsLastNonce = async (origin: string, _pool?: Pool | db.TxnClientForRepeatableRead) => {
+  const poolToUse = _pool ?? pool;
+  const result = await db
+    .select(
+      'origin_intents',
+      {
+        origin,
+      },
+      {
+        order: { by: 'nonce', direction: 'DESC' },
+        limit: 1,
+      },
+    )
+    .run(poolToUse);
+
+  return result && result.length ? converters.fromOriginIntent(result[0]).nonce : 0;
+};

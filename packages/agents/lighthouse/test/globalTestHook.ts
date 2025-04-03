@@ -448,6 +448,7 @@ export const mochaHooks = {
       saveEpochResults: stub().resolves(),
       saveRewards: stub().resolves(),
       saveCheckPoint: stub().resolves(),
+      getOriginIntentsLastNonce: stub().resolves(0),
     } as unknown as Database;
     mockHistoricPrice = {
       getHistoricTokenPrice: stub(),
