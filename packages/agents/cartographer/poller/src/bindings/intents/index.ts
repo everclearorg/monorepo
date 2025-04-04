@@ -6,6 +6,7 @@ import {
   updateDestinationIntents,
   updateSettlementIntents,
   updateHubIntents,
+  updateOrders,
 } from '../../lib/operations';
 
 export const bindIntents = async (context: AppContext) => {
@@ -20,6 +21,7 @@ export const bindIntents = async (context: AppContext) => {
     await updateDestinationIntents();
     await updateHubIntents();
     await updateSettlementIntents();
+    await updateOrders();
 
     // Refresh the materialized view
     await database.refreshIntentsView();

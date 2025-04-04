@@ -18,6 +18,7 @@ import {
   DEPOSIT_PROCESSED_EVENT_ENTITY,
   DEPOSIT_QUEUE_ENTITY,
   INTENT_SETTLEMENT_EVENT_ENTITY,
+  ORDER_ENTITY,
 } from './entities';
 
 export const getBlockNumberQuery = (): string => {
@@ -405,6 +406,27 @@ export const getHubMetaQuery = (): string => {
   return `
     meta (id: "HUB_META_ID"){
       ${HUB_META_ENTITY}
+    }
+  `;
+};
+
+export const getOrdersByNonce = (
+  fromNonce: number,
+  maxBlockNumber?: number,
+  orderDirection: 'asc' | 'desc' = 'asc',
+  limit?: number,
+): string => {
+  return `
+    orderCreateds(
+      where: {
+        txNonce_gte: ${fromNonce}
+        ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
+      },
+      first: ${limit ?? 200},
+      orderBy: txNonce,
+      orderDirection: ${orderDirection}
+    ){
+      ${ORDER_ENTITY}
     }
   `;
 };

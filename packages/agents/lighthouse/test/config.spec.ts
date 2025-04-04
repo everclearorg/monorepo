@@ -55,7 +55,7 @@ describe('Config', () => {
       stub(process, 'env').value({
         LIGHTHOUSE_CONFIG: 'xxx',
         LIGHTHOUSE_CONFIG_FILE: './test/test_config.json',
-      }); 
+      });
       await expect(loadConfig()).to.be.fulfilled;
     })
 

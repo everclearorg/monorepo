@@ -54,6 +54,12 @@
     "environment": "MainnetStaging"
   },
   {
+    "address": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
+    "domainName": "Base",
+    "domainId": 8453,
+    "environment": "MainnetStaging"
+  },
+  {
     "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
     "domainName": "Optimism",
     "domainId": 10,
