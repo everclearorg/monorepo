@@ -10,6 +10,7 @@ import {IHubGateway} from 'interfaces/hub/IHubGateway.sol';
 import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
 import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
+import {IXERC20Module} from 'interfaces/intent/modules/IXERC20Module.sol';
 
 abstract contract DefaultValues {
   ///////////////////// HUB ARGUMENTS /////////////////////////
@@ -29,6 +30,7 @@ abstract contract DefaultValues {
   address public constant WATCHTOWER = 0x6281ea3060B26352b558C4F45767C90db482c4fd;
   address public constant ASSET_MANAGER = 0xBF67dfcdC720E7bcaAdca6e1092f3A65207b7874;
   address public constant ROUTER = 0xe9Ed3751665930c112cF8e0b278C025A13C041c2;
+  address public constant L2_FEE_SIGNER = 0xd148C7f37b346a4bD8e14f8c1f181f5f640481C8;
 }
 
 abstract contract MainnetAssets {
@@ -111,7 +113,11 @@ abstract contract Ethereum {
   IEverclearSpoke public ETHEREUM_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public ETHEREUM_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public ETHEREUM_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
-  address public ETHEREUM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  IXERC20Module public ETHEREUM_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public ETHEREUM_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+
+  // Fee adapter constants
+  address public constant ETHEREUM_ENG_MULTISIG = 0xa02a88F0bbD47045001Bd460Ad186C30F9a974d6;
 }
 
 abstract contract ArbitrumOne {
@@ -121,7 +127,11 @@ abstract contract ArbitrumOne {
   IEverclearSpoke public ARBITRUM_ONE_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public ARBITRUM_ONE_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public ARBITRUM_ONE_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
-  address public ARBITRUM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  IXERC20Module public ARBITRUM_ONE_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public ARBITRUM_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+
+  // Fee adapter constants
+  address public constant ARBITRUM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Base {
@@ -131,7 +141,11 @@ abstract contract Base {
   IEverclearSpoke public BASE_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public BASE_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public BASE_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
-  address public BASE_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  IXERC20Module public BASE_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public BASE_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+
+  // Fee adapter constants
+  address public constant BASE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Optimism {
@@ -141,7 +155,11 @@ abstract contract Optimism {
   IEverclearSpoke public OPTIMISM_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public OPTIMISM_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public OPTIMISM_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
-  address public OPTIMISM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  IXERC20Module public OPTIMISM_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public OPTIMISM_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+
+  // Fee adapter constants
+  address public constant OPTIMISM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Bnb {
@@ -151,7 +169,11 @@ abstract contract Bnb {
   IEverclearSpoke public BNB_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public BNB_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public BNB_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
-  address public BNB_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  IXERC20Module public BNB_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public BNB_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+
+  // Fee adapter constants
+  address public constant BNB_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Zircuit {
@@ -161,7 +183,11 @@ abstract contract Zircuit {
   IEverclearSpoke public ZIRCUIT_SPOKE = IEverclearSpoke(0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe);
   ISpokeGateway public ZIRCUIT_SPOKE_GATEWAY = ISpokeGateway(0x2Ec2b2CC1813941b638D3ADBA86A1af7F6488A9E);
   ICallExecutor public ZIRCUIT_EXECUTOR = ICallExecutor(0x391BBeaffe82CCb3570F18F615AE5ab4d6eA2fc0);
+  IXERC20Module public ZIRCUIT_XERC20_MODULE = IXERC20Module(0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541);
   address public ZIRCUIT_SPOKE_IMPL = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
+
+  // Fee adapter constants
+  address public constant ZIRCUIT_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Blast {
@@ -171,6 +197,11 @@ abstract contract Blast {
   IEverclearSpoke public BLAST_SPOKE = IEverclearSpoke(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ISpokeGateway public BLAST_SPOKE_GATEWAY = ISpokeGateway(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
   ICallExecutor public BLAST_EXECUTOR = ICallExecutor(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  IXERC20Module public BLAST_XERC20_MODULE = IXERC20Module(0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64);
+  address public BLAST_SPOKE_IMPL = 0xe0F010e465f15dcD42098dF9b99F1038c11B3056;
+
+  // Fee adapter constants
+  address public constant BLAST_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Linea {
@@ -180,6 +211,11 @@ abstract contract Linea {
   IEverclearSpoke public LINEA_SPOKE = IEverclearSpoke(0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751);
   ISpokeGateway public LINEA_SPOKE_GATEWAY = ISpokeGateway(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
   ICallExecutor public LINEA_EXECUTOR = ICallExecutor(0x7480BAeD22695AeA229fDD280a5194d51dc54A21);
+  IXERC20Module public LINEA_XERC20_MODULE = IXERC20Module(0xBBd3546f8FB1A335E2Cc1AeE5d7f3FC696D853aB);
+  address public LINEA_SPOKE_IMPL = 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460;
+
+  // Fee adapter constants
+  address public constant LINEA_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Polygon {
@@ -189,6 +225,11 @@ abstract contract Polygon {
   IEverclearSpoke public POLYGON_SPOKE = IEverclearSpoke(0x7189C59e245135696bFd2906b56607755F84F3fD);
   ISpokeGateway public POLYGON_SPOKE_GATEWAY = ISpokeGateway(0x26CFF54f11608Cd3060408690803AB4a43f462f2);
   ICallExecutor public POLYGON_EXECUTOR = ICallExecutor(0xd08c4718A58bf1f13F540dAEB170f22533d292b7);
+  IXERC20Module public POLYGON_XERC20_MODULE = IXERC20Module(0x4aade9F812d2160A1b3c6e77f30f1bF14eC7e2a5);
+  address public POLYGON_SPOKE_IMPL = 0x5d81D204FbbC606526A73C11d02C127Ce46B488F;
+
+  // Fee adapter constants
+  address public constant POLYGON_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Avalanche {
@@ -198,6 +239,11 @@ abstract contract Avalanche {
   IEverclearSpoke public AVALANCHE_SPOKE = IEverclearSpoke(0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460);
   ISpokeGateway public AVALANCHE_SPOKE_GATEWAY = ISpokeGateway(0x7EB63a646721de65eBa79ffe91c55DCE52b73c12);
   ICallExecutor public AVALANCHE_EXECUTOR = ICallExecutor(0xC1E5b7bE6c62948eeAb40523B33e5d0121ccae94);
+  IXERC20Module public AVALANCHE_XERC20_MODULE = IXERC20Module(0x255aba6E7f08d40B19872D11313688c2ED65d1C9);
+  address public AVALANCHE_SPOKE_IMPL = 0xD385Af1A209890AEE184BDf75f328aC396d52fB6;
+
+  // Fee adapter constants
+  address public constant AVALANCHE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Scroll {
@@ -207,6 +253,11 @@ abstract contract Scroll {
   IEverclearSpoke public SCROLL_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public SCROLL_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public SCROLL_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public SCROLL_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public SCROLL_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant SCROLL_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Taiko {
@@ -216,6 +267,11 @@ abstract contract Taiko {
   IEverclearSpoke public TAIKO_SPOKE = IEverclearSpoke(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ISpokeGateway public TAIKO_SPOKE_GATEWAY = ISpokeGateway(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
   ICallExecutor public TAIKO_EXECUTOR = ICallExecutor(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  IXERC20Module public TAIKO_XERC20_MODULE = IXERC20Module(0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64);
+  address public TAIKO_SPOKE_IMPL = 0xe0F010e465f15dcD42098dF9b99F1038c11B3056;
+
+  // Fee adapter constants
+  address public constant TAIKO_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Apechain {
@@ -225,7 +281,14 @@ abstract contract Apechain {
   IEverclearSpoke public APECHAIN_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public APECHAIN_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public APECHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public APECHAIN_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public APECHAIN_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant APECHAIN_ENG_MULTISIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
 }
+// load_cli_owners 0x9692d38bed86e7c86a32316b17cbbf06e28a3eef7bd1abe5bec3f694bb3d1eda
+// add_owner 0x7fB1B8D2C4a8186426Fb12a4Ae483f0093ED2315
 
 abstract contract ZkSync {
   uint32 public constant ZKSYNC = 324;
@@ -234,6 +297,10 @@ abstract contract ZkSync {
   IEverclearSpoke public ZKSYNC_SPOKE = IEverclearSpoke(0x7F5e085981C93C579c865554B9b723B058AaE4D3);
   ISpokeGateway public ZKSYNC_SPOKE_GATEWAY = ISpokeGateway(0xbD82E5503461913a70566E66a454465a46F5C903);
   ICallExecutor public ZKSYNC_EXECUTOR = ICallExecutor(0xd2cC1a32430B1b81b0ed6327bc37670a26ca4568);
+  IXERC20Module public ZKSYNC_XERC20_MODULE = IXERC20Module(0x6ACf19603C8588885250F7a02F0EaFFa4FcafB04);
+
+  // Fee adapter constants
+  address public constant ZKSYNC_ENG_MULTISIG = 0x227a7aC43503c15fe7ab31901468DA07108eA967;
 }
 
 abstract contract Mode {
@@ -243,6 +310,11 @@ abstract contract Mode {
   IEverclearSpoke public MODE_SPOKE = IEverclearSpoke(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   ISpokeGateway public MODE_SPOKE_GATEWAY = ISpokeGateway(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
   ICallExecutor public MODE_EXECUTOR = ICallExecutor(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
+  IXERC20Module public MODE_XERC20_MODULE = IXERC20Module(0x7B435CCF350DBC773e077410e8FEFcd46A1cDfAA);
+  address public MODE_SPOKE_IMPL = 0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7;
+
+  // Fee adapter constants
+  address public constant MODE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Unichain {
@@ -252,6 +324,11 @@ abstract contract Unichain {
   IEverclearSpoke public UNICHAIN_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   ISpokeGateway public UNICHAIN_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public UNICHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public UNICHAIN_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public UNICHAIN_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant UNICHAIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract Ronin {
@@ -261,6 +338,11 @@ abstract contract Ronin {
   IEverclearSpoke public RONIN_SPOKE = IEverclearSpoke(0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64);
   ISpokeGateway public RONIN_SPOKE_GATEWAY = ISpokeGateway(0x1FC1f47a6a7c61f53321643A14bEc044213AbF95);
   ICallExecutor public RONIN_EXECUTOR = ICallExecutor(0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71);
+  IXERC20Module public RONIN_XERC20_MODULE = IXERC20Module(0x92dcaf947DB325ac023b105591d76315743883eD);
+  address public RONIN_SPOKE_IMPL = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
+
+  // Fee adapter constants
+  address public constant RONIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 }
 
 abstract contract MainnetProductionDomains is

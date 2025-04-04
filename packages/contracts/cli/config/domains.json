@@ -24,7 +24,8 @@
     "name": "Base",
     "id": 8453,
     "rpc": "https://base-mainnet.public.blastapi.io",
-    "environments": ["MainnetProduction"],
+    "verifierUrl": "https://api.basescan.org/api",
+    "environments": ["MainnetProduction", "MainnetStaging"],
     "realm": "spoke"
   },
   {
@@ -78,15 +79,6 @@
     "rpc": "https://linea.drpc.org",
     "verifierUrl": "https://api.lineascan.build/api",
     "environments": ["MainnetStaging", "MainnetProduction"],
-    "realm": "spoke"
-  },
-  {
-    "name": "Linea",
-    "id": 59144,
-    "rpc": "https://linea.drpc.org",
-    "environments": [
-      "MainnetProduction"
-    ],
     "realm": "spoke"
   },
   {

@@ -17,6 +17,7 @@ library Constants {
   bytes32 public constant EMPTY_HASH = keccak256('');
   uint256 public constant MAX_PK =
     115_792_089_237_316_195_423_570_985_008_687_907_852_837_564_279_074_904_382_605_163_141_518_161_494_337;
+  uint8 public constant DEFAULT_NORMALIZED_DECIMALS = 18;
 
   bytes32 public constant GATEWAY_HASH = keccak256(abi.encode('GATEWAY'));
   bytes32 public constant MAILBOX_HASH = keccak256(abi.encode('MAILBOX'));

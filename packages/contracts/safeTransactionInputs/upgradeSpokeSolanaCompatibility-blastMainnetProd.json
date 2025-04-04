@@ -1,0 +1,19 @@
+{
+  "chainId": "81457",
+  "createdAt": "1743691387000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Blast | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7",
+      "value": "0",
+      "data": "0x4f1ef2860000000000000000000000005157f2536ed861f15c59026f91d018914f317d8400000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

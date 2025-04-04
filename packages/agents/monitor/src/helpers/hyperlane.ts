@@ -5,13 +5,12 @@ import {
   jsonifyError,
   HyperlaneMessageResponse,
   HyperlaneStatus,
-  getMailboxInterface,
   Message,
 } from '@chimera-monorepo/utils';
 import { Interface, hexlify, solidityPack } from 'ethers/lib/utils';
 import { NoDispatchEventOnMessage, NoGatewayConfigured } from '../types/errors';
 import { getContext } from '../context';
-import { getHyperlaneMessageStatus, getHyperlaneMsgDelivered } from './../mockable';
+import { getHyperlaneMessageStatus, getHyperlaneMsgDelivered, getMailboxInterface } from './../mockable';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 
 export const getMessageStatus = async (

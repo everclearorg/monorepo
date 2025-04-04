@@ -79,6 +79,14 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(167000);
   } else if (network == 'apechain-mainnet') {
     chainId = BigInt.fromI32(33139);
+  } else if (network == 'blast') {
+    chainId = BigInt.fromI32(81457);
+  } else if (network == 'zircuit') {
+    chainId = BigInt.fromI32(48900);
+  } else if (network == 'ronin') {
+    chainId = BigInt.fromI32(2020);
+  } else if (network == 'unichain') {
+    chainId = BigInt.fromI32(130);
   } else {
     throw new Error(`No chainName for network ${network}`);
   }

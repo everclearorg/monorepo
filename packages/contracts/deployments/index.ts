@@ -110,6 +110,10 @@ import ProductionSpokeGatewayMode from './production/34443/SpokeGateway.json';
 import ProductionEverclearSpokeUnichain from './production/130/EverclearSpoke.json';
 import ProductionSpokeGatewayUnichain from './production/130/SpokeGateway.json';
 
+// Add Ronin deployment imports
+import ProductionEverclearSpokeRonin from './production/2020/EverclearSpoke.json';
+import ProductionSpokeGatewayRonin from './production/2020/SpokeGateway.json';
+
 export const Deployments = {
   local: {},
   production: {
@@ -208,6 +212,10 @@ export const Deployments = {
     130: {
       everclear: ProductionEverclearSpokeUnichain,
       gateway: ProductionSpokeGatewayUnichain,
+    },
+    2020: {
+      everclear: ProductionEverclearSpokeRonin,
+      gateway: ProductionSpokeGatewayRonin,
     },
   },
   staging: {
