@@ -1,0 +1,19 @@
+{
+  "chainId": "59144",
+  "createdAt": "1743691402000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Linea | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000efa6ac3f931620fd0449ec8c619f2a14a0a78e9900000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

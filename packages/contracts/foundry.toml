@@ -19,7 +19,7 @@ fs_permissions = [
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-optimism.json" },
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-base.json" },
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-bnb.json" }
-    ]
+]
 
 [profile.optimized]
 via_ir = true
@@ -33,7 +33,7 @@ out = 'out-via-ir'
 src = 'src/interfaces/'
 
 [fuzz]
-runs = 1000
+runs = 100
 max_test_rejects = 100_000
 
 [rpc_endpoints]

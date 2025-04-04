@@ -17,6 +17,7 @@ import {
   DepositQueue,
   SettlementIntent,
   HyperlaneStatus,
+  Order,
 } from '@chimera-monorepo/utils';
 import {
   SettlementQueueEntity,
@@ -38,6 +39,7 @@ import {
   DepositQueueEntity,
   IntentSettlementEventEntity,
   IntentStatus,
+  OrderEntity,
 } from '../operations/entities';
 import { BigNumber } from 'ethers';
 
@@ -70,6 +72,11 @@ export const originIntent = (entity: SpokeAddIntentEventEntity): OriginIntent =>
     gasPrice: entity.gasPrice,
     txOrigin: entity.txOrigin,
     txNonce: StringToNumber(entity.txNonce),
+
+    tokenFee: entity.intent.fees?.tokenFee ?? undefined,
+    nativeFee: entity.intent.fees?.nativeFee ?? undefined,
+    feeAdapterInitiator: entity.intent.fees?.initiator ?? undefined,
+    orderId: entity.intent.order?.id ?? undefined,
   };
 };
 
@@ -373,5 +380,24 @@ export const depositQueue = (entity: DepositQueueEntity): DepositQueue => {
     type: QueueType.Deposit,
     tickerHash: entity.tickerHash,
     epoch: StringToNumber(entity.epoch),
+  };
+};
+
+export const order = (domain: string, entity: OrderEntity): Order & { domain: string } => {
+  return {
+    domain,
+    id: entity.id,
+    autoId: StringToNumber(entity.txNonce),
+    intentIds: entity.intents.map((i) => i.id),
+    tokenFee: entity.tokenFee,
+    nativeFee: entity.nativeFee,
+    initiator: entity.initiator,
+    transactionHash: entity.transactionHash,
+    blockNumber: StringToNumber(entity.blockNumber),
+    gasLimit: entity.gasLimit,
+    gasPrice: entity.gasPrice,
+    txOrigin: entity.txOrigin,
+    txNonce: StringToNumber(entity.txNonce),
+    timestamp: StringToNumber(entity.timestamp),
   };
 };

@@ -1,0 +1,19 @@
+{
+  "chainId": "48900",
+  "createdAt": "1743691367000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Zircuit | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe",
+      "value": "0",
+      "data": "0x4f1ef2860000000000000000000000005c2afe0bae15dce018a7517d89d61124dd37a39200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

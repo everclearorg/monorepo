@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "fastify": "4.26.2",
-    "zapatos": "6.4.0"
+    "zapatos": "6.5.0"
   },
   "packageManager": "yarn@3.3.1"
 }

@@ -25,8 +25,6 @@ contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
   using TypeCasts for address;
   using TypeCasts for bytes32;
 
-  address public HUB_GATEWAY = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
-
   // ============ Upgrade ============ //
   function test_spokeArrayUpgrade_upgrade() public {
     vm.createSelectFork(vm.envString('MAINNET_RPC'), FIXED_MAIN_BLOCK);
@@ -222,7 +220,7 @@ contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
     vm.expectCall(
       address(MAILBOX_MAINNET),
       abi.encodeWithSignature(
-        'dispatch(uint32,bytes32,bytes,bytes)', HUB_ID, HUB_GATEWAY, _batchIntentmessage, metadata
+        'dispatch(uint32,bytes32,bytes,bytes)', HUB_ID, HUB_GATEWAY_PROD, _batchIntentmessage, metadata
       )
     );
 
@@ -231,21 +229,7 @@ contract SpokeArrayUpgradeTest is BaseTest, UpgradeHelper {
     assertEq(lightHouse.balance, _initialLighthouseBal - _messageFee);
   }
 
-  // ============ Helpers ============ //
-  function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
-    state.permit = address(spokeProxy.PERMIT2());
-    state.EVERCLEAR = spokeProxy.EVERCLEAR();
-    state.DOMAIN = spokeProxy.DOMAIN();
-    state.lighthouse = spokeProxy.lighthouse();
-    state.watchtower = spokeProxy.watchtower();
-    state.messageReceiver = spokeProxy.messageReceiver();
-    state.gateway = address(spokeProxy.gateway());
-    state.callExecutor = address(spokeProxy.callExecutor());
-    state.paused = spokeProxy.paused();
-    state.nonce = spokeProxy.nonce();
-    state.messageGasLimit = spokeProxy.messageGasLimit();
-  }
-
+  // ============ Public ============ //
   function _upgradeSpoke() internal {
     vm.createSelectFork(vm.envString('MAINNET_RPC'), FIXED_MAIN_BLOCK);
     // Checking implementation correct and caching the state variables

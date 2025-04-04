@@ -1,0 +1,19 @@
+{
+  "chainId": "33139",
+  "createdAt": "1743691545000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Apechain | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+      "value": "0",
+      "data": "0x4f1ef28600000000000000000000000092dcaf947db325ac023b105591d76315743883ed00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}
