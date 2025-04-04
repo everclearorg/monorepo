@@ -27,3 +27,6 @@ anchor-spl = "0.31.0"
 fixed-hash = "=0.8.0" # exact version for hyperlane interfacing
 uint = "=0.9.5" # exact version for hyperlane interfacing
 tiny-keccak = { version = "2.0", features = ["keccak"] }
+
+[dev-dependencies]
+hex = "0.4.3"

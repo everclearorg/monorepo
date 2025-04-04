@@ -54,79 +54,129 @@ pub fn compute_intent_hash(intent: &EVMIntent) -> [u8; 32] {
 
 pub(crate) fn encode_single_intent(intent: &EVMIntent) -> Vec<u8> {
     let mut out = Vec::new();
+
+    out.extend_from_slice(&u256_to_32bytes(32u64 as u128));
+
     let mut head = Vec::new();
 
-    // 1) Initiator
-    head.extend_from_slice(intent.initiator.as_ref());
+    // Now we write the struct #0 "head," which is 12 * 32 bytes
 
-    // 2) Receiver
-    head.extend_from_slice(intent.receiver.as_ref());
+    // word0: initiator (bytes32)
+    head.extend_from_slice(&intent.initiator);
 
-    // 3) InputAsset
-    head.extend_from_slice(intent.input_asset.as_ref());
+    // word1: receiver (bytes32)
+    head.extend_from_slice(&intent.receiver);
 
-    // 4) OutputAsset
-    head.extend_from_slice(intent.output_asset.as_ref());
+    // word2: input_asset (bytes32)
+    head.extend_from_slice(&intent.input_asset);
 
-    // 5) maxFee
-    head.extend_from_slice(&intent.max_fee.to_be_bytes());
+    // word3: output_asset (bytes32)
+    head.extend_from_slice(&intent.output_asset);
 
-    // 6) originDomain
-    head.extend_from_slice(&intent.origin.to_be_bytes());
+    // word4: max_fee => stored in top 3 bytes or simply zero-extended as a 32-byte word
+    // For abi.encode, the entire 32 bytes get used, with the last 3 bytes carrying the value for a uint24
+    head.extend_from_slice(&u256_to_32bytes(u128::from(intent.max_fee)));
 
-    // 7) nonce
-    head.extend_from_slice(&intent.nonce.to_be_bytes());
+    // word5: origin (uint32 => 4 bytes used, the other 28 are zero)
+    head.extend_from_slice(&u256_to_32bytes(u128::from(intent.origin)));
 
-    // 8) timestamp
-    head.extend_from_slice(&intent.timestamp.to_be_bytes());
+    // word6: nonce (uint64)
+    head.extend_from_slice(&u256_to_32bytes(intent.nonce as u128));
 
-    // 9) ttl
-    head.extend_from_slice(&intent.ttl.to_be_bytes());
+    // word7: timestamp (uint48 => we store in 32 bytes, last 6 bytes used)
+    head.extend_from_slice(&u256_to_32bytes(intent.timestamp as u128));
 
-    // 10) normalizedAmount
+    // word8: ttl (uint48 => same reasoning)
+    head.extend_from_slice(&u256_to_32bytes(intent.ttl as u128));
+
+    // word9: amount (uint256 => already 32 bytes big-endian).
+    // In typical abi.encode, we just place it as-is, but ensure it's 32 bytes big-endian
     head.extend_from_slice(&intent.amount);
 
-    let (tail, dest_offset, data_offset) = encode_struct_tail(intent);
+    // We have 2 dynamic fields => destinations[] and data
+    // They each get a 32-byte "offset" word. The offset is from the start of struct #0 head (i.e. offset=0 there)
+    // We know the struct head is 384 bytes total => that means the "tail" starts at offset 384
+    // But we must figure out how big "destinations" is to know where "data" begins in that tail.
+
+    // We'll build the tail in a separate buffer, so we can figure out lengths
+    let (tail, destinations_offset, data_offset) = encode_struct_tail(intent);
 
     // word10: offset to destinations
-    head.extend_from_slice(&u256_to_32bytes(dest_offset as u128));
+    head.extend_from_slice(&u256_to_32bytes(destinations_offset as u128));
 
     // word11: offset to data
     head.extend_from_slice(&u256_to_32bytes(data_offset as u128));
 
-    // Now place the entire head (384 bytes) first
+    // Finally, we put the entire head (384 bytes) after the initial 32 bytes for array length:
     out.extend_from_slice(&head);
-    // Then place the tail
+
+    // Then we append the tail:
     out.extend_from_slice(&tail);
 
     out
 }
 
+/// Helper that encodes the "tail" portion for the dynamic fields (destinations and data)
+/// and returns:
+///   - the tail bytes
+///   - the offset (in bytes) from the start of the struct's head to the destinations data
+///   - the offset (in bytes) from the start of the struct's head to the data field
+///
+/// We know:
+///   - The struct "head" is 12 words = 384 bytes.
+///   - So the tail region physically begins at offset = 384 from the start of the struct head.
+///   - The offset we store in word10 is the distance from 0.. to where destinations data starts in the tail.
+///   - The offset we store in word11 is the distance from 0.. to where data starts in the tail.
+///
 fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
     let mut tail = Vec::new();
-    // The offset for the first dynamic field is 384 bytes (12×32) from the start of the struct
-    let destinations_offset = 384;
-    // We'll encode the destinations first, then we know where the data will go
-    let mut destinations_bytes = Vec::new();
+    // The tail offset starts right after the struct's 384-byte head,
+    // but the offsets *within* the struct are measured from the start of that head (i.e. 0).
+    // So the first dynamic field (destinations) will be at offset = 384 - 384 = 0?
+    // Actually, in the ABI spec, the offset stored in the struct’s head is measured
+    // *relative to the start of that struct’s head*. So if the tail is appended
+    // immediately after 384 bytes, then the first dynamic field is at offset = 384 - 384 = 0 from the tail’s start.
+    //
+    // However, we typically store just the numeric offset "384" in the top-level array encoding,
+    // then plus the struct's index. But because we have an array of length=1, we measure from the
+    // start of that single struct's head, so it is indeed 384. But inside that single struct,
+    // it is "0" to the first tail chunk. The EVM looks at (headStart + offset).
+    //
+    // In practice, to keep consistent with the standard approach:
+    //   - For the first dynamic field, we store offset=384 in the struct’s head.
+    //   - Then for the second dynamic field, offset=384 + [size of the first], etc.
+    //
+    // Because there's only one struct, that "384" is the distance from the struct start
+    // up to the tail. So let's do this carefully:
+    //
+    // We'll figure out the size of the destinations chunk, then we know where data begins.
+    // Then we know the offsets to store in the head are (384) for destinations, (384 + size_of_destinations_chunk) for data.
 
-    // 1) destinations:
-    //   - 32 bytes array length
-    //   - each element occupies one full 32‐byte word
-    destinations_bytes.extend_from_slice(&u256_to_32bytes(intent.destinations.len() as u128));
+    // 1) Encode destinations
+    let mut destinations_bytes = Vec::new();
+    //  - first 32 bytes => length of array
+    destinations_bytes.extend_from_slice(&u256_to_32bytes(u128::from(
+        intent.destinations.len() as u64
+    )));
+
+    //  - then each element is a uint32 => in abi.encode, each element is still a full 32-byte word,
+    //    with the value in the last 4 bytes (big-endian).
     for &val in intent.destinations.iter() {
-        destinations_bytes.extend_from_slice(&u256_to_32bytes(val as u128));
+        destinations_bytes.extend_from_slice(&u256_to_32bytes(u128::from(val)));
     }
 
-    let data_offset = destinations_offset + destinations_bytes.len() as u64;
-
-    // 2) data (bytes)
+    // 2) Encode data (bytes)
     let mut data_bytes = Vec::new();
-    // 32 bytes => length
-    data_bytes.extend_from_slice(&u256_to_32bytes(intent.data.len() as u128));
+    data_bytes.extend_from_slice(&u256_to_32bytes(u128::from(intent.data.len() as u64)));
+    // the raw bytes, then pad to multiple of 32
     data_bytes.extend_from_slice(&intent.data);
-    // pad to multiple of 32
+    // pad
     let padding = (32 - (intent.data.len() % 32)) % 32;
     data_bytes.extend(std::iter::repeat(0u8).take(padding));
+
+    // We place "destinations_bytes" first, then "data_bytes" in the tail
+    let destinations_offset = 384; // from start of struct #0
+    let data_offset = destinations_offset + destinations_bytes.len() as u64; // from start of struct #0
 
     tail.extend_from_slice(&destinations_bytes);
     tail.extend_from_slice(&data_bytes);
@@ -141,4 +191,42 @@ fn u256_to_32bytes(val: u128) -> [u8; 32] {
         word[31 - i] = (val >> (8 * i)) as u8;
     }
     word
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn u64_to_u256_be(val: u64) -> [u8; 32] {
+        let mut out = [0u8; 32];
+        // copy val’s big-endian bytes into the last 8 bytes
+        out[24..32].copy_from_slice(&val.to_be_bytes());
+        out
+    }
+
+    #[test]
+    fn test_compute_intent_hash() {
+        let intent = EVMIntent {
+            initiator: Pubkey::from_str_const("AUgefcX2VZq9v72gqXUg8rgUNxsbHV7RVWuw42yU4LyQ")
+                .to_bytes(),
+            receiver: Pubkey::from_str_const("1111111111113FiC6QTSLv7Up9gSeUwhPifXRCoH").to_bytes(),
+            input_asset: Pubkey::from_str_const("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
+                .to_bytes(),
+            output_asset: Pubkey::from_str_const("1111111111112q2Gg8TH19xwTZeyUCme313nZsTQ")
+                .to_bytes(),
+            max_fee: 10000,
+            origin: 1399811149,
+            nonce: 35,
+            timestamp: 1743782830,
+            ttl: 0,
+            amount: u64_to_u256_be(2000000000000000000),
+            destinations: vec![8453],
+            data: vec![],
+        };
+        let intent_id = compute_intent_hash(&intent);
+        assert_eq!(
+            hex::encode(intent_id),
+            "f8d48e46ed43d8b79f5a48a0f34c2deb5b554a7cb130654425d8385c118d2a7b"
+        );
+    }
 }
