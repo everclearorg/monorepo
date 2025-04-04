@@ -17,11 +17,11 @@ export const bindIntents = async (context: AppContext) => {
   const { requestContext, methodContext } = createLoggingContext(bindIntents.name);
   try {
     logger.debug('Bind intents polling loop start', requestContext, methodContext);
+    await updateOrders();
     await updateOriginIntents();
     await updateDestinationIntents();
     await updateHubIntents();
     await updateSettlementIntents();
-    await updateOrders();
 
     // Refresh the materialized view
     await database.refreshIntentsView();
