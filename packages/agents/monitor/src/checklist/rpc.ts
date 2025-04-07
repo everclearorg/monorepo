@@ -3,6 +3,7 @@ import { createLoggingContext, Logger } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { Report, Severity } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
+import { Connection } from '@solana/web3.js';
 
 interface RpcError {
   rpcOrigin: string;
@@ -33,8 +34,14 @@ export const checkRpcs = async () => {
     for (const rpcUrl of rpcUrls) {
       const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
       try {
-        const provider = new providers.JsonRpcProvider(rpcUrl);
-        const blockNumber = await provider.getBlockNumber();
+        let blockNumber: number;
+        if (chainConfig.network === 'svm') {
+          const connection = new Connection(rpcUrl);
+          blockNumber = await connection.getBlockHeight();
+        } else {
+          const provider = new providers.JsonRpcProvider(rpcUrl);
+          blockNumber = await provider.getBlockNumber();
+        }
         goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
       } catch (error: unknown) {
         (error as Error).message = (error as Error).message.replace(rpcUrl, rpcOrigin);

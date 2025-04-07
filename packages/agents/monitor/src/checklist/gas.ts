@@ -14,7 +14,10 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
   const { requestContext, methodContext } = createLoggingContext(checkGas.name);
 
   const chainGas = [];
-  const chains = [...Object.keys(config.chains), config.hub.domain];
+  const chains = [
+    ...Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm'),
+    config.hub.domain,
+  ];
   let native;
   for (const domainId of chains) {
     // If the domain is hub, get the native asset from hub assets

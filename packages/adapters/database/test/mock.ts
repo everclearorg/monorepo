@@ -78,6 +78,7 @@ export const createMockDatabase = (): Database => {
     saveEpochResults: stub().resolves(),
     getLockPositions: stub().resolves([]),
     saveLockPositions: stub().resolves(),
+    getOriginIntentsLastNonce: stub().resolves(0),
   };
 };
 
