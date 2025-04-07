@@ -155,12 +155,11 @@ pub fn handle_account_metas(
     let (event_authority_pubkey, _) =
         Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
 
-    let msg_type = handle.message[0];
-    match msg_type {
-        1 => {
+    let message: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
+    match message.message_type {
+        MessageType::Settlement => {
             msg!("Processing settlement batch message");
-            let settlement_data = &handle.message[1..];
-            let batch: Vec<Settlement> = AnchorDeserialize::deserialize(&mut &settlement_data[..])
+            let batch: Settlements = AnchorDeserialize::deserialize(&mut message.rest.as_ref())
                 .map_err(|_| error!(SpokeError::InvalidMessage))?;
 
             // Derive the vault authority PDA
@@ -176,7 +175,7 @@ pub fn handle_account_metas(
                 to_serializable_account_meta(*ctx.program_id, false),
             ];
             // Add mint public key, recipient ATA and vault ATA per each settlement
-            for s in batch.iter() {
+            for s in batch.settlements.iter() {
                 ret.push(to_serializable_account_meta(s.asset, false));
                 let recipient_token_account_pubkey =
                     get_associated_token_address(&s.recipient, &s.asset);
@@ -190,7 +189,7 @@ pub fn handle_account_metas(
             }
             Ok(ret)
         }
-        2 => {
+        MessageType::VarUpdate => {
             // Var update
             msg!("variable update message metadata");
             // NOTE: we skip variable update message in nanospoke now
@@ -205,6 +204,7 @@ pub fn handle_account_metas(
             ])
         }
         _ => {
+            msg!("invalid message type: {:?}", message.message_type);
             err!(SpokeError::InvalidMessage)
         }
     }
@@ -382,6 +382,7 @@ impl AnchorDeserialize for Settlements {
     }
 }
 
+#[derive(Debug)]
 pub enum MessageType {
     Intent,
     Fill,
