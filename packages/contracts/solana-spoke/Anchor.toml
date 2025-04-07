@@ -5,6 +5,9 @@ anchor_version = "0.31.0"
 resolution = true
 skip-lint = false
 
+[programs.mainnet]
+everclear_spoke = "4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL" # mainnet-staging
+
 [programs.localnet]
 everclear_spoke = "uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC"
 

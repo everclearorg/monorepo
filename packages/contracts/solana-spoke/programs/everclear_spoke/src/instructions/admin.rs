@@ -3,9 +3,9 @@ use anchor_lang::prelude::*;
 use super::AdminState;
 use crate::{
     events::{
-        DomainUpdatedEvent, IgpUpdatedEvent, LighthouseUpdatedEvent,
-        MailboxDispatchAuthorityBumpUpdatedEvent, MailboxUpdatedEvent, MessageGasLimitUpdatedEvent,
-        VaultAuthorityBumpUpdatedEvent, WatchtowerUpdatedEvent,
+        IgpUpdatedEvent, LighthouseUpdatedEvent, MailboxDispatchAuthorityBumpUpdatedEvent,
+        MailboxUpdatedEvent, MessageGasLimitUpdatedEvent, VaultAuthorityBumpUpdatedEvent,
+        WatchtowerUpdatedEvent,
     },
     hyperlane::InterchainGasPaymasterType,
 };
@@ -82,15 +82,5 @@ pub fn update_vault_authority_bump(ctx: Context<AdminState>, new_bump: u8) -> Re
     let old_bump: u8 = ctx.accounts.spoke_state.vault_authority_bump;
     ctx.accounts.spoke_state.vault_authority_bump = new_bump;
     emit_cpi!(VaultAuthorityBumpUpdatedEvent { old_bump, new_bump });
-    Ok(())
-}
-
-pub fn update_domain(ctx: Context<AdminState>, new_domain: u32) -> Result<()> {
-    let old_domain: u32 = ctx.accounts.spoke_state.domain;
-    ctx.accounts.spoke_state.domain = new_domain;
-    emit_cpi!(DomainUpdatedEvent {
-        old_domain,
-        new_domain
-    });
     Ok(())
 }

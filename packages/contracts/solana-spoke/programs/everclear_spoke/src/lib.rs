@@ -12,7 +12,7 @@ use events::*;
 use hyperlane::{mailbox::HandleInstruction, InterchainGasPaymasterType, SerializableAccountMeta};
 use instructions::*;
 
-declare_id!("uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC");
+declare_id!("4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL");
 
 #[program]
 pub mod everclear_spoke {
@@ -201,15 +201,5 @@ pub mod everclear_spoke {
         );
 
         instructions::update_vault_authority_bump(ctx, new_bump)
-    }
-
-    pub fn update_domain(ctx: Context<AdminState>, new_domain: u32) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        require!(
-            state.owner == ctx.accounts.admin.key(),
-            SpokeError::OnlyOwner
-        );
-
-        instructions::update_domain(ctx, new_domain)
     }
 }
