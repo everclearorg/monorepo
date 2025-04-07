@@ -37,7 +37,7 @@ contract DeploySolanaCompatibilityUpgrade is Script, ScriptUtils {
     address newEverclearSpoke;
 
     // Generating the inputs for CREATE3
-    bool useCreate3 = true;
+    bool useCreate3 = false;
     if (useCreate3) {
       uint8 version = 5;
       bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
@@ -124,5 +124,8 @@ contract MainnetProduction is DeploySolanaCompatibilityUpgrade, MainnetProductio
 
     // Ronin
     _deploymentParams[RONIN] = DeploymentParams({owner: OWNER, spokeProxy: address(RONIN_SPOKE)}); // set domain id as mapping key
+
+    // Gnosis
+    _deploymentParams[GNOSIS] = DeploymentParams({owner: OWNER, spokeProxy: address(GNOSIS_SPOKE)}); // set domain id as mapping key
   }
 }

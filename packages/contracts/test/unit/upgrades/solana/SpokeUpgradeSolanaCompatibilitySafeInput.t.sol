@@ -46,6 +46,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
   address public constant MODE_SPOKE_UPGRADE_IMPL = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
   address public constant UNICHAIN_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
   address public constant RONIN_SPOKE_UPGRADE_IMPL = 0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541;
+  address public constant GNOSIS_SPOKE_UPGRADE_IMPL = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
 
   function setUp() public {
     //// Arbitrum One
@@ -158,6 +159,13 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
       owner: L2_MULTI_SIG,
       spokeProxy: address(RONIN_SPOKE),
       spokeImpl: RONIN_SPOKE_IMPL
+    });
+
+    // Gnosis
+    _deploymentParams[GNOSIS] = DeploymentParams({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(GNOSIS_SPOKE),
+      spokeImpl: GNOSIS_SPOKE_IMPL
     });
   }
 
@@ -1232,6 +1240,69 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     );
   }
 
-  // TODO: May need to deploy + upgrade via the zk project
-  function test_spokeUpgradeSolanaCompatibilitySafe_upgradeZKSyncProd() public {}
+  function test_spokeUpgradeSolanaCompatibilitySafe_upgradeGnosisProd() public {
+    vm.createSelectFork(vm.envString('GNOSIS_RPC'));
+    vm.rollFork(39_386_682);
+    _params = _deploymentParams[block.chainid];
+
+    // Checking implementation correct and caching the state variables
+    spokeProxyV3 = EverclearSpokeV3(_params.spokeProxy);
+    address oldImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _params.spokeImpl);
+
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV3();
+    address newEverclearSpoke = GNOSIS_SPOKE_UPGRADE_IMPL;
+
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, '');
+
+    vm.prank(_params.owner);
+    (success,) = _params.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
+
+    // dealing to the user
+    uint32[] memory destinations = _getDestinations(10);
+    uint256 _amount = 1e18;
+    address _inputAsset = deployAndDeal(address(0x123), _amount).toAddress();
+
+    // approving the spokeProxy
+    vm.startPrank(address(0x123));
+    IERC20(_inputAsset).approve(address(spokeProxyV3), _amount);
+
+    // sending intent via new intent bytes path
+    (bytes32 _intentId,) = spokeProxyV3.newIntent(
+      destinations, address(0x123).toBytes32(), _inputAsset, address(0x456).toBytes32(), _amount, 0, 0, hex'00'
+    );
+    assertEq(uint8(spokeProxyV3.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
+
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV3.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV3.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV3.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV3.lighthouse());
+    assertEq(state.watchtower, spokeProxyV3.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV3.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV3.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
+    assertEq(state.paused, spokeProxyV3.paused());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
+
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
+    string memory chainId = '100';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-gnosisMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Gnosis | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
 }
