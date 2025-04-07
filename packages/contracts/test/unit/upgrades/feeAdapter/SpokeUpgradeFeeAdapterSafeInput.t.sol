@@ -50,7 +50,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(ARBITRUM_ONE_SPOKE),
       spokeImpl: ARBITRUM_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: ARBITRUM_FEE_ADAPTER
     });
 
     //// Optimism
@@ -58,7 +58,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(OPTIMISM_SPOKE),
       spokeImpl: OPTIMISM_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: OPTIMISM_FEE_ADAPTER
     });
 
     //// Base
@@ -66,7 +66,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(BASE_SPOKE),
       spokeImpl: BASE_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: BASE_FEE_ADAPTER
     });
 
     //// Bnb
@@ -74,7 +74,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(BNB_SPOKE),
       spokeImpl: BNB_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: BNB_FEE_ADAPTER
     });
 
     //// Ethereum
@@ -82,7 +82,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L1_MULTI_SIG,
       spokeProxy: address(ETHEREUM_SPOKE),
       spokeImpl: ETHEREUM_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: ETHEREUM_FEE_ADAPTER
     });
 
     //// Zircuit
@@ -90,7 +90,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(ZIRCUIT_SPOKE),
       spokeImpl: ZIRCUIT_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: ZIRCUIT_FEE_ADAPTER
     });
 
     // Blast
@@ -98,7 +98,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(BLAST_SPOKE),
       spokeImpl: BLAST_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: BLAST_FEE_ADAPTER
     });
 
     // Linea
@@ -106,7 +106,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(LINEA_SPOKE),
       spokeImpl: LINEA_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: LINEA_FEE_ADAPTER
     });
 
     // Polygon
@@ -114,7 +114,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(POLYGON_SPOKE),
       spokeImpl: POLYGON_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: POLYGON_FEE_ADAPTER
     });
 
     // Avalanche
@@ -122,7 +122,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(AVALANCHE_SPOKE),
       spokeImpl: AVALANCHE_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: AVALANCHE_FEE_ADAPTER
     });
 
     // Scroll
@@ -130,7 +130,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(SCROLL_SPOKE),
       spokeImpl: SCROLL_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: SCROLL_FEE_ADAPTER
     });
 
     // Ape
@@ -138,7 +138,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: APECHAIN_MULTI_SIG,
       spokeProxy: address(APECHAIN_SPOKE),
       spokeImpl: APECHAIN_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: APECHAIN_FEE_ADAPTER
     });
 
     // Taiko
@@ -146,7 +146,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(TAIKO_SPOKE),
       spokeImpl: TAIKO_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: TAIKO_FEE_ADAPTER
     });
 
     // Mode
@@ -154,7 +154,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(MODE_SPOKE),
       spokeImpl: MODE_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: MODE_FEE_ADAPTER
     });
 
     // Uni
@@ -162,7 +162,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(UNICHAIN_SPOKE),
       spokeImpl: UNICHAIN_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: UNICHAIN_FEE_ADAPTER
     });
 
     // Ronin
@@ -170,7 +170,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(RONIN_SPOKE),
       spokeImpl: RONIN_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: RONIN_FEE_ADAPTER
     });
   }
 

@@ -118,6 +118,7 @@ abstract contract Ethereum {
 
   // Fee adapter constants
   address public constant ETHEREUM_ENG_MULTISIG = 0xa02a88F0bbD47045001Bd460Ad186C30F9a974d6;
+  address public constant ETHEREUM_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract ArbitrumOne {
@@ -132,6 +133,7 @@ abstract contract ArbitrumOne {
 
   // Fee adapter constants
   address public constant ARBITRUM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant ARBITRUM_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Base {
@@ -146,6 +148,7 @@ abstract contract Base {
 
   // Fee adapter constants
   address public constant BASE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant BASE_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Optimism {
@@ -160,6 +163,7 @@ abstract contract Optimism {
 
   // Fee adapter constants
   address public constant OPTIMISM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant OPTIMISM_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Bnb {
@@ -174,6 +178,7 @@ abstract contract Bnb {
 
   // Fee adapter constants
   address public constant BNB_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant BNB_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Zircuit {
@@ -188,6 +193,7 @@ abstract contract Zircuit {
 
   // Fee adapter constants
   address public constant ZIRCUIT_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant ZIRCUIT_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Blast {
@@ -202,6 +208,7 @@ abstract contract Blast {
 
   // Fee adapter constants
   address public constant BLAST_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant BLAST_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Linea {
@@ -216,6 +223,7 @@ abstract contract Linea {
 
   // Fee adapter constants
   address public constant LINEA_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant LINEA_FEE_ADAPTER = 0x1B0Dc9CB7EadDa36f4CcFB8130B0Ad967b0A3508;
 }
 
 abstract contract Polygon {
@@ -230,6 +238,7 @@ abstract contract Polygon {
 
   // Fee adapter constants
   address public constant POLYGON_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant POLYGON_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Avalanche {
@@ -244,6 +253,7 @@ abstract contract Avalanche {
 
   // Fee adapter constants
   address public constant AVALANCHE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant AVALANCHE_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Scroll {
@@ -258,6 +268,7 @@ abstract contract Scroll {
 
   // Fee adapter constants
   address public constant SCROLL_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant SCROLL_FEE_ADAPTER = 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1;
 }
 
 abstract contract Taiko {
@@ -272,6 +283,7 @@ abstract contract Taiko {
 
   // Fee adapter constants
   address public constant TAIKO_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant TAIKO_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Apechain {
@@ -286,6 +298,7 @@ abstract contract Apechain {
 
   // Fee adapter constants
   address public constant APECHAIN_ENG_MULTISIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
+  address public constant APECHAIN_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract ZkSync {
@@ -300,6 +313,7 @@ abstract contract ZkSync {
 
   // Fee adapter constants
   address public constant ZKSYNC_ENG_MULTISIG = 0x227a7aC43503c15fe7ab31901468DA07108eA967;
+  address public constant ZKSYNC_FEE_ADAPTER = 0x80EF3ee093aE3B5aDd1B213628875A4C73F640AF;
 }
 
 abstract contract Mode {
@@ -314,6 +328,7 @@ abstract contract Mode {
 
   // Fee adapter constants
   address public constant MODE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant MODE_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Unichain {
@@ -328,6 +343,7 @@ abstract contract Unichain {
 
   // Fee adapter constants
   address public constant UNICHAIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant UNICHAIN_FEE_ADAPTER = 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1;
 }
 
 abstract contract Ronin {
@@ -342,6 +358,7 @@ abstract contract Ronin {
 
   // Fee adapter constants
   address public constant RONIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant RONIN_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Gnosis {
