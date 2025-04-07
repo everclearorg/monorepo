@@ -29,6 +29,7 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [33139, 33139], // ApeChain
   [130, 130], // Unichain
   [2020, 2020], // Ronin
+  [1399811149, 1399811149], // Solana
 ]);
 
 const TESTNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([

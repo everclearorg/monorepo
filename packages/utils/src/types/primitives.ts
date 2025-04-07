@@ -57,6 +57,7 @@ export const TChainConfig = Type.Object({
   ),
   // keyed on asset ticker
   assets: Type.Optional(Type.Record(Type.String(), TAssetConfig)),
+  network: Type.Optional(Type.String()),
 });
 export type ChainConfig = Static<typeof TChainConfig>;
 

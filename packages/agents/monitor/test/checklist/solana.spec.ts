@@ -1,4 +1,4 @@
-import { Logger, expect } from '@chimera-monorepo/utils';
+import { expect } from '@chimera-monorepo/utils';
 import { restore, reset, stub, SinonStub, SinonStubbedInstance } from 'sinon';
 import { getContextStub, mock } from '../globalTestHook';
 import { Database } from '@chimera-monorepo/database';
@@ -10,7 +10,6 @@ import { checkSolanaPipelineStatus } from "../../src/checklist/solana";
 describe('solana pipeline status', () => {
   let sendAlertsStub: SinonStub;
   let getLastSolanaIntentNonceStub: SinonStub;
-  // let logger: SinonStubbedInstance<Logger>;
   let database: SinonStubbedInstance<Database>;
 
   beforeEach(() => {
@@ -18,7 +17,6 @@ describe('solana pipeline status', () => {
       ...process.env,
       ...createProcessEnv(),
     });
-    // logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     getContextStub.returns({
       ...mock.context(),
