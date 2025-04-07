@@ -139,10 +139,7 @@ pub fn interchain_security_module_account_metas(
 }
 
 #[derive(Accounts)]
-pub struct InterchainSecurityModuleAccountMetas<'info> {
-    /// CHECK: this is now undefined pdas where we dont store anything
-    account_metas_pda: UncheckedAccount<'info>,
-}
+pub struct InterchainSecurityModuleAccountMetas {}
 
 /// Return accounts required for the handle call.
 /// Note the authority parameter will be the first parameter filled by hyperlane and do not needed to be added here.
@@ -312,7 +309,7 @@ fn handle_settlement<'info>(
 }
 
 // Context for the settlements
-#[derive(AnchorSerialize, Clone)]
+#[derive(AnchorSerialize, Clone, PartialEq, Debug)]
 pub struct Settlement {
     pub intent_id: [u8; 32],
     pub amount: U256,
@@ -382,7 +379,7 @@ impl AnchorDeserialize for Settlements {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum MessageType {
     Intent,
     Fill,
@@ -422,5 +419,39 @@ impl AnchorDeserialize for HyperlaneMessages {
         let mut rest = vec![];
         reader.read_to_end(&mut rest)?;
         Ok(HyperlaneMessages { message_type, rest })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hyperlane_message_deserialize() {
+        let data = hex::decode("0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000012f4a5c761bb98e62e126f2ef03950b75eb9920e70f5f1ea7f5e7050ad275db800000000000000000000000000000000000000000000000000ddd2935029d8000c6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d617e6a69246a33870eb4b7218a18e51c460c6e995f49d9a964e2d7445195953fd60000000000000000000000000000000000000000000000000000000000000000").unwrap();
+        let message: HyperlaneMessages =
+            AnchorDeserialize::deserialize(&mut data.as_ref()).unwrap();
+        assert_eq!(message.message_type, MessageType::Settlement);
+        assert_eq!(message.rest, hex::decode("000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000012f4a5c761bb98e62e126f2ef03950b75eb9920e70f5f1ea7f5e7050ad275db800000000000000000000000000000000000000000000000000ddd2935029d8000c6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d617e6a69246a33870eb4b7218a18e51c460c6e995f49d9a964e2d7445195953fd60000000000000000000000000000000000000000000000000000000000000000").unwrap());
+    }
+
+    #[test]
+    fn test_settlements_deserialize() {
+        let data = hex::decode("000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000012f4a5c761bb98e62e126f2ef03950b75eb9920e70f5f1ea7f5e7050ad275db800000000000000000000000000000000000000000000000000ddd2935029d8000c6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d617e6a69246a33870eb4b7218a18e51c460c6e995f49d9a964e2d7445195953fd60000000000000000000000000000000000000000000000000000000000000000").unwrap();
+        let settlements: Settlements = AnchorDeserialize::deserialize(&mut data.as_ref()).unwrap();
+        assert_eq!(settlements.settlements.len(), 1);
+        assert_eq!(
+            settlements.settlements[0],
+            Settlement {
+                intent_id: [
+                    47, 74, 92, 118, 27, 185, 142, 98, 225, 38, 242, 239, 3, 149, 11, 117, 235,
+                    153, 32, 231, 15, 95, 30, 167, 245, 231, 5, 10, 210, 117, 219, 128
+                ],
+                amount: U256::from(999000000000000000u64),
+                asset: Pubkey::from_str_const("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+                recipient: Pubkey::from_str_const("9WUUr2WNUiKMzwxJgbb4oxS81oYAyhrBFkv3NSg2mjbj"),
+                update_virtual_balance: false,
+            }
+        )
     }
 }
