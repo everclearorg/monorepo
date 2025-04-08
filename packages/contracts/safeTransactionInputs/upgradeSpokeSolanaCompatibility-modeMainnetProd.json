@@ -1,0 +1,19 @@
+{
+  "chainId": "34443",
+  "createdAt": "1743691581000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Mode | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99",
+      "value": "0",
+      "data": "0x4f1ef28600000000000000000000000081fff6085f4a77a2e1e6fd31d0f5b972fe86922600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

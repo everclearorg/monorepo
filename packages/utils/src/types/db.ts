@@ -116,6 +116,10 @@ export const OriginIntentSchema = Type.Intersect([
     queueIdx: Type.Integer(),
     messageId: Type.Optional(Type.String({ maxLength: 66 })),
     status: Type.Enum(TIntentStatus),
+    nativeFee: Type.Optional(TIntegerString),
+    tokenFee: Type.Optional(TIntegerString),
+    feeAdapterInitiator: Type.Optional(TAddress),
+    orderId: Type.Optional(TBytes32),
   }),
 ]);
 export type OriginIntent = Static<typeof OriginIntentSchema>;
@@ -437,3 +441,16 @@ export const LockPositionSchema = Type.Object({
   expiry: Type.Number(),
 });
 export type LockPosition = Static<typeof LockPositionSchema>;
+
+export const OrderSchema = Type.Intersect([
+  OnchainTransactionContextSchema,
+  Type.Object({
+    id: Type.String({ maxLength: 66 }),
+    autoId: Type.Number(),
+    tokenFee: TIntegerString,
+    nativeFee: TIntegerString,
+    intentIds: Type.Array(TBytes32),
+    initiator: TAddress,
+  }),
+]);
+export type Order = Static<typeof OrderSchema>;

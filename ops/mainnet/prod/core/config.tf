@@ -90,6 +90,12 @@ locals {
     environment = "production" 
     web3SignerUrl = "https://${module.relayer_web3signer.service_endpoint}"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json"
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
+    }
     chains = {
       "1" = {
         providers = [
@@ -142,7 +148,7 @@ locals {
       "324" = {
         providers = [
           "https://zksync-mainnet.blastapi.io/${var.blast_key}",
-          "https://1rpc.io/zksync2-era"
+          "https://mainnet.era.zksync.io"
         ]
       }
       "137" = {
@@ -214,6 +220,12 @@ locals {
     environment = "production" 
     web3SignerUrl = "https://${module.watchtower_web3signer.service_endpoint}"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json"
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
+    }
     chains = {
       "1" = {
         providers = [
@@ -344,6 +356,12 @@ locals {
     network = "mainnet"
     environment = "production" 
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json"
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
+    }
     chains = {
       "1" = {
         providers = [
@@ -538,6 +556,12 @@ locals {
       534352 = { maxAge = 60, size = 1 },
       167000 = { maxAge = 60, size = 1 }
       # 33139 = { maxAge = 60, size = 1 }
+    }
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
     }
     chains = {
       "1" = {

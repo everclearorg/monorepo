@@ -1,0 +1,19 @@
+{
+  "chainId": "42161",
+  "createdAt": "1743691310000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Arbitrum | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000ca6e4c424fe12f989b6fea2d9473515be9b412b200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

@@ -737,10 +737,10 @@ CREATE TABLE public.checkpoints (
 
 
 --
--- Name: closedepochsprocessed_fa915858_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: closedepochsprocessed_fa915858_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.closedepochsprocessed_fa915858_9d29eee8 (
+CREATE TABLE shadow.closedepochsprocessed_fa915858_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -768,26 +768,26 @@ CREATE TABLE shadow.closedepochsprocessed_fa915858_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.closedepochsprocessed AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data___last_closed_epoch_processed,
-    data___ticker_hash,
-    "timestamp",
-    latency
-   FROM shadow.closedepochsprocessed_fa915858_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data___last_closed_epoch_processed,
+    shadow_table.data___ticker_hash,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.closedepochsprocessed_fa915858_73f6f386 shadow_table
   WITH NO DATA;
 
 
@@ -897,7 +897,11 @@ CREATE TABLE public.origin_intents (
     status public.intent_status DEFAULT 'NONE'::public.intent_status NOT NULL,
     initiator character varying(66) NOT NULL,
     ttl bigint NOT NULL,
-    destinations character varying(66)[] NOT NULL
+    destinations character varying(66)[] NOT NULL,
+    native_fee character varying(255),
+    token_fee character varying(255),
+    fee_adapter_initiator character varying(66),
+    order_id character varying(66)
 );
 
 
@@ -952,6 +956,10 @@ CREATE MATERIALIZED VIEW public.intents AS
     origin_intents.tx_origin AS origin_tx_origin,
     origin_intents.tx_nonce AS origin_tx_nonce,
     origin_intents.auto_id AS origin_auto_id,
+    origin_intents.native_fee AS origin_native_fee,
+    origin_intents.token_fee AS origin_token_fee,
+    origin_intents.fee_adapter_initiator AS origin_fee_adapter_initiator,
+    origin_intents.order_id AS origin_order_id,
     destination_intents.queue_idx AS destination_queue_idx,
     destination_intents.message_id AS destination_message_id,
     destination_intents.status AS destination_status,
@@ -1043,6 +1051,10 @@ CREATE MATERIALIZED VIEW public.invoices AS
     origin_intents.tx_origin AS origin_tx_origin,
     origin_intents.tx_nonce AS origin_tx_nonce,
     origin_intents.auto_id AS origin_auto_id,
+    origin_intents.native_fee AS origin_native_fee,
+    origin_intents.token_fee AS origin_token_fee,
+    origin_intents.fee_adapter_initiator AS origin_fee_adapter_initiator,
+    origin_intents.order_id AS origin_order_id,
     hub_invoices.id AS hub_invoice_id,
     hub_invoices.intent_id AS hub_invoice_intent_id,
     hub_invoices.amount AS hub_invoice_amount,
@@ -1176,31 +1188,31 @@ CREATE MATERIALIZED VIEW public.daily_metrics_by_chains_tokens AS
            FROM (netted_final n
              FULL JOIN settled_final s ON (((n.day = s.day) AND (n.from_chain_id = s.from_chain_id) AND (n.to_chain_id = s.to_chain_id) AND ((n.from_asset_address)::text = (s.from_asset_address)::text) AND ((n.to_asset_address)::text = (s.to_asset_address)::text))))
         )
- SELECT day,
-    from_chain_id,
-    from_asset_address,
-    from_asset_symbol,
-    to_chain_id,
-    to_asset_address,
-    to_asset_symbol,
-    netting_volume,
-    netting_avg_intent_size,
-    netting_protocol_revenue,
-    netting_total_intents,
-    netting_avg_time_in_hrs,
-    volume_settled_by_mm,
-    total_intents_by_mm,
-    discounts_by_mm,
-    avg_discounts_by_mm,
-    rewards_for_invoices,
-    avg_rewards_by_invoice,
-    avg_settlement_time_in_hrs_by_mm,
-    apy,
-    avg_discount_epoch_by_mm,
-    total_volume,
-    total_intents,
-    total_protocol_revenue,
-    total_rebalancing_fee
+ SELECT combined.day,
+    combined.from_chain_id,
+    combined.from_asset_address,
+    combined.from_asset_symbol,
+    combined.to_chain_id,
+    combined.to_asset_address,
+    combined.to_asset_symbol,
+    combined.netting_volume,
+    combined.netting_avg_intent_size,
+    combined.netting_protocol_revenue,
+    combined.netting_total_intents,
+    combined.netting_avg_time_in_hrs,
+    combined.volume_settled_by_mm,
+    combined.total_intents_by_mm,
+    combined.discounts_by_mm,
+    combined.avg_discounts_by_mm,
+    combined.rewards_for_invoices,
+    combined.avg_rewards_by_invoice,
+    combined.avg_settlement_time_in_hrs_by_mm,
+    combined.apy,
+    combined.avg_discount_epoch_by_mm,
+    combined.total_volume,
+    combined.total_intents,
+    combined.total_protocol_revenue,
+    combined.total_rebalancing_fee
    FROM combined
   WITH NO DATA;
 
@@ -1294,10 +1306,10 @@ CREATE MATERIALIZED VIEW public.daily_metrics_by_date AS
 
 
 --
--- Name: depositenqueued_2f2b1630_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: depositenqueued_2f2b1630_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.depositenqueued_2f2b1630_9d29eee8 (
+CREATE TABLE shadow.depositenqueued_2f2b1630_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -1314,7 +1326,7 @@ CREATE TABLE shadow.depositenqueued_2f2b1630_9d29eee8 (
     transaction_index bigint NOT NULL,
     transaction_log_index bigint NOT NULL,
     data___amount numeric(78,0),
-    data___domain bigint,
+    data___domain integer,
     data___epoch bigint,
     data___intent_id character varying(66),
     data___ticker_hash character varying(66),
@@ -1328,37 +1340,37 @@ CREATE TABLE shadow.depositenqueued_2f2b1630_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.depositenqueued AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data___amount,
-    data___domain,
-    data___epoch,
-    data___intent_id,
-    data___ticker_hash,
-    "timestamp",
-    latency
-   FROM shadow.depositenqueued_2f2b1630_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data___amount,
+    shadow_table.data___domain,
+    shadow_table.data___epoch,
+    shadow_table.data___intent_id,
+    shadow_table.data___ticker_hash,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.depositenqueued_2f2b1630_73f6f386 shadow_table
   WITH NO DATA;
 
 
 --
--- Name: depositprocessed_ffe546d6_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: depositprocessed_ffe546d6_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.depositprocessed_ffe546d6_9d29eee8 (
+CREATE TABLE shadow.depositprocessed_ffe546d6_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -1389,29 +1401,29 @@ CREATE TABLE shadow.depositprocessed_ffe546d6_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.depositprocessed AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data___amount_and_rewards,
-    data___domain,
-    data___epoch,
-    data___intent_id,
-    data___ticker_hash,
-    "timestamp",
-    latency
-   FROM shadow.depositprocessed_ffe546d6_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data___amount_and_rewards,
+    shadow_table.data___domain,
+    shadow_table.data___epoch,
+    shadow_table.data___intent_id,
+    shadow_table.data___ticker_hash,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.depositprocessed_ffe546d6_73f6f386 shadow_table
   WITH NO DATA;
 
 
@@ -1564,10 +1576,10 @@ ALTER SEQUENCE public.epoch_results_id_seq OWNED BY public.epoch_results.id;
 
 
 --
--- Name: finddepositdomain_2744076b_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: finddepositdomain_2744076b_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.finddepositdomain_2744076b_9d29eee8 (
+CREATE TABLE shadow.finddepositdomain_2744076b_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -1603,42 +1615,42 @@ CREATE TABLE shadow.finddepositdomain_2744076b_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.finddepositdomain AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data__amount,
-    data__amount_and_rewards,
-    data__destinations,
-    data__highest_liquidity_destination,
-    data__intent_id,
-    data__is_deposit,
-    data__liquidity_in_destinations,
-    data__origin,
-    data__selected_destination,
-    data__ticker_hash,
-    "timestamp",
-    latency
-   FROM shadow.finddepositdomain_2744076b_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data__amount,
+    shadow_table.data__amount_and_rewards,
+    shadow_table.data__destinations,
+    shadow_table.data__highest_liquidity_destination,
+    shadow_table.data__intent_id,
+    shadow_table.data__is_deposit,
+    shadow_table.data__liquidity_in_destinations,
+    shadow_table.data__origin,
+    shadow_table.data__selected_destination,
+    shadow_table.data__ticker_hash,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.finddepositdomain_2744076b_73f6f386 shadow_table
   WITH NO DATA;
 
 
 --
--- Name: findinvoicedomain_e0b68ef7_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: findinvoicedomain_e0b68ef7_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.findinvoicedomain_e0b68ef7_9d29eee8 (
+CREATE TABLE shadow.findinvoicedomain_e0b68ef7_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -1678,38 +1690,38 @@ CREATE TABLE shadow.findinvoicedomain_e0b68ef7_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.findinvoicedomain AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data__amount_after_discount,
-    data__amount_to_be_discoutned,
-    data__current_epoch,
-    data__discount_dbps,
-    data__domain,
-    data__entry_epoch,
-    data__invoice_amount,
-    data__invoice_intent_id,
-    data__invoice_owner,
-    data__liquidity,
-    data__rewards_for_depositors,
-    data__selected_domain,
-    data__selected_liquidity,
-    data__ticker_hash,
-    "timestamp",
-    latency
-   FROM shadow.findinvoicedomain_e0b68ef7_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data__amount_after_discount,
+    shadow_table.data__amount_to_be_discoutned,
+    shadow_table.data__current_epoch,
+    shadow_table.data__discount_dbps,
+    shadow_table.data__domain,
+    shadow_table.data__entry_epoch,
+    shadow_table.data__invoice_amount,
+    shadow_table.data__invoice_intent_id,
+    shadow_table.data__invoice_owner,
+    shadow_table.data__liquidity,
+    shadow_table.data__rewards_for_depositors,
+    shadow_table.data__selected_domain,
+    shadow_table.data__selected_liquidity,
+    shadow_table.data__ticker_hash,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.findinvoicedomain_e0b68ef7_73f6f386 shadow_table
   WITH NO DATA;
 
 
@@ -1822,65 +1834,10 @@ ALTER SEQUENCE public.hub_invoices_auto_id_seq OWNED BY public.hub_invoices.auto
 
 
 --
--- Name: intentprocessed_ad83ca5a_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: settledeposit_488e0804_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.intentprocessed_ad83ca5a_9d29eee8 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___intent_id character varying(66),
-    data___status smallint,
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: intentprocessed; Type: MATERIALIZED VIEW; Schema: public; Owner: -
---
-
-CREATE MATERIALIZED VIEW public.intentprocessed AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data___intent_id,
-    data___status,
-    "timestamp",
-    latency
-   FROM shadow.intentprocessed_ad83ca5a_9d29eee8 shadow_table
-  WITH NO DATA;
-
-
---
--- Name: settledeposit_488e0804_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.settledeposit_488e0804_9d29eee8 (
+CREATE TABLE shadow.settledeposit_488e0804_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -1918,36 +1875,36 @@ CREATE TABLE shadow.settledeposit_488e0804_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.settledeposit AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data__amount,
-    data__amount_after_fees,
-    data__amount_and_rewards,
-    data__destinations,
-    data__input_asset,
-    data__intent_id,
-    data__is_deposit,
-    data__is_settlement,
-    data__origin,
-    data__output_asset,
-    data__rewards,
-    data__selected_destination,
-    "timestamp",
-    latency
-   FROM shadow.settledeposit_488e0804_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data__amount,
+    shadow_table.data__amount_after_fees,
+    shadow_table.data__amount_and_rewards,
+    shadow_table.data__destinations,
+    shadow_table.data__input_asset,
+    shadow_table.data__intent_id,
+    shadow_table.data__is_deposit,
+    shadow_table.data__is_settlement,
+    shadow_table.data__origin,
+    shadow_table.data__output_asset,
+    shadow_table.data__rewards,
+    shadow_table.data__selected_destination,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.settledeposit_488e0804_73f6f386 shadow_table
   WITH NO DATA;
 
 
@@ -2064,10 +2021,10 @@ CREATE MATERIALIZED VIEW public.intents_with_shadow_data AS
 
 
 --
--- Name: invoiceenqueued_81d2714b_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: invoiceenqueued_81d2714b_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.invoiceenqueued_81d2714b_9d29eee8 (
+CREATE TABLE shadow.invoiceenqueued_81d2714b_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -2098,37 +2055,37 @@ CREATE TABLE shadow.invoiceenqueued_81d2714b_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.invoiceenqueued AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data___amount,
-    data___entry_epoch,
-    data___intent_id,
-    data___owner,
-    data___ticker_hash,
-    "timestamp",
-    latency
-   FROM shadow.invoiceenqueued_81d2714b_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data___amount,
+    shadow_table.data___entry_epoch,
+    shadow_table.data___intent_id,
+    shadow_table.data___owner,
+    shadow_table.data___ticker_hash,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.invoiceenqueued_81d2714b_73f6f386 shadow_table
   WITH NO DATA;
 
 
 --
--- Name: settlementenqueued_49194ff9_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: settlementenqueued_49194ff9_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.settlementenqueued_49194ff9_9d29eee8 (
+CREATE TABLE shadow.settlementenqueued_49194ff9_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -2161,31 +2118,31 @@ CREATE TABLE shadow.settlementenqueued_49194ff9_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.settlementenqueued AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data___amount,
-    data___asset,
-    data___domain,
-    data___entry_epoch,
-    data___intent_id,
-    data___owner,
-    data___update_virtual_balance,
-    "timestamp",
-    latency
-   FROM shadow.settlementenqueued_49194ff9_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data___amount,
+    shadow_table.data___asset,
+    shadow_table.data___domain,
+    shadow_table.data___entry_epoch,
+    shadow_table.data___intent_id,
+    shadow_table.data___owner,
+    shadow_table.data___update_virtual_balance,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.settlementenqueued_49194ff9_73f6f386 shadow_table
   WITH NO DATA;
 
 
@@ -2243,10 +2200,10 @@ CREATE MATERIALIZED VIEW public.invoice_enqueued_not_settled AS
 
 
 --
--- Name: matchdeposit_883a2568_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: matchdeposit_883a2568_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.matchdeposit_883a2568_9d29eee8 (
+CREATE TABLE shadow.matchdeposit_883a2568_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -2286,38 +2243,38 @@ CREATE TABLE shadow.matchdeposit_883a2568_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.matchdeposit AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data__deposit_intent_id,
-    data__deposit_purchase_power,
-    data__deposit_rewards,
-    data__discount_dbps,
-    data__domain,
-    data__invoice_amount,
-    data__invoice_intent_id,
-    data__invoice_owner,
-    data__match_count,
-    data__remaining_amount,
-    data__selected_amount_after_discount,
-    data__selected_amount_to_be_discounted,
-    data__selected_rewards_for_depositors,
-    data__ticker_hash,
-    "timestamp",
-    latency
-   FROM shadow.matchdeposit_883a2568_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data__deposit_intent_id,
+    shadow_table.data__deposit_purchase_power,
+    shadow_table.data__deposit_rewards,
+    shadow_table.data__discount_dbps,
+    shadow_table.data__domain,
+    shadow_table.data__invoice_amount,
+    shadow_table.data__invoice_intent_id,
+    shadow_table.data__invoice_owner,
+    shadow_table.data__match_count,
+    shadow_table.data__remaining_amount,
+    shadow_table.data__selected_amount_after_discount,
+    shadow_table.data__selected_amount_to_be_discounted,
+    shadow_table.data__selected_rewards_for_depositors,
+    shadow_table.data__ticker_hash,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.matchdeposit_883a2568_73f6f386 shadow_table
   WITH NO DATA;
 
 
@@ -2483,6 +2440,47 @@ CREATE SEQUENCE public.messages_auto_id_seq
 --
 
 ALTER SEQUENCE public.messages_auto_id_seq OWNED BY public.messages.auto_id;
+
+
+--
+-- Name: orders; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.orders (
+    id character varying(66) NOT NULL,
+    auto_id integer NOT NULL,
+    token_fee character varying(255) NOT NULL,
+    native_fee character varying(255) NOT NULL,
+    intent_ids character varying(66)[] NOT NULL,
+    initiator character varying(66) NOT NULL,
+    transaction_hash character(66) NOT NULL,
+    "timestamp" bigint NOT NULL,
+    block_number bigint NOT NULL,
+    tx_origin character varying(66) NOT NULL,
+    tx_nonce bigint NOT NULL,
+    gas_limit bigint NOT NULL,
+    gas_price bigint NOT NULL
+);
+
+
+--
+-- Name: orders_auto_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.orders_auto_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: orders_auto_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.orders_auto_id_seq OWNED BY public.orders.auto_id;
 
 
 --
@@ -2654,10 +2652,10 @@ ALTER SEQUENCE public.settlement_intents_auto_id_seq OWNED BY public.settlement_
 
 
 --
--- Name: settlementqueueprocessed_17786ebb_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: settlementqueueprocessed_17786ebb_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.settlementqueueprocessed_17786ebb_9d29eee8 (
+CREATE TABLE shadow.settlementqueueprocessed_17786ebb_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -2687,36 +2685,36 @@ CREATE TABLE shadow.settlementqueueprocessed_17786ebb_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.settlementqueueprocessed AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data___amount,
-    data___domain,
-    data___message_id,
-    data___quote,
-    "timestamp",
-    latency
-   FROM shadow.settlementqueueprocessed_17786ebb_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data___amount,
+    shadow_table.data___domain,
+    shadow_table.data___message_id,
+    shadow_table.data___quote,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.settlementqueueprocessed_17786ebb_73f6f386 shadow_table
   WITH NO DATA;
 
 
 --
--- Name: settlementsent_dac85f08_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
+-- Name: settlementsent_dac85f08_73f6f386; Type: TABLE; Schema: shadow; Owner: -
 --
 
-CREATE TABLE shadow.settlementsent_dac85f08_9d29eee8 (
+CREATE TABLE shadow.settlementsent_dac85f08_73f6f386 (
     address character varying(66) NOT NULL,
     block_hash character varying(66) NOT NULL,
     block_number bigint NOT NULL,
@@ -2744,26 +2742,26 @@ CREATE TABLE shadow.settlementsent_dac85f08_9d29eee8 (
 --
 
 CREATE MATERIALIZED VIEW public.settlementsent AS
- SELECT address,
-    block_hash,
-    block_number,
-    block_timestamp,
-    chain,
-    block_log_index,
-    name,
-    network,
-    topic_0,
-    topic_1,
-    topic_2,
-    topic_3,
-    transaction_hash,
-    transaction_index,
-    transaction_log_index,
-    data__current_epoch,
-    data__intent_ids,
-    "timestamp",
-    latency
-   FROM shadow.settlementsent_dac85f08_9d29eee8 shadow_table
+ SELECT shadow_table.address,
+    shadow_table.block_hash,
+    shadow_table.block_number,
+    shadow_table.block_timestamp,
+    shadow_table.chain,
+    shadow_table.block_log_index,
+    shadow_table.name,
+    shadow_table.network,
+    shadow_table.topic_0,
+    shadow_table.topic_1,
+    shadow_table.topic_2,
+    shadow_table.topic_3,
+    shadow_table.transaction_hash,
+    shadow_table.transaction_index,
+    shadow_table.transaction_log_index,
+    shadow_table.data__current_epoch,
+    shadow_table.data__intent_ids,
+    shadow_table."timestamp",
+    shadow_table.latency
+   FROM shadow.settlementsent_dac85f08_73f6f386 shadow_table
   WITH NO DATA;
 
 
@@ -2778,549 +2776,6 @@ CREATE TABLE public.tokens (
     max_discount_bps bigint NOT NULL,
     discount_per_epoch bigint NOT NULL,
     prioritized_strategy character varying(255) NOT NULL
-);
-
-
---
--- Name: closedepochsprocessed_fa915858_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.closedepochsprocessed_fa915858_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___last_closed_epoch_processed bigint,
-    data___ticker_hash character varying(66),
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: depositenqueued_2f2b1630_71390f0e; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.depositenqueued_2f2b1630_71390f0e (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___amount numeric(78,0),
-    data___domain bigint,
-    data___epoch bigint,
-    data___intent_id character varying(66),
-    data___ticker_hash character varying(66)
-);
-
-
---
--- Name: depositenqueued_2f2b1630_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.depositenqueued_2f2b1630_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___amount numeric(78,0),
-    data___domain integer,
-    data___epoch bigint,
-    data___intent_id character varying(66),
-    data___ticker_hash character varying(66),
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: depositprocessed_ffe546d6_71390f0e; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.depositprocessed_ffe546d6_71390f0e (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___amount_and_rewards numeric(78,0),
-    data___domain bigint,
-    data___epoch bigint,
-    data___intent_id character varying(66),
-    data___ticker_hash character varying(66)
-);
-
-
---
--- Name: depositprocessed_ffe546d6_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.depositprocessed_ffe546d6_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___amount_and_rewards numeric(78,0),
-    data___domain bigint,
-    data___epoch bigint,
-    data___intent_id character varying(66),
-    data___ticker_hash character varying(66),
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: finddepositdomain_2744076b_71390f0e; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.finddepositdomain_2744076b_71390f0e (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data__amount numeric(78,0),
-    data__amount_and_rewards numeric(78,0),
-    data__destinations jsonb,
-    data__highest_liquidity_destination numeric(78,0),
-    data__intent_id character varying(66),
-    data__is_deposit boolean,
-    data__liquidity_in_destinations jsonb,
-    data__origin bigint,
-    data__selected_destination bigint,
-    data__ticker_hash character varying(66)
-);
-
-
---
--- Name: finddepositdomain_2744076b_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.finddepositdomain_2744076b_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data__amount numeric(78,0),
-    data__amount_and_rewards numeric(78,0),
-    data__destinations jsonb,
-    data__highest_liquidity_destination numeric(78,0),
-    data__intent_id character varying(66),
-    data__is_deposit boolean,
-    data__liquidity_in_destinations jsonb,
-    data__origin bigint,
-    data__selected_destination bigint,
-    data__ticker_hash character varying(66),
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: findinvoicedomain_e0b68ef7_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.findinvoicedomain_e0b68ef7_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data__amount_after_discount numeric(78,0),
-    data__amount_to_be_discoutned numeric(78,0),
-    data__current_epoch bigint,
-    data__discount_dbps integer,
-    data__domain bigint,
-    data__entry_epoch bigint,
-    data__invoice_amount numeric(78,0),
-    data__invoice_intent_id character varying(66),
-    data__invoice_owner character varying(66),
-    data__liquidity numeric(78,0),
-    data__rewards_for_depositors numeric(78,0),
-    data__selected_domain bigint,
-    data__selected_liquidity numeric(78,0),
-    data__ticker_hash character varying(66),
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: initialized_c7f505b2_9d29eee8; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.initialized_c7f505b2_9d29eee8 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data__version numeric(20,0)
-);
-
-
---
--- Name: invoiceenqueued_81d2714b_71390f0e; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.invoiceenqueued_81d2714b_71390f0e (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___amount numeric(78,0),
-    data___entry_epoch bigint,
-    data___intent_id character varying(66),
-    data___owner character varying(66),
-    data___ticker_hash character varying(66)
-);
-
-
---
--- Name: invoiceenqueued_81d2714b_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.invoiceenqueued_81d2714b_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___amount numeric(78,0),
-    data___entry_epoch bigint,
-    data___intent_id character varying(66),
-    data___owner character varying(66),
-    data___ticker_hash character varying(66),
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: matchdeposit_883a2568_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.matchdeposit_883a2568_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data__deposit_intent_id character varying(66),
-    data__deposit_purchase_power numeric(78,0),
-    data__deposit_rewards numeric(78,0),
-    data__discount_dbps integer,
-    data__domain bigint,
-    data__invoice_amount numeric(78,0),
-    data__invoice_intent_id character varying(66),
-    data__invoice_owner character varying(66),
-    data__match_count numeric(78,0),
-    data__remaining_amount numeric(78,0),
-    data__selected_amount_after_discount numeric(78,0),
-    data__selected_amount_to_be_discounted numeric(78,0),
-    data__selected_rewards_for_depositors numeric(78,0),
-    data__ticker_hash character varying(66),
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: settledeposit_488e0804_71390f0e; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.settledeposit_488e0804_71390f0e (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data__amount numeric(78,0),
-    data__amount_after_fees numeric(78,0),
-    data__amount_and_rewards numeric(78,0),
-    data__destinations jsonb,
-    data__input_asset character varying(66),
-    data__intent_id character varying(66),
-    data__is_deposit boolean,
-    data__is_settlement boolean,
-    data__origin bigint,
-    data__output_asset character varying(66),
-    data__rewards numeric(78,0),
-    data__selected_destination bigint
-);
-
-
---
--- Name: settledeposit_488e0804_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.settledeposit_488e0804_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data__amount numeric(78,0),
-    data__amount_after_fees numeric(78,0),
-    data__amount_and_rewards numeric(78,0),
-    data__destinations jsonb,
-    data__input_asset character varying(66),
-    data__intent_id character varying(66),
-    data__is_deposit boolean,
-    data__is_settlement boolean,
-    data__origin bigint,
-    data__output_asset character varying(66),
-    data__rewards numeric(78,0),
-    data__selected_destination bigint,
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: settlementenqueued_49194ff9_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.settlementenqueued_49194ff9_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___amount numeric(78,0),
-    data___asset character varying(66),
-    data___domain bigint,
-    data___entry_epoch bigint,
-    data___intent_id character varying(66),
-    data___owner character varying(66),
-    data___update_virtual_balance boolean,
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: settlementqueueprocessed_17786ebb_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.settlementqueueprocessed_17786ebb_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data___amount bigint,
-    data___domain bigint,
-    data___message_id character varying(66),
-    data___quote numeric(78,0),
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: settlementsent_dac85f08_e6c5ebc0; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.settlementsent_dac85f08_e6c5ebc0 (
-    address character varying(66) NOT NULL,
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    block_timestamp timestamp without time zone NOT NULL,
-    chain character varying(20) NOT NULL,
-    block_log_index bigint,
-    name character varying(66),
-    network character varying(20) NOT NULL,
-    topic_0 character varying(66) NOT NULL,
-    topic_1 character varying(66),
-    topic_2 character varying(66),
-    topic_3 character varying(66),
-    transaction_hash character varying(66) NOT NULL,
-    transaction_index bigint NOT NULL,
-    transaction_log_index bigint NOT NULL,
-    data__current_epoch bigint,
-    data__intent_ids jsonb,
-    "timestamp" timestamp without time zone,
-    latency interval
-);
-
-
---
--- Name: shadow_reorged_blocks; Type: TABLE; Schema: shadow; Owner: -
---
-
-CREATE TABLE shadow.shadow_reorged_blocks (
-    block_hash character varying(66) NOT NULL,
-    block_number bigint NOT NULL,
-    chain character varying(255) NOT NULL,
-    network character varying(255) NOT NULL
 );
 
 
@@ -4192,6 +3647,13 @@ ALTER TABLE ONLY public.messages ALTER COLUMN auto_id SET DEFAULT nextval('publi
 
 
 --
+-- Name: orders auto_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.orders ALTER COLUMN auto_id SET DEFAULT nextval('public.orders_auto_id_seq'::regclass);
+
+
+--
 -- Name: origin_intents auto_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4339,6 +3801,14 @@ ALTER TABLE ONLY public.messages
 
 
 --
+-- Name: orders orders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT orders_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: origin_intents origin_intents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4403,243 +3873,91 @@ ALTER TABLE ONLY public.tokens
 
 
 --
--- Name: closedepochsprocessed_fa915858_e6c5ebc0 closedepochsprocessed_fa91585_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: closedepochsprocessed_fa915858_73f6f386 closedepochsprocessed_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.closedepochsprocessed_fa915858_e6c5ebc0
-    ADD CONSTRAINT closedepochsprocessed_fa91585_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: closedepochsprocessed_fa915858_9d29eee8 closedepochsprocessed_fa91585_transaction_hash_transaction_key1; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.closedepochsprocessed_fa915858_9d29eee8
-    ADD CONSTRAINT closedepochsprocessed_fa91585_transaction_hash_transaction_key1 UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.closedepochsprocessed_fa915858_73f6f386
+    ADD CONSTRAINT closedepochsprocessed_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: depositenqueued_2f2b1630_e6c5ebc0 depositenqueued_2f2b1630_1c70_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: depositenqueued_2f2b1630_73f6f386 depositenqueued_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.depositenqueued_2f2b1630_e6c5ebc0
-    ADD CONSTRAINT depositenqueued_2f2b1630_1c70_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: depositenqueued_2f2b1630_71390f0e depositenqueued_2f2b1630_7139_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.depositenqueued_2f2b1630_71390f0e
-    ADD CONSTRAINT depositenqueued_2f2b1630_7139_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.depositenqueued_2f2b1630_73f6f386
+    ADD CONSTRAINT depositenqueued_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: depositenqueued_2f2b1630_9d29eee8 depositenqueued_2f2b1630_9d29_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: depositprocessed_ffe546d6_73f6f386 depositprocessed_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.depositenqueued_2f2b1630_9d29eee8
-    ADD CONSTRAINT depositenqueued_2f2b1630_9d29_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: depositprocessed_ffe546d6_71390f0e depositprocessed_ffe546d6_713_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.depositprocessed_ffe546d6_71390f0e
-    ADD CONSTRAINT depositprocessed_ffe546d6_713_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.depositprocessed_ffe546d6_73f6f386
+    ADD CONSTRAINT depositprocessed_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: depositprocessed_ffe546d6_9d29eee8 depositprocessed_ffe546d6_9d2_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: finddepositdomain_2744076b_73f6f386 finddepositdomain_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.depositprocessed_ffe546d6_9d29eee8
-    ADD CONSTRAINT depositprocessed_ffe546d6_9d2_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: depositprocessed_ffe546d6_e6c5ebc0 depositprocessed_ffe546d6_e6c_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.depositprocessed_ffe546d6_e6c5ebc0
-    ADD CONSTRAINT depositprocessed_ffe546d6_e6c_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.finddepositdomain_2744076b_73f6f386
+    ADD CONSTRAINT finddepositdomain_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: finddepositdomain_2744076b_71390f0e finddepositdomain_2744076b_71_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: findinvoicedomain_e0b68ef7_73f6f386 findinvoicedomain_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.finddepositdomain_2744076b_71390f0e
-    ADD CONSTRAINT finddepositdomain_2744076b_71_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: finddepositdomain_2744076b_9d29eee8 finddepositdomain_2744076b_9d_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.finddepositdomain_2744076b_9d29eee8
-    ADD CONSTRAINT finddepositdomain_2744076b_9d_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.findinvoicedomain_e0b68ef7_73f6f386
+    ADD CONSTRAINT findinvoicedomain_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: finddepositdomain_2744076b_e6c5ebc0 finddepositdomain_2744076b_e6_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: invoiceenqueued_81d2714b_73f6f386 invoiceenqueued_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.finddepositdomain_2744076b_e6c5ebc0
-    ADD CONSTRAINT finddepositdomain_2744076b_e6_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: findinvoicedomain_e0b68ef7_9d29eee8 findinvoicedomain_e0b68ef7_9d_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.findinvoicedomain_e0b68ef7_9d29eee8
-    ADD CONSTRAINT findinvoicedomain_e0b68ef7_9d_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.invoiceenqueued_81d2714b_73f6f386
+    ADD CONSTRAINT invoiceenqueued_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: findinvoicedomain_e0b68ef7_e6c5ebc0 findinvoicedomain_e0b68ef7_e6_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: matchdeposit_883a2568_73f6f386 matchdeposit_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.findinvoicedomain_e0b68ef7_e6c5ebc0
-    ADD CONSTRAINT findinvoicedomain_e0b68ef7_e6_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: initialized_c7f505b2_9d29eee8 initialized_c7f505b2_9d29eee8_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.initialized_c7f505b2_9d29eee8
-    ADD CONSTRAINT initialized_c7f505b2_9d29eee8_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.matchdeposit_883a2568_73f6f386
+    ADD CONSTRAINT matchdeposit_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: intentprocessed_ad83ca5a_9d29eee8 intentprocessed_ad83ca5a_9d29_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: settledeposit_488e0804_73f6f386 settledeposit_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.intentprocessed_ad83ca5a_9d29eee8
-    ADD CONSTRAINT intentprocessed_ad83ca5a_9d29_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: invoiceenqueued_81d2714b_71390f0e invoiceenqueued_81d2714b_7139_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.invoiceenqueued_81d2714b_71390f0e
-    ADD CONSTRAINT invoiceenqueued_81d2714b_7139_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.settledeposit_488e0804_73f6f386
+    ADD CONSTRAINT settledeposit_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: invoiceenqueued_81d2714b_9d29eee8 invoiceenqueued_81d2714b_9d29_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: settlementenqueued_49194ff9_73f6f386 settlementenqueued_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.invoiceenqueued_81d2714b_9d29eee8
-    ADD CONSTRAINT invoiceenqueued_81d2714b_9d29_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: invoiceenqueued_81d2714b_e6c5ebc0 invoiceenqueued_81d2714b_e6c5_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.invoiceenqueued_81d2714b_e6c5ebc0
-    ADD CONSTRAINT invoiceenqueued_81d2714b_e6c5_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.settlementenqueued_49194ff9_73f6f386
+    ADD CONSTRAINT settlementenqueued_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: matchdeposit_883a2568_9d29eee8 matchdeposit_883a2568_9d29eee_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: settlementqueueprocessed_17786ebb_73f6f386 settlementqueueprocessed_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.matchdeposit_883a2568_9d29eee8
-    ADD CONSTRAINT matchdeposit_883a2568_9d29eee_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: matchdeposit_883a2568_e6c5ebc0 matchdeposit_883a2568_e6c5ebc_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.matchdeposit_883a2568_e6c5ebc0
-    ADD CONSTRAINT matchdeposit_883a2568_e6c5ebc_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+ALTER TABLE ONLY shadow.settlementqueueprocessed_17786ebb_73f6f386
+    ADD CONSTRAINT settlementqueueprocessed_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
--- Name: settledeposit_488e0804_71390f0e settledeposit_488e0804_71390f_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
+-- Name: settlementsent_dac85f08_73f6f386 settlementsent_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
 --
 
-ALTER TABLE ONLY shadow.settledeposit_488e0804_71390f0e
-    ADD CONSTRAINT settledeposit_488e0804_71390f_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: settledeposit_488e0804_9d29eee8 settledeposit_488e0804_9d29ee_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.settledeposit_488e0804_9d29eee8
-    ADD CONSTRAINT settledeposit_488e0804_9d29ee_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: settledeposit_488e0804_e6c5ebc0 settledeposit_488e0804_e6c5eb_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.settledeposit_488e0804_e6c5ebc0
-    ADD CONSTRAINT settledeposit_488e0804_e6c5eb_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: settlementenqueued_49194ff9_9d29eee8 settlementenqueued_49194ff9_9_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.settlementenqueued_49194ff9_9d29eee8
-    ADD CONSTRAINT settlementenqueued_49194ff9_9_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: settlementenqueued_49194ff9_e6c5ebc0 settlementenqueued_49194ff9_e_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.settlementenqueued_49194ff9_e6c5ebc0
-    ADD CONSTRAINT settlementenqueued_49194ff9_e_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: settlementqueueprocessed_17786ebb_e6c5ebc0 settlementqueueprocessed_1778_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.settlementqueueprocessed_17786ebb_e6c5ebc0
-    ADD CONSTRAINT settlementqueueprocessed_1778_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: settlementqueueprocessed_17786ebb_9d29eee8 settlementqueueprocessed_1778_transaction_hash_transaction_key1; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.settlementqueueprocessed_17786ebb_9d29eee8
-    ADD CONSTRAINT settlementqueueprocessed_1778_transaction_hash_transaction_key1 UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: settlementsent_dac85f08_9d29eee8 settlementsent_dac85f08_9d29e_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.settlementsent_dac85f08_9d29eee8
-    ADD CONSTRAINT settlementsent_dac85f08_9d29e_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: settlementsent_dac85f08_e6c5ebc0 settlementsent_dac85f08_e6c5e_transaction_hash_transaction__key; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.settlementsent_dac85f08_e6c5ebc0
-    ADD CONSTRAINT settlementsent_dac85f08_e6c5e_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
-
-
---
--- Name: shadow_reorged_blocks shadow_reorged_blocks_pkey; Type: CONSTRAINT; Schema: shadow; Owner: -
---
-
-ALTER TABLE ONLY shadow.shadow_reorged_blocks
-    ADD CONSTRAINT shadow_reorged_blocks_pkey PRIMARY KEY (block_hash, chain, network);
+ALTER TABLE ONLY shadow.settlementsent_dac85f08_73f6f386
+    ADD CONSTRAINT settlementsent_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
 
 
 --
@@ -5156,13 +4474,6 @@ CREATE INDEX idx_proofs_merkle_root ON public.rewards USING btree (merkle_root);
 
 
 --
--- Name: intentprocessed_timestamp_idx; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX intentprocessed_timestamp_idx ON public.intentprocessed USING btree ("timestamp");
-
-
---
 -- Name: invoiceenqueued_timestamp_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5191,10 +4502,24 @@ CREATE INDEX messages_tx_nonce_idx ON public.messages USING btree (tx_nonce);
 
 
 --
+-- Name: orders_auto_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX orders_auto_id_idx ON public.orders USING btree (auto_id);
+
+
+--
 -- Name: origin_intents_auto_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX origin_intents_auto_id_index ON public.origin_intents USING btree (auto_id);
+
+
+--
+-- Name: origin_intents_order_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX origin_intents_order_id_idx ON public.origin_intents USING btree (order_id);
 
 
 --
@@ -5261,248 +4586,10 @@ CREATE INDEX settlementsent_timestamp_idx ON public.settlementsent USING btree (
 
 
 --
--- Name: bridge_in_error_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX bridge_in_error_timestamp_idx ON tokenomics.bridge_in_error USING btree (insert_timestamp);
-
-
---
--- Name: bridge_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX bridge_updated_timestamp_idx ON tokenomics.bridge_updated USING btree (insert_timestamp);
-
-
---
--- Name: bridged_in_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX bridged_in_timestamp_idx ON tokenomics.bridged_in USING btree (insert_timestamp);
-
-
---
--- Name: bridged_lock_error_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX bridged_lock_error_timestamp_idx ON tokenomics.bridged_lock_error USING btree (insert_timestamp);
-
-
---
--- Name: bridged_lock_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX bridged_lock_timestamp_idx ON tokenomics.bridged_lock USING btree (insert_timestamp);
-
-
---
--- Name: bridged_out_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX bridged_out_timestamp_idx ON tokenomics.bridged_out USING btree (insert_timestamp);
-
-
---
--- Name: chain_gateway_added_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX chain_gateway_added_timestamp_idx ON tokenomics.chain_gateway_added USING btree (insert_timestamp);
-
-
---
--- Name: chain_gateway_removed_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX chain_gateway_removed_timestamp_idx ON tokenomics.chain_gateway_removed USING btree (insert_timestamp);
-
-
---
--- Name: early_exit_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX early_exit_timestamp_idx ON tokenomics.early_exit USING btree (insert_timestamp);
-
-
---
--- Name: eip712_domain_changed_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX eip712_domain_changed_timestamp_idx ON tokenomics.eip712_domain_changed USING btree (insert_timestamp);
-
-
---
--- Name: epoch_rewards_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX epoch_rewards_updated_timestamp_idx ON tokenomics.epoch_rewards_updated USING btree (insert_timestamp);
-
-
---
--- Name: eth_withdrawn_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX eth_withdrawn_timestamp_idx ON tokenomics.eth_withdrawn USING btree (insert_timestamp);
-
-
---
--- Name: fee_info_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX fee_info_timestamp_idx ON tokenomics.fee_info USING btree (insert_timestamp);
-
-
---
--- Name: gateway_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX gateway_updated_timestamp_idx ON tokenomics.gateway_updated USING btree (insert_timestamp);
-
-
---
--- Name: hub_gauge_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX hub_gauge_updated_timestamp_idx ON tokenomics.hub_gauge_updated USING btree (insert_timestamp);
-
-
---
--- Name: mailbox_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX mailbox_updated_timestamp_idx ON tokenomics.mailbox_updated USING btree (insert_timestamp);
-
-
---
--- Name: message_gas_limit_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX message_gas_limit_updated_timestamp_idx ON tokenomics.message_gas_limit_updated USING btree (insert_timestamp);
-
-
---
--- Name: mint_message_sent_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX mint_message_sent_timestamp_idx ON tokenomics.mint_message_sent USING btree (insert_timestamp);
-
-
---
--- Name: new_lock_position_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX new_lock_position_timestamp_idx ON tokenomics.new_lock_position USING btree (insert_timestamp);
-
-
---
--- Name: ownership_transferred_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX ownership_transferred_timestamp_idx ON tokenomics.ownership_transferred USING btree (insert_timestamp);
-
-
---
--- Name: process_error_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX process_error_timestamp_idx ON tokenomics.process_error USING btree (insert_timestamp);
-
-
---
--- Name: retry_bridge_out_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX retry_bridge_out_timestamp_idx ON tokenomics.retry_bridge_out USING btree (insert_timestamp);
-
-
---
--- Name: retry_lock_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX retry_lock_timestamp_idx ON tokenomics.retry_lock USING btree (insert_timestamp);
-
-
---
--- Name: retry_message_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX retry_message_timestamp_idx ON tokenomics.retry_message USING btree (insert_timestamp);
-
-
---
--- Name: retry_mint_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX retry_mint_timestamp_idx ON tokenomics.retry_mint USING btree (insert_timestamp);
-
-
---
--- Name: retry_transfer_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX retry_transfer_timestamp_idx ON tokenomics.retry_transfer USING btree (insert_timestamp);
-
-
---
--- Name: return_fee_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX return_fee_updated_timestamp_idx ON tokenomics.return_fee_updated USING btree (insert_timestamp);
-
-
---
 -- Name: reward_claimed_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
 --
 
 CREATE INDEX reward_claimed_timestamp_idx ON tokenomics.reward_claimed USING btree (insert_timestamp);
-
-
---
--- Name: reward_metadata_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX reward_metadata_updated_timestamp_idx ON tokenomics.reward_metadata_updated USING btree (insert_timestamp);
-
-
---
--- Name: rewards_claimed_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX rewards_claimed_timestamp_idx ON tokenomics.rewards_claimed USING btree (insert_timestamp);
-
-
---
--- Name: security_module_updated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX security_module_updated_timestamp_idx ON tokenomics.security_module_updated USING btree (insert_timestamp);
-
-
---
--- Name: vote_cast_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX vote_cast_timestamp_idx ON tokenomics.vote_cast USING btree (insert_timestamp);
-
-
---
--- Name: vote_delegated_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX vote_delegated_timestamp_idx ON tokenomics.vote_delegated USING btree (insert_timestamp);
-
-
---
--- Name: withdraw_eth_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX withdraw_eth_timestamp_idx ON tokenomics.withdraw_eth USING btree (insert_timestamp);
-
-
---
--- Name: withdraw_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX withdraw_timestamp_idx ON tokenomics.withdraw USING btree (insert_timestamp);
 
 
 --
@@ -5534,353 +4621,80 @@ CREATE TRIGGER queue_type_change_trigger AFTER UPDATE OF type ON public.queues F
 
 
 --
--- Name: closedepochsprocessed_fa915858_9d29eee8 closedepochsprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: closedepochsprocessed_fa915858_73f6f386 closedepochsprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER closedepochsprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.closedepochsprocessed_fa915858_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER closedepochsprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.closedepochsprocessed_fa915858_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: closedepochsprocessed_fa915858_e6c5ebc0 closedepochsprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: depositenqueued_2f2b1630_73f6f386 depositenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER closedepochsprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.closedepochsprocessed_fa915858_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER depositenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.depositenqueued_2f2b1630_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: depositenqueued_2f2b1630_9d29eee8 depositenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: depositprocessed_ffe546d6_73f6f386 depositprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER depositenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.depositenqueued_2f2b1630_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER depositprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.depositprocessed_ffe546d6_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: depositenqueued_2f2b1630_e6c5ebc0 depositenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: finddepositdomain_2744076b_73f6f386 finddepositdomain_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER depositenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.depositenqueued_2f2b1630_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER finddepositdomain_set_timestamp_and_latency BEFORE INSERT ON shadow.finddepositdomain_2744076b_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: depositprocessed_ffe546d6_9d29eee8 depositprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: findinvoicedomain_e0b68ef7_73f6f386 findinvoicedomain_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER depositprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.depositprocessed_ffe546d6_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER findinvoicedomain_set_timestamp_and_latency BEFORE INSERT ON shadow.findinvoicedomain_e0b68ef7_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: depositprocessed_ffe546d6_e6c5ebc0 depositprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: invoiceenqueued_81d2714b_73f6f386 invoiceenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER depositprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.depositprocessed_ffe546d6_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER invoiceenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.invoiceenqueued_81d2714b_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: finddepositdomain_2744076b_9d29eee8 finddepositdomain_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: matchdeposit_883a2568_73f6f386 matchdeposit_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER finddepositdomain_set_timestamp_and_latency BEFORE INSERT ON shadow.finddepositdomain_2744076b_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER matchdeposit_set_timestamp_and_latency BEFORE INSERT ON shadow.matchdeposit_883a2568_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: finddepositdomain_2744076b_e6c5ebc0 finddepositdomain_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: settledeposit_488e0804_73f6f386 settledeposit_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER finddepositdomain_set_timestamp_and_latency BEFORE INSERT ON shadow.finddepositdomain_2744076b_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER settledeposit_set_timestamp_and_latency BEFORE INSERT ON shadow.settledeposit_488e0804_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: findinvoicedomain_e0b68ef7_9d29eee8 findinvoicedomain_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: settlementenqueued_49194ff9_73f6f386 settlementenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER findinvoicedomain_set_timestamp_and_latency BEFORE INSERT ON shadow.findinvoicedomain_e0b68ef7_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER settlementenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementenqueued_49194ff9_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: findinvoicedomain_e0b68ef7_e6c5ebc0 findinvoicedomain_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: settlementqueueprocessed_17786ebb_73f6f386 settlementqueueprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER findinvoicedomain_set_timestamp_and_latency BEFORE INSERT ON shadow.findinvoicedomain_e0b68ef7_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
+CREATE TRIGGER settlementqueueprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementqueueprocessed_17786ebb_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
--- Name: intentprocessed_ad83ca5a_9d29eee8 intentprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
+-- Name: settlementsent_dac85f08_73f6f386 settlementsent_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
 --
 
-CREATE TRIGGER intentprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.intentprocessed_ad83ca5a_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: invoiceenqueued_81d2714b_9d29eee8 invoiceenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER invoiceenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.invoiceenqueued_81d2714b_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: invoiceenqueued_81d2714b_e6c5ebc0 invoiceenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER invoiceenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.invoiceenqueued_81d2714b_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: matchdeposit_883a2568_9d29eee8 matchdeposit_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER matchdeposit_set_timestamp_and_latency BEFORE INSERT ON shadow.matchdeposit_883a2568_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: matchdeposit_883a2568_e6c5ebc0 matchdeposit_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER matchdeposit_set_timestamp_and_latency BEFORE INSERT ON shadow.matchdeposit_883a2568_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: settledeposit_488e0804_9d29eee8 settledeposit_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER settledeposit_set_timestamp_and_latency BEFORE INSERT ON shadow.settledeposit_488e0804_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: settledeposit_488e0804_e6c5ebc0 settledeposit_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER settledeposit_set_timestamp_and_latency BEFORE INSERT ON shadow.settledeposit_488e0804_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: settlementenqueued_49194ff9_9d29eee8 settlementenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER settlementenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementenqueued_49194ff9_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: settlementenqueued_49194ff9_e6c5ebc0 settlementenqueued_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER settlementenqueued_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementenqueued_49194ff9_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: settlementqueueprocessed_17786ebb_9d29eee8 settlementqueueprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER settlementqueueprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementqueueprocessed_17786ebb_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: settlementqueueprocessed_17786ebb_e6c5ebc0 settlementqueueprocessed_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER settlementqueueprocessed_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementqueueprocessed_17786ebb_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: settlementsent_dac85f08_9d29eee8 settlementsent_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER settlementsent_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementsent_dac85f08_9d29eee8 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: settlementsent_dac85f08_e6c5ebc0 settlementsent_set_timestamp_and_latency; Type: TRIGGER; Schema: shadow; Owner: -
---
-
-CREATE TRIGGER settlementsent_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementsent_dac85f08_e6c5ebc0 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
-
-
---
--- Name: bridge_in_error bridge_in_error_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER bridge_in_error_set_timestamp_and_latency BEFORE INSERT ON tokenomics.bridge_in_error FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: bridge_updated bridge_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER bridge_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.bridge_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: bridged_in bridged_in_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER bridged_in_set_timestamp_and_latency BEFORE INSERT ON tokenomics.bridged_in FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: bridged_lock_error bridged_lock_error_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER bridged_lock_error_set_timestamp_and_latency BEFORE INSERT ON tokenomics.bridged_lock_error FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: bridged_lock bridged_lock_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER bridged_lock_set_timestamp_and_latency BEFORE INSERT ON tokenomics.bridged_lock FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: bridged_out bridged_out_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER bridged_out_set_timestamp_and_latency BEFORE INSERT ON tokenomics.bridged_out FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: chain_gateway_added chain_gateway_added_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER chain_gateway_added_set_timestamp_and_latency BEFORE INSERT ON tokenomics.chain_gateway_added FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: chain_gateway_removed chain_gateway_removed_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER chain_gateway_removed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.chain_gateway_removed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: early_exit early_exit_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER early_exit_set_timestamp_and_latency BEFORE INSERT ON tokenomics.early_exit FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: eip712_domain_changed eip712_domain_changed_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER eip712_domain_changed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.eip712_domain_changed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: epoch_rewards_updated epoch_rewards_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER epoch_rewards_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.epoch_rewards_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: eth_withdrawn eth_withdrawn_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER eth_withdrawn_set_timestamp_and_latency BEFORE INSERT ON tokenomics.eth_withdrawn FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: fee_info fee_info_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER fee_info_set_timestamp_and_latency BEFORE INSERT ON tokenomics.fee_info FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: gateway_updated gateway_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER gateway_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.gateway_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: hub_gauge_updated hub_gauge_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER hub_gauge_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.hub_gauge_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: mailbox_updated mailbox_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER mailbox_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.mailbox_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: message_gas_limit_updated message_gas_limit_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER message_gas_limit_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.message_gas_limit_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: mint_message_sent mint_message_sent_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER mint_message_sent_set_timestamp_and_latency BEFORE INSERT ON tokenomics.mint_message_sent FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: new_lock_position new_lock_position_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER new_lock_position_set_timestamp_and_latency BEFORE INSERT ON tokenomics.new_lock_position FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: ownership_transferred ownership_transferred_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER ownership_transferred_set_timestamp_and_latency BEFORE INSERT ON tokenomics.ownership_transferred FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: process_error process_error_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER process_error_set_timestamp_and_latency BEFORE INSERT ON tokenomics.process_error FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: retry_bridge_out retry_bridge_out_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER retry_bridge_out_set_timestamp_and_latency BEFORE INSERT ON tokenomics.retry_bridge_out FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: retry_lock retry_lock_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER retry_lock_set_timestamp_and_latency BEFORE INSERT ON tokenomics.retry_lock FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: retry_message retry_message_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER retry_message_set_timestamp_and_latency BEFORE INSERT ON tokenomics.retry_message FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: retry_mint retry_mint_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER retry_mint_set_timestamp_and_latency BEFORE INSERT ON tokenomics.retry_mint FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: retry_transfer retry_transfer_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER retry_transfer_set_timestamp_and_latency BEFORE INSERT ON tokenomics.retry_transfer FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: return_fee_updated return_fee_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER return_fee_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.return_fee_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
+CREATE TRIGGER settlementsent_set_timestamp_and_latency BEFORE INSERT ON shadow.settlementsent_dac85f08_73f6f386 FOR EACH ROW EXECUTE FUNCTION shadow.set_timestamp_and_latency();
 
 
 --
@@ -5891,61 +4705,46 @@ CREATE TRIGGER reward_claimed_set_timestamp_and_latency BEFORE INSERT ON tokenom
 
 
 --
--- Name: reward_metadata_updated reward_metadata_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER reward_metadata_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.reward_metadata_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: rewards_claimed rewards_claimed_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER rewards_claimed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.rewards_claimed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: security_module_updated security_module_updated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER security_module_updated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.security_module_updated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: vote_cast vote_cast_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER vote_cast_set_timestamp_and_latency BEFORE INSERT ON tokenomics.vote_cast FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: vote_delegated vote_delegated_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER vote_delegated_set_timestamp_and_latency BEFORE INSERT ON tokenomics.vote_delegated FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: withdraw_eth withdraw_eth_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER withdraw_eth_set_timestamp_and_latency BEFORE INSERT ON tokenomics.withdraw_eth FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
--- Name: withdraw withdraw_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
---
-
-CREATE TRIGGER withdraw_set_timestamp_and_latency BEFORE INSERT ON tokenomics.withdraw FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
-
-
---
 -- Name: balances balances_account_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.balances
     ADD CONSTRAINT balances_account_fkey FOREIGN KEY (account) REFERENCES public.depositors(id);
 
+
+--
+-- Name: origin_intents origin_intents_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.origin_intents
+    ADD CONSTRAINT origin_intents_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id);
+
+
+--
+-- Name: job cron_job_policy; Type: POLICY; Schema: cron; Owner: -
+--
+
+CREATE POLICY cron_job_policy ON cron.job USING ((username = CURRENT_USER));
+
+
+--
+-- Name: job_run_details cron_job_run_details_policy; Type: POLICY; Schema: cron; Owner: -
+--
+
+CREATE POLICY cron_job_run_details_policy ON cron.job_run_details USING ((username = CURRENT_USER));
+
+
+--
+-- Name: job; Type: ROW SECURITY; Schema: cron; Owner: -
+--
+
+ALTER TABLE cron.job ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: job_run_details; Type: ROW SECURITY; Schema: cron; Owner: -
+--
+
+ALTER TABLE cron.job_run_details ENABLE ROW LEVEL SECURITY;
 
 --
 -- PostgreSQL database dump complete
@@ -6035,4 +4834,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20241217225034'),
     ('20250107062058'),
     ('20250108140315'),
-    ('20250321152002');
+    ('20250321152002'),
+    ('20250322012505'),
+    ('20250325230805');

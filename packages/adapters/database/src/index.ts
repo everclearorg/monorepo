@@ -25,6 +25,7 @@ import {
   EpochResult,
   NewLockPositionEvent,
   LockPosition,
+  Order,
 } from '@chimera-monorepo/utils';
 import { Pool } from 'pg';
 import { TxnClientForRepeatableRead } from 'zapatos/db';
@@ -80,6 +81,8 @@ import {
   getNewLockPositionEvents,
   getLockPositions,
   saveLockPositions,
+  saveOrders,
+  getOrders,
   getOriginIntentsLastNonce,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
@@ -256,6 +259,8 @@ export type Database = {
     lockPositions: LockPosition[],
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
+  saveOrders: (orders: Order[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  getOrders: (orderIds: string[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<Order[]>;
   getOriginIntentsLastNonce: (origin: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
 };
 
@@ -324,6 +329,8 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getNewLockPositionEvents,
     getLockPositions,
     saveLockPositions,
+    saveOrders,
+    getOrders,
     getOriginIntentsLastNonce,
   };
 };

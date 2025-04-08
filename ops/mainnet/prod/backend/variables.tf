@@ -61,6 +61,11 @@ variable "graph_api_key" {
   sensitive = true
 }
 
+variable "gelato_everclear_rpc_key" {
+  type      = string
+  sensitive = true
+}
+
 variable "cartographer_intents_heartbeat" {
   type      = string
   sensitive = true
