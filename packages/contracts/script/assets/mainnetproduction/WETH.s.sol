@@ -189,8 +189,8 @@ contract WETH is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
-      maxDiscountDbps: 12, // 1.2 BPS
-      discountPerEpoch: 3, // 0.3 BPS
+      maxDiscountDbps: 0,
+      discountPerEpoch: 0,
       fees: _fees,
       adoptedForAssets: _assetConfigs
     });
