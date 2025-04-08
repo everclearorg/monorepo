@@ -122,14 +122,7 @@ pub fn interchain_security_module(_ctx: Context<InterchainSecurityModule>) -> Re
 }
 
 #[derive(Accounts)]
-pub struct InterchainSecurityModule<'info> {
-    /// CHECK: this is a undefined pda that is not in used now
-    inbox_pda: UncheckedAccount<'info>,
-    // self
-    program: Program<'info, EverclearSpoke>,
-    // extra account data required as in interchain_security_module_acconut_metas
-    // we have none now
-}
+pub struct InterchainSecurityModule {}
 
 pub fn interchain_security_module_account_metas(
     _ctx: Context<InterchainSecurityModuleAccountMetas>,
