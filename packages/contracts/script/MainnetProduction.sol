@@ -287,8 +287,6 @@ abstract contract Apechain {
   // Fee adapter constants
   address public constant APECHAIN_ENG_MULTISIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
 }
-// load_cli_owners 0x9692d38bed86e7c86a32316b17cbbf06e28a3eef7bd1abe5bec3f694bb3d1eda
-// add_owner 0x7fB1B8D2C4a8186426Fb12a4Ae483f0093ED2315
 
 abstract contract ZkSync {
   uint32 public constant ZKSYNC = 324;
