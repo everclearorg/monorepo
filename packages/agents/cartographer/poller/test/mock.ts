@@ -5,6 +5,10 @@ import { Database } from '@chimera-monorepo/database';
 import { CartographerConfig } from '../src/config';
 import { AppContext, SubgraphReader } from '../src/shared';
 
+type LogLevel = "fatal" | "error" | "warn" | "info" | "debug" | "trace" | "silent";
+type Environment = "staging" | "production";
+type Service = "invoices" | "intents" | "depositors" | "monitor";
+
 export const createMockDatabase = (): Database => {
   return {
     getAllQueuedSettlements: stub().resolves([]),
@@ -41,8 +45,17 @@ export const createMockDatabase = (): Database => {
   };
 };
 
-export const createCartographerConfig = (overrides: Partial<CartographerConfig> = {}) => {
-  const config = {
+export const createCartographerConfig = (overrides: Partial<CartographerConfig> = {}): CartographerConfig => {
+  const config: {
+    pollInterval: number;
+    logLevel: LogLevel;
+    database: string;
+    environment: Environment;
+    healthUrls: {};
+    service: Service;
+    chains: Record<string, any>;
+    hub: Record<string, any>;
+  } = {
     pollInterval: 15000,
     logLevel: 'silent',
     database: 'postgres://postgres:qwery@localhost:5432/everclear?sslmode=disable',
