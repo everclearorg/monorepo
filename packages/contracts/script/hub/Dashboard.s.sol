@@ -12,7 +12,6 @@ import {HubGateway} from 'contracts/hub/HubGateway.sol';
 import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
 
 import {IHubGateway} from 'interfaces/hub/IHubGateway.sol';
-import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';
 
 contract Dashboard is Script, ScriptUtils {
   using TypeCasts for address;
