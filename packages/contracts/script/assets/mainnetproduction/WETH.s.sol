@@ -30,7 +30,7 @@ contract WETH is AddAssetBase, MainnetProductionEnvironment {
     //////////////////////////////////////////////////////////////*/
 
     IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](1);
-    _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 2}); // 0.2 BPS
+    _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 0}); // 0.2 BPS
 
     /*///////////////////////////////////////////////////////////////
                          ADOPTED CONFIGURATION  
