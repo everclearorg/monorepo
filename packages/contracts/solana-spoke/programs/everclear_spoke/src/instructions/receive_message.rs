@@ -8,9 +8,10 @@ use crate::{
     consts::{everclear_gateway, h256_to_pub, DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::{MessageReceivedEvent, SettledEvent},
-    hyperlane::{to_serializable_account_meta, SerializableAccountMeta, U256},
+    hyperlane::{
+        to_serializable_account_meta, SerializableAccountMeta, SimulationReturnData, U256,
+    },
     mailbox_process_authority_pda_seeds,
-    program::EverclearSpoke,
     state::{IntentStatus, SpokeState},
     utils::normalize_decimals,
     vault_authority_pda_seeds,
@@ -126,9 +127,9 @@ pub struct InterchainSecurityModule {}
 
 pub fn interchain_security_module_account_metas(
     _ctx: Context<InterchainSecurityModuleAccountMetas>,
-) -> Result<Vec<SerializableAccountMeta>> {
+) -> Result<SimulationReturnData<Vec<SerializableAccountMeta>>> {
     // NOTE: we dont need to any account meta for the ISM call
-    Ok(vec![])
+    Ok(SimulationReturnData::new(vec![]))
 }
 
 #[derive(Accounts)]
