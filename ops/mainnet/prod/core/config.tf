@@ -678,6 +678,7 @@ locals {
       invoice          = "${var.lighthouse_invoice_heartbeat}"
       reward           = "${var.lighthouse_reward_heartbeat}"
       reward_metadata  = "${var.lighthouse_reward_metadata_heartbeat}"
+      solana           = "${var.lighthouse_solana_heartbeat}"
     }
     coingecko = "${var.coingecko_api_key}"
     rewards = {
@@ -710,6 +711,13 @@ locals {
     betterUptime = {
       apiKey = var.betteruptime_api_key
       requesterEmail = var.betteruptime_requester_email
+    }
+    solana = {
+      tokens = [
+        {
+          address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
+        }
+      ]
     }
   })
 }
