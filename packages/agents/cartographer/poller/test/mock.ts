@@ -71,6 +71,7 @@ export const createCartographerConfig = (overrides: Partial<CartographerConfig> 
           gateway: mkAddress('0x1337fff'),
         },
         minGasPrice: '3',
+        network: 'evm',
       },
       '1338': {
         providers: ['http://rpc-1338:8545'],
@@ -80,6 +81,7 @@ export const createCartographerConfig = (overrides: Partial<CartographerConfig> 
           gateway: mkAddress('0x1338fff'),
         },
         minGasPrice: '3',
+        network: 'evm',
       },
     },
     hub: {
