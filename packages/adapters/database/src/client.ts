@@ -830,3 +830,21 @@ export const getOrders = async (ids: string[], _pool?: Pool | db.TxnClientForRep
   const result = await db.select('orders', { id: db.conditions.isIn(ids.map((i) => i.toLowerCase())) }).run(poolToUse);
   return result.map(converters.fromOrders);
 };
+
+export const getOriginIntentsLastNonce = async (origin: string, _pool?: Pool | db.TxnClientForRepeatableRead) => {
+  const poolToUse = _pool ?? pool;
+  const result = await db
+    .select(
+      'origin_intents',
+      {
+        origin,
+      },
+      {
+        order: { by: 'nonce', direction: 'DESC' },
+        limit: 1,
+      },
+    )
+    .run(poolToUse);
+
+  return result && result.length ? converters.fromOriginIntent(result[0]).nonce : 0;
+};

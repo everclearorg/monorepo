@@ -1,0 +1,32 @@
+[package]
+name = "everclear_spoke"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+resolver = "2"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "everclear_spoke"
+
+[features]
+anchor-debug = []
+default = []  # Include it in default features if you want it enabled by default
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = [
+    "anchor-lang/idl-build",
+    "anchor-spl/idl-build",
+]
+
+[dependencies]
+anchor-lang = { version = "0.31.0", features = ["init-if-needed", "event-cpi"] }
+anchor-spl = "0.31.0"
+fixed-hash = "=0.8.0" # exact version for hyperlane interfacing
+uint = "=0.9.5" # exact version for hyperlane interfacing
+tiny-keccak = { version = "2.0", features = ["keccak"] }
+
+[dev-dependencies]
+hex = "0.4.3"
