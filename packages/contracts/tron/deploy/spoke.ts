@@ -1,12 +1,9 @@
 // Run command: yarn ts-node --files --project tsconfig.json tron/deploy/spoke.ts
-// Failed tx out of energy: https://tronscan.org/#/transaction/60ae88d633895594a5ca9d3c901e709f44d2743ab87371299cff49a87c0cb947
 import TronWeb from 'tronweb';
-// import Web3 from 'web3';
 import dotenv from 'dotenv';
 dotenv.config();
 
 // The JSON artifacts produced by TronBox or another compiler
-// import Create2DeployerArtifact from '../build/contracts/Create2Deployer.json';
 import EverclearSpokeArtifact from '../build/contracts/EverclearSpoke.json';
 import SpokeGatewayArtifact from '../build/contracts/SpokeGateway.json';
 import ERC1967ProxyArtifact from '../build/contracts/ERC1967Proxy.json';
@@ -17,10 +14,6 @@ const tronWeb = new TronWeb({
   fullHost: process.env.TRON_MAINNET_RPC!,
   privateKey: process.env.TRON_KEY,
 });
-
-// TODO: Use if needed for CREATE2
-// NOTE: CREATE2 formula: keccak256( 0x41 ++ address ++ salt ++ keccak256(init_code))[12:] source: https://developers.tron.network/docs/tvm
-// const web3 = new Web3(); // for keccak256/padding, etc.
 
 interface DeploymentParams {
   gateway: string;
@@ -42,8 +35,9 @@ const hubGateway: string = '41EFfAB7cCEBF63FbEFB4884964b12259d4374FaAa';
 const tronOwner: string = 'TXE2CSwYQFCuuAp7ZStdLzUFQEKEvfqhsV'; // NOTE: Using EOA to enable the update of the gateway
 const tronMaxSolversFee: number = 5000;
 const hubDomain: number = 25327;
-const tronIsm: string = 'TXE2CSwYQFCuuAp7ZStdLzUFQEKEvfqhsV'; // TODO: Change to correct ISM?
-const tronMailbox: string = 'TXE2CSwYQFCuuAp7ZStdLzUFQEKEvfqhsV'; // TODO: Change to correct mailbox
+const tronIsm: string = '410000000000000000000000000000000000000000';
+const tronMailbox: string = 'TFDcY4nc4L6S6pMrSVsew34AgqciJfvkHj';
+const HUB_GATEWAY = '0x000000000000000000000000effab7ccebf63fbefb4884964b12259d4374faaa';
 
 function configureDeploymentParameters(): DeploymentParams {
   return {
@@ -86,32 +80,86 @@ async function deployContract(abi: unknown[], bytecode: string, constructorArgs:
  * 2) Encode an "initialize" call
  * 3) Deploy the proxy with that init call
  */
-async function deployProxy(
+async function deploySpokeProxy(
   implAbi: unknown[],
   implBytecode: string,
   proxyAbi: unknown[],
   proxyBytecode: string,
-  initFunctionSig: string,
-  initArgs: unknown[],
+  params: DeploymentParams
 ): Promise<string> {
   // 1) Deploy the implementation
   const implAddress = await deployContract(implAbi, implBytecode);
   console.log(`Implementation deployed at ${implAddress}`);
 
-  // 2) Encode the initializer
-  console.log('Initializing with:', initFunctionSig, initArgs);
-  const encodedInit = await tronWeb
-    .contract(implAbi, implAddress)
-    .methods[initFunctionSig](...initArgs)
-    .encodeABI();
+  // 2) Deploy the proxy, passing (implementation, initCall) to constructor
+  const contractInstance = await tronWeb.contract().new({
+    abi: proxyAbi,
+    bytecode: proxyBytecode,
+    feeLimit: 1_000_000_000,
+    callValue: 0,
+    parameters: [implAddress, '0x'],
+  });
+  const proxyAddress = contractInstance.address;  
 
-  console.log('Encoded init:', encodedInit);
-  console.log('proxy abi:', proxyAbi);
-  console.log('proxy bytecode:', proxyBytecode);
+  // 3) Call the initialize function on the proxy
+  console.log('Initializing Spoke...');
+  const spokeInstance = await tronWeb.contract(implAbi, proxyAddress);
 
-  // 3) Deploy the proxy, passing (implementation, initCall) to constructor
-  const proxyAddress = await deployContract(proxyAbi, proxyBytecode, [implAddress, encodedInit]);
-  console.log(`Proxy deployed at ${proxyAddress}`);
+  // Initialize the spoke
+  await spokeInstance.initialize(
+    [params.gateway,
+    params.executor,
+    params.messageReceiver,
+    params.lighthouse,
+    params.watchtower,
+    params.hubDomain,
+    params.owner]
+  ).send({
+    feeLimit: 1_000_000_000,
+  });
+
+  return proxyAddress;
+}
+
+async function deployGatewayProxy(
+  implAbi: unknown[],
+  implBytecode: string,
+  proxyAbi: unknown[],
+  proxyBytecode: string,
+  params: DeploymentParams,
+  receiver: string
+): Promise<string> {
+  // 1) Deploy the implementation
+  const implAddress = await deployContract(implAbi, implBytecode);
+  console.log(`Implementation deployed at ${implAddress}`);
+
+  // 2) Deploy the proxy, passing (implementation, initCall) to constructor
+  const contractInstance = await tronWeb.contract().new({
+    abi: proxyAbi,
+    bytecode: proxyBytecode,
+    feeLimit: 1_000_000_000,
+    callValue: 0,
+    parameters: [implAddress, '0x'],
+  });
+  const proxyAddress = contractInstance.address; 
+
+  // 3) Call the initialize function on the proxy
+  const gatewayInstance = await tronWeb.contract(implAbi, proxyAddress);
+
+  await gatewayInstance
+    .initialize(
+      params.owner,
+      params.mailbox,
+      receiver,
+      params.ism,
+      hubDomain,
+      HUB_GATEWAY
+    )
+    .send({
+      feeLimit: 1_000_000_000,
+    });
+
+  console.log(`Gateway proxy deployed at ${proxyAddress}`);
   return proxyAddress;
 }
 
@@ -142,6 +190,7 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     throw new Error(`Not enough free bandwidth ${availableBandwidth - bandwidthUsage}`);
 }
 
+
 (async () => {
   try {
     // configuring the parameters
@@ -150,41 +199,30 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
 
     // Deploy Call Executor (no proxy for example)
     const executorAddr = await deployContract(CallExecutorArtifact.abi, CallExecutorArtifact.bytecode);
-    params.executor = executorAddr;
     console.log('CallExecutor at:', executorAddr);
 
     // Deploy MessageReceiver (no proxy for example)
     const messageReceiverAddr = await deployContract(MessageReceiverArtifact.abi, MessageReceiverArtifact.bytecode);
-    params.messageReceiver = messageReceiverAddr;
     console.log('MessageReceiver at:', messageReceiverAddr);
 
     // Deploy Spoke (UUPS style)
-    const spokeAddress = await deployProxy(
+    const spokeAddress = await deploySpokeProxy(
       EverclearSpokeArtifact.abi,
       EverclearSpokeArtifact.bytecode,
       ERC1967ProxyArtifact.abi,
       ERC1967ProxyArtifact.bytecode.object,
-      'initialize',
-      [
-        params.gateway,
-        params.executor,
-        params.messageReceiver,
-        params.lighthouse,
-        params.watchtower,
-        params.hubDomain,
-        params.owner,
-      ],
+      params
     );
     console.log('Everclear Spoke (proxy) at:', spokeAddress);
 
     // Deploy Gateway (UUPS style)
-    const gatewayAddress = await deployProxy(
+    const gatewayAddress = await deployGatewayProxy(
       SpokeGatewayArtifact.abi,
       SpokeGatewayArtifact.bytecode,
       ERC1967ProxyArtifact.abi,
       ERC1967ProxyArtifact.bytecode.object,
-      'initialize',
-      [params.owner, params.mailbox, spokeAddress, params.ism, params.hubDomain, params.hubGateway],
+      params,
+      spokeAddress
     );
     console.log('Spoke Gateway (proxy) at:', gatewayAddress);
 
