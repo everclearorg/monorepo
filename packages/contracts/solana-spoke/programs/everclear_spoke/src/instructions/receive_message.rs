@@ -140,7 +140,7 @@ pub struct InterchainSecurityModuleAccountMetas {}
 pub fn handle_account_metas(
     ctx: Context<HandleAccountMetas>,
     handle: HandleInstruction,
-) -> Result<Vec<SerializableAccountMeta>> {
+) -> Result<SimulationReturnData<Vec<SerializableAccountMeta>>> {
     let (spoke_state_pda, _) = Pubkey::find_program_address(&[b"spoke_state"], ctx.program_id);
 
     let (event_authority_pubkey, _) =
@@ -178,21 +178,21 @@ pub fn handle_account_metas(
                     get_associated_token_address(&vault_authority_pubkey, &s.asset);
                 ret.push(to_serializable_account_meta(vault_account_pubkey, true));
             }
-            Ok(ret)
+            Ok(SimulationReturnData::new(ret))
         }
         MessageType::VarUpdate => {
             // Var update
             msg!("variable update message metadata");
             // NOTE: we skip variable update message in nanospoke now
             let zero_address = Pubkey::from([0; 32]);
-            Ok(vec![
+            Ok(SimulationReturnData::new(vec![
                 to_serializable_account_meta(spoke_state_pda, false),
                 to_serializable_account_meta(zero_address, false),
                 to_serializable_account_meta(zero_address, false),
                 to_serializable_account_meta(system_program::id(), false),
                 to_serializable_account_meta(event_authority_pubkey, false),
                 to_serializable_account_meta(*ctx.program_id, false),
-            ])
+            ]))
         }
         _ => {
             msg!("invalid message type: {:?}", message.message_type);
