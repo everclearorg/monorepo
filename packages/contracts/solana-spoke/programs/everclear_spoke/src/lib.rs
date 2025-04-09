@@ -112,7 +112,7 @@ pub mod everclear_spoke {
     pub fn handle_account_metas(
         ctx: Context<HandleAccountMetas>,
         handle: HandleInstruction,
-    ) -> Result<Vec<SerializableAccountMeta>> {
+    ) -> Result<SimulationReturnData<Vec<SerializableAccountMeta>>> {
         instructions::handle_account_metas(ctx, handle)
     }
 
