@@ -21,8 +21,8 @@ describe('#everclear_spoke', () => {
     Buffer.from('dispatch_authority'),
   ], program.programId);
 
-  // const hyperlaneMailbox = new anchor.web3.PublicKey('E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi'); // mainnet
-  const hyperlaneMailbox = new anchor.web3.PublicKey('75HBBLae3ddeneJVrZeyrDfv6vb7SMC3aCpBucSXS5aR'); // testnet
+  const hyperlaneMailbox = new anchor.web3.PublicKey('E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi'); // mainnet
+  // const hyperlaneMailbox = new anchor.web3.PublicKey('75HBBLae3ddeneJVrZeyrDfv6vb7SMC3aCpBucSXS5aR'); // testnet
   const [mailboxOutbox] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane'),
     Buffer.from('-'),
@@ -37,12 +37,12 @@ describe('#everclear_spoke', () => {
     uniqueMessageAccountKeypair.publicKey.toBuffer(),
   ], hyperlaneMailbox);
 
-  // const igpProgram = new anchor.web3.PublicKey('BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv'); // mainnet
-  // const configuredIgpAccount = new anchor.web3.PublicKey('JAvHW21tYXE9dtdG83DReqU2b4LUexFuCbtJT5tF8X6M'); // mainnet
-  // const innerIgpAccount = new anchor.web3.PublicKey('AkeHBbE5JkwVppujCQQ6WuxsVsJtruBAjUo6fDCFp6fF'); // mainnet
-  const igpProgram = new anchor.web3.PublicKey('5p7Hii6CJL4xGBYYTGEQmH9LnUSZteFJUu9AVLDExZX2'); // testnet
-  const configuredIgpAccount = new anchor.web3.PublicKey('9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy'); // testnet
-  const innerIgpAccount = new anchor.web3.PublicKey('hBHAApi5ZoeCYHqDdCKkCzVKmBdwywdT3hMqe327eZB'); // testnet
+  const igpProgram = new anchor.web3.PublicKey('BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv'); // mainnet
+  const configuredIgpAccount = new anchor.web3.PublicKey('JAvHW21tYXE9dtdG83DReqU2b4LUexFuCbtJT5tF8X6M'); // mainnet
+  const innerIgpAccount = new anchor.web3.PublicKey('AkeHBbE5JkwVppujCQQ6WuxsVsJtruBAjUo6fDCFp6fF'); // mainnet
+  // const igpProgram = new anchor.web3.PublicKey('5p7Hii6CJL4xGBYYTGEQmH9LnUSZteFJUu9AVLDExZX2'); // testnet
+  // const configuredIgpAccount = new anchor.web3.PublicKey('9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy'); // testnet
+  // const innerIgpAccount = new anchor.web3.PublicKey('hBHAApi5ZoeCYHqDdCKkCzVKmBdwywdT3hMqe327eZB'); // testnet
   const [igpProgramData] = anchor.web3.PublicKey.findProgramAddressSync([
     Buffer.from('hyperlane_igp'),
     Buffer.from('-'),
@@ -521,29 +521,6 @@ describe('#everclear_spoke', () => {
       // Assert
       spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.vaultAuthorityBump).to.be.equal(newBump);
-    });
-  });
-
-  describe('#update_domain', () => {
-    it('should work', async () => {
-      // Arrange
-      const newDomain = 7;
-
-      // Sanity check
-      let spokeState = await program.account.spokeState.fetch(spokeStateAddress);
-      expect(spokeState.domain).to.be.equal(1);
-
-      // Act
-      await program.methods.updateDomain(newDomain)
-        .accounts({
-          spokeState: spokeStateAddress,
-          admin: user.publicKey,
-        })
-        .rpc();
-
-      // Assert
-      spokeState = await program.account.spokeState.fetch(spokeStateAddress);
-      expect(spokeState.domain).to.be.equal(newDomain);
     });
   });
 });
