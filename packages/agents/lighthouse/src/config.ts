@@ -73,6 +73,7 @@ export const TLighthouseService = Type.Union([
   Type.Literal('invoice'),
   Type.Literal('reward'),
   Type.Literal('reward_metadata'),
+  Type.Literal('solana'),
 ]);
 export type LighthouseService = Static<typeof TLighthouseService>;
 
