@@ -11,6 +11,7 @@ locals {
   lighthouse_invoice_config_param_name = "lighthouse-invoice-${var.environment}-${var.stage}-config"
   lighthouse_reward_config_param_name = "lighthouse-reward-${var.environment}-${var.stage}-config"
   lighthouse_reward_metadata_config_param_name = "lighthouse-reward_metadata-${var.environment}-${var.stage}-config"
+  lighthouse_solana_config_param_name = "lighthouse-solana-${var.environment}-${var.stage}-config"
   monitor_poller_config_param_name = "monitor-poller-${var.environment}-${var.stage}-config"
 
   relayer_env_vars = [
@@ -711,13 +712,6 @@ locals {
     betterUptime = {
       apiKey = var.betteruptime_api_key
       requesterEmail = var.betteruptime_requester_email
-    }
-    solana = {
-      tokens = [
-        {
-          address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
-        }
-      ]
     }
   })
 }
