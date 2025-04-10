@@ -33,7 +33,7 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
   // Deprecated contracts from upgrades //
   address public constant ZIRCUIT_SPOKE_DEPRECATED = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
 
-  // V1 Spoke contracts impl // 
+  // V1 Spoke contracts impl //
   address public constant ETHEREUM_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
   address public constant ARBITRUM_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
   address public constant OPTIMISM_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
