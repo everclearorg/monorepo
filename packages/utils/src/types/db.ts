@@ -35,6 +35,9 @@ export const TIntentStatus = {
   // hub -> settlement message sent, or unsupported intent returned via hyperlane
   // origin -> intent message sent
   // destination -> fill message sent (optional)
+
+  // NOTE: This status is used only for Solana transactions
+  Delivered: 'DELIVERED',
 } as const;
 export type TIntentStatus = (typeof TIntentStatus)[keyof typeof TIntentStatus];
 

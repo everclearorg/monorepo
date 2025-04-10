@@ -24,7 +24,7 @@ export const processSolanaTransactions = async () => {
 
   // Get pending Solana settlements from database
   logger.info('Fetching pending Solana settlements', requestContext, methodContext);
-  //   const pendingTransactions = await database.getPendingSolanaTransactions();
+  const pendingTransactions = await database.getDeliveredSolanaTransactions();
 
   logger.info('Completed processing Solana settlements', requestContext, methodContext);
 };

@@ -49,6 +49,7 @@ import {
   saveLockPositions,
   getLockPositions,
   getOriginIntentsLastNonce,
+  getDeliveredSolanaTransactions,
 } from '../src/client';
 import {
   expect,
@@ -983,6 +984,29 @@ describe('Database Adapter:Client', () => {
       expect(await getOriginIntentsLastNonce('12345', pool)).to.be.deep.eq(0);
       await saveOriginIntents(intents, pool);
       expect(await getOriginIntentsLastNonce('12345', pool)).to.be.deep.eq(7);
+    });
+  });
+
+  describe('#getDeliveredSolanaTransactions', () => {
+    const deliveredIntents = createSettlementIntents(2, [
+      { status: TIntentStatus.Delivered, domain: '1337' },
+      { status: TIntentStatus.Delivered, domain: '1338' }
+    ]);
+    
+    const nonDeliveredIntents = createSettlementIntents(2, [
+      { status: TIntentStatus.Settled, domain: '1339' },
+      { status: TIntentStatus.None, domain: '1340' }
+    ]);
+
+    it('should return only settlement intents with DELIVERED status', async () => {
+      expect(await getDeliveredSolanaTransactions(pool)).to.be.deep.eq([]);
+      
+      // Save all intents
+      await saveSettlementIntents([...deliveredIntents, ...nonDeliveredIntents], pool);
+      
+      // Verify only DELIVERED intents are returned
+      const result = await getDeliveredSolanaTransactions(pool);
+      expect(result).to.be.deep.eq(deliveredIntents);
     });
   });
 });

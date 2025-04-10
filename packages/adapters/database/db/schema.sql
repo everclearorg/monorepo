@@ -65,7 +65,8 @@ CREATE TYPE public.intent_status AS ENUM (
     'DISPATCHED_HUB',
     'SETTLED_AND_COMPLETED',
     'ADDED_SPOKE',
-    'ADDED_HUB'
+    'ADDED_HUB',
+    'DELIVERED'
 );
 
 
@@ -4836,4 +4837,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250108140315'),
     ('20250321152002'),
     ('20250322012505'),
-    ('20250325230805');
+    ('20250325230805'),
+    ('20250410040210');
