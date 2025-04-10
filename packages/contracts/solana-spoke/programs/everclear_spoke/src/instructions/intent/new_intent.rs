@@ -227,7 +227,11 @@ pub struct NewIntent<'info> {
     pub token_program: Program<'info, Token>,
 
     // NOTE: validation of intent pda is done inside call
-    #[account(mut)]
+    #[account(
+        init,
+        payer = authority,
+        space = 8 + std::mem::size_of::<IntentStatusAccount>(),
+    )]
     pub intent_pda: Account<'info, IntentStatusAccount>,
 
     // The Hyperlane Mailbox program (by address only).
