@@ -150,6 +150,12 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
         &ctx.accounts.intent_status_pda.key(),
         &settlement,
     )?;
+    // if its already settled, reject the marking
+    if ctx.accounts.intent_status_pda.status == IntentStatus::Settled
+        || ctx.accounts.intent_status_pda.status == IntentStatus::SettledAndManuallyExecuted
+    {
+        return err!(SpokeError::InvalidIntentStatus);
+    }
     ctx.accounts.intent_status_pda.settlement = Some(settlement.clone());
     ctx.accounts.intent_status_pda.status = IntentStatus::Delivered;
     ctx.accounts.intent_status_pda.accounts = account_metas.clone();
