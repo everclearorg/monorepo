@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 
-use super::AdminState;
 use crate::{
     events::{
         IgpUpdatedEvent, LighthouseUpdatedEvent, MailboxDispatchAuthorityBumpUpdatedEvent,
@@ -8,7 +7,16 @@ use crate::{
         WatchtowerUpdatedEvent,
     },
     hyperlane::InterchainGasPaymasterType,
+    state::SpokeState,
 };
+
+#[event_cpi]
+#[derive(Accounts)]
+pub struct AdminState<'info> {
+    #[account(mut)]
+    pub spoke_state: Account<'info, SpokeState>,
+    pub admin: Signer<'info>,
+}
 
 pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
     let old = ctx.accounts.spoke_state.lighthouse;
