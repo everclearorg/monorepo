@@ -10,7 +10,7 @@ export const processSolanaTransactions = async () => {
   const {
     config: { chains },
     logger,
-    // adapters: { database },
+    adapters: { database },
   } = getContext();
 
   // Create logging context
