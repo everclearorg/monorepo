@@ -4,6 +4,8 @@ pub(crate) mod utils;
 pub mod admin;
 pub mod initialize;
 pub mod intent;
+pub mod messages;
+pub mod pda_seeds;
 pub mod receive_message;
 
 pub use admin::*;

@@ -1,10 +1,10 @@
+use crate::messages::MessageType;
 use crate::{
     consts::everclear_gateway,
     hyperlane::{
         transfer_remote, Igp, Mailbox, SplNoop, TransferRemote, TransferRemoteContext, U256,
     },
-    instructions::MessageType,
-    vault_authority_pda_seeds,
+    intent_status_pda_seeds, vault_authority_pda_seeds,
 };
 use anchor_lang::prelude::*;
 use anchor_spl::{
@@ -80,15 +80,6 @@ pub fn new_intent(
         SpokeError::InvalidVaultAccount
     );
 
-    // Transfer from user's token account -> program's vault
-    let cpi_accounts = Transfer {
-        from: ctx.accounts.user_token_account.to_account_info(),
-        to: ctx.accounts.program_vault_account.to_account_info(),
-        authority: ctx.accounts.authority.to_account_info(),
-    };
-    let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
-    token::transfer(cpi_ctx, amount)?;
-
     // Update global nonce and create intent_id
     let new_nonce = state
         .nonce
@@ -116,15 +107,30 @@ pub fn new_intent(
     // Hash the EVM intent information
     let intent_id = compute_intent_hash(&evm_intent);
 
+    // validate intent status pda
+    let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(intent_id);
+    let intent_status_account = Pubkey::create_program_address(intent_status_seed, ctx.program_id)
+        .map_err(|_| error!(SpokeError::InvalidArgument))?;
+    require!(
+        ctx.accounts.intent_pda.key() == intent_status_account,
+        SpokeError::InvalidIntentPda
+    );
+
+    // Transfer from user's token account -> program's vault
+    let cpi_accounts = Transfer {
+        from: ctx.accounts.user_token_account.to_account_info(),
+        to: ctx.accounts.program_vault_account.to_account_info(),
+        authority: ctx.accounts.authority.to_account_info(),
+    };
+    let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
+    token::transfer(cpi_ctx, amount)?;
+
     // Produce the EVM ABI message:
     // NOTE: message type should be
     let evm_encoded_message = encode_full(MessageType::Intent, &evm_intent);
 
     // Also, record a minimal status mapping (we only record the intent_id and its status).
-    state.status.push(IntentStatusAccount {
-        key: intent_id,
-        status: IntentStatus::Added,
-    });
+    ctx.accounts.intent_pda.status = IntentStatus::Added;
 
     // Build your TransferRemote
     let xfer = TransferRemote {
@@ -193,8 +199,7 @@ pub struct NewIntent<'info> {
         mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump,
-        realloc = 8 + std::mem::size_of::<SpokeState>() +
-            (std::mem::size_of::<IntentStatusAccount>() * (spoke_state.status.len() + 1)),
+        realloc = 8 + std::mem::size_of::<SpokeState>(),
         realloc::payer = authority,
         realloc::zero = false,
     )]
@@ -214,12 +219,16 @@ pub struct NewIntent<'info> {
     )]
     pub user_token_account: Account<'info, TokenAccount>,
 
-    // NOTE: validation of the program vauult account is done inside the call
+    // NOTE: validation of the program vault account is done inside the call
     #[account(mut)]
     pub program_vault_account: Account<'info, TokenAccount>,
 
     #[account(address = TOKEN_PROGRAM_ID)]
     pub token_program: Program<'info, Token>,
+
+    // NOTE: validation of intent pda is done inside call
+    #[account(mut)]
+    pub intent_pda: Account<'info, IntentStatusAccount>,
 
     // The Hyperlane Mailbox program (by address only).
     #[account(address = spoke_state.mailbox)]

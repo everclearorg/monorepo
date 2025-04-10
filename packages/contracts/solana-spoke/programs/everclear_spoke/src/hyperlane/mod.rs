@@ -1,6 +1,6 @@
 use crate::error::SpokeError;
 use crate::mailbox_message_dispatch_authority_pda_seeds;
-use crate::state::{IntentStatusAccount, SpokeState};
+use crate::state::SpokeState;
 use anchor_lang::prelude::{AccountInfo, AccountMeta, Pubkey};
 use anchor_lang::solana_program::system_program;
 use anchor_lang::solana_program::{
@@ -283,8 +283,7 @@ pub struct TransferRemoteContext<'info> {
         mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump,
-        realloc = 8 + std::mem::size_of::<SpokeState>() +
-            (std::mem::size_of::<IntentStatusAccount>() * (spoke_state.status.len() + 1)),
+        realloc = 8 + std::mem::size_of::<SpokeState>(),
         realloc::payer = sender_wallet,
         realloc::zero = false,
     )]
