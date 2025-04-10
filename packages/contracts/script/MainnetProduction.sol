@@ -283,7 +283,7 @@ abstract contract Taiko {
 
   // Fee adapter constants
   address public constant TAIKO_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
-  address public constant TAIKO_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
+  address public constant TAIKO_FEE_ADAPTER = 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1;
 }
 
 abstract contract Apechain {
@@ -368,8 +368,11 @@ abstract contract Gnosis {
   IEverclearSpoke public GNOSIS_SPOKE = IEverclearSpoke(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
   ISpokeGateway public GNOSIS_SPOKE_GATEWAY = ISpokeGateway(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   ICallExecutor public GNOSIS_EXECUTOR = ICallExecutor(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
-
   address public GNOSIS_SPOKE_IMPL = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+
+  // Fee adapter constants
+  address public constant GNOSIS_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public GNOSIS_FEE_ADAPTER;
 }
 
 abstract contract MainnetProductionDomains is
