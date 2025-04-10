@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 
-use crate::hyperlane::InterchainGasPaymasterType;
+use crate::{
+    hyperlane::{InterchainGasPaymasterType, SerializableAccountMeta},
+    instructions::messages::Settlement,
+};
 
 // =====================================================================
 // EVENTS
@@ -67,6 +70,12 @@ pub struct WatchtowerUpdatedEvent {
 pub struct MessageReceivedEvent {
     pub origin: u32,
     pub sender: Pubkey,
+}
+
+#[event]
+pub struct MessageDeliveredEvent {
+    pub settlement: Settlement,
+    pub account_metas: Vec<SerializableAccountMeta>,
 }
 
 #[event]
