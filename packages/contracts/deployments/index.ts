@@ -220,6 +220,7 @@ export const Deployments = {
     2020: {
       everclear: ProductionEverclearSpokeRonin,
       gateway: ProductionSpokeGatewayRonin,
+    },
     100: {
       everclear: ProductionEverclearSpokeGnosis,
       gateway: ProductionSpokeGatewayGnosis,
