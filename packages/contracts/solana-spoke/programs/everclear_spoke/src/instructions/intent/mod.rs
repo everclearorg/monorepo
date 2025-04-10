@@ -2,7 +2,8 @@ pub mod new_intent;
 
 pub use new_intent::*;
 
-use super::{utils::encode_single_intent, MessageType};
+use super::utils::encode_single_intent;
+use crate::messages::MessageType;
 
 /// Represents the 12 fields in our Intent struct, matching the Solidity layout.
 #[derive(Debug, Clone)]
