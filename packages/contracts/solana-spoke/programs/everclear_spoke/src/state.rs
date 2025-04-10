@@ -76,6 +76,13 @@ pub struct IntentStatusAccount {
     pub accounts: Vec<SerializableAccountMeta>,
 }
 
+impl IntentStatusAccount {
+    pub const SIZE: usize = 1 // IntentStatus
+        + 136 // Option<Settlement>
+        + 24 // accounts: Vec<SerializableAccountMeta>
+    ;
+}
+
 /// Intent status.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
 pub enum IntentStatus {

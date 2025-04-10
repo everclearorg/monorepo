@@ -47,6 +47,7 @@ pub fn handle_account_metas(
             let ret = vec![
                 to_serializable_account_meta(spoke_state_pda, false),
                 to_serializable_account_meta(intent_status_account, true),
+                to_serializable_account_meta(system_program::id(), false),
                 to_serializable_account_meta(event_authority_pubkey, false),
                 to_serializable_account_meta(*ctx.program_id, false),
             ];
@@ -94,8 +95,13 @@ pub struct HandleContext {
         bump = spoke_state.bump
     )]
     pub spoke_state: Account<'info, SpokeState>,
-    #[account(mut)]
+    #[account(
+        init,
+        payer = authority,
+        space = 8 + std::mem::size_of::<IntentStatusAccount>(),
+    )]
     pub intent_status_pda: Account<'info, IntentStatusAccount>,
+    pub system_program: Program<'info, System>,
 }
 
 pub(crate) fn mark_message_as_delivered(
