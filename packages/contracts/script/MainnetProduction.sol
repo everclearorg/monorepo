@@ -88,6 +88,14 @@ abstract contract MainnetAssets {
   address public constant ZIRCUIT_PUFETH = 0x9346A5043C590133FE900aec643D9622EDddBA57;
   address public constant APECHAIN_PUFETH = 0x6234E5ef39B12EFdFcbd99dd7F452F27F3fEAE3b;
 
+  ///////////////////// CLEAR
+  address public constant ETHEREUM_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant ARBITRUM_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant OPTIMISM_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant BNB_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant POLYGON_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant GNOSIS_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+
   ///////////////////// FEE RECIPIENTS
   address public constant FEE_RECIPIENT = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
 }

@@ -14,5 +14,9 @@
     {
         "symbol": "xPufETH",
         "contractName": "PufETH"
+    },
+    {
+        "symbol": "CLEAR",
+        "contractName": "CLEAR"
     }
 ]
