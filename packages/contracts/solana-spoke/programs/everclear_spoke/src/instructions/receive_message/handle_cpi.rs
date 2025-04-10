@@ -20,7 +20,7 @@ pub fn handle_account_metas(
     ctx: Context<HandleAccountMetas>,
     handle: HandleInstruction,
 ) -> Result<SimulationReturnData<Vec<SerializableAccountMeta>>> {
-    let (spoke_state_pda, _) = Pubkey::find_program_address(&[b"spoke_state"], ctx.program_id);
+    let (spoke_state_pda, _) = Pubkey::find_program_address(&[b"spoke-state"], ctx.program_id);
 
     let (event_authority_pubkey, _) =
         Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
@@ -172,7 +172,7 @@ fn build_settle_intent_account_metas(
     intent_status_pda: &Pubkey,
     settlement: &Settlement,
 ) -> Result<Vec<SerializableAccountMeta>> {
-    let (spoke_state_pda, _) = Pubkey::find_program_address(&[b"spoke_state"], program_id);
+    let (spoke_state_pda, _) = Pubkey::find_program_address(&[b"spoke-state"], program_id);
 
     let (event_authority_pubkey, _) =
         Pubkey::find_program_address(&[b"__event_authority"], program_id);
