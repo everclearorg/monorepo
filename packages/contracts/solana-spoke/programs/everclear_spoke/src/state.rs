@@ -60,7 +60,6 @@ impl SpokeState {
 
 #[account]
 pub struct IntentStatusAccount {
-    pub key: [u8; 32],
     pub status: IntentStatus,
     pub settlement: Option<Settlement>,
     pub accounts: Vec<SerializableAccountMeta>,

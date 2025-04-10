@@ -153,6 +153,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
     // if its already settled, reject the marking
     if ctx.accounts.intent_status_pda.status == IntentStatus::Settled
         || ctx.accounts.intent_status_pda.status == IntentStatus::SettledAndManuallyExecuted
+        || ctx.accounts.intent_status_pda.status == IntentStatus::Delivered
     {
         return err!(SpokeError::InvalidIntentStatus);
     }

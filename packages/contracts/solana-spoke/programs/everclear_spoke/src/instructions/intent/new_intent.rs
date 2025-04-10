@@ -130,7 +130,6 @@ pub fn new_intent(
     let evm_encoded_message = encode_full(MessageType::Intent, &evm_intent);
 
     // Also, record a minimal status mapping (we only record the intent_id and its status).
-    ctx.accounts.intent_pda.key = intent_id;
     ctx.accounts.intent_pda.status = IntentStatus::Added;
 
     // Build your TransferRemote
