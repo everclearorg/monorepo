@@ -1,22 +1,26 @@
 [
-    {
-        "symbol": "WETH",
-        "contractName": "WETH"
-    },
-    {
-        "symbol": "USDT",
-        "contractName": "USDT"
-    },
-    {
-        "symbol": "USDC",
-        "contractName": "USDC"
-    },
-    {
-        "symbol": "xPufETH",
-        "contractName": "PufETH"
-    },
-    {
-        "symbol": "CLEAR",
-        "contractName": "CLEAR"
-    }
+  {
+    "symbol": "WETH",
+    "contractName": "WETH"
+  },
+  {
+    "symbol": "USDT",
+    "contractName": "USDT"
+  },
+  {
+    "symbol": "USDC",
+    "contractName": "USDC"
+  },
+  {
+    "symbol": "xPufETH",
+    "contractName": "PufETH"
+  },
+  {
+    "symbol": "CLEAR",
+    "contractName": "CLEAR"
+  },
+  {
+    "symbol": "cbBTC",
+    "contractName": "cbBTC"
+  }
 ]

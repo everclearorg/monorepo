@@ -96,6 +96,11 @@ abstract contract MainnetAssets {
   address public constant POLYGON_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
   address public constant GNOSIS_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
 
+  ///////////////////// cbBTC
+  address public constant ETHEREUM_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+  address public constant ARBITRUM_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+  address public constant BASE_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+
   ///////////////////// FEE RECIPIENTS
   address public constant FEE_RECIPIENT = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
 }

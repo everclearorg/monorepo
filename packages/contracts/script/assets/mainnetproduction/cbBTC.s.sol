@@ -10,7 +10,7 @@ import {AddAssetBase} from '../AddAsset.s.sol';
 
 import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 
-contract CLEAR is AddAssetBase, MainnetProductionEnvironment {
+contract cbBTC is AddAssetBase, MainnetProductionEnvironment {
   using TypeCasts for address;
 
   function _fetchTokenSetup()
@@ -22,7 +22,7 @@ contract CLEAR is AddAssetBase, MainnetProductionEnvironment {
                              TICKER HASH
     //////////////////////////////////////////////////////////////*/
 
-    _symbol = 'xCLEAR';
+    _symbol = 'cbBTC';
     bytes32 _tickerHash = keccak256(bytes(_symbol));
 
     /*///////////////////////////////////////////////////////////////
@@ -36,60 +36,33 @@ contract CLEAR is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](6);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](3);
 
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ETHEREUM_CLEAR.toBytes32(),
+      adopted: ETHEREUM_CBBTC.toBytes32(),
       domain: ETHEREUM,
       approval: true,
-      strategy: IEverclear.Strategy.XERC20
+      strategy: IEverclear.Strategy.DEFAULT
     });
 
     ///// Arbitrum
     _assetConfigs[1] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ARBITRUM_CLEAR.toBytes32(),
+      adopted: ARBITRUM_CBBTC.toBytes32(),
       domain: ARBITRUM_ONE,
       approval: true,
-      strategy: IEverclear.Strategy.XERC20
+      strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Optimism
+    ///// Base
     _assetConfigs[2] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: OPTIMISM_CLEAR.toBytes32(),
-      domain: OPTIMISM,
+      adopted: BASE_CBBTC.toBytes32(),
+      domain: BASE,
       approval: true,
-      strategy: IEverclear.Strategy.XERC20
-    });
-
-    ///// BNB
-    _assetConfigs[3] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: BNB_CLEAR.toBytes32(),
-      domain: BNB,
-      approval: true,
-      strategy: IEverclear.Strategy.XERC20
-    });
-
-    ///// Polygon
-    _assetConfigs[4] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: POLYGON_CLEAR.toBytes32(),
-      domain: POLYGON,
-      approval: true,
-      strategy: IEverclear.Strategy.XERC20
-    });
-
-    ///// Gnosis
-    _assetConfigs[5] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: GNOSIS_CLEAR.toBytes32(),
-      domain: GNOSIS,
-      approval: true,
-      strategy: IEverclear.Strategy.XERC20
+      strategy: IEverclear.Strategy.DEFAULT
     });
 
     /*///////////////////////////////////////////////////////////////
@@ -99,7 +72,7 @@ contract CLEAR is AddAssetBase, MainnetProductionEnvironment {
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
       initLastClosedEpochProcessed: false,
-      prioritizedStrategy: IEverclear.Strategy.XERC20,
+      prioritizedStrategy: IEverclear.Strategy.DEFAULT,
       maxDiscountDbps: 0,
       discountPerEpoch: 0,
       fees: _fees,
@@ -108,7 +81,7 @@ contract CLEAR is AddAssetBase, MainnetProductionEnvironment {
   }
 }
 
-contract CLEARDashboard is CLEAR {
+contract cbBTCDashboard is cbBTC {
   function run(
     address _hub
   ) public {
