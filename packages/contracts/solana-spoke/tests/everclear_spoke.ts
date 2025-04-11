@@ -72,6 +72,15 @@ describe('#everclear_spoke', () => {
     return new anchor.BN(value).toArray('be', 32)
   }
 
+  const intentId = toBytes32(4);
+
+  const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync([
+    Buffer.from('everclear_spoke'),
+    Buffer.from('-'),
+    Buffer.from('intent_status'),
+    intentId,
+  ], program.programId);
+
   describe('#initialize', () => {
     it('should work', async () => {
       // Arrange
@@ -170,7 +179,8 @@ describe('#everclear_spoke', () => {
         new anchor.BN(0), // ttl
         [1], // destinations
         Buffer.from(''), // data
-        new anchor.BN(4321) // message_gas_limit
+        new anchor.BN(4321), // message_gas_limit
+        toBytes32(111), // intent_id
       )
         .accounts({
           spokeState: spokeStateAddress,
@@ -206,7 +216,7 @@ describe('#everclear_spoke', () => {
     });
   });
 
-  describe('#handle', () => {
+  describe('#handle_as_admin', () => {
     it('should work', async () => {
       // Arrange
 
@@ -217,14 +227,6 @@ describe('#everclear_spoke', () => {
         mint.publicKey, // mint authority
         mint.publicKey, // freeze authority
         TOKEN_DECIMALS, // decimals
-      );
-
-      // Create a user token account
-      const userTokenAccount = await token.createAssociatedTokenAccount(
-        connection,
-        user, // fee payer
-        mintPubkey, // mint
-        user.publicKey, // owner,
       );
 
       // Create a program vault account
@@ -260,7 +262,6 @@ describe('#everclear_spoke', () => {
 
       const intentAmount = new anchor.BN(5e18.toString());
 
-      const intentId = toBytes32(4);
       const amount = toBytes32(intentAmount);
       const asset = mintPubkey.toBuffer();
       const recipient = user.publicKey.toBuffer();
@@ -286,30 +287,23 @@ describe('#everclear_spoke', () => {
       };
 
       // Act
-      try {
-        await program.methods.handleAsAdmin(
-          handleIx,
-        )
-          .accounts({
-            authority: user.publicKey,
-            spokeState: spokeStateAddress,
-            vaultAuthority,
-            tokenProgram: token.TOKEN_PROGRAM_ID,
-            systemProgram: anchor.web3.SystemProgram.programId,
-          })
-          .remainingAccounts([
-            { pubkey: mintPubkey, isWritable: false, isSigner: false },
-            { pubkey: userTokenAccount, isWritable: true, isSigner: false },
-            { pubkey: programVault.address, isWritable: true, isSigner: false },
-          ])
-          .rpc();
+      await program.methods.handleAsAdmin(
+        handleIx,
+      )
+        .accounts({
+          authority: user.publicKey,
+          spokeState: spokeStateAddress,
+          intentStatusPda,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc();
 
-        // Assert
-        const userBalance = await connection.getTokenAccountBalance(userTokenAccount);
-        expect(userBalance.value.amount).to.be.equal(intentAmount.toString());
-      } catch (e) {
-        console.log(e);
-      }
+      // Assert
+      const intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
+      // console.log(intentStatus);
+      expect(intentStatus.status).to.be.deep.equal({ delivered: {} });
+      expect(intentStatus.settlement.intentId).to.be.deep.equal(intentId);
+      expect(intentStatus.settlement.asset.toBase58()).to.be.equal(mintPubkey.toBase58());
     });
   });
 
