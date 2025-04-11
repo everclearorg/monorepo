@@ -4,7 +4,7 @@ use crate::{
     hyperlane::{
         transfer_remote, Igp, Mailbox, SplNoop, TransferRemote, TransferRemoteContext, U256,
     },
-    intent_status_pda_seeds, vault_authority_pda_seeds,
+    vault_authority_pda_seeds,
 };
 use anchor_lang::prelude::*;
 use anchor_spl::{
@@ -18,7 +18,6 @@ use crate::{
     events::IntentAddedEvent,
     intent::{encode_full, u64_to_u256_be, EVMIntent},
     state::SpokeState,
-    state::{IntentStatus, IntentStatusAccount},
     utils::{compute_intent_hash, normalize_decimals},
 };
 
@@ -36,7 +35,6 @@ pub fn new_intent(
     destinations: Vec<u32>,
     data: Vec<u8>,
     message_gas_limit: u64,
-    intent_id: [u8; 32],
 ) -> Result<()> {
     // Clone to allow mut ref before move
     let spoke_state = ctx.accounts.spoke_state.clone();
@@ -106,20 +104,7 @@ pub fn new_intent(
     };
 
     // Hash the EVM intent information
-    let calculated_intent_id = compute_intent_hash(&evm_intent);
-    require!(
-        calculated_intent_id == intent_id,
-        SpokeError::InvalidIntentId
-    );
-
-    // validate intent status pda
-    let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(intent_id);
-    let intent_status_account = Pubkey::create_program_address(intent_status_seed, ctx.program_id)
-        .map_err(|_| error!(SpokeError::InvalidArgument))?;
-    require!(
-        ctx.accounts.intent_pda.key() == intent_status_account,
-        SpokeError::InvalidIntentPda
-    );
+    let intent_id = compute_intent_hash(&evm_intent);
 
     // Transfer from user's token account -> program's vault
     let cpi_accounts = Transfer {
@@ -133,9 +118,6 @@ pub fn new_intent(
     // Produce the EVM ABI message:
     // NOTE: message type should be
     let evm_encoded_message = encode_full(MessageType::Intent, &evm_intent);
-
-    // Also, record a minimal status mapping (we only record the intent status).
-    ctx.accounts.intent_pda.status = IntentStatus::Added;
 
     // Build your TransferRemote
     let xfer = TransferRemote {
@@ -231,16 +213,6 @@ pub struct NewIntent<'info> {
 
     #[account(address = TOKEN_PROGRAM_ID)]
     pub token_program: Program<'info, Token>,
-
-    // NOTE: validation of intent pda is done inside call
-    #[account(
-        init,
-        payer = authority,
-        space = 8 + std::mem::size_of::<IntentStatusAccount>(),
-        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "intent_status".as_bytes(), &intent_id],
-        bump
-    )]
-    pub intent_pda: Account<'info, IntentStatusAccount>,
 
     // The Hyperlane Mailbox program (by address only).
     #[account(address = spoke_state.mailbox)]
