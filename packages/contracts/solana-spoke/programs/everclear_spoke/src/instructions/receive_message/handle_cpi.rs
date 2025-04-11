@@ -25,6 +25,9 @@ pub fn handle_account_metas(
     let (event_authority_pubkey, _) =
         Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
 
+    let (pda_payer, _) =
+        Pubkey::find_program_address(&[b"everclear_spoke", b"-", b"pda_payer"], ctx.program_id);
+
     let message: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
     match message.message_type {
         MessageType::Settlement => {
@@ -50,6 +53,7 @@ pub fn handle_account_metas(
                 to_serializable_account_meta(system_program::id(), false),
                 to_serializable_account_meta(event_authority_pubkey, false),
                 to_serializable_account_meta(*ctx.program_id, false),
+                to_serializable_account_meta(pda_payer, true),
             ];
             Ok(SimulationReturnData::new(ret))
         }
@@ -85,10 +89,9 @@ pub fn handle(ctx: Context<HandleContext>, handle: HandleInstruction) -> Result<
 
 #[event_cpi]
 #[derive(Accounts)]
-#[instruction(handle_ix: HandleInstruction)]
+#[instruction(handle: HandleInstruction)]
 pub struct HandleContext {
     // NOTE: authority will have to be the first account for the usage in receive_message
-    #[account(mut)]
     pub authority: Signer<'info>,
     #[account(
         seeds = [b"spoke-state"],
@@ -97,14 +100,24 @@ pub struct HandleContext {
     pub spoke_state: Account<'info, SpokeState>,
     #[account(
         init,
-        payer = authority,
+        payer = pda_payer,
         space = 8 + std::mem::size_of::<IntentStatusAccount>() + 10 * std::mem::size_of::<SerializableAccountMeta>(),
-        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "intent_status".as_bytes(), &handle_ix.message[160..192]],
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "intent_status".as_bytes(), &handle.message[160..192]],
         bump
     )]
     pub intent_status_pda: Account<'info, IntentStatusAccount>,
     pub system_program: Program<'info, System>,
+
+    #[account(
+        mut,
+        seeds = [b"everclear_spoke", b"-", b"pda_payer"],
+        bump
+    )]
+    pub pda_payer: Account<'info, PdaPayer>,
 }
+
+#[account]
+pub struct PdaPayer {}
 
 pub(crate) fn mark_message_as_delivered(
     ctx: Context<HandleContext>,

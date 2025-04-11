@@ -274,7 +274,7 @@ describe('#everclear_spoke', () => {
         updateVirtualBalance,
       ]);
 
-      const handleIx = {
+      const handle = {
         origin: 25327,
         sender: { 0: [
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 229, 242, 244, 175, 173, 98, 17, 207, 189, 106, 136, 45,
@@ -288,7 +288,7 @@ describe('#everclear_spoke', () => {
 
       // Act
       await program.methods.handleAsAdmin(
-        handleIx,
+        handle,
       )
         .accounts({
           authority: user.publicKey,
