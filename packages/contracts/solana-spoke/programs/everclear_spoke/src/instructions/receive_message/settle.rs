@@ -5,7 +5,6 @@ use crate::{
     consts::DEFAULT_NORMALIZED_DECIMALS,
     error::SpokeError,
     events::SettledEvent,
-    intent_status_pda_seeds,
     state::{IntentStatus, IntentStatusAccount, SpokeState},
     utils::normalize_decimals,
     vault_authority_pda_seeds,
@@ -15,17 +14,8 @@ use crate::{
 // endpoint do not need to be authenticated as it only settles authenticated delivered intents.
 pub fn settle_delivered_intent(
     ctx: Context<SettleDeliveredIntentContext>,
-    intent_id: SettleDeliveredIntentInstruction,
+    _ix: SettleDeliveredIntentInstruction,
 ) -> Result<()> {
-    // verify intent status pda matches intent id
-    let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(intent_id.intent_id);
-    // return canonical pda for intent status
-    let (intent_status_account, _) =
-        Pubkey::find_program_address(intent_status_seed, ctx.program_id);
-    require!(
-        ctx.accounts.intent_status_pda.key() == intent_status_account,
-        SpokeError::InvalidIntentPda
-    );
     // assert settlement exists and the status is delivered
     require!(
         ctx.accounts.intent_status_pda.settlement.is_some()
@@ -67,7 +57,7 @@ pub fn settle_delivered_intent(
         SpokeError::IncorrectSettlementAccounts
     );
 
-    // SAFE: settlement existance is checked
+    // SAFE: settlement existence is checked
     let settlement = ctx.accounts.intent_status_pda.settlement.clone().unwrap();
 
     // 2) Mark as settled in storage
@@ -119,14 +109,17 @@ pub struct SettleDeliveredIntentInstruction {
 
 #[event_cpi]
 #[derive(Accounts)]
+#[instruction(ix: SettleDeliveredIntentInstruction)]
 pub struct SettleDeliveredIntentContext {
     // NOTE: authority will have to be the first account for the usage in receive_message
     #[account(mut)]
     pub authority: Signer<'info>,
-    #[account(mut)]
     pub spoke_state: Account<'info, SpokeState>,
-    // NOTE: validation of intent pda is done inside call
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "intent_status".as_bytes(), &ix.intent_id],
+        bump,
+    )]
     pub intent_status_pda: Account<'info, IntentStatusAccount>,
 
     /// CHECK: This is a PDA that signs for the vault

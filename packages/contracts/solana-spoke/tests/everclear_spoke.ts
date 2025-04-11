@@ -20,6 +20,11 @@ describe('#everclear_spoke', () => {
     Buffer.from('-'),
     Buffer.from('dispatch_authority'),
   ], program.programId);
+  const [pdaPayer] = anchor.web3.PublicKey.findProgramAddressSync([
+    Buffer.from('everclear_spoke'),
+    Buffer.from('-'),
+    Buffer.from('pda_payer'),
+  ], program.programId);
 
   const hyperlaneMailbox = new anchor.web3.PublicKey('E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi'); // mainnet
   // const hyperlaneMailbox = new anchor.web3.PublicKey('75HBBLae3ddeneJVrZeyrDfv6vb7SMC3aCpBucSXS5aR'); // testnet
@@ -59,7 +64,8 @@ describe('#everclear_spoke', () => {
   const mint = anchor.web3.Keypair.generate();
   const user = anchor.Wallet.local().payer;
 
-  const intentAmount = new anchor.BN('1000000000000000000');
+  const outgoingIntentAmount = new anchor.BN(1e18.toString());
+  const incomingIntentAmount = new anchor.BN(5e18.toString());
   const initialMessageGasLimit = new anchor.BN(10000);
   const TOKEN_DECIMALS = 18;
 
@@ -174,13 +180,12 @@ describe('#everclear_spoke', () => {
         anchor.web3.Keypair.generate().publicKey, // receiver
         anchor.web3.Keypair.generate().publicKey, // input_asset
         anchor.web3.Keypair.generate().publicKey, // output_asset
-        intentAmount, // amount
+        outgoingIntentAmount, // amount
         123, // max_fee
         new anchor.BN(0), // ttl
         [1], // destinations
         Buffer.from(''), // data
         new anchor.BN(4321), // message_gas_limit
-        toBytes32(111), // intent_id
       )
         .accounts({
           spokeState: spokeStateAddress,
@@ -209,7 +214,7 @@ describe('#everclear_spoke', () => {
 
       // Assert
       const vaultBalance = await connection.getTokenAccountBalance(programVault.address);
-      expect(vaultBalance.value.amount).to.be.equal(intentAmount.toString());
+      expect(vaultBalance.value.amount).to.be.equal(outgoingIntentAmount.toString());
 
       const spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.status.length).to.be.equal(1);
@@ -238,6 +243,14 @@ describe('#everclear_spoke', () => {
         true, // allowOwnerOffCurve is true because the owner is a PDA
       );
 
+      // Create a user token account
+      const userTokenAccount = await token.createAssociatedTokenAccount(
+        connection,
+        user, // fee payer
+        mintPubkey, // mint
+        user.publicKey, // owner,
+      );
+
       // Mint some tokens to the user token account
       await token.mintToChecked(
         connection,
@@ -245,7 +258,7 @@ describe('#everclear_spoke', () => {
         mintPubkey, // mint
         programVault.address, // receiver (should be a token account)
         mint, // mint authority
-        5e18, // amount
+        7e18, // amount
         TOKEN_DECIMALS, // decimals
       );
 
@@ -260,9 +273,7 @@ describe('#everclear_spoke', () => {
         size,
       ]);
 
-      const intentAmount = new anchor.BN(5e18.toString());
-
-      const amount = toBytes32(intentAmount);
+      const amount = toBytes32(incomingIntentAmount);
       const asset = mintPubkey.toBuffer();
       const recipient = user.publicKey.toBuffer();
       const updateVirtualBalance = toBytes32(0);
@@ -295,12 +306,12 @@ describe('#everclear_spoke', () => {
           spokeState: spokeStateAddress,
           intentStatusPda,
           systemProgram: anchor.web3.SystemProgram.programId,
+          pdaPayer,
         })
         .rpc();
 
       // Assert
       const intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
-      // console.log(intentStatus);
       expect(intentStatus.status).to.be.deep.equal({ delivered: {} });
       expect(intentStatus.settlement.intentId).to.be.deep.equal(intentId);
       expect(intentStatus.settlement.asset.toBase58()).to.be.equal(mintPubkey.toBase58());
@@ -314,9 +325,14 @@ describe('#everclear_spoke', () => {
         intentId,
       };
       let intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
+      const recipientTokenAccount = intentStatus.accounts[6].pubkey;
+      const vaultTokenAccount = intentStatus.accounts[7].pubkey;
 
       // Sanity check
       expect(intentStatus.status).to.be.deep.equal({ delivered: {} });
+
+      const vaultBalance = await connection.getTokenAccountBalance(vaultTokenAccount);
+      expect(vaultBalance.value.amount).to.be.equal(7e18.toString());
 
       // Act
       await program.methods.settleDeliveredIntent(
@@ -330,14 +346,17 @@ describe('#everclear_spoke', () => {
           tokenProgram: intentStatus.accounts[3].pubkey,
           systemProgram: intentStatus.accounts[4].pubkey,
           mintAccount: intentStatus.accounts[5].pubkey,
-          recipientTokenAccount: intentStatus.accounts[6].pubkey,
-          vaultTokenAccount: intentStatus.accounts[7].pubkey,
+          recipientTokenAccount,
+          vaultTokenAccount,
         })
         .rpc();
 
       // Assert
       intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
       expect(intentStatus.status).to.be.deep.equal({ settled: {} });
+
+      const recipientBalance = await connection.getTokenAccountBalance(recipientTokenAccount);
+      expect(recipientBalance.value.amount).to.be.equal(incomingIntentAmount.toString());
     });
   });
 
