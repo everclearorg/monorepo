@@ -112,7 +112,8 @@ pub struct HandleContext {
     #[account(
         mut,
         seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()],
-        bump
+        bump,
+        signer,
     )]
     pub pda_payer: AccountInfo<'info>,
 }
@@ -211,7 +212,7 @@ fn build_settle_intent_account_metas(
         to_serializable_account_meta(vault_authority_pubkey, false),
         to_serializable_account_meta(TOKEN_PROGRAM_ID, false),
         to_serializable_account_meta(system_program::id(), false),
-        // mint public key
+        // mint public key    
         to_serializable_account_meta(settlement.asset, false),
         // recipient ATA
         to_serializable_account_meta(recipient_token_account_pubkey, true),
