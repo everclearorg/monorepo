@@ -91,7 +91,6 @@ pub struct HandleContext {
     #[account(mut)]
     pub authority: Signer<'info>,
     #[account(
-        mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump
     )]
