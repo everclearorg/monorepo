@@ -158,30 +158,28 @@ pub(crate) fn mark_message_as_delivered(
 }
 
 fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlement) -> Result<()> {
+    let intent_status_pda = &mut ctx.accounts.intent_status_pda;
     // verify intent status pda matches intent id
     let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(settlement.intent_id);
     // return canonical pda for intent status
     let (intent_status_account, _) =
         Pubkey::find_program_address(intent_status_seed, ctx.program_id);
     require!(
-        ctx.accounts.intent_status_pda.key() == intent_status_account,
+        intent_status_pda.key() == intent_status_account,
         SpokeError::InvalidIntentPda
     );
-    let account_metas = build_settle_intent_account_metas(
-        ctx.program_id,
-        &ctx.accounts.intent_status_pda.key(),
-        &settlement,
-    )?;
+    let account_metas =
+        build_settle_intent_account_metas(ctx.program_id, &intent_status_pda.key(), &settlement)?;
     // if its already settled, reject the marking
-    if ctx.accounts.intent_status_pda.status == IntentStatus::Settled
-        || ctx.accounts.intent_status_pda.status == IntentStatus::SettledAndManuallyExecuted
-        || ctx.accounts.intent_status_pda.status == IntentStatus::Delivered
+    if intent_status_pda.status == IntentStatus::Settled
+        || intent_status_pda.status == IntentStatus::SettledAndManuallyExecuted
+        || intent_status_pda.status == IntentStatus::Delivered
     {
         return err!(SpokeError::InvalidIntentStatus);
     }
-    ctx.accounts.intent_status_pda.settlement = Some(settlement.clone());
-    ctx.accounts.intent_status_pda.status = IntentStatus::Delivered;
-    ctx.accounts.intent_status_pda.accounts = account_metas.clone();
+    intent_status_pda.settlement = Some(settlement.clone());
+    intent_status_pda.status = IntentStatus::Delivered;
+    intent_status_pda.accounts = account_metas.clone();
     emit_cpi!(MessageDeliveredEvent {
         settlement,
         account_metas,
