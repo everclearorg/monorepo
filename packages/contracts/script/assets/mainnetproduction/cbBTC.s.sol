@@ -10,7 +10,7 @@ import {AddAssetBase} from '../AddAsset.s.sol';
 
 import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 
-contract cbBTC is AddAssetBase, MainnetProductionEnvironment {
+contract CBBTC is AddAssetBase, MainnetProductionEnvironment {
   using TypeCasts for address;
 
   function _fetchTokenSetup()
@@ -81,7 +81,7 @@ contract cbBTC is AddAssetBase, MainnetProductionEnvironment {
   }
 }
 
-contract cbBTCDashboard is cbBTC {
+contract CBBTCDashboard is CBBTC {
   function run(
     address _hub
   ) public {
