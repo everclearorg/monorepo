@@ -108,12 +108,13 @@ pub struct HandleContext {
     pub intent_status_pda: Account<'info, IntentStatusAccount>,
     pub system_program: Program<'info, System>,
 
+    /// CHECK: This is an empty account pda that only store funds to create intent status pda.
     #[account(
         mut,
         seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()],
         bump
     )]
-    pub pda_payer: Account<'info, PdaPayer>,
+    pub pda_payer: AccountInfo<'info>,
 }
 
 #[account]
