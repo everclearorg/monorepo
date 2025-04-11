@@ -5,6 +5,8 @@ use crate::{
     state::SpokeState,
 };
 
+use super::PdaPayer;
+
 pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
     let state = &mut ctx.accounts.spoke_state;
 
@@ -55,6 +57,14 @@ pub struct Initialize<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
+    #[account(
+        init,
+        payer = payer,
+        seeds = [b"everclear_spoke", "-".as_bytes(), b"pda_payer"],
+        bump,
+        space = 8
+    )]
+    pub pda_payer: Account<'info, PdaPayer>,
 }
 
 impl Initialize<'_> {
