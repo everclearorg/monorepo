@@ -51,9 +51,9 @@ pub fn handle_account_metas(
                 to_serializable_account_meta(spoke_state_pda, false),
                 to_serializable_account_meta(intent_status_account, true),
                 to_serializable_account_meta(system_program::id(), false),
+                to_serializable_account_meta(pda_payer, true),
                 to_serializable_account_meta(event_authority_pubkey, false),
                 to_serializable_account_meta(*ctx.program_id, false),
-                to_serializable_account_meta(pda_payer, true),
             ];
             Ok(SimulationReturnData::new(ret))
         }
