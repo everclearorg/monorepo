@@ -307,6 +307,40 @@ describe('#everclear_spoke', () => {
     });
   });
 
+  describe('#settle_delivered_intent', () => {
+    it('should work', async () => {
+      // Arrange
+      const settleIx = {
+        intentId,
+      };
+      let intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
+
+      // Sanity check
+      expect(intentStatus.status).to.be.deep.equal({ delivered: {} });
+
+      // Act
+      await program.methods.settleDeliveredIntent(
+        settleIx,
+      )
+        .accounts({
+          authority: user.publicKey,
+          spokeState: intentStatus.accounts[0].pubkey,
+          intentStatusPda: intentStatus.accounts[1].pubkey,
+          vaultAuthority: intentStatus.accounts[2].pubkey,
+          tokenProgram: intentStatus.accounts[3].pubkey,
+          systemProgram: intentStatus.accounts[4].pubkey,
+          mintAccount: intentStatus.accounts[5].pubkey,
+          recipientTokenAccount: intentStatus.accounts[6].pubkey,
+          vaultTokenAccount: intentStatus.accounts[7].pubkey,
+        })
+        .rpc();
+
+      // Assert
+      intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
+      expect(intentStatus.status).to.be.deep.equal({ settled: {} });
+    });
+  });
+
   describe('#pause', () => {
     it('should work', async () => {
       // Sanity check
