@@ -22,7 +22,7 @@ pub struct CreatePayer<'info> {
     #[account(
         init,
         payer = payer,
-        seeds = [b"everclear_spoke", "-".as_bytes(), b"pda_payer"],
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()],
         bump,
         space = 8
     )]

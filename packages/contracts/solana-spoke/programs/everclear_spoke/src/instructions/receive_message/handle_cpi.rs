@@ -110,7 +110,7 @@ pub struct HandleContext {
 
     #[account(
         mut,
-        seeds = [b"everclear_spoke", b"-", b"pda_payer"],
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()],
         bump
     )]
     pub pda_payer: Account<'info, PdaPayer>,
