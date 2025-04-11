@@ -36,6 +36,7 @@ pub fn new_intent(
     destinations: Vec<u32>,
     data: Vec<u8>,
     message_gas_limit: u64,
+    intent_id: [u8; 32],
 ) -> Result<()> {
     // Clone to allow mut ref before move
     let spoke_state = ctx.accounts.spoke_state.clone();
@@ -80,7 +81,7 @@ pub fn new_intent(
         SpokeError::InvalidVaultAccount
     );
 
-    // Update global nonce and create intent_id
+    // Update global nonce and calculate intent id
     let new_nonce = state
         .nonce
         .checked_add(1)
@@ -105,7 +106,11 @@ pub fn new_intent(
     };
 
     // Hash the EVM intent information
-    let intent_id = compute_intent_hash(&evm_intent);
+    let calculated_intent_id = compute_intent_hash(&evm_intent);
+    require!(
+        calculated_intent_id == intent_id,
+        SpokeError::InvalidIntentId
+    );
 
     // validate intent status pda
     let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(intent_id);
@@ -129,7 +134,7 @@ pub fn new_intent(
     // NOTE: message type should be
     let evm_encoded_message = encode_full(MessageType::Intent, &evm_intent);
 
-    // Also, record a minimal status mapping (we only record the intent_id and its status).
+    // Also, record a minimal status mapping (we only record the intent status).
     ctx.accounts.intent_pda.status = IntentStatus::Added;
 
     // Build your TransferRemote
@@ -194,6 +199,7 @@ pub fn new_intent(
 
 #[event_cpi]
 #[derive(Accounts)]
+#[instruction(intent_id: [u8; 32])]
 pub struct NewIntent<'info> {
     #[account(
         mut,
@@ -231,6 +237,8 @@ pub struct NewIntent<'info> {
         init,
         payer = authority,
         space = 8 + std::mem::size_of::<IntentStatusAccount>(),
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "intent_status".as_bytes(), &intent_id],
+        bump
     )]
     pub intent_pda: Account<'info, IntentStatusAccount>,
 
