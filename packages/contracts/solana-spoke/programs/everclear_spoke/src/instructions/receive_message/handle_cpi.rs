@@ -85,6 +85,7 @@ pub fn handle(ctx: Context<HandleContext>, handle: HandleInstruction) -> Result<
 
 #[event_cpi]
 #[derive(Accounts)]
+#[instruction(handleIx: HandleInstruction)]
 pub struct HandleContext {
     // NOTE: authority will have to be the first account for the usage in receive_message
     #[account(mut)]
@@ -98,7 +99,9 @@ pub struct HandleContext {
     #[account(
         init,
         payer = authority,
-        space = 8 + std::mem::size_of::<IntentStatusAccount>(),
+        space = 8 + std::mem::size_of::<IntentStatusAccount>() + 10 * std::mem::size_of::<SerializableAccountMeta>(),
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "intent_status".as_bytes(), &handleIx.message[160..192]],
+        bump
     )]
     pub intent_status_pda: Account<'info, IntentStatusAccount>,
     pub system_program: Program<'info, System>,

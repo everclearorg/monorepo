@@ -69,6 +69,7 @@ pub mod everclear_spoke {
         destinations: Vec<u32>,
         data: Vec<u8>,
         message_gas_limit: u64,
+        intent_id: [u8; 32],
     ) -> Result<()> {
         instructions::new_intent(
             ctx,
@@ -81,6 +82,7 @@ pub mod everclear_spoke {
             destinations,
             data,
             message_gas_limit,
+            intent_id,
         )
     }
 

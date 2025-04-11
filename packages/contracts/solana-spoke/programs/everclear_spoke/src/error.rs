@@ -70,4 +70,6 @@ pub enum SpokeError {
     InvalidSettlementSize,
     #[msg("Incorrect settlement accounts, mismatch with intent PDA.")]
     IncorrectSettlementAccounts,
+    #[msg("Invalid intent id")]
+    InvalidIntentId,
 }
