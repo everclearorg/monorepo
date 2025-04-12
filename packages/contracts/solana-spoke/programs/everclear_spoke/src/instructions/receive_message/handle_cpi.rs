@@ -189,7 +189,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
         let payer_seed = &[
             "everclear_spoke".as_bytes(),
             "-".as_bytes(),
-            "pda_payer".as_bytes(),
+            "pda_payer/v2".as_bytes(),
         ];
         let (payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
 
@@ -197,7 +197,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
         msg!(
             "{:?}",
             Pubkey::create_program_address(
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
+                &[b"everclear_spoke", b"-", b"pda_payer/v2", &[payer_pda_bump]],
                 ctx.program_id
             )
         );
@@ -209,7 +209,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
                 intent_status_pda.to_account_info(),
             ],
             &[
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
+                &[b"everclear_spoke", b"-", b"pda_payer/v2", &[payer_pda_bump]],
                 intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
             ],
         )?;
