@@ -60,7 +60,7 @@ pub struct Initialize<'info> {
     #[account(
         init,
         payer = payer,
-        seeds = [b"everclear_spoke", "-".as_bytes(), b"pda_payer"],
+        seeds = [b"everclear_spoke", "-".as_bytes(), b"pda_payer/v2"],
         bump,
         space = 8
     )]
