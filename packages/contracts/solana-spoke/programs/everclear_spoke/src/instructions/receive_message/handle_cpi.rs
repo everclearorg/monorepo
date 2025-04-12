@@ -29,7 +29,7 @@ pub fn handle_account_metas(
         Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
 
     let (pda_payer, _) =
-        Pubkey::find_program_address(&[b"everclear_spoke", b"-", b"pda_payer"], ctx.program_id);
+        Pubkey::find_program_address(&[b"everclear_spoke", b"-", b"pda_payer/v2"], ctx.program_id);
 
     let message: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
     match message.message_type {
@@ -109,7 +109,7 @@ pub struct HandleContext {
     /// CHECK: This is an empty account pda that only store funds to create intent status pda.
     #[account(
         mut,
-        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()],
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer/v2".as_bytes()],
         bump,
     )]
     pub pda_payer: AccountInfo<'info>,
