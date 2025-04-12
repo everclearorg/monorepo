@@ -63,10 +63,14 @@ pub fn settle_delivered_intent(
     // 2) Mark as settled in storage
     ctx.accounts.intent_status_pda.status = IntentStatus::Settled;
 
+    let mut buf = [0u8; 32];
+    settlement.amount.to_little_endian(&mut buf);
+    let normalized_amount = u64::from_be_bytes(buf[24..32].try_into().unwrap());
+
     // 3) Normalise the settlement amount
     let minted_decimals = ctx.accounts.mint_account.decimals;
     let amount = normalize_decimals(
-        settlement.amount.low_u64(),
+        normalized_amount,
         DEFAULT_NORMALIZED_DECIMALS,
         minted_decimals,
     )?;
