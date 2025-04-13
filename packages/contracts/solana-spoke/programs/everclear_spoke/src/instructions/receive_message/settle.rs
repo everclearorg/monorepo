@@ -133,7 +133,9 @@ pub struct SettleDeliveredIntentContext {
 
     pub mint_account: Account<'info, Mint>,
 
+    #[account(mut)]
     pub recipient_token_account: Account<'info, TokenAccount>,
 
+    #[account(mut)]
     pub vault_token_account: Account<'info, TokenAccount>,
 }
