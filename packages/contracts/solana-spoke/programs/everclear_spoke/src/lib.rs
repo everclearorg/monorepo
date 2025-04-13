@@ -17,21 +17,6 @@ use instructions::*;
 
 declare_id!("4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL");
 
-#[derive(Accounts)]
-pub struct CreatePayer<'info> {
-    #[account(
-        init,
-        payer = payer,
-        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()],
-        bump,
-        space = 8
-    )]
-    pub pda_payer: Account<'info, PdaPayer>,
-    #[account(mut)]
-    pub payer: Signer<'info>,
-    pub system_program: Program<'info, System>,
-}
-
 #[program]
 pub mod everclear_spoke {
     use super::*;
@@ -41,11 +26,6 @@ pub mod everclear_spoke {
     #[access_control(ctx.accounts.ensure_owner_is_valid(&init.owner))]
     pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
         instructions::initialize(ctx, init)
-    }
-
-    // TODO: remove this after debug
-    pub fn create_payer_pda(_ctx: Context<CreatePayer>) -> Result<()> {
-        Ok(())
     }
 
     /// Pause the program.
