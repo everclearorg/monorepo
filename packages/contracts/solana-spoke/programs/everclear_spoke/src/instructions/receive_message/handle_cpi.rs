@@ -170,12 +170,11 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
     // try to create:
 
     let data = IntentStatusAccount::try_deserialize(&mut &intent_status_pda.data.borrow()[..]);
-    if !data.is_ok() {
+    if data.is_err() {
         let space = 8
             + std::mem::size_of::<IntentStatusAccount>()
             + 10 * std::mem::size_of::<SerializableAccountMeta>();
 
-        let space = space;
         let __anchor_rent = Rent::get()?;
         let lamports = __anchor_rent.minimum_balance(space);
         let inst = anchor_lang::solana_program::system_instruction::create_account(
@@ -191,7 +190,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
             "-".as_bytes(),
             "pda_payer/v2".as_bytes(),
         ];
-        let (payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
+        let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
 
         msg!("{:?}", inst);
         msg!(
@@ -227,7 +226,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
 
     let account_metas =
         build_settle_intent_account_metas(ctx.program_id, &intent_status_pda.key(), &settlement)?;
-    
+
     let intent_status = IntentStatusAccount {
         settlement: Some(settlement.clone()),
         status: IntentStatus::Delivered,
