@@ -7,7 +7,7 @@ use super::HandleContext;
 /// Receive a cross‑chain message via Hyperlane via admin.
 /// This have the same interface as the hyperlane message `handle`, and should only be used if hyperlane fails
 /// to transmit message.
-pub fn handle_as_admin<'info>(
+pub fn handle_as_admin(
     ctx: Context<HandleContext>,
     handle: HandleInstruction,
 ) -> Result<()> {
