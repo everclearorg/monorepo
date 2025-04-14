@@ -191,6 +191,6 @@ SET search_path = solana, public;
 CREATE TRIGGER process_cpi_events_trigger BEFORE INSERT OR UPDATE ON solana.solana_spoke_instructions
 FOR EACH ROW EXECUTE FUNCTION public.process_cpi_events();
 
-DROP FUNCTION IF EXISTS public.parse_and_insert_delivered_cpi_event(rec record);
+DROP FUNCTION IF EXISTS public.parse_and_insert_delivered_cpi_event(hex_data TEXT, rec record);
 
 
