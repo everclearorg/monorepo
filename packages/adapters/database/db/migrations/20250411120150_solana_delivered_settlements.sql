@@ -115,7 +115,7 @@ CREATE OR REPLACE FUNCTION public.process_cpi_events() RETURNS TRIGGER AS $$
 DECLARE
 	res BOOLEAN;
 BEGIN
-    IF NEW.accounts = '["HoUvmo3eC8gwMknYvyhto8S8iT8xZryUdErfXhawoHeG"]'
+    IF NEW.accounts = '["3RaCiTPYkAQPg61JVdfbxSp9V4tsw8ZuARtFMdQfNaMp"]'
            AND NEW.tx_status = 1 AND NEW.tx_err = 'null' THEN
         res := parse_and_insert_cpi_event(NEW);
         IF res IS FALSE THEN
