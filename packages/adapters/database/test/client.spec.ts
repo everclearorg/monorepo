@@ -49,7 +49,7 @@ import {
   saveLockPositions,
   getLockPositions,
   getOriginIntentsLastNonce,
-  getDeliveredSolanaTransactions,
+  getDeliveredSettlements,
 } from '../src/client';
 import {
   expect,
@@ -987,25 +987,26 @@ describe('Database Adapter:Client', () => {
     });
   });
 
-  describe('#getDeliveredSolanaTransactions', () => {
+  describe('#getDeliveredSettlements', () => {
     const deliveredIntents = createSettlementIntents(2, [
-      { status: TIntentStatus.Delivered, domain: '1337' },
-      { status: TIntentStatus.Delivered, domain: '1338' }
+      { status: TIntentStatus.Delivered, domain: '1399811149' },
+      { status: TIntentStatus.Delivered, domain: '1399811149' }
     ]);
     
-    const nonDeliveredIntents = createSettlementIntents(2, [
+    const otherIntents = createSettlementIntents(2, [
+      { status: TIntentStatus.Settled, domain: '1399811149' },
       { status: TIntentStatus.Settled, domain: '1339' },
       { status: TIntentStatus.None, domain: '1340' }
     ]);
 
-    it('should return only settlement intents with DELIVERED status', async () => {
-      expect(await getDeliveredSolanaTransactions(pool)).to.be.deep.eq([]);
+    it('should return only settlement intents with DELIVERED status and the set domain', async () => {
+      expect(await getDeliveredSettlements('1399811149', pool)).to.be.deep.eq([]);
       
       // Save all intents
-      await saveSettlementIntents([...deliveredIntents, ...nonDeliveredIntents], pool);
+      await saveSettlementIntents([...deliveredIntents, ...otherIntents], pool);
       
-      // Verify only DELIVERED intents are returned
-      const result = await getDeliveredSolanaTransactions(pool);
+      // Verify only DELIVERED intents that belong to the set domain are returned
+      const result = await getDeliveredSettlements('1399811149', pool);
       expect(result).to.be.deep.eq(deliveredIntents);
     });
   });
