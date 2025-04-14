@@ -15,7 +15,7 @@ use hyperlane::{
 };
 use instructions::*;
 
-declare_id!("4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL");
+declare_id!("Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw");
 
 #[program]
 pub mod everclear_spoke {
@@ -89,10 +89,7 @@ pub mod everclear_spoke {
     /// Receive a cross‑chain message via Hyperlane.
     /// In production, this would be invoked via CPI from Hyperlane's Mailbox.
     #[instruction(discriminator = [33, 210, 5, 66, 196, 212, 239, 142])]
-    pub fn handle<'info>(
-        ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
-        handle: HandleInstruction,
-    ) -> Result<()> {
+    pub fn handle(ctx: Context<HandleContext>, handle: HandleInstruction) -> Result<()> {
         instructions::handle(ctx, handle)
     }
 
@@ -117,11 +114,16 @@ pub mod everclear_spoke {
     }
 
     // Admin functions, note this do not need to conform with hyperlane interfaces as this is manually triggered by admin.
-    pub fn handle_as_admin<'info>(
-        ctx: Context<'_, '_, 'info, 'info, AuthState<'info>>,
-        handle: HandleInstruction,
-    ) -> Result<()> {
+    pub fn handle_as_admin(ctx: Context<HandleContext>, handle: HandleInstruction) -> Result<()> {
         instructions::handle_as_admin(ctx, handle)
+    }
+
+    // settle delivered message
+    pub fn settle_delivered_intent(
+        ctx: Context<SettleDeliveredIntentContext>,
+        settle_delivered_intent: SettleDeliveredIntentInstruction,
+    ) -> Result<()> {
+        instructions::settle_delivered_intent(ctx, settle_delivered_intent)
     }
 
     pub fn update_lighthouse(ctx: Context<AdminState>, new_lighthouse: Pubkey) -> Result<()> {
