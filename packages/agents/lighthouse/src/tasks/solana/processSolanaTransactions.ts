@@ -38,8 +38,6 @@ export const processSolanaTransactions = async () => {
   }
 
   // Set up Solana provider
-  anchor.setProvider(anchor.AnchorProvider.local(chainConfig.providers[0]));
-  const spoke = anchor.workspace.EverclearSpoke as anchor.Program<EverclearSpoke>;
   const signer = anchor.web3.Keypair.fromSecretKey(
     new Uint8Array(
       solana.signer
@@ -48,6 +46,10 @@ export const processSolanaTransactions = async () => {
         .map(Number),
     ),
   );
+  const connection = new anchor.web3.Connection(chainConfig.providers[0]);
+  const wallet = new anchor.Wallet(signer);
+  anchor.setProvider(new anchor.AnchorProvider(connection, wallet));
+  const spoke = anchor.workspace.EverclearSpoke as anchor.Program<EverclearSpoke>;
 
   // Process settlements
   for (const settlement of settlements) {
