@@ -72,8 +72,8 @@ pub struct OldIntentStatusAccount {
 #[account]
 pub struct IntentStatusAccount {
     pub status: IntentStatus,
-    pub settlement: Option<Settlement>,
     pub accounts: Vec<SerializableAccountMeta>,
+    pub settlement: Option<Settlement>,
 }
 
 impl IntentStatusAccount {

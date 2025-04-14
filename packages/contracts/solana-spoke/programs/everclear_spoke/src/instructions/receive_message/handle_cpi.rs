@@ -1,4 +1,7 @@
-use anchor_lang::{prelude::*, solana_program::system_program};
+use anchor_lang::{
+    prelude::*,
+    solana_program::{program::invoke_signed, system_program},
+};
 use anchor_spl::{associated_token::get_associated_token_address, token::ID as TOKEN_PROGRAM_ID};
 
 use crate::{
@@ -25,6 +28,9 @@ pub fn handle_account_metas(
     let (event_authority_pubkey, _) =
         Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
 
+    let (pda_payer, _) =
+        Pubkey::find_program_address(&[b"everclear_spoke", b"-", b"pda_payer/v2"], ctx.program_id);
+
     let message: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
     match message.message_type {
         MessageType::Settlement => {
@@ -48,6 +54,7 @@ pub fn handle_account_metas(
                 to_serializable_account_meta(spoke_state_pda, false),
                 to_serializable_account_meta(intent_status_account, true),
                 to_serializable_account_meta(system_program::id(), false),
+                to_serializable_account_meta(pda_payer, true),
                 to_serializable_account_meta(event_authority_pubkey, false),
                 to_serializable_account_meta(*ctx.program_id, false),
             ];
@@ -85,27 +92,31 @@ pub fn handle(ctx: Context<HandleContext>, handle: HandleInstruction) -> Result<
 
 #[event_cpi]
 #[derive(Accounts)]
-#[instruction(handleIx: HandleInstruction)]
+#[instruction(handle: HandleInstruction)]
 pub struct HandleContext {
     // NOTE: authority will have to be the first account for the usage in receive_message
-    #[account(mut)]
     pub authority: Signer<'info>,
     #[account(
-        mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump
     )]
     pub spoke_state: Account<'info, SpokeState>,
-    #[account(
-        init,
-        payer = authority,
-        space = 8 + std::mem::size_of::<IntentStatusAccount>() + 10 * std::mem::size_of::<SerializableAccountMeta>(),
-        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "intent_status".as_bytes(), &handleIx.message[160..192]],
-        bump
-    )]
-    pub intent_status_pda: Account<'info, IntentStatusAccount>,
+    /// CHECK:
+    #[account(mut)]
+    pub intent_status_pda: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
+
+    /// CHECK: This is an empty account pda that only store funds to create intent status pda.
+    #[account(
+        mut,
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer/v2".as_bytes()],
+        bump,
+    )]
+    pub pda_payer: AccountInfo<'info>,
 }
+
+#[account]
+pub struct PdaPayer {}
 
 pub(crate) fn mark_message_as_delivered(
     ctx: Context<HandleContext>,
@@ -145,30 +156,85 @@ pub(crate) fn mark_message_as_delivered(
 }
 
 fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlement) -> Result<()> {
+    let intent_status_pda = &mut ctx.accounts.intent_status_pda;
     // verify intent status pda matches intent id
     let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(settlement.intent_id);
     // return canonical pda for intent status
-    let (intent_status_account, _) =
+    let (intent_status_account, intent_status_bump) =
         Pubkey::find_program_address(intent_status_seed, ctx.program_id);
     require!(
-        ctx.accounts.intent_status_pda.key() == intent_status_account,
+        intent_status_pda.key() == intent_status_account,
         SpokeError::InvalidIntentPda
     );
-    let account_metas = build_settle_intent_account_metas(
-        ctx.program_id,
-        &ctx.accounts.intent_status_pda.key(),
-        &settlement,
-    )?;
-    // if its already settled, reject the marking
-    if ctx.accounts.intent_status_pda.status == IntentStatus::Settled
-        || ctx.accounts.intent_status_pda.status == IntentStatus::SettledAndManuallyExecuted
-        || ctx.accounts.intent_status_pda.status == IntentStatus::Delivered
-    {
-        return err!(SpokeError::InvalidIntentStatus);
+
+    // try to create:
+
+    let data = IntentStatusAccount::try_deserialize(&mut &intent_status_pda.data.borrow()[..]);
+    if data.is_err() {
+        let space = 8
+            + std::mem::size_of::<IntentStatusAccount>()
+            + 10 * std::mem::size_of::<SerializableAccountMeta>();
+
+        let __anchor_rent = Rent::get()?;
+        let lamports = __anchor_rent.minimum_balance(space);
+        let inst = anchor_lang::solana_program::system_instruction::create_account(
+            &ctx.accounts.pda_payer.key(),
+            &intent_status_pda.key(),
+            lamports,
+            space as u64,
+            ctx.program_id,
+        );
+
+        let payer_seed = &[
+            "everclear_spoke".as_bytes(),
+            "-".as_bytes(),
+            "pda_payer/v2".as_bytes(),
+        ];
+        let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
+
+        msg!("{:?}", inst);
+        msg!(
+            "{:?}",
+            Pubkey::create_program_address(
+                &[b"everclear_spoke", b"-", b"pda_payer/v2", &[payer_pda_bump]],
+                ctx.program_id
+            )
+        );
+
+        invoke_signed(
+            &inst,
+            &[
+                ctx.accounts.pda_payer.to_account_info(),
+                intent_status_pda.to_account_info(),
+            ],
+            &[
+                &[b"everclear_spoke", b"-", b"pda_payer/v2", &[payer_pda_bump]],
+                intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
+            ],
+        )?;
+    } else {
+        // the account is created beforehand
+        let pda_data = data.unwrap();
+        // if its already settled, reject the delivery
+        if pda_data.status == IntentStatus::Settled
+            || pda_data.status == IntentStatus::SettledAndManuallyExecuted
+            || pda_data.status == IntentStatus::Delivered
+        {
+            return err!(SpokeError::InvalidIntentStatus);
+        }
     }
-    ctx.accounts.intent_status_pda.settlement = Some(settlement.clone());
-    ctx.accounts.intent_status_pda.status = IntentStatus::Delivered;
-    ctx.accounts.intent_status_pda.accounts = account_metas.clone();
+
+    let account_metas =
+        build_settle_intent_account_metas(ctx.program_id, &intent_status_pda.key(), &settlement)?;
+
+    let intent_status = IntentStatusAccount {
+        settlement: Some(settlement.clone()),
+        status: IntentStatus::Delivered,
+        accounts: account_metas.clone(),
+    };
+
+    intent_status.try_serialize(&mut &mut intent_status_pda.data.borrow_mut()[..])?;
+
     emit_cpi!(MessageDeliveredEvent {
         settlement,
         account_metas,
