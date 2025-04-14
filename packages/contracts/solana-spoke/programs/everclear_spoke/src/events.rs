@@ -74,6 +74,7 @@ pub struct MessageReceivedEvent {
 
 #[event]
 pub struct MessageDeliveredEvent {
+    pub domain: u32,
     pub settlement: Settlement,
     pub account_metas: Vec<SerializableAccountMeta>,
 }

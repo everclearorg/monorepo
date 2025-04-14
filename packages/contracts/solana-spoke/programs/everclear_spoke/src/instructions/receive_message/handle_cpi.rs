@@ -236,6 +236,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
     intent_status.try_serialize(&mut &mut intent_status_pda.data.borrow_mut()[..])?;
 
     emit_cpi!(MessageDeliveredEvent {
+        domain: ctx.accounts.spoke_state.domain,
         settlement,
         account_metas,
     });
