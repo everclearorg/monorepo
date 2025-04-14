@@ -74,5 +74,8 @@
         "signer": "blahblah",
         "masterCopyAddress": "blahblah",
         "fallbackHandlerAddress": "blahblah"
+    },
+    "solana": {
+        "signer": "blahblah"
     }
 }

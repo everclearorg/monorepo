@@ -1,7 +1,6 @@
-import { createLoggingContext, SOLANA_CHAINID } from '@chimera-monorepo/utils';
+import { createLoggingContext, SOLANA_CHAINID, EverclearSpoke } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { NoProvidersConfigured, UnableToGetSpokeState } from '../types';
-import { EverclearSpoke } from './types/solana_spoke';
 import * as anchor from '@coral-xyz/anchor';
 
 export const getLastSolanaIntentNonce = async (): Promise<number> => {

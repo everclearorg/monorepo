@@ -19,6 +19,7 @@ import {
   TSafeConfig,
   TokenVolumeReward,
   TokenStakingReward,
+  TSolanaConfig,
 } from '@chimera-monorepo/utils';
 import { InvalidConfig } from './errors';
 import { getSsmParameter } from './tasks/helpers/mockable';
@@ -107,6 +108,7 @@ export const TLighthouseConfig = Type.Object({
       requesterEmail: Type.Optional(Type.String()),
     }),
   ),
+  solana: TSolanaConfig,
 });
 export type LighthouseConfig = Static<typeof TLighthouseConfig>;
 
@@ -258,6 +260,7 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     coingecko: configJson?.coingecko || configFile?.coingecko || '',
     safe: configJson?.safe || configFile?.safe || {},
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},
+    solana: configJson?.solana || configFile?.solana || {},
   };
 
   // Validate schema
