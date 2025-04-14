@@ -989,14 +989,14 @@ describe('Database Adapter:Client', () => {
 
   describe('#getDeliveredSettlements', () => {
     const deliveredIntents = createSettlementIntents(2, [
-      { status: TIntentStatus.Delivered, domain: '1399811149' },
-      { status: TIntentStatus.Delivered, domain: '1399811149' }
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1399811149' },
+      { intentId: mkBytes32('0x2'), status: TIntentStatus.Delivered, domain: '1399811149' }
     ]);
     
     const otherIntents = createSettlementIntents(2, [
-      { status: TIntentStatus.Settled, domain: '1399811149' },
-      { status: TIntentStatus.Settled, domain: '1339' },
-      { status: TIntentStatus.None, domain: '1340' }
+      { intentId: mkBytes32('0x3'), status: TIntentStatus.Settled, domain: '1399811149' },
+      { intentId: mkBytes32('0x4'), status: TIntentStatus.Settled, domain: '1339' },
+      { intentId: mkBytes32('0x5'), status: TIntentStatus.None, domain: '1340' }
     ]);
 
     it('should return only settlement intents with DELIVERED status and the set domain', async () => {
