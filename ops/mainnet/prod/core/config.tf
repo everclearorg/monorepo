@@ -713,5 +713,8 @@ locals {
       apiKey = var.betteruptime_api_key
       requesterEmail = var.betteruptime_requester_email
     }
+    solana {
+      signer = var.solana_signer
+    }
   })
 }

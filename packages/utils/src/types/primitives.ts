@@ -207,3 +207,8 @@ export const TSafeConfig = Type.Object({
   fallbackHandlerAddress: Type.String(),
 });
 export type SafeConfig = Static<typeof TSafeConfig>;
+
+export const TSolanaConfig = Type.Object({
+  signer: Type.String(),
+});
+export type SolanaConfig = Static<typeof TSolanaConfig>;
