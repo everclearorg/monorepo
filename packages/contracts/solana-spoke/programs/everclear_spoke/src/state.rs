@@ -43,7 +43,7 @@ impl SpokeState {
         + 1                      // initialized_version: u8
         + 4                      // domain: u32
         + 4                      // everclear: u32
-        + 32 * 4                 // 5 Pubkeys
+        + 32 * 2                 // 2 Pubkeys
         + 8                      // message_gas_limit: u64
         + 8                      // nonce: u64
         + 32                     // owner: Pubkey
