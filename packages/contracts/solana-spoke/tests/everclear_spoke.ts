@@ -100,8 +100,6 @@ describe('#everclear_spoke', () => {
         hubDomain: 2,
         lighthouse: lighthouseKeyPair.publicKey,
         watchtower: watchtowerKeyPair.publicKey,
-        callExecutor: anchor.web3.Keypair.generate().publicKey,
-        messageReceiver: anchor.web3.Keypair.generate().publicKey,
         messageGasLimit: initialMessageGasLimit,
         owner: user.publicKey,
         mailbox: hyperlaneMailbox,
@@ -126,8 +124,6 @@ describe('#everclear_spoke', () => {
       expect(spokeState.everclear).to.be.equal(params.hubDomain);
       expect(spokeState.lighthouse.toBase58()).to.be.equal(lighthouseKeyPair.publicKey.toBase58());
       expect(spokeState.watchtower.toBase58()).to.be.equal(watchtowerKeyPair.publicKey.toBase58());
-      expect(spokeState.callExecutor.toBase58()).to.be.equal(params.callExecutor.toBase58());
-      expect(spokeState.messageReceiver.toBase58()).to.be.equal(params.messageReceiver.toBase58());
       expect(spokeState.messageGasLimit.toString()).to.be.equal(params.messageGasLimit.toString());
       expect(spokeState.owner.toBase58()).to.be.equal(user.publicKey.toBase58());
       expect(spokeState.mailbox.toBase58()).to.be.equal(hyperlaneMailbox.toBase58());

@@ -18,8 +18,6 @@ pub struct SpokeState {
     // Addresses for key roles.
     pub lighthouse: Pubkey,
     pub watchtower: Pubkey,
-    pub call_executor: Pubkey,
-    pub message_receiver: Pubkey,
     // Message gas limit (stored, though not used on Solana).
     pub message_gas_limit: u64,
     // Global nonce for intents.
