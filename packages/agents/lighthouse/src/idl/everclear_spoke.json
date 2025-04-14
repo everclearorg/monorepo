@@ -1,0 +1,2404 @@
+{
+  "address": "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw",
+  "metadata": {
+    "name": "everclear_spoke",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "handle",
+      "docs": [
+        "Receive a cross‑chain message via Hyperlane.",
+        "In production, this would be invoked via CPI from Hyperlane's Mailbox."
+      ],
+      "discriminator": [
+        33,
+        210,
+        5,
+        66,
+        196,
+        212,
+        239,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "spoke_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "intent_status_pda",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "pda_payer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  114,
+                  99,
+                  108,
+                  101,
+                  97,
+                  114,
+                  95,
+                  115,
+                  112,
+                  111,
+                  107,
+                  101
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  45
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  100,
+                  97,
+                  95,
+                  112,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "handle",
+          "type": {
+            "defined": {
+              "name": "HandleInstruction"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "handle_account_metas",
+      "discriminator": [
+        194,
+        141,
+        30,
+        82,
+        241,
+        41,
+        169,
+        52
+      ],
+      "accounts": [
+        {
+          "name": "account_metas_pda",
+          "docs": [
+            "ref: https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/48b8508af42061d67cf46a3377e4569feb95d1d8/rust/main/chains/hyperlane-sealevel/src/mailbox.rs#L267"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "handle",
+          "type": {
+            "defined": {
+              "name": "HandleInstruction"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "SimulationReturnData",
+          "generics": [
+            {
+              "kind": "type",
+              "type": {
+                "vec": {
+                  "defined": {
+                    "name": "SerializableAccountMeta"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "handle_as_admin",
+      "discriminator": [
+        85,
+        72,
+        192,
+        28,
+        239,
+        150,
+        131,
+        187
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "spoke_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "intent_status_pda",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "pda_payer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  114,
+                  99,
+                  108,
+                  101,
+                  97,
+                  114,
+                  95,
+                  115,
+                  112,
+                  111,
+                  107,
+                  101
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  45
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  100,
+                  97,
+                  95,
+                  112,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "handle",
+          "type": {
+            "defined": {
+              "name": "HandleInstruction"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "Initialize the global state.",
+        "This function creates the SpokeState (global config) PDA."
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "init",
+          "type": {
+            "defined": {
+              "name": "SpokeInitializationParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "interchain_security_module",
+      "discriminator": [
+        45,
+        18,
+        245,
+        87,
+        234,
+        46,
+        246,
+        15
+      ],
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "interchain_security_module_account_metas",
+      "discriminator": [
+        190,
+        214,
+        218,
+        129,
+        67,
+        97,
+        4,
+        76
+      ],
+      "accounts": [],
+      "args": [],
+      "returns": {
+        "defined": {
+          "name": "SimulationReturnData",
+          "generics": [
+            {
+              "kind": "type",
+              "type": {
+                "vec": {
+                  "defined": {
+                    "name": "SerializableAccountMeta"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "new_intent",
+      "docs": [
+        "Create a new intent.",
+        "The user \"locks\" funds (previously deposited) and creates an intent.",
+        "For simplicity, we assume full deposit has been made before."
+      ],
+      "discriminator": [
+        157,
+        204,
+        58,
+        235,
+        252,
+        199,
+        95,
+        123
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "user_token_account",
+          "writable": true
+        },
+        {
+          "name": "program_vault_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "hyperlane_mailbox"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "spl_noop_program",
+          "address": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
+        },
+        {
+          "name": "mailbox_outbox",
+          "writable": true
+        },
+        {
+          "name": "dispatch_authority",
+          "writable": true
+        },
+        {
+          "name": "unique_message_account",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispatched_message_pda",
+          "writable": true
+        },
+        {
+          "name": "igp_program"
+        },
+        {
+          "name": "igp_program_data",
+          "writable": true
+        },
+        {
+          "name": "igp_payment_pda",
+          "writable": true
+        },
+        {
+          "name": "configured_igp_account",
+          "writable": true
+        },
+        {
+          "name": "inner_igp_account",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "receiver",
+          "type": "pubkey"
+        },
+        {
+          "name": "input_asset",
+          "type": "pubkey"
+        },
+        {
+          "name": "output_asset",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "max_fee",
+          "type": "u32"
+        },
+        {
+          "name": "ttl",
+          "type": "u64"
+        },
+        {
+          "name": "destinations",
+          "type": {
+            "vec": "u32"
+          }
+        },
+        {
+          "name": "data",
+          "type": "bytes"
+        },
+        {
+          "name": "message_gas_limit",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "pause",
+      "docs": [
+        "Pause the program.",
+        "Only the lighthouse or watchtower can call this."
+      ],
+      "discriminator": [
+        211,
+        22,
+        221,
+        251,
+        74,
+        121,
+        193,
+        47
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "settle_delivered_intent",
+      "discriminator": [
+        106,
+        187,
+        207,
+        145,
+        6,
+        174,
+        89,
+        217
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "spoke_state"
+        },
+        {
+          "name": "intent_status_pda",
+          "writable": true
+        },
+        {
+          "name": "vault_authority"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "mint_account"
+        },
+        {
+          "name": "recipient_token_account",
+          "writable": true
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "settle_delivered_intent",
+          "type": {
+            "defined": {
+              "name": "SettleDeliveredIntentInstruction"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "unpause",
+      "docs": [
+        "Unpause the program."
+      ],
+      "discriminator": [
+        169,
+        144,
+        4,
+        38,
+        10,
+        141,
+        188,
+        255
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_igp",
+      "docs": [
+        "new_igp contains the IGP address",
+        "new_igp_type contains either the IGP address (as in new_igp), or the overhead IGP address if the IGP is an overhead IGP."
+      ],
+      "discriminator": [
+        228,
+        15,
+        51,
+        100,
+        221,
+        15,
+        217,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_igp",
+          "type": "pubkey"
+        },
+        {
+          "name": "new_igp_type",
+          "type": {
+            "defined": {
+              "name": "InterchainGasPaymasterType"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_lighthouse",
+      "discriminator": [
+        51,
+        13,
+        101,
+        249,
+        40,
+        209,
+        254,
+        17
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_lighthouse",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "update_mailbox",
+      "discriminator": [
+        213,
+        10,
+        94,
+        69,
+        72,
+        226,
+        161,
+        204
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_mailbox",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "update_mailbox_dispatch_authority_bump",
+      "discriminator": [
+        99,
+        54,
+        179,
+        125,
+        118,
+        161,
+        99,
+        5
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "update_message_gas_limit",
+      "discriminator": [
+        95,
+        171,
+        202,
+        222,
+        76,
+        224,
+        79,
+        19
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_limit",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "update_vault_authority_bump",
+      "discriminator": [
+        124,
+        42,
+        9,
+        237,
+        19,
+        224,
+        189,
+        190
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "update_watchtower",
+      "discriminator": [
+        146,
+        49,
+        28,
+        59,
+        251,
+        130,
+        217,
+        207
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_watchtower",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "IntentStatusAccount",
+      "discriminator": [
+        31,
+        58,
+        221,
+        56,
+        60,
+        126,
+        214,
+        23
+      ]
+    },
+    {
+      "name": "SpokeState",
+      "discriminator": [
+        203,
+        210,
+        244,
+        16,
+        167,
+        13,
+        229,
+        82
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "IgpUpdatedEvent",
+      "discriminator": [
+        117,
+        50,
+        157,
+        103,
+        151,
+        162,
+        142,
+        136
+      ]
+    },
+    {
+      "name": "InitializedEvent",
+      "discriminator": [
+        136,
+        202,
+        63,
+        120,
+        152,
+        146,
+        41,
+        79
+      ]
+    },
+    {
+      "name": "IntentAddedEvent",
+      "discriminator": [
+        18,
+        99,
+        228,
+        90,
+        86,
+        91,
+        49,
+        93
+      ]
+    },
+    {
+      "name": "LighthouseUpdatedEvent",
+      "discriminator": [
+        76,
+        188,
+        81,
+        137,
+        120,
+        178,
+        82,
+        45
+      ]
+    },
+    {
+      "name": "MailboxDispatchAuthorityBumpUpdatedEvent",
+      "discriminator": [
+        136,
+        254,
+        105,
+        103,
+        87,
+        8,
+        242,
+        12
+      ]
+    },
+    {
+      "name": "MailboxUpdatedEvent",
+      "discriminator": [
+        6,
+        80,
+        174,
+        219,
+        230,
+        25,
+        176,
+        6
+      ]
+    },
+    {
+      "name": "MessageDeliveredEvent",
+      "discriminator": [
+        170,
+        221,
+        81,
+        222,
+        188,
+        71,
+        22,
+        47
+      ]
+    },
+    {
+      "name": "MessageGasLimitUpdatedEvent",
+      "discriminator": [
+        47,
+        54,
+        237,
+        179,
+        148,
+        197,
+        0,
+        141
+      ]
+    },
+    {
+      "name": "MessageReceivedEvent",
+      "discriminator": [
+        232,
+        67,
+        17,
+        7,
+        89,
+        91,
+        17,
+        69
+      ]
+    },
+    {
+      "name": "PausedEvent",
+      "discriminator": [
+        43,
+        14,
+        250,
+        236,
+        116,
+        42,
+        177,
+        89
+      ]
+    },
+    {
+      "name": "SettledEvent",
+      "discriminator": [
+        117,
+        207,
+        196,
+        174,
+        197,
+        200,
+        11,
+        67
+      ]
+    },
+    {
+      "name": "UnpausedEvent",
+      "discriminator": [
+        150,
+        198,
+        191,
+        67,
+        103,
+        86,
+        160,
+        55
+      ]
+    },
+    {
+      "name": "VaultAuthorityBumpUpdatedEvent",
+      "discriminator": [
+        88,
+        55,
+        123,
+        0,
+        203,
+        140,
+        231,
+        153
+      ]
+    },
+    {
+      "name": "WatchtowerUpdatedEvent",
+      "discriminator": [
+        78,
+        128,
+        124,
+        179,
+        254,
+        219,
+        127,
+        3
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "OnlyOwner",
+      "msg": "Only the contract owner can call this method."
+    },
+    {
+      "code": 6001,
+      "name": "NotAuthorizedToPause",
+      "msg": "Not authorized to pause."
+    },
+    {
+      "code": 6002,
+      "name": "ContractPaused",
+      "msg": "Contract is paused."
+    },
+    {
+      "code": 6003,
+      "name": "InvalidAmount",
+      "msg": "Invalid amount provided."
+    },
+    {
+      "code": 6004,
+      "name": "InvalidOperation",
+      "msg": "Invalid operation or overflow."
+    },
+    {
+      "code": 6005,
+      "name": "IntentNotFound",
+      "msg": "Intent not found."
+    },
+    {
+      "code": 6006,
+      "name": "InvalidIntentStatus",
+      "msg": "Intent is in an invalid status for this operation."
+    },
+    {
+      "code": 6007,
+      "name": "MaxFeeExceeded",
+      "msg": "Max fee exceeded."
+    },
+    {
+      "code": 6008,
+      "name": "InvalidOrigin",
+      "msg": "Invalid origin for inbound message."
+    },
+    {
+      "code": 6009,
+      "name": "InvalidSender",
+      "msg": "Invalid sender for inbound message."
+    },
+    {
+      "code": 6010,
+      "name": "InvalidMessage",
+      "msg": "Invalid or unknown message."
+    },
+    {
+      "code": 6011,
+      "name": "Unauthorized",
+      "msg": "Unauthorized operation."
+    },
+    {
+      "code": 6012,
+      "name": "SignatureExpired",
+      "msg": "Signature has expired"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidSignature",
+      "msg": "Invalid signature"
+    },
+    {
+      "code": 6014,
+      "name": "ZeroAmount",
+      "msg": "Zero amount provided"
+    },
+    {
+      "code": 6015,
+      "name": "DecimalConversionOverflow",
+      "msg": "Decimal conversion overflow"
+    },
+    {
+      "code": 6016,
+      "name": "AlreadyInitialized",
+      "msg": "Already initialized"
+    },
+    {
+      "code": 6017,
+      "name": "InvalidOwner",
+      "msg": "Invalid Owner"
+    },
+    {
+      "code": 6018,
+      "name": "InvalidVarUpdate",
+      "msg": "Invalid var update"
+    },
+    {
+      "code": 6019,
+      "name": "InvalidIntent",
+      "msg": "Invalid intent"
+    },
+    {
+      "code": 6020,
+      "name": "Overflow",
+      "msg": "Overflow"
+    },
+    {
+      "code": 6021,
+      "name": "InvalidAccount",
+      "msg": "Invalid account meta"
+    },
+    {
+      "code": 6022,
+      "name": "InvalidArgument",
+      "msg": "Invalid argument data"
+    },
+    {
+      "code": 6023,
+      "name": "IncorrectProgramId",
+      "msg": "Incorrect program id"
+    },
+    {
+      "code": 6024,
+      "name": "MissingRequiredSignature",
+      "msg": "Missing required signature"
+    },
+    {
+      "code": 6025,
+      "name": "ExtraneousAccount",
+      "msg": "Extraneous account"
+    },
+    {
+      "code": 6026,
+      "name": "IntegerOverflow",
+      "msg": "Overflowing Integer"
+    },
+    {
+      "code": 6027,
+      "name": "InvalidSeeds",
+      "msg": "Invalid seeds for deriving pda"
+    },
+    {
+      "code": 6028,
+      "name": "InvalidVaultAccount",
+      "msg": "Invalid vault account"
+    },
+    {
+      "code": 6029,
+      "name": "InvalidIntentPda",
+      "msg": "Invalid intent pda"
+    },
+    {
+      "code": 6030,
+      "name": "InvalidSettlementSize",
+      "msg": "Invalid settlement size"
+    },
+    {
+      "code": 6031,
+      "name": "IncorrectSettlementAccounts",
+      "msg": "Incorrect settlement accounts, mismatch with intent PDA."
+    },
+    {
+      "code": 6032,
+      "name": "InvalidIntentId",
+      "msg": "Invalid intent id"
+    }
+  ],
+  "types": [
+    {
+      "name": "H256",
+      "docs": [
+        "256-bit hash type."
+      ],
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "HandleInstruction",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "origin",
+            "type": "u32"
+          },
+          {
+            "name": "sender",
+            "type": {
+              "defined": {
+                "name": "H256"
+              }
+            }
+          },
+          {
+            "name": "message",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "IgpUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "old_igp",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_igp",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_igp_type",
+            "type": {
+              "defined": {
+                "name": "InterchainGasPaymasterType"
+              }
+            }
+          },
+          {
+            "name": "new_igp_type",
+            "type": {
+              "defined": {
+                "name": "InterchainGasPaymasterType"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "domain",
+            "type": "u32"
+          },
+          {
+            "name": "everclear",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "IntentAddedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "intent_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "message_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "initiator",
+            "type": "pubkey"
+          },
+          {
+            "name": "receiver",
+            "type": "pubkey"
+          },
+          {
+            "name": "input_asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "output_asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "normalized_amount",
+            "type": "u64"
+          },
+          {
+            "name": "max_fee",
+            "type": "u32"
+          },
+          {
+            "name": "origin_domain",
+            "type": "u32"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "ttl",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "destinations",
+            "type": {
+              "vec": "u32"
+            }
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "IntentStatus",
+      "docs": [
+        "Intent status."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Added"
+          },
+          {
+            "name": "Filled"
+          },
+          {
+            "name": "Settled"
+          },
+          {
+            "name": "SettledAndManuallyExecuted"
+          },
+          {
+            "name": "Delivered"
+          }
+        ]
+      }
+    },
+    {
+      "name": "IntentStatusAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "IntentStatus"
+              }
+            }
+          },
+          {
+            "name": "accounts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "SerializableAccountMeta"
+                }
+              }
+            }
+          },
+          {
+            "name": "settlement",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Settlement"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InterchainGasPaymasterType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Igp",
+            "fields": [
+              "pubkey"
+            ]
+          },
+          {
+            "name": "OverheadIgp",
+            "fields": [
+              "pubkey"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "LighthouseUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "old_lighthouse",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_lighthouse",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MailboxDispatchAuthorityBumpUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "old_bump",
+            "type": "u8"
+          },
+          {
+            "name": "new_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MailboxUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "old_mailbox",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_mailbox",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageDeliveredEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "domain",
+            "type": "u32"
+          },
+          {
+            "name": "settlement",
+            "type": {
+              "defined": {
+                "name": "Settlement"
+              }
+            }
+          },
+          {
+            "name": "account_metas",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "SerializableAccountMeta"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageGasLimitUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "old_limit",
+            "type": "u64"
+          },
+          {
+            "name": "new_limit",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessageReceivedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "origin",
+            "type": "u32"
+          },
+          {
+            "name": "sender",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PausedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "SerializableAccountMeta",
+      "docs": [
+        "A borsh-serializable version of `AccountMeta`."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_signer",
+            "type": "bool"
+          },
+          {
+            "name": "is_writable",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SettleDeliveredIntentInstruction",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "intent_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SettledEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "intent_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "domain",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Settlement",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "intent_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "amount",
+            "type": {
+              "defined": {
+                "name": "U256"
+              }
+            }
+          },
+          {
+            "name": "asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "update_virtual_balance",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SimulationReturnData",
+      "docs": [
+        "NOTE: This is used for hyperlane interop only and should not be used anywhere else",
+        "A ridiculous workaround for `<https://github.com/solana-labs/solana/issues/31391>`,",
+        "which is a bug where if a simulated transaction's return data ends with zero byte(s),",
+        "they end up being incorrectly truncated.",
+        "As a workaround, we can (de)serialize data with a trailing non-zero byte."
+      ],
+      "generics": [
+        {
+          "kind": "type",
+          "name": "T"
+        }
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "return_data",
+            "type": {
+              "generic": "T"
+            }
+          },
+          {
+            "name": "trailing_byte",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SpokeInitializationParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "domain",
+            "type": "u32"
+          },
+          {
+            "name": "hub_domain",
+            "type": "u32"
+          },
+          {
+            "name": "lighthouse",
+            "type": "pubkey"
+          },
+          {
+            "name": "watchtower",
+            "type": "pubkey"
+          },
+          {
+            "name": "message_gas_limit",
+            "type": "u64"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "mailbox",
+            "type": "pubkey"
+          },
+          {
+            "name": "igp",
+            "type": "pubkey"
+          },
+          {
+            "name": "igp_type",
+            "type": {
+              "defined": {
+                "name": "InterchainGasPaymasterType"
+              }
+            }
+          },
+          {
+            "name": "mailbox_dispatch_authority_bump",
+            "type": "u8"
+          },
+          {
+            "name": "vault_authority_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SpokeState",
+      "docs": [
+        "SpokeState – global configuration."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initialized_version",
+            "type": "u8"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "domain",
+            "type": "u32"
+          },
+          {
+            "name": "everclear",
+            "type": "u32"
+          },
+          {
+            "name": "lighthouse",
+            "type": "pubkey"
+          },
+          {
+            "name": "watchtower",
+            "type": "pubkey"
+          },
+          {
+            "name": "message_gas_limit",
+            "type": "u64"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "mailbox",
+            "type": "pubkey"
+          },
+          {
+            "name": "mailbox_dispatch_authority_bump",
+            "type": "u8"
+          },
+          {
+            "name": "igp",
+            "type": "pubkey"
+          },
+          {
+            "name": "igp_type",
+            "type": {
+              "defined": {
+                "name": "InterchainGasPaymasterType"
+              }
+            }
+          },
+          {
+            "name": "vault_authority_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "U256",
+      "docs": [
+        "Little-endian large integer type",
+        "256-bit unsigned integer."
+      ],
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "array": [
+              "u64",
+              4
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnpausedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    },
+    {
+      "name": "VaultAuthorityBumpUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "old_bump",
+            "type": "u8"
+          },
+          {
+            "name": "new_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WatchtowerUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "old_watchtower",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_watchtower",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}

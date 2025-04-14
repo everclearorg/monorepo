@@ -1,6 +1,7 @@
 import { createLoggingContext, SOLANA_CHAINID, EverclearSpoke, TIntentStatus } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import * as anchor from '@coral-xyz/anchor';
+import idlFile from '../../idl/everclear_spoke.json';
 
 /**
  * @notice Processes Solana settlements by collecting them from the database and submitting
@@ -19,6 +20,8 @@ export const processSolanaTransactions = async () => {
 
   // Check if Solana chain is configured
   const chainConfig = chains[SOLANA_CHAINID];
+  const idl = JSON.parse(JSON.stringify(idlFile));
+
   if (!chainConfig) {
     logger.warn('Solana chain not configured', requestContext, methodContext);
     return;
@@ -37,7 +40,9 @@ export const processSolanaTransactions = async () => {
     return;
   }
 
-  // Set up Solana provider
+  // Set up Solana provider with mainnet connection
+  const connection = new anchor.web3.Connection(chainConfig.providers[0]);
+
   const signer = anchor.web3.Keypair.fromSecretKey(
     new Uint8Array(
       solana.signer
@@ -46,10 +51,19 @@ export const processSolanaTransactions = async () => {
         .map(Number),
     ),
   );
-  const connection = new anchor.web3.Connection(chainConfig.providers[0]);
+
+  // Create a wallet from the signer
   const wallet = new anchor.Wallet(signer);
-  anchor.setProvider(new anchor.AnchorProvider(connection, wallet));
-  const spoke = anchor.workspace.EverclearSpoke as anchor.Program<EverclearSpoke>;
+
+  // Create a custom provider with the mainnet connection and wallet
+  const provider = new anchor.AnchorProvider(connection, wallet, { commitment: 'confirmed' });
+
+  const spokeProgramId = new anchor.web3.PublicKey(idl.address);
+  if (!spokeProgramId) {
+    throw new Error('solana.spokeProgramId not configured');
+  }
+
+  const spoke = new anchor.Program(idl, provider) as anchor.Program<EverclearSpoke>;
 
   // Process settlements
   for (const settlement of settlements) {
@@ -81,7 +95,7 @@ export const processSolanaTransactions = async () => {
         .instruction(),
     );
 
-    await anchor.web3.sendAndConfirmTransaction(anchor.getProvider().connection, transaction, [signer]);
+    await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer]);
 
     settlement.status = TIntentStatus.Settled;
   }
