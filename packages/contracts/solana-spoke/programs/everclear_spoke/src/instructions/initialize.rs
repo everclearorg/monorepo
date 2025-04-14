@@ -16,10 +16,8 @@ pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> 
 
     state.paused = false;
     state.domain = init.domain;
-    state.message_receiver = init.message_receiver;
     state.lighthouse = init.lighthouse;
     state.watchtower = init.watchtower;
-    state.call_executor = init.call_executor;
     state.everclear = init.hub_domain;
     state.message_gas_limit = init.message_gas_limit;
     state.nonce = 0;
@@ -70,8 +68,6 @@ pub struct SpokeInitializationParams {
     pub hub_domain: u32,
     pub lighthouse: Pubkey,
     pub watchtower: Pubkey,
-    pub call_executor: Pubkey,
-    pub message_receiver: Pubkey,
     pub message_gas_limit: u64,
     pub owner: Pubkey,
     pub mailbox: Pubkey,

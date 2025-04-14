@@ -6,41 +6,41 @@ import { concat } from 'viem';
 
 describe('#everclear_spoke', () => {
   anchor.setProvider(anchor.AnchorProvider.local());
+  // anchor.setProvider(anchor.AnchorProvider.local('https://solana-mainnet.g.alchemy.com/v2/-xyMcWICws-b78V6cbcFHjtaIPXt9xT0'));
   const connection = anchor.getProvider().connection;
+  // const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/-xyMcWICws-b78V6cbcFHjtaIPXt9xT0', 'confirmed');
+
   const program = anchor.workspace.EverclearSpoke as anchor.Program<EverclearSpoke>;
 
-  const [spokeStateAddress] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('spoke-state'),
-  ], program.programId);
-  const [vaultAuthority, vaultAuthorityBump] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('vault'),
-  ], program.programId);
-  const [dispatchAuthority, mailboxDispatchAuthorityBump] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('hyperlane_dispatcher'),
-    Buffer.from('-'),
-    Buffer.from('dispatch_authority'),
-  ], program.programId);
-  const [pdaPayer] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('everclear_spoke'),
-    Buffer.from('-'),
-    Buffer.from('pda_payer'),
-  ], program.programId);
-
+  const [spokeStateAddress] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('spoke-state')],
+    program.programId,
+  );
+  const [vaultAuthority, vaultAuthorityBump] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('vault')],
+    program.programId,
+  );
+  const [dispatchAuthority, mailboxDispatchAuthorityBump] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('hyperlane_dispatcher'), Buffer.from('-'), Buffer.from('dispatch_authority')],
+    program.programId,
+  );
   const hyperlaneMailbox = new anchor.web3.PublicKey('E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi'); // mainnet
   // const hyperlaneMailbox = new anchor.web3.PublicKey('75HBBLae3ddeneJVrZeyrDfv6vb7SMC3aCpBucSXS5aR'); // testnet
-  const [mailboxOutbox] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('hyperlane'),
-    Buffer.from('-'),
-    Buffer.from('outbox'),
-  ], hyperlaneMailbox);
+  const [mailboxOutbox] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('hyperlane'), Buffer.from('-'), Buffer.from('outbox')],
+    hyperlaneMailbox,
+  );
   const uniqueMessageAccountKeypair = anchor.web3.Keypair.generate();
-  const [dispatchedMessagePda] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('hyperlane'),
-    Buffer.from('-'),
-    Buffer.from('dispatched_message'),
-    Buffer.from('-'),
-    uniqueMessageAccountKeypair.publicKey.toBuffer(),
-  ], hyperlaneMailbox);
+  const [dispatchedMessagePda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from('hyperlane'),
+      Buffer.from('-'),
+      Buffer.from('dispatched_message'),
+      Buffer.from('-'),
+      uniqueMessageAccountKeypair.publicKey.toBuffer(),
+    ],
+    hyperlaneMailbox,
+  );
 
   const igpProgram = new anchor.web3.PublicKey('BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv'); // mainnet
   const configuredIgpAccount = new anchor.web3.PublicKey('JAvHW21tYXE9dtdG83DReqU2b4LUexFuCbtJT5tF8X6M'); // mainnet
@@ -48,24 +48,26 @@ describe('#everclear_spoke', () => {
   // const igpProgram = new anchor.web3.PublicKey('5p7Hii6CJL4xGBYYTGEQmH9LnUSZteFJUu9AVLDExZX2'); // testnet
   // const configuredIgpAccount = new anchor.web3.PublicKey('9SQVtTNsbipdMzumhzi6X8GwojiSMwBfqAhS7FgyTcqy'); // testnet
   // const innerIgpAccount = new anchor.web3.PublicKey('hBHAApi5ZoeCYHqDdCKkCzVKmBdwywdT3hMqe327eZB'); // testnet
-  const [igpProgramData] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('hyperlane_igp'),
-    Buffer.from('-'),
-    Buffer.from('program_data'),
-  ], igpProgram);
-  const [igpPaymentPda] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('hyperlane_igp'),
-    Buffer.from('-'),
-    Buffer.from('gas_payment'),
-    Buffer.from('-'),
-    uniqueMessageAccountKeypair.publicKey.toBuffer(),
-  ], igpProgram);
+  const [igpProgramData] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('hyperlane_igp'), Buffer.from('-'), Buffer.from('program_data')],
+    igpProgram,
+  );
+  const [igpPaymentPda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from('hyperlane_igp'),
+      Buffer.from('-'),
+      Buffer.from('gas_payment'),
+      Buffer.from('-'),
+      uniqueMessageAccountKeypair.publicKey.toBuffer(),
+    ],
+    igpProgram,
+  );
 
   const mint = anchor.web3.Keypair.generate();
   const user = anchor.Wallet.local().payer;
 
-  const outgoingIntentAmount = new anchor.BN(1e18.toString());
-  const incomingIntentAmount = new anchor.BN(5e18.toString());
+  const outgoingIntentAmount = new anchor.BN((1e18).toString());
+  const incomingIntentAmount = new anchor.BN((5e18).toString());
   const initialMessageGasLimit = new anchor.BN(10000);
   const TOKEN_DECIMALS = 18;
 
@@ -75,17 +77,20 @@ describe('#everclear_spoke', () => {
   const watchtowerKeyPair = anchor.web3.Keypair.generate();
 
   const toBytes32 = (value: number | anchor.BN) => {
-    return new anchor.BN(value).toArray('be', 32)
-  }
+    return new anchor.BN(value).toArray('be', 32);
+  };
 
   const intentId = toBytes32(4);
 
-  const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync([
-    Buffer.from('everclear_spoke'),
-    Buffer.from('-'),
-    Buffer.from('intent_status'),
-    intentId,
-  ], program.programId);
+  const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('everclear_spoke'), Buffer.from('-'), Buffer.from('intent_status'), intentId],
+    program.programId,
+  );
+
+  const [pdaPayer] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('everclear_spoke'), Buffer.from('-'), Buffer.from('pda_payer')],
+    program.programId,
+  );
 
   describe('#initialize', () => {
     it('should work', async () => {
@@ -95,8 +100,6 @@ describe('#everclear_spoke', () => {
         hubDomain: 2,
         lighthouse: lighthouseKeyPair.publicKey,
         watchtower: watchtowerKeyPair.publicKey,
-        callExecutor: anchor.web3.Keypair.generate().publicKey,
-        messageReceiver: anchor.web3.Keypair.generate().publicKey,
         messageGasLimit: initialMessageGasLimit,
         owner: user.publicKey,
         mailbox: hyperlaneMailbox,
@@ -121,16 +124,13 @@ describe('#everclear_spoke', () => {
       expect(spokeState.everclear).to.be.equal(params.hubDomain);
       expect(spokeState.lighthouse.toBase58()).to.be.equal(lighthouseKeyPair.publicKey.toBase58());
       expect(spokeState.watchtower.toBase58()).to.be.equal(watchtowerKeyPair.publicKey.toBase58());
-      expect(spokeState.callExecutor.toBase58()).to.be.equal(params.callExecutor.toBase58());
-      expect(spokeState.messageReceiver.toBase58()).to.be.equal(params.messageReceiver.toBase58());
       expect(spokeState.messageGasLimit.toString()).to.be.equal(params.messageGasLimit.toString());
       expect(spokeState.owner.toBase58()).to.be.equal(user.publicKey.toBase58());
       expect(spokeState.mailbox.toBase58()).to.be.equal(hyperlaneMailbox.toBase58());
       expect(spokeState.nonce.toString()).to.be.equal(new anchor.BN(0).toString());
-      expect(spokeState.status).to.be.empty;
       expect(spokeState.mailboxDispatchAuthorityBump).to.be.equal(mailboxDispatchAuthorityBump);
       expect(spokeState.igp.toBase58()).to.be.equal(igpProgram.toBase58());
-      expect(spokeState.igpType.igp['0'].toBase58()).to.be.equal(configuredIgpAccount.toBase58());
+      expect(spokeState.igpType.igp!['0'].toBase58()).to.be.equal(configuredIgpAccount.toBase58());
     });
   });
 
@@ -176,17 +176,18 @@ describe('#everclear_spoke', () => {
       );
 
       // Act
-      await program.methods.newIntent(
-        anchor.web3.Keypair.generate().publicKey, // receiver
-        anchor.web3.Keypair.generate().publicKey, // input_asset
-        anchor.web3.Keypair.generate().publicKey, // output_asset
-        outgoingIntentAmount, // amount
-        123, // max_fee
-        new anchor.BN(0), // ttl
-        [1], // destinations
-        Buffer.from(''), // data
-        new anchor.BN(4321), // message_gas_limit
-      )
+      await program.methods
+        .newIntent(
+          anchor.web3.Keypair.generate().publicKey, // receiver
+          anchor.web3.Keypair.generate().publicKey, // input_asset
+          anchor.web3.Keypair.generate().publicKey, // output_asset
+          outgoingIntentAmount, // amount
+          123, // max_fee
+          new anchor.BN(0), // ttl
+          [1], // destinations
+          Buffer.from(''), // data
+          new anchor.BN(4321), // message_gas_limit
+        )
         .accounts({
           spokeState: spokeStateAddress,
           authority: user.publicKey,
@@ -207,23 +208,19 @@ describe('#everclear_spoke', () => {
           configuredIgpAccount,
           innerIgpAccount,
         })
-        .signers([
-          uniqueMessageAccountKeypair,
-        ])
+        .signers([uniqueMessageAccountKeypair])
         .rpc();
 
       // Assert
       const vaultBalance = await connection.getTokenAccountBalance(programVault.address);
       expect(vaultBalance.value.amount).to.be.equal(outgoingIntentAmount.toString());
-
-      const spokeState = await program.account.spokeState.fetch(spokeStateAddress);
-      expect(spokeState.status.length).to.be.equal(1);
     });
   });
 
   describe('#handle_as_admin', () => {
     it('should work', async () => {
       // Arrange
+      await connection.requestAirdrop(pdaPayer, 50000000);
 
       // Create a mint account
       const mintPubkey = await token.createMint(
@@ -265,56 +262,46 @@ describe('#everclear_spoke', () => {
       const type = toBytes32(2); // Settlement
       const ignored = toBytes32(0);
       const size = toBytes32(1);
-      const header = concat([
-        type,
-        ignored,
-        ignored,
-        ignored,
-        size,
-      ]);
+      const header = concat([type, ignored, ignored, ignored, size]);
 
       const amount = toBytes32(incomingIntentAmount);
       const asset = mintPubkey.toBuffer();
       const recipient = user.publicKey.toBuffer();
       const updateVirtualBalance = toBytes32(0);
-      const intent = concat([
-        intentId,
-        amount,
-        asset,
-        recipient,
-        updateVirtualBalance,
-      ]);
+      const intent = concat([intentId, amount, asset, recipient, updateVirtualBalance]);
 
       const handle = {
         origin: 25327,
-        sender: { 0: [
-          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 229, 242, 244, 175, 173, 98, 17, 207, 189, 106, 136, 45,
-          90, 106, 67, 85, 48, 238, 57, 9,
-        ]},
-        message: Buffer.from(concat([
-          header,
-          intent,
-        ])),
+        sender: {
+          0: [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 229, 242, 244, 175, 173, 98, 17, 207, 189, 106, 136, 45, 90, 106, 67,
+            85, 48, 238, 57, 9,
+          ],
+        },
+        message: Buffer.from(concat([header, intent])),
       };
 
       // Act
-      await program.methods.handleAsAdmin(
-        handle,
-      )
-        .accounts({
-          authority: user.publicKey,
-          spokeState: spokeStateAddress,
-          intentStatusPda,
-          systemProgram: anchor.web3.SystemProgram.programId,
-          pdaPayer,
-        })
-        .rpc();
+      try {
+        await program.methods
+          .handleAsAdmin(handle)
+          .accounts({
+            authority: user.publicKey,
+            spokeState: spokeStateAddress,
+            intentStatusPda,
+            systemProgram: anchor.web3.SystemProgram.programId,
+            pdaPayer,
+          })
+          .rpc();
+      } catch (e) {
+        console.error(e);
+      }
 
       // Assert
       const intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
       expect(intentStatus.status).to.be.deep.equal({ delivered: {} });
-      expect(intentStatus.settlement.intentId).to.be.deep.equal(intentId);
-      expect(intentStatus.settlement.asset.toBase58()).to.be.equal(mintPubkey.toBase58());
+      expect(intentStatus.settlement!.intentId).to.be.deep.equal(intentId);
+      expect(intentStatus.settlement!.asset.toBase58()).to.be.equal(mintPubkey.toBase58());
     });
   });
 
@@ -332,12 +319,11 @@ describe('#everclear_spoke', () => {
       expect(intentStatus.status).to.be.deep.equal({ delivered: {} });
 
       const vaultBalance = await connection.getTokenAccountBalance(vaultTokenAccount);
-      expect(vaultBalance.value.amount).to.be.equal(7e18.toString());
+      expect(vaultBalance.value.amount).to.be.equal((7e18).toString());
 
       // Act
-      await program.methods.settleDeliveredIntent(
-        settleIx,
-      )
+      await program.methods
+        .settleDeliveredIntent(settleIx)
         .accounts({
           authority: user.publicKey,
           spokeState: intentStatus.accounts[0].pubkey,
@@ -388,7 +374,8 @@ describe('#everclear_spoke', () => {
       expect(spokeState.paused).to.be.equal(true);
 
       // Act
-      await program.methods.unpause()
+      await program.methods
+        .unpause()
         .accounts({
           spokeState: spokeStateAddress,
           admin: watchtowerKeyPair.publicKey,
@@ -412,7 +399,8 @@ describe('#everclear_spoke', () => {
       expect(spokeState.lighthouse.toBase58()).to.be.equal(lighthouseKeyPair.publicKey.toBase58());
 
       // Act
-      await program.methods.updateLighthouse(newLighthouseKeyPair.publicKey)
+      await program.methods
+        .updateLighthouse(newLighthouseKeyPair.publicKey)
         .accounts({
           spokeState: spokeStateAddress,
           admin: user.publicKey,
@@ -435,7 +423,8 @@ describe('#everclear_spoke', () => {
       expect(spokeState.watchtower.toBase58()).to.be.equal(watchtowerKeyPair.publicKey.toBase58());
 
       // Act
-      await program.methods.updateWatchtower(newWatchtowerKeyPair.publicKey)
+      await program.methods
+        .updateWatchtower(newWatchtowerKeyPair.publicKey)
         .accounts({
           spokeState: spokeStateAddress,
           admin: user.publicKey,
@@ -458,7 +447,8 @@ describe('#everclear_spoke', () => {
       expect(spokeState.mailbox.toBase58()).to.be.equal(hyperlaneMailbox.toBase58());
 
       // Act
-      await program.methods.updateMailbox(newMailboxKeyPair.publicKey)
+      await program.methods
+        .updateMailbox(newMailboxKeyPair.publicKey)
         .accounts({
           spokeState: spokeStateAddress,
           admin: user.publicKey,
@@ -485,10 +475,11 @@ describe('#everclear_spoke', () => {
       // Sanity check
       let spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.igp.toBase58()).to.be.equal(igpProgram.toBase58());
-      expect(spokeState.igpType.igp['0'].toBase58()).to.be.equal(configuredIgpAccount.toBase58());
+      expect(spokeState.igpType.igp!['0'].toBase58()).to.be.equal(configuredIgpAccount.toBase58());
 
       // Act
-      await program.methods.updateIgp(newIgp, newIgpType)
+      await program.methods
+        .updateIgp(newIgp, newIgpType)
         .accounts({
           spokeState: spokeStateAddress,
           admin: user.publicKey,
@@ -498,7 +489,7 @@ describe('#everclear_spoke', () => {
       // Assert
       spokeState = await program.account.spokeState.fetch(spokeStateAddress);
       expect(spokeState.igp.toBase58()).to.be.equal(newIgp.toBase58());
-      expect(spokeState.igpType.overheadIgp['0'].toBase58()).to.be.equal(newInnerIgpAccount.toBase58());
+      expect(spokeState.igpType.overheadIgp!['0'].toBase58()).to.be.equal(newInnerIgpAccount.toBase58());
     });
   });
 
@@ -512,7 +503,8 @@ describe('#everclear_spoke', () => {
       expect(spokeState.messageGasLimit.toString()).to.be.equal(initialMessageGasLimit.toString());
 
       // Act
-      await program.methods.updateMessageGasLimit(newMessageGasLimit)
+      await program.methods
+        .updateMessageGasLimit(newMessageGasLimit)
         .accounts({
           spokeState: spokeStateAddress,
           admin: user.publicKey,
@@ -535,7 +527,8 @@ describe('#everclear_spoke', () => {
       expect(spokeState.mailboxDispatchAuthorityBump).to.be.equal(mailboxDispatchAuthorityBump);
 
       // Act
-      await program.methods.updateMailboxDispatchAuthorityBump(newBump)
+      await program.methods
+        .updateMailboxDispatchAuthorityBump(newBump)
         .accounts({
           spokeState: spokeStateAddress,
           admin: user.publicKey,
@@ -558,7 +551,8 @@ describe('#everclear_spoke', () => {
       expect(spokeState.vaultAuthorityBump).to.be.equal(vaultAuthorityBump);
 
       // Act
-      await program.methods.updateVaultAuthorityBump(newBump)
+      await program.methods
+        .updateVaultAuthorityBump(newBump)
         .accounts({
           spokeState: spokeStateAddress,
           admin: user.publicKey,

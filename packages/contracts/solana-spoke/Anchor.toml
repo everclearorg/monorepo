@@ -6,10 +6,10 @@ resolution = true
 skip-lint = false
 
 [programs.mainnet]
-everclear_spoke = "4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL" # mainnet-staging
+everclear_spoke = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw" # mainnet-staging
 
 [programs.localnet]
-everclear_spoke = "uvXqfnsfugQTAbd8Wy7xUBQDhcREMGZZeCUb1Y3fXLC"
+everclear_spoke = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
 
 [registry]
 url = "https://api.apr.dev"

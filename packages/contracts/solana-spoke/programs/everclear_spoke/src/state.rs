@@ -18,17 +18,12 @@ pub struct SpokeState {
     // Addresses for key roles.
     pub lighthouse: Pubkey,
     pub watchtower: Pubkey,
-    pub call_executor: Pubkey,
-    pub message_receiver: Pubkey,
     // Message gas limit (stored, though not used on Solana).
     pub message_gas_limit: u64,
     // Global nonce for intents.
     pub nonce: u64,
     // Owner of the program (admin).
     pub owner: Pubkey,
-    // TODO: remove this as this is deprecated
-    // Intent status mapping.
-    pub status: Vec<OldIntentStatusAccount>,
     // Bump for PDA.
     pub bump: u8,
     // Mailbox address
@@ -48,25 +43,17 @@ impl SpokeState {
         + 1                      // initialized_version: u8
         + 4                      // domain: u32
         + 4                      // everclear: u32
-        + 32 * 4                 // 5 Pubkeys
+        + 32 * 2                 // 2 Pubkeys
         + 8                      // message_gas_limit: u64
         + 8                      // nonce: u64
         + 32                     // owner: Pubkey
         + 1                      // bump: u8
         + 32                     // mailbox: Pubkey
-        // TODO: remove status hashmap as it is deprecated
-        + 4                      // status HashMap
         + 1                      // mailbox_dispatch_authority_bump: u8
         + 32                     // igp: Pubkey
         + 33                     // igp_type: InterchainGasPaymasterType
         + 1                      // vault_authority_bump: u8
     ;
-}
-
-#[account]
-pub struct OldIntentStatusAccount {
-    pub key: [u8; 32],
-    pub status: IntentStatus,
 }
 
 #[account]
