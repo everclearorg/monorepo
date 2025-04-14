@@ -36,7 +36,7 @@ contract USDT is AddAssetBase, MainnetStagingEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](2);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](3);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -52,6 +52,15 @@ contract USDT is AddAssetBase, MainnetStagingEnvironment {
       tickerHash: _tickerHash,
       adopted: ARBITRUM_USDT.toBytes32(),
       domain: ARBITRUM_ONE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Base
+    _assetConfigs[2] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BASE_USDT.toBytes32(),
+      domain: BASE,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });

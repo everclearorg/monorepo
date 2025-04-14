@@ -24,7 +24,7 @@
     "name": "Base",
     "id": 8453,
     "rpc": "https://base-mainnet.public.blastapi.io",
-    "environments": ["MainnetProduction"],
+    "environments": ["MainnetStaging", "MainnetProduction"],
     "realm": "spoke"
   },
   {

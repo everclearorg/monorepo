@@ -78,3 +78,4 @@ mode = { key = "${MODE_VERIFIER_KEY}", url = "${MODE_VERIFIER_API_URL}" }
 unichain = { key = "${UNICHAIN_API_KEY}", chain = "130", url = "${UNICHAIN_VERIFIER_API_URL}" }
 zksync = { key = "${ZKSYNC_API_KEY}", chain = "324", url = "${ZKSYNC_VERIFIER_API_URL}" }
 ronin = { key = "${RONIN_VERIFIER_KEY}", chain = "2020", url = "${RONIN_VERIFIER_API_URL}" }
+base = { key = "${BASE_VERIFIER_KEY}", chain = "8453", url = "${BASE_VERIFIER_API_URL}" }

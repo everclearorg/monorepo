@@ -36,7 +36,7 @@ contract USDC is AddAssetBase, MainnetStagingEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](2);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](3);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -56,13 +56,22 @@ contract USDC is AddAssetBase, MainnetStagingEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    ///// Base
+    _assetConfigs[2] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BASE_USDC.toBytes32(),
+      domain: BASE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
                           TOKEN SETUP 
     //////////////////////////////////////////////////////////////*/
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: true,
+      initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
       maxDiscountDbps: 10_000,
       discountPerEpoch: 8,

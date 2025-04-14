@@ -43,5 +43,35 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-arbitrum",
+    "domain": "42161",
+    "environment": "staging",
+    "network": "arbitrum-one",
+    "indexers": [
+      "goldsky",
+      "studio"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-optimism",
+    "domain": "10",
+    "environment": "staging",
+    "network": "optimism",
+    "indexers": [
+      "goldsky",
+      "studio"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-base",
+    "domain": "8453",
+    "environment": "staging",
+    "network": "base",
+    "indexers": [
+      "goldsky",
+      "studio"
+    ]
   }
 ]
