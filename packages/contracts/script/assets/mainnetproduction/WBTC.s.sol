@@ -10,7 +10,7 @@ import {AddAssetBase} from '../AddAsset.s.sol';
 
 import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 
-contract PufETH is AddAssetBase, MainnetProductionEnvironment {
+contract WBTC is AddAssetBase, MainnetProductionEnvironment {
   using TypeCasts for address;
 
   function _fetchTokenSetup()
@@ -22,7 +22,7 @@ contract PufETH is AddAssetBase, MainnetProductionEnvironment {
                              TICKER HASH
     //////////////////////////////////////////////////////////////*/
 
-    _symbol = 'xPufETH';
+    _symbol = 'WBTC';
     bytes32 _tickerHash = keccak256(bytes(_symbol));
 
     /*///////////////////////////////////////////////////////////////
@@ -36,33 +36,42 @@ contract PufETH is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](3);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](4);
 
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ETHEREUM_PUFETH.toBytes32(),
+      adopted: ETHEREUM_WBTC.toBytes32(),
       domain: ETHEREUM,
       approval: true,
-      strategy: IEverclear.Strategy.XERC20
+      strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Zircuit
+    ///// Arbitrum
     _assetConfigs[1] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ZIRCUIT_PUFETH.toBytes32(),
-      domain: ZIRCUIT,
+      adopted: ARBITRUM_WBTC.toBytes32(),
+      domain: ARBITRUM_ONE,
       approval: true,
-      strategy: IEverclear.Strategy.XERC20
+      strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// APECHAIN
+    ///// Berachain
     _assetConfigs[2] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: APECHAIN_PUFETH.toBytes32(),
-      domain: APECHAIN,
+      adopted: BERACHAIN_WBTC.toBytes32(),
+      domain: BERACHAIN,
       approval: true,
-      strategy: IEverclear.Strategy.XERC20
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Mantle
+    _assetConfigs[3] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BASE_WBTC.toBytes32(),
+      domain: BASE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
     });
 
     /*///////////////////////////////////////////////////////////////
@@ -71,8 +80,8 @@ contract PufETH is AddAssetBase, MainnetProductionEnvironment {
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: false,
-      prioritizedStrategy: IEverclear.Strategy.XERC20,
+      initLastClosedEpochProcessed: true,
+      prioritizedStrategy: IEverclear.Strategy.DEFAULT,
       maxDiscountDbps: 0,
       discountPerEpoch: 0,
       fees: _fees,
@@ -81,7 +90,7 @@ contract PufETH is AddAssetBase, MainnetProductionEnvironment {
   }
 }
 
-contract PufETHDashboard is PufETH {
+contract WBTCDashboard is WBTC {
   function run(
     address _hub
   ) public {

@@ -51,6 +51,10 @@ abstract contract MainnetAssets {
   address public constant UNICHAIN_WETH = 0x4200000000000000000000000000000000000006;
   address public constant ZKSYNC_WETH = 0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91;
   address public constant RONIN_WETH = 0xc99a6A985eD2Cac1ef41640596C5A5f9F4E19Ef5;
+  address public constant BERACHAIN_WETH = 0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590;
+  address public constant MANTLE_WETH = 0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111;
+  address public constant SONIC_WETH = 0x50c42dEAcD8Fc9773493ED674b675bE577f2634b;
+  address public constant INK_WETH = 0x4200000000000000000000000000000000000006;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
@@ -66,6 +70,8 @@ abstract contract MainnetAssets {
   address public constant MODE_USDT = 0xf0F161fDA2712DB8b566946122a5af183995e2eD; // Mode's USDT
   address public constant ZKSYNC_USDT = 0x493257fD37EDB34451f62EDf8D2a0C418852bA4C;
   address public constant UNICHAIN_USDT = 0x588CE4F028D8e7B53B687865d6A67b3A54C75518;
+  address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
+  address public constant SONIC_USDT = 0x6047828dc181963ba44974801FF68e538dA5eaF9;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -82,6 +88,10 @@ abstract contract MainnetAssets {
   address public constant UNICHAIN_USDC = 0x078D782b760474a361dDA0AF3839290b0EF57AD6;
   address public constant ZKSYNC_USDC = 0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4;
   address public constant RONIN_USDC = 0x0B7007c13325C48911F73A2daD5FA5dCBf808aDc;
+  address public constant BERACHAIN_USDC = 0x549943e04f40284185054145c6E4e9568C1D3241;
+  address public constant MANTLE_USDC = 0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9;
+  address public constant SONIC_USDC = 0x29219dd400f2Bf60E5a23d13Be72B486D4038894;
+  address public constant INK_USDC = 0xF1815bd50389c46847f0Bda824eC8da914045D14;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
@@ -100,6 +110,12 @@ abstract contract MainnetAssets {
   address public constant ETHEREUM_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
   address public constant ARBITRUM_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
   address public constant BASE_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+
+  //////////////////// WBTC
+  address public constant ETHEREUM_WBTC = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+  address public constant ARBITRUM_WBTC = 0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f;
+  address public constant BASE_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
+  address public constant BERACHAIN_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
 
   ///////////////////// FEE RECIPIENTS
   address public constant FEE_RECIPIENT = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
@@ -388,6 +404,66 @@ abstract contract Gnosis {
   address public GNOSIS_FEE_ADAPTER;
 }
 
+abstract contract Berachain {
+  uint32 public constant BERACHAIN = 80_094;
+  IMailbox public BERACHAIN_MAILBOX = IMailbox(0x7f50C5776722630a0024fAE05fDe8b47571D7B39);
+
+  IEverclearSpoke public BERACHAIN_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public BERACHAIN_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public BERACHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public BERACHAIN_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public BERACHAIN_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant BERACHAIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant BERACHAIN_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
+abstract contract Mantle {
+  uint32 public constant MANTLE = 5000;
+  IMailbox public MANTLE_MAILBOX = IMailbox(0x398633D19f4371e1DB5a8EFE90468eB70B1176AA);
+
+  IEverclearSpoke public MANTLE_SPOKE = IEverclearSpoke(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
+  ISpokeGateway public MANTLE_SPOKE_GATEWAY = ISpokeGateway(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  ICallExecutor public MANTLE_EXECUTOR = ICallExecutor(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
+  IXERC20Module public MANTLE_XERC20_MODULE = IXERC20Module(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
+  address public MANTLE_SPOKE_IMPL = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+
+  // Fee adapter constants
+  address public constant MANTLE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant MANTLE_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
+abstract contract Sonic {
+  uint32 public constant SONIC = 146;
+  IMailbox public SONIC_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public SONIC_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public SONIC_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public SONIC_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public SONIC_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public SONIC_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant SONIC_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant SONIC_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
+abstract contract Ink {
+  uint32 public constant INK = 57_073;
+  IMailbox public INK_MAILBOX = IMailbox(0x7f50C5776722630a0024fAE05fDe8b47571D7B39);
+
+  IEverclearSpoke public INK_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public INK_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public INK_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public INK_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public INK_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant INK_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant INK_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
 abstract contract MainnetProductionDomains is
   Everclear,
   Ethereum,
@@ -407,7 +483,11 @@ abstract contract MainnetProductionDomains is
   Apechain,
   Unichain,
   Ronin,
-  Gnosis
+  Gnosis,
+  Berachain,
+  Mantle,
+  Sonic,
+  Ink
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
@@ -521,8 +601,29 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: RONIN, blockGasLimit: 30_000_000, gateway: address(RONIN_SPOKE_GATEWAY).toBytes32()})
     );
+
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: GNOSIS, blockGasLimit: 17_000_000, gateway: address(GNOSIS_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({
+        chainId: BERACHAIN,
+        blockGasLimit: 30_000_000,
+        gateway: address(BERACHAIN_SPOKE_GATEWAY).toBytes32()
+      })
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: MANTLE, blockGasLimit: 250_000_000, gateway: address(MANTLE_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: SONIC, blockGasLimit: 5_000_000_000, gateway: address(SONIC_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: INK, blockGasLimit: 30_000_000, gateway: address(INK_SPOKE_GATEWAY).toBytes32()})
     );
   }
 }
@@ -551,7 +652,11 @@ abstract contract MainnetProductionEnvironment is
     UNICHAIN,
     ZKSYNC,
     RONIN,
-    GNOSIS
+    GNOSIS,
+    BERACHAIN,
+    MANTLE,
+    SONIC,
+    INK
   ];
 
   /**

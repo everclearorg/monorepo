@@ -102,21 +102,31 @@ import ProductionSpokeGatewayAvalanche from './production/43114/SpokeGateway.jso
 import ProductionEverclearSpokeApeChain from './production/33139/EverclearSpoke.json';
 import ProductionSpokeGatewayApeChain from './production/33139/SpokeGateway.json';
 
-// Add Mode deployment imports
 import ProductionEverclearSpokeMode from './production/34443/EverclearSpoke.json';
 import ProductionSpokeGatewayMode from './production/34443/SpokeGateway.json';
 
-// Add Unichain deployment imports
 import ProductionEverclearSpokeUnichain from './production/130/EverclearSpoke.json';
 import ProductionSpokeGatewayUnichain from './production/130/SpokeGateway.json';
 
-// Add Ronin deployment imports
 import ProductionEverclearSpokeRonin from './production/2020/EverclearSpoke.json';
 import ProductionSpokeGatewayRonin from './production/2020/SpokeGateway.json';
 
-// Add Gnosis deployment imports
 import ProductionEverclearSpokeGnosis from './production/100/EverclearSpoke.json';
 import ProductionSpokeGatewayGnosis from './production/100/SpokeGateway.json';
+
+import ProductionEverclearSpokeBerachain from './production/80094/EverclearSpoke.json';
+import ProductionSpokeGatewayBerachain from './production/80094/SpokeGateway.json';
+
+import ProductionEverclearSpokeMantle from './production/5000/EverclearSpoke.json';
+import ProductionSpokeGatewayMantle from './production/5000/SpokeGateway.json';
+
+// Add Sonic deployments here
+import ProductionEverclearSpokeSonic from './production/146/EverclearSpoke.json';
+import ProductionSpokeGatewaySonic from './production/146/SpokeGateway.json';
+
+// Add Ink deployments here
+import ProductionEverclearSpokeInk from './production/57073/EverclearSpoke.json';
+import ProductionSpokeGatewayInk from './production/57073/SpokeGateway.json';
 
 export const Deployments = {
   local: {},
@@ -224,6 +234,22 @@ export const Deployments = {
     100: {
       everclear: ProductionEverclearSpokeGnosis,
       gateway: ProductionSpokeGatewayGnosis,
+    },
+    80094: {
+      everclear: ProductionEverclearSpokeBerachain,
+      gateway: ProductionSpokeGatewayBerachain,
+    },
+    5000: {
+      everclear: ProductionEverclearSpokeMantle,
+      gateway: ProductionSpokeGatewayMantle,
+    },
+    146: {
+      everclear: ProductionEverclearSpokeSonic,
+      gateway: ProductionSpokeGatewaySonic,
+    },
+    57073: {
+      everclear: ProductionEverclearSpokeInk,
+      gateway: ProductionSpokeGatewayInk,
     },
   },
   staging: {

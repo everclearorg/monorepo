@@ -160,5 +160,29 @@
     "domainName": "Gnosis",
     "domainId": 100,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Berachain",
+    "domainId": 80094,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xe0F010e465f15dcD42098dF9b99F1038c11B3056",
+    "domainName": "Mantle",
+    "domainId": 5000,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Sonic",
+    "domainId": 146,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Ink",
+    "domainId": 57073,
+    "environment": "MainnetProduction"
   }
 ]

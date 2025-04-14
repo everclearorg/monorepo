@@ -234,6 +234,42 @@ contract MainnetProduction is DeployAdapterBase, MainnetProductionEnvironment {
       feeSigner: L2_FEE_SIGNER,
       owner: MODE_ENG_MULTISIG
     });
+
+    // berachain
+    _deploymentParams[BERACHAIN] = DeploymentParams({
+      spoke: address(BERACHAIN_SPOKE),
+      xerc20Module: address(BERACHAIN_XERC20_MODULE),
+      feeRecipient: BERACHAIN_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: BERACHAIN_ENG_MULTISIG
+    });
+
+    // mantle
+    _deploymentParams[MANTLE] = DeploymentParams({
+      spoke: address(MANTLE_SPOKE),
+      xerc20Module: address(MANTLE_XERC20_MODULE),
+      feeRecipient: MANTLE_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: MANTLE_ENG_MULTISIG
+    });
+
+    // sonic
+    _deploymentParams[SONIC] = DeploymentParams({
+      spoke: address(SONIC_SPOKE),
+      xerc20Module: address(SONIC_XERC20_MODULE),
+      feeRecipient: SONIC_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: SONIC_ENG_MULTISIG
+    });
+
+    // ink
+    _deploymentParams[INK] = DeploymentParams({
+      spoke: address(INK_SPOKE),
+      xerc20Module: address(INK_XERC20_MODULE),
+      feeRecipient: INK_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: INK_ENG_MULTISIG
+    });
   }
 }
 

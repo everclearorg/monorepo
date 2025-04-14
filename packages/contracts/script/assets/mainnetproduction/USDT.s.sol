@@ -29,14 +29,14 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
                               TOKEN FEES 
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](1);
-    _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 2}); // 0.2 BPS
+    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](0);
+    // _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 0}); // 0 BPS
 
     /*///////////////////////////////////////////////////////////////
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](12);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](14);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -146,6 +146,24 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    ///// Mantle
+    _assetConfigs[12] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MANTLE_USDT.toBytes32(),
+      domain: MANTLE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Sonic
+    _assetConfigs[13] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SONIC_USDT.toBytes32(),
+      domain: SONIC,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
                           TOKEN SETUP 
     //////////////////////////////////////////////////////////////*/
@@ -154,8 +172,8 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
-      maxDiscountDbps: 12, // 1.2 BPS
-      discountPerEpoch: 3, // 0.3 BPS
+      maxDiscountDbps: 0, // 0 BPS
+      discountPerEpoch: 0, // 0 BPS
       fees: _fees,
       adoptedForAssets: _assetConfigs
     });
