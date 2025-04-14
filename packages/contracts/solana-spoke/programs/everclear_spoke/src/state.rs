@@ -59,12 +59,6 @@ impl SpokeState {
 }
 
 #[account]
-pub struct OldIntentStatusAccount {
-    pub key: [u8; 32],
-    pub status: IntentStatus,
-}
-
-#[account]
 pub struct IntentStatusAccount {
     pub status: IntentStatus,
     pub accounts: Vec<SerializableAccountMeta>,

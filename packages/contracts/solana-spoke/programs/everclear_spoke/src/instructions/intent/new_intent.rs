@@ -79,6 +79,15 @@ pub fn new_intent(
         SpokeError::InvalidVaultAccount
     );
 
+    // Transfer from user's token account -> program's vault
+    let cpi_accounts = Transfer {
+        from: ctx.accounts.user_token_account.to_account_info(),
+        to: ctx.accounts.program_vault_account.to_account_info(),
+        authority: ctx.accounts.authority.to_account_info(),
+    };
+    let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
+    token::transfer(cpi_ctx, amount)?;
+
     // Update global nonce and calculate intent id
     let new_nonce = state
         .nonce
@@ -105,15 +114,6 @@ pub fn new_intent(
 
     // Hash the EVM intent information
     let intent_id = compute_intent_hash(&evm_intent);
-
-    // Transfer from user's token account -> program's vault
-    let cpi_accounts = Transfer {
-        from: ctx.accounts.user_token_account.to_account_info(),
-        to: ctx.accounts.program_vault_account.to_account_info(),
-        authority: ctx.accounts.authority.to_account_info(),
-    };
-    let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
-    token::transfer(cpi_ctx, amount)?;
 
     // Produce the EVM ABI message:
     // NOTE: message type should be
@@ -181,7 +181,6 @@ pub fn new_intent(
 
 #[event_cpi]
 #[derive(Accounts)]
-#[instruction(intent_id: [u8; 32])]
 pub struct NewIntent<'info> {
     #[account(
         mut,
