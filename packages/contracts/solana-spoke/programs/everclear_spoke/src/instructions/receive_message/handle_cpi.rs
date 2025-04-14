@@ -29,7 +29,7 @@ pub fn handle_account_metas(
         Pubkey::find_program_address(&[b"__event_authority"], ctx.program_id);
 
     let (pda_payer, _) =
-        Pubkey::find_program_address(&[b"everclear_spoke", b"-", b"pda_payer/v2"], ctx.program_id);
+        Pubkey::find_program_address(&[b"everclear_spoke", b"-", b"pda_payer"], ctx.program_id);
 
     let message: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
     match message.message_type {
@@ -109,7 +109,7 @@ pub struct HandleContext {
     /// CHECK: This is an empty account pda that only store funds to create intent status pda.
     #[account(
         mut,
-        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer/v2".as_bytes()],
+        seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()],
         bump,
     )]
     pub pda_payer: AccountInfo<'info>,
@@ -188,7 +188,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
         let payer_seed = &[
             "everclear_spoke".as_bytes(),
             "-".as_bytes(),
-            "pda_payer/v2".as_bytes(),
+            "pda_payer".as_bytes(),
         ];
         let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
 
@@ -196,7 +196,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
         msg!(
             "{:?}",
             Pubkey::create_program_address(
-                &[b"everclear_spoke", b"-", b"pda_payer/v2", &[payer_pda_bump]],
+                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
                 ctx.program_id
             )
         );
@@ -208,7 +208,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
                 intent_status_pda.to_account_info(),
             ],
             &[
-                &[b"everclear_spoke", b"-", b"pda_payer/v2", &[payer_pda_bump]],
+                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
                 intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
             ],
         )?;

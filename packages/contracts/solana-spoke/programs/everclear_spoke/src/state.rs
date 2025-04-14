@@ -26,9 +26,6 @@ pub struct SpokeState {
     pub nonce: u64,
     // Owner of the program (admin).
     pub owner: Pubkey,
-    // TODO: remove this as this is deprecated
-    // Intent status mapping.
-    pub status: Vec<OldIntentStatusAccount>,
     // Bump for PDA.
     pub bump: u8,
     // Mailbox address
@@ -54,8 +51,6 @@ impl SpokeState {
         + 32                     // owner: Pubkey
         + 1                      // bump: u8
         + 32                     // mailbox: Pubkey
-        // TODO: remove status hashmap as it is deprecated
-        + 4                      // status HashMap
         + 1                      // mailbox_dispatch_authority_bump: u8
         + 32                     // igp: Pubkey
         + 33                     // igp_type: InterchainGasPaymasterType

@@ -15,7 +15,7 @@ use hyperlane::{
 };
 use instructions::*;
 
-declare_id!("4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL");
+declare_id!("Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw");
 
 #[program]
 pub mod everclear_spoke {
