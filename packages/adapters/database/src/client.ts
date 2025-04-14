@@ -847,10 +847,11 @@ export const getOriginIntentsLastNonce = async (origin: string, _pool?: Pool | d
   return result && result.length ? converters.fromOriginIntent(result[0]).nonce : 0;
 };
 
-export const getDeliveredSolanaTransactions = async (
+export const getDeliveredSettlements = async (
+  domain: string,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<SettlementIntent[]> => {
   const poolToUse = _pool ?? pool;
-  const result = await db.select('settlement_intents', { status: TIntentStatus.Delivered }).run(poolToUse);
+  const result = await db.select('settlement_intents', { status: TIntentStatus.Delivered, domain }).run(poolToUse);
   return result.map(converters.fromSettlementIntents);
 };
