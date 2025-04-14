@@ -175,7 +175,12 @@ describe('#processRewards', () => {
   const processRewardsTest = async (data: object) => {
     setup(data);
 
-    await processRewards();
+    try {
+      await processRewards();
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
 
     if (data.epochResults.length) {
       if (!database.saveEpochResults.calledWith(match(data.epochResults))) {
@@ -300,6 +305,10 @@ describe('#processRewards', () => {
       it('with votes', async () => {
         await processRewardsTest(testVector.volumeRewardsOnly.withVotes);
       });
+
+      it('base volume reward is greater than epoch volume reward', async () => {
+        await processRewardsTest(testVector.volumeRewardsOnly.baseRewardGreaterThanEpochReward);
+      });
     });
 
     describe('stake rewards only', () => {
@@ -331,16 +340,6 @@ describe('#processRewards', () => {
       await processRewardsFailureTest(testVector.failures.volumeAssetIsNotConfigured, 'Invalid asset');
 
       volumeTokenConfig.address = volumeTokenAddress;
-    });
-
-    it('base volume reward is greater than epoch volume reward', async () => {
-      const volumeTokenConfig = mock.config().rewards.volume.tokens[0];
-      const epochVolumeReward = volumeTokenConfig.epochVolumeReward;
-      volumeTokenConfig.epochVolumeReward = '10';
-
-      await processRewardsFailureTest(testVector.failures.baseRewardGreaterThanEpochReward, 'Invalid calculation state');
-
-      volumeTokenConfig.epochVolumeReward = epochVolumeReward;
     });
 
     it('staking reward asset is not configured', async () => {

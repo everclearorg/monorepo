@@ -90,7 +90,7 @@ interface IEverclearSpokeV3 is ISpokeStorage {
    * @param _returnData The return data of the call
    */
   event ExternalCalldataExecuted(bytes32 indexed _intentId, bytes _returnData);
-  
+
   /*///////////////////////////////////////////////////////////////
                               ERRORS
   //////////////////////////////////////////////////////////////*/

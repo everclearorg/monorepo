@@ -114,7 +114,7 @@ abstract contract Ethereum {
   ISpokeGateway public ETHEREUM_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public ETHEREUM_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   IXERC20Module public ETHEREUM_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
-  address public ETHEREUM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public ETHEREUM_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
 
   // Fee adapter constants
   address public constant ETHEREUM_ENG_MULTISIG = 0xa02a88F0bbD47045001Bd460Ad186C30F9a974d6;
@@ -128,7 +128,7 @@ abstract contract ArbitrumOne {
   ISpokeGateway public ARBITRUM_ONE_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public ARBITRUM_ONE_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   IXERC20Module public ARBITRUM_ONE_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
-  address public ARBITRUM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public ARBITRUM_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
 
   // Fee adapter constants
   address public constant ARBITRUM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
@@ -142,7 +142,7 @@ abstract contract Base {
   ISpokeGateway public BASE_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public BASE_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   IXERC20Module public BASE_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
-  address public BASE_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public BASE_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
 
   // Fee adapter constants
   address public constant BASE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
@@ -156,7 +156,7 @@ abstract contract Optimism {
   ISpokeGateway public OPTIMISM_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public OPTIMISM_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   IXERC20Module public OPTIMISM_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
-  address public OPTIMISM_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public OPTIMISM_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
 
   // Fee adapter constants
   address public constant OPTIMISM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
@@ -170,7 +170,7 @@ abstract contract Bnb {
   ISpokeGateway public BNB_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   ICallExecutor public BNB_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   IXERC20Module public BNB_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
-  address public BNB_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public BNB_SPOKE_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
 
   // Fee adapter constants
   address public constant BNB_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
@@ -287,8 +287,7 @@ abstract contract Apechain {
   // Fee adapter constants
   address public constant APECHAIN_ENG_MULTISIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
 }
-// load_cli_owners 0x9692d38bed86e7c86a32316b17cbbf06e28a3eef7bd1abe5bec3f694bb3d1eda
-// add_owner 0x7fB1B8D2C4a8186426Fb12a4Ae483f0093ED2315
+
 abstract contract ZkSync {
   uint32 public constant ZKSYNC = 324;
   IMailbox public ZKSYNC_MAILBOX = IMailbox(0x6bD0A2214797Bc81e0b006F7B74d6221BcD8cb6E);
@@ -299,7 +298,7 @@ abstract contract ZkSync {
   IXERC20Module public ZKSYNC_XERC20_MODULE = IXERC20Module(0x6ACf19603C8588885250F7a02F0EaFFa4FcafB04);
 
   // Fee adapter constants
-  address public constant ZKSYNC_ENG_MULTISIG = 0x352338ABE6a204A07c9ffa549fdb7802c91d9761;
+  address public constant ZKSYNC_ENG_MULTISIG = 0x227a7aC43503c15fe7ab31901468DA07108eA967;
 }
 
 abstract contract Mode {

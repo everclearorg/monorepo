@@ -148,7 +148,7 @@ locals {
       "324" = {
         providers = [
           "https://zksync-mainnet.blastapi.io/${var.blast_key}",
-          "https://1rpc.io/zksync2-era"
+          "https://mainnet.era.zksync.io"
         ]
       }
       "137" = {
@@ -278,7 +278,7 @@ locals {
       "324" = {
         providers = [
           "https://zksync-mainnet.blastapi.io/${var.blast_key}",
-          "https://1rpc.io/zksync2-era"
+          "https://mainnet.era.zksync.io"
         ]
       }
       "137" = {
@@ -414,7 +414,7 @@ locals {
       "324" = {
         providers = [
           "https://zksync-mainnet.blastapi.io/${var.blast_key}",
-          "https://1rpc.io/zksync2-era"
+          "https://mainnet.era.zksync.io"
         ]
       }
       "137" = {
@@ -554,7 +554,8 @@ locals {
       130 = { maxAge = 60, size = 1 },
       324 = { maxAge = 60, size = 1 },
       534352 = { maxAge = 60, size = 1 },
-      167000 = { maxAge = 60, size = 1 }
+      167000 = { maxAge = 60, size = 1 },
+      2020 = { maxAge = 60, size = 1 }
       # 33139 = { maxAge = 60, size = 1 }
     }
     hub = {
@@ -615,7 +616,7 @@ locals {
       "324" = {
         providers = [
           "https://zksync-mainnet.blastapi.io/${var.blast_key}",
-          "https://1rpc.io/zksync2-era"
+          "https://mainnet.era.zksync.io"
         ]
       }
       "137" = {

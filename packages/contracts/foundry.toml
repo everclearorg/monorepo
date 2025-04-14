@@ -19,7 +19,7 @@ fs_permissions = [
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-optimism.json" },
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-base.json" },
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-bnb.json" }
-    ]
+]
 
 [profile.optimized]
 via_ir = true

@@ -23,7 +23,7 @@ abstract contract DefaultValues {
     uint256 constant BUFFER_DBPS = 10_000; // 10%
 
     ///////////////////// ACCOUNTS /////////////////////////
-    address public constant OWNER = 0xeb19B3Bdad53A775EB2d94d57D5a46c5260B0044;
+    address public constant OWNER = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
     address public constant ADMIN = 0xbBc0a29458eD4b2d489F2B564fE482C9086006F6;
     address public constant LIGHTHOUSE = 0x68F44CD6b4cd9c4F723E00b1734E667bfaF72042;
     address public constant WATCHTOWER = 0xc687BadC2CD8Da70eCACC748D6c27D06115a7de6;

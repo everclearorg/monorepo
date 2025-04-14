@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   OriginIntent,
   DestinationIntent,
@@ -171,7 +172,7 @@ export function settlementIntentFromIntent(intent: intents.JSONSelectable): Sett
     txNonce: +intent.settlement_tx_nonce!,
     gasLimit: String(intent.settlement_gas_limit),
     gasPrice: String(intent.settlement_gas_price),
-  }
+  };
 }
 
 export function toSettlementIntents(settlementIntent: SettlementIntent): settlement_intents.Insertable {
@@ -314,9 +315,15 @@ export function fromHubIntent(hubIntent: hub_intents.JSONSelectable): HubIntent 
     addedTxNonce: hubIntent.added_tx_nonce ? +hubIntent.added_tx_nonce : undefined,
     filledTimestamp: hubIntent.filled_timestamp ? +hubIntent.filled_timestamp : undefined,
     filledTxNonce: hubIntent.filled_tx_nonce ? +hubIntent.filled_tx_nonce : undefined,
-    settlementEnqueuedTimestamp: hubIntent.settlement_enqueued_timestamp ? +hubIntent.settlement_enqueued_timestamp : undefined,
-    settlementEnqueuedTxNonce: hubIntent.settlement_enqueued_tx_nonce ? +hubIntent.settlement_enqueued_tx_nonce : undefined,
-    settlementEnqueuedBlockNumber: hubIntent.settlement_enqueued_block_number ? +hubIntent.settlement_enqueued_block_number : undefined,
+    settlementEnqueuedTimestamp: hubIntent.settlement_enqueued_timestamp
+      ? +hubIntent.settlement_enqueued_timestamp
+      : undefined,
+    settlementEnqueuedTxNonce: hubIntent.settlement_enqueued_tx_nonce
+      ? +hubIntent.settlement_enqueued_tx_nonce
+      : undefined,
+    settlementEnqueuedBlockNumber: hubIntent.settlement_enqueued_block_number
+      ? +hubIntent.settlement_enqueued_block_number
+      : undefined,
     settlementEpoch: hubIntent.settlement_epoch ? +hubIntent.settlement_epoch : undefined,
     updateVirtualBalance: hubIntent.update_virtual_balance ?? undefined,
   };
@@ -357,12 +364,10 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       nonce: +invoice.origin_nonce!,
       data: invoice.origin_data ?? '0x',
       ttl: +invoice.origin_ttl!,
-      nativeFee: invoice.origin_native_fee ?? undefined,
+nativeFee: invoice.origin_native_fee ?? undefined,
       tokenFee: invoice.origin_token_fee ?? undefined,
       feeAdapterInitiator: invoice.origin_fee_adapter_initiator ?? undefined,
       orderId: invoice.origin_order_id ?? undefined,
-
-
       transactionHash: invoice.origin_transaction_hash!,
       timestamp: +invoice.origin_timestamp!,
       blockNumber: +invoice.origin_block_number!,
@@ -381,7 +386,7 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
     hubInvoiceEnqueuedTxNonce: +invoice.hub_invoice_enqueued_tx_nonce!,
     hubStatus: invoice.hub_status as TIntentStatus,
     hubSettlementEpoch: invoice.hub_settlement_epoch ? +invoice.hub_settlement_epoch : undefined,
-  }
+  };
 }
 
 export function fromHubInvoices(hubInvoice: hub_invoices.JSONSelectable): HubInvoice {
@@ -427,7 +432,7 @@ export function fromMessages(message: messages.JSONSelectable): Message {
     type: message.type,
     domain: message.domain,
     originDomain: message.domain,
-    destinationDomain: message.destination_domain ?? "",
+    destinationDomain: message.destination_domain ?? '',
     quote: message.quote ?? undefined,
     first: +message.first,
     last: +message.last,
@@ -591,7 +596,7 @@ export function fromMerkleTree(merkleTree: merkle_trees.JSONSelectable): MerkleT
     merkleTree: merkleTree.merkle_tree,
     root: merkleTree.root,
     proof: merkleTree.proof,
-  }
+  };
 }
 
 export function toMerkleTree(merkleTree: MerkleTree): merkle_trees.Insertable {
@@ -604,10 +609,7 @@ export function toMerkleTree(merkleTree: MerkleTree): merkle_trees.Insertable {
   };
 }
 
-export function fromVote(vote: {
-  domain: number | `${number}`;
-  voteCount: any;
-}): Vote {
+export function fromVote(vote: { domain: number | `${number}`; voteCount: any }): Vote {
   return {
     domain: +vote.domain,
     votes: vote.voteCount,
@@ -635,7 +637,7 @@ export function toReward(reward: Reward): rewards.Insertable {
     protocol_rewards: reward.protocolRewards,
     cumulative_rewards: reward.cumulativeRewards,
     epoch_timestamp: db.toString(reward.epochTimestamp, 'timestamp:UTC'),
-  }
+  };
 }
 
 export function toEpochResult(epochResult: EpochResult): epoch_results.Insertable {
@@ -647,10 +649,12 @@ export function toEpochResult(epochResult: EpochResult): epoch_results.Insertabl
     clear_emissions: epochResult.clearEmissions,
     cumulative_rewards: epochResult.cumulativeRewards,
     epoch_timestamp: db.toString(epochResult.epochTimestamp, 'timestamp:UTC'),
-  }
+  };
 }
 
-export function fromNewLockPositionEvent(newLockPosition: tokenomics.new_lock_position.JSONSelectable): NewLockPositionEvent {
+export function fromNewLockPositionEvent(
+  newLockPosition: tokenomics.new_lock_position.JSONSelectable,
+): NewLockPositionEvent {
   return {
     vid: +newLockPosition.vid,
     // the database format is in `\\x00000000000000000000000039096a17ba70fe5c1eddb923f940b2e6deae5c3b`

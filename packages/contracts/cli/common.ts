@@ -89,6 +89,10 @@ export async function chooseAccount(): Promise<string> {
     .filter((key) => /^0x[a-fA-F0-9]{64}$/.test(process.env[key] as string))
     .map((key) => key);
 
+  if (accounts.length === 0) {
+    throw new Error(`No available keys, please update .env`);
+  }
+
   return await select({
     message: 'Select account to broadcast from',
     choices: accounts.map((x) => ({ name: x, value: x })),

@@ -211,9 +211,8 @@ contract SpokeSolanaCompatibilityUpgradeTest is BaseTest, UpgradeHelper {
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(spokeProxyV3), _amount);
 
-    (bytes32 _intentId,) = spokeProxyV3.newIntent(
-      destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00'
-    );
+    (bytes32 _intentId,) =
+      spokeProxyV3.newIntent(destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00');
 
     assertEq(uint8(spokeProxyV3.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
 
