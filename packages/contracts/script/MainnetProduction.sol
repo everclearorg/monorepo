@@ -401,6 +401,7 @@ abstract contract Gnosis {
   IEverclearSpoke public GNOSIS_SPOKE = IEverclearSpoke(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
   ISpokeGateway public GNOSIS_SPOKE_GATEWAY = ISpokeGateway(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   ICallExecutor public GNOSIS_EXECUTOR = ICallExecutor(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
+  IXERC20Module public GNOSIS_XERC20_MODULE = IXERC20Module(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
   address public GNOSIS_SPOKE_IMPL = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
 
   // Fee adapter constants
@@ -471,8 +472,8 @@ abstract contract Ink {
 abstract contract Solana {
   uint32 public constant SOLANA = 1_399_811_149;
 
-  bytes32 public SOLANA_SPOKE;
-  bytes32 public SOLANA_SPOKE_GATEWAY;
+  bytes32 public SOLANA_SPOKE = 0xe7d6ce702e5272e3b7013b6ec6eb755c08b8597d3b63bc6a4aa1a49118e9d194;
+  bytes32 public SOLANA_SPOKE_GATEWAY = 0xe7d6ce702e5272e3b7013b6ec6eb755c08b8597d3b63bc6a4aa1a49118e9d194;
 }
 
 abstract contract MainnetProductionDomains is
@@ -636,6 +637,10 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: INK, blockGasLimit: 30_000_000, gateway: address(INK_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: SOLANA, blockGasLimit: 48_000_000, gateway: SOLANA_SPOKE_GATEWAY})
     );
   }
 }
