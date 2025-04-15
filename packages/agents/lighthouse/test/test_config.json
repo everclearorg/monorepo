@@ -76,6 +76,7 @@
         "fallbackHandlerAddress": "blahblah"
     },
     "solana": {
-        "signer": "blahblah"
+        "signer": "blahblah",
+        "spokeAddress": "blahblah"
     }
 }

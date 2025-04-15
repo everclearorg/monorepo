@@ -520,6 +520,9 @@ locals {
       maxTokenomicsExportDelay = 1800
       maxTokenomicsExportLatency = 10
     }
+    solana = {
+      spokeAddress = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
+    }
   })
 
   local_lighthouse_config = jsonencode({
@@ -715,6 +718,7 @@ locals {
     }
     solana = {
       signer = var.solana_signer
+      spokeAddress = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
     }
   })
 }
