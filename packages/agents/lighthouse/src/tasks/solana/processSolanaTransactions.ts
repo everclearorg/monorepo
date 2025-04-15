@@ -3,6 +3,8 @@ import { getContext } from '../../context';
 import * as anchor from '@coral-xyz/anchor';
 import idlFile from '../../idl/everclear_spoke.json';
 
+const MAX_RETRIES = 60;
+
 /**
  * @notice Processes Solana settlements by collecting them from the database and submitting
  * them to the Solana network through chainservice.
@@ -95,7 +97,30 @@ export const processSolanaTransactions = async () => {
         .instruction(),
     );
 
-    await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer]);
+    for (let retryCount = 0; retryCount < MAX_RETRIES; retryCount++) {
+      try {
+        await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer]);
+        break; // Success, exit the loop
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.debug(`Transaction failed (attempt ${retryCount + 1}/${MAX_RETRIES})`, requestContext, methodContext, {
+          error: errorMessage,
+          intentId: settlement.intentId,
+        });
+
+        if (retryCount === MAX_RETRIES - 1) {
+          logger.error(`Failed to send transaction after ${MAX_RETRIES} attempts`, requestContext, methodContext, {
+            message: `Failed to process intent ${settlement.intentId}`,
+            type: 'TransactionError',
+            context: { intentId: settlement.intentId },
+          });
+          throw error;
+        }
+
+        // Wait a bit before retrying
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
 
     settlement.status = TIntentStatus.Settled;
   }
