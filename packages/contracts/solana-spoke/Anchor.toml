@@ -1,0 +1,61 @@
+[toolchain]
+anchor_version = "0.31.0"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.mainnet]
+everclear_spoke = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm" #mainnet-prod
+# everclear_spoke = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw" # mainnet-staging
+
+[programs.localnet]
+everclear_spoke = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+
+[test]
+startup_wait = 100000
+
+[test.validator]
+url = "https://api.mainnet-beta.solana.com"
+
+# hyperlane mailbox
+[[test.validator.clone]]
+address = "E588QtVUvresuXq2KoNEwAmoifCzYGpRBdHByN9KQMbi"
+
+# hyperlane mailbox pda
+[[test.validator.clone]]
+address = "FFicpnbYxbbPE9j91w7DxdybZJ4uPyRe2k7PmgQ8RaQk"
+
+# hyperlane IGP
+[[test.validator.clone]]
+address = "BhNcatUDC2D5JTyeaqrdSukiVFsEHK7e3hVmKMztwefv"
+
+# hyperlane IGP pda
+[[test.validator.clone]]
+address = "G9Nhfm7TARpeU9zTjeYhzR4C9C3QymsAFqvkaSTiEiJS"
+
+# configured igp account
+[[test.validator.clone]]
+address = "JAvHW21tYXE9dtdG83DReqU2b4LUexFuCbtJT5tF8X6M"
+
+# inner igp account
+[[test.validator.clone]]
+address = "AkeHBbE5JkwVppujCQQ6WuxsVsJtruBAjUo6fDCFp6fF"
+
+# spl_noop
+[[test.validator.clone]]
+address = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
+
+# spl_noop pda
+[[test.validator.clone]]
+address = "3RHkdjCwWyK2firrwFQGvXCxbUpBky1GTmb9EDK9hUnX"

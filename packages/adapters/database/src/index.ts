@@ -83,6 +83,8 @@ import {
   saveLockPositions,
   saveOrders,
   getOrders,
+  getOriginIntentsLastNonce,
+  getDeliveredSettlements,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
@@ -260,6 +262,8 @@ export type Database = {
   ) => Promise<void>;
   saveOrders: (orders: Order[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   getOrders: (orderIds: string[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<Order[]>;
+  getOriginIntentsLastNonce: (origin: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
+  getDeliveredSettlements: (domain: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<SettlementIntent[]>;
 };
 
 export let pool: Pool;
@@ -329,6 +333,8 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     saveLockPositions,
     saveOrders,
     getOrders,
+    getOriginIntentsLastNonce,
+    getDeliveredSettlements,
   };
 };
 

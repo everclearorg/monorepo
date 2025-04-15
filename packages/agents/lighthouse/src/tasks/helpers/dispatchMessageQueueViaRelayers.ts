@@ -7,12 +7,13 @@ import {
   domainToChainId,
   jsonifyError,
   getNtpTimeSeconds,
+  SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 import { Interface, arrayify, keccak256, defaultAbiCoder } from 'ethers/lib/utils';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 import { getContext } from '../../context';
 import { getQueueMethodName, getTypeHash } from './getMessageQueueConstants';
-import { RelayerSendFailed } from '../../errors/tasks';
+import { RelayerSendFailed } from '../../errors';
 import { BigNumber } from 'ethers';
 
 const DEFAULT_SIGNATURE_TTL = 60 * 60; // 60 minutes
@@ -30,6 +31,8 @@ const DESTINATION_GAS_CONSUMPTION: Record<QueueType, number> = {
 // NOTE: When sending messages from hub, may hit the gas limit on the origin if the destination chain
 // has a higher gas limit. These values are derived from forge.
 const MAX_SETTLEMENT_DEQUEUE = 900;
+// Solana settlement message is limited because of the 1kb tx size limit.
+const MAX_SETTLEMENT_DEQUEUE_SOLANA = 1;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
@@ -87,7 +90,12 @@ export const dispatchMessageQueueViaRelayers = async (
     .div(BPS_DENOMINATOR + DEFAULT_GAS_BUFFER)
     .sub(BASE_GAS);
   const calculatedMax = gasAvailable.div(DESTINATION_GAS_CONSUMPTION[type]).toNumber();
-  const maxDequeue = type === QueueType.Settlement ? Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE) : calculatedMax;
+  const maxDequeue =
+    type === QueueType.Settlement
+      ? destinationDomain === SOLANA_CHAINID
+        ? Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE_SOLANA)
+        : Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE)
+      : calculatedMax;
 
   if (maxDequeue === 0) {
     logger.warn('Unable to retrieve max dequeue elements', requestContext, methodContext, {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   OriginIntent,
   DestinationIntent,
@@ -367,7 +368,6 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       tokenFee: invoice.origin_token_fee ?? undefined,
       feeAdapterInitiator: invoice.origin_fee_adapter_initiator ?? undefined,
       orderId: invoice.origin_order_id ?? undefined,
-
       transactionHash: invoice.origin_transaction_hash!,
       timestamp: +invoice.origin_timestamp!,
       blockNumber: +invoice.origin_block_number!,

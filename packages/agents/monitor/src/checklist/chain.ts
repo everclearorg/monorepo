@@ -12,7 +12,10 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
   const { requestContext, methodContext } = createLoggingContext(checkChains.name);
 
   const chainStatus = [];
-  const domains = [...Object.keys(config.chains), config.hub.domain];
+  const domains = [
+    ...Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm'),
+    config.hub.domain,
+  ];
   const subgraphBlockNumbers = await subgraph.getLatestBlockNumber(domains);
   const threshold = config.thresholds.maxDelayedSubgraphBlock ?? 0;
   for (const domainId of domains) {

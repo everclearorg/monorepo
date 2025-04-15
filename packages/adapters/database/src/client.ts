@@ -33,8 +33,6 @@ import type * as s from 'zapatos/schema';
 
 import { IntentMessageUpdate, pool } from './index';
 
-// This switches node-postgres’s JSON parsing to use the json-custom-numbers package,
-//  and return as strings any values that aren’t representable as a JS number.
 db.enableCustomJSONParsingForLargeNumbers(pg);
 
 export const saveOriginIntents = async (
@@ -829,4 +827,31 @@ export const getOrders = async (ids: string[], _pool?: Pool | db.TxnClientForRep
   const poolToUse = _pool ?? pool;
   const result = await db.select('orders', { id: db.conditions.isIn(ids.map((i) => i.toLowerCase())) }).run(poolToUse);
   return result.map(converters.fromOrders);
+};
+
+export const getOriginIntentsLastNonce = async (origin: string, _pool?: Pool | db.TxnClientForRepeatableRead) => {
+  const poolToUse = _pool ?? pool;
+  const result = await db
+    .select(
+      'origin_intents',
+      {
+        origin,
+      },
+      {
+        order: { by: 'nonce', direction: 'DESC' },
+        limit: 1,
+      },
+    )
+    .run(poolToUse);
+
+  return result && result.length ? converters.fromOriginIntent(result[0]).nonce : 0;
+};
+
+export const getDeliveredSettlements = async (
+  domain: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<SettlementIntent[]> => {
+  const poolToUse = _pool ?? pool;
+  const result = await db.select('settlement_intents', { status: TIntentStatus.Delivered, domain }).run(poolToUse);
+  return result.map(converters.fromSettlementIntents);
 };
