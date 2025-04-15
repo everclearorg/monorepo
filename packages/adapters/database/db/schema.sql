@@ -661,8 +661,7 @@ CREATE FUNCTION public.process_cpi_events() RETURNS trigger
 DECLARE
 	res BOOLEAN;
 BEGIN
-    IF NEW.accounts = '["HoUvmo3eC8gwMknYvyhto8S8iT8xZryUdErfXhawoHeG"]'
-           AND NEW.tx_status = 1 AND NEW.tx_err = 'null' THEN
+    IF NEW.tx_status = 1 AND NEW.tx_err = 'null' THEN
         res := parse_and_insert_cpi_event(NEW);
         IF res IS FALSE THEN
             RAISE WARNING 'Failed to parse and insert CPI event for transaction %', NEW.tx_signature;
@@ -4902,4 +4901,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250322012505'),
     ('20250325230805'),
     ('20250410040210'),
-    ('20250411120150');
+    ('20250411120150'),
+    ('20250415125459');
