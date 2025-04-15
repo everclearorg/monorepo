@@ -461,17 +461,17 @@ BEGIN
 	pos := pos + 64;
 	output_asset := '0x' || SUBSTRING(hex_data, pos, 64);
 	pos := pos + 64;
-	normalized_amount := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	normalized_amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
 	max_fee := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
 	origin_domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
-	nonce := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	nonce := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
-	ttl := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	ttl := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
-	timestamp := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	timestamp := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
 	destination_count := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
@@ -584,7 +584,7 @@ BEGIN
 	pos := pos + 64;
 	asset := '0x' || SUBSTRING(hex_data, pos, 64);
 	pos := pos + 64;
-	amount := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
 	domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
@@ -741,6 +741,19 @@ CREATE FUNCTION public.to_int(hex_str text) RETURNS integer
     AS $$
 BEGIN
     RETURN CAST(CAST(('x' || hex_str) AS bit(32)) AS INT);
+END;
+$$;
+
+
+--
+-- Name: to_numeric(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.to_numeric(hex_str text) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    RETURN ('0x' || hex_str)::numeric;
 END;
 $$;
 
@@ -4894,4 +4907,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250410040210'),
     ('20250411120150'),
     ('20250415125459'),
-    ('20250415163121');
+    ('20250415163121'),
+    ('20250415204003');
