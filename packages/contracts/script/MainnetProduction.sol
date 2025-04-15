@@ -116,6 +116,7 @@ abstract contract MainnetAssets {
   address public constant ARBITRUM_WBTC = 0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f;
   address public constant BASE_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
   address public constant BERACHAIN_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
+  address public constant MANTLE_WBTC = 0xCAbAE6f6Ea1ecaB08Ad02fE02ce9A44F09aebfA2;
 
   ///////////////////// FEE RECIPIENTS
   address public constant FEE_RECIPIENT = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;

@@ -36,7 +36,7 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](4);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](5);
 
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -65,11 +65,20 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Mantle
+    ///// Base
     _assetConfigs[3] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
       adopted: BASE_WBTC.toBytes32(),
       domain: BASE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Mantle
+    _assetConfigs[4] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MANTLE_WBTC.toBytes32(),
+      domain: MANTLE,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
