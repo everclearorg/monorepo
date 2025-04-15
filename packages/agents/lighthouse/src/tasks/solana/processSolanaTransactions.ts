@@ -53,10 +53,10 @@ export const processSolanaTransactions = async () => {
   );
   const connection = new anchor.web3.Connection(chainConfig.providers[0]);
   const wallet = new anchor.Wallet(signer);
-  const provider = new anchor.AnchorProvider(connection, wallet);
+  const provider = new anchor.AnchorProvider(connection, wallet, { commitment: 'confirmed' });
   const spokeAddress = new anchor.web3.PublicKey(solana.spokeAddress);
   const spokeIdl = await anchor.Program.fetchIdl(spokeAddress, provider);
-  const spoke = new anchor.Program(spokeIdl as anchor.Idl, provider) as unknown as anchor.Program<EverclearSpoke>;
+  const spoke = new anchor.Program(JSON.parse(JSON.stringify(spokeIdl)), provider) as anchor.Program<EverclearSpoke>;
 
   // Process settlements
   for (const settlement of settlements) {
