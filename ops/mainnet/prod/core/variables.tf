@@ -262,3 +262,8 @@ variable "lighthouse_solana_heartbeat" {
   type      = string
   sensitive = true
 }
+
+variable "solana_signer" {
+  type      = string
+  sensitive = true
+}

@@ -162,6 +162,7 @@ const MOCK_SAFE: SafeConfig = {
 
 const MOCK_SOLANA: SolanaConfig = {
   signer: mkBytes32('0xcccc'),
+  spokeAddress: mkBytes32('0xdddd'),
 };
 
 const MOCK_ENV = {

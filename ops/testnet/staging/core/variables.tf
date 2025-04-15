@@ -239,3 +239,8 @@ variable "coingecko_api_key" {
   sensitive = true
   default = "neverclear"
 }
+
+variable "solana_signer" {
+  type      = string
+  sensitive = true
+}

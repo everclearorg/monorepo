@@ -20,6 +20,7 @@ import {
   Invoice,
   ShadowEvent,
   TokenomicsEvent,
+  SolanaConfig,
 } from '@chimera-monorepo/utils';
 import { ChainReader, ReadTransaction } from '@chimera-monorepo/chainservice';
 import { MonitorConfig } from '../src/types';
@@ -162,12 +163,18 @@ const MOCK_DISCORD = { url: 'https://discord.com' };
 const MOCK_AGENTS = { router: 'http://router:8080' };
 const MOCK_HEALTH_URLS = {};
 
+const MOCK_SOLANA: SolanaConfig = {
+  signer: mkBytes32('0xcccc'),
+  spokeAddress: mkBytes32('0xdddd'),
+};
+
 const MOCK_ENV = {
   MONITOR_LOG_LEVEL: 'info',
   MONITOR_CONFIG: JSON.stringify({
     chains: MOCK_CHAINS,
     hub: MOCK_HUB,
     database: MOCK_DATABASE,
+    solana: MOCK_SOLANA,
   }),
   EVERCLEAR_CONFIG: 'https://raw.githubusercontent.com/connext/chaindata/main/everclear.testnet.json',
 };
@@ -254,6 +261,7 @@ export const mock = {
       healthUrls: MOCK_HEALTH_URLS,
       shadowTables: MOCK_SHADOW_TABLES,
       tokenomicsTables: MOCK_TOKENOMICS_TABLES,
+      solana: MOCK_SOLANA,
       ...overrides,
     };
   },

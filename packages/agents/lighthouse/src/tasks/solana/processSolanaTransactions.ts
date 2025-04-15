@@ -45,6 +45,11 @@ export const processSolanaTransactions = async () => {
   // Set up Solana provider with mainnet connection
   const connection = new anchor.web3.Connection(chainConfig.providers[0]);
 
+  if (!solana.signer) {
+    logger.info('Solana signer is not set', requestContext, methodContext);
+    return;
+  }
+
   const signer = anchor.web3.Keypair.fromSecretKey(
     new Uint8Array(
       solana.signer
@@ -67,13 +72,14 @@ export const processSolanaTransactions = async () => {
 
   const spoke = new anchor.Program(idl, provider) as anchor.Program<EverclearSpoke>;
 
+
   // Process settlements
   for (const settlement of settlements) {
     logger.debug('Settling intent', requestContext, methodContext, { intentId: settlement.intentId });
     const intentId = Buffer.from(settlement.intentId.slice(2), 'hex');
     const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('everclear_spoke'), Buffer.from('-'), Buffer.from('intent_status'), intentId],
-      spoke.programId,
+      spokeAddress,
     );
 
     const intentStatus = await spoke.account.intentStatusAccount.fetch(intentStatusPda);
