@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 /// A borsh-serializable version of `AccountMeta`.
-#[derive(Debug, AnchorSerialize, AnchorDeserialize)]
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct SerializableAccountMeta {
     pub pubkey: Pubkey,
     pub is_signer: bool,

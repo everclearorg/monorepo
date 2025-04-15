@@ -9,6 +9,7 @@ import {
   TThresholdsConfig,
   TRelayerConfig,
   TLogLevel,
+  TSolanaConfig,
 } from '@chimera-monorepo/utils';
 
 export enum CheckItem {
@@ -82,6 +83,7 @@ export const TMonitorConfigSchema = Type.Object({
   healthUrls: Type.Partial(Type.Record(TService, Type.String({ format: 'uri' }))),
   shadowTables: Type.Optional(Type.Array(Type.String())),
   tokenomicsTables: Type.Optional(Type.Array(Type.String())),
+  solana: TSolanaConfig,
 });
 export type MonitorConfig = Static<typeof TMonitorConfigSchema>;
 export type TelegramConfig = Static<typeof TMonitorConfigSchema>['telegram'];

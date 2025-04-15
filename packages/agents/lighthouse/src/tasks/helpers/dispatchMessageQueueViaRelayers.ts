@@ -31,8 +31,8 @@ const DESTINATION_GAS_CONSUMPTION: Record<QueueType, number> = {
 // NOTE: When sending messages from hub, may hit the gas limit on the origin if the destination chain
 // has a higher gas limit. These values are derived from forge.
 const MAX_SETTLEMENT_DEQUEUE = 900;
-// Solana settlement message is limited to 2 intents because of the 1kb tx size limit.
-const MAX_SETTLEMENT_DEQUEUE_SOLANA = 2;
+// Solana settlement message is limited because of the 1kb tx size limit.
+const MAX_SETTLEMENT_DEQUEUE_SOLANA = 1;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;

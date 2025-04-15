@@ -24,6 +24,13 @@ COMMENT ON EXTENSION pg_cron IS 'Job scheduler for PostgreSQL';
 
 
 --
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+-- *not* creating schema, since initdb creates it
+
+
+--
 -- Name: shadow; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -65,7 +72,8 @@ CREATE TYPE public.intent_status AS ENUM (
     'DISPATCHED_HUB',
     'SETTLED_AND_COMPLETED',
     'ADDED_SPOKE',
-    'ADDED_HUB'
+    'ADDED_HUB',
+    'DELIVERED'
 );
 
 
@@ -311,28 +319,109 @@ DECLARE
     expected_cpi_disc TEXT := 'e445a52e51cb9a1d';
     new_intent_disc TEXT := '1263e45a565b315d';
     settled_disc TEXT := '75cfc4aec5c80b43';
+    delivered_disc TEXT := 'aadd51debc47162f';
     cpi_disc TEXT;
     ivent_disc TEXT;
-	pos INT := 1;
+    pos INT := 1;
 BEGIN
     hex_data := to_hex(base58_decode(rec.data));
 
-	cpi_disc := SUBSTRING(hex_data, pos, 16);
-	pos := pos + 16;
-	IF cpi_disc != expected_cpi_disc THEN
-		RAISE WARNING 'invalid CPI discriminator %, expected %', cpi_disc, expected_cpi_disc;
-		RETURN FALSE;
-	END IF;
+    cpi_disc := SUBSTRING(hex_data, pos, 16);
+    pos := pos + 16;
+    IF cpi_disc != expected_cpi_disc THEN
+        RAISE WARNING 'invalid CPI discriminator %, expected %', cpi_disc, expected_cpi_disc;
+        RETURN FALSE;
+    END IF;
 
-	ivent_disc := SUBSTRING(hex_data, pos, 16);
-	pos := pos + 16;
-	IF ivent_disc = new_intent_disc THEN
-		RETURN parse_and_insert_new_intent_cpi_event(hex_data, rec);
-	ELSIF ivent_disc = settled_disc THEN
-		RETURN parse_and_insert_settled_cpi_event(hex_data, rec);
-	END IF;
+    ivent_disc := SUBSTRING(hex_data, pos, 16);
+    pos := pos + 16;
+    IF ivent_disc = new_intent_disc THEN
+        RETURN parse_and_insert_new_intent_cpi_event(hex_data, rec);
+    ELSIF ivent_disc = settled_disc THEN
+        RETURN parse_and_insert_settled_cpi_event(hex_data, rec);
+    ELSIF ivent_disc = delivered_disc THEN
+        RETURN parse_and_insert_delivered_cpi_event(hex_data, rec);
+    END IF;
 
     RETURN FALSE;
+END;$$;
+
+
+--
+-- Name: parse_and_insert_delivered_cpi_event(text, record); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.parse_and_insert_delivered_cpi_event(hex_data text, rec record) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    intent_id TEXT;
+    recipient TEXT;
+    asset TEXT;
+    domain INT;
+    pos INT := 33;
+BEGIN
+    domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
+    pos := pos + 8;
+    intent_id := '0x' || SUBSTRING(hex_data, pos, 64);
+    pos := pos + 64 + 64; -- skip amount
+    asset := '0x' || SUBSTRING(hex_data, pos, 64);
+    pos := pos + 64;
+    recipient := '0x' || SUBSTRING(hex_data, pos, 64);
+    pos := pos + 64;
+
+    INSERT INTO public.settlement_intents(
+        id,
+        amount,
+        asset,
+        recipient,
+        domain,
+        transaction_hash,
+        "timestamp",
+        block_number,
+        tx_origin,
+        tx_nonce,
+        auto_id,
+        gas_limit,
+        gas_price,
+        return_data,
+        status
+    )
+    VALUES (
+        intent_id,
+        0,
+        asset,
+        recipient,
+        domain,
+        '',
+        rec.block_timestamp,
+        rec.block_slot,
+        '',
+        0,
+        0,
+        rec.tx_fee,
+        1,
+        '0x',
+        'DELIVERED'
+    )
+    ON CONFLICT (id)
+        DO UPDATE SET
+            amount = EXCLUDED.amount,
+            asset = EXCLUDED.asset,
+            recipient = EXCLUDED.recipient,
+            domain = EXCLUDED.domain,
+            transaction_hash = EXCLUDED.transaction_hash,
+            "timestamp" = EXCLUDED."timestamp",
+            block_number = EXCLUDED.block_number,
+            tx_origin = EXCLUDED.tx_origin,
+            tx_nonce = EXCLUDED.tx_nonce,
+            auto_id = EXCLUDED.auto_id,
+            gas_limit = EXCLUDED.gas_limit,
+            gas_price = EXCLUDED.gas_price,
+            return_data = EXCLUDED.return_data,
+            status = EXCLUDED.status;
+
+    RETURN TRUE;
 END;$$;
 
 
@@ -2780,6 +2869,32 @@ CREATE TABLE public.tokens (
 
 
 --
+-- Name: solana_spoke_instructions; Type: TABLE; Schema: solana; Owner: -
+--
+
+CREATE TABLE solana.solana_spoke_instructions (
+    id text NOT NULL,
+    block_slot bigint,
+    block_hash text,
+    block_timestamp bigint,
+    tx_signature text,
+    tx_status bigint,
+    tx_index bigint,
+    tx_fee bigint,
+    tx_err text,
+    index bigint,
+    parent_index bigint,
+    accounts text,
+    data text,
+    program text,
+    program_id text,
+    instruction_type text,
+    params text,
+    parsed text
+);
+
+
+--
 -- Name: bridge_in_error; Type: TABLE; Schema: tokenomics; Owner: -
 --
 
@@ -3558,32 +3673,6 @@ CREATE TABLE tokenomics.withdraw_eth (
 
 
 --
--- Name: solana_spoke_instructions; Type: TABLE; Schema: solana; Owner: -
---
-
-CREATE TABLE solana.solana_spoke_instructions (
-    id text NOT NULL,
-    block_slot bigint,
-    block_hash text,
-    block_timestamp bigint,
-    tx_signature text,
-    tx_status bigint,
-    tx_index bigint,
-    tx_fee bigint,
-    tx_err text,
-    index bigint,
-    parent_index bigint,
-    accounts text,
-    data text,
-    program text,
-    program_id text,
-    instruction_type text,
-    params text,
-    parsed text
-);
-
-
---
 -- Name: destination_intents auto_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3958,6 +4047,14 @@ ALTER TABLE ONLY shadow.settlementqueueprocessed_17786ebb_73f6f386
 
 ALTER TABLE ONLY shadow.settlementsent_dac85f08_73f6f386
     ADD CONSTRAINT settlementsent_transaction_hash_transaction__key UNIQUE (transaction_hash, transaction_log_index);
+
+
+--
+-- Name: solana_spoke_instructions solana_spoke_instructions_pkey; Type: CONSTRAINT; Schema: solana; Owner: -
+--
+
+ALTER TABLE ONLY solana.solana_spoke_instructions
+    ADD CONSTRAINT solana_spoke_instructions_pkey PRIMARY KEY (id);
 
 
 --
@@ -4586,13 +4683,6 @@ CREATE INDEX settlementsent_timestamp_idx ON public.settlementsent USING btree (
 
 
 --
--- Name: reward_claimed_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
---
-
-CREATE INDEX reward_claimed_timestamp_idx ON tokenomics.reward_claimed USING btree (insert_timestamp);
-
-
---
 -- Name: destination_intents destination_intent_status_change_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -4698,10 +4788,10 @@ CREATE TRIGGER settlementsent_set_timestamp_and_latency BEFORE INSERT ON shadow.
 
 
 --
--- Name: reward_claimed reward_claimed_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
+-- Name: solana_spoke_instructions process_cpi_events_trigger; Type: TRIGGER; Schema: solana; Owner: -
 --
 
-CREATE TRIGGER reward_claimed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.reward_claimed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
+CREATE TRIGGER process_cpi_events_trigger BEFORE INSERT OR UPDATE ON solana.solana_spoke_instructions FOR EACH ROW EXECUTE FUNCTION public.process_cpi_events();
 
 
 --
@@ -4719,32 +4809,6 @@ ALTER TABLE ONLY public.balances
 ALTER TABLE ONLY public.origin_intents
     ADD CONSTRAINT origin_intents_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id);
 
-
---
--- Name: job cron_job_policy; Type: POLICY; Schema: cron; Owner: -
---
-
-CREATE POLICY cron_job_policy ON cron.job USING ((username = CURRENT_USER));
-
-
---
--- Name: job_run_details cron_job_run_details_policy; Type: POLICY; Schema: cron; Owner: -
---
-
-CREATE POLICY cron_job_run_details_policy ON cron.job_run_details USING ((username = CURRENT_USER));
-
-
---
--- Name: job; Type: ROW SECURITY; Schema: cron; Owner: -
---
-
-ALTER TABLE cron.job ENABLE ROW LEVEL SECURITY;
-
---
--- Name: job_run_details; Type: ROW SECURITY; Schema: cron; Owner: -
---
-
-ALTER TABLE cron.job_run_details ENABLE ROW LEVEL SECURITY;
 
 --
 -- PostgreSQL database dump complete
@@ -4836,4 +4900,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250108140315'),
     ('20250321152002'),
     ('20250322012505'),
-    ('20250325230805');
+    ('20250325230805'),
+    ('20250410040210'),
+    ('20250411120150');

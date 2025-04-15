@@ -64,4 +64,12 @@ pub enum SpokeError {
     InvalidSeeds,
     #[msg("Invalid vault account")]
     InvalidVaultAccount,
+    #[msg("Invalid intent pda")]
+    InvalidIntentPda,
+    #[msg("Invalid settlement size")]
+    InvalidSettlementSize,
+    #[msg("Incorrect settlement accounts, mismatch with intent PDA.")]
+    IncorrectSettlementAccounts,
+    #[msg("Invalid intent id")]
+    InvalidIntentId,
 }

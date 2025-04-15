@@ -1,9 +1,9 @@
+use crate::messages::MessageType;
 use crate::{
     consts::everclear_gateway,
     hyperlane::{
         transfer_remote, Igp, Mailbox, SplNoop, TransferRemote, TransferRemoteContext, U256,
     },
-    instructions::MessageType,
     vault_authority_pda_seeds,
 };
 use anchor_lang::prelude::*;
@@ -18,7 +18,6 @@ use crate::{
     events::IntentAddedEvent,
     intent::{encode_full, u64_to_u256_be, EVMIntent},
     state::SpokeState,
-    state::{IntentStatus, IntentStatusAccount},
     utils::{compute_intent_hash, normalize_decimals},
 };
 
@@ -89,7 +88,7 @@ pub fn new_intent(
     let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
     token::transfer(cpi_ctx, amount)?;
 
-    // Update global nonce and create intent_id
+    // Update global nonce and calculate intent id
     let new_nonce = state
         .nonce
         .checked_add(1)
@@ -119,12 +118,6 @@ pub fn new_intent(
     // Produce the EVM ABI message:
     // NOTE: message type should be
     let evm_encoded_message = encode_full(MessageType::Intent, &evm_intent);
-
-    // Also, record a minimal status mapping (we only record the intent_id and its status).
-    state.status.push(IntentStatusAccount {
-        key: intent_id,
-        status: IntentStatus::Added,
-    });
 
     // Build your TransferRemote
     let xfer = TransferRemote {
@@ -193,8 +186,7 @@ pub struct NewIntent<'info> {
         mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump,
-        realloc = 8 + std::mem::size_of::<SpokeState>() +
-            (std::mem::size_of::<IntentStatusAccount>() * (spoke_state.status.len() + 1)),
+        realloc = 8 + std::mem::size_of::<SpokeState>(),
         realloc::payer = authority,
         realloc::zero = false,
     )]
@@ -214,7 +206,7 @@ pub struct NewIntent<'info> {
     )]
     pub user_token_account: Account<'info, TokenAccount>,
 
-    // NOTE: validation of the program vauult account is done inside the call
+    // NOTE: validation of the program vault account is done inside the call
     #[account(mut)]
     pub program_vault_account: Account<'info, TokenAccount>,
 

@@ -364,7 +364,7 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       nonce: +invoice.origin_nonce!,
       data: invoice.origin_data ?? '0x',
       ttl: +invoice.origin_ttl!,
-nativeFee: invoice.origin_native_fee ?? undefined,
+      nativeFee: invoice.origin_native_fee ?? undefined,
       tokenFee: invoice.origin_token_fee ?? undefined,
       feeAdapterInitiator: invoice.origin_fee_adapter_initiator ?? undefined,
       orderId: invoice.origin_order_id ?? undefined,

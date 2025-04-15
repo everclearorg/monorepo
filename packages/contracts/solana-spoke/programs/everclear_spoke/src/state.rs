@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 
-use crate::hyperlane::InterchainGasPaymasterType;
+use crate::{
+    hyperlane::{InterchainGasPaymasterType, SerializableAccountMeta},
+    instructions::messages::Settlement,
+};
 
 /// SpokeState – global configuration.
 #[account]
@@ -15,16 +18,12 @@ pub struct SpokeState {
     // Addresses for key roles.
     pub lighthouse: Pubkey,
     pub watchtower: Pubkey,
-    pub call_executor: Pubkey,
-    pub message_receiver: Pubkey,
     // Message gas limit (stored, though not used on Solana).
     pub message_gas_limit: u64,
     // Global nonce for intents.
     pub nonce: u64,
     // Owner of the program (admin).
     pub owner: Pubkey,
-    // Intent status mapping.
-    pub status: Vec<IntentStatusAccount>,
     // Bump for PDA.
     pub bump: u8,
     // Mailbox address
@@ -44,11 +43,10 @@ impl SpokeState {
         + 1                      // initialized_version: u8
         + 4                      // domain: u32
         + 4                      // everclear: u32
-        + 32 * 4                 // 5 Pubkeys
+        + 32 * 2                 // 2 Pubkeys
         + 8                      // message_gas_limit: u64
         + 8                      // nonce: u64
         + 32                     // owner: Pubkey
-        + 4                      // status HashMap
         + 1                      // bump: u8
         + 32                     // mailbox: Pubkey
         + 1                      // mailbox_dispatch_authority_bump: u8
@@ -60,8 +58,16 @@ impl SpokeState {
 
 #[account]
 pub struct IntentStatusAccount {
-    pub key: [u8; 32],
     pub status: IntentStatus,
+    pub accounts: Vec<SerializableAccountMeta>,
+    pub settlement: Option<Settlement>,
+}
+
+impl IntentStatusAccount {
+    pub const SIZE: usize = 1 // IntentStatus
+        + 136 // Option<Settlement>
+        + 24 // accounts: Vec<SerializableAccountMeta>
+    ;
 }
 
 /// Intent status.
@@ -72,4 +78,5 @@ pub enum IntentStatus {
     Filled,
     Settled,
     SettledAndManuallyExecuted,
+    Delivered,
 }

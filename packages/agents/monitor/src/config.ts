@@ -205,6 +205,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     healthUrls: process.env.MONITOR_HEALTH_URLS || configJson.healthUrls || configFile.healthUrls || {},
     shadowTables: configJson.shadowTables || configFile.shadowTables || DefaultShadowTables,
     tokenomicsTables: configJson.tokenomicsTables || configFile.tokenomicsTables || DefaultTokenomicsTables,
+    solana: configJson?.solana || configFile?.solana || {},
   };
 
   const validate = ajv.compile(TMonitorConfigSchema);

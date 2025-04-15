@@ -788,15 +788,15 @@ DROP MATERIALIZED VIEW IF EXISTS public.daily_metrics_by_date;
 DROP MATERIALIZED VIEW IF EXISTS public.invoices;
 DROP MATERIALIZED VIEW IF EXISTS public.intents;
 
--- Drop the orders table
-DROP TABLE IF EXISTS orders;
-
 -- Remove the fee columns and order_id from origin_intents
 ALTER TABLE origin_intents
 DROP COLUMN IF EXISTS native_fee,
 DROP COLUMN IF EXISTS token_fee,
 DROP COLUMN IF EXISTS fee_adapter_initiator,
 DROP COLUMN IF EXISTS order_id;
+
+-- Drop the orders table
+DROP TABLE IF EXISTS orders;
 
 -- Recreate the original materialized view without the fee columns
 CREATE MATERIALIZED VIEW public.intents AS

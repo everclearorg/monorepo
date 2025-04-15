@@ -1,7 +1,6 @@
-import { createLoggingContext, SOLANA_CHAINID } from '@chimera-monorepo/utils';
+import { createLoggingContext, SOLANA_CHAINID, EverclearSpoke } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { NoProvidersConfigured, UnableToGetSpokeState } from '../types';
-import { EverclearSpoke } from './types/solana_spoke';
 import * as anchor from '@coral-xyz/anchor';
 
 export const getLastSolanaIntentNonce = async (): Promise<number> => {
@@ -15,16 +14,20 @@ export const getLastSolanaIntentNonce = async (): Promise<number> => {
     });
   }
 
-  for (const provider of providers) {
-    anchor.setProvider(anchor.AnchorProvider.local(provider));
-    const program = anchor.workspace.EverclearSpoke as anchor.Program<EverclearSpoke>;
+  for (const providerUrl of providers) {
+    const connection = new anchor.web3.Connection(providerUrl);
+    const wallet = new anchor.Wallet(anchor.web3.Keypair.generate());
+    const provider = new anchor.AnchorProvider(connection, wallet);
+    const spokeAddress = new anchor.web3.PublicKey(config.solana.spokeAddress);
+    const spokeIdl = await anchor.Program.fetchIdl(spokeAddress, provider);
+    const spoke = new anchor.Program(spokeIdl as anchor.Idl, provider) as unknown as anchor.Program<EverclearSpoke>;
     const [spokeStateAddress] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('spoke-state')],
-      program.programId,
+      spokeAddress,
     );
 
     try {
-      const spokeState = await program.account.spokeState.fetch(spokeStateAddress);
+      const spokeState = await spoke.account.spokeState.fetch(spokeStateAddress);
       return spokeState.nonce.toNumber();
     } catch (error) {
       logger.warn('Solana spoke state fetching failed', requestContext, methodContext, {

@@ -15,8 +15,8 @@ import {
   mkBytes32,
   mkHash,
   RequestContext,
-  SafeConfig,
-} from '@chimera-monorepo/utils';
+  SafeConfig, SolanaConfig
+} from "@chimera-monorepo/utils";
 import { ChainService, ReadTransaction, WriteTransaction } from '@chimera-monorepo/chainservice';
 import { Environment, LighthouseConfig, LighthouseService } from '../src/config';
 import { Database } from '@chimera-monorepo/database';
@@ -160,6 +160,11 @@ const MOCK_SAFE: SafeConfig = {
   fallbackHandlerAddress: mkBytes32('0xbbbb'),
 };
 
+const MOCK_SOLANA: SolanaConfig = {
+  signer: mkBytes32('0xcccc'),
+  spokeAddress: mkBytes32('0xdddd'),
+};
+
 const MOCK_ENV = {
   LIGHTHOUSE_LOG_LEVEL: 'info',
   LIGHTHOUSE_ENVIRONMENT: 'staging',
@@ -172,6 +177,7 @@ const MOCK_ENV = {
     database: MOCK_DATABASE,
     relayers: MOCK_RELAYERS,
     safe: MOCK_SAFE,
+    solana: MOCK_SOLANA,
   }),
   EVERCLEAR_CONFIG: 'https://raw.githubusercontent.com/connext/chaindata/main/everclear.testnet.json',
 };
@@ -284,6 +290,7 @@ export const mock = {
       rewards: MOCK_REWARDS,
       coingecko: MOCK_COINGECKO,
       safe: MOCK_SAFE,
+      solana: MOCK_SOLANA,
       ...overrides,
     };
   },
