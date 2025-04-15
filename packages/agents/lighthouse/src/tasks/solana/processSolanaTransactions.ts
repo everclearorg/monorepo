@@ -71,7 +71,6 @@ export const processSolanaTransactions = async () => {
   }
 
   const spoke = new anchor.Program(idl, provider) as anchor.Program<EverclearSpoke>;
-  const spokeAddress = new anchor.web3.PublicKey(solana.spokeAddress!);
 
   // Process settlements
   for (const settlement of settlements) {
@@ -79,7 +78,7 @@ export const processSolanaTransactions = async () => {
     const intentId = Buffer.from(settlement.intentId.slice(2), 'hex');
     const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('everclear_spoke'), Buffer.from('-'), Buffer.from('intent_status'), intentId],
-      spokeAddress,
+      spokeProgramId,
     );
 
     const intentStatus = await spoke.account.intentStatusAccount.fetch(intentStatusPda);
@@ -103,30 +102,7 @@ export const processSolanaTransactions = async () => {
         .instruction(),
     );
 
-    for (let retryCount = 0; retryCount < MAX_RETRIES; retryCount++) {
-      try {
-        await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer]);
-        break; // Success, exit the loop
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        logger.debug(`Transaction failed (attempt ${retryCount + 1}/${MAX_RETRIES})`, requestContext, methodContext, {
-          error: errorMessage,
-          intentId: settlement.intentId,
-        });
-
-        if (retryCount === MAX_RETRIES - 1) {
-          logger.error(`Failed to send transaction after ${MAX_RETRIES} attempts`, requestContext, methodContext, {
-            message: `Failed to process intent ${settlement.intentId}`,
-            type: 'TransactionError',
-            context: { intentId: settlement.intentId },
-          });
-          throw error;
-        }
-
-        // Wait a bit before retrying
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-    }
+    await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer], { maxRetries: MAX_RETRIES });
 
     settlement.status = TIntentStatus.Settled;
   }
