@@ -90,7 +90,7 @@ export const IntentSchema = Type.Object({
 export type Intent = Static<typeof IntentSchema>;
 
 export const OnchainTransactionContextSchema = Type.Object({
-  transactionHash: Type.String({ maxLength: 66 }),
+  transactionHash: Type.String({ maxLength: 130 }),
   blockNumber: Type.Integer(),
   gasLimit: TIntegerString,
   gasPrice: TIntegerString,
