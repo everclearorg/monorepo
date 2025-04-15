@@ -143,11 +143,6 @@ locals {
           "https://api.roninchain.com/rpc",
           "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
-      },
-      "1399811149" = {
-        providers = [
-          "https://api.mainnet-beta.solana.com"
-        ]
       }
     }
   })
