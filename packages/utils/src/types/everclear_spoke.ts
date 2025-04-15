@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/everclear_spoke.json`.
  */
 export type EverclearSpoke = {
-  "address": "4Q68Tz8X42zvTBPuxJD9BosXhtx94cLXWZCUFpGPNfwL",
+  "address": "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm",
   "metadata": {
     "name": "everclearSpoke",
     "version": "0.1.0",
