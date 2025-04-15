@@ -11,6 +11,7 @@ locals {
   lighthouse_invoice_config_param_name = "lighthouse-invoice-${var.environment}-${var.stage}-config"
   lighthouse_reward_config_param_name = "lighthouse-reward-${var.environment}-${var.stage}-config"
   lighthouse_reward_metadata_config_param_name = "lighthouse-reward_metadata-${var.environment}-${var.stage}-config"
+  lighthouse_solana_config_param_name = "lighthouse-solana-${var.environment}-${var.stage}-config"
   monitor_poller_config_param_name = "monitor-poller-${var.environment}-${var.stage}-config"
 
   relayer_env_vars = [
@@ -519,6 +520,9 @@ locals {
       maxTokenomicsExportDelay = 1800
       maxTokenomicsExportLatency = 10
     }
+    solana = {
+      spokeAddress = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
+    }
   })
 
   local_lighthouse_config = jsonencode({
@@ -678,6 +682,7 @@ locals {
       invoice          = "${var.lighthouse_invoice_heartbeat}"
       reward           = "${var.lighthouse_reward_heartbeat}"
       reward_metadata  = "${var.lighthouse_reward_metadata_heartbeat}"
+      solana           = "${var.lighthouse_solana_heartbeat}"
     }
     coingecko = "${var.coingecko_api_key}"
     rewards = {
@@ -710,6 +715,10 @@ locals {
     betterUptime = {
       apiKey = var.betteruptime_api_key
       requesterEmail = var.betteruptime_requester_email
+    }
+    solana = {
+      signer = var.solana_signer
+      spokeAddress = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
     }
   })
 }

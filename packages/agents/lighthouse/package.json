@@ -18,6 +18,7 @@
         "start:invoice": "LIGHTHOUSE_SERVICE=invoice npx ts-node src/tasks/run.ts",
         "start:reward": "LIGHTHOUSE_SERVICE=reward npx ts-node src/tasks/run.ts",
         "start:reward_metadata": "LIGHTHOUSE_SERVICE=reward_metadata npx ts-node src/tasks/run.ts",
+        "start:solana": "LIGHTHOUSE_SERVICE=solana npx ts-node src/tasks/run.ts",
         "lint:src": "eslint ./src --env node",
         "lint:fix": "yarn lint:src --fix",
         "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",

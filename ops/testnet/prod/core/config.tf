@@ -254,6 +254,9 @@ locals {
       maxTokenomicsExportDelay = 1800
       maxTokenomicsExportLatency = 10
     }
+    solana = {
+      spokeAddress = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
+    }
   })
 
   local_lighthouse_config = jsonencode({
@@ -350,6 +353,10 @@ locals {
     betterUptime = {
       apiKey = var.betteruptime_api_key
       requesterEmail = var.betteruptime_requester_email
+    }
+    solana = {
+      signer = var.solana_signer
+      spokeAddress = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
     }
   })
 }

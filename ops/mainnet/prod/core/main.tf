@@ -389,6 +389,27 @@ module "monitor_poller_cron" {
 }
 
 
+module "lighthouse_solana_cron" {
+  source              = "../../../modules/lambda"
+  ecr_repository_name = "chimera-lighthouse"
+  docker_image_tag    = var.lighthouse_image_tag
+  container_family    = "lighthouse-solana"
+  environment         = var.environment
+  stage               = var.stage
+  config_param_name   = local.lighthouse_solana_config_param_name
+  container_env_vars  = merge(local.lighthouse_env_vars, {
+    LIGHTHOUSE_SERVICE = "solana"
+    CONFIG_PARAMETER_NAME = local.lighthouse_solana_config_param_name
+  })
+  schedule_expression    = "rate(1 minute)"
+  timeout                = 300
+  memory_size            = 2048
+  lambda_in_vpc          = true
+  subnet_ids             = module.network.private_subnets
+  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
+}
+
 module "lighthouse_web3signer" {
   source                   = "../../../modules/service"
   stage                    = var.stage
@@ -480,3 +501,4 @@ module "watchtower_cache" {
   node_type                     = "cache.t3.small"
   public_redis                  = true
 }
+

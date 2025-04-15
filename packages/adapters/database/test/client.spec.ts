@@ -49,6 +49,7 @@ import {
   saveLockPositions,
   getLockPositions,
   getOriginIntentsLastNonce,
+  getDeliveredSettlements,
 } from '../src/client';
 import {
   expect,
@@ -983,6 +984,30 @@ describe('Database Adapter:Client', () => {
       expect(await getOriginIntentsLastNonce('12345', pool)).to.be.deep.eq(0);
       await saveOriginIntents(intents, pool);
       expect(await getOriginIntentsLastNonce('12345', pool)).to.be.deep.eq(7);
+    });
+  });
+
+  describe('#getDeliveredSettlements', () => {
+    const deliveredIntents = createSettlementIntents(2, [
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1399811149' },
+      { intentId: mkBytes32('0x2'), status: TIntentStatus.Delivered, domain: '1399811149' }
+    ]);
+    
+    const otherIntents = createSettlementIntents(2, [
+      { intentId: mkBytes32('0x3'), status: TIntentStatus.Settled, domain: '1399811149' },
+      { intentId: mkBytes32('0x4'), status: TIntentStatus.Settled, domain: '1339' },
+      { intentId: mkBytes32('0x5'), status: TIntentStatus.None, domain: '1340' }
+    ]);
+
+    it('should return only settlement intents with DELIVERED status and the set domain', async () => {
+      expect(await getDeliveredSettlements('1399811149', pool)).to.be.deep.eq([]);
+      
+      // Save all intents
+      await saveSettlementIntents([...deliveredIntents, ...otherIntents], pool);
+      
+      // Verify only DELIVERED intents that belong to the set domain are returned
+      const result = await getDeliveredSettlements('1399811149', pool);
+      expect(result).to.be.deep.eq(deliveredIntents);
     });
   });
 });

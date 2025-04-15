@@ -304,6 +304,9 @@ locals {
         "withdraw",
         "withdraw_eth"
     ]
+    solana = {
+      spokeAddress = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
+    }
   })
 
   local_lighthouse_config = jsonencode({
@@ -387,6 +390,10 @@ locals {
     betterUptime = {
       apiKey = var.betteruptime_api_key
       requesterEmail = var.betteruptime_requester_email
+    }
+    solana = {
+      signer = var.solana_signer
+      spokeAddress = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
     }
   })
 }
