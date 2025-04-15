@@ -36,7 +36,7 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](14);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](15);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -160,6 +160,15 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: SONIC_USDT.toBytes32(),
       domain: SONIC,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Solana
+    _assetConfigs[14] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SOLANA_USDT,
+      domain: SOLANA,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
