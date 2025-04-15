@@ -42,11 +42,18 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
   address public constant AVALANCHE_SPOKE_UPGRADE_IMPL = 0xAe6e59eB86ccccc17165Bd83a27c3904Ccd1A782;
   address public constant SCROLL_SPOKE_UPGRADE_IMPL = 0x92dcaf947DB325ac023b105591d76315743883eD;
   address public constant APECHAIN_SPOKE_UPGRADE_IMPL = 0x92dcaf947DB325ac023b105591d76315743883eD;
-  address public constant TAIKO_SPOKE_UPGRADE_IMPL = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
+  address public constant TAIKO_SPOKE_UPGRADE_IMPL = 0x391BBeaffe82CCb3570F18F615AE5ab4d6eA2fc0;
   address public constant MODE_SPOKE_UPGRADE_IMPL = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
   address public constant UNICHAIN_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
   address public constant RONIN_SPOKE_UPGRADE_IMPL = 0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541;
   address public constant GNOSIS_SPOKE_UPGRADE_IMPL = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
+  address public constant BERACHAIN_SPOKE_UPGRADE_IMPL = 0x4C1029C7BdFE1DadC7d9B753981735CD6954B40d;
+  address public constant SONIC_SPOKE_UPGRADE_IMPL = 0x2Ec2b2CC1813941b638D3ADBA86A1af7F6488A9E;
+  address public constant INK_SPOKE_UPGRADE_IMPL = 0xA388d644241A2185440EAf0ADd41C9Da30958ba5;
+  address public constant MANTLE_SPOKE_UPGRADE_IMPL = 0xF9D93B5Ac744648156E0f154e4380C7B9814f36c;
+
+  // Deprecated //
+  address public constant TAIKO_SPOKE_DEPRECATED = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
 
   function setUp() public {
     //// Arbitrum One
@@ -137,7 +144,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     _deploymentParams[TAIKO] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(TAIKO_SPOKE),
-      spokeImpl: TAIKO_SPOKE_IMPL
+      spokeImpl: TAIKO_SPOKE_DEPRECATED
     });
 
     // Mode
@@ -167,6 +174,31 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
       spokeProxy: address(GNOSIS_SPOKE),
       spokeImpl: GNOSIS_SPOKE_IMPL
     });
+
+    // Berachain
+    _deploymentParams[BERACHAIN] = DeploymentParams({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(BERACHAIN_SPOKE),
+      spokeImpl: BERACHAIN_SPOKE_IMPL
+    });
+
+    // Sonic
+    _deploymentParams[SONIC] = DeploymentParams({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(SONIC_SPOKE),
+      spokeImpl: SONIC_SPOKE_IMPL
+    });
+
+    // Mantle
+    _deploymentParams[MANTLE] = DeploymentParams({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(MANTLE_SPOKE),
+      spokeImpl: MANTLE_SPOKE_IMPL
+    });
+
+    // Ink
+    _deploymentParams[SONIC] =
+      DeploymentParams({owner: L2_MULTI_SIG, spokeProxy: address(INK_SPOKE), spokeImpl: INK_SPOKE_IMPL});
   }
 
   function _getDestinations(
@@ -978,7 +1010,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeTaikoProd() public {
     vm.createSelectFork(vm.envString('TAIKO_RPC'));
-    vm.rollFork(1_038_091);
+    vm.rollFork(1_079_385);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
@@ -1301,6 +1333,271 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     _writeSafeTransactionInput(
       'safeTransactionInputs/upgradeSpokeSolanaCompatibility-gnosisMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Gnosis | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
+
+  function test_spokeUpgradeSolanaCompatibilitySafe_upgradeBerachainProd() public {
+    vm.createSelectFork(vm.envString('BERACHAIN_RPC'));
+    vm.rollFork(3_743_434);
+    _params = _deploymentParams[block.chainid];
+
+    // Checking implementation correct and caching the state variables
+    spokeProxyV3 = EverclearSpokeV3(_params.spokeProxy);
+    address oldImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _params.spokeImpl);
+
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV3();
+    address newEverclearSpoke = BERACHAIN_SPOKE_UPGRADE_IMPL;
+
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, '');
+
+    vm.prank(_params.owner);
+    (success,) = _params.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
+
+    // dealing to the user
+    uint32[] memory destinations = _getDestinations(10);
+    uint256 _amount = 1e18;
+    address _inputAsset = deployAndDeal(address(0x123), _amount).toAddress();
+
+    // approving the spokeProxy
+    vm.startPrank(address(0x123));
+    IERC20(_inputAsset).approve(address(spokeProxyV3), _amount);
+
+    // sending intent via new intent bytes path
+    (bytes32 _intentId,) = spokeProxyV3.newIntent(
+      destinations, address(0x123).toBytes32(), _inputAsset, address(0x456).toBytes32(), _amount, 0, 0, hex'00'
+    );
+    assertEq(uint8(spokeProxyV3.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
+
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV3.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV3.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV3.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV3.lighthouse());
+    assertEq(state.watchtower, spokeProxyV3.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV3.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV3.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
+    assertEq(state.paused, spokeProxyV3.paused());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
+
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
+    string memory chainId = '80094';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-berachainMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Berachain | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
+
+  function test_spokeUpgradeSolanaCompatibilitySafe_upgradeSonicProd() public {
+    vm.createSelectFork(vm.envString('SONIC_RPC'));
+    vm.rollFork(20_406_151);
+    _params = _deploymentParams[block.chainid];
+
+    // Checking implementation correct and caching the state variables
+    spokeProxyV3 = EverclearSpokeV3(_params.spokeProxy);
+    address oldImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _params.spokeImpl);
+
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV3();
+    address newEverclearSpoke = SONIC_SPOKE_UPGRADE_IMPL;
+
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, '');
+
+    vm.prank(_params.owner);
+    (success,) = _params.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
+
+    // dealing to the user
+    uint32[] memory destinations = _getDestinations(10);
+    uint256 _amount = 1e18;
+    address _inputAsset = deployAndDeal(address(0x123), _amount).toAddress();
+
+    // approving the spokeProxy
+    vm.startPrank(address(0x123));
+    IERC20(_inputAsset).approve(address(spokeProxyV3), _amount);
+
+    // sending intent via new intent bytes path
+    (bytes32 _intentId,) = spokeProxyV3.newIntent(
+      destinations, address(0x123).toBytes32(), _inputAsset, address(0x456).toBytes32(), _amount, 0, 0, hex'00'
+    );
+    assertEq(uint8(spokeProxyV3.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
+
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV3.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV3.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV3.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV3.lighthouse());
+    assertEq(state.watchtower, spokeProxyV3.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV3.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV3.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
+    assertEq(state.paused, spokeProxyV3.paused());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
+
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
+    string memory chainId = '146';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-sonicMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Sonic | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
+
+  // TODO: Returning incorrect data
+  // function test_spokeUpgradeSolanaCompatibilitySafe_upgradeInkProd() public {
+  //   vm.createSelectFork(vm.envString('INK_RPC'));
+  //   vm.rollFork(11236356);
+  //   _params = _deploymentParams[block.chainid];
+
+  //   // Checking implementation correct and caching the state variables
+  //   spokeProxyV3 = EverclearSpokeV3(_params.spokeProxy);
+  //   address oldImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+  //   assertEq(oldImplementation, _params.spokeImpl);
+
+  //   // Caching state variables
+  //   CachedSpokeState memory state = _cacheSpokeStateV3();
+  //   address newEverclearSpoke = INK_SPOKE_UPGRADE_IMPL;
+
+  //   // Deploying impl and upgrading the contract
+  //   bool success = false;
+  //   bytes memory upgradeCalldata =
+  //     abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, '');
+
+  //   vm.prank(_params.owner);
+  //   (success,) = _params.spokeProxy.call(upgradeCalldata);
+  //   if (!success) revert UpgradeFailed();
+
+  //   // Checking the implementation address has updated
+  //   address newImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+  //   assertEq(newImplementation, newEverclearSpoke);
+
+  //   // dealing to the user
+  //   uint32[] memory destinations = _getDestinations(10);
+  //   uint256 _amount = 1e18;
+  //   address _inputAsset = deployAndDeal(address(0x123), _amount).toAddress();
+
+  //   // approving the spokeProxy
+  //   vm.startPrank(address(0x123));
+  //   IERC20(_inputAsset).approve(address(spokeProxyV3), _amount);
+
+  //   // sending intent via new intent bytes path
+  //   (bytes32 _intentId,) = spokeProxyV3.newIntent(
+  //     destinations, address(0x123).toBytes32(), _inputAsset, address(0x456).toBytes32(), _amount, 0, 0, hex'00'
+  //   );
+  //   assertEq(uint8(spokeProxyV3.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
+
+  //   // Checking the cached state
+  //   assertEq(state.permit, address(spokeProxyV3.PERMIT2()));
+  //   assertEq(state.EVERCLEAR, spokeProxyV3.EVERCLEAR());
+  //   assertEq(state.DOMAIN, spokeProxyV3.DOMAIN());
+  //   assertEq(state.lighthouse, spokeProxyV3.lighthouse());
+  //   assertEq(state.watchtower, spokeProxyV3.watchtower());
+  //   assertEq(state.messageReceiver, spokeProxyV3.messageReceiver());
+  //   assertEq(state.gateway, address(spokeProxyV3.gateway()));
+  //   assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
+  //   assertEq(state.paused, spokeProxyV3.paused());
+  //   assertEq(state.nonce + 1, spokeProxyV3.nonce());
+  //   assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
+
+  //   // Pushing data to safe tx json //
+  //   safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
+  //   string memory chainId = '57073';
+  //   _writeSafeTransactionInput(
+  //     'safeTransactionInputs/upgradeSpokeSolanaCompatibility-inkMainnetProd.json',
+  //     'Spoke Upgrade - Fee Adapter | Ink | Mainnet Prod',
+  //     safeTransactions,
+  //     chainId
+  //   );
+  // }
+
+  function test_spokeUpgradeSolanaCompatibilitySafe_upgradeMantleProd() public {
+    vm.createSelectFork(vm.envString('MANTLE_RPC'));
+    vm.rollFork(78_302_914);
+    _params = _deploymentParams[block.chainid];
+
+    // Checking implementation correct and caching the state variables
+    spokeProxyV3 = EverclearSpokeV3(_params.spokeProxy);
+    address oldImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _params.spokeImpl);
+
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV3();
+    address newEverclearSpoke = MANTLE_SPOKE_UPGRADE_IMPL;
+
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, '');
+
+    vm.prank(_params.owner);
+    (success,) = _params.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_params.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
+
+    // dealing to the user
+    uint32[] memory destinations = _getDestinations(10);
+    uint256 _amount = 1e18;
+    address _inputAsset = deployAndDeal(address(0x123), _amount).toAddress();
+
+    // approving the spokeProxy
+    vm.startPrank(address(0x123));
+    IERC20(_inputAsset).approve(address(spokeProxyV3), _amount);
+
+    // sending intent via new intent bytes path
+    (bytes32 _intentId,) = spokeProxyV3.newIntent(
+      destinations, address(0x123).toBytes32(), _inputAsset, address(0x456).toBytes32(), _amount, 0, 0, hex'00'
+    );
+    assertEq(uint8(spokeProxyV3.status(_intentId)), uint8(IEverclear.IntentStatus.ADDED));
+
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV3.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV3.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV3.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV3.lighthouse());
+    assertEq(state.watchtower, spokeProxyV3.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV3.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV3.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV3.callExecutor()));
+    assertEq(state.paused, spokeProxyV3.paused());
+    assertEq(state.nonce + 1, spokeProxyV3.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV3.messageGasLimit());
+
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
+    string memory chainId = '5000';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-mantleMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Mantle | Mainnet Prod',
       safeTransactions,
       chainId
     );

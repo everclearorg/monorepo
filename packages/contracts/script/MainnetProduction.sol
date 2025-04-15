@@ -55,7 +55,7 @@ abstract contract MainnetAssets {
   address public constant MANTLE_WETH = 0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111;
   address public constant SONIC_WETH = 0x50c42dEAcD8Fc9773493ED674b675bE577f2634b;
   address public constant INK_WETH = 0x4200000000000000000000000000000000000006;
-  bytes32 public constant SOLANA_WETH = 0xe74c7c9a9c6ef198a5869c6c1e0e464bdef8b8bc9c302c0f7b5c98870edb209f;
+  bytes32 public constant SOLANA_WETH = 0x66e5188a1308a1db90b6d31f3fbdca8c3df2678c8112dfdd3d192c5a3cc457a8;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
@@ -73,7 +73,7 @@ abstract contract MainnetAssets {
   address public constant UNICHAIN_USDT = 0x588CE4F028D8e7B53B687865d6A67b3A54C75518;
   address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
   address public constant SONIC_USDT = 0x6047828dc181963ba44974801FF68e538dA5eaF9;
-  bytes32 public constant SOLANA_USDT = 0x01f3b5d64a20b5b95c9d30ed60f9079d9ad93df8c34e04d7a0f5f3b78c51dd61;
+  bytes32 public constant SOLANA_USDT = 0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -94,7 +94,7 @@ abstract contract MainnetAssets {
   address public constant MANTLE_USDC = 0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9;
   address public constant SONIC_USDC = 0x29219dd400f2Bf60E5a23d13Be72B486D4038894;
   address public constant INK_USDC = 0xF1815bd50389c46847f0Bda824eC8da914045D14;
-  bytes32 public constant SOLANA_USDC = 0x2f6b34e4ba41c5e11aab5c3b52a59c27ea1dcf3b3be7e7ba938d3b4f13a4744e;
+  bytes32 public constant SOLANA_USDC = 0xc6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d61;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
@@ -472,8 +472,8 @@ abstract contract Ink {
 abstract contract Solana {
   uint32 public constant SOLANA = 1_399_811_149;
 
-  bytes32 public SOLANA_SPOKE = 0xe7d6ce702e5272e3b7013b6ec6eb755c08b8597d3b63bc6a4aa1a49118e9d194;
-  bytes32 public SOLANA_SPOKE_GATEWAY = 0xe7d6ce702e5272e3b7013b6ec6eb755c08b8597d3b63bc6a4aa1a49118e9d194;
+  bytes32 public SOLANA_SPOKE = 0x09b727b9209c8539f72647d10dd4f4670b53960ba169f034c513c758db0e9656;
+  bytes32 public SOLANA_SPOKE_GATEWAY = 0x09b727b9209c8539f72647d10dd4f4670b53960ba169f034c513c758db0e9656;
 }
 
 abstract contract MainnetProductionDomains is
