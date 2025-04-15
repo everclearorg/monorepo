@@ -1,6 +1,9 @@
 import { createLoggingContext, SOLANA_CHAINID, EverclearSpoke, TIntentStatus } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import * as anchor from '@coral-xyz/anchor';
+import idlFile from '../../idl/everclear_spoke.json';
+
+const MAX_RETRIES = 60;
 
 /**
  * @notice Processes Solana settlements by collecting them from the database and submitting
@@ -19,6 +22,8 @@ export const processSolanaTransactions = async () => {
 
   // Check if Solana chain is configured
   const chainConfig = chains[SOLANA_CHAINID];
+  const idl = JSON.parse(JSON.stringify(idlFile));
+
   if (!chainConfig) {
     logger.warn('Solana chain not configured', requestContext, methodContext);
     return;
@@ -37,12 +42,14 @@ export const processSolanaTransactions = async () => {
     return;
   }
 
+  // Set up Solana provider with mainnet connection
+  const connection = new anchor.web3.Connection(chainConfig.providers[0]);
+
   if (!solana.signer) {
     logger.info('Solana signer is not set', requestContext, methodContext);
     return;
   }
 
-  // Set up Solana provider
   const signer = anchor.web3.Keypair.fromSecretKey(
     new Uint8Array(
       solana.signer
@@ -51,12 +58,19 @@ export const processSolanaTransactions = async () => {
         .map(Number),
     ),
   );
-  const connection = new anchor.web3.Connection(chainConfig.providers[0]);
+
+  // Create a wallet from the signer
   const wallet = new anchor.Wallet(signer);
+
+  // Create a custom provider with the mainnet connection and wallet
   const provider = new anchor.AnchorProvider(connection, wallet, { commitment: 'confirmed' });
-  const spokeAddress = new anchor.web3.PublicKey(solana.spokeAddress);
-  const spokeIdl = await anchor.Program.fetchIdl(spokeAddress, provider);
-  const spoke = new anchor.Program(JSON.parse(JSON.stringify(spokeIdl)), provider) as anchor.Program<EverclearSpoke>;
+
+  const spokeProgramId = new anchor.web3.PublicKey(idl.address);
+  if (!spokeProgramId) {
+    throw new Error('solana.spokeProgramId not configured');
+  }
+
+  const spoke = new anchor.Program(idl, provider) as anchor.Program<EverclearSpoke>;
 
   // Process settlements
   for (const settlement of settlements) {
@@ -64,7 +78,7 @@ export const processSolanaTransactions = async () => {
     const intentId = Buffer.from(settlement.intentId.slice(2), 'hex');
     const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('everclear_spoke'), Buffer.from('-'), Buffer.from('intent_status'), intentId],
-      spokeAddress,
+      spokeProgramId,
     );
 
     const intentStatus = await spoke.account.intentStatusAccount.fetch(intentStatusPda);
@@ -88,7 +102,7 @@ export const processSolanaTransactions = async () => {
         .instruction(),
     );
 
-    await anchor.web3.sendAndConfirmTransaction(anchor.getProvider().connection, transaction, [signer]);
+    await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer], { maxRetries: MAX_RETRIES });
 
     settlement.status = TIntentStatus.Settled;
   }

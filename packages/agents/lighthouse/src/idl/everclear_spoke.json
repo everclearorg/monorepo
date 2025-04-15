@@ -1,13 +1,7 @@
-/**
- * Program IDL in camelCase format in order to be used in JS/TS.
- *
- * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/everclear_spoke.json`.
- */
-export type EverclearSpoke = {
+{
   "address": "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm",
   "metadata": {
-    "name": "everclearSpoke",
+    "name": "everclear_spoke",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
@@ -35,7 +29,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "pda": {
             "seeds": [
               {
@@ -58,15 +52,15 @@ export type EverclearSpoke = {
           }
         },
         {
-          "name": "intentStatusPda",
+          "name": "intent_status_pda",
           "writable": true
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "pdaPayer",
+          "name": "pda_payer",
           "writable": true,
           "pda": {
             "seeds": [
@@ -107,17 +101,14 @@ export type EverclearSpoke = {
                   97,
                   121,
                   101,
-                  114,
-                  47,
-                  118,
-                  50
+                  114
                 ]
               }
             ]
           }
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -154,14 +145,14 @@ export type EverclearSpoke = {
           "name": "handle",
           "type": {
             "defined": {
-              "name": "handleInstruction"
+              "name": "HandleInstruction"
             }
           }
         }
       ]
     },
     {
-      "name": "handleAccountMetas",
+      "name": "handle_account_metas",
       "discriminator": [
         194,
         141,
@@ -174,7 +165,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "accountMetasPda",
+          "name": "account_metas_pda",
           "docs": [
             "ref: https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/48b8508af42061d67cf46a3377e4569feb95d1d8/rust/main/chains/hyperlane-sealevel/src/mailbox.rs#L267"
           ]
@@ -185,21 +176,21 @@ export type EverclearSpoke = {
           "name": "handle",
           "type": {
             "defined": {
-              "name": "handleInstruction"
+              "name": "HandleInstruction"
             }
           }
         }
       ],
       "returns": {
         "defined": {
-          "name": "simulationReturnData",
+          "name": "SimulationReturnData",
           "generics": [
             {
               "kind": "type",
               "type": {
                 "vec": {
                   "defined": {
-                    "name": "serializableAccountMeta"
+                    "name": "SerializableAccountMeta"
                   }
                 }
               }
@@ -209,7 +200,7 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "handleAsAdmin",
+      "name": "handle_as_admin",
       "discriminator": [
         85,
         72,
@@ -226,7 +217,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "pda": {
             "seeds": [
               {
@@ -249,15 +240,15 @@ export type EverclearSpoke = {
           }
         },
         {
-          "name": "intentStatusPda",
+          "name": "intent_status_pda",
           "writable": true
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "pdaPayer",
+          "name": "pda_payer",
           "writable": true,
           "pda": {
             "seeds": [
@@ -298,17 +289,14 @@ export type EverclearSpoke = {
                   97,
                   121,
                   101,
-                  114,
-                  47,
-                  118,
-                  50
+                  114
                 ]
               }
             ]
           }
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -345,7 +333,7 @@ export type EverclearSpoke = {
           "name": "handle",
           "type": {
             "defined": {
-              "name": "handleInstruction"
+              "name": "HandleInstruction"
             }
           }
         }
@@ -369,7 +357,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true,
           "pda": {
             "seeds": [
@@ -398,11 +386,11 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -439,14 +427,14 @@ export type EverclearSpoke = {
           "name": "init",
           "type": {
             "defined": {
-              "name": "spokeInitializationParams"
+              "name": "SpokeInitializationParams"
             }
           }
         }
       ]
     },
     {
-      "name": "interchainSecurityModule",
+      "name": "interchain_security_module",
       "discriminator": [
         45,
         18,
@@ -461,7 +449,7 @@ export type EverclearSpoke = {
       "args": []
     },
     {
-      "name": "interchainSecurityModuleAccountMetas",
+      "name": "interchain_security_module_account_metas",
       "discriminator": [
         190,
         214,
@@ -476,14 +464,14 @@ export type EverclearSpoke = {
       "args": [],
       "returns": {
         "defined": {
-          "name": "simulationReturnData",
+          "name": "SimulationReturnData",
           "generics": [
             {
               "kind": "type",
               "type": {
                 "vec": {
                   "defined": {
-                    "name": "serializableAccountMeta"
+                    "name": "SerializableAccountMeta"
                   }
                 }
               }
@@ -493,7 +481,7 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "newIntent",
+      "name": "new_intent",
       "docs": [
         "Create a new intent.",
         "The user \"locks\" funds (previously deposited) and creates an intent.",
@@ -511,7 +499,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true,
           "pda": {
             "seeds": [
@@ -543,67 +531,67 @@ export type EverclearSpoke = {
           "name": "mint"
         },
         {
-          "name": "userTokenAccount",
+          "name": "user_token_account",
           "writable": true
         },
         {
-          "name": "programVaultAccount",
+          "name": "program_vault_account",
           "writable": true
         },
         {
-          "name": "tokenProgram",
+          "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "hyperlaneMailbox"
+          "name": "hyperlane_mailbox"
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "splNoopProgram",
+          "name": "spl_noop_program",
           "address": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
         },
         {
-          "name": "mailboxOutbox",
+          "name": "mailbox_outbox",
           "writable": true
         },
         {
-          "name": "dispatchAuthority",
+          "name": "dispatch_authority",
           "writable": true
         },
         {
-          "name": "uniqueMessageAccount",
+          "name": "unique_message_account",
           "writable": true,
           "signer": true
         },
         {
-          "name": "dispatchedMessagePda",
+          "name": "dispatched_message_pda",
           "writable": true
         },
         {
-          "name": "igpProgram"
+          "name": "igp_program"
         },
         {
-          "name": "igpProgramData",
+          "name": "igp_program_data",
           "writable": true
         },
         {
-          "name": "igpPaymentPda",
+          "name": "igp_payment_pda",
           "writable": true
         },
         {
-          "name": "configuredIgpAccount",
+          "name": "configured_igp_account",
           "writable": true
         },
         {
-          "name": "innerIgpAccount",
+          "name": "inner_igp_account",
           "writable": true,
           "optional": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -641,11 +629,11 @@ export type EverclearSpoke = {
           "type": "pubkey"
         },
         {
-          "name": "inputAsset",
+          "name": "input_asset",
           "type": "pubkey"
         },
         {
-          "name": "outputAsset",
+          "name": "output_asset",
           "type": "pubkey"
         },
         {
@@ -653,7 +641,7 @@ export type EverclearSpoke = {
           "type": "u64"
         },
         {
-          "name": "maxFee",
+          "name": "max_fee",
           "type": "u32"
         },
         {
@@ -671,7 +659,7 @@ export type EverclearSpoke = {
           "type": "bytes"
         },
         {
-          "name": "messageGasLimit",
+          "name": "message_gas_limit",
           "type": "u64"
         }
       ]
@@ -694,7 +682,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -702,7 +690,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -737,7 +725,7 @@ export type EverclearSpoke = {
       "args": []
     },
     {
-      "name": "settleDeliveredIntent",
+      "name": "settle_delivered_intent",
       "discriminator": [
         106,
         187,
@@ -755,36 +743,36 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "spokeState"
+          "name": "spoke_state"
         },
         {
-          "name": "intentStatusPda",
+          "name": "intent_status_pda",
           "writable": true
         },
         {
-          "name": "vaultAuthority"
+          "name": "vault_authority"
         },
         {
-          "name": "tokenProgram",
+          "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "systemProgram",
+          "name": "system_program",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "mintAccount"
+          "name": "mint_account"
         },
         {
-          "name": "recipientTokenAccount",
+          "name": "recipient_token_account",
           "writable": true
         },
         {
-          "name": "vaultTokenAccount",
+          "name": "vault_token_account",
           "writable": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -818,10 +806,10 @@ export type EverclearSpoke = {
       ],
       "args": [
         {
-          "name": "settleDeliveredIntent",
+          "name": "settle_delivered_intent",
           "type": {
             "defined": {
-              "name": "settleDeliveredIntentInstruction"
+              "name": "SettleDeliveredIntentInstruction"
             }
           }
         }
@@ -844,7 +832,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -852,7 +840,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -887,7 +875,7 @@ export type EverclearSpoke = {
       "args": []
     },
     {
-      "name": "updateIgp",
+      "name": "update_igp",
       "docs": [
         "new_igp contains the IGP address",
         "new_igp_type contains either the IGP address (as in new_igp), or the overhead IGP address if the IGP is an overhead IGP."
@@ -904,7 +892,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -912,7 +900,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -946,21 +934,21 @@ export type EverclearSpoke = {
       ],
       "args": [
         {
-          "name": "newIgp",
+          "name": "new_igp",
           "type": "pubkey"
         },
         {
-          "name": "newIgpType",
+          "name": "new_igp_type",
           "type": {
             "defined": {
-              "name": "interchainGasPaymasterType"
+              "name": "InterchainGasPaymasterType"
             }
           }
         }
       ]
     },
     {
-      "name": "updateLighthouse",
+      "name": "update_lighthouse",
       "discriminator": [
         51,
         13,
@@ -973,7 +961,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -981,7 +969,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -1015,13 +1003,13 @@ export type EverclearSpoke = {
       ],
       "args": [
         {
-          "name": "newLighthouse",
+          "name": "new_lighthouse",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "updateMailbox",
+      "name": "update_mailbox",
       "discriminator": [
         213,
         10,
@@ -1034,7 +1022,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -1042,7 +1030,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -1076,13 +1064,13 @@ export type EverclearSpoke = {
       ],
       "args": [
         {
-          "name": "newMailbox",
+          "name": "new_mailbox",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "updateMailboxDispatchAuthorityBump",
+      "name": "update_mailbox_dispatch_authority_bump",
       "discriminator": [
         99,
         54,
@@ -1095,7 +1083,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -1103,7 +1091,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -1137,13 +1125,13 @@ export type EverclearSpoke = {
       ],
       "args": [
         {
-          "name": "newBump",
+          "name": "new_bump",
           "type": "u8"
         }
       ]
     },
     {
-      "name": "updateMessageGasLimit",
+      "name": "update_message_gas_limit",
       "discriminator": [
         95,
         171,
@@ -1156,7 +1144,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -1164,7 +1152,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -1198,13 +1186,13 @@ export type EverclearSpoke = {
       ],
       "args": [
         {
-          "name": "newLimit",
+          "name": "new_limit",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "updateVaultAuthorityBump",
+      "name": "update_vault_authority_bump",
       "discriminator": [
         124,
         42,
@@ -1217,7 +1205,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -1225,7 +1213,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -1259,13 +1247,13 @@ export type EverclearSpoke = {
       ],
       "args": [
         {
-          "name": "newBump",
+          "name": "new_bump",
           "type": "u8"
         }
       ]
     },
     {
-      "name": "updateWatchtower",
+      "name": "update_watchtower",
       "discriminator": [
         146,
         49,
@@ -1278,7 +1266,7 @@ export type EverclearSpoke = {
       ],
       "accounts": [
         {
-          "name": "spokeState",
+          "name": "spoke_state",
           "writable": true
         },
         {
@@ -1286,7 +1274,7 @@ export type EverclearSpoke = {
           "signer": true
         },
         {
-          "name": "eventAuthority",
+          "name": "event_authority",
           "pda": {
             "seeds": [
               {
@@ -1320,7 +1308,7 @@ export type EverclearSpoke = {
       ],
       "args": [
         {
-          "name": "newWatchtower",
+          "name": "new_watchtower",
           "type": "pubkey"
         }
       ]
@@ -1328,7 +1316,7 @@ export type EverclearSpoke = {
   ],
   "accounts": [
     {
-      "name": "intentStatusAccount",
+      "name": "IntentStatusAccount",
       "discriminator": [
         31,
         58,
@@ -1341,7 +1329,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "spokeState",
+      "name": "SpokeState",
       "discriminator": [
         203,
         210,
@@ -1356,7 +1344,7 @@ export type EverclearSpoke = {
   ],
   "events": [
     {
-      "name": "igpUpdatedEvent",
+      "name": "IgpUpdatedEvent",
       "discriminator": [
         117,
         50,
@@ -1369,7 +1357,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "initializedEvent",
+      "name": "InitializedEvent",
       "discriminator": [
         136,
         202,
@@ -1382,7 +1370,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "intentAddedEvent",
+      "name": "IntentAddedEvent",
       "discriminator": [
         18,
         99,
@@ -1395,7 +1383,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "lighthouseUpdatedEvent",
+      "name": "LighthouseUpdatedEvent",
       "discriminator": [
         76,
         188,
@@ -1408,7 +1396,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "mailboxDispatchAuthorityBumpUpdatedEvent",
+      "name": "MailboxDispatchAuthorityBumpUpdatedEvent",
       "discriminator": [
         136,
         254,
@@ -1421,7 +1409,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "mailboxUpdatedEvent",
+      "name": "MailboxUpdatedEvent",
       "discriminator": [
         6,
         80,
@@ -1434,7 +1422,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "messageDeliveredEvent",
+      "name": "MessageDeliveredEvent",
       "discriminator": [
         170,
         221,
@@ -1447,7 +1435,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "messageGasLimitUpdatedEvent",
+      "name": "MessageGasLimitUpdatedEvent",
       "discriminator": [
         47,
         54,
@@ -1460,7 +1448,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "messageReceivedEvent",
+      "name": "MessageReceivedEvent",
       "discriminator": [
         232,
         67,
@@ -1473,7 +1461,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "pausedEvent",
+      "name": "PausedEvent",
       "discriminator": [
         43,
         14,
@@ -1486,7 +1474,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "settledEvent",
+      "name": "SettledEvent",
       "discriminator": [
         117,
         207,
@@ -1499,7 +1487,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "unpausedEvent",
+      "name": "UnpausedEvent",
       "discriminator": [
         150,
         198,
@@ -1512,7 +1500,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "vaultAuthorityBumpUpdatedEvent",
+      "name": "VaultAuthorityBumpUpdatedEvent",
       "discriminator": [
         88,
         55,
@@ -1525,7 +1513,7 @@ export type EverclearSpoke = {
       ]
     },
     {
-      "name": "watchtowerUpdatedEvent",
+      "name": "WatchtowerUpdatedEvent",
       "discriminator": [
         78,
         128,
@@ -1541,173 +1529,173 @@ export type EverclearSpoke = {
   "errors": [
     {
       "code": 6000,
-      "name": "onlyOwner",
+      "name": "OnlyOwner",
       "msg": "Only the contract owner can call this method."
     },
     {
       "code": 6001,
-      "name": "notAuthorizedToPause",
+      "name": "NotAuthorizedToPause",
       "msg": "Not authorized to pause."
     },
     {
       "code": 6002,
-      "name": "contractPaused",
+      "name": "ContractPaused",
       "msg": "Contract is paused."
     },
     {
       "code": 6003,
-      "name": "invalidAmount",
+      "name": "InvalidAmount",
       "msg": "Invalid amount provided."
     },
     {
       "code": 6004,
-      "name": "invalidOperation",
+      "name": "InvalidOperation",
       "msg": "Invalid operation or overflow."
     },
     {
       "code": 6005,
-      "name": "intentNotFound",
+      "name": "IntentNotFound",
       "msg": "Intent not found."
     },
     {
       "code": 6006,
-      "name": "invalidIntentStatus",
+      "name": "InvalidIntentStatus",
       "msg": "Intent is in an invalid status for this operation."
     },
     {
       "code": 6007,
-      "name": "maxFeeExceeded",
+      "name": "MaxFeeExceeded",
       "msg": "Max fee exceeded."
     },
     {
       "code": 6008,
-      "name": "invalidOrigin",
+      "name": "InvalidOrigin",
       "msg": "Invalid origin for inbound message."
     },
     {
       "code": 6009,
-      "name": "invalidSender",
+      "name": "InvalidSender",
       "msg": "Invalid sender for inbound message."
     },
     {
       "code": 6010,
-      "name": "invalidMessage",
+      "name": "InvalidMessage",
       "msg": "Invalid or unknown message."
     },
     {
       "code": 6011,
-      "name": "unauthorized",
+      "name": "Unauthorized",
       "msg": "Unauthorized operation."
     },
     {
       "code": 6012,
-      "name": "signatureExpired",
+      "name": "SignatureExpired",
       "msg": "Signature has expired"
     },
     {
       "code": 6013,
-      "name": "invalidSignature",
+      "name": "InvalidSignature",
       "msg": "Invalid signature"
     },
     {
       "code": 6014,
-      "name": "zeroAmount",
+      "name": "ZeroAmount",
       "msg": "Zero amount provided"
     },
     {
       "code": 6015,
-      "name": "decimalConversionOverflow",
+      "name": "DecimalConversionOverflow",
       "msg": "Decimal conversion overflow"
     },
     {
       "code": 6016,
-      "name": "alreadyInitialized",
+      "name": "AlreadyInitialized",
       "msg": "Already initialized"
     },
     {
       "code": 6017,
-      "name": "invalidOwner",
+      "name": "InvalidOwner",
       "msg": "Invalid Owner"
     },
     {
       "code": 6018,
-      "name": "invalidVarUpdate",
+      "name": "InvalidVarUpdate",
       "msg": "Invalid var update"
     },
     {
       "code": 6019,
-      "name": "invalidIntent",
+      "name": "InvalidIntent",
       "msg": "Invalid intent"
     },
     {
       "code": 6020,
-      "name": "overflow",
-      "msg": "overflow"
+      "name": "Overflow",
+      "msg": "Overflow"
     },
     {
       "code": 6021,
-      "name": "invalidAccount",
+      "name": "InvalidAccount",
       "msg": "Invalid account meta"
     },
     {
       "code": 6022,
-      "name": "invalidArgument",
+      "name": "InvalidArgument",
       "msg": "Invalid argument data"
     },
     {
       "code": 6023,
-      "name": "incorrectProgramId",
+      "name": "IncorrectProgramId",
       "msg": "Incorrect program id"
     },
     {
       "code": 6024,
-      "name": "missingRequiredSignature",
+      "name": "MissingRequiredSignature",
       "msg": "Missing required signature"
     },
     {
       "code": 6025,
-      "name": "extraneousAccount",
+      "name": "ExtraneousAccount",
       "msg": "Extraneous account"
     },
     {
       "code": 6026,
-      "name": "integerOverflow",
+      "name": "IntegerOverflow",
       "msg": "Overflowing Integer"
     },
     {
       "code": 6027,
-      "name": "invalidSeeds",
+      "name": "InvalidSeeds",
       "msg": "Invalid seeds for deriving pda"
     },
     {
       "code": 6028,
-      "name": "invalidVaultAccount",
+      "name": "InvalidVaultAccount",
       "msg": "Invalid vault account"
     },
     {
       "code": 6029,
-      "name": "invalidIntentPda",
+      "name": "InvalidIntentPda",
       "msg": "Invalid intent pda"
     },
     {
       "code": 6030,
-      "name": "invalidSettlementSize",
+      "name": "InvalidSettlementSize",
       "msg": "Invalid settlement size"
     },
     {
       "code": 6031,
-      "name": "incorrectSettlementAccounts",
+      "name": "IncorrectSettlementAccounts",
       "msg": "Incorrect settlement accounts, mismatch with intent PDA."
     },
     {
       "code": 6032,
-      "name": "invalidIntentId",
+      "name": "InvalidIntentId",
       "msg": "Invalid intent id"
     }
   ],
   "types": [
     {
-      "name": "h256",
+      "name": "H256",
       "docs": [
         "256-bit hash type."
       ],
@@ -1727,7 +1715,7 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "handleInstruction",
+      "name": "HandleInstruction",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1739,7 +1727,7 @@ export type EverclearSpoke = {
             "name": "sender",
             "type": {
               "defined": {
-                "name": "h256"
+                "name": "H256"
               }
             }
           },
@@ -1751,31 +1739,31 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "igpUpdatedEvent",
+      "name": "IgpUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "oldIgp",
+            "name": "old_igp",
             "type": "pubkey"
           },
           {
-            "name": "newIgp",
+            "name": "new_igp",
             "type": "pubkey"
           },
           {
-            "name": "oldIgpType",
+            "name": "old_igp_type",
             "type": {
               "defined": {
-                "name": "interchainGasPaymasterType"
+                "name": "InterchainGasPaymasterType"
               }
             }
           },
           {
-            "name": "newIgpType",
+            "name": "new_igp_type",
             "type": {
               "defined": {
-                "name": "interchainGasPaymasterType"
+                "name": "InterchainGasPaymasterType"
               }
             }
           }
@@ -1783,7 +1771,7 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "initializedEvent",
+      "name": "InitializedEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1803,12 +1791,12 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "intentAddedEvent",
+      "name": "IntentAddedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intentId",
+            "name": "intent_id",
             "type": {
               "array": [
                 "u8",
@@ -1817,7 +1805,7 @@ export type EverclearSpoke = {
             }
           },
           {
-            "name": "messageId",
+            "name": "message_id",
             "type": {
               "array": [
                 "u8",
@@ -1834,23 +1822,23 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "inputAsset",
+            "name": "input_asset",
             "type": "pubkey"
           },
           {
-            "name": "outputAsset",
+            "name": "output_asset",
             "type": "pubkey"
           },
           {
-            "name": "normalizedAmount",
+            "name": "normalized_amount",
             "type": "u64"
           },
           {
-            "name": "maxFee",
+            "name": "max_fee",
             "type": "u32"
           },
           {
-            "name": "originDomain",
+            "name": "origin_domain",
             "type": "u32"
           },
           {
@@ -1879,7 +1867,7 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "intentStatus",
+      "name": "IntentStatus",
       "docs": [
         "Intent status."
       ],
@@ -1887,28 +1875,28 @@ export type EverclearSpoke = {
         "kind": "enum",
         "variants": [
           {
-            "name": "none"
+            "name": "None"
           },
           {
-            "name": "added"
+            "name": "Added"
           },
           {
-            "name": "filled"
+            "name": "Filled"
           },
           {
-            "name": "settled"
+            "name": "Settled"
           },
           {
-            "name": "settledAndManuallyExecuted"
+            "name": "SettledAndManuallyExecuted"
           },
           {
-            "name": "delivered"
+            "name": "Delivered"
           }
         ]
       }
     },
     {
-      "name": "intentStatusAccount",
+      "name": "IntentStatusAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1916,7 +1904,7 @@ export type EverclearSpoke = {
             "name": "status",
             "type": {
               "defined": {
-                "name": "intentStatus"
+                "name": "IntentStatus"
               }
             }
           },
@@ -1925,7 +1913,7 @@ export type EverclearSpoke = {
             "type": {
               "vec": {
                 "defined": {
-                  "name": "serializableAccountMeta"
+                  "name": "SerializableAccountMeta"
                 }
               }
             }
@@ -1935,7 +1923,7 @@ export type EverclearSpoke = {
             "type": {
               "option": {
                 "defined": {
-                  "name": "settlement"
+                  "name": "Settlement"
                 }
               }
             }
@@ -1944,18 +1932,18 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "interchainGasPaymasterType",
+      "name": "InterchainGasPaymasterType",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "igp",
+            "name": "Igp",
             "fields": [
               "pubkey"
             ]
           },
           {
-            "name": "overheadIgp",
+            "name": "OverheadIgp",
             "fields": [
               "pubkey"
             ]
@@ -1964,72 +1952,76 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "lighthouseUpdatedEvent",
+      "name": "LighthouseUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "oldLighthouse",
+            "name": "old_lighthouse",
             "type": "pubkey"
           },
           {
-            "name": "newLighthouse",
+            "name": "new_lighthouse",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "mailboxDispatchAuthorityBumpUpdatedEvent",
+      "name": "MailboxDispatchAuthorityBumpUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "oldBump",
+            "name": "old_bump",
             "type": "u8"
           },
           {
-            "name": "newBump",
+            "name": "new_bump",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "mailboxUpdatedEvent",
+      "name": "MailboxUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "oldMailbox",
+            "name": "old_mailbox",
             "type": "pubkey"
           },
           {
-            "name": "newMailbox",
+            "name": "new_mailbox",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "messageDeliveredEvent",
+      "name": "MessageDeliveredEvent",
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "domain",
+            "type": "u32"
+          },
           {
             "name": "settlement",
             "type": {
               "defined": {
-                "name": "settlement"
+                "name": "Settlement"
               }
             }
           },
           {
-            "name": "accountMetas",
+            "name": "account_metas",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "serializableAccountMeta"
+                  "name": "SerializableAccountMeta"
                 }
               }
             }
@@ -2038,23 +2030,23 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "messageGasLimitUpdatedEvent",
+      "name": "MessageGasLimitUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "oldLimit",
+            "name": "old_limit",
             "type": "u64"
           },
           {
-            "name": "newLimit",
+            "name": "new_limit",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "messageReceivedEvent",
+      "name": "MessageReceivedEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2070,39 +2062,14 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "oldIntentStatusAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "key",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "status",
-            "type": {
-              "defined": {
-                "name": "intentStatus"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "pausedEvent",
+      "name": "PausedEvent",
       "type": {
         "kind": "struct",
         "fields": []
       }
     },
     {
-      "name": "serializableAccountMeta",
+      "name": "SerializableAccountMeta",
       "docs": [
         "A borsh-serializable version of `AccountMeta`."
       ],
@@ -2114,23 +2081,23 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "isSigner",
+            "name": "is_signer",
             "type": "bool"
           },
           {
-            "name": "isWritable",
+            "name": "is_writable",
             "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "settleDeliveredIntentInstruction",
+      "name": "SettleDeliveredIntentInstruction",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intentId",
+            "name": "intent_id",
             "type": {
               "array": [
                 "u8",
@@ -2142,12 +2109,12 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "settledEvent",
+      "name": "SettledEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intentId",
+            "name": "intent_id",
             "type": {
               "array": [
                 "u8",
@@ -2175,12 +2142,12 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "settlement",
+      "name": "Settlement",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intentId",
+            "name": "intent_id",
             "type": {
               "array": [
                 "u8",
@@ -2192,7 +2159,7 @@ export type EverclearSpoke = {
             "name": "amount",
             "type": {
               "defined": {
-                "name": "u256"
+                "name": "U256"
               }
             }
           },
@@ -2205,14 +2172,14 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "updateVirtualBalance",
+            "name": "update_virtual_balance",
             "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "simulationReturnData",
+      "name": "SimulationReturnData",
       "docs": [
         "NOTE: This is used for hyperlane interop only and should not be used anywhere else",
         "A ridiculous workaround for `<https://github.com/solana-labs/solana/issues/31391>`,",
@@ -2223,27 +2190,27 @@ export type EverclearSpoke = {
       "generics": [
         {
           "kind": "type",
-          "name": "t"
+          "name": "T"
         }
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "returnData",
+            "name": "return_data",
             "type": {
-              "generic": "t"
+              "generic": "T"
             }
           },
           {
-            "name": "trailingByte",
+            "name": "trailing_byte",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "spokeInitializationParams",
+      "name": "SpokeInitializationParams",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2252,7 +2219,7 @@ export type EverclearSpoke = {
             "type": "u32"
           },
           {
-            "name": "hubDomain",
+            "name": "hub_domain",
             "type": "u32"
           },
           {
@@ -2264,15 +2231,7 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "callExecutor",
-            "type": "pubkey"
-          },
-          {
-            "name": "messageReceiver",
-            "type": "pubkey"
-          },
-          {
-            "name": "messageGasLimit",
+            "name": "message_gas_limit",
             "type": "u64"
           },
           {
@@ -2288,26 +2247,26 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "igpType",
+            "name": "igp_type",
             "type": {
               "defined": {
-                "name": "interchainGasPaymasterType"
+                "name": "InterchainGasPaymasterType"
               }
             }
           },
           {
-            "name": "mailboxDispatchAuthorityBump",
+            "name": "mailbox_dispatch_authority_bump",
             "type": "u8"
           },
           {
-            "name": "vaultAuthorityBump",
+            "name": "vault_authority_bump",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "spokeState",
+      "name": "SpokeState",
       "docs": [
         "SpokeState – global configuration."
       ],
@@ -2315,7 +2274,7 @@ export type EverclearSpoke = {
         "kind": "struct",
         "fields": [
           {
-            "name": "initializedVersion",
+            "name": "initialized_version",
             "type": "u8"
           },
           {
@@ -2339,15 +2298,7 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "callExecutor",
-            "type": "pubkey"
-          },
-          {
-            "name": "messageReceiver",
-            "type": "pubkey"
-          },
-          {
-            "name": "messageGasLimit",
+            "name": "message_gas_limit",
             "type": "u64"
           },
           {
@@ -2359,16 +2310,6 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "status",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "oldIntentStatusAccount"
-                }
-              }
-            }
-          },
-          {
             "name": "bump",
             "type": "u8"
           },
@@ -2377,7 +2318,7 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "mailboxDispatchAuthorityBump",
+            "name": "mailbox_dispatch_authority_bump",
             "type": "u8"
           },
           {
@@ -2385,22 +2326,22 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "igpType",
+            "name": "igp_type",
             "type": {
               "defined": {
-                "name": "interchainGasPaymasterType"
+                "name": "InterchainGasPaymasterType"
               }
             }
           },
           {
-            "name": "vaultAuthorityBump",
+            "name": "vault_authority_bump",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "u256",
+      "name": "U256",
       "docs": [
         "Little-endian large integer type",
         "256-bit unsigned integer."
@@ -2421,43 +2362,43 @@ export type EverclearSpoke = {
       }
     },
     {
-      "name": "unpausedEvent",
+      "name": "UnpausedEvent",
       "type": {
         "kind": "struct",
         "fields": []
       }
     },
     {
-      "name": "vaultAuthorityBumpUpdatedEvent",
+      "name": "VaultAuthorityBumpUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "oldBump",
+            "name": "old_bump",
             "type": "u8"
           },
           {
-            "name": "newBump",
+            "name": "new_bump",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "watchtowerUpdatedEvent",
+      "name": "WatchtowerUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "oldWatchtower",
+            "name": "old_watchtower",
             "type": "pubkey"
           },
           {
-            "name": "newWatchtower",
+            "name": "new_watchtower",
             "type": "pubkey"
           }
         ]
       }
     }
   ]
-};
+}
