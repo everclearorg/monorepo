@@ -44,7 +44,7 @@ export const updateMessages = async () => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateMessages.name);
 
-  const evmDomains = Object.keys(config.chains).concat(config.hub.domain).filter(d => config.chains[d].network === 'evm');
+  const evmDomains = Object.keys(config.chains).filter(d => config.chains[d].network === 'evm').concat(config.hub.domain);
   for (const domain of evmDomains) {
     // Retrieve the most recent timestamp
     const latestNonce = await database.getCheckPoint('message_' + domain);
