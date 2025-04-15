@@ -2,6 +2,8 @@ import { createLoggingContext, SOLANA_CHAINID, EverclearSpoke, TIntentStatus } f
 import { getContext } from '../../context';
 import * as anchor from '@coral-xyz/anchor';
 
+const MAX_RETRIES = 100;
+
 /**
  * @notice Processes Solana settlements by collecting them from the database and submitting
  * them to the Solana network through chainservice.
@@ -88,7 +90,31 @@ export const processSolanaTransactions = async () => {
         .instruction(),
     );
 
-    await anchor.web3.sendAndConfirmTransaction(anchor.getProvider().connection, transaction, [signer]);
+    for (let i = 0; i < MAX_RETRIES; i++) {
+      try {
+        await anchor.web3.sendAndConfirmTransaction(anchor.getProvider().connection, transaction, [signer]);
+        break;
+      } catch (err) {
+        if (i === MAX_RETRIES - 1) {
+          logger.error('Failed to send and confirm transaction', requestContext, methodContext, {
+            message: err instanceof Error ? err.message : String(err),
+            stack: err instanceof Error ? err.stack : undefined,
+            type: 'error',
+            context: { intentId: settlement.intentId },
+          });
+          throw new Error(
+            `Failed to send and confirm transaction after ${MAX_RETRIES} attempts: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+        // Wait for 1 second before retrying
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        logger.warn('Retrying transaction', requestContext, methodContext, {
+          attempt: i + 1,
+          maxRetries: MAX_RETRIES,
+          intentId: settlement.intentId,
+        });
+      }
+    }
 
     settlement.status = TIntentStatus.Settled;
   }
