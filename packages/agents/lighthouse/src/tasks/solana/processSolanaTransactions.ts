@@ -71,7 +71,7 @@ export const processSolanaTransactions = async () => {
   }
 
   const spoke = new anchor.Program(idl, provider) as anchor.Program<EverclearSpoke>;
-
+  const spokeAddress = new anchor.web3.PublicKey(solana.spokeAddress!);
 
   // Process settlements
   for (const settlement of settlements) {
