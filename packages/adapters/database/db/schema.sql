@@ -436,12 +436,12 @@ DECLARE
     receiver TEXT;
     input_asset TEXT;
     output_asset TEXT;
-    normalized_amount BIGINT;
+    normalized_amount NUMERIC;
     max_fee INT;
     origin_domain INT;
-    nonce BIGINT;
-    ttl BIGINT;
-    timestamp BIGINT;
+    nonce NUMERIC;
+    ttl NUMERIC;
+    timestamp NUMERIC;
     destination_count INT;
     destinations VARCHAR(66)[];
     data_length INT;
@@ -574,7 +574,7 @@ DECLARE
     intent_id TEXT;
     recipient TEXT;
     asset TEXT;
-    amount BIGINT;
+    amount NUMERIC;
     domain INT;
 	pos INT := 33;
 BEGIN
@@ -4908,4 +4908,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250411120150'),
     ('20250415125459'),
     ('20250415163121'),
-    ('20250415204003');
+    ('20250415204003'),
+    ('20250416224500');
