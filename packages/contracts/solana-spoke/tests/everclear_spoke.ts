@@ -6,9 +6,7 @@ import { concat } from 'viem';
 
 describe('#everclear_spoke', () => {
   anchor.setProvider(anchor.AnchorProvider.local());
-  // anchor.setProvider(anchor.AnchorProvider.local('https://solana-mainnet.g.alchemy.com/v2/-xyMcWICws-b78V6cbcFHjtaIPXt9xT0'));
   const connection = anchor.getProvider().connection;
-  // const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/-xyMcWICws-b78V6cbcFHjtaIPXt9xT0', 'confirmed');
 
   const program = anchor.workspace.EverclearSpoke as anchor.Program<EverclearSpoke>;
 
@@ -66,10 +64,10 @@ describe('#everclear_spoke', () => {
   const mint = anchor.web3.Keypair.generate();
   const user = anchor.Wallet.local().payer;
 
-  const outgoingIntentAmount = new anchor.BN((1e18).toString());
-  const incomingIntentAmount = new anchor.BN((5e18).toString());
+  const outgoingIntentAmount = new anchor.BN((1e8).toString());
+  const incomingIntentAmount = new anchor.BN('5000000000000000000000');
   const initialMessageGasLimit = new anchor.BN(10000);
-  const TOKEN_DECIMALS = 18;
+  const TOKEN_DECIMALS = 8;
 
   const splNoopProgram = new anchor.web3.PublicKey('noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV');
 
@@ -162,7 +160,7 @@ describe('#everclear_spoke', () => {
         mintPubkey, // mint
         userTokenAccount, // receiver (should be a token account)
         mint, // mint authority
-        5e18, // amount
+        5e8, // amount
         TOKEN_DECIMALS, // decimals
       );
 
@@ -255,9 +253,13 @@ describe('#everclear_spoke', () => {
         mintPubkey, // mint
         programVault.address, // receiver (should be a token account)
         mint, // mint authority
-        7e18, // amount
+        7e11, // amount
         TOKEN_DECIMALS, // decimals
       );
+
+      const vaultBalance = await connection.getTokenAccountBalance(programVault.address);
+      expect(vaultBalance.value.amount).to.be.equal((7e11).toString());
+      expect(vaultBalance.value.uiAmountString).to.be.equal((7000).toString());
 
       const type = toBytes32(2); // Settlement
       const ignored = toBytes32(0);
@@ -274,8 +276,8 @@ describe('#everclear_spoke', () => {
         origin: 25327,
         sender: {
           0: [
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 229, 242, 244, 175, 173, 98, 17, 207, 189, 106, 136, 45, 90, 106, 67,
-            85, 48, 238, 57, 9,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 239, 250, 183, 204, 235, 246, 63, 190, 251, 72, 132, 150, 75, 18, 37,
+            157, 67, 116, 250, 170,
           ],
         },
         message: Buffer.from(concat([header, intent])),
@@ -318,8 +320,13 @@ describe('#everclear_spoke', () => {
       // Sanity check
       expect(intentStatus.status).to.be.deep.equal({ delivered: {} });
 
-      const vaultBalance = await connection.getTokenAccountBalance(vaultTokenAccount);
-      expect(vaultBalance.value.amount).to.be.equal((7e18).toString());
+      let vaultBalance = await connection.getTokenAccountBalance(vaultTokenAccount);
+      expect(vaultBalance.value.amount).to.be.equal((7e11).toString());
+      expect(vaultBalance.value.uiAmountString).to.be.equal((7000).toString());
+
+      let recipientBalance = await connection.getTokenAccountBalance(recipientTokenAccount);
+      expect(recipientBalance.value.amount).to.be.equal((0).toString());
+      expect(recipientBalance.value.uiAmountString).to.be.equal((0).toString());
 
       // Act
       await program.methods
@@ -341,8 +348,15 @@ describe('#everclear_spoke', () => {
       intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
       expect(intentStatus.status).to.be.deep.equal({ settled: {} });
 
-      const recipientBalance = await connection.getTokenAccountBalance(recipientTokenAccount);
-      expect(recipientBalance.value.amount).to.be.equal(incomingIntentAmount.toString());
+      const incomingAmount = incomingIntentAmount.div(new anchor.BN(Math.pow(10, 18 - TOKEN_DECIMALS)));
+
+      recipientBalance = await connection.getTokenAccountBalance(recipientTokenAccount);
+      expect(recipientBalance.value.amount).to.be.equal(incomingAmount.toString());
+      expect(recipientBalance.value.uiAmountString).to.be.equal((5000).toString());
+
+      vaultBalance = await connection.getTokenAccountBalance(vaultTokenAccount);
+      expect(vaultBalance.value.amount).to.be.equal((2e11).toString());
+      expect(vaultBalance.value.uiAmountString).to.be.equal((2000).toString());
     });
   });
 
