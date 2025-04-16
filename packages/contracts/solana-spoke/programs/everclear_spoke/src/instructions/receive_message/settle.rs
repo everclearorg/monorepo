@@ -74,6 +74,9 @@ pub fn settle_delivered_intent(
         DEFAULT_NORMALIZED_DECIMALS,
         minted_decimals,
     )?;
+
+    require!(amount < u64::MAX.into(), SpokeError::InvalidAmount);
+ 
     if amount == 0 {
         return Ok(());
     }
