@@ -10,7 +10,7 @@ everclear_spoke = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm" #mainnet-prod
 # everclear_spoke = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw" # mainnet-staging
 
 [programs.localnet]
-everclear_spoke = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
+everclear_spoke = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
 
 [registry]
 url = "https://api.apr.dev"
