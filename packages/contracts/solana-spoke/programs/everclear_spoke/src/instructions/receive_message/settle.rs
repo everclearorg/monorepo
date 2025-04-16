@@ -65,7 +65,7 @@ pub fn settle_delivered_intent(
 
     let mut buf = [0u8; 32];
     settlement.amount.to_little_endian(&mut buf);
-    let normalized_amount = u64::from_be_bytes(buf[24..32].try_into().unwrap());
+    let normalized_amount = u128::from_be_bytes(buf[16..32].try_into().unwrap());
 
     // 3) Normalise the settlement amount
     let minted_decimals = ctx.accounts.mint_account.decimals;
@@ -74,6 +74,9 @@ pub fn settle_delivered_intent(
         DEFAULT_NORMALIZED_DECIMALS,
         minted_decimals,
     )?;
+
+    require!(amount < u64::MAX.into(), SpokeError::InvalidAmount);
+ 
     if amount == 0 {
         return Ok(());
     }
@@ -94,13 +97,13 @@ pub fn settle_delivered_intent(
     );
 
     // NOTE: Removed the virtual balance logic
-    token::transfer(cpi_ctx, amount)?;
+    token::transfer(cpi_ctx, amount as u64)?;
 
     emit_cpi!(SettledEvent {
         intent_id: settlement.intent_id,
         recipient: settlement.recipient,
         asset: settlement.asset,
-        amount,
+        amount: amount as u64,
         domain: ctx.accounts.spoke_state.domain,
     });
     Ok(())
