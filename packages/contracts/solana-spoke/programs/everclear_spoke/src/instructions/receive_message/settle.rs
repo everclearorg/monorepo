@@ -65,7 +65,7 @@ pub fn settle_delivered_intent(
 
     let mut buf = [0u8; 32];
     settlement.amount.to_little_endian(&mut buf);
-    let normalized_amount = u128::from_be_bytes(buf[24..32].try_into().unwrap());
+    let normalized_amount = u128::from_be_bytes(buf[16..32].try_into().unwrap());
 
     // 3) Normalise the settlement amount
     let minted_decimals = ctx.accounts.mint_account.decimals;
