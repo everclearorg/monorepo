@@ -461,8 +461,8 @@ BEGIN
 	pos := pos + 64;
 	output_asset := '0x' || SUBSTRING(hex_data, pos, 64);
 	pos := pos + 64;
-	normalized_amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
-	pos := pos + 16;
+	normalized_amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
+	pos := pos + 32;
 	max_fee := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
 	origin_domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
@@ -4909,4 +4909,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250415125459'),
     ('20250415163121'),
     ('20250415204003'),
-    ('20250416224500');
+    ('20250416224500'),
+    ('20250417163412');
