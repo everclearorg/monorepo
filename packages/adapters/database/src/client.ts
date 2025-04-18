@@ -855,3 +855,12 @@ export const getDeliveredSettlements = async (
   const result = await db.select('settlement_intents', { status: TIntentStatus.Delivered, domain }).run(poolToUse);
   return result.map(converters.fromSettlementIntents);
 };
+
+export const updateSettlementStatus = async (
+  intentId: string,
+  status: s.intent_status,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+) => {
+  const poolToUse = _pool ?? pool;
+  await db.update('settlement_intents', { status }, { id: intentId }).run(poolToUse);
+};
