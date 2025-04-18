@@ -75,36 +75,45 @@ export const processSolanaTransactions = async () => {
   // Process settlements
   for (const settlement of settlements) {
     logger.debug('Settling intent', requestContext, methodContext, { intentId: settlement.intentId });
-    const intentId = Buffer.from(settlement.intentId.slice(2), 'hex');
-    const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from('everclear_spoke'), Buffer.from('-'), Buffer.from('intent_status'), intentId],
-      spokeProgramId,
-    );
+    try {
+      const intentId = Buffer.from(settlement.intentId.slice(2), 'hex');
+      const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync(
+        [Buffer.from('everclear_spoke'), Buffer.from('-'), Buffer.from('intent_status'), intentId],
+        spokeProgramId,
+      );
 
-    const intentStatus = await spoke.account.intentStatusAccount.fetch(intentStatusPda);
+      const intentStatus = await spoke.account.intentStatusAccount.fetch(intentStatusPda);
 
-    const transaction = new anchor.web3.Transaction().add(
-      await spoke.methods
-        .settleDeliveredIntent({
-          intentId: Array.from(intentId),
-        })
-        .accountsPartial({
-          authority: signer.publicKey,
-          spokeState: intentStatus.accounts[0].pubkey,
-          intentStatusPda: intentStatus.accounts[1].pubkey,
-          vaultAuthority: intentStatus.accounts[2].pubkey,
-          tokenProgram: intentStatus.accounts[3].pubkey,
-          systemProgram: intentStatus.accounts[4].pubkey,
-          mintAccount: intentStatus.accounts[5].pubkey,
-          recipientTokenAccount: intentStatus.accounts[6].pubkey,
-          vaultTokenAccount: intentStatus.accounts[7].pubkey,
-        })
-        .instruction(),
-    );
+      const transaction = new anchor.web3.Transaction().add(
+        await spoke.methods
+          .settleDeliveredIntent({
+            intentId: Array.from(intentId),
+          })
+          .accountsPartial({
+            authority: signer.publicKey,
+            spokeState: intentStatus.accounts[0].pubkey,
+            intentStatusPda: intentStatus.accounts[1].pubkey,
+            vaultAuthority: intentStatus.accounts[2].pubkey,
+            tokenProgram: intentStatus.accounts[3].pubkey,
+            systemProgram: intentStatus.accounts[4].pubkey,
+            mintAccount: intentStatus.accounts[5].pubkey,
+            recipientTokenAccount: intentStatus.accounts[6].pubkey,
+            vaultTokenAccount: intentStatus.accounts[7].pubkey,
+          })
+          .instruction(),
+      );
 
-    await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer], { maxRetries: MAX_RETRIES });
+      await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer], { maxRetries: MAX_RETRIES });
 
-    settlement.status = TIntentStatus.Settled;
+      settlement.status = TIntentStatus.Settled;
+    } catch (error) {
+      logger.error('Failed to settle intent', requestContext, methodContext, {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        type: error instanceof Error ? error.constructor.name : typeof error,
+        context: { intentId: settlement.intentId },
+      }); // Continue to the next settlement
+    }
   }
 
   // Update the status of the settlements in the database
