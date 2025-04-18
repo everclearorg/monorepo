@@ -526,7 +526,7 @@ BEGIN
 		rec.tx_signature,
 		timestamp,
 		rec.block_slot,
-        initiator,
+		initiator,
 		0,
 		rec.tx_fee,
 		1,
