@@ -395,7 +395,7 @@ BEGIN
         rec.tx_signature,
         rec.block_timestamp,
         rec.block_slot,
-        '',
+        recipient,
         0,
         rec.tx_fee,
         1,
@@ -614,7 +614,7 @@ BEGIN
         rec.tx_signature,
 		rec.block_timestamp,
 		rec.block_slot,
-		'',
+		recipient,
 		0,
 		rec.tx_fee,
 		1,
@@ -4911,4 +4911,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250415204003'),
     ('20250416224500'),
     ('20250417163412'),
-    ('20250418160651');
+    ('20250418160651'),
+    ('20250418195903');
