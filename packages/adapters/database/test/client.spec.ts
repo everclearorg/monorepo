@@ -50,6 +50,7 @@ import {
   getLockPositions,
   getOriginIntentsLastNonce,
   getDeliveredSettlements,
+  updateSettlementStatus,
 } from '../src/client';
 import {
   expect,
@@ -1008,6 +1009,24 @@ describe('Database Adapter:Client', () => {
       // Verify only DELIVERED intents that belong to the set domain are returned
       const result = await getDeliveredSettlements('1399811149', pool);
       expect(result).to.be.deep.eq(deliveredIntents);
+    });
+  });
+
+  describe('#updateSettlementStatus', () => {
+    const intents = createSettlementIntents(2, [
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1339' },
+      { intentId: mkBytes32('0x2'), status: TIntentStatus.Delivered, domain: '1340' },
+    ]);
+
+    const expectedIntents = createSettlementIntents(1, [
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Settled, domain: '1339' },
+    ]);
+
+    it('should work', async () => {
+      await saveSettlementIntents(intents, pool);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.empty;
+      await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Settled, pool);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.deep.eq(expectedIntents);
     });
   });
 });

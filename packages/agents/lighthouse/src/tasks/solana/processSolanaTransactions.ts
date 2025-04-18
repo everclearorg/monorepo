@@ -105,7 +105,8 @@ export const processSolanaTransactions = async () => {
 
       await anchor.web3.sendAndConfirmTransaction(connection, transaction, [signer], { maxRetries: MAX_RETRIES });
 
-      settlement.status = TIntentStatus.Settled;
+      // Update the status of the settlement in the database
+      await database.updateSettlementStatus(settlement.intentId, TIntentStatus.Settled);
     } catch (error) {
       logger.error('Failed to settle intent', requestContext, methodContext, {
         message: error instanceof Error ? error.message : String(error),
@@ -115,9 +116,6 @@ export const processSolanaTransactions = async () => {
       }); // Continue to the next settlement
     }
   }
-
-  // Update the status of the settlements in the database
-  await database.saveSettlementIntents(settlements);
 
   logger.info('Completed processing Solana settlements', requestContext, methodContext);
 };
