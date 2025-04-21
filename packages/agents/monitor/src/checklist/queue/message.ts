@@ -60,7 +60,7 @@ export const checkMessageStatus = async (shouldAlert = true) => {
   while (!end) {
     const uncompletedDbMessages = await database.getMessagesByStatus(uncompletedStatuses, offset, limit);
     // TODO: Remove this once Solana chain messages are supported by pipeline triggers
-    const uncompletedMessages = uncompletedDbMessages.filter((message) => message.destinationDomain === SOLANA_CHAINID);
+    const uncompletedMessages = uncompletedDbMessages.filter((message) => message.destinationDomain !== SOLANA_CHAINID);
     logger.debug('Getting hyperlane message status', requestContext, methodContext, {
       offset,
       limit,
