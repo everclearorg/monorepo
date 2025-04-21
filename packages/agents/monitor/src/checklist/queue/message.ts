@@ -1,4 +1,4 @@
-import { HyperlaneStatus, createLoggingContext, getNtpTimeSeconds } from '@chimera-monorepo/utils';
+import { HyperlaneStatus, SOLANA_CHAINID, createLoggingContext, getNtpTimeSeconds } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import { getMessageStatus } from '../../helpers';
 import { IntentMessageSummary, Severity } from '../../types';
@@ -58,7 +58,9 @@ export const checkMessageStatus = async (shouldAlert = true) => {
   let offset = 0;
   const messagesToAlert: string[] = [];
   while (!end) {
-    const uncompletedMessages = await database.getMessagesByStatus(uncompletedStatuses, offset, limit);
+    const uncompletedDbMessages = await database.getMessagesByStatus(uncompletedStatuses, offset, limit);
+    // TODO: Remove this once Solana chain messages are supported by pipeline triggers
+    const uncompletedMessages = uncompletedDbMessages.filter((message) => message.destinationDomain === SOLANA_CHAINID);
     logger.debug('Getting hyperlane message status', requestContext, methodContext, {
       offset,
       limit,

@@ -17,7 +17,7 @@ import {
   HyperlaneMessageSummary,
   HyperlaneMessageSummarySchema,
 } from '../types/api';
-import { createLoggingContext, jsonifyError } from '@chimera-monorepo/utils';
+import { createLoggingContext, jsonifyError, SOLANA_CHAINID } from '@chimera-monorepo/utils';
 import { getIntentStatus } from '../checklist/queue';
 import { getContext } from '../context';
 import { getAssetConfig, getTokenPrice, selfRelayHyperlaneMessages } from '../libs';
@@ -55,7 +55,7 @@ export const bindServer = async (): Promise<FastifyInstance> => {
         const { originDomain, destinationDomains, intentId } = request.params;
         const messages = await getIntentStatus(
           originDomain,
-          destinationDomains.split(',').filter((d) => d !== originDomain),
+          destinationDomains.split(',').filter((d) => d !== originDomain && d !== SOLANA_CHAINID),
           intentId,
         );
         logger.debug('Retrieved message status for intent', requestContext, methodContext, { intentId, messages });
