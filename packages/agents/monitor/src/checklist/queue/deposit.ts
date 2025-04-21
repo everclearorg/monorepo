@@ -16,7 +16,7 @@ export const checkDepositQueueCount = async (): Promise<Map<string, number>> => 
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkDepositQueueCount.name);
 
-  const domains = Object.keys(config.chains);
+  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
   const enqueuedDepositsByDomain = await database.getAllEnqueuedDeposits(domains);
 
   const queueCountByKey: Map<string, number> = new Map();
@@ -82,7 +82,7 @@ export const checkDepositQueueLatency = async (): Promise<Map<string, number>> =
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkDepositQueueLatency.name);
 
-  const domains = Object.keys(config.chains);
+  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
   logger.debug('Method start', requestContext, methodContext, {
     domains,
     hubDomain: config.hub.domain,
