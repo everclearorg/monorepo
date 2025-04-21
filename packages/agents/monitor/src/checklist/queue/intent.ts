@@ -11,7 +11,7 @@ export const checkFillQueueCount = async (): Promise<Map<string, number>> => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkFillQueueCount.name);
 
-  const domains = Object.keys(config.chains);
+  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
   const intentsByDomain = await database.getMessageQueueContents(QueueType.Fill, domains);
   const countsByDomain = new Map<string, number>(
     domains.map((domain) => [domain, intentsByDomain.get(domain)?.length ?? 0]),
@@ -62,7 +62,7 @@ export const checkFillQueueLatency = async (): Promise<Map<string, number>> => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkFillQueueLatency.name);
 
-  const domains = Object.keys(config.chains);
+  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
   const intentsByDomain = await database.getMessageQueueContents(QueueType.Fill, domains);
 
   const latencyByDomain = new Map<string, number>();
@@ -133,7 +133,7 @@ export const checkIntentQueueCount = async (): Promise<Map<string, number>> => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkIntentQueueCount.name);
 
-  const domains = Object.keys(config.chains);
+  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
   const intentsByDomain = await database.getMessageQueueContents(QueueType.Intent, domains);
   const countsByDomain = new Map<string, number>(
     domains.map((domain) => [domain, intentsByDomain.get(domain)?.length ?? 0]),
@@ -184,7 +184,7 @@ export const checkIntentQueueLatency = async (): Promise<Map<string, number>> =>
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkIntentQueueLatency.name);
 
-  const domains = Object.keys(config.chains);
+  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
   const intentsByDomain = await database.getMessageQueueContents(QueueType.Intent, domains);
 
   const latencyByDomain = new Map<string, number>();

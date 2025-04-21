@@ -163,6 +163,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
 
     const deployments: any = localChainConfig?.deployments || everclearChainConfig?.deployments || {};
     const assets: any = localChainConfig?.assets || everclearChainConfig?.assets || {};
+    const network: string = localChainConfig?.network || everclearChainConfig?.network || 'evm';
 
     chainsForMonitorConfig[domainId] = {
       providers,
@@ -170,6 +171,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
       confirmations,
       deployments,
       assets,
+      network,
     };
   }
 
