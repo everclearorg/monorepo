@@ -1,7 +1,5 @@
 -- migrate:up
 
-DROP FUNCTION IF EXISTS public.parse_and_insert_new_intent_cpi_event(hex_data TEXT, rec record);
-
 CREATE OR REPLACE FUNCTION public.parse_and_insert_new_intent_cpi_event(hex_data TEXT, rec record) RETURNS BOOLEAN AS $$
 DECLARE
     intent_id TEXT;

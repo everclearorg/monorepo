@@ -1,10 +1,6 @@
 -- migrate:up
 
-CREATE OR REPLACE FUNCTION public.to_numeric(hex_str TEXT) RETURNS NUMERIC AS $$
-BEGIN
-    RETURN ('0x' || hex_str)::numeric;
-END;
-$$ LANGUAGE plpgsql;
+ALTER TABLE public.messages ALTER COLUMN transaction_hash TYPE character(130);
 
 CREATE OR REPLACE FUNCTION public.parse_and_insert_new_intent_cpi_event(hex_data TEXT, rec record) RETURNS BOOLEAN AS $$
 DECLARE
@@ -14,12 +10,12 @@ DECLARE
     receiver TEXT;
     input_asset TEXT;
     output_asset TEXT;
-    normalized_amount BIGINT;
+    normalized_amount NUMERIC;
     max_fee INT;
     origin_domain INT;
-    nonce BIGINT;
-    ttl BIGINT;
-    timestamp BIGINT;
+    nonce NUMERIC;
+    ttl NUMERIC;
+    timestamp NUMERIC;
     destination_count INT;
     destinations VARCHAR(66)[];
     data_length INT;
@@ -39,8 +35,8 @@ BEGIN
 	pos := pos + 64;
 	output_asset := '0x' || SUBSTRING(hex_data, pos, 64);
 	pos := pos + 64;
-	normalized_amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
-	pos := pos + 16;
+	normalized_amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
+	pos := pos + 32;
 	max_fee := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
 	origin_domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
@@ -104,7 +100,7 @@ BEGIN
 		rec.tx_signature,
 		timestamp,
 		rec.block_slot,
-		'',
+		initiator,
 		0,
 		rec.tx_fee,
 		1,
@@ -137,77 +133,63 @@ BEGIN
 		ttl = EXCLUDED.ttl,
 		destinations = EXCLUDED.destinations;
 
-    RETURN TRUE;
-END;$$
-LANGUAGE PLPGSQL;
-
-CREATE OR REPLACE FUNCTION public.parse_and_insert_settled_cpi_event(hex_data TEXT, rec record) RETURNS BOOLEAN AS $$
-DECLARE
-    intent_id TEXT;
-    recipient TEXT;
-    asset TEXT;
-    amount BIGINT;
-    domain INT;
-	pos INT := 33;
-BEGIN
-	intent_id := '0x' || SUBSTRING(hex_data, pos, 64);
-	pos := pos + 64;
-	recipient := '0x' || SUBSTRING(hex_data, pos, 64);
-	pos := pos + 64;
-	asset := '0x' || SUBSTRING(hex_data, pos, 64);
-	pos := pos + 64;
-	amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
-	pos := pos + 16;
-	domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
-	pos := pos + 8;
-
-	INSERT INTO public.settlement_intents(
-		id,
-		amount,
-		asset,
-		recipient,
-		domain,
-		transaction_hash,
-		"timestamp",
-		block_number,
-		tx_origin,
-		tx_nonce,
-		gas_limit,
-		gas_price,
-		return_data,
-		status
-	)
+	INSERT INTO public.messages(
+	    id,
+        domain,
+        type,
+        quote,
+        first,
+        last,
+        intent_ids,
+        tx_origin,
+        transaction_hash,
+        "timestamp",
+        block_number,
+        tx_nonce,
+        gas_price,
+        gas_limit,
+        message_status,
+        origin_domain,
+        destination_domain
+    )
 	VALUES (
-		intent_id,
-		amount,
-		asset,
-		recipient,
-		domain,
+        message_id,
+        origin_domain,
+        'INTENT',
+        '0',
+        0,
+        0,
+        ARRAY[intent_id],
+        initiator,
         rec.tx_signature,
-		rec.block_timestamp,
-		rec.block_slot,
-		'',
-		0,
-		rec.tx_fee,
-		1,
-		'0x',
-		'SETTLED'
-	)
+        timestamp,
+        rec.block_slot,
+        0,
+        1,
+        rec.tx_fee,
+        'delivered',
+        origin_domain,
+        '25327'
+    )
 	ON CONFLICT (id)
 	DO UPDATE SET
-		amount = EXCLUDED.amount,
-		asset = EXCLUDED.asset,
-		recipient = EXCLUDED.recipient,
-		domain = EXCLUDED.domain,
-		transaction_hash = EXCLUDED.transaction_hash,
-		"timestamp" = EXCLUDED."timestamp",
-		block_number = EXCLUDED.block_number,
-		tx_origin = EXCLUDED.tx_origin,
-		tx_nonce = EXCLUDED.tx_nonce,
-		gas_limit = EXCLUDED.gas_limit,
-		gas_price = EXCLUDED.gas_price,
-		return_data = EXCLUDED.return_data,
-		status = EXCLUDED.status;
+        id = EXCLUDED.id,
+        domain = EXCLUDED.domain,
+        type = EXCLUDED.type,
+        quote = EXCLUDED.quote,
+        first = EXCLUDED.first,
+        last = EXCLUDED.last,
+        intent_ids = EXCLUDED.intent_ids,
+        tx_origin = EXCLUDED.tx_origin,
+        transaction_hash = EXCLUDED.transaction_hash,
+        "timestamp" = EXCLUDED."timestamp",
+        block_number = EXCLUDED.block_number,
+        tx_nonce = EXCLUDED.tx_nonce,
+        gas_price = EXCLUDED.gas_price,
+        gas_limit = EXCLUDED.gas_limit,
+        message_status = EXCLUDED.message_status,
+        origin_domain = EXCLUDED.origin_domain,
+        destination_domain = EXCLUDED.destination_domain;
 
     RETURN TRUE;
 END;$$

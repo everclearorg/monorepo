@@ -559,6 +559,64 @@ BEGIN
 		ttl = EXCLUDED.ttl,
 		destinations = EXCLUDED.destinations;
 
+	INSERT INTO public.messages(
+	    id,
+        domain,
+        type,
+        quote,
+        first,
+        last,
+        intent_ids,
+        tx_origin,
+        transaction_hash,
+        "timestamp",
+        block_number,
+        tx_nonce,
+        gas_price,
+        gas_limit,
+        message_status,
+        origin_domain,
+        destination_domain
+    )
+	VALUES (
+        message_id,
+        origin_domain,
+        'INTENT',
+        '0',
+        0,
+        0,
+        ARRAY[intent_id],
+        initiator,
+        rec.tx_signature,
+        timestamp,
+        rec.block_slot,
+        0,
+        1,
+        rec.tx_fee,
+        'delivered',
+        origin_domain,
+        '25327'
+    )
+	ON CONFLICT (id)
+	DO UPDATE SET
+        id = EXCLUDED.id,
+        domain = EXCLUDED.domain,
+        type = EXCLUDED.type,
+        quote = EXCLUDED.quote,
+        first = EXCLUDED.first,
+        last = EXCLUDED.last,
+        intent_ids = EXCLUDED.intent_ids,
+        tx_origin = EXCLUDED.tx_origin,
+        transaction_hash = EXCLUDED.transaction_hash,
+        "timestamp" = EXCLUDED."timestamp",
+        block_number = EXCLUDED.block_number,
+        tx_nonce = EXCLUDED.tx_nonce,
+        gas_price = EXCLUDED.gas_price,
+        gas_limit = EXCLUDED.gas_limit,
+        message_status = EXCLUDED.message_status,
+        origin_domain = EXCLUDED.origin_domain,
+        destination_domain = EXCLUDED.destination_domain;
+
     RETURN TRUE;
 END;$$;
 
@@ -2502,7 +2560,7 @@ CREATE TABLE public.messages (
     last bigint NOT NULL,
     intent_ids character varying(66)[] NOT NULL,
     tx_origin character varying(66) NOT NULL,
-    transaction_hash character(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
     "timestamp" bigint NOT NULL,
     block_number bigint NOT NULL,
     tx_nonce bigint NOT NULL,
@@ -4912,4 +4970,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250416224500'),
     ('20250417163412'),
     ('20250418160651'),
-    ('20250418195903');
+    ('20250418195903'),
+    ('20250421233253');
