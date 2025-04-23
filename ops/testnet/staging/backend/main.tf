@@ -23,13 +23,13 @@ data "aws_route53_zone" "primary" {
 }
 
 locals {
-  db_alarm_emails = ["preetham@proximalabs.io", "wang@proximalabs.io", "layne@proximalabs.io"]
+  db_alarm_emails = ["preetham@proximalabs.io", "layne@proximalabs.io"]
 }
 
 module "cartographer_db" {
   domain                = "cartographer"
   source                = "../../../modules/db"
-  identifier            = "rds-postgres-cartographer-${var.environment}"
+  identifier            = "rds-postgres-cartographer-mainnet-staging-chimera"
   instance_class        = "db.t4g.large"
   allocated_storage     = 150
   max_allocated_storage = 180
@@ -56,67 +56,19 @@ module "cartographer_db" {
   publicly_accessible        = true
 }
 
-module "cartographer-db-alarms" {
-  source                                  = "../../../modules/db-alarms"
-  db_instance_name                        = module.cartographer_db.db_instance_name
-  db_instance_id                          = module.cartographer_db.db_instance_id
-  is_replica                              = false
-  enable_cpu_utilization_alarm            = true
-  enable_free_storage_space_too_low_alarm = true
-  enable_transaction_logs_disk_usage_alarm = true
-  stage                                   = var.stage
-  environment                             = var.environment
-  sns_topic_subscription_emails           = local.db_alarm_emails
-}
+# module "cartographer-db-alarms" {
+#   source                                  = "../../../modules/db-alarms"
+#   db_instance_name                        = module.cartographer_db.db_instance_name
+#   db_instance_id                          = module.cartographer_db.db_instance_id
+#   is_replica                              = false
+#   enable_cpu_utilization_alarm            = true
+#   enable_free_storage_space_too_low_alarm = true
+#   enable_transaction_logs_disk_usage_alarm = true
+#   stage                                   = var.stage
+#   environment                             = var.environment
+#   sns_topic_subscription_emails           = local.db_alarm_emails
+# }
 
-module "cartographer_db_replica" {
-  domain              = "cartographer"
-  source              = "../../../modules/db-replica"
-  replicate_source_db = module.cartographer_db.db_instance_identifier
-  depends_on          = [module.cartographer_db]
-  replica_identifier  = "rds-postgres-cartographer-replica-${var.environment}"
-  instance_class      = "db.t4g.large"
-  allocated_storage   = 25
-  max_allocated_storage = 180
-
-  name     = module.cartographer_db.db_instance_name
-  username = module.cartographer_db.db_instance_username
-  password = module.cartographer_db.db_instance_password
-  port     = module.cartographer_db.db_instance_port
-
-  engine_version = module.cartographer_db.db_instance_engine_version
-
-  maintenance_window      = module.cartographer_db.db_maintenance_window
-  backup_retention_period = module.cartographer_db.db_backup_retention_period
-  backup_window           = module.cartographer_db.db_backup_window
-
-  tags = {
-    Environment = var.environment
-    Domain      = var.domain
-  }
-
-  parameter_group_name = "rds-postgres"
-
-  hosted_zone_id        = data.aws_route53_zone.primary.zone_id
-  stage                 = var.stage
-  environment           = var.environment
-  db_security_group_ids = module.cartographer_db.db_instance_vpc_security_group_ids
-  db_subnet_group_name  = module.cartographer_db.db_subnet_group_name
-  publicly_accessible   = module.cartographer_db.db_publicly_accessible
-}
-
-module "cartographer-db-replica-alarms" {
-  source                                  = "../../../modules/db-alarms"
-  db_instance_name                        = module.cartographer_db.db_instance_name
-  db_instance_id                          = module.cartographer_db.db_instance_id
-  is_replica                              = true
-  enable_cpu_utilization_alarm            = true
-  enable_free_storage_space_too_low_alarm = true
-  enable_transaction_logs_disk_usage_alarm = true
-  stage                                   = var.stage
-  environment                             = var.environment
-  sns_topic_subscription_emails           = local.db_alarm_emails
-}
 
 module "postgrest" {
   source                   = "../../../modules/service"
@@ -146,73 +98,73 @@ module "postgrest" {
   domain                   = var.domain
 }
 
-module "cartographer-depositors-lambda-cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-cartographer"
-  docker_image_tag    = var.cartographer_image_tag
-  container_family    = "cartographer-depositors"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.cartographer_depositors_config_param_name
-  container_env_vars  = merge(local.cartographer_env_vars, {
-    CARTOGRAPHER_SERVICE = "depositors"
-    CONFIG_PARAMETER_NAME = local.cartographer_depositors_config_param_name
-  })
-  schedule_expression = "rate(1 minute)"
-  memory_size         = 1024
-  config              = local.local_cartographer_config
-}
+# module "cartographer-depositors-lambda-cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-cartographer"
+#   docker_image_tag    = var.cartographer_image_tag
+#   container_family    = "cartographer-depositors"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.cartographer_depositors_config_param_name
+#   container_env_vars  = merge(local.cartographer_env_vars, {
+#     CARTOGRAPHER_SERVICE = "depositors"
+#     CONFIG_PARAMETER_NAME = local.cartographer_depositors_config_param_name
+#   })
+#   schedule_expression = "rate(1 minute)"
+#   memory_size         = 1024
+#   config              = local.local_cartographer_config
+# }
 
-module "cartographer-intents-lambda-cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-cartographer"
-  docker_image_tag    = var.cartographer_image_tag
-  container_family    = "cartographer-intents"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.cartographer_intents_config_param_name
-  container_env_vars  = merge(local.cartographer_env_vars, {
-    CARTOGRAPHER_SERVICE = "intents"
-    CONFIG_PARAMETER_NAME = local.cartographer_intents_config_param_name
-  })
-  schedule_expression = "rate(1 minute)"
-  memory_size         = 1024
-  config              = local.local_cartographer_config
-}
+# module "cartographer-intents-lambda-cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-cartographer"
+#   docker_image_tag    = var.cartographer_image_tag
+#   container_family    = "cartographer-intents"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.cartographer_intents_config_param_name
+#   container_env_vars  = merge(local.cartographer_env_vars, {
+#     CARTOGRAPHER_SERVICE = "intents"
+#     CONFIG_PARAMETER_NAME = local.cartographer_intents_config_param_name
+#   })
+#   schedule_expression = "rate(1 minute)"
+#   memory_size         = 1024
+#   config              = local.local_cartographer_config
+# }
 
-module "cartographer-invoices-lambda-cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-cartographer"
-  docker_image_tag    = var.cartographer_image_tag
-  container_family    = "cartographer-invoices"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.cartographer_invoices_config_param_name
-  container_env_vars  = merge(local.cartographer_env_vars, {
-    CARTOGRAPHER_SERVICE = "invoices"
-    CONFIG_PARAMETER_NAME = local.cartographer_invoices_config_param_name
-  })
-  schedule_expression = "rate(1 minute)"
-  memory_size         = 1024
-  config              = local.local_cartographer_config
-}
+# module "cartographer-invoices-lambda-cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-cartographer"
+#   docker_image_tag    = var.cartographer_image_tag
+#   container_family    = "cartographer-invoices"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.cartographer_invoices_config_param_name
+#   container_env_vars  = merge(local.cartographer_env_vars, {
+#     CARTOGRAPHER_SERVICE = "invoices"
+#     CONFIG_PARAMETER_NAME = local.cartographer_invoices_config_param_name
+#   })
+#   schedule_expression = "rate(1 minute)"
+#   memory_size         = 1024
+#   config              = local.local_cartographer_config
+# }
 
-module "cartographer-monitor-lambda-cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-cartographer"
-  docker_image_tag    = var.cartographer_image_tag
-  container_family    = "cartographer-monitor"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.cartographer_monitor_config_param_name
-  container_env_vars  = merge(local.cartographer_env_vars, {
-    CARTOGRAPHER_SERVICE = "monitor"
-    CONFIG_PARAMETER_NAME = local.cartographer_monitor_config_param_name
-  })
-  schedule_expression = "rate(1 minute)"
-  memory_size         = 1024
-  config              = local.local_cartographer_config
-}
+# module "cartographer-monitor-lambda-cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-cartographer"
+#   docker_image_tag    = var.cartographer_image_tag
+#   container_family    = "cartographer-monitor"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.cartographer_monitor_config_param_name
+#   container_env_vars  = merge(local.cartographer_env_vars, {
+#     CARTOGRAPHER_SERVICE = "monitor"
+#     CONFIG_PARAMETER_NAME = local.cartographer_monitor_config_param_name
+#   })
+#   schedule_expression = "rate(1 minute)"
+#   memory_size         = 1024
+#   config              = local.local_cartographer_config
+# }
 
 module "network" {
   source      = "../../../modules/networking"

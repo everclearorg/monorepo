@@ -143,6 +143,36 @@ locals {
           "https://api.roninchain.com/rpc",
           "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.berachain.com"
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
+        ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.gnosis.gateway.fm"
+        ]
       }
     }
   })

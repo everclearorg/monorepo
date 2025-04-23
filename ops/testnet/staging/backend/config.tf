@@ -6,9 +6,9 @@ locals {
   cartographer_monitor_config_param_name = "cartographer-monitor-${var.environment}-${var.stage}-config"
 
   cartographer_env_vars = {
-    DATABASE_URL        = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear",
+    DATABASE_URL        = "postgres://everclear:qnoFvFr19eDVq6OzTxtvcMh7aY5ovo@rds-postgres-cartographer-mainnet-staging-chimera.c2g2uuqedmjs.eu-west-1.rds.amazonaws.com:5432/everclear",
     ENVIRONMENT         = var.environment,
-    EVERCLEAR_CONFIG    = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.testnet.staging.json",
+    EVERCLEAR_CONFIG    = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json",
     STAGE               = var.stage,
     DD_ENV              = "${var.environment}-${var.stage}",
     DD_LOGS_ENABLED     = true,
@@ -18,11 +18,11 @@ locals {
 
   postgrest_env_vars = [
     { name = "PGRST_ADMIN_SERVER_PORT", value = "3001" },
-    { name = "PGRST_DB_URI", value = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db_replica.db_instance_endpoint}/everclear" },
+    { name = "PGRST_DB_URI", value = "postgres://everclear:qnoFvFr19eDVq6OzTxtvcMh7aY5ovo@rds-postgres-cartographer-mainnet-staging-chimera.c2g2uuqedmjs.eu-west-1.rds.amazonaws.com:5432/everclear" },
     { name = "PGRST_DB_SCHEMA", value = "public" },
     { name = "PGRST_DB_ANON_ROLE", value = "query" },
-    { name = "ENVIRONMENT", value = var.environment },
-    { name = "STAGE", value = var.stage },
+    { name = "ENVIRONMENT", value = "mainnet" },
+    { name = "STAGE", value = "staging" },
     { name = "PGRST_DB_AGGREGATES_ENABLED", value = "true" }
   ]
 
