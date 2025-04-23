@@ -188,6 +188,8 @@ BEGIN
     ELSIF origin_status = 'DISPATCHED' THEN
         IF hub_status IS NULL OR hub_status = 'NONE' THEN
             RETURN 'DISPATCHED_SPOKE';
+        ELSIF hub_status = 'ADDED' THEN
+            RETURN 'ADDED_HUB';
         ELSIF hub_status = 'DISPATCHED' THEN
             RETURN 'DISPATCHED_HUB';
         ELSE
@@ -4970,4 +4972,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250417163412'),
     ('20250418160651'),
     ('20250418195903'),
-    ('20250421233253');
+    ('20250421233253'),
+    ('20250423160717');
