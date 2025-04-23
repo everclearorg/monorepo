@@ -2,7 +2,10 @@ use anchor_lang::{
     prelude::*,
     solana_program::{program::invoke_signed, system_program},
 };
-use anchor_spl::{associated_token::get_associated_token_address, token::ID as TOKEN_PROGRAM_ID};
+use anchor_spl::{
+    associated_token::{get_associated_token_address, AssociatedToken},
+    token::ID as TOKEN_PROGRAM_ID,
+};
 
 use crate::{
     consts::{everclear_gateway, h256_to_pub, EVERCLEAR_DOMAIN},
@@ -173,7 +176,7 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
     if data.is_err() {
         let space = 8
             + std::mem::size_of::<IntentStatusAccount>()
-            + 10 * std::mem::size_of::<SerializableAccountMeta>();
+            + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
         let __anchor_rent = Rent::get()?;
         let lamports = __anchor_rent.minimum_balance(space);
@@ -269,6 +272,10 @@ fn build_settle_intent_account_metas(
         to_serializable_account_meta(system_program::id(), false),
         // mint public key
         to_serializable_account_meta(settlement.asset, false),
+        // associated token program
+        to_serializable_account_meta(AssociatedToken::id(), false),
+        // recipient
+        to_serializable_account_meta(settlement.recipient, false),
         // recipient ATA
         to_serializable_account_meta(recipient_token_account_pubkey, true),
         // vault ATA
