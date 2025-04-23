@@ -406,7 +406,7 @@ abstract contract Gnosis {
 
   // Fee adapter constants
   address public constant GNOSIS_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
-  address public GNOSIS_FEE_ADAPTER;
+  address public GNOSIS_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
 }
 
 abstract contract Berachain {

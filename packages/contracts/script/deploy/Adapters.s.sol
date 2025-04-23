@@ -270,6 +270,15 @@ contract MainnetProduction is DeployAdapterBase, MainnetProductionEnvironment {
       feeSigner: L2_FEE_SIGNER,
       owner: INK_ENG_MULTISIG
     });
+
+    // gnosis
+    _deploymentParams[GNOSIS] = DeploymentParams({
+      spoke: address(GNOSIS_SPOKE),
+      xerc20Module: address(GNOSIS_XERC20_MODULE),
+      feeRecipient: GNOSIS_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: GNOSIS_ENG_MULTISIG
+    });
   }
 }
 
