@@ -205,7 +205,43 @@
     "subgraphName": "everclear-spoke-gnosis",
     "domain": "100",
     "environment": "production",
-    "network": "gnosis",
+    "network": "xdai",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-berachain",
+    "domain": "80094",
+    "environment": "production",
+    "network": "berachain-mainnet",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-mantle",
+    "domain": "5000",
+    "environment": "production",
+    "network": "mantle",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-sonic",
+    "domain": "146",
+    "environment": "production",
+    "network": "sonic",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-ink",
+    "domain": "57073",
+    "environment": "production",
+    "network": "ink",
     "indexers": [
       "goldsky"
     ]
