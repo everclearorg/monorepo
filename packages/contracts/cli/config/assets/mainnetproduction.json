@@ -16,11 +16,11 @@
     "contractName": "PufETH"
   },
   {
-    "symbol": "CLEAR",
-    "contractName": "CLEAR"
+    "symbol": "xCLEAR",
+    "contractName": "XCLEAR"
   },
   {
-    "symbol": "CBBTC",
+    "symbol": "cbBTC",
     "contractName": "CBBTC"
   },
   {
