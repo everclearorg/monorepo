@@ -1,5 +1,11 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Mint, Token, TokenAccount};
+use anchor_spl::{
+    associated_token::{
+        spl_associated_token_account::instruction::create_associated_token_account_idempotent,
+        AssociatedToken,
+    },
+    token::{self, Mint, Token, TokenAccount},
+};
 
 use crate::{
     consts::DEFAULT_NORMALIZED_DECIMALS,
@@ -48,12 +54,21 @@ pub fn settle_delivered_intent(
         SpokeError::IncorrectSettlementAccounts
     );
     require!(
-        ctx.accounts.recipient_token_account.key()
+        ctx.accounts.associated_token_program.key()
             == ctx.accounts.intent_status_pda.accounts[6].pubkey,
         SpokeError::IncorrectSettlementAccounts
     );
     require!(
-        ctx.accounts.vault_token_account.key() == ctx.accounts.intent_status_pda.accounts[7].pubkey,
+        ctx.accounts.recipient.key() == ctx.accounts.intent_status_pda.accounts[7].pubkey,
+        SpokeError::IncorrectSettlementAccounts
+    );
+    require!(
+        ctx.accounts.recipient_token_account.key()
+            == ctx.accounts.intent_status_pda.accounts[8].pubkey,
+        SpokeError::IncorrectSettlementAccounts
+    );
+    require!(
+        ctx.accounts.vault_token_account.key() == ctx.accounts.intent_status_pda.accounts[9].pubkey,
         SpokeError::IncorrectSettlementAccounts
     );
 
@@ -76,10 +91,30 @@ pub fn settle_delivered_intent(
     )?;
 
     require!(amount < u64::MAX.into(), SpokeError::InvalidAmount);
- 
+
     if amount == 0 {
         return Ok(());
     }
+
+    // Create ATA idempotently
+    let create_idempotent_inst = create_associated_token_account_idempotent(
+        ctx.accounts.authority.key,
+        ctx.accounts.recipient.key,
+        &ctx.accounts.mint_account.key(),
+        ctx.accounts.token_program.key,
+    );
+    msg!("{:?}", create_idempotent_inst);
+    anchor_lang::solana_program::program::invoke(
+        &create_idempotent_inst,
+        &[
+            ctx.accounts.authority.to_account_info(),
+            ctx.accounts.recipient_token_account.to_account_info(),
+            ctx.accounts.recipient.to_account_info(),
+            ctx.accounts.mint_account.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+        ],
+    )?;
 
     let signer_seeds: &[&[u8]] =
         vault_authority_pda_seeds!(ctx.accounts.spoke_state.vault_authority_bump);
@@ -129,15 +164,21 @@ pub struct SettleDeliveredIntentContext {
     )]
     pub intent_status_pda: Account<'info, IntentStatusAccount>,
 
-    /// CHECK: This is a PDA that signs for the vault
+    /// CHECK: verification is done via the storage pda
     pub vault_authority: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
 
     pub mint_account: Account<'info, Mint>,
 
+    pub associated_token_program: Program<'info, AssociatedToken>,
+
+    /// CHECK: verification is done via the storage pda
+    pub recipient: UncheckedAccount<'info>,
+
+    /// CHECK: verification is done via the storage pda
     #[account(mut)]
-    pub recipient_token_account: Account<'info, TokenAccount>,
+    pub recipient_token_account: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub vault_token_account: Account<'info, TokenAccount>,

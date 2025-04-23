@@ -238,14 +238,6 @@ describe('#everclear_spoke', () => {
         true, // allowOwnerOffCurve is true because the owner is a PDA
       );
 
-      // Create a user token account
-      const userTokenAccount = await token.createAssociatedTokenAccount(
-        connection,
-        user, // fee payer
-        mintPubkey, // mint
-        user.publicKey, // owner,
-      );
-
       // Mint some tokens to the user token account
       await token.mintToChecked(
         connection,
@@ -308,14 +300,14 @@ describe('#everclear_spoke', () => {
   });
 
   describe('#settle_delivered_intent', () => {
-    it('should work', async () => {
+    it('should work when the recipient ata is not created', async () => {
       // Arrange
       const settleIx = {
         intentId,
       };
       let intentStatus = await program.account.intentStatusAccount.fetch(intentStatusPda);
-      const recipientTokenAccount = intentStatus.accounts[6].pubkey;
-      const vaultTokenAccount = intentStatus.accounts[7].pubkey;
+      const recipientTokenAccount = intentStatus.accounts[8].pubkey;
+      const vaultTokenAccount = intentStatus.accounts[9].pubkey;
 
       // Sanity check
       expect(intentStatus.status).to.be.deep.equal({ delivered: {} });
@@ -324,9 +316,8 @@ describe('#everclear_spoke', () => {
       expect(vaultBalance.value.amount).to.be.equal((7e11).toString());
       expect(vaultBalance.value.uiAmountString).to.be.equal((7000).toString());
 
-      let recipientBalance = await connection.getTokenAccountBalance(recipientTokenAccount);
-      expect(recipientBalance.value.amount).to.be.equal((0).toString());
-      expect(recipientBalance.value.uiAmountString).to.be.equal((0).toString());
+      // assert recipient token account is not created yet
+      expect(connection.getTokenAccountBalance(recipientTokenAccount)).to.be.rejectedWith(Error);
 
       // Act
       await program.methods
@@ -336,11 +327,11 @@ describe('#everclear_spoke', () => {
           spokeState: intentStatus.accounts[0].pubkey,
           intentStatusPda: intentStatus.accounts[1].pubkey,
           vaultAuthority: intentStatus.accounts[2].pubkey,
-          tokenProgram: intentStatus.accounts[3].pubkey,
-          systemProgram: intentStatus.accounts[4].pubkey,
           mintAccount: intentStatus.accounts[5].pubkey,
+          recipient: intentStatus.accounts[7].pubkey,
           recipientTokenAccount,
           vaultTokenAccount,
+          program: program.programId,
         })
         .rpc();
 
@@ -350,7 +341,7 @@ describe('#everclear_spoke', () => {
 
       const incomingAmount = incomingIntentAmount.div(new anchor.BN(Math.pow(10, 18 - TOKEN_DECIMALS)));
 
-      recipientBalance = await connection.getTokenAccountBalance(recipientTokenAccount);
+      const recipientBalance = await connection.getTokenAccountBalance(recipientTokenAccount);
       expect(recipientBalance.value.amount).to.be.equal(incomingAmount.toString());
       expect(recipientBalance.value.uiAmountString).to.be.equal((5000).toString());
 
