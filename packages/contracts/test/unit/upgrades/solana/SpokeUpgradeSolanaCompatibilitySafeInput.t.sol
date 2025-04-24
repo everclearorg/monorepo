@@ -1472,7 +1472,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
 
   function test_spokeUpgradeSolanaCompatibilitySafe_upgradeInkProd() public {
     vm.createSelectFork(vm.envString('INK_RPC'));
-    vm.rollFork(11236356);
+    vm.rollFork(11_236_356);
     _params = _deploymentParams[block.chainid];
 
     // Checking implementation correct and caching the state variables
