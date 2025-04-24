@@ -87,7 +87,7 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(2020);
   } else if (network == 'unichain') {
     chainId = BigInt.fromI32(130);
-  } else if (network == 'berachain') {
+  } else if (network == 'berachain-mainnet') {
     chainId = BigInt.fromI32(80094);
   } else if (network == 'sonic') {
     chainId = BigInt.fromI32(146);
