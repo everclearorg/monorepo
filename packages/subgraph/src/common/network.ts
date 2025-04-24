@@ -15,7 +15,7 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(56);
   } else if (network == 'chapel') {
     chainId = BigInt.fromI32(97);
-  } else if (network == 'gnosis') {
+  } else if (network == 'xdai') {
     chainId = BigInt.fromI32(100);
   } else if (network == 'matic') {
     chainId = BigInt.fromI32(137);
