@@ -688,11 +688,7 @@ locals {
     rewards = {
       clearAssetAddress = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
       volume = {
-        tokens = [
-          {
-            address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
-          }
-        ]
+        tokens = []
       }
       staking = {
         tokens = [
