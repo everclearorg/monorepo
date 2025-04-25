@@ -5,10 +5,8 @@ export const getGelatoRelayerAddress = (domain: string): string => {
   switch (domain) {
     case '280': // zkSync testnet
     case '324': // zkSync mainnet
-      return '0x0c1B63765Be752F07147ACb80a7817A8b74d9831';
-    case '130': // Unichain
-      return '0xC6e576260853e8eDb7a683Ff1233747Ad9904f16';
+      return '0x30532F63B02c5bBb6D6f684Cbc7bebfC5deF407B';
     default:
-      return '0xF9D64d54D32EE2BDceAAbFA60C4C438E224427d0'; // all other networks
+      return '0xceA8aAa918bc6C19e5B77841ebD77ff3188385AF'; // all other networks
   }
 };
