@@ -34,6 +34,9 @@ const MAX_SETTLEMENT_DEQUEUE = 900;
 // Solana settlement message is limited because of the 1kb tx size limit.
 const MAX_SETTLEMENT_DEQUEUE_SOLANA = 1;
 
+// NOTE: We are now capping intents because of hyperlane gas calculations
+const MAX_INTENT_DEQUEUE = 6;
+
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
 
@@ -90,12 +93,19 @@ export const dispatchMessageQueueViaRelayers = async (
     .div(BPS_DENOMINATOR + DEFAULT_GAS_BUFFER)
     .sub(BASE_GAS);
   const calculatedMax = gasAvailable.div(DESTINATION_GAS_CONSUMPTION[type]).toNumber();
-  const maxDequeue =
-    type === QueueType.Settlement
-      ? destinationDomain === SOLANA_CHAINID
-        ? Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE_SOLANA)
-        : Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE)
-      : calculatedMax;
+  let maxDequeue = calculatedMax;
+  switch (type) {
+    case QueueType.Settlement:
+      if (destinationDomain === SOLANA_CHAINID) {
+        maxDequeue = Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE_SOLANA);
+      } else {
+        maxDequeue = Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE);
+      }
+      break;
+    case QueueType.Intent:
+      maxDequeue = Math.min(calculatedMax, MAX_INTENT_DEQUEUE);
+      break;
+  }
 
   if (maxDequeue === 0) {
     logger.warn('Unable to retrieve max dequeue elements', requestContext, methodContext, {
