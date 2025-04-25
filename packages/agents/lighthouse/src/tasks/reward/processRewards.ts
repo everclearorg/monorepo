@@ -158,9 +158,20 @@ export const processRewards = async () => {
 
   const rewardDist: RewardDistributions = {};
   const volumeMetadata = await processVolumeRewards(epoch, epochEnd, historicPrice, rewardDist);
+  logger.info('generated volume rewards', requestContext, methodContext, {
+    rewardDist,
+    epoch,
+  });
   const stakeMetadata = await processStakingRewards(epoch, epochEnd, epochDuration, historicPrice, rewardDist);
-
+  logger.info('generated volume and staking rewards', requestContext, methodContext, {
+    rewardDist,
+    epoch,
+  });
   await mergeRewardWithPreviousTree(epoch, rewardDist);
+  logger.info('combined with previous tree', requestContext, methodContext, {
+    rewardDist,
+    epoch,
+  });
 
   const trees: {
     [address: string]: StandardMerkleTree<string[]>;
@@ -235,7 +246,7 @@ export const processRewards = async () => {
   const rewards = [];
   for (const user in volumeMetadata.userVolume) {
     for (const domain in volumeMetadata.userVolume[user].epochResult) {
-      const clearEmissions = rewardsConfig.clearAssetAddress
+      const clearEmissions = rewardsConfig.clearAssetAddress && volumeMetadata.userVolume[user]?.epochResult[domain]?.emissions[rewardsConfig.clearAssetAddress]
         ? volumeMetadata.userVolume[user].epochResult[domain].emissions[rewardsConfig.clearAssetAddress]
         : 0;
       epochResults.push({
@@ -244,7 +255,7 @@ export const processRewards = async () => {
         userVolume: volumeMetadata.userVolume[user].epochResult[domain].scaledUserVolume.toString(),
         totalVolume: volumeMetadata.totalVolume[domain].toString(),
         clearEmissions: clearEmissions.toString(),
-        cumulativeRewards: rewardsConfig.clearAssetAddress
+        cumulativeRewards: rewardsConfig.clearAssetAddress && rewardDist[rewardsConfig.clearAssetAddress][user]
           ? rewardDist[rewardsConfig.clearAssetAddress][user].toString()
           : '0',
         epochTimestamp: new Date(epoch * 1000),
