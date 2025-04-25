@@ -107,10 +107,7 @@ export type EverclearSpoke = {
                   97,
                   121,
                   101,
-                  114,
-                  47,
-                  118,
-                  50
+                  114
                 ]
               }
             ]
@@ -298,10 +295,7 @@ export type EverclearSpoke = {
                   97,
                   121,
                   101,
-                  114,
-                  47,
-                  118,
-                  50
+                  114
                 ]
               }
             ]
@@ -2017,6 +2011,10 @@ export type EverclearSpoke = {
         "kind": "struct",
         "fields": [
           {
+            "name": "domain",
+            "type": "u32"
+          },
+          {
             "name": "settlement",
             "type": {
               "defined": {
@@ -2065,31 +2063,6 @@ export type EverclearSpoke = {
           {
             "name": "sender",
             "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "oldIntentStatusAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "key",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "status",
-            "type": {
-              "defined": {
-                "name": "intentStatus"
-              }
-            }
           }
         ]
       }
@@ -2264,14 +2237,6 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "callExecutor",
-            "type": "pubkey"
-          },
-          {
-            "name": "messageReceiver",
-            "type": "pubkey"
-          },
-          {
             "name": "messageGasLimit",
             "type": "u64"
           },
@@ -2339,14 +2304,6 @@ export type EverclearSpoke = {
             "type": "pubkey"
           },
           {
-            "name": "callExecutor",
-            "type": "pubkey"
-          },
-          {
-            "name": "messageReceiver",
-            "type": "pubkey"
-          },
-          {
             "name": "messageGasLimit",
             "type": "u64"
           },
@@ -2357,16 +2314,6 @@ export type EverclearSpoke = {
           {
             "name": "owner",
             "type": "pubkey"
-          },
-          {
-            "name": "status",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "oldIntentStatusAccount"
-                }
-              }
-            }
           },
           {
             "name": "bump",
