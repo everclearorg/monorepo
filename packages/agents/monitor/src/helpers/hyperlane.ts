@@ -6,6 +6,7 @@ import {
   HyperlaneMessageResponse,
   HyperlaneStatus,
   Message,
+  SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 import { Interface, hexlify, solidityPack } from 'ethers/lib/utils';
 import { NoDispatchEventOnMessage, NoGatewayConfigured } from '../types/errors';
@@ -34,6 +35,14 @@ export const getMessageStatus = async (
 
   if (!message.destinationDomain) {
     return { status: 'pending' };
+  }
+  // Check if destination is Solana chain
+  if (message.destinationDomain === SOLANA_CHAINID) {
+    logger.warn('Skipping Solana destination chain', requestContext, methodContext, {
+      messageId: id,
+      destinationDomain: message.destinationDomain,
+    });
+    return { status: 'none' };
   }
 
   // If the message is pending, check to see if it has been delivered onchain.

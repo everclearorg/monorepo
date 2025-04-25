@@ -188,6 +188,8 @@ BEGIN
     ELSIF origin_status = 'DISPATCHED' THEN
         IF hub_status IS NULL OR hub_status = 'NONE' THEN
             RETURN 'DISPATCHED_SPOKE';
+        ELSIF hub_status = 'ADDED' THEN
+            RETURN 'ADDED_HUB';
         ELSIF hub_status = 'DISPATCHED' THEN
             RETURN 'DISPATCHED_HUB';
         ELSE
@@ -381,7 +383,6 @@ BEGIN
         block_number,
         tx_origin,
         tx_nonce,
-        auto_id,
         gas_limit,
         gas_price,
         return_data,
@@ -393,11 +394,10 @@ BEGIN
         asset,
         recipient,
         domain,
-        '',
+        rec.tx_signature,
         rec.block_timestamp,
         rec.block_slot,
-        '',
-        0,
+        recipient,
         0,
         rec.tx_fee,
         1,
@@ -415,7 +415,6 @@ BEGIN
             block_number = EXCLUDED.block_number,
             tx_origin = EXCLUDED.tx_origin,
             tx_nonce = EXCLUDED.tx_nonce,
-            auto_id = EXCLUDED.auto_id,
             gas_limit = EXCLUDED.gas_limit,
             gas_price = EXCLUDED.gas_price,
             return_data = EXCLUDED.return_data,
@@ -439,12 +438,12 @@ DECLARE
     receiver TEXT;
     input_asset TEXT;
     output_asset TEXT;
-    normalized_amount BIGINT;
+    normalized_amount NUMERIC;
     max_fee INT;
     origin_domain INT;
-    nonce BIGINT;
-    ttl BIGINT;
-    timestamp BIGINT;
+    nonce NUMERIC;
+    ttl NUMERIC;
+    timestamp NUMERIC;
     destination_count INT;
     destinations VARCHAR(66)[];
     data_length INT;
@@ -464,21 +463,20 @@ BEGIN
 	pos := pos + 64;
 	output_asset := '0x' || SUBSTRING(hex_data, pos, 64);
 	pos := pos + 64;
-	normalized_amount := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
-	pos := pos + 16;
+	normalized_amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
+	pos := pos + 32;
 	max_fee := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
 	origin_domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
-	nonce := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	nonce := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
-	ttl := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	ttl := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
-	timestamp := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	timestamp := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
 	destination_count := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
-
 
 	FOR i IN 0..(destination_count - 1) LOOP
 		destinations[i] := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
@@ -507,7 +505,6 @@ BEGIN
 		block_number,
 		tx_origin,
 		tx_nonce,
-		auto_id,
 		gas_limit,
 		gas_price,
 		status,
@@ -527,11 +524,10 @@ BEGIN
 		origin_domain,
 		nonce,
 		data,
-		'',
+		rec.tx_signature,
 		timestamp,
 		rec.block_slot,
-		'',
-		0,
+		initiator,
 		0,
 		rec.tx_fee,
 		1,
@@ -557,13 +553,70 @@ BEGIN
 		block_number = EXCLUDED.block_number,
 		tx_origin = EXCLUDED.tx_origin,
 		tx_nonce = EXCLUDED.tx_nonce,
-		auto_id = EXCLUDED.auto_id,
 		gas_limit = EXCLUDED.gas_limit,
 		gas_price = EXCLUDED.gas_price,
 		status = EXCLUDED.status,
 		initiator = EXCLUDED.initiator,
 		ttl = EXCLUDED.ttl,
 		destinations = EXCLUDED.destinations;
+
+	INSERT INTO public.messages(
+		id,
+		domain,
+		type,
+		quote,
+		first,
+		last,
+		intent_ids,
+		tx_origin,
+		transaction_hash,
+		"timestamp",
+		block_number,
+		tx_nonce,
+		gas_price,
+		gas_limit,
+		message_status,
+		origin_domain,
+		destination_domain
+	)
+	VALUES (
+		message_id,
+		origin_domain,
+		'INTENT',
+		'0',
+		0,
+		0,
+		ARRAY[intent_id],
+		initiator,
+		rec.tx_signature,
+		timestamp,
+		rec.block_slot,
+		0,
+		1,
+		rec.tx_fee,
+		'delivered',
+		origin_domain,
+		'25327'
+	)
+	ON CONFLICT (id)
+	DO UPDATE SET
+		id = EXCLUDED.id,
+		domain = EXCLUDED.domain,
+		type = EXCLUDED.type,
+		quote = EXCLUDED.quote,
+		first = EXCLUDED.first,
+		last = EXCLUDED.last,
+		intent_ids = EXCLUDED.intent_ids,
+		tx_origin = EXCLUDED.tx_origin,
+		transaction_hash = EXCLUDED.transaction_hash,
+		"timestamp" = EXCLUDED."timestamp",
+		block_number = EXCLUDED.block_number,
+		tx_nonce = EXCLUDED.tx_nonce,
+		gas_price = EXCLUDED.gas_price,
+		gas_limit = EXCLUDED.gas_limit,
+		message_status = EXCLUDED.message_status,
+		origin_domain = EXCLUDED.origin_domain,
+		destination_domain = EXCLUDED.destination_domain;
 
     RETURN TRUE;
 END;$$;
@@ -580,7 +633,7 @@ DECLARE
     intent_id TEXT;
     recipient TEXT;
     asset TEXT;
-    amount BIGINT;
+    amount NUMERIC;
     domain INT;
 	pos INT := 33;
 BEGIN
@@ -590,7 +643,7 @@ BEGIN
 	pos := pos + 64;
 	asset := '0x' || SUBSTRING(hex_data, pos, 64);
 	pos := pos + 64;
-	amount := to_bigint(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
+	amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
 	pos := pos + 16;
 	domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
@@ -606,7 +659,6 @@ BEGIN
 		block_number,
 		tx_origin,
 		tx_nonce,
-		auto_id,
 		gas_limit,
 		gas_price,
 		return_data,
@@ -618,11 +670,10 @@ BEGIN
 		asset,
 		recipient,
 		domain,
-		'',
+        rec.tx_signature,
 		rec.block_timestamp,
 		rec.block_slot,
-		'',
-		0,
+		recipient,
 		0,
 		rec.tx_fee,
 		1,
@@ -640,7 +691,6 @@ BEGIN
 		block_number = EXCLUDED.block_number,
 		tx_origin = EXCLUDED.tx_origin,
 		tx_nonce = EXCLUDED.tx_nonce,
-		auto_id = EXCLUDED.auto_id,
 		gas_limit = EXCLUDED.gas_limit,
 		gas_price = EXCLUDED.gas_price,
 		return_data = EXCLUDED.return_data,
@@ -750,6 +800,19 @@ CREATE FUNCTION public.to_int(hex_str text) RETURNS integer
     AS $$
 BEGIN
     RETURN CAST(CAST(('x' || hex_str) AS bit(32)) AS INT);
+END;
+$$;
+
+
+--
+-- Name: to_numeric(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.to_numeric(hex_str text) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    RETURN ('0x' || hex_str)::numeric;
 END;
 $$;
 
@@ -974,7 +1037,7 @@ CREATE TABLE public.origin_intents (
     origin character varying(66) NOT NULL,
     nonce bigint NOT NULL,
     data text,
-    transaction_hash character(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
     "timestamp" bigint NOT NULL,
     block_number bigint NOT NULL,
     tx_origin character varying(66) NOT NULL,
@@ -1003,7 +1066,7 @@ CREATE TABLE public.settlement_intents (
     asset character varying(66) NOT NULL,
     recipient character varying(66) NOT NULL,
     domain character varying(66) NOT NULL,
-    transaction_hash character(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
     "timestamp" bigint NOT NULL,
     block_number bigint NOT NULL,
     tx_origin character varying(66) NOT NULL,
@@ -2498,7 +2561,7 @@ CREATE TABLE public.messages (
     last bigint NOT NULL,
     intent_ids character varying(66)[] NOT NULL,
     tx_origin character varying(66) NOT NULL,
-    transaction_hash character(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
     "timestamp" bigint NOT NULL,
     block_number bigint NOT NULL,
     tx_nonce bigint NOT NULL,
@@ -4902,4 +4965,12 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250325230805'),
     ('20250410040210'),
     ('20250411120150'),
-    ('20250415125459');
+    ('20250415125459'),
+    ('20250415163121'),
+    ('20250415204003'),
+    ('20250416224500'),
+    ('20250417163412'),
+    ('20250418160651'),
+    ('20250418195903'),
+    ('20250421233253'),
+    ('20250423160717');

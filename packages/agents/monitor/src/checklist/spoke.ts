@@ -139,7 +139,7 @@ export const checkSpokeBalance = async () => {
 
   const checkAssetSpokeBalanceCalls = [];
   const checkedAsset = new Set();
-  for (const domain of Object.keys(config.chains)) {
+  for (const domain of Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm')) {
     const chainConfig = config.chains[domain];
     if (chainConfig.assets) {
       for (const assetName of Object.keys(chainConfig.assets)) {

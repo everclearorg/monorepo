@@ -125,6 +125,9 @@ export class SubgraphReader {
       if (response[i].status === 'fulfilled') {
         const data = (response[i] as PromiseFulfilledResult<QueryResponse<{ _meta: MetaEntity }>>).value;
         result.set(data.domain, data.data._meta.block.number);
+      } else {
+        // Check if the response is a rejected promise before accessing reason
+        console.error(jsonifyError((response[i] as PromiseRejectedResult).reason as Error), { domain: domains[i] });
       }
     }
 

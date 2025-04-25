@@ -44,8 +44,8 @@ export const updateMessages = async () => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateMessages.name);
 
-  const domains = Object.keys(config.chains).concat(config.hub.domain);
-  for (const domain of domains) {
+  const evmDomains = Object.keys(config.chains).filter(d => config.chains[d].network === 'evm').concat(config.hub.domain);
+  for (const domain of evmDomains) {
     // Retrieve the most recent timestamp
     const latestNonce = await database.getCheckPoint('message_' + domain);
 
@@ -124,8 +124,8 @@ export const updateQueues = async () => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateQueues.name);
 
-  const spokes = Object.keys(config.chains).filter((c) => c !== config.hub.domain);
-  logger.debug('Method start', requestContext, methodContext, { spokes, hub: config.hub.domain });
+  const evmDomains = Object.keys(config.chains).filter((c) => c !== config.hub.domain && config.chains[c].network === 'evm');
+  logger.debug('Method start', requestContext, methodContext, { spokes: evmDomains, hub: config.hub.domain });
 
   const settlementQueues = await subgraph.getSettlementQueues(config.hub.domain);
   logger.debug('Retrieved settlement queues', requestContext, methodContext, {
@@ -137,7 +137,7 @@ export const updateQueues = async () => {
   const prevEpoch = await database.getCheckPoint('hub_queue_deposit');
   const depositQueues = await subgraph.getDepositQueues(config.hub.domain, prevEpoch);
 
-  const spokeSubgraphReturn = await Promise.all(spokes.map((s) => subgraph.getSpokeQueues(s)));
+  const spokeSubgraphReturn = await Promise.all(evmDomains.map((s) => subgraph.getSpokeQueues(s)));
   const spokeQueues = [...spokeSubgraphReturn.flat()];
   logger.debug('Retrieved spoke queues', requestContext, methodContext, {
     spokeQueues: spokeQueues.length,
