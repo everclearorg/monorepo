@@ -136,6 +136,9 @@ export const updateQueues = async () => {
   // There could be many more deposit queues than message queues, so these require a checkpoint
   const prevEpoch = await database.getCheckPoint('hub_queue_deposit');
   const depositQueues = await subgraph.getDepositQueues(config.hub.domain, prevEpoch);
+  logger.debug('Retrieved deposit queues', requestContext, methodContext, {
+    depositQueues
+  });
 
   const spokeSubgraphReturn = await Promise.all(evmDomains.map((s) => subgraph.getSpokeQueues(s)));
   const spokeQueues = [...spokeSubgraphReturn.flat()];
