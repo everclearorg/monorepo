@@ -145,6 +145,14 @@ export const dispatchMessageQueueViaRelayers = async (
     const toDequeue = Math.min(maxDequeue, totalIntents - i);
     // Trim intents to match max elements, sorted by block number
     const trimmedIntents = sortedContents.slice(i, i + toDequeue);
+    if (trimmedIntents.length !== toDequeue) {
+      logger.error('Trimmed intents do not match dequeue target', requestContext, methodContext, undefined, {
+        trimmedIntents,
+        toDequeue,
+        sortedContents,
+      });
+      break;
+    }
 
     // NOTE: the signature _must_ include the relayer address, meaning a different
     // relayer transaction will be required for each configured relayer.

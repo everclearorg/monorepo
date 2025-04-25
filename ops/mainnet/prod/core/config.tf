@@ -195,6 +195,36 @@ locals {
         providers = [
           "https://api.mainnet-beta.solana.com"
         ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          ""
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
+        ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.gnosis.gateway.fm"
+        ]
       }
     }
     server = {
@@ -465,6 +495,29 @@ locals {
         providers = [
           "https://api.mainnet-beta.solana.com"
         ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.berachain.com"
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
       }
     }
     betterUptime = {
@@ -563,7 +616,12 @@ locals {
       534352 = { maxAge = 60, size = 1 },
       167000 = { maxAge = 60, size = 1 },
       2020 = { maxAge = 60, size = 1 },
-      1399811149 = { maxAge = 60, size = 1 }
+      1399811149 = { maxAge = 60, size = 1 },
+      80094 = { maxAge = 60, size = 1 },
+      5000 = { maxAge = 60, size = 1 },
+      146 = { maxAge = 60, size = 1 },
+      57073 = { maxAge = 60, size = 1 },
+      100 = { maxAge = 60, size = 1 }
     }
     hub = {
       domain = "25327",
@@ -675,6 +733,36 @@ locals {
         providers = [
           "https://api.mainnet-beta.solana.com"
         ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.berachain.com"
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
+        ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.gnosis.gateway.fm"
+        ]
       }
     }
     database = { url = local.default_db_url }
@@ -696,11 +784,7 @@ locals {
     rewards = {
       clearAssetAddress = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
       volume = {
-        tokens = [
-          {
-            address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
-          }
-        ]
+        tokens = []
       }
       staking = {
         tokens = [

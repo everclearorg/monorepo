@@ -127,9 +127,8 @@ fn u256_to_32bytes(val: impl Into<u128>) -> [u8; 32] {
     word
 }
 
-fn u64_to_u256_be(val: u64) -> [u8; 32] {
+fn u128_to_u256_be(val: u128) -> [u8; 32] {
     let mut out = [0u8; 32];
-    // copy val’s big-endian bytes into the last 8 bytes
-    out[24..32].copy_from_slice(&val.to_be_bytes());
+    out[16..32].copy_from_slice(&val.to_be_bytes()); // full 128 bits
     out
 }

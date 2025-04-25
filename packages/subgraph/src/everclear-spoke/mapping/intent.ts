@@ -9,10 +9,7 @@ import {
   AssetTransferFailed,
   AssetMintFailed,
 } from '../../../generated/EverclearSpoke/EverclearSpoke';
-import {
-  IntentWithFeesAdded,
-  OrderCreated as OrderCreatedEvent,
-} from '../../../generated/FeeAdapter/FeeAdapter';
+import { IntentWithFeesAdded, OrderCreated as OrderCreatedEvent } from '../../../generated/FeeAdapter/FeeAdapter';
 import {
   Balance,
   DestinationIntent,

@@ -159,6 +159,45 @@
     "realm": "spoke"
   },
   {
+    "name": "Gnosis",
+    "id": 100,
+    "rpc": "https://gnosis-rpc.publicnode.com",
+    "verifierUrl": "https://api.gnosisscan.io/api",
+    "environments": ["MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
+    "name": "Berachain",
+    "id": 80094,
+    "rpc": "https://rpc.berachain.com/",
+    "verifierUrl": "https://berascan.com/api",
+    "environments": ["MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
+    "name": "Mantle",
+    "id": 5000,
+    "rpc": "https://rpc.mantle.xyz",
+    "environments": ["MainnetProduction"],
+    "verifierUrl": "https://api.mantlescan.xyz/api",
+    "realm": "spoke"
+  },
+  {
+    "name": "Sonic",
+    "id": 146,
+    "rpc": "https://rpc.soniclabs.com",
+    "verifierUrl": "https://api.sonicscan.org/api",
+    "environments": ["MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
+    "name": "Ink",
+    "id": 57073,
+    "rpc": "https://rpc-gel.inkonchain.com",
+    "environments": ["MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
     "name": "Scroll Sepolia",
     "id": 534351,
     "rpc": "https://scroll-testnet-public.unifra.io",

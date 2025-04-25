@@ -30,7 +30,7 @@ pub struct IntentAddedEvent {
     pub receiver: Pubkey,
     pub input_asset: Pubkey,
     pub output_asset: Pubkey,
-    pub normalized_amount: u64,
+    pub normalized_amount: u128,
     pub max_fee: u32,
     pub origin_domain: u32,
     pub nonce: u64,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EverclearError } from '@chimera-monorepo/utils';
 
 export class RelayerSendFailed extends EverclearError {

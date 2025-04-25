@@ -30,7 +30,8 @@ export async function deployAdapters() {
     }
   }
 
-  let script = `deploy/Adapters.s.sol:MainnetProduction --rpc-url ${domain.rpc} --chain ${domain.id} --slow`;
+  let script = 'deploy/Adapters.s.sol';
+  script += `:${environment} --rpc-url ${domain.rpc} --chain ${domain.id} --slow`;
 
   // if verifying, add verification arguments
   if (verify) {

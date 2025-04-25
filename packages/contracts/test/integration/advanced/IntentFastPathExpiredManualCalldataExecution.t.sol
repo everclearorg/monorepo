@@ -21,7 +21,7 @@ contract FastPathIntent_Expired_ManualCalldataExecution is IntegrationBase {
   IEverclear.FillMessage internal _fillMessage;
 
   uint256 intentAmountEth = 100 ether;
-  uint256 intentAmountBsc = 100 ether * 1e12;
+  uint256 intentAmountBsc = 100 ether;
 
   event ExternalCalldataExecuted(bytes32 indexed _intentId, bytes _returnData);
 

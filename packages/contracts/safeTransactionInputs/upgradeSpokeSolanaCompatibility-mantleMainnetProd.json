@@ -1,0 +1,19 @@
+{
+  "chainId": "5000",
+  "createdAt": "1744736140000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Mantle | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xe0F010e465f15dcD42098dF9b99F1038c11B3056",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000f9d93b5ac744648156e0f154e4380c7b9814f36c00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

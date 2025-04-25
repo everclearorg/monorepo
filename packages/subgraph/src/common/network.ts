@@ -15,7 +15,7 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(56);
   } else if (network == 'chapel') {
     chainId = BigInt.fromI32(97);
-  } else if (network == 'gnosis') {
+  } else if (network == 'xdai') {
     chainId = BigInt.fromI32(100);
   } else if (network == 'matic') {
     chainId = BigInt.fromI32(137);
@@ -87,6 +87,12 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(2020);
   } else if (network == 'unichain') {
     chainId = BigInt.fromI32(130);
+  } else if (network == 'berachain-mainnet') {
+    chainId = BigInt.fromI32(80094);
+  } else if (network == 'sonic') {
+    chainId = BigInt.fromI32(146);
+  } else if (network == 'ink') {
+    chainId = BigInt.fromI32(57073);
   } else {
     throw new Error(`No chainName for network ${network}`);
   }

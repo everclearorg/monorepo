@@ -24,6 +24,10 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
   bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
   address public constant CREATE_3 = 0x9fBB3DF7C40Da2e5A0dE984fFE2CCB7C47cd0ABf;
 
+  // CREATE3 addresses
+  address public constant LIFI_CREATE3 = 0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1;
+  address public constant LIFI_LONDON_CREATE3 = 0x8437A5fE47A4Df14700c96DF1870824e72FA8499;
+
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
 
   error EmptyProxy();
@@ -37,14 +41,14 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
     address newEverclearSpoke;
 
     // Generating the inputs for CREATE3
-    uint8 version = 5;
+    uint8 version = 6;
     bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
     bytes memory _creation = type(EverclearSpokeV4).creationCode;
 
     // Deploying the new implementation via CREATE3
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
-    (bool success, bytes memory returnData) = CREATE_3.call(create3Calldata);
+    (bool success, bytes memory returnData) = LIFI_LONDON_CREATE3.call(create3Calldata);
     if (!success) revert Create3DeploymentFailed();
     newEverclearSpoke = abi.decode(returnData, (address));
 
@@ -119,5 +123,8 @@ contract MainnetProduction is DeployFeeAdapterUpgrade, MainnetProductionEnvironm
 
     // Ronin
     _deploymentParams[RONIN] = DeploymentParams({owner: OWNER, spokeProxy: address(RONIN_SPOKE)}); // set domain id as mapping key
+
+    // Gnosis
+    _deploymentParams[GNOSIS] = DeploymentParams({owner: OWNER, spokeProxy: address(GNOSIS_SPOKE)}); // set domain id as mapping key
   }
 }

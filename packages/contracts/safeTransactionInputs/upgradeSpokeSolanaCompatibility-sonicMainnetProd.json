@@ -1,0 +1,19 @@
+{
+  "chainId": "146",
+  "createdAt": "1744734603000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Sonic | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+      "value": "0",
+      "data": "0x4f1ef2860000000000000000000000002ec2b2cc1813941b638d3adba86a1af7f6488a9e00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

@@ -51,6 +51,11 @@ abstract contract MainnetAssets {
   address public constant UNICHAIN_WETH = 0x4200000000000000000000000000000000000006;
   address public constant ZKSYNC_WETH = 0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91;
   address public constant RONIN_WETH = 0xc99a6A985eD2Cac1ef41640596C5A5f9F4E19Ef5;
+  address public constant BERACHAIN_WETH = 0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590;
+  address public constant MANTLE_WETH = 0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111;
+  address public constant SONIC_WETH = 0x50c42dEAcD8Fc9773493ED674b675bE577f2634b;
+  address public constant INK_WETH = 0x4200000000000000000000000000000000000006;
+  bytes32 public constant SOLANA_WETH = 0x66e5188a1308a1db90b6d31f3fbdca8c3df2678c8112dfdd3d192c5a3cc457a8;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
@@ -66,6 +71,9 @@ abstract contract MainnetAssets {
   address public constant MODE_USDT = 0xf0F161fDA2712DB8b566946122a5af183995e2eD; // Mode's USDT
   address public constant ZKSYNC_USDT = 0x493257fD37EDB34451f62EDf8D2a0C418852bA4C;
   address public constant UNICHAIN_USDT = 0x588CE4F028D8e7B53B687865d6A67b3A54C75518;
+  address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
+  address public constant SONIC_USDT = 0x6047828dc181963ba44974801FF68e538dA5eaF9;
+  bytes32 public constant SOLANA_USDT = 0xce010e60afedb22717bd63192f54145a3f965a33bb82d2c7029eb2ce1e208264;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -82,11 +90,36 @@ abstract contract MainnetAssets {
   address public constant UNICHAIN_USDC = 0x078D782b760474a361dDA0AF3839290b0EF57AD6;
   address public constant ZKSYNC_USDC = 0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4;
   address public constant RONIN_USDC = 0x0B7007c13325C48911F73A2daD5FA5dCBf808aDc;
+  address public constant BERACHAIN_USDC = 0x549943e04f40284185054145c6E4e9568C1D3241;
+  address public constant MANTLE_USDC = 0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9;
+  address public constant SONIC_USDC = 0x29219dd400f2Bf60E5a23d13Be72B486D4038894;
+  address public constant INK_USDC = 0xF1815bd50389c46847f0Bda824eC8da914045D14;
+  bytes32 public constant SOLANA_USDC = 0xc6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d61;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
   address public constant ZIRCUIT_PUFETH = 0x9346A5043C590133FE900aec643D9622EDddBA57;
   address public constant APECHAIN_PUFETH = 0x6234E5ef39B12EFdFcbd99dd7F452F27F3fEAE3b;
+
+  ///////////////////// CLEAR
+  address public constant ETHEREUM_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant ARBITRUM_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant OPTIMISM_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant BNB_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant POLYGON_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+  address public constant GNOSIS_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
+
+  ///////////////////// cbBTC
+  address public constant ETHEREUM_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+  address public constant ARBITRUM_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+  address public constant BASE_CBBTC = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+
+  //////////////////// WBTC
+  address public constant ETHEREUM_WBTC = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+  address public constant ARBITRUM_WBTC = 0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f;
+  address public constant BASE_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
+  address public constant BERACHAIN_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
+  address public constant MANTLE_WBTC = 0xCAbAE6f6Ea1ecaB08Ad02fE02ce9A44F09aebfA2;
 
   ///////////////////// FEE RECIPIENTS
   address public constant FEE_RECIPIENT = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
@@ -118,6 +151,7 @@ abstract contract Ethereum {
 
   // Fee adapter constants
   address public constant ETHEREUM_ENG_MULTISIG = 0xa02a88F0bbD47045001Bd460Ad186C30F9a974d6;
+  address public constant ETHEREUM_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract ArbitrumOne {
@@ -132,6 +166,7 @@ abstract contract ArbitrumOne {
 
   // Fee adapter constants
   address public constant ARBITRUM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant ARBITRUM_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Base {
@@ -146,6 +181,7 @@ abstract contract Base {
 
   // Fee adapter constants
   address public constant BASE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant BASE_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Optimism {
@@ -160,6 +196,7 @@ abstract contract Optimism {
 
   // Fee adapter constants
   address public constant OPTIMISM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant OPTIMISM_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Bnb {
@@ -174,6 +211,7 @@ abstract contract Bnb {
 
   // Fee adapter constants
   address public constant BNB_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant BNB_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Zircuit {
@@ -188,6 +226,7 @@ abstract contract Zircuit {
 
   // Fee adapter constants
   address public constant ZIRCUIT_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant ZIRCUIT_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Blast {
@@ -202,6 +241,7 @@ abstract contract Blast {
 
   // Fee adapter constants
   address public constant BLAST_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant BLAST_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Linea {
@@ -216,6 +256,7 @@ abstract contract Linea {
 
   // Fee adapter constants
   address public constant LINEA_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant LINEA_FEE_ADAPTER = 0x1B0Dc9CB7EadDa36f4CcFB8130B0Ad967b0A3508;
 }
 
 abstract contract Polygon {
@@ -230,6 +271,7 @@ abstract contract Polygon {
 
   // Fee adapter constants
   address public constant POLYGON_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant POLYGON_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Avalanche {
@@ -244,6 +286,7 @@ abstract contract Avalanche {
 
   // Fee adapter constants
   address public constant AVALANCHE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant AVALANCHE_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Scroll {
@@ -258,6 +301,7 @@ abstract contract Scroll {
 
   // Fee adapter constants
   address public constant SCROLL_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant SCROLL_FEE_ADAPTER = 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1;
 }
 
 abstract contract Taiko {
@@ -272,6 +316,7 @@ abstract contract Taiko {
 
   // Fee adapter constants
   address public constant TAIKO_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant TAIKO_FEE_ADAPTER = 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1;
 }
 
 abstract contract Apechain {
@@ -286,6 +331,7 @@ abstract contract Apechain {
 
   // Fee adapter constants
   address public constant APECHAIN_ENG_MULTISIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
+  address public constant APECHAIN_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract ZkSync {
@@ -296,9 +342,11 @@ abstract contract ZkSync {
   ISpokeGateway public ZKSYNC_SPOKE_GATEWAY = ISpokeGateway(0xbD82E5503461913a70566E66a454465a46F5C903);
   ICallExecutor public ZKSYNC_EXECUTOR = ICallExecutor(0xd2cC1a32430B1b81b0ed6327bc37670a26ca4568);
   IXERC20Module public ZKSYNC_XERC20_MODULE = IXERC20Module(0x6ACf19603C8588885250F7a02F0EaFFa4FcafB04);
+  address public ZKSYNC_SPOKE_IMPL = 0x6019f814FDa7fbF4037fe967C608f979b782b834;
 
   // Fee adapter constants
   address public constant ZKSYNC_ENG_MULTISIG = 0x227a7aC43503c15fe7ab31901468DA07108eA967;
+  address public constant ZKSYNC_FEE_ADAPTER = 0x80EF3ee093aE3B5aDd1B213628875A4C73F640AF;
 }
 
 abstract contract Mode {
@@ -313,6 +361,7 @@ abstract contract Mode {
 
   // Fee adapter constants
   address public constant MODE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant MODE_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
 }
 
 abstract contract Unichain {
@@ -327,6 +376,7 @@ abstract contract Unichain {
 
   // Fee adapter constants
   address public constant UNICHAIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant UNICHAIN_FEE_ADAPTER = 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1;
 }
 
 abstract contract Ronin {
@@ -341,6 +391,89 @@ abstract contract Ronin {
 
   // Fee adapter constants
   address public constant RONIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant RONIN_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
+}
+
+abstract contract Gnosis {
+  uint32 public constant GNOSIS = 100;
+  IMailbox public GNOSIS_MAILBOX = IMailbox(0xaD09d78f4c6b9dA2Ae82b1D34107802d380Bb74f);
+
+  IEverclearSpoke public GNOSIS_SPOKE = IEverclearSpoke(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
+  ISpokeGateway public GNOSIS_SPOKE_GATEWAY = ISpokeGateway(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  ICallExecutor public GNOSIS_EXECUTOR = ICallExecutor(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
+  IXERC20Module public GNOSIS_XERC20_MODULE = IXERC20Module(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
+  address public GNOSIS_SPOKE_IMPL = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+
+  // Fee adapter constants
+  address public constant GNOSIS_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public GNOSIS_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
+abstract contract Berachain {
+  uint32 public constant BERACHAIN = 80_094;
+  IMailbox public BERACHAIN_MAILBOX = IMailbox(0x7f50C5776722630a0024fAE05fDe8b47571D7B39);
+
+  IEverclearSpoke public BERACHAIN_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public BERACHAIN_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public BERACHAIN_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public BERACHAIN_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public BERACHAIN_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant BERACHAIN_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant BERACHAIN_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
+abstract contract Mantle {
+  uint32 public constant MANTLE = 5000;
+  IMailbox public MANTLE_MAILBOX = IMailbox(0x398633D19f4371e1DB5a8EFE90468eB70B1176AA);
+
+  IEverclearSpoke public MANTLE_SPOKE = IEverclearSpoke(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
+  ISpokeGateway public MANTLE_SPOKE_GATEWAY = ISpokeGateway(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  ICallExecutor public MANTLE_EXECUTOR = ICallExecutor(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
+  IXERC20Module public MANTLE_XERC20_MODULE = IXERC20Module(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
+  address public MANTLE_SPOKE_IMPL = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+
+  // Fee adapter constants
+  address public constant MANTLE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant MANTLE_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
+abstract contract Sonic {
+  uint32 public constant SONIC = 146;
+  IMailbox public SONIC_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public SONIC_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public SONIC_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public SONIC_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public SONIC_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public SONIC_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant SONIC_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant SONIC_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
+abstract contract Ink {
+  uint32 public constant INK = 57_073;
+  IMailbox public INK_MAILBOX = IMailbox(0x7f50C5776722630a0024fAE05fDe8b47571D7B39);
+
+  IEverclearSpoke public INK_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public INK_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public INK_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public INK_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public INK_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // Fee adapter constants
+  address public constant INK_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant INK_FEE_ADAPTER = 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4;
+}
+
+abstract contract Solana {
+  uint32 public constant SOLANA = 1_399_811_149;
+
+  bytes32 public SOLANA_SPOKE = 0x09b727b9209c8539f72647d10dd4f4670b53960ba169f034c513c758db0e9656;
+  bytes32 public SOLANA_SPOKE_GATEWAY = 0x09b727b9209c8539f72647d10dd4f4670b53960ba169f034c513c758db0e9656;
 }
 
 abstract contract MainnetProductionDomains is
@@ -361,7 +494,13 @@ abstract contract MainnetProductionDomains is
   Scroll,
   Apechain,
   Unichain,
-  Ronin
+  Ronin,
+  Gnosis,
+  Berachain,
+  Mantle,
+  Sonic,
+  Ink,
+  Solana
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
@@ -475,6 +614,34 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: RONIN, blockGasLimit: 30_000_000, gateway: address(RONIN_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: GNOSIS, blockGasLimit: 17_000_000, gateway: address(GNOSIS_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({
+        chainId: BERACHAIN,
+        blockGasLimit: 30_000_000,
+        gateway: address(BERACHAIN_SPOKE_GATEWAY).toBytes32()
+      })
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: MANTLE, blockGasLimit: 250_000_000, gateway: address(MANTLE_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: SONIC, blockGasLimit: 5_000_000_000, gateway: address(SONIC_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: INK, blockGasLimit: 30_000_000, gateway: address(INK_SPOKE_GATEWAY).toBytes32()})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: SOLANA, blockGasLimit: 48_000_000, gateway: SOLANA_SPOKE_GATEWAY})
+    );
   }
 }
 
@@ -501,8 +668,15 @@ abstract contract MainnetProductionEnvironment is
     MODE,
     UNICHAIN,
     ZKSYNC,
-    RONIN
+    RONIN,
+    GNOSIS,
+    BERACHAIN,
+    MANTLE,
+    SONIC,
+    INK,
+    SOLANA
   ];
+
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed

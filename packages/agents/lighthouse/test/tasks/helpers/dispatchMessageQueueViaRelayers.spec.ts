@@ -11,6 +11,7 @@ import { RelayerSendFailed } from '../../../src/errors/tasks';
 
 describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   const [queue] = createIntentQueues();
+  queue.size = 1;
   const intents = [mock.destinationIntent({ origin: queue.domain })];
   const rc = mock.requestContext();
   let context: LighthouseContext;
@@ -148,9 +149,9 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   it('should not dispatch more than 15 intents for a 10M gas limit message destination', async () => {
     context.config.chains['1337'].gasLimit = 10_000_000;
     const largeQueue = mock.queue({ type: 'INTENT', size: 150, lastProcessed: 0, domain: '1337' });
-    const contents = new Array(queue.size)
+    const contents = new Array(largeQueue.size)
       .fill(0)
-      .map((_, i) => mock.originIntent({ origin: queue.domain, id: mkBytes32(`0x${i}${i}${i}`) }));
+      .map((_, i) => mock.originIntent({ origin: largeQueue.domain, id: mkBytes32(`0x${i}${i}${i}`) }));
     await dispatchMessageQueueViaRelayers('INTENT', largeQueue, contents, rc);
     // FIXME: revert this to 15 once batching is implemented 
     expect(sendWithRelayerWithBackupStub.callCount).to.be.greaterThanOrEqual(1); // 150 / 15, should dispatch 10 tasks
