@@ -27,22 +27,23 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
   address public constant APECHAIN_MULTI_SIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
 
   // Deployed upgrade contracts //
-  address public constant ETHEREUM_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant ARB_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant OP_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant BNB_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant BASE_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant ZIRCUIT_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant BLAST_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant LINEA_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant POLYGON_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant AVALANCHE_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant SCROLL_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant APECHAIN_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant TAIKO_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant MODE_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant UNICHAIN_SPOKE_UPGRADE_IMPL = address(0);
-  address public constant RONIN_SPOKE_UPGRADE_IMPL = address(0);
+  address public constant ETHEREUM_SPOKE_UPGRADE_IMPL = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  address public constant ARB_SPOKE_UPGRADE_IMPL = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  address public constant OP_SPOKE_UPGRADE_IMPL = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  address public constant BNB_SPOKE_UPGRADE_IMPL = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  address public constant BASE_SPOKE_UPGRADE_IMPL = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  address public constant ZIRCUIT_SPOKE_UPGRADE_IMPL = 0x92D4Bd0203C12ddCcd0810C677F1D83D59C27586;
+  address public constant BLAST_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
+  address public constant LINEA_SPOKE_UPGRADE_IMPL = 0x28D1D0c17861232c488e0ebA3a13d3B40A920895;
+  address public constant POLYGON_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
+  address public constant AVALANCHE_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
+  address public constant SCROLL_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
+  address public constant APECHAIN_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
+  address public constant TAIKO_SPOKE_UPGRADE_IMPL = 0xacd4a022D5e50718AAB3Cbb9cc4Ccf74dd2e7115;
+  address public constant MODE_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
+  address public constant UNICHAIN_SPOKE_UPGRADE_IMPL = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  address public constant RONIN_SPOKE_UPGRADE_IMPL = 0xc192b47fD86C52d987FFf2579B64c28037Bf7567;
+  address public constant GNOSIS_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
 
   function setUp() public {
     //// Arbitrum One
@@ -50,7 +51,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(ARBITRUM_ONE_SPOKE),
       spokeImpl: ARBITRUM_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: ARBITRUM_FEE_ADAPTER
     });
 
     //// Optimism
@@ -58,7 +59,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(OPTIMISM_SPOKE),
       spokeImpl: OPTIMISM_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: OPTIMISM_FEE_ADAPTER
     });
 
     //// Base
@@ -66,7 +67,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(BASE_SPOKE),
       spokeImpl: BASE_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: BASE_FEE_ADAPTER
     });
 
     //// Bnb
@@ -74,7 +75,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(BNB_SPOKE),
       spokeImpl: BNB_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: BNB_FEE_ADAPTER
     });
 
     //// Ethereum
@@ -82,7 +83,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L1_MULTI_SIG,
       spokeProxy: address(ETHEREUM_SPOKE),
       spokeImpl: ETHEREUM_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: ETHEREUM_FEE_ADAPTER
     });
 
     //// Zircuit
@@ -90,7 +91,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(ZIRCUIT_SPOKE),
       spokeImpl: ZIRCUIT_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: ZIRCUIT_FEE_ADAPTER
     });
 
     // Blast
@@ -98,7 +99,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(BLAST_SPOKE),
       spokeImpl: BLAST_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: BLAST_FEE_ADAPTER
     });
 
     // Linea
@@ -106,7 +107,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(LINEA_SPOKE),
       spokeImpl: LINEA_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: LINEA_FEE_ADAPTER
     });
 
     // Polygon
@@ -114,7 +115,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(POLYGON_SPOKE),
       spokeImpl: POLYGON_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: POLYGON_FEE_ADAPTER
     });
 
     // Avalanche
@@ -122,7 +123,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(AVALANCHE_SPOKE),
       spokeImpl: AVALANCHE_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: AVALANCHE_FEE_ADAPTER
     });
 
     // Scroll
@@ -130,7 +131,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(SCROLL_SPOKE),
       spokeImpl: SCROLL_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: SCROLL_FEE_ADAPTER
     });
 
     // Ape
@@ -138,7 +139,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: APECHAIN_MULTI_SIG,
       spokeProxy: address(APECHAIN_SPOKE),
       spokeImpl: APECHAIN_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: APECHAIN_FEE_ADAPTER
     });
 
     // Taiko
@@ -146,7 +147,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(TAIKO_SPOKE),
       spokeImpl: TAIKO_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: TAIKO_FEE_ADAPTER
     });
 
     // Mode
@@ -154,7 +155,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(MODE_SPOKE),
       spokeImpl: MODE_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: MODE_FEE_ADAPTER
     });
 
     // Uni
@@ -162,7 +163,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(UNICHAIN_SPOKE),
       spokeImpl: UNICHAIN_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: UNICHAIN_FEE_ADAPTER
     });
 
     // Ronin
@@ -170,14 +171,22 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       owner: L2_MULTI_SIG,
       spokeProxy: address(RONIN_SPOKE),
       spokeImpl: RONIN_SPOKE_IMPL,
-      feeAdapter: address(0)
+      feeAdapter: RONIN_FEE_ADAPTER
+    });
+
+    // Gnosis
+    _deploymentParamsV4[GNOSIS] = DeploymentParamsV4({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(GNOSIS_SPOKE),
+      spokeImpl: GNOSIS_SPOKE_IMPL,
+      feeAdapter: GNOSIS_FEE_ADAPTER
     });
   }
 
   // ============ Upgrade ============ //
   function test_spokeUpgradeFeeAdapterSafe_upgradeMainnetProd() public {
     vm.createSelectFork(vm.envString('MAINNET_RPC'));
-    vm.rollFork(22_146_318);
+    vm.rollFork(22_237_678);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -187,7 +196,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = ETHEREUM_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -247,7 +256,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeArbitrumProd() public {
     vm.createSelectFork(vm.envString('ARBITRUM_RPC'));
-    vm.rollFork(320_483_553);
+    vm.rollFork(324_862_689);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -257,7 +266,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = ARB_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -317,7 +326,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeOptimismProd() public {
     vm.createSelectFork(vm.envString('OPTIMISM_RPC'));
-    vm.rollFork(133_790_742);
+    vm.rollFork(134_339_571);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -327,7 +336,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = OP_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -387,7 +396,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeBaseProd() public {
     vm.createSelectFork(vm.envString('BASE_RPC'));
-    vm.rollFork(28_195_511);
+    vm.rollFork(28_744_365);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -397,7 +406,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = BASE_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -457,7 +466,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeBNBProd() public {
     vm.createSelectFork(vm.envString('BNB_RPC'));
-    vm.rollFork(47_866_210);
+    vm.rollFork(48_232_603);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -467,7 +476,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = BNB_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -527,7 +536,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeZircuitProd() public {
     vm.createSelectFork(vm.envString('ZIRCUIT_RPC'));
-    vm.rollFork(11_622_098);
+    vm.rollFork(12_170_949);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -537,7 +546,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = ZIRCUIT_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -597,7 +606,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeBlastProd() public {
     vm.createSelectFork(vm.envString('BLAST_RPC'));
-    vm.rollFork(17_303_775);
+    vm.rollFork(17_734_173);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -607,7 +616,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = BLAST_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -667,7 +676,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeLineaProd() public {
     vm.createSelectFork(vm.envString('LINEA_RPC'));
-    vm.rollFork(17_564_832);
+    vm.rollFork(17_898_766);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -677,7 +686,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = LINEA_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -737,7 +746,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradePolygonProd() public {
     vm.createSelectFork(vm.envString('POLYGON_RPC'));
-    vm.rollFork(69_723_951);
+    vm.rollFork(70_123_994);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -747,7 +756,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = POLYGON_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -798,7 +807,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '137';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-lineaMainnetProd.json',
+      'safeTransactionInputs/upgradeSpokeFeeAdapter-polygonMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Polygon | Mainnet Prod',
       safeTransactions,
       chainId
@@ -807,7 +816,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeAvalancheProd() public {
     vm.createSelectFork(vm.envString('AVALANCHE_RPC'));
-    vm.rollFork(21_053_270);
+    vm.rollFork(60_012_245);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -817,7 +826,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = AVALANCHE_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -877,7 +886,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeScrollProd() public {
     vm.createSelectFork(vm.envString('SCROLL_RPC'));
-    vm.rollFork(14_331_080);
+    vm.rollFork(14_606_748);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -887,7 +896,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = SCROLL_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -947,7 +956,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeApeProd() public {
     vm.createSelectFork(vm.envString('APE_RPC'));
-    vm.rollFork(12_543_894);
+    vm.rollFork(12_953_177);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -957,7 +966,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = APECHAIN_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1017,7 +1026,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeTaikoProd() public {
     vm.createSelectFork(vm.envString('TAIKO_RPC'));
-    vm.rollFork(1_028_472);
+    vm.rollFork(1_061_261);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1027,7 +1036,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = TAIKO_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1087,7 +1096,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeModeProd() public {
     vm.createSelectFork(vm.envString('MODE_RPC'));
-    vm.rollFork(21_628_204);
+    vm.rollFork(22_055_397);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1097,7 +1106,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = MODE_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1157,7 +1166,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeUniProd() public {
     vm.createSelectFork(vm.envString('UNI_RPC'));
-    vm.rollFork(12_675_697);
+    vm.rollFork(13_530_235);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1167,7 +1176,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = UNICHAIN_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1227,7 +1236,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeRoninProd() public {
     vm.createSelectFork(vm.envString('RONIN_RPC'));
-    vm.rollFork(43_857_109);
+    vm.rollFork(44_142_187);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1237,7 +1246,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     assertEq(oldImplementation, _paramsV3.spokeImpl);
 
     // Caching state variables
-    CachedSpokeState memory state = _cacheSpokeState();
+    CachedSpokeState memory state = _cacheSpokeStateV4();
     address newEverclearSpoke = RONIN_SPOKE_UPGRADE_IMPL;
 
     // Deploying impl and upgrading the contract
@@ -1295,6 +1304,73 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     );
   }
 
-  // TODO: May need to deploy + upgrade via the zk project
-  function test_spokeUpgradeFeeAdapterSafe_upgradeZKSyncProd() public {}
+  //  function test_spokeUpgradeFeeAdapterSafe_upgradeGnosisProd() public {
+  //   vm.createSelectFork(vm.envString('GNOSIS_RPC'));
+  //   vm.rollFork(39_485_557);
+  //   _paramsV3 = _deploymentParamsV4[block.chainid];
+  //   if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
+
+  //   // Checking implementation correct and caching the state variables
+  //   spokeProxyV4 = EverclearSpokeV4(_paramsV3.spokeProxy);
+  //   address oldImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+  //   assertEq(oldImplementation, _paramsV3.spokeImpl);
+
+  //   // Caching state variables
+  //   CachedSpokeState memory state = _cacheSpokeStateV4();
+  //   address newEverclearSpoke = GNOSIS_SPOKE_UPGRADE_IMPL;
+
+  //   // Deploying impl and upgrading the contract
+  //   bool success = false;
+  //   bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV4.initialize.selector, _paramsV3.feeAdapter);
+  //   bytes memory upgradeCalldata =
+  //     abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
+
+  //   vm.prank(_paramsV3.owner);
+  //   (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
+  //   if (!success) revert UpgradeFailed();
+
+  //   // Checking the implementation address has updated
+  //   address newImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+  //   assertEq(newImplementation, newEverclearSpoke);
+
+  //   // Creating intent
+  //   IEverclear.Intent memory _intent;
+
+  //   // Checking the new intent function reverts
+  //   vm.expectRevert(ISpokeStorageV4.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
+  //   spokeProxyV4.newIntent(
+  //     _intent.destinations,
+  //     _intent.receiver.toAddress(),
+  //     _intent.inputAsset.toAddress(),
+  //     address(0),
+  //     _intent.amount,
+  //     _intent.maxFee,
+  //     _intent.ttl,
+  //     _intent.data
+  //   );
+
+  //   // Checking the cached state
+  //   assertEq(state.permit, address(spokeProxyV4.PERMIT2()));
+  //   assertEq(state.EVERCLEAR, spokeProxyV4.EVERCLEAR());
+  //   assertEq(state.DOMAIN, spokeProxyV4.DOMAIN());
+  //   assertEq(state.lighthouse, spokeProxyV4.lighthouse());
+  //   assertEq(state.watchtower, spokeProxyV4.watchtower());
+  //   assertEq(state.messageReceiver, spokeProxyV4.messageReceiver());
+  //   assertEq(state.gateway, address(spokeProxyV4.gateway()));
+  //   assertEq(state.callExecutor, address(spokeProxyV4.callExecutor()));
+  //   assertEq(state.paused, spokeProxyV4.paused());
+  //   assertEq(state.nonce, spokeProxyV4.nonce());
+  //   assertEq(state.messageGasLimit, spokeProxyV4.messageGasLimit());
+  //   assertEq(_paramsV3.feeAdapter, spokeProxyV4.feeAdapter());
+
+  //   // Pushing data to safe tx json //
+  //   safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
+  //   string memory chainId = '2020';
+  //   _writeSafeTransactionInput(
+  //     'safeTransactionInputs/upgradeSpokeFeeAdapter-gnosisMainnetProd.json',
+  //     'Spoke Upgrade - Fee Adapter | Gnosis | Mainnet Prod',
+  //     safeTransactions,
+  //     chainId
+  //   );
+  // }
 }

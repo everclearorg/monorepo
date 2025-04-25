@@ -196,6 +196,36 @@ locals {
           "https://api.roninchain.com/rpc",
           "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          ""
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
+        ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.gnosis.gateway.fm"
+        ]
       }
     }
     server = {
@@ -462,6 +492,30 @@ locals {
           "https://api.roninchain.com/rpc",
           "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.berachain.com"
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
+        ]
       }
     }
     betterUptime = {
@@ -559,8 +613,12 @@ locals {
       324 = { maxAge = 60, size = 1 },
       534352 = { maxAge = 60, size = 1 },
       167000 = { maxAge = 60, size = 1 },
-      2020 = { maxAge = 60, size = 1 }
-      # 33139 = { maxAge = 60, size = 1 }
+      2020 = { maxAge = 60, size = 1 },
+      80094 = { maxAge = 60, size = 1 },
+      5000 = { maxAge = 60, size = 1 },
+      146 = { maxAge = 60, size = 1 },
+      57073 = { maxAge = 60, size = 1 },
+      100 = { maxAge = 60, size = 1 }
     }
     hub = {
       domain = "25327",
@@ -666,6 +724,36 @@ locals {
         providers = [
           "https://api.roninchain.com/rpc",
           "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.berachain.com"
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
+        ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.gnosis.gateway.fm"
         ]
       }
     }
