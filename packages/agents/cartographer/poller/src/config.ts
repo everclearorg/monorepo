@@ -98,12 +98,14 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
     const providers: string[] = localChainConfig?.providers || everclearChainConfig?.providers || [];
     const deployments: any = localChainConfig?.deployments || everclearChainConfig?.deployments || {};
     const subgraphUrls: string[] = localChainConfig?.subgraphUrls || everclearChainConfig?.subgraphUrls || [];
+    const network: string = localChainConfig?.network || everclearChainConfig?.network || 'evm';
 
     chainsForConfig[domainId] = {
       subgraphUrls,
       providers,
       confirmations,
       deployments,
+      network,
     };
   }
 

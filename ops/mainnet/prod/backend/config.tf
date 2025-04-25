@@ -144,6 +144,12 @@ locals {
           "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       },
+      "1399811149" = {
+        providers = [
+          "https://api.mainnet-beta.solana.com"
+        ],
+        network = "solana"
+      },
       "80094" = {
         providers = [
           "https://berachain-mainnet.blastapi.io/${var.blast_key}",

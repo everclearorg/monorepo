@@ -49,6 +49,7 @@ const MOCK_CHAINS = {
       gateway: mkAddress('0x1337fff'),
     },
     confirmations: 3,
+    network: 'evm',
     assets: {
       ETH: {
         symbol: 'ETH',
@@ -84,6 +85,7 @@ const MOCK_CHAINS = {
       gateway: mkAddress('0x1338fff'),
     },
     confirmations: 3,
+    network: 'evm',
     assets: {
       ETH: {
         symbol: 'ETH',
