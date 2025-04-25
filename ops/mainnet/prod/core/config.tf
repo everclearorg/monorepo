@@ -518,6 +518,7 @@ locals {
         providers = [
           "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://ink.drpc.org"
+        ]
       }
     }
     betterUptime = {
