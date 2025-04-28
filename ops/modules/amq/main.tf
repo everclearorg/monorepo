@@ -3,6 +3,7 @@ resource "aws_mq_broker" "default" {
   deployment_mode     = var.deployment_mode
   engine_type         = "RabbitMQ"
   engine_version      = "3.13"
+  auto_minor_version_upgrade = true # required by RabbitMQ 3.13+
   host_instance_type  = var.host_instance_type
   publicly_accessible = var.publicly_accessible
   subnet_ids          = var.publicly_accessible ? [] : var.subnet_ids
