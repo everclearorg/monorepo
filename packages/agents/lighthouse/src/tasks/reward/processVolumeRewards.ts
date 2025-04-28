@@ -102,9 +102,10 @@ export const processVolumeRewards = async (
       const settlementAsset = intent.settlementIntent.asset.toLowerCase();
       const asset = assetConfigs.get(settlementAsset);
       if (!asset) {
-        const error = new InvalidAsset(settlementAsset, { domain });
-        logger.error('invalid asset', requestContext, methodContext, error, { epoch, domain, assetConfigs });
-        throw error;
+        const error = new InvalidAsset(settlementAsset, { domain, epoch, assetConfigs });
+        logger.warn('invalid asset', requestContext, methodContext, error);
+        // We skip invalid assets in calculation as there could be intents fired with unsupported status
+        continue;
       }
 
       // USD Volume = intentAmount / AssetDecimals * multipliedUSD / usdMultiplier
@@ -406,10 +407,15 @@ export const processVolumeRewards = async (
     }
 
     for (const user in userVolume) {
+      const userProtocolRewards = userVolume[user].protocolRewards[token.address];
+      // skip user with no protocol rewards. This way rewards map will always reward positive entries
+      if (userProtocolRewards.lte(0)) {
+        continue;
+      }
       if (!rewards[token.address][user]) {
         rewards[token.address][user] = BigNumber.from(0);
       }
-      rewards[token.address][user] = rewards[token.address][user].add(userVolume[user].protocolRewards[token.address]);
+      rewards[token.address][user] = rewards[token.address][user].add(userProtocolRewards);
     }
 
     // NOTE: totalVariableReward will have rounding errors as variable rewards per user is calculated

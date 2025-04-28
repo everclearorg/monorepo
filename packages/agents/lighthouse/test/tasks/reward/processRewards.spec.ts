@@ -328,10 +328,6 @@ describe('#processRewards', () => {
   });
 
   describe('should fail', () => {
-    it('not supported asset', async () => {
-      await processRewardsFailureTest(testVector.failures.invalidAssetInIntent, 'Invalid asset');
-    });
-
     it('volume reward asset is not configured', async () => {
       const volumeTokenConfig = mock.config().rewards.volume.tokens[0];
       const volumeTokenAddress = volumeTokenConfig.address;
