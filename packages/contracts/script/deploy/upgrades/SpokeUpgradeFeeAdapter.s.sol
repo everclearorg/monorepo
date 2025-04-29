@@ -27,6 +27,8 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
   // CREATE3 addresses
   address public constant LIFI_CREATE3 = 0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1;
   address public constant LIFI_LONDON_CREATE3 = 0x8437A5fE47A4Df14700c96DF1870824e72FA8499;
+  address public constant BERACHAIN_CREATE3 = 0x5f63A2d7850776465b84Bc0fe6284BBC8188dbC7;
+  address public constant INK_CREATE3 = 0xeBbbaC35500713C4AD49929e1bE4225c7efF6510;
 
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
 
@@ -48,7 +50,7 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
 
     // Deploying the new implementation via CREATE3
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
-    (bool success, bytes memory returnData) = LIFI_LONDON_CREATE3.call(create3Calldata);
+    (bool success, bytes memory returnData) = LIFI_CREATE3.call(create3Calldata);
     if (!success) revert Create3DeploymentFailed();
     newEverclearSpoke = abi.decode(returnData, (address));
 
@@ -126,5 +128,17 @@ contract MainnetProduction is DeployFeeAdapterUpgrade, MainnetProductionEnvironm
 
     // Gnosis
     _deploymentParams[GNOSIS] = DeploymentParams({owner: OWNER, spokeProxy: address(GNOSIS_SPOKE)}); // set domain id as mapping key
+
+    // Berachain
+    _deploymentParams[BERACHAIN] = DeploymentParams({owner: OWNER, spokeProxy: address(BERACHAIN_SPOKE)}); // set domain id as mapping key
+
+    // Sonic
+    _deploymentParams[SONIC] = DeploymentParams({owner: OWNER, spokeProxy: address(SONIC_SPOKE)}); // set domain id as mapping key
+
+    // Ink
+    _deploymentParams[INK] = DeploymentParams({owner: OWNER, spokeProxy: address(INK_SPOKE)}); // set domain id as mapping key
+
+    // Mantle
+    _deploymentParams[MANTLE] = DeploymentParams({owner: OWNER, spokeProxy: address(MANTLE_SPOKE)}); // set domain id as mapping key
   }
 }

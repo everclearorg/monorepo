@@ -1,0 +1,19 @@
+{
+  "chainId": "100",
+  "createdAt": "1745920035000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Gnosis | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xe0F010e465f15dcD42098dF9b99F1038c11B3056",
+      "value": "0",
+      "data": "0x4f1ef28600000000000000000000000039291a3118db3644890ff79fa0d15dd3cb03592700000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000024c4d66de80000000000000000000000006dea30929a575b8b29f459aae1b3b85e52a723f400000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}
