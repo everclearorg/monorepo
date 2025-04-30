@@ -57,7 +57,13 @@ export const getConfiguredTickers = (chains: Record<string, ChainConfig>) => {
   const tickers = new Set<string>();
   domains.forEach((domain) => {
     const configured = Object.keys(chains[domain].assets ?? {});
-    configured.forEach((ticker: string) => tickers.add(ticker));
+    configured.forEach((ticker: string) => {
+      const asset = chains[domain].assets?.[ticker];
+      // Only add non-native assets
+      if (asset && !asset.isNative) {
+        tickers.add(ticker);
+      }
+    });
   });
   // Error if no tickers are configured for settlement.
   if (tickers.size === 0) {
