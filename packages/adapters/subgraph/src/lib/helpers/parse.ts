@@ -380,6 +380,7 @@ export const depositQueue = (entity: DepositQueueEntity): DepositQueue => {
     type: QueueType.Deposit,
     tickerHash: entity.tickerHash,
     epoch: StringToNumber(entity.epoch),
+    blockNumber: StringToNumber(entity.blockNumber),
   };
 };
 
