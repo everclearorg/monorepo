@@ -764,6 +764,13 @@
           "name": "mint_account"
         },
         {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "recipient"
+        },
+        {
           "name": "recipient_token_account",
           "writable": true
         },
@@ -1831,7 +1838,7 @@
           },
           {
             "name": "normalized_amount",
-            "type": "u64"
+            "type": "u128"
           },
           {
             "name": "max_fee",

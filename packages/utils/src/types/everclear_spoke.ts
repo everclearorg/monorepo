@@ -770,6 +770,13 @@ export type EverclearSpoke = {
           "name": "mintAccount"
         },
         {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "recipient"
+        },
+        {
           "name": "recipientTokenAccount",
           "writable": true
         },
@@ -1837,7 +1844,7 @@ export type EverclearSpoke = {
           },
           {
             "name": "normalizedAmount",
-            "type": "u64"
+            "type": "u128"
           },
           {
             "name": "maxFee",
