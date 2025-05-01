@@ -246,7 +246,7 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     signer: process.env.LIGHTHOUSE_SIGNER || configJson?.signer || configFile?.signer || '',
     relayers: configJson.relayers || configFile.relayers || [],
     rewards,
-    logLevel: (process.env.LIGHTHOUSE_LOG_LEVEL || configFile?.logLevel || 'info') as LogLevel,
+    logLevel: (process.env.LIGHTHOUSE_LOG_LEVEL || configJson?.logLevel || configFile?.logLevel || 'info') as LogLevel,
     environment,
     network,
     service: (process.env.LIGHTHOUSE_SERVICE || configFile?.service || 'intent') as LighthouseService,
