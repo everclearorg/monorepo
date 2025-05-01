@@ -354,22 +354,6 @@ export const DepoitorEventSchema = Type.Intersect([
 ]);
 export type DepositorEvent = Static<typeof DepoitorEventSchema>;
 
-export const ShadowEventSchema = Type.Object({
-  address: Type.String({ maxLength: 66 }),
-  blockHash: Type.String({ maxLength: 66 }),
-  blockNumber: Type.Number(),
-  blockTimestamp: Type.Date(),
-  chain: Type.String({ maxLength: 20 }),
-  network: Type.String({ maxLength: 20 }),
-  topic0: Type.String({ maxLength: 66 }),
-  transactionHash: Type.String({ maxLength: 66 }),
-  transactionIndex: Type.Number(),
-  transactionLogIndex: Type.Number(),
-  timestamp: Type.Date(),
-  latency: Type.String(),
-});
-export type ShadowEvent = Static<typeof ShadowEventSchema>;
-
 export const VoteSchema = Type.Object({
   domain: Type.Number(),
   votes: Type.String(),

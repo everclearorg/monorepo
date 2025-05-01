@@ -55,9 +55,10 @@ describe('Config', () => {
         ...process.env,
         CONFIG_PARAMETER_NAME: 'cartographer-config',
       });
-      ssmStub.resolves(JSON.stringify({ ...createCartographerConfig(), pollInterval: 98765 }));
+      const testConfig = createCartographerConfig();
+      ssmStub.resolves(JSON.stringify({ ...testConfig, databaseUrl: testConfig.database, pollInterval: 98765 }));
       const config = await getEnvConfig();
-      await expect(config.pollInterval).to.be.equal(98765);
+      expect(config.pollInterval).to.be.equal(98765);
     });
   });
 

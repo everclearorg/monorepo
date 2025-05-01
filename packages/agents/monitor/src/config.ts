@@ -30,8 +30,6 @@ export const DefaultThresholds: ThresholdsConfig = {
   maxInvoiceProcessingTime: 23 * 3600,
   minGasOnRelayer: 1,
   minGasOnGateway: 1,
-  maxShadowExportDelay: 900,
-  maxShadowExportLatency: 10,
   maxTokenomicsExportDelay: 1800,
   maxTokenomicsExportLatency: 10,
 };
@@ -72,20 +70,6 @@ export const DefaultTokenomicsTables = [
   'vote_delegated',
   'withdraw',
   'withdraw_eth',
-];
-
-export const DefaultShadowTables = [
-  'closedepochsprocessed',
-  'depositenqueued',
-  'depositprocessed',
-  'finddepositdomain',
-  'findinvoicedomain',
-  'invoiceenqueued',
-  'matchdeposit',
-  'settledeposit',
-  'settlementenqueued',
-  'settlementqueueprocessed',
-  'settlementsent',
 ];
 
 export const getConfig = async (): Promise<MonitorConfig> => {
@@ -205,7 +189,6 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},
     telegram: configJson.telegram || configFile.telegram || {},
     healthUrls: process.env.MONITOR_HEALTH_URLS || configJson.healthUrls || configFile.healthUrls || {},
-    shadowTables: configJson.shadowTables || configFile.shadowTables || DefaultShadowTables,
     tokenomicsTables: configJson.tokenomicsTables || configFile.tokenomicsTables || DefaultTokenomicsTables,
     solana: configJson?.solana || configFile?.solana || {},
   };

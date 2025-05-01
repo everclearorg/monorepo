@@ -155,8 +155,6 @@ export const TThresholdsConfig = Type.Object({
   maxInvoiceProcessingTime: Type.Optional(Type.Number()),
   minGasOnRelayer: Type.Optional(Type.Number()),
   minGasOnGateway: Type.Optional(Type.Number()),
-  maxShadowExportDelay: Type.Optional(Type.Number()),
-  maxShadowExportLatency: Type.Optional(Type.Number()),
   maxTokenomicsExportDelay: Type.Optional(Type.Number()),
   maxTokenomicsExportLatency: Type.Optional(Type.Number()),
 });

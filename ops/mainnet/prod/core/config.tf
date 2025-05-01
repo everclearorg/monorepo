@@ -572,8 +572,6 @@ locals {
       minGasOnGateway = 0.5
       averageElapsedEpochs = 6
       averageElapsedEpochsAlertAmount = 10000
-      maxShadowExportDelay = 900
-      maxShadowExportLatency = 10
       maxTokenomicsExportDelay = 1800
       maxTokenomicsExportLatency = 10
     }

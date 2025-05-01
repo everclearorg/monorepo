@@ -35,7 +35,6 @@ export const createMockDatabase = (): Database => {
     getMessagesByStatus: stub().resolves([]),
     updateMessageStatus: stub().resolves([]),
     getLatestTimestamp: stub().resolves(Date.UTC(2024, 0)),
-    getShadowEvents: stub().resolves([]),
     getVotes: stub().resolves([]),
     getTokenomicsEvents: stub().resolves([]),
     getNewLockPositionEvents: stub().resolves([]),
