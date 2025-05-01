@@ -103,8 +103,10 @@ export const processSolanaTransactions = async () => {
             tokenProgram: intentStatus.accounts[3].pubkey,
             systemProgram: intentStatus.accounts[4].pubkey,
             mintAccount: intentStatus.accounts[5].pubkey,
-            recipientTokenAccount: intentStatus.accounts[6].pubkey,
-            vaultTokenAccount: intentStatus.accounts[7].pubkey,
+            associatedTokenProgram: intentStatus.accounts[6].pubkey,
+            recipient: intentStatus.accounts[7].pubkey,
+            recipientTokenAccount: intentStatus.accounts[8].pubkey,
+            vaultTokenAccount: intentStatus.accounts[9].pubkey,
           })
           .instruction(),
       );

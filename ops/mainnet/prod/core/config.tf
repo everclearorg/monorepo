@@ -518,6 +518,7 @@ locals {
         providers = [
           "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://ink.drpc.org"
+        ]
       }
     }
     betterUptime = {
@@ -571,8 +572,6 @@ locals {
       minGasOnGateway = 0.5
       averageElapsedEpochs = 6
       averageElapsedEpochsAlertAmount = 10000
-      maxShadowExportDelay = 900
-      maxShadowExportLatency = 10
       maxTokenomicsExportDelay = 1800
       maxTokenomicsExportLatency = 10
     }

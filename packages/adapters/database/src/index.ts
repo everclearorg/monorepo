@@ -17,7 +17,6 @@ import {
   HubInvoice,
   HubDeposit,
   SettlementIntent,
-  ShadowEvent,
   Vote,
   TokenomicsEvent,
   MerkleTree,
@@ -69,7 +68,6 @@ import {
   getLatestInvoicesByTickerHash,
   getLatestHubInvoicesByTickerHash,
   getLatestTimestamp,
-  getShadowEvents,
   getVotes,
   getTokenomicsEvents,
   getSettledIntentsInEpoch,
@@ -222,12 +220,6 @@ export type Database = {
     timestampColumnName: string,
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<Date>;
-  getShadowEvents: (
-    table: string,
-    from: Date,
-    limit: number,
-    _pool?: Pool | TxnClientForRepeatableRead,
-  ) => Promise<ShadowEvent[]>;
   getVotes: (epoch: number, _pool?: Pool | TxnClientForRepeatableRead) => Promise<Vote[]>;
   getTokenomicsEvents: (
     table: string,
@@ -326,7 +318,6 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getLatestHubInvoicesByTickerHash,
     getTokens,
     getLatestTimestamp,
-    getShadowEvents,
     getVotes,
     getTokenomicsEvents,
     getMerkleTrees,
