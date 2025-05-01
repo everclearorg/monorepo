@@ -18,7 +18,6 @@ import {
   HyperlaneStatus,
   HubInvoice,
   Invoice,
-  ShadowEvent,
   TokenomicsEvent,
   SolanaConfig,
 } from '@chimera-monorepo/utils';
@@ -129,8 +128,6 @@ const MOCK_THRESHOLDS = {
   maxSettlementQueueAssetAmounts: { '1337': 100000 },
   messageMaxDelay: 1800, // Seconds
   maxInvoiceProcessingTime: 23 * 3600,
-  maxShadowExportDelay: 900,
-  maxShadowExportLatency: 10,
   maxTokenomicsExportDelay: 1800,
   maxTokenomicsExportLatency: 10,
 };
@@ -207,11 +204,6 @@ const MOCK_ORIGIN_INTENT: OriginIntent = {
   gasPrice: '12312123',
 };
 
-const MOCK_SHADOW_TABLES = [
-  'table1',
-  'table2',
-];
-
 const MOCK_TOKENOMICS_TABLES = [
   'table1',
   'table2',
@@ -261,7 +253,6 @@ export const mock = {
       telegram: MOCK_TELEGRAM,
       betterUptime: MOCK_BETTERUPTIME,
       healthUrls: MOCK_HEALTH_URLS,
-      shadowTables: MOCK_SHADOW_TABLES,
       tokenomicsTables: MOCK_TOKENOMICS_TABLES,
       solana: MOCK_SOLANA,
       ...overrides,
@@ -413,21 +404,6 @@ export const mock = {
     blockNumber: 1234,
     gasLimit: '1231231231',
     gasPrice: '12312123',
-    ...overrides,
-  }),
-  shadowEvent: (overrides: Partial<ShadowEvent> = {}): ShadowEvent => ({
-    address: mkBytes32('0x123'),
-    blockHash: mkBytes32('0x123'),
-    blockNumber: 234,
-    blockTimestamp: new Date(),
-    chain: '1337',
-    network: '1338',
-    topic0: mkBytes32('0x123'),
-    transactionHash: mkBytes32('0x123'),
-    transactionIndex: 1,
-    transactionLogIndex: 0,
-    timestamp: new Date(),
-    latency: '00:00:00.00000',
     ...overrides,
   }),
   tokenomicsEvent: (overrides: Partial<TokenomicsEvent> = {}): TokenomicsEvent => ({

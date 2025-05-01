@@ -249,8 +249,6 @@ locals {
     thresholds = {
       averageElapsedEpochs = 6
       averageElapsedEpochsAlertAmount = 1000000000
-      maxShadowExportDelay = 900
-      maxShadowExportLatency = 10
       maxTokenomicsExportDelay = 1800
       maxTokenomicsExportLatency = 10
     }

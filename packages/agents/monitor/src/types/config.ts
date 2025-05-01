@@ -81,7 +81,6 @@ export const TMonitorConfigSchema = Type.Object({
     }),
   ),
   healthUrls: Type.Partial(Type.Record(TService, Type.String({ format: 'uri' }))),
-  shadowTables: Type.Optional(Type.Array(Type.String())),
   tokenomicsTables: Type.Optional(Type.Array(Type.String())),
   solana: TSolanaConfig,
 });

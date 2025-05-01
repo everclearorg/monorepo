@@ -17,7 +17,6 @@ import {
   mkAddress,
   mkBytes32,
   mkHash,
-  ShadowEvent,
   TokenomicsEvent,
   MerkleTree,
   NewLockPositionEvent,
@@ -66,7 +65,6 @@ export const createMockDatabase = (): Database => {
     refreshInvoicesView: stub().resolves(),
     getInvoicesByStatus: stub().resolves([]),
     getLatestTimestamp: stub().resolves(Date.UTC(2024, 0)),
-    getShadowEvents: stub().resolves([]),
     getVotes: stub().resolves([]),
     getTokenomicsEvents: stub().resolves([]),
     getSettledIntentsInEpoch: stub().resolves([]),
@@ -431,22 +429,6 @@ export const createHubDeposit = (overrides: Partial<HubDeposit> = {}): HubDeposi
   enqueuedTxNonce: 12,
   processedTimestamp: undefined,
   processedTxNonce: undefined,
-  ...overrides,
-});
-
-export const createShadowEvent = (overrides: Partial<ShadowEvent> = {}): ShadowEvent => ({
-  address: mkBytes32('0x1'),
-  blockHash: mkBytes32('0x1'),
-  blockNumber: 1,
-  blockTimestamp: new Date(),
-  chain: 'Everclear',
-  network: '25327',
-  topic0: mkBytes32('0x1'),
-  transactionHash: mkBytes32('0x1'),
-  transactionIndex: 0,
-  transactionLogIndex: 0,
-  timestamp: new Date(),
-  latency: '0',
   ...overrides,
 });
 

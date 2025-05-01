@@ -16,7 +16,6 @@ import {
   DepositQueue,
   HyperlaneStatus,
   TIntentStatus,
-  ShadowEvent,
   MerkleTree,
   Vote,
   TokenomicsEvent,
@@ -569,23 +568,6 @@ export function fromHubDeposits(deposit: hub_deposits.JSONSelectable): HubDeposi
     enqueuedTimestamp: +deposit.enqueued_timestamp,
     processedTxNonce: deposit.processed_tx_nonce ? +deposit.processed_tx_nonce : undefined,
     processedTimestamp: deposit.processed_timestamp ? +deposit.processed_timestamp : undefined,
-  };
-}
-
-export function fromShadowEvent(event: any): ShadowEvent {
-  return {
-    address: event.address,
-    blockHash: event.block_hash,
-    blockNumber: event.block_number,
-    blockTimestamp: event.block_timestamp,
-    chain: event.chain,
-    network: event.network,
-    topic0: event.topic_0,
-    transactionHash: event.transaction_hash,
-    transactionIndex: event.transaction_index,
-    transactionLogIndex: event.transaction_log_index,
-    timestamp: event.timestamp,
-    latency: event.latency,
   };
 }
 
