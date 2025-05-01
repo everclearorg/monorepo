@@ -5,7 +5,7 @@ import {
   TMessageType,
   TSettlementMessageType,
   createLoggingContext,
-  getMaxBlockNumber,
+  getMaxEpoch,
   getMaxTxNonce,
 } from '@chimera-monorepo/utils';
 
@@ -134,8 +134,8 @@ export const updateQueues = async () => {
 
   // Deposit queues are configured by `epoch-origin_domain-tickerhash`
   // There could be many more deposit queues than message queues, so these require a checkpoint
-  const prevBlock = await database.getCheckPoint('hub_queue_deposit');
-  const depositQueues = await subgraph.getDepositQueues(config.hub.domain, prevBlock);
+  const prevEpoch = await database.getCheckPoint('hub_queue_deposit');
+  const depositQueues = await subgraph.getDepositQueues(config.hub.domain, prevEpoch);
   logger.debug('Retrieved deposit queues', requestContext, methodContext, {
     depositQueues
   });
@@ -152,9 +152,9 @@ export const updateQueues = async () => {
     queues: new Set(queues.map((q) => q.id)).size,
   });
 
-  const latestBlock = getMaxBlockNumber(depositQueues);
-  await database.saveCheckPoint('hub_queue_deposit', latestBlock);
-  logger.debug('Saved checkpoint', requestContext, methodContext, { latestBlock });
+  const latestEpoch = getMaxEpoch(depositQueues);
+  await database.saveCheckPoint('hub_queue_deposit', latestEpoch);
+  logger.debug('Saved checkpoint', requestContext, methodContext, { latestEpoch });
 
   logger.debug('Method complete', requestContext, methodContext, {
     queues: queues.map((q) => ({ id: q.id, domain: q.domain, size: q.size, lastProcessed: q.lastProcessed })),

@@ -596,7 +596,6 @@ export const DEPOSIT_QUEUE_ENTITY = `
     size
     first
     last
-    blockNumber
 `;
 
 export type HubInvoiceEntity = {

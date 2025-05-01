@@ -137,7 +137,7 @@ function getOrCreateDeposit(id: Bytes, amount: BigInt, epoch: BigInt, domain: Bi
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-function getOrCreateDepositQueue(epoch: BigInt, domain: BigInt, tickerHash: Bytes, blockNumber: BigInt): DepositQueue {
+function getOrCreateDepositQueue(epoch: BigInt, domain: BigInt, tickerHash: Bytes): DepositQueue {
   const id = Bytes.fromByteArray(Bytes.fromBigInt(epoch).concat(Bytes.fromBigInt(domain))).concat(tickerHash);
   let queue = DepositQueue.load(id);
   if (queue == null) {
@@ -148,7 +148,6 @@ function getOrCreateDepositQueue(epoch: BigInt, domain: BigInt, tickerHash: Byte
     queue.first = BigInt.fromI32(1);
     queue.last = BigInt.zero();
     queue.size = BigInt.zero();
-    queue.blockNumber = blockNumber;
     queue.save();
   }
   return queue;
@@ -425,7 +424,7 @@ export function handleDepositEnqueued(event: DepositEnqueued): void {
   const intentId = event.params._intentId;
 
   // Update Deposit Queue
-  const queue = getOrCreateDepositQueue(event.params._epoch, event.params._domain, event.params._tickerHash, event.block.number);
+  const queue = getOrCreateDepositQueue(event.params._epoch, event.params._domain, event.params._tickerHash);
   queue.last = queue.last.plus(BigInt.fromI32(1));
   queue.size = queue.size.plus(BigInt.fromI32(1));
   queue.save();
