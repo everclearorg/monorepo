@@ -5,10 +5,10 @@ use crate::error::SpokeError;
 use crate::intent::EVMIntent;
 
 pub(crate) fn normalize_decimals(
-    amount: u64,
+    amount: u128,
     minted_decimals: u8,
     target_decimals: u8,
-) -> Result<u64> {
+) -> Result<u128> {
     match minted_decimals.cmp(&target_decimals) {
         // No scaling needed
         std::cmp::Ordering::Equal => Ok(amount),
@@ -20,7 +20,7 @@ pub(crate) fn normalize_decimals(
                 // you might fail or just saturate for large differences
                 return err!(SpokeError::DecimalConversionOverflow);
             };
-            Ok(amount / 10u64.pow(shift as u32))
+            Ok(amount / u128::from(10u64.pow(shift as u32)))
         }
         // minted_decimals < target_decimals => upscale
         std::cmp::Ordering::Less => {
@@ -30,7 +30,7 @@ pub(crate) fn normalize_decimals(
                 .checked_pow(shift as u32)
                 .ok_or(error!(SpokeError::DecimalConversionOverflow))?;
             let scaled = amount
-                .checked_mul(factor)
+                .checked_mul(u128::from(factor))
                 .ok_or(error!(SpokeError::DecimalConversionOverflow))?;
             Ok(scaled)
         }
@@ -197,10 +197,10 @@ fn u256_to_32bytes(val: u128) -> [u8; 32] {
 mod tests {
     use super::*;
 
-    fn u64_to_u256_be(val: u64) -> [u8; 32] {
+    fn u128_to_u256_be(val: u128) -> [u8; 32] {
         let mut out = [0u8; 32];
         // copy val’s big-endian bytes into the last 8 bytes
-        out[24..32].copy_from_slice(&val.to_be_bytes());
+        out[16..32].copy_from_slice(&val.to_be_bytes());
         out
     }
 
@@ -219,7 +219,7 @@ mod tests {
             nonce: 35,
             timestamp: 1743782830,
             ttl: 0,
-            amount: u64_to_u256_be(2000000000000000000),
+            amount: u128_to_u256_be(2000000000000000000),
             destinations: vec![8453],
             data: vec![],
         };

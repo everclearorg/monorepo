@@ -239,6 +239,9 @@ export type HubDeposit = Static<typeof HubDepositSchema>;
 export const DepositQueueSchema = Type.Intersect([
   MessageQueueSchema,
   Type.Object({
+    blockNumber: Type.Integer(),
+  }),
+  Type.Object({
     type: Type.Literal(QueueType.Deposit),
     tickerHash: TBytes32,
     epoch: Type.Integer(),

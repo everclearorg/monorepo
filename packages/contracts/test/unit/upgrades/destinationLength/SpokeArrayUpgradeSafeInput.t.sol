@@ -32,7 +32,14 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
 
   // Deprecated contracts from upgrades //
   address public constant ZIRCUIT_SPOKE_DEPRECATED = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
-  address public constant ZIRCUIT_SPOKE_IMPL_DEPRECATED = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+
+  // V1 Spoke contracts impl //
+  address public constant ETHEREUM_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant ARBITRUM_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant OPTIMISM_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant BNB_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant BASE_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant ZIRCUIT_SPOKE_IMPL_V1 = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 
   // Owner //
   address public constant ETHEREUM_SPOKE_OWNER = 0xa02a88F0bbD47045001Bd460Ad186C30F9a974d6;
@@ -55,42 +62,42 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
     _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
       owner: ARBITRUM_SPOKE_OWNER,
       spokeProxy: address(ARBITRUM_ONE_SPOKE),
-      spokeImpl: ARBITRUM_SPOKE_IMPL
+      spokeImpl: ARBITRUM_SPOKE_IMPL_V1
     });
 
     //// Optimism
     _deploymentParams[OPTIMISM] = DeploymentParams({ // set domain id as mapping key
       owner: OPTIMISM_SPOKE_OWNER,
       spokeProxy: address(OPTIMISM_SPOKE),
-      spokeImpl: OPTIMISM_SPOKE_IMPL
+      spokeImpl: OPTIMISM_SPOKE_IMPL_V1
     });
 
     //// Base
     _deploymentParams[BASE] = DeploymentParams({ // set domain id as mapping key
       owner: BASE_SPOKE_OWNER,
       spokeProxy: address(BASE_SPOKE),
-      spokeImpl: BASE_SPOKE_IMPL
+      spokeImpl: BASE_SPOKE_IMPL_V1
     });
 
     //// Bnb
     _deploymentParams[BNB] = DeploymentParams({ // set domain id as mapping key
       owner: BNB_SPOKE_OWNER,
       spokeProxy: address(BNB_SPOKE),
-      spokeImpl: BNB_SPOKE_IMPL
+      spokeImpl: BNB_SPOKE_IMPL_V1
     });
 
     //// Ethereum
     _deploymentParams[ETHEREUM] = DeploymentParams({ // set domain id as mapping key
       owner: ETHEREUM_SPOKE_OWNER,
       spokeProxy: address(ETHEREUM_SPOKE),
-      spokeImpl: ETHEREUM_SPOKE_IMPL
+      spokeImpl: ETHEREUM_SPOKE_IMPL_V1
     });
 
     //// Zircuit
     _deploymentParams[ZIRCUIT] = DeploymentParams({ // set domain id as mapping key
       owner: ZIRCUIT_SPOKE_OWNER,
       spokeProxy: address(ZIRCUIT_SPOKE_DEPRECATED),
-      spokeImpl: ZIRCUIT_SPOKE_IMPL_DEPRECATED
+      spokeImpl: ZIRCUIT_SPOKE_IMPL_V1
     });
   }
 
@@ -513,6 +520,11 @@ contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, 
   address public constant ARBITRUM_SPOKE_OWNER = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
   address public constant OPTIMISM_SPOKE_OWNER = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 
+  // V1 contracts impl //
+  address public constant ARBITRUM_ONE_SPOKE_IMPL_V1 = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
+  address public constant OPTIMISM_SPOKE_IMPL_V1 = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
+  address public constant ETHEREUM_SPOKE_IMPL_V1 = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
+
   // Deployed upgrade contracts //
   address public constant ETHEREUM_SPOKE_UPGRADE_IMPL = 0x259F03D45eA8dE916a935E388024cF86D893244A;
   address public constant ARB_SPOKE_UPGRADE_IMPL = 0x259F03D45eA8dE916a935E388024cF86D893244A;
@@ -523,14 +535,14 @@ contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, 
     _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
       owner: ARBITRUM_SPOKE_OWNER,
       spokeProxy: address(ARBITRUM_ONE_SPOKE),
-      spokeImpl: ARBITRUM_SPOKE_IMPL
+      spokeImpl: ARBITRUM_ONE_SPOKE_IMPL_V1
     });
 
     //// Optimism
     _deploymentParams[OPTIMISM] = DeploymentParams({ // set domain id as mapping key
       owner: OPTIMISM_SPOKE_OWNER,
       spokeProxy: address(OPTIMISM_SPOKE),
-      spokeImpl: OPTIMISM_SPOKE_IMPL
+      spokeImpl: OPTIMISM_SPOKE_IMPL_V1
     });
 
     //// Ethereum

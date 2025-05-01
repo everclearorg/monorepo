@@ -32,14 +32,7 @@ const DEFAULT_GAS_LIMIT = 30_000_000;
 const DEFAULT_HEALTH_BASE_URI = 'https://uptime.betterstack.com/api/v1/heartbeat/';
 const DEFAULT_REWARDS_CONFIG = {
   volume: {
-    tokens: [
-      {
-        // 750000 CLEAR
-        epochVolumeReward: '750000000000000000000000',
-        baseRewardDbps: 12,
-        maxBpsUsdVolumeCap: 250000000,
-      },
-    ],
+    tokens: [],
   },
   staking: {
     tokens: [
@@ -231,7 +224,8 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
   const rewards = configJson.rewards || configFile.rewards || {};
   if (rewards.volume?.tokens) {
     rewards.volume.tokens = rewards.volume.tokens.map((item: TokenVolumeReward, index: number) => {
-      return { ...DEFAULT_REWARDS_CONFIG.volume.tokens[index], ...item };
+      // return { ...DEFAULT_REWARDS_CONFIG.volume.tokens[index], ...item };
+      return { ...item };
     });
   }
   if (rewards.staking?.tokens) {

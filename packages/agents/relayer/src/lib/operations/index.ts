@@ -1,4 +1,4 @@
-import { createTask } from "./tasks";
+import { createTask } from './tasks';
 
 export const getOperations = () => {
   return {

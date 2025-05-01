@@ -501,6 +501,7 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       maxSolversFee: MAX_FEE
     });
 
+    // Scroll
     _deploymentParams[SCROLL] = DeploymentParams({ // set domain id as mapping key
       gateway: ISpokeGateway(address(0)),
       executor: ICallExecutor(address(0)),
@@ -515,6 +516,7 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       maxSolversFee: MAX_FEE
     });
 
+    // Taiko
     _deploymentParams[TAIKO] = DeploymentParams({ // set domain id as mapping key
       gateway: ISpokeGateway(address(0)),
       executor: ICallExecutor(address(0)),
@@ -529,6 +531,7 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       maxSolversFee: MAX_FEE
     });
 
+    // Apechain
     _deploymentParams[APECHAIN] = DeploymentParams({ // set domain id as mapping key
       gateway: ISpokeGateway(address(0)),
       executor: ICallExecutor(address(0)),
@@ -542,6 +545,8 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       owner: OWNER,
       maxSolversFee: MAX_FEE
     });
+
+    // Unichain
     _deploymentParams[UNICHAIN] = DeploymentParams({ // set domain id as mapping key
       gateway: ISpokeGateway(address(0)),
       executor: ICallExecutor(address(0)),
@@ -556,6 +561,7 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       maxSolversFee: MAX_FEE
     });
 
+    // Ronin
     _deploymentParams[RONIN] = DeploymentParams({
       gateway: ISpokeGateway(address(0)),
       executor: ICallExecutor(address(0)),
@@ -564,6 +570,81 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       watchtower: WATCHTOWER,
       ism: address(0), // using the default ism
       mailbox: address(RONIN_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Gnosis
+    _deploymentParams[GNOSIS] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(GNOSIS_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Berachain
+    _deploymentParams[BERACHAIN] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(BERACHAIN_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Sonic
+    _deploymentParams[SONIC] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(SONIC_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Mantle
+    _deploymentParams[MANTLE] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(MANTLE_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Ink
+    _deploymentParams[INK] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(INK_MAILBOX), // domain mailbox
       hubDomain: EVERCLEAR_DOMAIN,
       hubGateway: address(HUB_GATEWAY),
       owner: OWNER,

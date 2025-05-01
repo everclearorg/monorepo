@@ -16,7 +16,7 @@ use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::IntentAddedEvent,
-    intent::{encode_full, u64_to_u256_be, EVMIntent},
+    intent::{encode_full, u128_to_u256_be, EVMIntent},
     state::SpokeState,
     utils::{compute_intent_hash, normalize_decimals},
 };
@@ -60,7 +60,7 @@ pub fn new_intent(
 
     let minted_decimals = ctx.accounts.mint.decimals;
     let normalized_amount =
-        normalize_decimals(amount, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
+        normalize_decimals(amount as u128, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
     require!(normalized_amount > 0, SpokeError::ZeroAmount); // Add zero amount check like Solidity
 
     // Validate program vault account is an ATA owned by vault authority:
@@ -107,7 +107,7 @@ pub fn new_intent(
         nonce: new_nonce,
         timestamp: clock.unix_timestamp as u64,
         ttl,
-        amount: u64_to_u256_be(normalized_amount),
+        amount: u128_to_u256_be(normalized_amount),
         destinations: destinations.clone(),
         data: data.clone(),
     };

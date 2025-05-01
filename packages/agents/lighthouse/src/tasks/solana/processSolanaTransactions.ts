@@ -1,4 +1,10 @@
-import { createLoggingContext, SOLANA_CHAINID, EverclearSpoke, TIntentStatus } from '@chimera-monorepo/utils';
+import {
+  createLoggingContext,
+  SOLANA_CHAINID,
+  EverclearSpoke,
+  TIntentStatus,
+  HyperlaneStatus,
+} from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import * as anchor from '@coral-xyz/anchor';
 import idlFile from '../../idl/everclear_spoke.json';
@@ -97,8 +103,10 @@ export const processSolanaTransactions = async () => {
             tokenProgram: intentStatus.accounts[3].pubkey,
             systemProgram: intentStatus.accounts[4].pubkey,
             mintAccount: intentStatus.accounts[5].pubkey,
-            recipientTokenAccount: intentStatus.accounts[6].pubkey,
-            vaultTokenAccount: intentStatus.accounts[7].pubkey,
+            associatedTokenProgram: intentStatus.accounts[6].pubkey,
+            recipient: intentStatus.accounts[7].pubkey,
+            recipientTokenAccount: intentStatus.accounts[8].pubkey,
+            vaultTokenAccount: intentStatus.accounts[9].pubkey,
           })
           .instruction(),
       );
@@ -107,6 +115,12 @@ export const processSolanaTransactions = async () => {
 
       // Update the status of the settlement in the database
       await database.updateSettlementStatus(settlement.intentId, TIntentStatus.Settled);
+
+      // Update the message status in the database
+      const messages = await database.getMessagesByIntentIds([settlement.intentId]);
+      if (messages && messages.length > 0) {
+        await database.updateMessageStatus(messages[0].id, HyperlaneStatus.delivered);
+      }
     } catch (error) {
       logger.error('Failed to settle intent', requestContext, methodContext, {
         message: error instanceof Error ? error.message : String(error),
