@@ -47,8 +47,8 @@ export const processDepositsAndInvoices = async () => {
     assets: chains.assets,
   });
 
-  // Get all the configured asset tickers
-  const tickers = getConfiguredTickers(chains);
+  // Get all the configured asset tickers excluding native assets
+  const tickers = getConfiguredTickers(chains, true);
   const tickerHashes = getTickerHashes(tickers);
   logger.info('Configured tickers', requestContext, methodContext, { tickers, tickerHashes });
 

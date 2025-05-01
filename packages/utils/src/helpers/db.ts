@@ -13,3 +13,7 @@ export const getMaxTxNonce = (items: { txNonce: number }[]): number => {
 export const getMaxEpoch = (items: { epoch: number }[]): number => {
   return items.length == 0 ? 0 : Math.max(...items.map((item) => item?.epoch ?? 0));
 };
+
+export const getMaxBlockNumber = (items: { blockNumber: number }[]): number => {
+  return items.length == 0 ? 0 : Math.max(...items.map((item) => item?.blockNumber ?? 0));
+};

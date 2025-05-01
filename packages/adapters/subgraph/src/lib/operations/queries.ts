@@ -353,7 +353,7 @@ export const getDepositsProcessedQuery = (
 };
 
 export const getDepositQueuesQuery = (
-  fromEpoch: number,
+  fromBlock: number,
   maxBlockNumber?: number,
   limit = 200,
   orderDirection: 'asc' | 'desc' = 'asc',
@@ -361,11 +361,11 @@ export const getDepositQueuesQuery = (
   return `
     depositQueues(
       where: {
-        epoch_gte: ${fromEpoch}
+        blockNumber_gte: ${fromBlock}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit},
-      orderBy: epoch,
+      orderBy: blockNumber,
       orderDirection: ${orderDirection}
     ) {
       ${DEPOSIT_QUEUE_ENTITY}

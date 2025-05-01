@@ -228,10 +228,10 @@ export class SubgraphReader {
     return queues;
   }
 
-  public async getDepositQueues(hubDomain: string, fromEpoch: number): Promise<DepositQueue[]> {
+  public async getDepositQueues(hubDomain: string, fromBlock: number): Promise<DepositQueue[]> {
     const { parser } = getHelpers();
     const response = await this.query<{ depositQueues: DepositQueueEntity[]; _meta: MetaEntity }>(hubDomain, [
-      getDepositQueuesQuery(fromEpoch),
+      getDepositQueuesQuery(fromBlock),
     ]);
 
     const queues = (response?.data.depositQueues ?? []).map((e) => parser.depositQueue(e));
