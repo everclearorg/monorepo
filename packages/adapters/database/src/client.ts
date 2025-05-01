@@ -615,29 +615,6 @@ export const getLatestTimestamp = async (
   return latestTimestamp;
 };
 
-export const getShadowEvents = async (
-  table: string,
-  from: Date,
-  limit: number = 100,
-  _pool?: Pool | db.TxnClientForRepeatableRead,
-) => {
-  const poolToUse = _pool ?? pool;
-  return (
-    await db
-      .select(
-        table as s.Table,
-        {
-          timestamp: db.conditions.gt(db.toString(from, 'timestamptz') as db.TimestampString),
-        },
-        {
-          order: { by: 'timestamp', direction: 'ASC' },
-          limit,
-        },
-      )
-      .run(poolToUse)
-  ).map(converters.fromShadowEvent);
-};
-
 export const getVotes = async (epoch: number, _pool?: Pool | db.TxnClientForRepeatableRead) => {
   const poolToUse = _pool ?? pool;
   return (
