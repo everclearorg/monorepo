@@ -50,7 +50,7 @@ export const getTickerFromAssetContext = (domain: string, assetId: string, chain
   return ticker;
 };
 
-export const getConfiguredTickers = (chains: Record<string, ChainConfig>) => {
+export const getConfiguredTickers = (chains: Record<string, ChainConfig>, skipNativeAssets: boolean = false) => {
   // Get all the domains
   const domains = Object.keys(chains);
   // Get all the configured asset tickers
@@ -59,9 +59,13 @@ export const getConfiguredTickers = (chains: Record<string, ChainConfig>) => {
     const configured = Object.keys(chains[domain].assets ?? {});
     configured.forEach((ticker: string) => {
       const asset = chains[domain].assets?.[ticker];
-      // Only add non-native assets
-      if (asset && !asset.isNative) {
-        tickers.add(ticker);
+      if (asset) {
+        if (skipNativeAssets) {
+          // Only add non-native assets
+          if (!asset.isNative) tickers.add(ticker);
+        } else {
+          tickers.add(ticker);
+        }
       }
     });
   });
