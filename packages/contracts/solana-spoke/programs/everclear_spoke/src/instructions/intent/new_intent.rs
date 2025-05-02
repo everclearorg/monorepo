@@ -1,4 +1,5 @@
 use crate::messages::MessageType;
+use crate::state::FeeAdapterState;
 use crate::{
     consts::everclear_gateway,
     hyperlane::{
@@ -191,6 +192,13 @@ pub struct NewIntent<'info> {
         realloc::zero = false,
     )]
     pub spoke_state: Account<'info, SpokeState>,
+
+    #[account(
+        mut,
+        seeds = [b"fee-adapter-state"],
+        bump = fee_adapter_state.bump,
+    )]
+    pub fee_adapter_state: Account<'info, FeeAdapterState>,
 
     #[account(mut)]
     pub authority: Signer<'info>,

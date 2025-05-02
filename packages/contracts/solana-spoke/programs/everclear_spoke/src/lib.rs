@@ -13,6 +13,10 @@ use hyperlane::{
     mailbox::HandleInstruction, InterchainGasPaymasterType, SerializableAccountMeta,
     SimulationReturnData,
 };
+use instructions::fee_adapter::{
+    FeeAdapterAdminState, InitializeFeeAdapter, __client_accounts_fee_adapter_admin_state,
+    __client_accounts_initialize_fee_adapter,
+};
 use instructions::*;
 
 declare_id!("everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm");
@@ -205,5 +209,41 @@ pub mod everclear_spoke {
         );
 
         instructions::update_vault_authority_bump(ctx, new_bump)
+    }
+
+    // Fee Adapter Functions
+
+    pub fn initialize_fee_adapter(
+        ctx: Context<InitializeFeeAdapter>,
+        fee_recipient: Pubkey,
+        fee_signer: Pubkey,
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.payer.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer)
+    }
+
+    pub fn update_fee_recipient(
+        ctx: Context<FeeAdapterAdminState>,
+        fee_recipient: Pubkey,
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::update_fee_recipient(ctx, fee_recipient)
+    }
+
+    pub fn update_fee_signer(ctx: Context<FeeAdapterAdminState>, fee_signer: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::update_fee_signer(ctx, fee_signer)
     }
 }
