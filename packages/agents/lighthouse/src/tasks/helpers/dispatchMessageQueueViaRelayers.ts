@@ -150,6 +150,8 @@ export const dispatchMessageQueueViaRelayers = async (
         trimmedIntents,
         toDequeue,
         sortedContents,
+        totalIntents,
+        index: i,
       });
       break;
     }
