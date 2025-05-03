@@ -29,6 +29,10 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [33139, 33139], // ApeChain
   [130, 130], // Unichain
   [2020, 2020], // Ronin
+  [80094, 80094], // Berachain
+  [146, 146], // Sonic
+  [57073, 57073], // Ink
+  [1399811149, 1399811149], // Solana
 ]);
 
 const TESTNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
@@ -58,6 +62,8 @@ const DEVNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [31338, 31338],
   [31339, 31339],
 ]);
+
+export const SOLANA_CHAINID = '1399811149';
 
 // Hex domains calculated using `getHexDomainFromString`
 // alternative: ethers.BigNumber.from(ethers.utils.toUtf8Bytes("some string")).toNumber()
