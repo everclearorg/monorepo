@@ -6,18 +6,21 @@ pub mod events;
 pub mod hyperlane;
 pub mod instructions;
 pub mod state;
+pub mod types;
 
+use instructions::fee_adapter::{
+    FeeAdapterAdminState, InitializeFeeAdapter, __client_accounts_fee_adapter_admin_state,
+    __client_accounts_initialize_fee_adapter, __client_accounts_new_order
+};
+use instructions::*;
 use error::SpokeError;
 use events::*;
 use hyperlane::{
     mailbox::HandleInstruction, InterchainGasPaymasterType, SerializableAccountMeta,
     SimulationReturnData,
 };
-use instructions::fee_adapter::{
-    FeeAdapterAdminState, InitializeFeeAdapter, __client_accounts_fee_adapter_admin_state,
-    __client_accounts_initialize_fee_adapter,
-};
-use instructions::*;
+
+use types::{OrderParameters};
 
 declare_id!("everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm");
 
@@ -86,6 +89,16 @@ pub mod everclear_spoke {
             data,
             message_gas_limit,
         )
+    }
+    
+    pub fn new_order(
+        ctx: Context<NewOrder>,
+        fee: u64,
+        deadline: i64,
+        sig: Vec<u8>,
+        params: Vec<OrderParameters>,
+    ) -> Result<()> {
+        instructions::new_order(ctx, fee, deadline, sig, params)
     }
 
     // Instruction relates to message receiving
@@ -246,4 +259,6 @@ pub mod everclear_spoke {
         );
         fee_adapter::update_fee_signer(ctx, fee_signer)
     }
+
+
 }

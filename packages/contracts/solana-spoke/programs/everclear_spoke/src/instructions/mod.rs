@@ -12,3 +12,4 @@ pub use admin::*;
 pub use initialize::*;
 pub use intent::*;
 pub use receive_message::*;
+pub use fee_adapter::*;

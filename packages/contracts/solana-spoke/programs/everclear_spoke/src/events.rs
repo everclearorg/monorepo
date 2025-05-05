@@ -123,3 +123,12 @@ pub struct FeeSignerUpdatedEvent {
     pub old_fee_signer: Pubkey,
     pub new_fee_signer: Pubkey,
 }
+
+#[event]
+pub struct OrderCreated {
+    pub order_id: [u8; 32],
+    pub user: Pubkey,
+    pub intent_ids: Vec<[u8; 32]>,
+    pub fee: u64,
+    pub native_value: u64,
+}
