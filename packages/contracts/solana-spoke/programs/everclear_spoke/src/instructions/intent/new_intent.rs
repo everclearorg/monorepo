@@ -10,7 +10,7 @@ use crate::{
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token,
-    token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID},
+    token::{self, Mint, Token, TokenAccount,  Transfer, ID as TOKEN_PROGRAM_ID},
 };
 
 use crate::{
@@ -38,9 +38,27 @@ pub fn new_intent(
     message_gas_limit: u64,
 ) -> Result<()> {
     // Clone to allow mut ref before move
-    let spoke_state = ctx.accounts.spoke_state.clone();
+    let accounts = ctx.accounts.clone();
+    handle_new_intent(accounts, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data, message_gas_limit);
 
-    let state = &mut ctx.accounts.spoke_state;
+}
+
+pub fn handle_new_intent<'info>(
+    accounts: &NewIntentAccounts<'info>,
+    program_id:Pubkey, // for ctx.programId
+    receiver: Pubkey,
+    input_asset: Pubkey,
+    output_asset: Pubkey,
+    amount: u64,
+    max_fee: u32,
+    ttl: u64,
+    destinations: Vec<u32>,
+    data: Vec<u8>,
+    message_gas_limit: u64,
+) -> Result<()> {
+    let spoke_state = accounts.spoke_state.clone();
+
+    let state = &mut accounts.spoke_state;
     require!(!state.paused, SpokeError::ContractPaused);
     require!(!destinations.is_empty(), SpokeError::InvalidOperation);
     require!(destinations.len() <= 10, SpokeError::InvalidIntent);
@@ -59,34 +77,34 @@ pub fn new_intent(
     require!(max_fee <= 10_000, SpokeError::MaxFeeExceeded);
     // NOTE: we do not need to check data len as this is implicitly done with solana tx size limitation of 1232 bytes
 
-    let minted_decimals = ctx.accounts.mint.decimals;
+    let minted_decimals = accounts.mint.decimals;
     let normalized_amount =
         normalize_decimals(amount as u128, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
     require!(normalized_amount > 0, SpokeError::ZeroAmount); // Add zero amount check like Solidity
 
     // Validate program vault account is an ATA owned by vault authority:
     let vault_authority_seeds: &[&[u8]] = vault_authority_pda_seeds!(state.vault_authority_bump);
-    let vault_authority = Pubkey::create_program_address(vault_authority_seeds, ctx.program_id)
+    let vault_authority = Pubkey::create_program_address(vault_authority_seeds, program_id)
         .map_err(|_| error!(SpokeError::InvalidArgument))?;
     let vault_ata = associated_token::get_associated_token_address_with_program_id(
         &vault_authority,
-        &ctx.accounts.mint.key(),
-        ctx.accounts.token_program.key,
+        &accounts.mint.key(),
+        accounts.token_program.key,
     );
     require!(
-        ctx.accounts.program_vault_account.mint == ctx.accounts.mint.key()
-            && ctx.accounts.program_vault_account.owner == vault_authority
-            && ctx.accounts.program_vault_account.key() == vault_ata,
+        accounts.program_vault_account.mint == accounts.mint.key()
+            && accounts.program_vault_account.owner == vault_authority
+            && accounts.program_vault_account.key() == vault_ata,
         SpokeError::InvalidVaultAccount
     );
 
     // Transfer from user's token account -> program's vault
     let cpi_accounts = Transfer {
-        from: ctx.accounts.user_token_account.to_account_info(),
-        to: ctx.accounts.program_vault_account.to_account_info(),
-        authority: ctx.accounts.authority.to_account_info(),
+        from: accounts.user_token_account.to_account_info(),
+        to: accounts.program_vault_account.to_account_info(),
+        authority: accounts.authority.to_account_info(),
     };
-    let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
+    let cpi_ctx = CpiContext::new(accounts.token_program.to_account_info(), cpi_accounts);
     token::transfer(cpi_ctx, amount)?;
 
     // Update global nonce and calculate intent id
@@ -99,7 +117,7 @@ pub fn new_intent(
 
     // Now create your EVMIntent
     let evm_intent = EVMIntent {
-        initiator: ctx.accounts.authority.key().to_bytes(),
+        initiator: accounts.authority.key().to_bytes(),
         receiver: receiver.to_bytes(),
         input_asset: input_asset.to_bytes(),
         output_asset: output_asset.to_bytes(),
@@ -133,25 +151,25 @@ pub fn new_intent(
     // Build your TransferRemoteContext in a local variable (so it doesn't drop too soon)
     let mut transfer_remote_context = TransferRemoteContext {
         spoke_state,
-        system_program: ctx.accounts.system_program.clone(),
-        spl_noop_program: ctx.accounts.spl_noop_program.clone(),
-        mailbox_program: ctx.accounts.hyperlane_mailbox.clone(),
-        mailbox_outbox: ctx.accounts.mailbox_outbox.to_account_info(),
-        dispatch_authority: ctx.accounts.dispatch_authority.to_account_info(),
+        system_program: accounts.system_program.clone(),
+        spl_noop_program: accounts.spl_noop_program.clone(),
+        mailbox_program: accounts.hyperlane_mailbox.clone(),
+        mailbox_outbox: accounts.mailbox_outbox.to_account_info(),
+        dispatch_authority: accounts.dispatch_authority.to_account_info(),
         // TODO: need to figure out how this is used for the IGP payer and whether this is correct
-        sender_wallet: ctx.accounts.authority.to_account_info(),
-        unique_message_account: ctx.accounts.unique_message_account.to_account_info(),
-        dispatched_message_pda: ctx.accounts.dispatched_message_pda.to_account_info(),
-        igp_program: ctx.accounts.igp_program.clone(),
-        igp_program_data: ctx.accounts.igp_program_data.to_account_info(),
-        igp_payment_pda: ctx.accounts.igp_payment_pda.to_account_info(),
-        configured_igp_account: ctx.accounts.configured_igp_account.to_account_info(),
-        inner_igp_account: ctx.accounts.inner_igp_account.clone(),
+        sender_wallet: accounts.authority.to_account_info(),
+        unique_message_account: accounts.unique_message_account.to_account_info(),
+        dispatched_message_pda: accounts.dispatched_message_pda.to_account_info(),
+        igp_program: accounts.igp_program.clone(),
+        igp_program_data: accounts.igp_program_data.to_account_info(),
+        igp_payment_pda: accounts.igp_payment_pda.to_account_info(),
+        configured_igp_account: accounts.configured_igp_account.to_account_info(),
+        inner_igp_account: accounts.inner_igp_account.clone(),
     };
 
     // Now create the Anchor Context, referencing your local `transfer_remote_context`.
     let transfer_ctx = Context::new(
-        ctx.program_id,
+        program_id,
         &mut transfer_remote_context, // pass a mutable reference
         &[],                          // remaining accounts if needed
         Default::default(),           // any custom context seeds if needed
@@ -161,10 +179,10 @@ pub fn new_intent(
     let message_id = transfer_remote(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
-    emit_cpi!(IntentAddedEvent {
+    emit(IntentAddedEvent {
         intent_id,
         message_id: message_id.into(),
-        initiator: ctx.accounts.authority.key(),
+        initiator: accounts.authority.key(),
         receiver,
         input_asset,
         output_asset,
@@ -179,6 +197,30 @@ pub fn new_intent(
     });
     Ok(())
 }
+
+
+pub struct NewIntentAccounts<'info> {
+    pub spoke_state: Pubkey,
+    pub mint: Mint,
+    pub token_program: Program<'info, Token>,
+    pub program_vault_account: Program<'info, TokenAccount>,
+    pub user_token_account: Program<'info, TokenAccount>,
+    pub authority: Signer<'info>,
+    pub system_program: Program<'info, System>,
+    pub spl_noop_program: Program<'info, SplNoop>,
+    pub hyperlane_mailbox: Interface<'info, Mailbox>,
+    pub mailbox_outbox: AccountInfo<'info>,
+    pub dispatch_authority: AccountInfo<'info>,
+    pub unique_message_account: Signer<'info>,
+    pub dispatched_message_pda: AccountInfo<'info>,
+    pub igp_program: AccountInfo<'info>,
+    pub igp_program_data: AccountInfo<'info>,
+    pub igp_payment_pda: AccountInfo<'info>,
+    pub configured_igp_account: AccountInfo<'info>,
+    pub inner_igp_account: Option<AccountInfo<'info>>,
+}
+
+
 
 #[event_cpi]
 #[derive(Accounts)]

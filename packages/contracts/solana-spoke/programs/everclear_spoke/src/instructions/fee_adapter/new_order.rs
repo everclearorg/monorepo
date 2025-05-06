@@ -1,10 +1,7 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{ Mint, Token, TokenAccount, ID as TOKEN_PROGRAM_ID};
 
-use crate::hyperlane::{Igp, Mailbox, SplNoop};
 use crate::error::SpokeError;
 use crate::events::OrderCreated;
-use crate::state::{SpokeState, FeeAdapterState};
 use crate::instructions::{new_intent, NewIntent};
 use crate::types::OrderParameters;
 use crate::intent::{EVMIntent, u128_to_u256_be};
@@ -13,7 +10,7 @@ use crate::consts::{DEFAULT_NORMALIZED_DECIMALS};
 
 /// Batch-create multiple intents and handle fees.
 pub fn new_order(
-    ctx: Context<NewOrder>,
+    ctx: Context<NewIntent>,
     fee: u64,
     deadline: i64,
     sig: Vec<u8>,
@@ -89,10 +86,5 @@ pub fn new_order(
 
 
 
-#[event_cpi]
-#[derive(Accounts)]
-pub struct NewOrder<'info> {
-    #[account(flatten)]
-    pub intent_ctx: NewIntent<'info>,
-}
+
 

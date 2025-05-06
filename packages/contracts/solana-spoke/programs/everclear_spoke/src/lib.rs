@@ -10,7 +10,7 @@ pub mod types;
 
 use instructions::fee_adapter::{
     FeeAdapterAdminState, InitializeFeeAdapter, __client_accounts_fee_adapter_admin_state,
-    __client_accounts_initialize_fee_adapter, __client_accounts_new_order
+    __client_accounts_initialize_fee_adapter
 };
 use instructions::*;
 use error::SpokeError;
@@ -92,7 +92,7 @@ pub mod everclear_spoke {
     }
     
     pub fn new_order(
-        ctx: Context<NewOrder>,
+        ctx: Context<NewIntent>,
         fee: u64,
         deadline: i64,
         sig: Vec<u8>,

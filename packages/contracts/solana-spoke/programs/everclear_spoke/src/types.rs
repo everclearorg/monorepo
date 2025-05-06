@@ -10,4 +10,5 @@ pub struct OrderParameters {
   pub max_fee:      u32,
   pub ttl:          u64,
   pub data:         Vec<u8>,
+  pub message_gas_limit: u64,
 }
