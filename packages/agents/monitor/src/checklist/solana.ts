@@ -36,7 +36,7 @@ export const checkSolanaPipelineStatus = async (shouldAlert = true): Promise<voi
     const report = {
       severity: Severity.Warning,
       type: 'SolanaPipelineDelay',
-      ids: [],
+      ids: ['SolanaPipelineDelay'],
       reason: `The solana pipeline is delayed, local nonce: ${localNonce}, chain nonce: ${chainNonce}`,
       timestamp: Date.now(),
       logger: logger,
