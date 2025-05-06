@@ -38,13 +38,33 @@ pub fn new_intent(
     message_gas_limit: u64,
 ) -> Result<()> {
     // Clone to allow mut ref before move
-    let accounts = ctx.accounts.clone();
-    handle_new_intent(accounts, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data, message_gas_limit);
+    let mut accounts = NewIntentAccounts {
+        spoke_state: ctx.accounts.spoke_state.clone(),
+        mint: ctx.accounts.mint.clone(),
+        token_program: ctx.accounts.token_program.clone(),
+        program_vault_account: ctx.accounts.program_vault_account.clone(),
+        user_token_account: ctx.accounts.user_token_account.clone(),
+        authority: ctx.accounts.authority.clone(),
+        system_program: ctx.accounts.system_program.clone(),
+        spl_noop_program: ctx.accounts.spl_noop_program.clone(),
+        hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.clone(),
+        mailbox_outbox: ctx.accounts.mailbox_outbox.clone(),
+        dispatch_authority: ctx.accounts.dispatch_authority.clone(),
+        unique_message_account: ctx.accounts.unique_message_account.clone(),
+        dispatched_message_pda: ctx.accounts.dispatched_message_pda.clone(),
+        igp_program: ctx.accounts.igp_program.clone(),
+        igp_program_data: ctx.accounts.igp_program_data.clone(),
+        igp_payment_pda: ctx.accounts.igp_payment_pda.clone(),
+        configured_igp_account: ctx.accounts.configured_igp_account.clone(),
+        inner_igp_account: ctx.accounts.inner_igp_account.clone(),
+    };
+    let program_id = ctx.program_id.clone();
+    handle_new_intent(&mut accounts, program_id, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data, message_gas_limit)
 
 }
 
 pub fn handle_new_intent<'info>(
-    accounts: &NewIntentAccounts<'info>,
+    accounts: &mut NewIntentAccounts<'info>,
     program_id:Pubkey, // for ctx.programId
     receiver: Pubkey,
     input_asset: Pubkey,
@@ -84,7 +104,7 @@ pub fn handle_new_intent<'info>(
 
     // Validate program vault account is an ATA owned by vault authority:
     let vault_authority_seeds: &[&[u8]] = vault_authority_pda_seeds!(state.vault_authority_bump);
-    let vault_authority = Pubkey::create_program_address(vault_authority_seeds, program_id)
+    let vault_authority = Pubkey::create_program_address(vault_authority_seeds, &program_id)
         .map_err(|_| error!(SpokeError::InvalidArgument))?;
     let vault_ata = associated_token::get_associated_token_address_with_program_id(
         &vault_authority,
@@ -169,7 +189,7 @@ pub fn handle_new_intent<'info>(
 
     // Now create the Anchor Context, referencing your local `transfer_remote_context`.
     let transfer_ctx = Context::new(
-        program_id,
+        &program_id,
         &mut transfer_remote_context, // pass a mutable reference
         &[],                          // remaining accounts if needed
         Default::default(),           // any custom context seeds if needed
@@ -179,7 +199,7 @@ pub fn handle_new_intent<'info>(
     let message_id = transfer_remote(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
-    emit(IntentAddedEvent {
+    emit!(IntentAddedEvent {
         intent_id,
         message_id: message_id.into(),
         initiator: accounts.authority.key(),
@@ -200,11 +220,11 @@ pub fn handle_new_intent<'info>(
 
 
 pub struct NewIntentAccounts<'info> {
-    pub spoke_state: Pubkey,
-    pub mint: Mint,
+    pub spoke_state: Account<'info, SpokeState>,
+    pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
-    pub program_vault_account: Program<'info, TokenAccount>,
-    pub user_token_account: Program<'info, TokenAccount>,
+    pub program_vault_account: Account<'info, TokenAccount>,
+    pub user_token_account: Account<'info, TokenAccount>,
     pub authority: Signer<'info>,
     pub system_program: Program<'info, System>,
     pub spl_noop_program: Program<'info, SplNoop>,
@@ -213,7 +233,7 @@ pub struct NewIntentAccounts<'info> {
     pub dispatch_authority: AccountInfo<'info>,
     pub unique_message_account: Signer<'info>,
     pub dispatched_message_pda: AccountInfo<'info>,
-    pub igp_program: AccountInfo<'info>,
+    pub igp_program: Interface<'info, Igp>,
     pub igp_program_data: AccountInfo<'info>,
     pub igp_payment_pda: AccountInfo<'info>,
     pub configured_igp_account: AccountInfo<'info>,
