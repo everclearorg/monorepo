@@ -1,6 +1,7 @@
 pub(crate) mod utils;
 
 pub mod admin;
+pub mod fee_adapter;
 pub mod initialize;
 pub mod intent;
 pub mod messages;
