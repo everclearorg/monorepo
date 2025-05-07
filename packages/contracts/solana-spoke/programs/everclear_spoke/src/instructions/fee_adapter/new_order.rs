@@ -1,12 +1,12 @@
 use anchor_lang::prelude::*;
 
+use crate::consts::DEFAULT_NORMALIZED_DECIMALS;
 use crate::error::SpokeError;
 use crate::events::OrderCreated;
 use crate::instructions::{new_intent, NewIntent};
+use crate::intent::{u128_to_u256_be, EVMIntent};
 use crate::types::OrderParameters;
-use crate::intent::{EVMIntent, u128_to_u256_be};
-use crate::utils::{ compute_intent_hash, normalize_decimals};
-use crate::consts::{DEFAULT_NORMALIZED_DECIMALS};
+use crate::utils::{compute_intent_hash, normalize_decimals};
 
 /// Batch-create multiple intents and handle fees.
 pub fn new_order(
@@ -27,7 +27,7 @@ pub fn new_order(
 
     let accounts = &ctx.accounts;
     let state = &mut accounts.spoke_state;
-   
+
     let mut intent_ids: Vec<[u8; 32]> = Vec::with_capacity(params.len());
     for p in &params {
         new_intent(
@@ -70,9 +70,8 @@ pub fn new_order(
     }
 
     // 4) Derive order ID and emit event
-    let order_id = compute_intent_hash(
-        &intent_ids.iter().map(|id| id.as_ref()).collect::<Vec<_>>(),
-    );
+    let order_id =
+        compute_intent_hash(&intent_ids.iter().map(|id| id.as_ref()).collect::<Vec<_>>());
     emit!(OrderCreated {
         order_id,
         user: ctx.accounts.authority.key().to_bytes(),
@@ -83,8 +82,3 @@ pub fn new_order(
 
     Ok(())
 }
-
-
-
-
-

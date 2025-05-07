@@ -23,9 +23,9 @@ pub enum SpokeError {
     #[msg("Max fee exceeded.")]
     MaxFeeExceeded,
     #[msg("Multiple input assets in a single order are not allowed.")]
-    MultipleOrderAssets, 
+    MultipleOrderAssets,
     #[msg("Empty Params in new order function are not allowed")]
-    EmptyParams, 
+    EmptyParams,
     #[msg("Invalid origin for inbound message.")]
     InvalidOrigin,
     #[msg("Invalid sender for inbound message.")]

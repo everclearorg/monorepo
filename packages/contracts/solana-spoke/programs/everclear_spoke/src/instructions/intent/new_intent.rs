@@ -10,7 +10,7 @@ use crate::{
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token,
-    token::{self, Mint, Token, TokenAccount,  Transfer, ID as TOKEN_PROGRAM_ID},
+    token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID},
 };
 
 use crate::{
@@ -37,7 +37,6 @@ pub fn new_intent(
     data: Vec<u8>,
     message_gas_limit: u64,
 ) -> Result<()> {
-    // Clone to allow mut ref before move
     let mut accounts = NewIntentAccounts {
         spoke_state: ctx.accounts.spoke_state.clone(),
         mint: ctx.accounts.mint.clone(),
@@ -59,13 +58,44 @@ pub fn new_intent(
         inner_igp_account: ctx.accounts.inner_igp_account.clone(),
     };
     let program_id = ctx.program_id.clone();
-    handle_new_intent(&mut accounts, program_id, receiver, input_asset, output_asset, amount, max_fee, ttl, destinations, data, message_gas_limit)
+    let event_data = handle_new_intent(
+        &mut accounts,
+        program_id,
+        receiver,
+        input_asset,
+        output_asset,
+        amount,
+        max_fee,
+        ttl,
+        destinations,
+        data,
+        message_gas_limit,
+    )
+    .unwrap();
 
+    emit_cpi!(IntentAddedEvent {
+        intent_id: event_data.intent_id,
+        message_id: event_data.message_id,
+        initiator: event_data.initiator,
+        receiver: event_data.receiver,
+        input_asset: event_data.input_asset,
+        output_asset: event_data.output_asset,
+        normalized_amount: event_data.normalized_amount,
+        max_fee: event_data.max_fee,
+        origin_domain: event_data.origin_domain,
+        nonce: event_data.nonce,
+        ttl: event_data.ttl,
+        timestamp: event_data.timestamp,
+        destinations: event_data.destinations,
+        data: event_data.data,
+    });
+
+    Ok(())
 }
 
 pub fn handle_new_intent<'info>(
     accounts: &mut NewIntentAccounts<'info>,
-    program_id:Pubkey, // for ctx.programId
+    program_id: Pubkey, // for ctx.programId
     receiver: Pubkey,
     input_asset: Pubkey,
     output_asset: Pubkey,
@@ -75,7 +105,7 @@ pub fn handle_new_intent<'info>(
     destinations: Vec<u32>,
     data: Vec<u8>,
     message_gas_limit: u64,
-) -> Result<()> {
+) -> Result<EventData> {
     let spoke_state = accounts.spoke_state.clone();
 
     let state = &mut accounts.spoke_state;
@@ -199,7 +229,7 @@ pub fn handle_new_intent<'info>(
     let message_id = transfer_remote(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
-    emit!(IntentAddedEvent {
+    Ok(EventData {
         intent_id,
         message_id: message_id.into(),
         initiator: accounts.authority.key(),
@@ -214,10 +244,8 @@ pub fn handle_new_intent<'info>(
         timestamp: clock.unix_timestamp as u64,
         destinations,
         data,
-    });
-    Ok(())
+    })
 }
-
 
 pub struct NewIntentAccounts<'info> {
     pub spoke_state: Account<'info, SpokeState>,
@@ -240,7 +268,22 @@ pub struct NewIntentAccounts<'info> {
     pub inner_igp_account: Option<AccountInfo<'info>>,
 }
 
-
+pub struct EventData {
+    pub intent_id: [u8; 32],
+    pub message_id: [u8; 32],
+    pub initiator: Pubkey,
+    pub receiver: Pubkey,
+    pub input_asset: Pubkey,
+    pub output_asset: Pubkey,
+    pub normalized_amount: u128,
+    pub max_fee: u32,
+    pub origin_domain: u32,
+    pub nonce: u64,
+    pub ttl: u64,
+    pub timestamp: u64,
+    pub destinations: Vec<u32>,
+    pub data: Vec<u8>,
+}
 
 #[event_cpi]
 #[derive(Accounts)]
