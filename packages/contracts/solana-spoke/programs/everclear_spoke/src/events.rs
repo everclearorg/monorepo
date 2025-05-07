@@ -123,3 +123,14 @@ pub struct FeeSignerUpdatedEvent {
     pub old_fee_signer: Pubkey,
     pub new_fee_signer: Pubkey,
 }
+
+#[event]
+pub struct IntentWithFeesAddedEvent {
+    pub intent_id: [u8; 32],
+    pub initiator: Pubkey,
+    pub input_asset: Pubkey,
+    /// native amount in Solana
+    pub amount: u64,
+    /// native amount in Solana
+    pub fee: u64,
+}

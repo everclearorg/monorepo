@@ -72,4 +72,10 @@ pub enum SpokeError {
     IncorrectSettlementAccounts,
     #[msg("Invalid intent id")]
     InvalidIntentId,
+    #[msg("Invalid deadline")]
+    InvalidDeadline,
+    #[msg("Missing ed25519 preinstructions")]
+    MissingEd25519Instruction,
+    #[msg("Invalid fee signature")]
+    InvalidFeeSignature,
 }
