@@ -73,6 +73,7 @@ abstract contract MainnetAssets {
   address public constant UNICHAIN_USDT = 0x588CE4F028D8e7B53B687865d6A67b3A54C75518;
   address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
   address public constant SONIC_USDT = 0x6047828dc181963ba44974801FF68e538dA5eaF9;
+  address public constant BASE_USDT = 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2;
   bytes32 public constant SOLANA_USDT = 0xce010e60afedb22717bd63192f54145a3f965a33bb82d2c7029eb2ce1e208264;
 
   ///////////////////// USDC, cannot find Apechain USDC
