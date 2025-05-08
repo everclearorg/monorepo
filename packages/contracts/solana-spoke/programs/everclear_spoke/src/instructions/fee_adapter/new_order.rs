@@ -1,12 +1,9 @@
 use anchor_lang::prelude::*;
 
-use crate::consts::DEFAULT_NORMALIZED_DECIMALS;
 use crate::error::SpokeError;
-use crate::events::OrderCreated;
+use crate::events::{IntentAddedEvent, OrderCreated};
 use crate::instructions::{handle_new_intent, NewIntent, NewIntentAccounts};
-use crate::intent::{u128_to_u256_be, EVMIntent};
-use crate::types::OrderParameters;
-use crate::utils::{hash_intent_id_array,compute_intent_hash ,normalize_decimals};
+use crate::utils::hash_intent_id_array;
 
 /// Batch-create multiple intents and handle fees.
 pub fn new_order(
@@ -14,17 +11,20 @@ pub fn new_order(
     fee: u64,
     deadline: i64,
     sig: Vec<u8>,
-    params: Vec<OrderParameters>,
+    params: Vec<OrderParameters>, // need to check transaction limit
 ) -> Result<()> {
-    // 1) Validate inputs
+    let state = &mut ctx.accounts.spoke_state;
+
+    require!(!state.paused, SpokeError::ContractPaused);
     require!(!params.is_empty(), SpokeError::EmptyParams);
+
     let asset = params[0].input_asset;
     for p in &params {
         require!(p.input_asset == asset, SpokeError::MultipleOrderAssets);
     }
 
+    let pre_balance = **ctx.accounts.program_vault_account.to_account_info().lamports.borrow();
     // handle_fees(&ctx, fee, asset, deadline, sig)?; yet to implement
-
 
     let mut accounts = NewIntentAccounts {
         spoke_state: ctx.accounts.spoke_state.clone(),
@@ -51,7 +51,7 @@ pub fn new_order(
 
     let mut intent_ids: Vec<[u8; 32]> = Vec::with_capacity(params.len());
     for p in &params {
-        let _ = handle_new_intent(
+        let event_data = handle_new_intent(
             &mut accounts,
             program_id,
             p.receiver,
@@ -63,33 +63,30 @@ pub fn new_order(
             p.destinations.clone(),
             p.data.clone(),
             p.message_gas_limit,
-        );
-
-        // Recompute intent ID exactly as in new_intent
-        let minted_decimals = ctx.accounts.mint.decimals;
-        let normalized_amt = normalize_decimals(
-            p.amount as u128,
-            minted_decimals,
-            DEFAULT_NORMALIZED_DECIMALS,
         )?;
-        let clock = Clock::get()?;
-        let evm_intent = EVMIntent {
-            initiator: ctx.accounts.authority.key().to_bytes(),
-            receiver: p.receiver.to_bytes(),
-            input_asset: p.input_asset.to_bytes(),
-            output_asset: p.output_asset.to_bytes(),
-            max_fee: p.max_fee,
-            origin: ctx.accounts.spoke_state.domain,
-            nonce: ctx.accounts.spoke_state.nonce,
-            timestamp: clock.unix_timestamp as u64,
-            ttl: p.ttl,
-            amount: u128_to_u256_be(normalized_amt),
-            destinations: p.destinations.clone(),
-            data: p.data.clone(),
-        };
-        let intent_id = compute_intent_hash(&evm_intent);
-        intent_ids.push(intent_id);
+
+        emit_cpi!(IntentAddedEvent {
+            intent_id: event_data.intent_id,
+            message_id: event_data.message_id,
+            initiator: event_data.initiator,
+            receiver: event_data.receiver,
+            input_asset: event_data.input_asset,
+            output_asset: event_data.output_asset,
+            normalized_amount: event_data.normalized_amount,
+            max_fee: event_data.max_fee,
+            origin_domain: event_data.origin_domain,
+            nonce: event_data.nonce,
+            ttl: event_data.ttl,
+            timestamp: event_data.timestamp,
+            destinations: event_data.destinations,
+            data: event_data.data,
+        });
+
+        intent_ids.push(event_data.intent_id);
     }
+
+    let post_balance = **ctx.accounts.program_vault_account.to_account_info().lamports.borrow();
+    let native_value = post_balance.saturating_sub(pre_balance);
 
     // 4) Derive order ID and emit event
     let order_id = hash_intent_id_array(&intent_ids);
@@ -99,8 +96,21 @@ pub fn new_order(
         user: ctx.accounts.authority.key(),
         intent_ids: intent_ids.clone(),
         fee,
-        native_value: ctx.accounts.authority.lamports(),
+        native_value,
     });
 
     Ok(())
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct OrderParameters {
+    pub destinations: Vec<u32>,
+    pub receiver: Pubkey,
+    pub input_asset: Pubkey,
+    pub output_asset: Pubkey,
+    pub amount: u64,
+    pub max_fee: u32,
+    pub ttl: u64,
+    pub data: Vec<u8>,
+    pub message_gas_limit: u64,
 }

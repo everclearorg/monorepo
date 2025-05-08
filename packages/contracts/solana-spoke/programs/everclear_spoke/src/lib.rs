@@ -6,7 +6,6 @@ pub mod events;
 pub mod hyperlane;
 pub mod instructions;
 pub mod state;
-pub mod types;
 
 use error::SpokeError;
 use events::*;
@@ -18,9 +17,9 @@ use instructions::fee_adapter::{
     FeeAdapterAdminState, InitializeFeeAdapter, __client_accounts_fee_adapter_admin_state,
     __client_accounts_initialize_fee_adapter,
 };
-use instructions::*;
 
-use types::OrderParameters;
+use instructions::new_order::OrderParameters;
+use instructions::*;
 
 declare_id!("everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm");
 
