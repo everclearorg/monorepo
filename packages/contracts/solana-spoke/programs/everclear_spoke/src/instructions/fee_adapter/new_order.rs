@@ -24,7 +24,7 @@ pub fn new_order(
     }
 
     let pre_balance = **ctx.accounts.program_vault_account.to_account_info().lamports.borrow();
-    // handle_fees(&ctx, fee, asset, deadline, sig)?; yet to implement
+    
 
     let mut accounts = NewIntentAccounts {
         spoke_state: ctx.accounts.spoke_state.clone(),
@@ -87,6 +87,8 @@ pub fn new_order(
 
     let post_balance = **ctx.accounts.program_vault_account.to_account_info().lamports.borrow();
     let native_value = post_balance.saturating_sub(pre_balance);
+
+    // handle_fees(&ctx, fee, asset, deadline, sig)?; yet to implement
 
     // 4) Derive order ID and emit event
     let order_id = hash_intent_id_array(&intent_ids);
