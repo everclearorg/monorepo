@@ -76,4 +76,6 @@ pub enum SpokeError {
     IncorrectSettlementAccounts,
     #[msg("Invalid intent id")]
     InvalidIntentId,
+    #[msg("Too many orders in params")]
+    TooManyOrders
 }

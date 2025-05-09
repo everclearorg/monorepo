@@ -17,6 +17,7 @@ pub fn new_order(
 
     require!(!state.paused, SpokeError::ContractPaused);
     require!(!params.is_empty(), SpokeError::EmptyParams);
+    require!(params.len() <= 6, SpokeError::TooManyOrders);
 
     let asset = params[0].input_asset;
     for p in &params {
