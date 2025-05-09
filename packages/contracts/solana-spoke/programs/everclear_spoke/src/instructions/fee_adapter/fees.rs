@@ -6,6 +6,14 @@ use crate::error::SpokeError;
 use super::signature::verify_signature;
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct FeeParams {
+    pub token_fee: u64,
+    pub native_fee: u64,
+    pub deadline: u64,
+    pub signature: [u8; 64],
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct FeeData {
     pub token_fee: u64,
     pub native_fee: u64,

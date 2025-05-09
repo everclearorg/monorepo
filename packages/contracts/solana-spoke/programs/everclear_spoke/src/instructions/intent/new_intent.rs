@@ -1,3 +1,6 @@
+use crate::instructions::fee_adapter::{
+    handle_fees, FeeData, FeeParams, HandleFeeAccounts, SignatureAccounts,
+};
 use crate::messages::MessageType;
 use crate::state::FeeAdapterState;
 use crate::{
@@ -8,6 +11,7 @@ use crate::{
     vault_authority_pda_seeds,
 };
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::sysvar::instructions::ID as SYSVAR_INSTRUCTIONS_ID;
 use anchor_spl::{
     associated_token,
     token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID},
@@ -36,6 +40,7 @@ pub fn new_intent(
     destinations: Vec<u32>,
     data: Vec<u8>,
     message_gas_limit: u64,
+    fee_param: FeeParams,
 ) -> Result<()> {
     // Clone to allow mut ref before move
     let spoke_state = ctx.accounts.spoke_state.clone();
@@ -79,6 +84,27 @@ pub fn new_intent(
             && ctx.accounts.program_vault_account.key() == vault_ata,
         SpokeError::InvalidVaultAccount
     );
+
+    let fee_data = FeeData {
+        token_fee: fee_param.token_fee,
+        native_fee: fee_param.native_fee,
+        input_asset,
+        deadline: fee_param.deadline,
+    };
+    let fee_accounts = HandleFeeAccounts {
+        signature_accounts: SignatureAccounts {
+            signer: ctx.accounts.fee_signer.to_account_info(),
+            instruction_sysvar: ctx.accounts.instruction_sysvar.to_account_info(),
+        },
+        user_account: ctx.accounts.authority.to_account_info(),
+        user_token_account: ctx.accounts.user_token_account.to_account_info(),
+        user_authority_account: ctx.accounts.authority.to_account_info(),
+        fee_reciever_account: ctx.accounts.fee_recipient.to_account_info(),
+        fee_reciever_token_account: ctx.accounts.fee_recipient_token_account.to_account_info(),
+        token_program: ctx.accounts.token_program.to_account_info(),
+        system_program: ctx.accounts.system_program.to_account_info(),
+    };
+    handle_fees(fee_data, fee_param.signature, fee_accounts)?;
 
     // Transfer from user's token account -> program's vault
     let cpi_accounts = Transfer {
@@ -132,7 +158,7 @@ pub fn new_intent(
     // TODO: make this no_copy
     // Build your TransferRemoteContext in a local variable (so it doesn't drop too soon)
     let mut transfer_remote_context = TransferRemoteContext {
-        spoke_state,
+        spoke_state: *spoke_state,
         system_program: ctx.accounts.system_program.clone(),
         spl_noop_program: ctx.accounts.spl_noop_program.clone(),
         mailbox_program: ctx.accounts.hyperlane_mailbox.clone(),
@@ -187,18 +213,15 @@ pub struct NewIntent<'info> {
         mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump,
-        realloc = 8 + std::mem::size_of::<SpokeState>(),
-        realloc::payer = authority,
-        realloc::zero = false,
     )]
-    pub spoke_state: Account<'info, SpokeState>,
+    pub spoke_state: Box<Account<'info, SpokeState>>,
 
     #[account(
         mut,
         seeds = [b"fee-adapter-state"],
         bump = fee_adapter_state.bump,
     )]
-    pub fee_adapter_state: Account<'info, FeeAdapterState>,
+    pub fee_adapter_state: Box<Account<'info, FeeAdapterState>>,
 
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -263,6 +286,30 @@ pub struct NewIntent<'info> {
     #[account(mut)]
     pub configured_igp_account: AccountInfo<'info>,
 
+    /// CHECK: we verify this is consistent with fee_signer
+    #[account(address = fee_adapter_state.fee_signer)]
+    pub fee_signer: AccountInfo<'info>,
+
+    /// CHECK: we verify this is consistent with fee_recipient
+    #[account(
+        mut,
+        address = fee_adapter_state.fee_recipient
+    )]
+    pub fee_recipient: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        token::mint = mint,
+        token::authority = fee_recipient,
+        token::token_program = token_program
+    )]
+    pub fee_recipient_token_account: Account<'info, TokenAccount>,
+
+    /// CHECK: we verify this is consistent with SYSVAR_INSTRUCTIONS
+    #[account(address = SYSVAR_INSTRUCTIONS_ID)]
+    pub instruction_sysvar: AccountInfo<'info>,
+
+    // Optional accounts: need to be put at the end
     /// CHECK:
     #[account(mut)]
     pub inner_igp_account: Option<AccountInfo<'info>>,
