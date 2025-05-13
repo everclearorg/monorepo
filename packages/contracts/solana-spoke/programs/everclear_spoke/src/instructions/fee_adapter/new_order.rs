@@ -2,33 +2,30 @@ use anchor_lang::prelude::*;
 
 use crate::error::SpokeError;
 use crate::events::{IntentAddedEvent, OrderCreated};
+use crate::instructions::fee_adapter::{
+    handle_fees, FeeData, FeeParams, HandleFeeAccounts, SignatureAccounts,
+};
 use crate::instructions::{handle_new_intent, NewIntent, NewIntentAccounts};
 use crate::utils::hash_intent_id_array;
 
 /// Batch-create multiple intents and handle fees.
 pub fn new_order(
     ctx: Context<NewIntent>,
-    fee: u64,
-    deadline: i64,
-    sig: Vec<u8>,
-    params: Vec<OrderParameters>, // need to check transaction limit
+    params: Vec<OrderParameters>,
+    fee_param: FeeParams,
 ) -> Result<()> {
     let state = &mut ctx.accounts.spoke_state;
 
     require!(!state.paused, SpokeError::ContractPaused);
     require!(!params.is_empty(), SpokeError::EmptyParams);
-    require!(params.len() <= 6, SpokeError::TooManyOrders);
 
     let asset = params[0].input_asset;
     for p in &params {
         require!(p.input_asset == asset, SpokeError::MultipleOrderAssets);
     }
 
-    let pre_balance = **ctx.accounts.program_vault_account.to_account_info().lamports.borrow();
-    
-
     let mut accounts = NewIntentAccounts {
-        spoke_state: ctx.accounts.spoke_state.clone(),
+        spoke_state: ctx.accounts.spoke_state.as_ref().clone(),
         mint: ctx.accounts.mint.clone(),
         token_program: ctx.accounts.token_program.clone(),
         program_vault_account: ctx.accounts.program_vault_account.clone(),
@@ -49,6 +46,28 @@ pub fn new_order(
     };
 
     let program_id = ctx.program_id.clone();
+
+    let fee_data = FeeData {
+        token_fee: fee_param.token_fee,
+        native_fee: fee_param.native_fee,
+        input_asset: asset,
+        deadline: fee_param.deadline,
+    };
+    let fee_accounts = HandleFeeAccounts {
+        signature_accounts: SignatureAccounts {
+            signer: ctx.accounts.fee_signer.to_account_info(),
+            instruction_sysvar: ctx.accounts.instruction_sysvar.to_account_info(),
+        },
+        user_account: ctx.accounts.authority.to_account_info(),
+        user_token_account: ctx.accounts.user_token_account.to_account_info(),
+        user_authority_account: ctx.accounts.authority.to_account_info(),
+        fee_reciever_account: ctx.accounts.fee_recipient.to_account_info(),
+        fee_reciever_token_account: ctx.accounts.fee_recipient_token_account.to_account_info(),
+        token_program: ctx.accounts.token_program.to_account_info(),
+        system_program: ctx.accounts.system_program.to_account_info(),
+    };
+
+    handle_fees(fee_data, fee_param.signature, fee_accounts)?;
 
     let mut intent_ids: Vec<[u8; 32]> = Vec::with_capacity(params.len());
     for p in &params {
@@ -86,20 +105,14 @@ pub fn new_order(
         intent_ids.push(event_data.intent_id);
     }
 
-    let post_balance = **ctx.accounts.program_vault_account.to_account_info().lamports.borrow();
-    let native_value = post_balance.saturating_sub(pre_balance);
-
-    // handle_fees(&ctx, fee, asset, deadline, sig)?; yet to implement
-
-    // 4) Derive order ID and emit event
     let order_id = hash_intent_id_array(&intent_ids);
 
     emit_cpi!(OrderCreated {
         order_id,
         user: ctx.accounts.authority.key(),
         intent_ids: intent_ids.clone(),
-        fee,
-        native_value,
+        fee: fee_param.token_fee,
+        native_value: fee_param.native_fee,
     });
 
     Ok(())

@@ -14,8 +14,8 @@ use hyperlane::{
     SimulationReturnData,
 };
 use instructions::fee_adapter::{
-    FeeAdapterAdminState, InitializeFeeAdapter, __client_accounts_fee_adapter_admin_state,
-    __client_accounts_initialize_fee_adapter,
+    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter,
+    __client_accounts_fee_adapter_admin_state, __client_accounts_initialize_fee_adapter,
 };
 
 use instructions::new_order::OrderParameters;
@@ -25,6 +25,7 @@ declare_id!("everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm");
 
 #[program]
 pub mod everclear_spoke {
+
     use super::*;
 
     /// Initialize the global state.
@@ -75,6 +76,7 @@ pub mod everclear_spoke {
         destinations: Vec<u32>,
         data: Vec<u8>,
         message_gas_limit: u64,
+        fee_param: FeeParams,
     ) -> Result<()> {
         instructions::new_intent(
             ctx,
@@ -87,17 +89,16 @@ pub mod everclear_spoke {
             destinations,
             data,
             message_gas_limit,
+            fee_param,
         )
     }
 
     pub fn new_order(
         ctx: Context<NewIntent>,
-        fee: u64,
-        deadline: i64,
-        sig: Vec<u8>,
         params: Vec<OrderParameters>,
+        fee_param: FeeParams,
     ) -> Result<()> {
-        instructions::new_order(ctx, fee, deadline, sig, params)
+        instructions::new_order(ctx, params, fee_param)
     }
 
     // Instruction relates to message receiving

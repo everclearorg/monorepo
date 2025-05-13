@@ -132,3 +132,14 @@ pub struct OrderCreated {
     pub fee: u64,
     pub native_value: u64,
 }
+
+#[event]
+pub struct IntentWithFeesAddedEvent {
+    pub intent_id: [u8; 32],
+    pub initiator: Pubkey,
+    pub input_asset: Pubkey,
+    /// native amount in Solana
+    pub amount: u64,
+    /// native amount in Solana
+    pub fee: u64,
+}
