@@ -17,6 +17,8 @@ use instructions::fee_adapter::{
     FeeAdapterAdminState, FeeParams, InitializeFeeAdapter,
     __client_accounts_fee_adapter_admin_state, __client_accounts_initialize_fee_adapter,
 };
+
+use instructions::new_order::OrderParameters;
 use instructions::*;
 
 declare_id!("everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm");
@@ -89,6 +91,14 @@ pub mod everclear_spoke {
             message_gas_limit,
             fee_param,
         )
+    }
+
+    pub fn new_order(
+        ctx: Context<NewIntent>,
+        params: Vec<OrderParameters>,
+        fee_param: FeeParams,
+    ) -> Result<()> {
+        instructions::new_order(ctx, params, fee_param)
     }
 
     // Instruction relates to message receiving
