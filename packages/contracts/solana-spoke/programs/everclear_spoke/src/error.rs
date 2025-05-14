@@ -82,4 +82,6 @@ pub enum SpokeError {
     MissingEd25519Instruction,
     #[msg("Invalid fee signature")]
     InvalidFeeSignature,
+    #[msg("Fee adapter paused")]
+    FeeAdapterPaused,
 }

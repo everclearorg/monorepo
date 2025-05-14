@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::{
-    events::{FeeRecipientUpdatedEvent, FeeSignerUpdatedEvent},
+    events::{FeeAdapterPausedEvent, FeeRecipientUpdatedEvent, FeeSignerUpdatedEvent},
     state::{FeeAdapterState, SpokeState},
 };
 
@@ -43,5 +43,17 @@ pub fn update_fee_signer(ctx: Context<FeeAdapterAdminState>, new_fee_signer: Pub
         old_fee_signer,
         new_fee_signer,
     });
+    Ok(())
+}
+
+pub fn pause_fee_adapter(ctx: Context<FeeAdapterAdminState>) -> Result<()> {
+    ctx.accounts.fee_adapter_state.paused = true;
+    emit_cpi!(FeeAdapterPausedEvent {});
+    Ok(())
+}
+
+pub fn unpause_fee_adapter(ctx: Context<FeeAdapterAdminState>) -> Result<()> {
+    ctx.accounts.fee_adapter_state.paused = false;
+    emit_cpi!(FeeAdapterPausedEvent {});
     Ok(())
 }

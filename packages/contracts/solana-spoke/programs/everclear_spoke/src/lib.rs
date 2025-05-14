@@ -259,4 +259,22 @@ pub mod everclear_spoke {
         );
         fee_adapter::update_fee_signer(ctx, fee_signer)
     }
+
+    pub fn pause_fee_adapter(ctx: Context<FeeAdapterAdminState>) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::pause_fee_adapter(ctx)
+    }
+
+    pub fn unpause_fee_adapter(ctx: Context<FeeAdapterAdminState>) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::unpause_fee_adapter(ctx)
+    }
 }

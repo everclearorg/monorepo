@@ -59,6 +59,7 @@ impl SpokeState {
 #[account]
 pub struct FeeAdapterState {
     pub initialized: bool,
+    pub paused: bool,
     pub fee_recipient: Pubkey,
     pub fee_signer: Pubkey,
     pub bump: u8,
