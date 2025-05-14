@@ -15,6 +15,7 @@ pub fn initialize_fee_adapter(
 
     require!(!state.initialized, SpokeError::AlreadyInitialized);
     state.initialized = true;
+    state.paused = false;
     state.fee_recipient = fee_recipient;
     state.fee_signer = fee_signer;
 

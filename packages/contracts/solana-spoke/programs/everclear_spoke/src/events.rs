@@ -125,6 +125,12 @@ pub struct FeeSignerUpdatedEvent {
 }
 
 #[event]
+pub struct FeeAdapterPausedEvent {}
+
+#[event]
+pub struct FeeAdapterUnpausedEvent {}
+
+#[event]
 pub struct OrderCreated {
     pub order_id: [u8; 32],
     pub user: Pubkey,

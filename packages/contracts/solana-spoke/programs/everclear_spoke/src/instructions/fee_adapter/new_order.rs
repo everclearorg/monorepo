@@ -18,6 +18,10 @@ pub fn new_order(
 
     require!(!state.paused, SpokeError::ContractPaused);
     require!(!params.is_empty(), SpokeError::EmptyParams);
+    require!(
+        !ctx.accounts.fee_adapter_state.paused,
+        SpokeError::FeeAdapterPaused
+    );
 
     let asset = params[0].input_asset;
     for p in &params {
@@ -45,7 +49,7 @@ pub fn new_order(
         inner_igp_account: ctx.accounts.inner_igp_account.clone(),
     };
 
-    let program_id = ctx.program_id.clone();
+    let program_id = *ctx.program_id;
 
     let fee_data = FeeData {
         token_fee: fee_param.token_fee,

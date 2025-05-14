@@ -62,7 +62,7 @@ pub fn new_intent(
         configured_igp_account: ctx.accounts.configured_igp_account.clone(),
         inner_igp_account: ctx.accounts.inner_igp_account.clone(),
     };
-    let program_id = ctx.program_id.clone();
+    let program_id = *ctx.program_id;
 
     let fee_data = FeeData {
         token_fee: fee_param.token_fee,
@@ -84,7 +84,9 @@ pub fn new_intent(
         system_program: ctx.accounts.system_program.to_account_info(),
     };
 
-    handle_fees(fee_data, fee_param.signature, fee_accounts)?;
+    if !ctx.accounts.fee_adapter_state.paused {
+        handle_fees(fee_data, fee_param.signature, fee_accounts)?;
+    }
 
     let event_data = handle_new_intent(
         &mut accounts,
