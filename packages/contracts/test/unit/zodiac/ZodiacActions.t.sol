@@ -8,6 +8,28 @@ import {MainnetProductionEnvironment} from 'script/MainnetProduction.sol';
 
 contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
   function setUp() public {
+    // Ethereum
+    _zodiacConfig[ETHEREUM] = ZodiacConfiguration({
+      safeAddress: MULTI_SIG_ADDRESS,
+      roleModule: ETHEREUM_ROLE_MODULE,
+      feeAdapter: ETHEREUM_FEE_ADAPTER,
+      roleKey: ETHEREUM_ROLE_KEY,
+      validFee: ETHEREUM_FEE,
+      validDeadline: ETHEREUM_DEADLINE,
+      validSignature: ETHEREUM_SIG,
+      weth: ETHEREUM_WETH,
+      usdc: ETHEREUM_USDC,
+      usdt: ETHEREUM_USDT,
+      fixedBlock: ETHEREUM_FIXED_BLOCK
+    });
+    _addressConfig[ETHEREUM] = ExternalAddresses({
+      across: ETHEREUM_ACROSS_SPOKE_POOL,
+      stargateWeth: ETHEREUM_STARGATE_WETH_POOL,
+      stargateUsdc: ETHEREUM_STARGATE_USDC_POOL,
+      stargateUsdt: ETHEREUM_STARGATE_USDT_POOL,
+      cbBTC: ETHEREUM_CBBTC
+    });
+
     // Arbitrum
     _zodiacConfig[ARBITRUM_ONE] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
@@ -26,7 +48,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: ARBITRUM_ACROSS_SPOKE_POOL,
       stargateWeth: ARBITRUM_STARGATE_WETH_POOL,
       stargateUsdc: ARBITRUM_STARGATE_USDC_POOL,
-      stargateUsdt: ARBITRUM_STARGATE_USDT_POOL
+      stargateUsdt: ARBITRUM_STARGATE_USDT_POOL,
+      cbBTC: address(0)
     });
 
     // Optimism
@@ -47,7 +70,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: OPTIMISM_ACROSS_SPOKE_POOL,
       stargateWeth: OPTIMISM_STARGATE_WETH_POOL,
       stargateUsdc: OPTIMISM_STARGATE_USDC_POOL,
-      stargateUsdt: OPTIMISM_STARGATE_USDT_POOL
+      stargateUsdt: OPTIMISM_STARGATE_USDT_POOL,
+      cbBTC: address(0)
     });
 
     // Polygon
@@ -68,7 +92,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: POLYGON_ACROSS_SPOKE_POOL,
       stargateWeth: address(0),
       stargateUsdc: POLYGON_STARGATE_USDC_POOL,
-      stargateUsdt: POLYGON_STARGATE_USDT_POOL
+      stargateUsdt: POLYGON_STARGATE_USDT_POOL,
+      cbBTC: address(0)
     });
 
     // Base
@@ -89,7 +114,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: BASE_ACROSS_SPOKE_POOL,
       stargateWeth: BASE_STARGATE_WETH_POOL,
       stargateUsdc: BASE_STARGATE_USDC_POOL,
-      stargateUsdt: address(0)
+      stargateUsdt: address(0),
+      cbBTC: BASE_CBBTC
     });
 
     // BNB
@@ -110,7 +136,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: address(0),
       stargateWeth: address(0),
       stargateUsdc: BSC_STARGATE_USDC_POOL,
-      stargateUsdt: BSC_STARGATE_USDT_POOL
+      stargateUsdt: BSC_STARGATE_USDT_POOL,
+      cbBTC: address(0)
     });
 
     // Blast
@@ -131,7 +158,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: BLAST_ACROSS_SPOKE_POOL,
       stargateWeth: address(0),
       stargateUsdc: address(0),
-      stargateUsdt: address(0)
+      stargateUsdt: address(0),
+      cbBTC: address(0)
     });
 
     // Sonic
@@ -152,7 +180,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: address(0),
       stargateWeth: address(0),
       stargateUsdc: SONIC_STARGATE_USDC_POOL,
-      stargateUsdt: address(0)
+      stargateUsdt: address(0),
+      cbBTC: address(0)
     });
 
     // Mantle
@@ -173,7 +202,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: address(0),
       stargateWeth: MANTLE_STARGATE_WETH_POOL,
       stargateUsdc: MANTLE_STARGATE_USDC_POOL,
-      stargateUsdt: MANTLE_STARGATE_USDT_POOL
+      stargateUsdt: MANTLE_STARGATE_USDT_POOL,
+      cbBTC: address(0)
     });
 
     // Ink
@@ -194,7 +224,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: INK_ACROSS_SPOKE_POOL,
       stargateWeth: address(0),
       stargateUsdc: INK_STARGATE_USDC_POOL,
-      stargateUsdt: address(0)
+      stargateUsdt: address(0),
+      cbBTC: address(0)
     });
 
     // Scroll
@@ -215,7 +246,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: SCROLL_ACROSS_SPOKE_POOL,
       stargateWeth: SCROLL_STARGATE_WETH_POOL,
       stargateUsdc: SCROLL_STARGATE_USDC_POOL,
-      stargateUsdt: address(0)
+      stargateUsdt: address(0),
+      cbBTC: address(0)
     });
 
     // Berachain
@@ -236,7 +268,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: address(0),
       stargateWeth: BERACHAIN_STARGATE_WETH_POOL,
       stargateUsdc: BERACHAIN_STARGATE_USDC_POOL,
-      stargateUsdt: address(0)
+      stargateUsdt: address(0),
+      cbBTC: address(0)
     });
 
     // Unichain
@@ -257,7 +290,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: UNICHAIN_ACROSS_SPOKE_POOL,
       stargateWeth: UNICHAIN_STARGATE_WETH_POOL,
       stargateUsdc: address(0),
-      stargateUsdt: address(0)
+      stargateUsdt: address(0),
+      cbBTC: address(0)
     });
 
     // Mode
@@ -278,8 +312,253 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       across: MODE_ACROSS_SPOKE_POOL,
       stargateWeth: address(0),
       stargateUsdc: address(0),
-      stargateUsdt: address(0)
+      stargateUsdt: address(0),
+      cbBTC: address(0)
     });
+
+    // Ronin
+    _zodiacConfig[RONIN] = ZodiacConfiguration({
+      safeAddress: RONIN_SAFE_ADDRESS,
+      roleModule: RONIN_ROLE_MODULE,
+      feeAdapter: RONIN_FEE_ADAPTER,
+      roleKey: RONIN_ROLE_KEY,
+      validFee: RONIN_FEE,
+      validDeadline: RONIN_DEADLINE,
+      validSignature: RONIN_SIG,
+      weth: RONIN_WETH,
+      usdc: RONIN_USDC,
+      usdt: address(0),
+      fixedBlock: RONIN_FIXED_BLOCK
+    });
+
+    // Avalanche
+    _zodiacConfig[AVALANCHE] = ZodiacConfiguration({
+      safeAddress: MULTI_SIG_ADDRESS,
+      roleModule: AVALANCHE_ROLE_MODULE,
+      feeAdapter: AVALANCHE_FEE_ADAPTER,
+      roleKey: AVALANCHE_ROLE_KEY,
+      validFee: AVALANCHE_FEE,
+      validDeadline: AVALANCHE_DEADLINE,
+      validSignature: AVALANCHE_SIG,
+      weth: AVALANCHE_WETH,
+      usdc: AVALANCHE_USDC,
+      usdt: AVALANCHE_USDT,
+      fixedBlock: AVALANCHE_FIXED_BLOCK
+    });
+    _addressConfig[AVALANCHE] = ExternalAddresses({
+      across: address(0),
+      stargateWeth: address(0),
+      stargateUsdc: AVALANCHE_STARGATE_USDC_POOL,
+      stargateUsdt: AVALANCHE_STARGATE_USDT_POOL,
+      cbBTC: address(0)
+    });
+  }
+
+  function test_zodiacConfiguration_ethereum() public {
+    vm.createSelectFork(vm.envString('MAINNET_RPC'));
+    ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
+    ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
+    vm.rollFork(config.fixedBlock);
+
+    // Setting up the environment
+    feeAdapter = IFeeAdapter(config.feeAdapter);
+    roleModule = IRoleModule(config.roleModule);
+
+    //////////////////////////// Supported Actions ////////////////////////////
+    // checking module is configured as expected
+    _checkRolesConfiguration(config);
+
+    // checking safe is configured as expected
+    _checkSafeConfiguration(config);
+
+    // FeeAdapter: testing fee adapter can be set as spender for each asset
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+    _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+    _approveAsset(config.usdt, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+    _approveAsset(addressConfig.cbBTC, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+
+    // Across: testing across spoke pool can be set as spender for each asset
+    _approveAsset(config.weth, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
+    _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
+    _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
+
+    // Stargate: testing stargate can be approved for each asset
+    _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
+    _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.stargateUsdt, config, 100 ether, false);
+
+    // Binance: testing can transfer to Binance
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1 ether, false);
+
+    // WETH: approving weth to burn WETH then unwrapping
+    _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
+    deal(config.weth, config.safeAddress, 10 ether);
+    _unwrapWETH(config.weth, 10 ether, config.roleKey, APPROVED_CALLER, false);
+
+    // WETH: wrapping weth
+    vm.deal(config.safeAddress, 100 ether);
+    _wrapWETH(config.weth, 10 ether, config.roleKey, APPROVED_CALLER, false);
+
+    // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
+    uint32[] memory _destinations = new uint32[](2);
+    _destinations[0] = 1;
+    _destinations[1] = 10;
+
+    uint256[] memory _amounts = new uint256[](2);
+    _amounts[0] = 1 ether;
+    _amounts[1] = 0.001 ether;
+
+    // Everclear: sending new intent
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+    );
+
+    // Everclear: sending new order
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+    );
+
+    // Bridges: configuring the bridge inputs
+    BridgeParams memory _params;
+    _params.destination = 10;
+    _params.caller = APPROVED_CALLER;
+    _params.receiver = config.safeAddress;
+    _params.depositor = config.safeAddress;
+    _params.inputToken = config.weth;
+    _params.inputAmount = _amounts[0]; // 1 ether
+    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.quoteTimestamp = uint32(block.timestamp);
+    _params.fillDeadline = uint32(block.timestamp + 30 minutes);
+    _params.message = '';
+    _params.across = addressConfig.across;
+
+    // Across: sending an order
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendDepositV3(_params, config, false);
+
+    // Stargate: sending an order
+    _params.inputAmount = 100e6;
+    _params.outputAmount = 90e6;
+    _params.nativeFee = 0.01 ether;
+    _params.destination = 30_110;
+
+    vm.deal(config.safeAddress, 100 ether);
+    _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
+
+    // Stargate: sending an order in native
+    _params.inputAmount = 1 ether;
+    _params.outputAmount = 0.9 ether;
+    _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
+
+    // //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidCaller: checking an invalid address cannot set approvals for each asset
+    _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+    _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+    _approveAsset(config.usdt, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+
+    // invalidCaller: transferring to invalid receiver
+    _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
+    _transferAsset(config.usdc, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
+
+    // invalidCaller: checking a random address cannot send a new intent
+    _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
+
+    // invalidSpender: checking an invalid spender cannot be used in approval spender field
+    _approveAsset(config.weth, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+    _approveAsset(config.usdc, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+    _approveAsset(config.usdt, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+
+    // invalidReceiver: transferring to invalid receiver
+    _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+    _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: checking a random address cannot receive funds
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: checking the receiver invalidity in different arrays
+    _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+    _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+    _sendNewOrderInvalidFifthArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+
+    // invalidTTl: checking the order cannot be sent with a non-zero ttl
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+    );
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+    );
+    _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+
+    // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+    );
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+    );
+    _sendNewOrderInvalidFifthArrayMaxFee(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+    );
+
+    // invalidDepositor: checking random address cannot receive funds with Across
+    _params.depositor = INVALID_RECEIVER;
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendDepositV3(_params, config, true);
+    _params.depositor = config.safeAddress;
+
+    // invalidReceiver: checking random address cannot receive funds with Across
+    _params.receiver = INVALID_RECEIVER;
+    _sendDepositV3(_params, config, true);
+    _params.receiver = config.safeAddress;
+
+    // invalidRelayer: checking relayer must be address(0)
+    _params.exclusiveRelayer = address(0x123);
+    _sendDepositV3(_params, config, true);
+    _params.exclusiveRelayer = address(0);
+
+    // invalidDeadline: checking exclusivity deadline must be zero
+    _params.exclusivityDeadline = uint32(NONZERO_TTL);
+    _sendDepositV3(_params, config, true);
+    _params.exclusivityDeadline = 0;
+
+    // invalidMessage: checking message must be empty
+    _params.message = '0x1234';
+    _sendDepositV3(_params, config, true);
+    _params.message = '';
+
+    // invalidReceiver: checking random address cannot receive funds wih Stargate
+    _params.receiver = INVALID_RECEIVER;
+    _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
+    _dealFunds(config.usdt, _amounts, config.validFee, config.safeAddress);
+
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, true);
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdt, true);
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true);
+    _params.receiver = config.safeAddress;
+
+    // invalidRefundReceiver: checking refund address must be safe address
+    _sendStargate(_params, config, INVALID_RECEIVER, addressConfig.stargateUsdc, true);
+    _sendStargate(_params, config, INVALID_RECEIVER, addressConfig.stargateUsdt, true);
+    _sendStargate(_params, config, INVALID_RECEIVER, addressConfig.stargateWeth, true);
+
+    // invalidExtraOptions and composeMsg: checking extra options must be empty
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '0x123', '');
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
   function test_zodiacConfiguration_arbitrum() public {
@@ -310,7 +589,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.stargateUsdt, config, 100 ether, false);
 
@@ -377,11 +655,16 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _params.inputAmount = 100e6;
     _params.outputAmount = 90e6;
     _params.nativeFee = 0.01 ether;
-    _params.destination = 30_101;
+    _params.destination = 30_110;
 
     vm.deal(config.safeAddress, 100 ether);
     _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
+
+    // Stargate: sending an order in native
+    _params.inputAmount = 1 ether;
+    _params.outputAmount = 0.9 ether;
+    _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
     // invalidCaller: checking an invalid address cannot set approvals for each asset
@@ -509,7 +792,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.stargateUsdt, config, 100 ether, false);
 
@@ -581,6 +863,11 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     vm.deal(config.safeAddress, 100 ether);
     _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
+
+    // Stargate: sending an order in native
+    _params.inputAmount = 1 ether;
+    _params.outputAmount = 0.9 ether;
+    _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
     // invalidCaller: checking an invalid address cannot set approvals for each asset
@@ -708,7 +995,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.stargateUsdt, config, 100 ether, false);
 
@@ -891,6 +1177,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
     _approveAsset(config.usdt, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+    _approveAsset(addressConfig.cbBTC, APPROVED_CALLER, config.feeAdapter, config, 1 ether, false);
 
     // Across: testing across spoke pool can be set as spender for each asset
     _approveAsset(config.weth, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
@@ -898,7 +1185,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
 
     // Binance: testing can transfer to Binance
@@ -967,11 +1253,17 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
+    // Stargate: sending an order in native
+    _params.inputAmount = 1 ether;
+    _params.outputAmount = 0.9 ether;
+    _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
+
     //////////////////////////// Reverting Actions ////////////////////////////
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdt, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+    _approveAsset(addressConfig.cbBTC, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
 
     // invalidCaller: transferring to invalid receiver
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
@@ -985,6 +1277,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.weth, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
     _approveAsset(config.usdc, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
     _approveAsset(config.usdt, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+    _approveAsset(addressConfig.cbBTC, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
 
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
@@ -1376,7 +1669,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
 
     // Binance: testing can transfer to Binance
@@ -1444,6 +1736,11 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     vm.deal(config.safeAddress, 100 ether);
     _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
+
+    // Stargate: sending an order in native
+    _params.inputAmount = 1 ether;
+    _params.outputAmount = 0.9 ether;
+    _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
     // invalidCaller: checking an invalid address cannot set approvals for each asset
@@ -1545,7 +1842,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdt, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
 
     // Binance: testing can transfer to Binance
@@ -1694,7 +1990,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
 
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
@@ -1822,7 +2117,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdt, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.stargateUsdt, config, 100 ether, false);
 
@@ -1969,7 +2263,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
 
     // Stargate: testing stargate can be approved for each asset
-    // _approveAsset(config.weth, APPROVED_CALLER, addressConfig.stargateWeth, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
 
     // WETH: approving weth to burn WETH then unwrapping
@@ -2141,12 +2434,12 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
     _approveAsset(config.usdt, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
 
-        // Across: testing across spoke pool can be set as spender for each asset
+    // Across: testing across spoke pool can be set as spender for each asset
     _approveAsset(config.weth, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
 
-        // WETH: approving weth to burn WETH then unwrapping
+    // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
     deal(config.weth, config.safeAddress, 10 ether);
     _unwrapWETH(config.weth, 10 ether, config.roleKey, APPROVED_CALLER, false);
@@ -2180,7 +2473,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
     );
 
-        // Bridges: configuring the bridge inputs
+    // Bridges: configuring the bridge inputs
     BridgeParams memory _params;
     _params.destination = 10;
     _params.caller = APPROVED_CALLER;
@@ -2198,16 +2491,17 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendDepositV3(_params, config, false);
 
-    // TODO: Test sending native
-    // // Stargate: sending an order
-    // _params.inputAmount = 100e6;
-    // _params.outputAmount = 90e6;
-    // _params.nativeFee = 0.01 ether;
-    // _params.destination = 30_101;
+    // Stargate: sending an order in native
+    _params.inputAmount = 1 ether;
+    _params.outputAmount = 0.9 ether;
+    _params.nativeFee = 0.01 ether;
+    _params.destination = 30_101;
+    vm.deal(config.safeAddress, 100 ether);
+    _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
-    // vm.deal(config.safeAddress, 100 ether);
-    // _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
-    // _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
+    _params.inputAmount = 1 ether;
+    _params.outputAmount = 0.9 ether;
+    _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
     // invalidCaller: checking an invalid address cannot set approvals for each asset
@@ -2352,7 +2646,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
     );
 
-        // Bridges: configuring the bridge inputs
+    // Bridges: configuring the bridge inputs
     BridgeParams memory _params;
     _params.destination = 10;
     _params.caller = APPROVED_CALLER;
@@ -2414,7 +2708,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
       _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
     );
 
-     // invalidDepositor: checking random address cannot receive funds with Across
+    // invalidDepositor: checking random address cannot receive funds with Across
     _params.depositor = INVALID_RECEIVER;
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendDepositV3(_params, config, true);
@@ -2439,5 +2733,249 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _params.message = '0x1234';
     _sendDepositV3(_params, config, true);
     _params.message = '';
+  }
+
+  function test_zodiacConfiguration_ronin() public {
+    vm.createSelectFork(vm.envString('RONIN_RPC'));
+    ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
+    vm.rollFork(config.fixedBlock);
+
+    // Setting up the environment
+    feeAdapter = IFeeAdapter(config.feeAdapter);
+    roleModule = IRoleModule(config.roleModule);
+
+    //////////////////////////// Supported Actions ////////////////////////////
+    // checking module is configured as expected
+    _checkRolesConfiguration(config);
+
+    // checking safe is configured as expected
+    _checkSafeConfiguration(config);
+
+    // FeeAdapter: testing the test address can set approvals for each asset
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+    _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+
+    // Binance: testing can transfer to Binance
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 10 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 10 ether, false);
+
+    // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
+    uint32[] memory _destinations = new uint32[](2);
+    _destinations[0] = 1;
+    _destinations[1] = 10;
+
+    uint256[] memory _amounts = new uint256[](2);
+    _amounts[0] = 1 ether;
+    _amounts[1] = 0.001 ether;
+
+    // Everclear: ending new intent
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, MULTI_SIG_ADDRESS, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
+    );
+
+    // Everclear: sending new order
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, MULTI_SIG_ADDRESS, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
+    );
+
+    //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidCaller: checking an invalid address cannot set approvals for each asset
+    _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+    _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+
+    // invalidCaller: checking a random address cannot send a new intent
+    _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
+
+    // invalidSpender: checking an invalid spender cannot be used in approval spender field
+    _approveAsset(config.weth, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+    _approveAsset(config.usdc, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+
+    // invalidReceiver: checking a random address cannot receive funds
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: checking the receiver invalidity in different arrays
+    _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+    _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+    _sendNewOrderInvalidFifthArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+
+    // invalidTTl: checking the order cannot be sent with a non-zero ttl
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+    );
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+    );
+    _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+
+    // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+    );
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+    );
+    _sendNewOrderInvalidFifthArrayMaxFee(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+    );
+  }
+
+  function test_zodiacConfiguration_avalanche() public {
+    vm.createSelectFork(vm.envString('AVALANCHE_RPC'));
+    ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
+    ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
+    vm.rollFork(config.fixedBlock);
+
+    // Setting up the environment
+    feeAdapter = IFeeAdapter(config.feeAdapter);
+    roleModule = IRoleModule(config.roleModule);
+
+    //////////////////////////// Supported Actions ////////////////////////////
+    // checking module is configured as expected
+    _checkRolesConfiguration(config);
+
+    // checking safe is configured as expected
+    _checkSafeConfiguration(config);
+
+    // FeeAdapter: testing fee adapter can be set as spender for each asset
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+    _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+    _approveAsset(config.usdt, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+
+    // Stargate: testing stargate can be approved for each asset
+    _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
+    _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.stargateUsdt, config, 100 ether, false);
+
+    // Binance: testing can transfer to Binance
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
+    uint32[] memory _destinations = new uint32[](2);
+    _destinations[0] = 1;
+    _destinations[1] = 10;
+
+    uint256[] memory _amounts = new uint256[](2);
+    _amounts[0] = 1 ether;
+    _amounts[1] = 0.001 ether;
+
+    // Everclear: sending new intent
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+    );
+
+    // Everclear: sending new order
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+    );
+
+    // Stargate: sending an order
+    BridgeParams memory _params;
+    _params.caller = APPROVED_CALLER;
+    _params.receiver = config.safeAddress;
+    _params.depositor = config.safeAddress;
+    _params.inputToken = config.weth;
+    _params.quoteTimestamp = uint32(block.timestamp);
+    _params.fillDeadline = uint32(block.timestamp + 30 minutes);
+    _params.message = '';
+    _params.across = addressConfig.across;
+    _params.inputAmount = 100e6;
+    _params.outputAmount = 90e6;
+    _params.nativeFee = 1 ether;
+    _params.destination = 30_110;
+
+    vm.deal(config.safeAddress, 100 ether);
+    _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);    
+
+    // //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidCaller: checking an invalid address cannot set approvals for each asset
+    _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+    _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+    _approveAsset(config.usdt, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
+
+    // invalidCaller: transferring to invalid receiver
+    _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
+    _transferAsset(config.usdc, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
+
+    // invalidCaller: checking a random address cannot send a new intent
+    _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
+
+    // invalidSpender: checking an invalid spender cannot be used in approval spender field
+    _approveAsset(config.weth, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+    _approveAsset(config.usdc, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+    _approveAsset(config.usdt, APPROVED_CALLER, INVALID_SPENDER, config, 100 ether, true);
+
+    // invalidReceiver: transferring to invalid receiver
+    _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+    _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: checking a random address cannot receive funds
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: checking the receiver invalidity in different arrays
+    _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+    _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+    _sendNewOrderInvalidFifthArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+
+    // invalidTTl: checking the order cannot be sent with a non-zero ttl
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+    );
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+    );
+    _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
+
+    // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+    );
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+    );
+    _sendNewOrderInvalidFifthArrayMaxFee(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+    );
+
+    // invalidReceiver: checking random address cannot receive funds wih Stargate
+    _params.receiver = INVALID_RECEIVER;
+    _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
+    _dealFunds(config.usdt, _amounts, config.validFee, config.safeAddress);
+
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, true);
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdt, true);
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true);
+    _params.receiver = config.safeAddress;
+
+    // invalidRefundReceiver: checking refund address must be safe address
+    _sendStargate(_params, config, INVALID_RECEIVER, addressConfig.stargateUsdc, true);
+    _sendStargate(_params, config, INVALID_RECEIVER, addressConfig.stargateUsdt, true);
+    _sendStargate(_params, config, INVALID_RECEIVER, addressConfig.stargateWeth, true);
+
+    // invalidExtraOptions and composeMsg: checking extra options must be empty
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '0x123', '');
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 }

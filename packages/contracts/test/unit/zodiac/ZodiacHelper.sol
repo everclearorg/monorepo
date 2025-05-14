@@ -8,6 +8,24 @@ import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import 'forge-std/Test.sol';
 import {IFeeAdapter} from 'interfaces/intent/IFeeAdapter.sol';
 
+abstract contract Ethereum {
+  address public constant ETHEREUM_ROLE_MODULE = 0x1B61aD319e5Aa9EDcEa8ae3a99cd7f624E628d5A;
+  bytes32 public constant ETHEREUM_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f6d61696e6e657400000000000000;
+
+  // API Inputs
+  uint256 public constant ETHEREUM_FEE = 0;
+  uint256 public constant ETHEREUM_DEADLINE = 1_747_218_384;
+  bytes public constant ETHEREUM_SIG =
+    hex'23bb8e3e64bce059f3545ba0e026b0b9ee4155e369d2c70a33f8fd18f4670f2d1742d9e24e660b12108843bd37fa5026304efb75a267007ca93f862c420b15e31c';
+  uint256 public constant ETHEREUM_FIXED_BLOCK = 22_480_748;
+
+  // Bridges
+  address public constant ETHEREUM_ACROSS_SPOKE_POOL = 0x5c7BCd6E7De5423a257D81B442095A1a6ced35C5;
+  address public constant ETHEREUM_STARGATE_WETH_POOL = 0x77b2043768d28E9C9aB44E1aBfC95944bcE57931;
+  address public constant ETHEREUM_STARGATE_USDC_POOL = 0xc026395860Db2d07ee33e05fE50ed7bD583189C7;
+  address public constant ETHEREUM_STARGATE_USDT_POOL = 0x933597a323Eb81cAe705C5bC29985172fd5A3973;
+}
+
 abstract contract Arbitrum {
   address public constant ARBITRUM_ROLE_MODULE = 0xfc62b8FBC8fdDdd1997130923fD44BB785033B12;
   bytes32 public constant ARBITRUM_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f6172620000000000000000000000;
@@ -43,17 +61,6 @@ abstract contract Optimism {
   address public constant OPTIMISM_STARGATE_USDC_POOL = 0xcE8CcA271Ebc0533920C83d39F417ED6A0abB7D0;
   address public constant OPTIMISM_STARGATE_USDT_POOL = 0x19cFCE47eD54a88614648DC3f19A5980097007dD;
 }
-
-// abstract contract Ethereum {
-//   address public constant ETHEREUM_ROLE_MODULE = ;
-//   bytes32 public constant ETHEREUM_ROLE_KEY = ;
-
-//   // API Inputs
-//   uint256 public constant ETHEREUM_FEE = 0;
-//   uint256 public constant ETHEREUM_DEADLINE = 0;
-//   bytes public constant ETHEREUM_SIG =
-//     hex'';
-// }
 
 abstract contract Polygon {
   address public constant POLYGON_ROLE_MODULE = 0x5d03263e18CB9623e0bbE9FBf7cf3347Bb7d551f;
@@ -94,10 +101,10 @@ abstract contract Base {
 
   // API Inputs
   uint256 public constant BASE_FEE = 0;
-  uint256 public constant BASE_DEADLINE = 1_747_131_509;
+  uint256 public constant BASE_DEADLINE = 1_747_215_864;
   bytes public constant BASE_SIG =
-    hex'40e9f2f1d36a837078ab8e72880c565f816f289fa05277f0fb22b6cc34690f84027c3d891dfe3452eaa8e8253641afde0d69f90509e94ebd05daa9b780c293141c';
-  uint256 public constant BASE_FIXED_BLOCK = 30_170_741;
+    hex'dc5cde8e23110bfdc9ace00e3098517a3a657f2b68d70222061583e00d9c497e13e93758e04ed658ee767e26bb77aac8b58a4c6b446373fd420e8683763501bf1b';
+  uint256 public constant BASE_FIXED_BLOCK = 30_212_943;
 
   // Bridges
   address public constant BASE_ACROSS_SPOKE_POOL = 0x09aea4b2242abC8bb4BB78D537A67a245A7bEC64;
@@ -142,7 +149,7 @@ abstract contract Mantle {
 
   // Api Inputs
   uint256 public constant MANTLE_FEE = 0.0005 ether;
-  uint256 public constant MANTLE_DEADLINE = 1747142792;
+  uint256 public constant MANTLE_DEADLINE = 1_747_142_792;
   bytes public constant MANTLE_SIG =
     hex'dfb617378ce7f2e9ba6ac15e6b18a3e39a412184cbbb1a41498dc928c21381cf45e11745613395ea890923856f0c24b7827746e20fb3e0b0896baa468b0511f21b';
   uint256 public constant MANTLE_FIXED_BLOCK = 79_505_646;
@@ -194,10 +201,10 @@ abstract contract Ink {
 
   // Api Inputs
   uint256 public constant INK_FEE = 0.0001 ether;
-  uint256 public constant INK_DEADLINE = 1747143461;
+  uint256 public constant INK_DEADLINE = 1_747_143_461;
   bytes public constant INK_SIG =
     hex'70fd6cac50837d6a3686b10312e428f953e2877ab2de38149b22cacb6161fb5953611fea0136f12cbb09d058253d4a52aeaaf06873e681d9131ab95b8c87af621b';
-  uint256 public constant INK_FIXED_BLOCK = 13644402;
+  uint256 public constant INK_FIXED_BLOCK = 13_644_402;
 
   // Bridges
   address public constant INK_ACROSS_SPOKE_POOL = 0xeF684C38F94F48775959ECf2012D7E864ffb9dd4;
@@ -210,10 +217,10 @@ abstract contract Unichain {
 
   // Api Inputs
   uint256 public constant UNICHAIN_FEE = 0.0007 ether;
-  uint256 public constant UNICHAIN_DEADLINE = 1747144179;
+  uint256 public constant UNICHAIN_DEADLINE = 1_747_144_179;
   bytes public constant UNICHAIN_SIG =
     hex'0359d8bbb660e4448ae753d19d850109c52c3add6a7baab32f4a3f8f59bc3a3b77809a80f30af6b4d4f0c85f54846a01df93e634c4133e5c4afd07c770ba6cbe1b';
-  uint256 public constant UNICHAIN_FIXED_BLOCK = 16395066;
+  uint256 public constant UNICHAIN_FIXED_BLOCK = 16_395_066;
 
   // Bridges
   address public constant UNICHAIN_ACROSS_SPOKE_POOL = 0x09aea4b2242abC8bb4BB78D537A67a245A7bEC64;
@@ -226,48 +233,57 @@ abstract contract Mode {
 
   // Api Inputs
   uint256 public constant MODE_FEE = 0.004 ether;
-  uint256 public constant MODE_DEADLINE = 1747145892;
+  uint256 public constant MODE_DEADLINE = 1_747_145_892;
   bytes public constant MODE_SIG =
     hex'19638a66549be0110f38c58e3175dbb6890cfd4b0fbecaa8826dfa02c9218edc0394aaaefbafb923841c0e1e53f54f1ad589e4fbe098de0a3020fda36cd455091b';
-  uint256 public constant MODE_FIXED_BLOCK = 23488838;
+  uint256 public constant MODE_FIXED_BLOCK = 23_488_838;
 
   // Bridges
   address public constant MODE_ACROSS_SPOKE_POOL = 0x3baD7AD0728f9917d1Bf08af5782dCbD516cDd96;
 }
 
+abstract contract Ronin {
+  address public constant RONIN_ROLE_MODULE = 0xF6436435d715e027B42e6300BCE122C02611b788;
+  bytes32 public constant RONIN_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f726f6e696e000000000000000000;
+
+  // Api Inputs
+  uint256 public constant RONIN_FEE = 0.00025 ether;
+  uint256 public constant RONIN_DEADLINE = 1_747_151_912;
+  bytes public constant RONIN_SIG =
+    hex'008201aa7243e8492a8aede88d19cbd95c7bd863c414ef0f522c052a487014f56e7075961313b22ccf22c0c5f4b52a316ad32024808354ed271bb7b94bedd59c1b';
+  uint256 public constant RONIN_FIXED_BLOCK = 45_099_362;
+}
+
+abstract contract Avalanche {
+  address public constant AVALANCHE_ROLE_MODULE = 0x4900c96157283032FF0C1e680960505E2831386A;
+  bytes32 public constant AVALANCHE_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f6176617800000000000000000000;
+
+  // Api Inputs
+  uint256 public constant AVALANCHE_FEE = 0.00025 ether;
+  uint256 public constant AVALANCHE_DEADLINE = 1_747_228_398;
+  bytes public constant AVALANCHE_SIG =
+    hex'3866c3de5bbcda9fffc32292b35abd1df99a5f478614c964e782fe9750005e3c51f0260d252da42f191f7c35b82f333abf75054c036aad079bc03d144ef9e05a1b';
+  uint256 public constant AVALANCHE_FIXED_BLOCK = 62017749;
+
+  // Bridges
+  address public constant AVALANCHE_STARGATE_USDC_POOL = 0x5634c4a5FEd09819E3c46D86A965Dd9447d86e47;
+  address public constant AVALANCHE_STARGATE_USDT_POOL = 0x12dC9256Acc9895B076f6638D628382881e62CeE;
+}
+
+// // NOTE: Unsupported in the API
 // abstract contract Apechain {
-//   address public constant APECHAIN_ROLE_MODULE = ;
-//   bytes32 public constant APECHAIN_ROLE_KEY = ;
+//   address public constant APECHAIN_ROLE_MODULE = 0x409687604697aE845b7dd2204C50F3a0bDC09e84;
+//   bytes32 public constant APECHAIN_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f617065636861696e000000000000;
 
 //   // Api Inputs
-//     uint256 public constant APECHAIN_FEE = 0 ether;
+//   uint256 public constant APECHAIN_FEE = 0 ether;
 //   uint256 public constant APECHAIN_DEADLINE = ;
 //   bytes public constant APECHAIN_SIG =
 //     hex'';
+//   uint256 public constant APECHAIN_FIXED_BLOCK = 15620102;
 // }
 
-// abstract Ronin {
-//   address public constant MODE_ROLE_MODULE = ;
-//   bytes32 public constant MODE_ROLE_KEY = ;
-
-//   // Api Inputs
-//     uint256 public constant MODE_FEE = 0 ether;
-//   uint256 public constant MODE_DEADLINE = ;
-//   bytes public constant MODE_SIG =
-//     hex'';
-// }
-
-// abstract contract Avalanche {
-//   address public constant AVALANCHE_ROLE_MODULE = ;
-//   bytes32 public constant AVALANCHE_ROLE_KEY = ;
-
-//   // Api Inputs
-//     uint256 public constant AVALANCHE_FEE = 0 ether;
-//   uint256 public constant AVALANCHE_DEADLINE = ;
-//   bytes public constant AVALANCHE_SIG =
-//     hex'';
-// }
-
+// NOTE: Zodiac Roles contract compilation issue - <shanghai version
 // abstract contract Linea {
 //   address public constant LINEA_ROLE_MODULE = ;
 //   bytes32 public constant LINEA_ROLE_KEY = ;
@@ -303,6 +319,7 @@ abstract contract Mode {
 
 abstract contract ZodiacHelper is
   Test,
+  Ethereum,
   Arbitrum,
   Blast,
   Optimism,
@@ -315,7 +332,9 @@ abstract contract ZodiacHelper is
   Mantle,
   Ink,
   Unichain,
-  Mode
+  Mode,
+  Ronin,
+  Avalanche
 {
   using TypeCasts for address;
   using TypeCasts for bytes32;
@@ -339,6 +358,7 @@ abstract contract ZodiacHelper is
     address stargateWeth;
     address stargateUsdc;
     address stargateUsdt;
+    address cbBTC;
   }
 
   struct BridgeParams {
@@ -365,6 +385,7 @@ abstract contract ZodiacHelper is
   address public constant SAFE_TEST_ADDRESS = 0x2eEd1440842990Fa61F0c396f981375Fa6004131;
   address public constant APPROVED_CALLER = SAFE_TEST_ADDRESS;
   address public constant MULTI_SIG_ADDRESS = 0xC55749A006f6B2098dF802b1711522498b83Fae3;
+  address public constant RONIN_SAFE_ADDRESS = 0x1B1435cc68074bc8DC7BD798498b4d90DB0A94B0;
   uint256 public constant EXPECTED_THRESHOLD = 1;
   bytes4 public constant NEW_INTENT_ADDRESS_SELECTOR =
     bytes4(keccak256('newIntent(uint32[],address,address,address,uint256,uint24,uint48,bytes,(uint256,uint256,bytes))'));
@@ -505,6 +526,38 @@ abstract contract ZodiacHelper is
     vm.startPrank(_params.caller);
     if (_expectRevert) vm.expectRevert();
     roleModule.execTransactionWithRole(_stargate, _params.nativeFee, sendCalldata, 0, _config.roleKey, true);
+    vm.stopPrank();
+  }
+
+  function _sendStargateWeth(
+    BridgeParams memory _params,
+    ZodiacConfiguration memory _config,
+    address _refundAddress,
+    address _stargate,
+    bool _expectRevert
+  ) internal {
+    // configuring the calldata
+    bytes memory sendCalldata = abi.encodeWithSelector(
+      IStargatePool.send.selector,
+      IStargatePool.SendParams({
+        dstEid: uint32(_params.destination),
+        to: _params.receiver.toBytes32(),
+        amountLD: _params.inputAmount,
+        minAmountLD: _params.outputAmount,
+        extraOptions: '',
+        composeMsg: '',
+        oftCmd: ''
+      }),
+      IStargatePool.MessagingFee({nativeFee: _params.nativeFee, lzTokenFee: 0}),
+      _refundAddress
+    );
+
+    // calling the module
+    vm.startPrank(_params.caller);
+    if (_expectRevert) vm.expectRevert();
+    roleModule.execTransactionWithRole(
+      _stargate, _params.inputAmount + _params.nativeFee, sendCalldata, 0, _config.roleKey, true
+    );
     vm.stopPrank();
   }
 
