@@ -370,7 +370,7 @@ contract EverclearSpokeV3 is
     watchtower = _init.watchtower;
     callExecutor = _init.callExecutor;
     EVERCLEAR = _init.hubDomain;
-    messageGasLimit = 20_000_000;
+    messageGasLimit = 2_000_000;
 
     __Ownable_init(_init.owner);
 
