@@ -18,6 +18,7 @@ export const TExtendedChainConfig = Type.Intersect([
   Type.Object({
     minGasOnRelayer: Type.Optional(Type.Number()),
     minGasOnGateway: Type.Optional(Type.Number()),
+    maxDelayedSubgraphBlock: Type.Optional(Type.Number()),
   }),
 ]);
 
@@ -27,6 +28,7 @@ export const TExtendedHubConfig = Type.Intersect([
   Type.Object({
     minGasOnRelayer: Type.Optional(Type.Number()),
     minGasOnGateway: Type.Optional(Type.Number()),
+    maxDelayedSubgraphBlock: Type.Optional(Type.Number()),
   }),
 ]);
 
