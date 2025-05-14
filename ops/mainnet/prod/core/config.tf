@@ -451,6 +451,8 @@ locals {
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
           # "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+        minGasOnRelayer = 500 
+        minGasOnGateway = 750 
       }
       "534352" = {
         providers = [
@@ -490,6 +492,7 @@ locals {
           "https://api.roninchain.com/rpc",
           "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+        maxDelayedSubgraphBlock = 1000
       },
       "1399811149" = {
         providers = [
@@ -507,12 +510,15 @@ locals {
           "https://mantle-mainnet.blastapi.io/${var.blast_key}",
           "https://mantle.drpc.org"
         ]
+        minGasOnRelayer = 200 
+        minGasOnGateway = 300
       },
       "146" = {
         providers = [
           "https://sonic-mainnet.blastapi.io/${var.blast_key}",
           "https://sonic.drpc.org"
         ]
+        maxDelayedSubgraphBlock = 1000
       },
       "57073" = {
         providers = [
