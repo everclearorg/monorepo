@@ -451,6 +451,8 @@ locals {
           "https://polygon-mainnet.blastapi.io/${var.blast_key}",
           # "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+        minGasOnRelayer = 500 
+        minGasOnGateway = 750 
       }
       "534352" = {
         providers = [
@@ -507,6 +509,8 @@ locals {
           "https://mantle-mainnet.blastapi.io/${var.blast_key}",
           "https://mantle.drpc.org"
         ]
+        minGasOnRelayer = 200 
+        minGasOnGateway = 300 
       },
       "146" = {
         providers = [
