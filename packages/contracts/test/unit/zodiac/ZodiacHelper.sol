@@ -9,7 +9,8 @@ import 'forge-std/Test.sol';
 import {IFeeAdapter} from 'interfaces/intent/IFeeAdapter.sol';
 
 abstract contract Ethereum {
-  address public constant ETHEREUM_ROLE_MODULE = 0x1B61aD319e5Aa9EDcEa8ae3a99cd7f624E628d5A;
+  address public constant ETHEREUM_STAGING_ROLE_MODULE = 0x1B61aD319e5Aa9EDcEa8ae3a99cd7f624E628d5A;
+  address public constant ETHEREUM_PROD_ROLE_MODULE = 0xDc4c839BA1F94E492b7fE9c008890d015080Bd3B;
   bytes32 public constant ETHEREUM_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f6d61696e6e657400000000000000;
 
   // API Inputs
@@ -27,7 +28,8 @@ abstract contract Ethereum {
 }
 
 abstract contract Arbitrum {
-  address public constant ARBITRUM_ROLE_MODULE = 0xfc62b8FBC8fdDdd1997130923fD44BB785033B12;
+  address public constant ARBITRUM_STAGING_ROLE_MODULE = 0xfc62b8FBC8fdDdd1997130923fD44BB785033B12;
+  address public constant ARBITRUM_PROD_ROLE_MODULE = 0x76fCd80859Ef20440BEba00240467733D2482375;
   bytes32 public constant ARBITRUM_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f6172620000000000000000000000;
 
   // API Inputs
@@ -45,7 +47,8 @@ abstract contract Arbitrum {
 }
 
 abstract contract Optimism {
-  address public constant OPTIMISM_ROLE_MODULE = 0x14b940d7128237CDA825fD3f2Ab5063B9DFC0613;
+  address public constant OPTIMISM_STAGING_ROLE_MODULE = 0x14b940d7128237CDA825fD3f2Ab5063B9DFC0613;
+  address public constant OPTIMISM_PROD_ROLE_MODULE = 0x04ee2500c19B2F86EC4928Cd39fEc46DD37c5859;
   bytes32 public constant OPTIMISM_ROLE_KEY = 0x6C69717569646974795F6D616E616765725F6F70000000000000000000000000;
 
   // API Inputs
@@ -63,7 +66,8 @@ abstract contract Optimism {
 }
 
 abstract contract Polygon {
-  address public constant POLYGON_ROLE_MODULE = 0x5d03263e18CB9623e0bbE9FBf7cf3347Bb7d551f;
+  address public constant POLYGON_STAGING_ROLE_MODULE = 0x5d03263e18CB9623e0bbE9FBf7cf3347Bb7d551f;
+  address public constant POLYGON_PROD_ROLE_MODULE = 0x17C6AFf10a4e66170e2F61d19D10bf92A1DaedD7;
   bytes32 public constant POLYGON_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f706f6c79676f6e00000000000000;
 
   // API Inputs
@@ -80,7 +84,8 @@ abstract contract Polygon {
 }
 
 abstract contract Bsc {
-  address public constant BSC_ROLE_MODULE = 0x5f67084B92abaB83002fE562Be9E761Ba99603E1;
+  address public constant BSC_STAGING_ROLE_MODULE = 0x5f67084B92abaB83002fE562Be9E761Ba99603E1;
+  address public constant BSC_PROD_ROLE_MODULE = 0xAFf14A306Ca6F0b7e4E46125405A2d8B4e32bae8;
   bytes32 public constant BSC_ROLE_KEY = 0x6C69717569646974795F6D616E616765725F6273630000000000000000000000;
 
   // API Inputs
@@ -96,7 +101,8 @@ abstract contract Bsc {
 }
 
 abstract contract Base {
-  address public constant BASE_ROLE_MODULE = 0x5818a6540c2591BD990B24fA180Ca3217A2f9Cd4;
+  address public constant BASE_STAGING_ROLE_MODULE = 0x5818a6540c2591BD990B24fA180Ca3217A2f9Cd4;
+  address public constant BASE_PROD_ROLE_MODULE = 0x5B664ef3826c473134F88dA1eA213Af825c09E91;
   bytes32 public constant BASE_ROLE_KEY = 0x6C69717569646974795F6D616E616765725F6261736500000000000000000000;
 
   // API Inputs
@@ -113,7 +119,8 @@ abstract contract Base {
 }
 
 abstract contract Sonic {
-  address public constant SONIC_ROLE_MODULE = 0x439DF7B8Fd25a8815Be21b6f4E6039f31F3564E5;
+  address public constant SONIC_STAGING_ROLE_MODULE = 0x439DF7B8Fd25a8815Be21b6f4E6039f31F3564E5;
+  address public constant SONIC_PROD_ROLE_MODULE = 0x27a66A95EddC977a202981Ea5f6b4a0E0b63fDbE;
   bytes32 public constant SONIC_ROLE_KEY = 0x6C69717569646974795F6D616E616765725F736F6E6963000000000000000000;
 
   // API Inputs
@@ -128,7 +135,8 @@ abstract contract Sonic {
 }
 
 abstract contract Berachain {
-  address public constant BERACHAIN_ROLE_MODULE = 0xF8e6e260b83d9665901311063bCF7E6042FcaB70;
+  address public constant BERACHAIN_STAGING_ROLE_MODULE = 0xF8e6e260b83d9665901311063bCF7E6042FcaB70;
+  address public constant BERACHAIN_PROD_ROLE_MODULE = 0x3BD24C518291CBe4D64ea7de23F177c883727E5D;
   bytes32 public constant BERACHAIN_ROLE_KEY = 0x6C69717569646974795F6D616E616765725F6265726100000000000000000000;
 
   // API Inputs
@@ -144,7 +152,8 @@ abstract contract Berachain {
 }
 
 abstract contract Mantle {
-  address public constant MANTLE_ROLE_MODULE = 0x0098084D57e6Db1522215BE2776554E42f4a65d7;
+  address public constant MANTLE_STAGING_ROLE_MODULE = 0x0098084D57e6Db1522215BE2776554E42f4a65d7;
+  address public constant MANTLE_PROD_ROLE_MODULE = 0xe96FbdfCA933aeEB73bB7b5017bdb9534fBaB187;
   bytes32 public constant MANTLE_ROLE_KEY = 0x6C69717569646974795F6D616E616765725F6D616E746C650000000000000000;
 
   // Api Inputs
@@ -161,7 +170,8 @@ abstract contract Mantle {
 }
 
 abstract contract Blast {
-  address public constant BLAST_ROLE_MODULE = 0x14bc534044B557bBb5E9A63473e761176bE665f6;
+  address public constant BLAST_STAGING_ROLE_MODULE = 0x14bc534044B557bBb5E9A63473e761176bE665f6;
+  address public constant BLAST_PROD_ROLE_MODULE = 0x6F7110b88F7a111Be53FbE95aFd40C2587CD2629;
   bytes32 public constant BLAST_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f626c617374000000000000000000;
 
   // API Inputs
@@ -179,7 +189,8 @@ abstract contract Blast {
 }
 
 abstract contract Scroll {
-  address public constant SCROLL_ROLE_MODULE = 0xfFbA1Fef54b229705Aacf2A8431D7B7d2D2000A0;
+  address public constant SCROLL_STAGING_ROLE_MODULE = 0xfFbA1Fef54b229705Aacf2A8431D7B7d2D2000A0;
+  address public constant SCROLL_PROD_ROLE_MODULE = 0xB9E4680CE7a3b67CB0C9FB74329b463D0C552D2C;
   bytes32 public constant SCROLL_ROLE_KEY = 0x6C69717569646974795F6D616E616765725F7363726F6C6C0000000000000000;
 
   // Api Inputs
@@ -196,7 +207,8 @@ abstract contract Scroll {
 }
 
 abstract contract Ink {
-  address public constant INK_ROLE_MODULE = 0x647Fe289E2D746Ee1eA88d1a3b6a95c5BAde2f17;
+  address public constant INK_STAGING_ROLE_MODULE = 0x647Fe289E2D746Ee1eA88d1a3b6a95c5BAde2f17;
+  address public constant INK_PROD_ROLE_MODULE = 0x4C0f90BaB08C92b88a4bf9e20Aa90882991e275A;
   bytes32 public constant INK_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f696e6b0000000000000000000000;
 
   // Api Inputs
@@ -212,7 +224,8 @@ abstract contract Ink {
 }
 
 abstract contract Unichain {
-  address public constant UNICHAIN_ROLE_MODULE = 0x715302b659804c40CF83eb5D2e33Bb4b35c8A854;
+  address public constant UNICHAIN_STAGING_ROLE_MODULE = 0x715302b659804c40CF83eb5D2e33Bb4b35c8A854;
+  address public constant UNICHAIN_PROD_ROLE_MODULE = 0xA7d61d5a488A2502F1193ae8aAb710C67239c192;
   bytes32 public constant UNICHAIN_ROLE_KEY = 0x6C69717569646974795F6D616E616765725F756E69636861696E000000000000;
 
   // Api Inputs
@@ -228,7 +241,8 @@ abstract contract Unichain {
 }
 
 abstract contract Mode {
-  address public constant MODE_ROLE_MODULE = 0x3CACE76d4b1da3a7e7D2643073710aB9F27807E0;
+  address public constant MODE_STAGING_ROLE_MODULE = 0x3CACE76d4b1da3a7e7D2643073710aB9F27807E0;
+  address public constant MODE_PROD_ROLE_MODULE = 0xeF708DaE471348a015d8bC083A14022ea174Ea7a;
   bytes32 public constant MODE_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f6d6f646500000000000000000000;
 
   // Api Inputs
@@ -243,7 +257,8 @@ abstract contract Mode {
 }
 
 abstract contract Ronin {
-  address public constant RONIN_ROLE_MODULE = 0xF6436435d715e027B42e6300BCE122C02611b788;
+  address public constant RONIN_STAGING_ROLE_MODULE = 0xF6436435d715e027B42e6300BCE122C02611b788;
+  address public constant RONIN_PROD_ROLE_MODULE = 0xe225d8499f263E60F5D76F33375D77A461b5c63d;
   bytes32 public constant RONIN_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f726f6e696e000000000000000000;
 
   // Api Inputs
@@ -255,7 +270,8 @@ abstract contract Ronin {
 }
 
 abstract contract Avalanche {
-  address public constant AVALANCHE_ROLE_MODULE = 0x4900c96157283032FF0C1e680960505E2831386A;
+  address public constant AVALANCHE_STAGING_ROLE_MODULE = 0x4900c96157283032FF0C1e680960505E2831386A;
+  address public constant AVALANCHE_PROD_ROLE_MODULE = 0x2A801Ebd0345C86a8Ed4CD7887B6197faC0c2D45;
   bytes32 public constant AVALANCHE_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f6176617800000000000000000000;
 
   // Api Inputs
@@ -272,7 +288,8 @@ abstract contract Avalanche {
 
 // // NOTE: Unsupported in the API
 // abstract contract Apechain {
-//   address public constant APECHAIN_ROLE_MODULE = 0x409687604697aE845b7dd2204C50F3a0bDC09e84;
+//   address public constant APECHAIN_STAGING_ROLE_MODULE = 0x409687604697aE845b7dd2204C50F3a0bDC09e84;
+//   address public constant APECHAIN_PROD_ROLE_MODULE = 0x404a75E5C484ffd2cd013c0D0F9CBf0b5eb08cF9
 //   bytes32 public constant APECHAIN_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f617065636861696e000000000000;
 
 //   // Api Inputs
@@ -285,7 +302,7 @@ abstract contract Avalanche {
 
 // NOTE: Zodiac Roles contract compilation issue - <shanghai version
 // abstract contract Linea {
-//   address public constant LINEA_ROLE_MODULE = ;
+//   address public constant LINEA_STAGING_ROLE_MODULE = ;
 //   bytes32 public constant LINEA_ROLE_KEY = ;
 
 //   // Api Inputs
@@ -296,7 +313,7 @@ abstract contract Avalanche {
 // }
 
 // abstract contract Taiko {
-//   address public constant TAIKO_ROLE_MODULE = ;
+//   address public constant TAIKO_STAGING_ROLE_MODULE = ;
 //   bytes32 public constant TAIKO_ROLE_KEY = ;
 
 //   // Api Inputs
@@ -307,7 +324,7 @@ abstract contract Avalanche {
 // }
 
 // abstract contract Zircuit {
-//   address public constant ZIRCUIT_ROLE_MODULE = ;
+//   address public constant ZIRCUIT_STAGING_ROLE_MODULE = ;
 //   bytes32 public constant ZIRCUIT_ROLE_KEY = ;
 
 //   // Api Inputs

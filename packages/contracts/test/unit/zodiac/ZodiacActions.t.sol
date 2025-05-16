@@ -11,7 +11,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Ethereum
     _zodiacConfig[ETHEREUM] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: ETHEREUM_ROLE_MODULE,
+      roleModule: ETHEREUM_STAGING_ROLE_MODULE,
       feeAdapter: ETHEREUM_FEE_ADAPTER,
       roleKey: ETHEREUM_ROLE_KEY,
       validFee: ETHEREUM_FEE,
@@ -33,7 +33,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Arbitrum
     _zodiacConfig[ARBITRUM_ONE] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: ARBITRUM_ROLE_MODULE,
+      roleModule: ARBITRUM_STAGING_ROLE_MODULE,
       feeAdapter: ARBITRUM_FEE_ADAPTER,
       roleKey: ARBITRUM_ROLE_KEY,
       validFee: ARBITRUM_FEE,
@@ -55,7 +55,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Optimism
     _zodiacConfig[OPTIMISM] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: OPTIMISM_ROLE_MODULE,
+      roleModule: OPTIMISM_STAGING_ROLE_MODULE,
       feeAdapter: OPTIMISM_FEE_ADAPTER,
       roleKey: OPTIMISM_ROLE_KEY,
       validFee: OPTIMISM_FEE,
@@ -77,7 +77,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Polygon
     _zodiacConfig[POLYGON] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: POLYGON_ROLE_MODULE,
+      roleModule: POLYGON_STAGING_ROLE_MODULE,
       feeAdapter: POLYGON_FEE_ADAPTER,
       roleKey: POLYGON_ROLE_KEY,
       validFee: POLYGON_FEE,
@@ -99,7 +99,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Base
     _zodiacConfig[BASE] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: BASE_ROLE_MODULE,
+      roleModule: BASE_STAGING_ROLE_MODULE,
       feeAdapter: BASE_FEE_ADAPTER,
       roleKey: BASE_ROLE_KEY,
       validFee: BASE_FEE,
@@ -121,7 +121,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // BNB
     _zodiacConfig[BNB] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: BSC_ROLE_MODULE,
+      roleModule: BSC_STAGING_ROLE_MODULE,
       feeAdapter: BNB_FEE_ADAPTER,
       roleKey: BSC_ROLE_KEY,
       validFee: BSC_FEE,
@@ -143,7 +143,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Blast
     _zodiacConfig[BLAST] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: BLAST_ROLE_MODULE,
+      roleModule: BLAST_STAGING_ROLE_MODULE,
       feeAdapter: BLAST_FEE_ADAPTER,
       roleKey: BLAST_ROLE_KEY,
       validFee: BLAST_FEE,
@@ -165,7 +165,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Sonic
     _zodiacConfig[SONIC] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: SONIC_ROLE_MODULE,
+      roleModule: SONIC_STAGING_ROLE_MODULE,
       feeAdapter: SONIC_FEE_ADAPTER,
       roleKey: SONIC_ROLE_KEY,
       validFee: SONIC_FEE,
@@ -187,7 +187,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Mantle
     _zodiacConfig[MANTLE] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: MANTLE_ROLE_MODULE,
+      roleModule: MANTLE_STAGING_ROLE_MODULE,
       feeAdapter: MANTLE_FEE_ADAPTER,
       roleKey: MANTLE_ROLE_KEY,
       validFee: MANTLE_FEE,
@@ -209,7 +209,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Ink
     _zodiacConfig[INK] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: INK_ROLE_MODULE,
+      roleModule: INK_STAGING_ROLE_MODULE,
       feeAdapter: INK_FEE_ADAPTER,
       roleKey: INK_ROLE_KEY,
       validFee: INK_FEE,
@@ -231,7 +231,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Scroll
     _zodiacConfig[SCROLL] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: SCROLL_ROLE_MODULE,
+      roleModule: SCROLL_STAGING_ROLE_MODULE,
       feeAdapter: SCROLL_FEE_ADAPTER,
       roleKey: SCROLL_ROLE_KEY,
       validFee: SCROLL_FEE,
@@ -253,7 +253,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Berachain
     _zodiacConfig[BERACHAIN] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: BERACHAIN_ROLE_MODULE,
+      roleModule: BERACHAIN_STAGING_ROLE_MODULE,
       feeAdapter: BERACHAIN_FEE_ADAPTER,
       roleKey: BERACHAIN_ROLE_KEY,
       validFee: BERACHAIN_FEE,
@@ -275,7 +275,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Unichain
     _zodiacConfig[UNICHAIN] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: UNICHAIN_ROLE_MODULE,
+      roleModule: UNICHAIN_STAGING_ROLE_MODULE,
       feeAdapter: UNICHAIN_FEE_ADAPTER,
       roleKey: UNICHAIN_ROLE_KEY,
       validFee: UNICHAIN_FEE,
@@ -297,7 +297,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Mode
     _zodiacConfig[MODE] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: MODE_ROLE_MODULE,
+      roleModule: MODE_STAGING_ROLE_MODULE,
       feeAdapter: MODE_FEE_ADAPTER,
       roleKey: MODE_ROLE_KEY,
       validFee: MODE_FEE,
@@ -319,7 +319,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Ronin
     _zodiacConfig[RONIN] = ZodiacConfiguration({
       safeAddress: RONIN_SAFE_ADDRESS,
-      roleModule: RONIN_ROLE_MODULE,
+      roleModule: RONIN_STAGING_ROLE_MODULE,
       feeAdapter: RONIN_FEE_ADAPTER,
       roleKey: RONIN_ROLE_KEY,
       validFee: RONIN_FEE,
@@ -334,7 +334,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Avalanche
     _zodiacConfig[AVALANCHE] = ZodiacConfiguration({
       safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: AVALANCHE_ROLE_MODULE,
+      roleModule: AVALANCHE_STAGING_ROLE_MODULE,
       feeAdapter: AVALANCHE_FEE_ADAPTER,
       roleKey: AVALANCHE_ROLE_KEY,
       validFee: AVALANCHE_FEE,
