@@ -572,7 +572,7 @@ locals {
       maxDepositQueueCount = 15
       maxDepositQueueLatency = 3600
       messageMaxDelay = 1800
-      maxDelayedSubgraphBlock = 250
+      maxDelayedSubgraphBlock = 500
       maxInvoiceProcessingTime = 64800
       minGasOnRelayer = 0.3
       minGasOnGateway = 0.5
