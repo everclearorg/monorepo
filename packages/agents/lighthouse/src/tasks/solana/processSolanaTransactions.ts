@@ -118,8 +118,11 @@ export const processSolanaTransactions = async () => {
 
       // Update the message status in the database
       const messages = await database.getMessagesByIntentIds([settlement.intentId]);
-      if (messages && messages.length > 0) {
-        await database.updateMessageStatus(messages[0].id, HyperlaneStatus.delivered);
+      for (const message of messages) {
+        if (message.destinationDomain === SOLANA_CHAINID && message.status !== HyperlaneStatus.delivered) {
+          await database.updateMessageStatus(message.id, HyperlaneStatus.delivered);
+          break;
+        }
       }
     } catch (error) {
       logger.error('Failed to settle intent', requestContext, methodContext, {

@@ -7,6 +7,7 @@ import {
   createLoggingContext,
   getMaxBlockNumber,
   getMaxTxNonce,
+  SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 
 import { getContext } from '../../shared';
@@ -181,8 +182,11 @@ export const updateMessageStatus = async () => {
       result: uncompletedMessages.length,
     });
 
+    // Skip messages going to solana, they will be updated by lighthouse
+    const messagesToProcess = uncompletedMessages.filter(message => message.destinationDomain !== SOLANA_CHAINID);
+
     const statusRes = await Promise.all(
-      uncompletedMessages.map(async (message) => {
+      messagesToProcess.map(async (message) => {
         const status = await getMessageStatus(message.id, config, message.destinationDomain);
         return { id: message.id, status };
       }),
