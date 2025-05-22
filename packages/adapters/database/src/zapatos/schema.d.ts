@@ -9915,6 +9915,299 @@ declare module 'zapatos/schema' {
   }
 
   /**
+   * **solana_lookup_tables**
+   * - Table in database
+   */
+  export namespace solana_lookup_tables {
+    export type Table = 'solana_lookup_tables';
+    export interface Selectable {
+      /**
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      chain_id: number;
+      /**
+      * **solana_lookup_tables.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at: Date | null;
+      /**
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id: string;
+      /**
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      lookup_table_address: string;
+      /**
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      mint_address: string;
+      /**
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      program_vault_account: string;
+      /**
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      slot: number;
+      /**
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_address: string;
+      /**
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_token_account: string;
+    }
+    export interface JSONSelectable {
+      /**
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      chain_id: number;
+      /**
+      * **solana_lookup_tables.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at: db.TimestampString | null;
+      /**
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id: string;
+      /**
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      lookup_table_address: string;
+      /**
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      mint_address: string;
+      /**
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      program_vault_account: string;
+      /**
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      slot: number;
+      /**
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_address: string;
+      /**
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_token_account: string;
+    }
+    export interface Whereable {
+      /**
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      chain_id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **solana_lookup_tables.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      lookup_table_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      mint_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      program_vault_account?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      slot?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_token_account?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      chain_id: number | db.Parameter<number> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      lookup_table_address: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      mint_address: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      program_vault_account: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      slot: number | db.Parameter<number> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_address: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_token_account: string | db.Parameter<string> | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      chain_id?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      lookup_table_address?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      mint_address?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      program_vault_account?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      slot?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_address?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_token_account?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'solana_lookup_tables_pkey' | 'solana_lookup_tables_user_address_mint_address_key';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
    * **tokens**
    * - Table in database
    */
@@ -10120,20 +10413,20 @@ declare module 'zapatos/schema' {
   /* --- aggregate types --- */
 
   export namespace public {  
-    export type Table = assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | tokens.Table;
-    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | tokens.Selectable;
-    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | tokens.JSONSelectable;
-    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | tokens.Whereable;
-    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | tokens.Insertable;
-    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | tokens.Updatable;
-    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | tokens.UniqueIndex;
-    export type Column = assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | tokens.Column;
+    export type Table = assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | solana_lookup_tables.Table | tokens.Table;
+    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | solana_lookup_tables.Selectable | tokens.Selectable;
+    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | solana_lookup_tables.JSONSelectable | tokens.JSONSelectable;
+    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | solana_lookup_tables.Whereable | tokens.Whereable;
+    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | solana_lookup_tables.Insertable | tokens.Insertable;
+    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | solana_lookup_tables.Updatable | tokens.Updatable;
+    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | solana_lookup_tables.UniqueIndex | tokens.UniqueIndex;
+    export type Column = assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | solana_lookup_tables.Column | tokens.Column;
   
-    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, tokens.Table];
+    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, tokens.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
     export type AllMaterializedViews = [daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, intents.Table, invoices.Table];
-    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, tokens.Table];
+    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, tokens.Table];
   }
 
 
@@ -25526,6 +25819,7 @@ declare module 'zapatos/schema' {
     "rewards": rewards.Selectable;
     "schema_migrations": schema_migrations.Selectable;
     "settlement_intents": settlement_intents.Selectable;
+    "solana_lookup_tables": solana_lookup_tables.Selectable;
     "tokens": tokens.Selectable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Selectable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Selectable;
@@ -25593,6 +25887,7 @@ declare module 'zapatos/schema' {
     "rewards": rewards.JSONSelectable;
     "schema_migrations": schema_migrations.JSONSelectable;
     "settlement_intents": settlement_intents.JSONSelectable;
+    "solana_lookup_tables": solana_lookup_tables.JSONSelectable;
     "tokens": tokens.JSONSelectable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.JSONSelectable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.JSONSelectable;
@@ -25660,6 +25955,7 @@ declare module 'zapatos/schema' {
     "rewards": rewards.Whereable;
     "schema_migrations": schema_migrations.Whereable;
     "settlement_intents": settlement_intents.Whereable;
+    "solana_lookup_tables": solana_lookup_tables.Whereable;
     "tokens": tokens.Whereable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Whereable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Whereable;
@@ -25727,6 +26023,7 @@ declare module 'zapatos/schema' {
     "rewards": rewards.Insertable;
     "schema_migrations": schema_migrations.Insertable;
     "settlement_intents": settlement_intents.Insertable;
+    "solana_lookup_tables": solana_lookup_tables.Insertable;
     "tokens": tokens.Insertable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Insertable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Insertable;
@@ -25794,6 +26091,7 @@ declare module 'zapatos/schema' {
     "rewards": rewards.Updatable;
     "schema_migrations": schema_migrations.Updatable;
     "settlement_intents": settlement_intents.Updatable;
+    "solana_lookup_tables": solana_lookup_tables.Updatable;
     "tokens": tokens.Updatable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Updatable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Updatable;
@@ -25861,6 +26159,7 @@ declare module 'zapatos/schema' {
     "rewards": rewards.UniqueIndex;
     "schema_migrations": schema_migrations.UniqueIndex;
     "settlement_intents": settlement_intents.UniqueIndex;
+    "solana_lookup_tables": solana_lookup_tables.UniqueIndex;
     "tokens": tokens.UniqueIndex;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.UniqueIndex;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.UniqueIndex;
@@ -25928,6 +26227,7 @@ declare module 'zapatos/schema' {
     "rewards": rewards.Column;
     "schema_migrations": schema_migrations.Column;
     "settlement_intents": settlement_intents.Column;
+    "solana_lookup_tables": solana_lookup_tables.Column;
     "tokens": tokens.Column;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Column;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Column;
@@ -25995,6 +26295,7 @@ declare module 'zapatos/schema' {
     "rewards": rewards.SQL;
     "schema_migrations": schema_migrations.SQL;
     "settlement_intents": settlement_intents.SQL;
+    "solana_lookup_tables": solana_lookup_tables.SQL;
     "tokens": tokens.SQL;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.SQL;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.SQL;
