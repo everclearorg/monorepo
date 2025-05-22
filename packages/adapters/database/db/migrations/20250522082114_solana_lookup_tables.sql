@@ -15,4 +15,4 @@ CREATE TABLE public.solana_lookup_tables (
 
 
 -- migrate:down
-
+DROP TABLE IF EXISTS public.solana_lookup_tables;

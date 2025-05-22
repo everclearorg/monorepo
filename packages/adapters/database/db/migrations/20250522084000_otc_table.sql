@@ -1,6 +1,6 @@
 -- migrate:up
 
-CREATE TABLE otc_sale_table (
+CREATE TABLE public.otc_sale_table (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),     -- unique ID per entry
   partner_id TEXT NOT NULL,                          -- identifier for the partner
   origin INTEGER NOT NULL,                           -- origin domain_id
@@ -12,4 +12,4 @@ CREATE TABLE otc_sale_table (
 );
 
 -- migrate:down
-
+DROP TABLE IF EXISTS public.otc_sale_table;
