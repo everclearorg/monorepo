@@ -28,6 +28,7 @@ export const RelayerApiPostTaskRequestParamsSchema = Type.Object({
   data: Type.String(),
   fee: RelayerApiFeeSchema,
   apiKey: Type.String(),
+  funcSig: Type.String(),
 });
 export type RelayerApiPostTaskRequestParams = Static<typeof RelayerApiPostTaskRequestParamsSchema>;
 

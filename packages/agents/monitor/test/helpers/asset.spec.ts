@@ -78,6 +78,7 @@ describe('Helpers:asset', () => {
   let chainreader: SinonStubbedInstance<ChainReader>;
   let decodeStub: SinonStub;
   let encodeStub: SinonStub;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
@@ -85,12 +86,13 @@ describe('Helpers:asset', () => {
     chainreader.readTx.resolves('0x1234');
     encodeStub = stub(Interface.prototype, 'encodeFunctionData').returns('0x1234');
     decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns([['0x1234']]);
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   for (const { name, fn, args, method, inputs, domain, to } of cases) {
     it(`${name} - should work`, async () => {
       await fn(...args);
-      expect(chainreader.readTx).to.be.calledWith({ to, domain, data: '0x1234' }, 'latest');
+      expect(chainreader.readTx).to.be.calledWith({ to, domain, data: '0x1234', funcSig: 'foo()' }, 'latest');
       expect(encodeStub).to.be.calledWith(method, inputs);
       expect(decodeStub).to.be.calledWith(method, '0x1234');
     });

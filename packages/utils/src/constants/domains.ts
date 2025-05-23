@@ -33,6 +33,7 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [146, 146], // Sonic
   [57073, 57073], // Ink
   [1399811149, 1399811149], // Solana
+  [728126428, 728126428], // Tron
 ]);
 
 const TESTNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
@@ -49,6 +50,7 @@ const TESTNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [534351, 534351], // Scroll sepolia
   [6398, 6398], //Everclear sepolia
   [168587773, 168587773], //Blast sepolia
+  [2494104990, 2494104990], // Tron Shasta
 ]);
 
 const DEVNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([

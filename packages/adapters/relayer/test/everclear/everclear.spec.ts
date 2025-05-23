@@ -57,6 +57,7 @@ describe('Everclear Relayer', () => {
           token: constants.AddressZero,
         },
         apiKey: 'foo',
+        funcSig: 'bar()',
       };
       const res = await everclearRelayerSend(
         mockChainId,
@@ -64,6 +65,7 @@ describe('Everclear Relayer', () => {
         params.to,
         params.data,
         '0',
+        params.funcSig,
         'foo',
         chainReaderMock,
         logger,
@@ -83,6 +85,7 @@ describe('Everclear Relayer', () => {
           mkAddress(),
           '0xbeed',
           '0',
+          'bar()',
           'foo',
           chainReaderMock,
           logger,

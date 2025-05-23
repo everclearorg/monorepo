@@ -38,6 +38,7 @@ describe('Helpers:hyperlane', () => {
   let chainreader: SinonStubbedInstance<ChainReader>;
   let decodeStub: SinonStub;
   let database: SinonStubbedInstance<Database>;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   describe('#getMessageStatus', () => {
     beforeEach(() => {
@@ -48,6 +49,7 @@ describe('Helpers:hyperlane', () => {
         getEventTopic: stub().returns(mkHash('0xtopic')) as any,
         parseLog: stub().returns({ args: { message: message.body } } as any) as any,
         encodeFunctionData: stub().returns('0x1234') as any,
+        getFunction: stub().returns(mockGetFunction) as any,
       }));
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
 
@@ -62,6 +64,7 @@ describe('Helpers:hyperlane', () => {
       stub(Interface.prototype, 'getEventTopic').returns(mkHash('0xtopic'));
       stub(Interface.prototype, 'parseLog').returns({ args: { message: message.body } } as any);
       stub(Interface.prototype, 'encodeFunctionData').returns('0x1234');
+      stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
       decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns(['0x1234']);
 
       database = mock.instances.database() as SinonStubbedInstance<Database>;
@@ -118,6 +121,7 @@ describe('Helpers:hyperlane', () => {
           domain: 1338,
           data: '0x1234',
           value: '0',
+          funcSig: 'foo()',
         },
       });
     });
@@ -143,6 +147,7 @@ describe('Helpers:hyperlane', () => {
         data: '0x1234',
         domain: +mock.message().destinationDomain!,
         value: '0',
+        funcSig: 'foo()',
       });
     });
   });
