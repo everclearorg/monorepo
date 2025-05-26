@@ -17,8 +17,12 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
     config.hub.domain,
   ];
   const subgraphBlockNumbers = await subgraph.getLatestBlockNumber(domains);
-  const threshold = config.thresholds.maxDelayedSubgraphBlock ?? 0;
+
   for (const domainId of domains) {
+    // Get chain-specific threshold or fall back to global default
+    const chainConfig = domainId === config.hub.domain ? config.hub : config.chains[domainId];
+    const threshold = chainConfig.maxDelayedSubgraphBlock ?? config.thresholds.maxDelayedSubgraphBlock ?? 0;
+
     const subgraphBlockNumber = subgraphBlockNumbers.has(domainId) ? subgraphBlockNumbers.get(domainId)! : 0;
     const rpcBlock = await chainreader.getBlock(+domainId, 'latest');
 
@@ -28,6 +32,7 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
       rpc: rpcBlock.number,
       subgraph: subgraphBlockNumber,
       diff,
+      threshold, // Log the threshold being used
     });
 
     chainStatus.push({
@@ -44,7 +49,7 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
       severity: Severity.Warning,
       type: 'SubgraphDelayed',
       ids: [domainId],
-      reason: `${requestContext.origin}, The subgraph of ${domainId} is behind by a threshold of blocks ${diff}`,
+      reason: `${requestContext.origin}, The subgraph of ${domainId} is behind by ${diff} blocks (threshold: ${threshold})`,
       timestamp: Date.now(),
       logger: logger,
       env: config.environment,
