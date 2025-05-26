@@ -27,15 +27,16 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
       native = Object.entries(config.chains[domainId].assets!).find(([, asset]) => asset.isNative)?.[1];
     }
 
-    // Get thresholds for relayer and gateway
-    const relayerThreshold = utils.parseUnits(
-      (config.thresholds.minGasOnRelayer ?? 0).toString(),
-      native?.decimals ?? 18,
-    );
-    const gatewayThreshold = utils.parseUnits(
-      (config.thresholds.minGasOnGateway ?? 0).toString(),
-      native?.decimals ?? 18,
-    );
+    // Get chain-specific thresholds or fall back to global defaults
+    const chainConfig = domainId === config.hub.domain ? config.hub : config.chains[domainId];
+
+    // Use chain-specific values if available, otherwise fall back to global thresholds
+    const relayerThresholdValue = chainConfig.minGasOnRelayer ?? config.thresholds.minGasOnRelayer ?? 0;
+    const gatewayThresholdValue = chainConfig.minGasOnGateway ?? config.thresholds.minGasOnGateway ?? 0;
+
+    // Parse threshold values with appropriate decimal places
+    const relayerThreshold = utils.parseUnits(relayerThresholdValue.toString(), native?.decimals ?? 18);
+    const gatewayThreshold = utils.parseUnits(gatewayThresholdValue.toString(), native?.decimals ?? 18);
 
     const relayerUrl = config.relayers.find((relayer) => relayer.type === 'Everclear')?.url;
 
@@ -68,6 +69,8 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
       gatewayAddress,
       gatewayGas,
       tokenomicsGatewayGas,
+      relayerThresholdValue,
+      gatewayThresholdValue,
     });
 
     chainGas.push({
