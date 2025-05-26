@@ -85,6 +85,8 @@ const MOCK_CHAINS = {
     },
     confirmations: 3,
     network: 'evm',
+    minGasOnRelayer: 2,
+    minGasOnGateway: 1.5,
     assets: {
       ETH: {
         symbol: 'ETH',
@@ -143,6 +145,8 @@ const MOCK_HUB = {
     rewardDistributor: mkAddress('0x1339bbb'),
     tokenomicsHubGateway: mkAddress('0x1339aaaa'),
   },
+  minGasOnRelayer: 3,
+  minGasOnGateway: 2,
 };
 
 const MOCK_DATABASE = { url: 'postgres.com' };
