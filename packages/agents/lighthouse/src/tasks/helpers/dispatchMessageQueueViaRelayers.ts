@@ -148,9 +148,11 @@ export const dispatchMessageQueueViaRelayers = async (
     const trimmedIntents = sortedContents.slice(i, i + toDequeue);
     if (trimmedIntents.length !== toDequeue) {
       logger.error('Trimmed intents do not match dequeue target', requestContext, methodContext, undefined, {
-        trimmedIntents,
+        trimmedIntents: trimmedIntents.length ? trimmedIntents : '[]',
         toDequeue,
-        sortedContents,
+        sortedContents: sortedContents.length ? sortedContents : '[]',
+        totalIntents,
+        index: i,
       });
       break;
     }

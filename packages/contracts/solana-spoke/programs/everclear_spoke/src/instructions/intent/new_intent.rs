@@ -100,7 +100,7 @@ pub fn new_intent(
     let evm_intent = EVMIntent {
         initiator: ctx.accounts.authority.key().to_bytes(),
         receiver: receiver.to_bytes(),
-        input_asset: input_asset.to_bytes(),
+        input_asset: ctx.accounts.mint.key().to_bytes(),
         output_asset: output_asset.to_bytes(),
         max_fee,              // watch out for 24-bit range if that matters
         origin: state.domain, // your "origin_domain"
@@ -165,7 +165,7 @@ pub fn new_intent(
         message_id: message_id.into(),
         initiator: ctx.accounts.authority.key(),
         receiver,
-        input_asset,
+        input_asset: ctx.accounts.mint.key(),
         output_asset,
         normalized_amount,
         max_fee,

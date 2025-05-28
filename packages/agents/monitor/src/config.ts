@@ -117,13 +117,35 @@ export const getConfig = async (): Promise<MonitorConfig> => {
   const everclearConfig = await getEverclearConfig(everclearConfigUrl);
   if (everclearConfig) cachedEverclearConfig = everclearConfig;
 
+  const hubDomain = configJson?.hub?.domain || configFile?.hub?.domain || everclearConfig?.hub.domain;
+  const hubProviders = configJson?.hub?.providers || configFile?.hub?.providers || everclearConfig?.hub.providers;
+  const hubDeployments =
+    configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments;
+  const hubAssets = configJson?.hub?.assets || configFile?.hub?.assets || everclearConfig?.hub?.assets;
+  const hubSubgraphUrls =
+    configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [];
+
+  // Get hub-specific gas thresholds if provided
+  const hubMinGasOnRelayer =
+    configJson?.hub?.minGasOnRelayer ||
+    configFile?.hub?.minGasOnRelayer ||
+    configJson?.thresholds?.minGasOnRelayer ||
+    configFile?.thresholds?.minGasOnRelayer;
+  const hubMinGasOnGateway =
+    configJson?.hub?.minGasOnGateway ||
+    configFile?.hub?.minGasOnGateway ||
+    configJson?.thresholds?.minGasOnGateway ||
+    configFile?.thresholds?.minGasOnGateway;
+
   const hubConfig = {
-    domain: configJson?.hub?.domain || configFile?.hub?.domain || everclearConfig?.hub.domain,
-    providers: configJson?.hub?.providers || configFile?.hub?.providers || everclearConfig?.hub.providers,
-    deployments: configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments,
-    assets: configJson?.hub?.assets || configFile?.hub?.assets || everclearConfig?.hub?.assets,
-    subgraphUrls:
-      configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [],
+    domain: hubDomain,
+    providers: hubProviders,
+    deployments: hubDeployments,
+    assets: hubAssets,
+    subgraphUrls: hubSubgraphUrls,
+    // Only include these properties if they were specified
+    ...(hubMinGasOnRelayer !== undefined && { minGasOnRelayer: hubMinGasOnRelayer }),
+    ...(hubMinGasOnGateway !== undefined && { minGasOnGateway: hubMinGasOnGateway }),
   };
 
   const environment = configJson.environment || configFile.environment || 'production';
@@ -149,6 +171,10 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     const assets: any = localChainConfig?.assets || everclearChainConfig?.assets || {};
     const network: string = localChainConfig?.network || everclearChainConfig?.network || 'evm';
 
+    // Include chain-specific gas thresholds if provided
+    const minGasOnRelayer = localChainConfig?.minGasOnRelayer || localThresholds?.minGasOnRelayer;
+    const minGasOnGateway = localChainConfig?.minGasOnGateway || localThresholds?.minGasOnGateway;
+
     chainsForMonitorConfig[domainId] = {
       providers,
       subgraphUrls,
@@ -156,6 +182,9 @@ export const getConfig = async (): Promise<MonitorConfig> => {
       deployments,
       assets,
       network,
+      // Only include these properties if they were specified
+      ...(minGasOnRelayer !== undefined && { minGasOnRelayer }),
+      ...(minGasOnGateway !== undefined && { minGasOnGateway }),
     };
   }
 
