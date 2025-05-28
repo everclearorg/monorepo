@@ -96,13 +96,14 @@ export const pollCache = async () => {
         continue;
       }
 
-      const { data, to, fee } = task;
+      const { data, to, fee, funcSig } = task;
       const transaction: WriteTransaction = {
         domain,
         to,
         data,
         from: await wallet.getAddress(),
         value: fee.amount ?? '0',
+        funcSig,
       };
       logger.debug(`Attempting to submit transaction`, requestContext, methodContext, {
         transaction,

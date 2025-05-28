@@ -62,6 +62,7 @@ export const getMessageStatus = async (
       to: gateway,
       domain: +message.destinationDomain,
       data: gatewayIface.encodeFunctionData('mailbox'),
+      funcSig: gatewayIface.getFunction('mailbox').format(),
     },
     'latest',
   );
@@ -112,6 +113,7 @@ export const getMessageStatus = async (
         hyperlaneMessage,
       ]),
       value: '0',
+      funcSig: iface.getFunction('process').format(),
     };
     logger.debug('Estimating gas for hyperlane relay tx', requestContext, methodContext, { tx });
     const gas = await chainreader.getGasEstimateWithRevertCode(tx);

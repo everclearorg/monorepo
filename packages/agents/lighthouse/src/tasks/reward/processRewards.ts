@@ -27,7 +27,12 @@ export const getGenesisEpoch = async (): Promise<number> => {
   const iface = new Interface(abis.hub.gauge);
   const encodedData = iface.encodeFunctionData('genesisEpoch', []);
   const res = await chainservice.readTx(
-    { to: hub.deployments.gauge, domain: +hub.domain, data: encodedData },
+    {
+      to: hub.deployments.gauge,
+      domain: +hub.domain,
+      data: encodedData,
+      funcSig: iface.getFunction('genesisEpoch').format(),
+    },
     'latest',
   );
 
@@ -43,7 +48,12 @@ export const getEpochDuration = async (): Promise<number> => {
   const iface = new Interface(abis.hub.gauge);
   const encodedData = iface.encodeFunctionData('EPOCH_DURATION', []);
   const res = await chainservice.readTx(
-    { to: hub.deployments.gauge, domain: +hub.domain, data: encodedData },
+    {
+      to: hub.deployments.gauge,
+      domain: +hub.domain,
+      data: encodedData,
+      funcSig: iface.getFunction('EPOCH_DURATION').format(),
+    },
     'latest',
   );
 
@@ -59,7 +69,12 @@ export const getRewardDistributorUpdateCount = async (assetAddress: string) => {
   const iface = new Interface(abis.hub.rewardDistributor);
   const encodedData = iface.encodeFunctionData('rewards', [assetAddress]);
   const res = await chainservice.readTx(
-    { to: hub.deployments.rewardDistributor, domain: +hub.domain, data: encodedData },
+    {
+      to: hub.deployments.rewardDistributor,
+      domain: +hub.domain,
+      data: encodedData,
+      funcSig: iface.getFunction('rewards').format(),
+    },
     'latest',
   );
 
@@ -246,18 +261,21 @@ export const processRewards = async () => {
   const rewards = [];
   for (const user in volumeMetadata.userVolume) {
     for (const domain in volumeMetadata.userVolume[user].epochResult) {
-      const clearEmissions = rewardsConfig.clearAssetAddress && volumeMetadata.userVolume[user]?.epochResult[domain]?.emissions[rewardsConfig.clearAssetAddress]
-        ? volumeMetadata.userVolume[user].epochResult[domain].emissions[rewardsConfig.clearAssetAddress]
-        : 0;
+      const clearEmissions =
+        rewardsConfig.clearAssetAddress &&
+        volumeMetadata.userVolume[user]?.epochResult[domain]?.emissions[rewardsConfig.clearAssetAddress]
+          ? volumeMetadata.userVolume[user].epochResult[domain].emissions[rewardsConfig.clearAssetAddress]
+          : 0;
       epochResults.push({
         account: user,
         domain: domain,
         userVolume: volumeMetadata.userVolume[user].epochResult[domain].scaledUserVolume.toString(),
         totalVolume: volumeMetadata.totalVolume[domain].toString(),
         clearEmissions: clearEmissions.toString(),
-        cumulativeRewards: rewardsConfig.clearAssetAddress && rewardDist[rewardsConfig.clearAssetAddress][user]
-          ? rewardDist[rewardsConfig.clearAssetAddress][user].toString()
-          : '0',
+        cumulativeRewards:
+          rewardsConfig.clearAssetAddress && rewardDist[rewardsConfig.clearAssetAddress][user]
+            ? rewardDist[rewardsConfig.clearAssetAddress][user].toString()
+            : '0',
         epochTimestamp: new Date(epoch * 1000),
       });
     }

@@ -8,6 +8,7 @@ import {
   ITransactionReceipt,
 } from '../types';
 import { getEthRpcProvider } from './eth';
+import { getTronRpcProvider } from './tron';
 export { SyncProvider } from './eth';
 
 // VM Type mappings
@@ -16,6 +17,7 @@ export { SyncProvider } from './eth';
 // NOTE: These can be used to strongly type the RpcProvider responses
 export const SupportedVms = {
   evm: 'evm',
+  tvm: 'tvm',
 } as const;
 export type SupportedVm = (typeof SupportedVms)[keyof typeof SupportedVms];
 
@@ -85,7 +87,13 @@ export const getVmFromDomainId = (domainId: number): SupportedVm => {
   if (domainId === 0) {
     throw new Error(`Invalid domain id: ${domainId}`);
   }
-  return 'evm';
+  switch (domainId) {
+    case 728126428:
+    case 2494104990:
+      return SupportedVms.tvm;
+    default:
+      return SupportedVms.evm;
+  }
 };
 
 /**
@@ -97,6 +105,8 @@ export const getRpcClient = (domainId: number, url: string): RpcProvider => {
   switch (vm) {
     case SupportedVms.evm:
       return getEthRpcProvider(domainId, url);
+    case SupportedVms.tvm:
+      return getTronRpcProvider(domainId, url);
     default:
       throw new Error(`Unsupported vm: ${vm}`);
   }

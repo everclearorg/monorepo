@@ -4,6 +4,7 @@ export type ReadTransaction = {
   domain: number;
   to: string;
   data: string;
+  funcSig: string;
 };
 
 export type WriteTransaction = {
@@ -44,6 +45,7 @@ export interface ITransactionRequest {
   gasLimit?: string;
   gasPrice?: string;
   maxFeePerGas?: string;
+  funcSig: string;
 }
 export interface ITransactionResponse {
   hash: string;

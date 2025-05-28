@@ -29,7 +29,7 @@ class BaseSyncProvider extends StaticJsonRpcProvider {
   public reliability = 1.0;
 
   // Used for tracking how many calls we've made in the last second.
-  private cpsTimestamps: number[] = [];
+  public cpsTimestamps: number[] = [];
   public get cps(): number {
     // Average CPS over the last 10 seconds.
     const now = Date.now();
@@ -52,11 +52,14 @@ class BaseSyncProvider extends StaticJsonRpcProvider {
   public get syncedBlockNumber(): number {
     return this._syncedBlockNumber;
   }
+  public set syncedBlockNumber(value: number) {
+    this._syncedBlockNumber = value;
+  }
 
   constructor(
     _connectionInfo: utils.ConnectionInfo | string,
     public readonly domain: number,
-    private readonly stallTimeout = 10_000,
+    public readonly stallTimeout = 10_000,
     private readonly debugLogging = false,
   ) {
     // NOTE: super (StaticJsonRpc) uses the hard-coded chainId when instantiated for all future
@@ -171,7 +174,7 @@ class BaseSyncProvider extends StaticJsonRpcProvider {
     });
   }
 
-  private updateMetrics(
+  public updateMetrics(
     success: boolean,
     sendTimestamp: number,
     iteration: number,
@@ -274,8 +277,16 @@ export class SyncProvider implements RpcProvider {
     return this.provider.syncedBlockNumber;
   }
 
+  public set syncedBlockNumber(value: number) {
+    this.provider.syncedBlockNumber = value;
+  }
+
   public get internalProvider(): BaseSyncProvider {
     return this.provider;
+  }
+
+  public get stallTimeout(): number {
+    return this.provider.stallTimeout;
   }
 
   // Env Methods

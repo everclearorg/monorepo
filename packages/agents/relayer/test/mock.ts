@@ -86,6 +86,7 @@ export const createTask = (overrides: Partial<CachedTaskData> = {}): CachedTaskD
       token: mkAddress(),
       chain: 1338,
     },
+    funcSig: 'foo()',
     ...overrides,
   };
 };

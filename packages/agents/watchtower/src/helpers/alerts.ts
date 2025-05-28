@@ -42,6 +42,7 @@ export async function sendAlerts(
 
   await Promise.allSettled(alertPromises);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { logger: _, ...toLog } = report;
 
   logger.warn('Alerts sent!!!', requestContext, methodContext, { report: toLog });
