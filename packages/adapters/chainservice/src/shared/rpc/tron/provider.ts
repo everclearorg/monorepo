@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber, constants } from 'ethers';
+import { BigNumber, constants, utils } from 'ethers';
 import { Block, TransactionReceipt, TransactionResponse } from '@ethersproject/abstract-provider';
-import { ISigner, ITransactionRequest, ITransactionResponse, ReadTransaction, WriteTransaction } from '../../types';
+import {
+  ISigner,
+  ISignerApi,
+  ITransactionRequest,
+  ITransactionResponse,
+  ReadTransaction,
+  WriteTransaction,
+} from '../../types';
 import { SyncProvider } from '../eth';
 import { GasEstimateInvalid, TransactionReadError } from '../../errors';
 import { TronWeb } from '../../../mockable';
@@ -40,8 +47,15 @@ function decodeParameters(data: string, funcSig: string, value?: string): Contra
   }));
 }
 
-class TronWebSigner implements ISigner {
-  constructor(private readonly tronWeb: TronWebInstance) {}
+class TronWeb3Signer implements ISigner {
+  constructor(
+    private readonly tronWeb: TronWebInstance,
+    private readonly api?: ISignerApi,
+  ) {}
+
+  public get signerApi(): ISignerApi | undefined {
+    return this.api;
+  }
 
   public async getAddress(): Promise<string> {
     return this.tronWeb.defaultAddress.hex as string;
@@ -71,7 +85,17 @@ class TronWebSigner implements ISigner {
     }
 
     // Sign and broadcast the transaction
-    const signedTx = await this.tronWeb.trx.sign(tx.transaction);
+    let signedTx: any;
+    if (this.api) {
+      // Use the signer API to sign the transaction
+      signedTx = tx.transaction;
+      const identifier = await this.api.getPublicKey();
+      const signature = await this.api.sign(identifier, utils.arrayify(signedTx.txID));
+      signedTx.signature = [signature];
+    } else {
+      // Sign using TronWeb directly
+      signedTx = await this.tronWeb.trx.sign(tx.transaction);
+    }
     const result = await this.tronWeb.trx.sendRawTransaction(signedTx);
 
     // Get transaction info to calculate confirmations
@@ -303,9 +327,9 @@ export class TronSyncProvider extends SyncProvider {
   public getSigner(signer: ISigner | string): ISigner {
     if (typeof signer === 'string') {
       this.tronWeb.setPrivateKey(signer);
-      return new TronWebSigner(this.tronWeb);
+      return new TronWeb3Signer(this.tronWeb);
     }
-    return signer;
+    return new TronWeb3Signer(this.tronWeb, signer.signerApi);
   }
 
   public connect(signer: ISigner | string): ISigner {

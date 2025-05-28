@@ -1,4 +1,4 @@
-import { BigNumberish, utils } from 'ethers';
+import { BigNumberish, Bytes, utils } from 'ethers';
 
 export type ReadTransaction = {
   domain: number;
@@ -25,10 +25,16 @@ export type Gas = {
   maxPriorityFeePerGas?: string;
 };
 
+export interface ISignerApi {
+  getPublicKey: () => Promise<string>;
+  sign: (identifier: string, data: string | Bytes) => Promise<string>;
+}
+
 // Note: This is the minimum required fields for a block as used in the txservice
 export interface ISigner {
   getAddress: () => Promise<string>;
   sendTransaction: (transaction: ITransactionRequest) => Promise<ITransactionResponse>;
+  signerApi?: ISignerApi;
 }
 export interface IBlock {
   hash: string;
