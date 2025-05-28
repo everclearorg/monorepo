@@ -2,8 +2,8 @@ import { expect } from 'chai';
 import { stub, SinonStub, restore } from 'sinon';
 import { TronSyncProvider, TronWebFactory } from '../../../../src/shared/rpc/tron/provider';
 import { TronWeb } from 'tronweb';
-import { BigNumber } from 'ethers';
-import { ISigner, StallTimeout } from '../../../../src';
+import { BigNumber, Bytes } from 'ethers';
+import { ISigner, ISignerApi } from '../../../../src';
 import { TEST_ERROR, TEST_SENDER_DOMAIN } from '../../../utils';
 
 // Define types for our mock objects
@@ -742,7 +742,11 @@ describe('TronSyncProvider', () => {
       expect(result).to.exist;
     });
 
-    it('should return original signer for ISigner input', () => {
+    it('should set signer API and return tronWeb instance', () => {
+      const mockSignerApi = {
+        getPublicKey: () => Promise.resolve('0xpublickey'),
+        sign: (identifier: string, data: string | Bytes) => Promise.resolve('signed_data')
+      };
       const mockSigner: ISigner = {
         getAddress: () => Promise.resolve('0x123'),
         sendTransaction: () => Promise.resolve({
@@ -751,16 +755,39 @@ describe('TronSyncProvider', () => {
           nonce: 0,
           gasPrice: BigNumber.from(1),
           gasLimit: BigNumber.from(0)
-        })
+        }),
+        signerApi: mockSignerApi,
       };
       const result = provider.getSigner(mockSigner);
-      expect(result).to.equal(mockSigner);
+      expect(result.signerApi).to.equal(mockSignerApi);
     });
 
-    it('should handle connect similar to getSigner', () => {
-      const result = provider.connect('private_key');
-      expect(mockTronWeb.setPrivateKey.calledWith('private_key')).to.be.true;
-      expect(result).to.exist;
+    describe('should handle connect similar to getSigner', () => {
+      it('should set private key and return tronWeb instance for string signer', () => {
+        const result = provider.connect('private_key');
+        expect(mockTronWeb.setPrivateKey.calledWith('private_key')).to.be.true;
+        expect(result).to.exist;
+      });
+
+      it('should set signer API and return tronWeb instance', () => {
+        const mockSignerApi = {
+          getPublicKey: () => Promise.resolve('0xpublickey'),
+          sign: (identifier: string, data: string | Bytes) => Promise.resolve('signed_data')
+        };
+        const mockSigner: ISigner = {
+          getAddress: () => Promise.resolve('0x123'),
+          sendTransaction: () => Promise.resolve({
+            hash: '0x123',
+            confirmations: 0,
+            nonce: 0,
+            gasPrice: BigNumber.from(1),
+            gasLimit: BigNumber.from(0)
+          }),
+          signerApi: mockSignerApi,
+        };
+        const result = provider.connect(mockSigner);
+        expect(result.signerApi).to.equal(mockSignerApi);
+      });
     });
   });
 
@@ -790,14 +817,21 @@ describe('TronSyncProvider', () => {
     });
   });
 
-  describe('TronWebSigner', () => {
-    let signer: ISigner;
+  describe('TronWeb3Signer', () => {
+    const getPublicKeyStub: SinonStub = stub().resolves('mockPublicKey');
+    const signStub: SinonStub = stub().resolves('mockSignature');
+    const mockSignerApi: ISignerApi = {
+      getPublicKey: getPublicKeyStub,
+      sign: (identifier: string, data: string | Bytes) => signStub(identifier, data),
+    };
 
     beforeEach(() => {
-      signer = provider.getSigner('private_key');
+      // Reset stubs before each test
+      getPublicKeyStub.resetHistory();
+      signStub.resetHistory();
     });
 
-    it('should handle TRX transfer when data is empty', async () => {
+    it('should handle TRX transfer when signer API is not set', async () => {
       const tx = {
         to: '0xrecipient',
         value: '1000000',
@@ -807,9 +841,7 @@ describe('TronSyncProvider', () => {
       };
 
       mockTronWeb.transactionBuilder.sendTrx.resolves({
-        transaction: {
-          // Mock transaction object
-        }
+        txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
       });
 
       mockTronWeb.trx.sign.resolves('signed_tx');
@@ -824,6 +856,18 @@ describe('TronSyncProvider', () => {
           }
         }
       });
+
+      const mockSigner: ISigner = {
+        getAddress: () => Promise.resolve('0x123'),
+        sendTransaction: () => Promise.resolve({
+          hash: '0x123',
+          confirmations: 0,
+          nonce: 0,
+          gasPrice: BigNumber.from(1),
+          gasLimit: BigNumber.from(0)
+        }),
+      };
+      const signer = provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -840,6 +884,207 @@ describe('TronSyncProvider', () => {
         '0xrecipient',
         1000000,
       ]);
+      expect(getPublicKeyStub.notCalled).to.be.true;
+      expect(signStub.notCalled).to.be.true;
+    });
+
+    it('should handle TRX transfer when signer API is set', async () => {
+      const tx = {
+        to: '0xrecipient',
+        value: '1000000',
+        gasLimit: '100000',
+        data: '', // Empty data indicates TRX transfer
+        funcSig: '' // Required by ITransactionRequest
+      };
+
+      mockTronWeb.transactionBuilder.sendTrx.resolves({
+        txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
+      });
+
+      mockTronWeb.trx.sendRawTransaction.resolves({ txid: '0x1234567890123456789012345678901234567890123456789012345678901234' });
+      mockTronWeb.trx.getTransactionInfo.resolves({
+        blockNumber: 12340
+      });
+      mockTronWeb.trx.getCurrentBlock.resolves({
+        block_header: {
+          raw_data: {
+            number: 12345
+          }
+        }
+      });
+
+      const mockSigner: ISigner = {
+        getAddress: () => Promise.resolve('0x123'),
+        sendTransaction: () => Promise.resolve({
+          hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
+          confirmations: 0,
+          nonce: 0,
+          gasPrice: BigNumber.from(1),
+          gasLimit: BigNumber.from(0)
+        }),
+        signerApi: mockSignerApi,
+      };
+      const signer = provider.getSigner(mockSigner);
+
+      const result = await signer.sendTransaction(tx);
+
+      expect(result).to.deep.include({
+        hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
+        confirmations: 5,
+        nonce: 0,
+        gasPrice: BigNumber.from(1),
+        gasLimit: '100000'
+      });
+
+      expect(mockTronWeb.transactionBuilder.sendTrx.calledOnce).to.be.true;
+      expect(mockTronWeb.transactionBuilder.sendTrx.firstCall.args).to.deep.equal([
+        '0xrecipient',
+        1000000,
+      ]);
+      expect(getPublicKeyStub.calledOnce).to.be.true;
+      expect(signStub.calledOnce).to.be.true;
+    });
+
+    it('should call smart contract when signer API is not set', async () => {
+      const tx = {
+        to: '0xcontract',
+        value: '1000000',
+        gasLimit: '100000',
+        data: '0xa9059cbb000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
+        funcSig: 'transfer(address,uint256)'
+      };
+
+      mockTronWeb.transactionBuilder.triggerSmartContract.resolves({
+        transaction: {
+          txID: '0x1234567890123456789012345678901234567890123456789012345678901234'
+        }
+      });
+
+      const signedTx = {
+        txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
+        signature: ['0x1234567890123456789012345678901234567890123456789012345678901234']
+      };
+      mockTronWeb.trx.sign.resolves(signedTx);
+      mockTronWeb.trx.sendRawTransaction.resolves({ txid: '0x1234567890123456789012345678901234567890123456789012345678901234' });
+      mockTronWeb.trx.getTransactionInfo.resolves({
+        blockNumber: 12340
+      });
+      mockTronWeb.trx.getCurrentBlock.resolves({
+        block_header: {
+          raw_data: {
+            number: 12345
+          }
+        }
+      });
+
+      const mockSigner: ISigner = {
+        getAddress: () => Promise.resolve('0x123'),
+        sendTransaction: () => Promise.resolve({
+          hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
+          confirmations: 0,
+          nonce: 0,
+          gasPrice: BigNumber.from(1),
+          gasLimit: BigNumber.from(0)
+        }),
+      };
+      const signer = provider.getSigner(mockSigner);
+
+      const result = await signer.sendTransaction(tx);
+
+      expect(result).to.deep.include({
+        hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
+        confirmations: 5,
+        nonce: 0,
+        gasPrice: BigNumber.from(1),
+        gasLimit: '100000'
+      });
+
+      expect(mockTronWeb.transactionBuilder.triggerSmartContract.calledOnce).to.be.true;
+      expect(mockTronWeb.transactionBuilder.triggerSmartContract.firstCall.args).to.deep.equal([
+        '0xcontract',
+        'transfer(address,uint256)',
+        {
+          feeLimit: 100000,
+          callValue: 1000000
+        },
+        [
+          { type: 'address', value: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
+          { type: 'uint256', value: '1000000000000000000' }
+        ],
+        '0x1234567890123456789012345678901234567890'
+      ]);
+      expect(mockTronWeb.trx.sign.calledOnce).to.be.true;
+      expect(getPublicKeyStub.notCalled).to.be.true;
+      expect(signStub.notCalled).to.be.true;
+    });
+
+    it('should call smart contract when signer API is set', async () => {
+      const tx = {
+        to: '0xcontract',
+        value: '1000000',
+        gasLimit: '100000',
+        data: '0xa9059cbb000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
+        funcSig: 'transfer(address,uint256)'
+      };
+
+      mockTronWeb.transactionBuilder.triggerSmartContract.resolves({
+        transaction: {
+          txID: '0x1234567890123456789012345678901234567890123456789012345678901234'
+        }
+      });
+
+      mockTronWeb.trx.sendRawTransaction.resolves({ txid: '0x1234567890123456789012345678901234567890123456789012345678901234' });
+      mockTronWeb.trx.getTransactionInfo.resolves({
+        blockNumber: 12340
+      });
+      mockTronWeb.trx.getCurrentBlock.resolves({
+        block_header: {
+          raw_data: {
+            number: 12345
+          }
+        }
+      });
+
+      const mockSigner: ISigner = {
+        getAddress: () => Promise.resolve('0x123'),
+        sendTransaction: () => Promise.resolve({
+          hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
+          confirmations: 0,
+          nonce: 0,
+          gasPrice: BigNumber.from(1),
+          gasLimit: BigNumber.from(0)
+        }),
+        signerApi: mockSignerApi,
+      };
+      const signer = provider.getSigner(mockSigner);
+
+      const result = await signer.sendTransaction(tx);
+
+      expect(result).to.deep.include({
+        hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
+        confirmations: 5,
+        nonce: 0,
+        gasPrice: BigNumber.from(1),
+        gasLimit: '100000'
+      });
+
+      expect(mockTronWeb.transactionBuilder.triggerSmartContract.calledOnce).to.be.true;
+      expect(mockTronWeb.transactionBuilder.triggerSmartContract.firstCall.args).to.deep.equal([
+        '0xcontract',
+        'transfer(address,uint256)',
+        {
+          feeLimit: 100000,
+          callValue: 1000000
+        },
+        [
+          { type: 'address', value: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
+          { type: 'uint256', value: '1000000000000000000' }
+        ],
+        '0x1234567890123456789012345678901234567890'
+      ]);
+      expect(mockTronWeb.trx.sign.called).to.be.false;
+      expect(getPublicKeyStub.calledOnce).to.be.true;
+      expect(signStub.calledOnce).to.be.true;
     });
   });
 }); 
