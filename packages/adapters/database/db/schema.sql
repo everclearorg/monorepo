@@ -24,13 +24,6 @@ COMMENT ON EXTENSION pg_cron IS 'Job scheduler for PostgreSQL';
 
 
 --
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
--- *not* creating schema, since initdb creates it
-
-
---
 -- Name: solana; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -1234,31 +1227,31 @@ CREATE MATERIALIZED VIEW public.daily_metrics_by_chains_tokens AS
            FROM (netted_final n
              FULL JOIN settled_final s ON (((n.day = s.day) AND (n.from_chain_id = s.from_chain_id) AND (n.to_chain_id = s.to_chain_id) AND ((n.from_asset_address)::text = (s.from_asset_address)::text) AND ((n.to_asset_address)::text = (s.to_asset_address)::text))))
         )
- SELECT combined.day,
-    combined.from_chain_id,
-    combined.from_asset_address,
-    combined.from_asset_symbol,
-    combined.to_chain_id,
-    combined.to_asset_address,
-    combined.to_asset_symbol,
-    combined.netting_volume,
-    combined.netting_avg_intent_size,
-    combined.netting_protocol_revenue,
-    combined.netting_total_intents,
-    combined.netting_avg_time_in_hrs,
-    combined.volume_settled_by_mm,
-    combined.total_intents_by_mm,
-    combined.discounts_by_mm,
-    combined.avg_discounts_by_mm,
-    combined.rewards_for_invoices,
-    combined.avg_rewards_by_invoice,
-    combined.avg_settlement_time_in_hrs_by_mm,
-    combined.apy,
-    combined.avg_discount_epoch_by_mm,
-    combined.total_volume,
-    combined.total_intents,
-    combined.total_protocol_revenue,
-    combined.total_rebalancing_fee
+ SELECT day,
+    from_chain_id,
+    from_asset_address,
+    from_asset_symbol,
+    to_chain_id,
+    to_asset_address,
+    to_asset_symbol,
+    netting_volume,
+    netting_avg_intent_size,
+    netting_protocol_revenue,
+    netting_total_intents,
+    netting_avg_time_in_hrs,
+    volume_settled_by_mm,
+    total_intents_by_mm,
+    discounts_by_mm,
+    avg_discounts_by_mm,
+    rewards_for_invoices,
+    avg_rewards_by_invoice,
+    avg_settlement_time_in_hrs_by_mm,
+    apy,
+    avg_discount_epoch_by_mm,
+    total_volume,
+    total_intents,
+    total_protocol_revenue,
+    total_rebalancing_fee
    FROM combined
   WITH NO DATA;
 
@@ -1741,6 +1734,22 @@ ALTER SEQUENCE public.origin_intents_status_log_id_seq OWNED BY public.origin_in
 
 
 --
+-- Name: otc_sale_table; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.otc_sale_table (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    partner_id text NOT NULL,
+    origin integer NOT NULL,
+    destination integer[] NOT NULL,
+    token text NOT NULL,
+    amount text NOT NULL,
+    total_fee text NOT NULL,
+    created_at timestamp without time zone DEFAULT now()
+);
+
+
+--
 -- Name: queues; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1855,6 +1864,23 @@ CREATE SEQUENCE public.settlement_intents_auto_id_seq
 --
 
 ALTER SEQUENCE public.settlement_intents_auto_id_seq OWNED BY public.settlement_intents.auto_id;
+
+
+--
+-- Name: solana_lookup_tables; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.solana_lookup_tables (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_address text NOT NULL,
+    mint_address text NOT NULL,
+    user_token_account text NOT NULL,
+    program_vault_account text NOT NULL,
+    lookup_table_address text NOT NULL,
+    created_at timestamp without time zone DEFAULT now(),
+    chain_id integer NOT NULL,
+    slot integer NOT NULL
+);
 
 
 --
@@ -2917,6 +2943,14 @@ ALTER TABLE ONLY public.origin_intents_status_log
 
 
 --
+-- Name: otc_sale_table otc_sale_table_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.otc_sale_table
+    ADD CONSTRAINT otc_sale_table_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: queues queues_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2954,6 +2988,22 @@ ALTER TABLE ONLY public.schema_migrations
 
 ALTER TABLE ONLY public.settlement_intents
     ADD CONSTRAINT settlement_intents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: solana_lookup_tables solana_lookup_tables_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.solana_lookup_tables
+    ADD CONSTRAINT solana_lookup_tables_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: solana_lookup_tables solana_lookup_tables_user_address_mint_address_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.solana_lookup_tables
+    ADD CONSTRAINT solana_lookup_tables_user_address_mint_address_key UNIQUE (user_address, mint_address);
 
 
 --
@@ -3673,4 +3723,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250418195903'),
     ('20250421233253'),
     ('20250423160717'),
-    ('20250430160025');
+    ('20250430160025'),
+    ('20250522082114'),
+    ('20250522084000');
