@@ -19,10 +19,10 @@ locals {
 
   postgrest_env_vars = [
     { name = "PGRST_ADMIN_SERVER_PORT", value = "3001" },
-    # { name = "PGRST_DB_URI", value = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db_replica.db_instance_endpoint}/everclear" },
-    { name = "PGRST_DB_URI", value = "postgres://${var.postgres_user}:${var.postgres_password}@db_read_replica.chimera.mainnet.everclear.ninja/everclear" },
+    { name = "PGRST_DB_URI", value = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear" },
     { name = "PGRST_DB_SCHEMA", value = "public" },
     { name = "PGRST_DB_ANON_ROLE", value = "query" },
+    { name = "PGRST_JWT_SECRET", value = "${var.postgrest_jwt_secret}"},
     { name = "ENVIRONMENT", value = var.environment },
     { name = "STAGE", value = var.stage },
     { name = "PGRST_DB_AGGREGATES_ENABLED", value = "true" }
