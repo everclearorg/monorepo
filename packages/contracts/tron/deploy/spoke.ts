@@ -85,7 +85,7 @@ async function deploySpokeProxy(
   implBytecode: string,
   proxyAbi: unknown[],
   proxyBytecode: string,
-  params: DeploymentParams
+  params: DeploymentParams,
 ): Promise<string> {
   // 1) Deploy the implementation
   const implAddress = await deployContract(implAbi, implBytecode);
@@ -99,24 +99,26 @@ async function deploySpokeProxy(
     callValue: 0,
     parameters: [implAddress, '0x'],
   });
-  const proxyAddress = contractInstance.address;  
+  const proxyAddress = contractInstance.address;
 
   // 3) Call the initialize function on the proxy
   console.log('Initializing Spoke...');
   const spokeInstance = await tronWeb.contract(implAbi, proxyAddress);
 
   // Initialize the spoke
-  await spokeInstance.initialize(
-    [params.gateway,
-    params.executor,
-    params.messageReceiver,
-    params.lighthouse,
-    params.watchtower,
-    params.hubDomain,
-    params.owner]
-  ).send({
-    feeLimit: 1_000_000_000,
-  });
+  await spokeInstance
+    .initialize([
+      params.gateway,
+      params.executor,
+      params.messageReceiver,
+      params.lighthouse,
+      params.watchtower,
+      params.hubDomain,
+      params.owner,
+    ])
+    .send({
+      feeLimit: 1_000_000_000,
+    });
 
   return proxyAddress;
 }
@@ -127,7 +129,7 @@ async function deployGatewayProxy(
   proxyAbi: unknown[],
   proxyBytecode: string,
   params: DeploymentParams,
-  receiver: string
+  receiver: string,
 ): Promise<string> {
   // 1) Deploy the implementation
   const implAddress = await deployContract(implAbi, implBytecode);
@@ -141,23 +143,14 @@ async function deployGatewayProxy(
     callValue: 0,
     parameters: [implAddress, '0x'],
   });
-  const proxyAddress = contractInstance.address; 
+  const proxyAddress = contractInstance.address;
 
   // 3) Call the initialize function on the proxy
   const gatewayInstance = await tronWeb.contract(implAbi, proxyAddress);
 
-  await gatewayInstance
-    .initialize(
-      params.owner,
-      params.mailbox,
-      receiver,
-      params.ism,
-      hubDomain,
-      HUB_GATEWAY
-    )
-    .send({
-      feeLimit: 1_000_000_000,
-    });
+  await gatewayInstance.initialize(params.owner, params.mailbox, receiver, params.ism, hubDomain, HUB_GATEWAY).send({
+    feeLimit: 1_000_000_000,
+  });
 
   console.log(`Gateway proxy deployed at ${proxyAddress}`);
   return proxyAddress;
@@ -190,7 +183,6 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     throw new Error(`Not enough free bandwidth ${availableBandwidth - bandwidthUsage}`);
 }
 
-
 (async () => {
   try {
     // configuring the parameters
@@ -211,7 +203,7 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
       EverclearSpokeArtifact.bytecode,
       ERC1967ProxyArtifact.abi,
       ERC1967ProxyArtifact.bytecode.object,
-      params
+      params,
     );
     console.log('Everclear Spoke (proxy) at:', spokeAddress);
 
@@ -222,7 +214,7 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
       ERC1967ProxyArtifact.abi,
       ERC1967ProxyArtifact.bytecode.object,
       params,
-      spokeAddress
+      spokeAddress,
     );
     console.log('Spoke Gateway (proxy) at:', gatewayAddress);
 
