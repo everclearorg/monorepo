@@ -1,0 +1,17 @@
+[profile.default]
+src = 'src'
+out = 'out'
+zkout = 'zkout'
+libs = ["../lib", "../../../node_modules"]
+compile = true
+fallback_oz = true
+mode = "1"
+
+[profile.zksync]
+zk_version = "1.5.7"
+cache_path = "cache"
+verbosity = 3
+
+fs_permissions = [
+    { access = "read", path = "../../lib" }
+]

@@ -37,6 +37,7 @@ describe('#getGenesisEpoch', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockGenesis = 1734307200;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
@@ -51,6 +52,8 @@ describe('#getGenesisEpoch', () => {
       ...mock.context(),
       config: { ...mock.config() },
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   afterEach(() => {
@@ -73,6 +76,7 @@ describe('#getEpochDuration', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockDuration = 7200;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
@@ -87,6 +91,8 @@ describe('#getEpochDuration', () => {
       ...mock.context(),
       config: { ...mock.config() },
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   afterEach(() => {
@@ -109,6 +115,7 @@ describe('#getRewardDistributorUpdateCount', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockUpdateCount = 25;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
@@ -123,6 +130,8 @@ describe('#getRewardDistributorUpdateCount', () => {
       proof: '0x',
       updateCount: mockUpdateCount
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
 
     getContextStub.returns({
       ...mock.context(),
@@ -153,6 +162,7 @@ describe('#processRewards', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   let processNewLockPositionsStub: SinonStub;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   const genesisEpoch = 1734307200;
   const epochDuration = 7200;
@@ -175,9 +185,17 @@ describe('#processRewards', () => {
   const processRewardsTest = async (data: object) => {
     setup(data);
 
-    await processRewards();
+    try {
+      await processRewards();
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
 
     if (data.epochResults.length) {
+      if (!database.saveEpochResults.calledWith(match(data.epochResults))) {
+        console.error(database.saveEpochResults.getCall(0).firstArg);
+      }
       expect(database.saveEpochResults.calledWith(match(data.epochResults)), "epochResult do not match").to.be.true;
     } else {
       expect(database.saveEpochResults.notCalled, "no epochResult should be saved").to.be.true;
@@ -244,7 +262,13 @@ describe('#processRewards', () => {
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     processNewLockPositionsStub = stub(Mockable, 'processNewLockPositions').resolves(0);
     historicPrice = mock.instances.historicPrice() as SinonStubbedInstance<HistoricPrice>;
-    historicPrice.getHistoricTokenPrice.resolves(2000);
+    historicPrice.getHistoricTokenPrice.callsFake(async (asset, date) => {
+      // return a smaller value if its mock CLEAR
+      if (asset.address == mkAddress('0x678')) {
+        return 0.1
+      }
+      return 2000.0
+    });
 
     encodeFunctionData = stub(Interface.prototype, 'encodeFunctionData');
     encodeFunctionData.returns('0xencoded');
@@ -257,6 +281,8 @@ describe('#processRewards', () => {
       proof: '',
       updateCount: rewardDistributorUpdateCount
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
 
     getContextStub.returns({
       ...mock.context(),
@@ -291,6 +317,10 @@ describe('#processRewards', () => {
       it('with votes', async () => {
         await processRewardsTest(testVector.volumeRewardsOnly.withVotes);
       });
+
+      it('base volume reward is greater than epoch volume reward', async () => {
+        await processRewardsTest(testVector.volumeRewardsOnly.baseRewardGreaterThanEpochReward);
+      });
     });
 
     describe('stake rewards only', () => {
@@ -310,10 +340,6 @@ describe('#processRewards', () => {
   });
 
   describe('should fail', () => {
-    it('not supported asset', async () => {
-      await processRewardsFailureTest(testVector.failures.invalidAssetInIntent, 'Invalid asset');
-    });
-
     it('volume reward asset is not configured', async () => {
       const volumeTokenConfig = mock.config().rewards.volume.tokens[0];
       const volumeTokenAddress = volumeTokenConfig.address;
@@ -322,16 +348,6 @@ describe('#processRewards', () => {
       await processRewardsFailureTest(testVector.failures.volumeAssetIsNotConfigured, 'Invalid asset');
 
       volumeTokenConfig.address = volumeTokenAddress;
-    });
-
-    it('base volume reward is greater than epoch volume reward', async () => {
-      const volumeTokenConfig = mock.config().rewards.volume.tokens[0];
-      const epochVolumeReward = volumeTokenConfig.epochVolumeReward;
-      volumeTokenConfig.epochVolumeReward = '10';
-
-      await processRewardsFailureTest(testVector.failures.baseRewardGreaterThanEpochReward, 'Invalid calculation state');
-
-      volumeTokenConfig.epochVolumeReward = epochVolumeReward;
     });
 
     it('staking reward asset is not configured', async () => {

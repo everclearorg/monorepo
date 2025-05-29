@@ -6,6 +6,7 @@ import { processExpiredIntents } from './clearing';
 import { processRewards, updateRewardsMetadata } from './reward';
 import { processMessageQueue } from './helpers';
 import { QueueType } from '@chimera-monorepo/utils';
+import { processSolanaTransactions } from './solana';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const makeLighthouse = async () => {
@@ -26,6 +27,8 @@ export const makeLighthouse = async () => {
       return makeLighthouseTask(processRewards, config, service);
     case 'reward_metadata':
       return makeLighthouseTask(updateRewardsMetadata, config, service);
+    case 'solana':
+      return makeLighthouseTask(processSolanaTransactions, config, service);
     default:
       throw new InvalidService(service);
   }

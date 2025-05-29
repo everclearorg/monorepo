@@ -31,7 +31,7 @@ import {
   createSpokeFillIntentEventEntity,
   createTokenEntity,
 } from '../mock';
-import { SettlementMessageType } from '../../src/lib/operations/entities';
+import { SettlementMessageType, FeesEntity, OrderEntity } from '../../src/lib/operations/entities';
 
 describe('Subgraph Adapter - parse', () => {
   const domain = '1337';
@@ -62,6 +62,11 @@ describe('Subgraph Adapter - parse', () => {
       gasPrice: entity.gasPrice,
       txOrigin: entity.txOrigin,
       txNonce: +entity.txNonce,
+
+      tokenFee: undefined,
+      nativeFee: undefined,
+      feeAdapterInitiator: undefined,
+      orderId: undefined,
     };
 
     it('should work for added intents', async () => {
@@ -76,6 +81,100 @@ describe('Subgraph Adapter - parse', () => {
         intent: { ...entity.intent, message: { id: messageId } as any },
       });
       expect(parsed).to.be.deep.eq({ ...expected, messageId, status: TIntentStatus.Dispatched });
+    });
+
+    it('should include fee information when present', async () => {
+      const fees: FeesEntity = {
+        id: mkBytes32('0xfees'),
+        intent: { id: entity.intent.id },
+        initiator: mkBytes32('0xfeeInitiator'),
+        tokenFee: '1000',
+        nativeFee: '2000',
+        transactionHash: entity.transactionHash,
+        timestamp: +entity.timestamp,
+        gasPrice: entity.gasPrice,
+        gasLimit: entity.gasLimit,
+        blockNumber: +entity.blockNumber,
+        txOrigin: entity.txOrigin,
+        txNonce: +entity.txNonce,
+      };
+      const parsed = originIntent({
+        ...entity,
+        intent: { ...entity.intent, fees },
+      });
+      expect(parsed).to.be.deep.eq({
+        ...expected,
+        tokenFee: fees.tokenFee,
+        nativeFee: fees.nativeFee,
+        feeAdapterInitiator: fees.initiator,
+      });
+    });
+
+    it('should include order information when present', async () => {
+      const order: OrderEntity = {
+        id: mkBytes32('0xorder'),
+        initiator: mkBytes32('0xorderInitiator'),
+        intents: [{ id: entity.intent.id }],
+        tokenFee: '4000',
+        nativeFee: '3000',
+        transactionHash: entity.transactionHash,
+        timestamp: +entity.timestamp,
+        gasPrice: entity.gasPrice,
+        gasLimit: entity.gasLimit,
+        blockNumber: +entity.blockNumber,
+        txOrigin: entity.txOrigin,
+        txNonce: +entity.txNonce,
+      };
+      const parsed = originIntent({
+        ...entity,
+        intent: { ...entity.intent, order },
+      });
+      expect(parsed).to.be.deep.eq({
+        ...expected,
+        orderId: order.id,
+      });
+    });
+
+    it('should handle both fees and order information together', async () => {
+      const fees: FeesEntity = {
+        id: mkBytes32('0xfees'),
+        intent: { id: entity.intent.id },
+        initiator: mkBytes32('0xfeeInitiator'),
+        tokenFee: '1000',
+        nativeFee: '2000',
+        transactionHash: entity.transactionHash,
+        timestamp: +entity.timestamp,
+        gasPrice: entity.gasPrice,
+        gasLimit: entity.gasLimit,
+        blockNumber: +entity.blockNumber,
+        txOrigin: entity.txOrigin,
+        txNonce: +entity.txNonce,
+      };
+      const order: OrderEntity = {
+        id: mkBytes32('0xorder'),
+        initiator: mkBytes32('0xorderInitiator'),
+        intents: [{ id: entity.intent.id }],
+        tokenFee: '4000',
+        nativeFee: '3000',
+        transactionHash: entity.transactionHash,
+        timestamp: +entity.timestamp,
+        gasPrice: entity.gasPrice,
+        gasLimit: entity.gasLimit,
+        blockNumber: +entity.blockNumber,
+        txOrigin: entity.txOrigin,
+        txNonce: +entity.txNonce,
+      };
+      const parsed = originIntent({
+        ...entity,
+        intent: { ...entity.intent, fees, order },
+      });
+      expect(parsed).to.be.deep.eq({
+        ...expected,
+        tokenFee: fees.tokenFee,
+        nativeFee: fees.nativeFee,
+        feeAdapterInitiator: fees.initiator,
+        orderId: order.id,
+      });
     });
   });
 
@@ -237,7 +336,7 @@ describe('Subgraph Adapter - parse', () => {
         updateVirtualBalance: event.intent.settlement?.updateVirtualBalance ?? undefined,
       });
     });
-    it('should work for the dispatched intent', () => {});
+    it('should work for the dispatched intent', () => { });
   });
 
   describe('#settlementMessage', () => {

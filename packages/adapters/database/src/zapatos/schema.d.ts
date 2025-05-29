@@ -19,9 +19,9 @@ declare module 'zapatos/schema' {
 
   /* --- enums --- */
 
-  export type intent_status = 'ADDED' | 'ADDED_AND_FILLED' | 'ADDED_HUB' | 'ADDED_SPOKE' | 'DEPOSIT_PROCESSED' | 'DISPATCHED' | 'DISPATCHED_HUB' | 'DISPATCHED_SPOKE' | 'DISPATCHED_UNSUPPORTED' | 'FILLED' | 'INVOICED' | 'NONE' | 'SETTLED' | 'SETTLED_AND_COMPLETED' | 'SETTLED_AND_MANUALLY_EXECUTED' | 'UNSUPPORTED' | 'UNSUPPORTED_RETURNED';
+  export type intent_status = 'ADDED' | 'ADDED_AND_FILLED' | 'ADDED_HUB' | 'ADDED_SPOKE' | 'DELIVERED' | 'DEPOSIT_PROCESSED' | 'DISPATCHED' | 'DISPATCHED_HUB' | 'DISPATCHED_SPOKE' | 'DISPATCHED_UNSUPPORTED' | 'FILLED' | 'INVOICED' | 'NONE' | 'SETTLED' | 'SETTLED_AND_COMPLETED' | 'SETTLED_AND_MANUALLY_EXECUTED' | 'UNSUPPORTED' | 'UNSUPPORTED_RETURNED';
   export namespace every {
-    export type intent_status = ['ADDED', 'ADDED_AND_FILLED', 'ADDED_HUB', 'ADDED_SPOKE', 'DEPOSIT_PROCESSED', 'DISPATCHED', 'DISPATCHED_HUB', 'DISPATCHED_SPOKE', 'DISPATCHED_UNSUPPORTED', 'FILLED', 'INVOICED', 'NONE', 'SETTLED', 'SETTLED_AND_COMPLETED', 'SETTLED_AND_MANUALLY_EXECUTED', 'UNSUPPORTED', 'UNSUPPORTED_RETURNED'];
+    export type intent_status = ['ADDED', 'ADDED_AND_FILLED', 'ADDED_HUB', 'ADDED_SPOKE', 'DELIVERED', 'DEPOSIT_PROCESSED', 'DISPATCHED', 'DISPATCHED_HUB', 'DISPATCHED_SPOKE', 'DISPATCHED_UNSUPPORTED', 'FILLED', 'INVOICED', 'NONE', 'SETTLED', 'SETTLED_AND_COMPLETED', 'SETTLED_AND_MANUALLY_EXECUTED', 'UNSUPPORTED', 'UNSUPPORTED_RETURNED'];
   }
   export type message_status = 'delivered' | 'none' | 'pending' | 'relayable';
   export namespace every {
@@ -468,373 +468,6 @@ declare module 'zapatos/schema' {
   }
 
   /**
-   * **closedepochsprocessed**
-   * - Materialized view in database
-   */
-  export namespace closedepochsprocessed {
-    export type Table = 'closedepochsprocessed';
-    export interface Selectable {
-      /**
-      * **closedepochsprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **closedepochsprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **closedepochsprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **closedepochsprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **closedepochsprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **closedepochsprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **closedepochsprocessed.data___last_closed_epoch_processed**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___last_closed_epoch_processed: db.Int8String | null;
-      /**
-      * **closedepochsprocessed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **closedepochsprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **closedepochsprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **closedepochsprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **closedepochsprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **closedepochsprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **closedepochsprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **closedepochsprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **closedepochsprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **closedepochsprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **closedepochsprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **closedepochsprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **closedepochsprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **closedepochsprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **closedepochsprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **closedepochsprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **closedepochsprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **closedepochsprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **closedepochsprocessed.data___last_closed_epoch_processed**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___last_closed_epoch_processed: (number | db.Int8String) | null;
-      /**
-      * **closedepochsprocessed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **closedepochsprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **closedepochsprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **closedepochsprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **closedepochsprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **closedepochsprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **closedepochsprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **closedepochsprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **closedepochsprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **closedepochsprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **closedepochsprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **closedepochsprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **closedepochsprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.data___last_closed_epoch_processed**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___last_closed_epoch_processed?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **closedepochsprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
    * **daily_metrics_by_chains_tokens**
    * - Materialized view in database
    */
@@ -1228,7 +861,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      netting_total_intents?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      netting_total_intents?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **daily_metrics_by_chains_tokens.netting_volume**
       * - `float8` in database
@@ -1264,13 +897,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      total_intents?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      total_intents?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **daily_metrics_by_chains_tokens.total_intents_by_mm**
       * - `int8` in database
       * - Materialized view column
       */
-      total_intents_by_mm?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      total_intents_by_mm?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **daily_metrics_by_chains_tokens.total_protocol_revenue**
       * - `float8` in database
@@ -1613,7 +1246,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      netting_total_intents?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      netting_total_intents?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **daily_metrics_by_date.netting_volume**
       * - `float8` in database
@@ -1631,13 +1264,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      total_intents?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      total_intents?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **daily_metrics_by_date.total_intents_by_mm**
       * - `int8` in database
       * - Materialized view column
       */
-      total_intents_by_mm?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      total_intents_by_mm?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **daily_metrics_by_date.total_protocol_revenue**
       * - `float8` in database
@@ -1662,1172 +1295,6 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       volume_settled_by_mm?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **deposit_enqueued_not_processed**
-   * - Materialized view in database
-   */
-  export namespace deposit_enqueued_not_processed {
-    export type Table = 'deposit_enqueued_not_processed';
-    export interface Selectable {
-      /**
-      * **deposit_enqueued_not_processed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **deposit_enqueued_not_processed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **deposit_enqueued_not_processed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **deposit_enqueued_not_processed.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount: db.NumericString | null;
-      /**
-      * **deposit_enqueued_not_processed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **deposit_enqueued_not_processed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_address: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_log_index: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_number: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_timestamp: Date | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_chain: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___amount_and_rewards: db.NumericString | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___domain: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___epoch: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___intent_id: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___ticker_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_name: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_network: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_0: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_1: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_2: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_3: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_index: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_log_index: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **deposit_enqueued_not_processed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **deposit_enqueued_not_processed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **deposit_enqueued_not_processed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **deposit_enqueued_not_processed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **deposit_enqueued_not_processed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **deposit_enqueued_not_processed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **deposit_enqueued_not_processed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **deposit_enqueued_not_processed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **deposit_enqueued_not_processed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **deposit_enqueued_not_processed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **deposit_enqueued_not_processed.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount: (number | db.NumericString) | null;
-      /**
-      * **deposit_enqueued_not_processed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **deposit_enqueued_not_processed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_address: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_log_index: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_number: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_timestamp: db.TimestampString | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_chain: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___amount_and_rewards: (number | db.NumericString) | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___domain: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___epoch: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___intent_id: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___ticker_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_name: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_network: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_0: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_1: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_2: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_3: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_index: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_log_index: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **deposit_enqueued_not_processed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **deposit_enqueued_not_processed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **deposit_enqueued_not_processed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **deposit_enqueued_not_processed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **deposit_enqueued_not_processed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **deposit_enqueued_not_processed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **deposit_enqueued_not_processed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **deposit_enqueued_not_processed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **deposit_enqueued_not_processed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      depositprocessed_block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___amount_and_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_data___ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.depositprocessed_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      depositprocessed_transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **deposit_enqueued_not_processed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **depositenqueued**
-   * - Materialized view in database
-   */
-  export namespace depositenqueued {
-    export type Table = 'depositenqueued';
-    export interface Selectable {
-      /**
-      * **depositenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **depositenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **depositenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **depositenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **depositenqueued.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **depositenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **depositenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount: db.NumericString | null;
-      /**
-      * **depositenqueued.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain: db.Int8String | null;
-      /**
-      * **depositenqueued.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch: db.Int8String | null;
-      /**
-      * **depositenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **depositenqueued.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **depositenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **depositenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **depositenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **depositenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **depositenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **depositenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **depositenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **depositenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **depositenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **depositenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **depositenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **depositenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **depositenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **depositenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **depositenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **depositenqueued.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **depositenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **depositenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount: (number | db.NumericString) | null;
-      /**
-      * **depositenqueued.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain: (number | db.Int8String) | null;
-      /**
-      * **depositenqueued.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch: (number | db.Int8String) | null;
-      /**
-      * **depositenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **depositenqueued.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **depositenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **depositenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **depositenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **depositenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **depositenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **depositenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **depositenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **depositenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **depositenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **depositenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **depositenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **depositenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
     }
     export interface Insertable {
       [key: string]: never;
@@ -2889,427 +1356,6 @@ declare module 'zapatos/schema' {
       id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
     }
     export type UniqueIndex = 'depositors_pkey';
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **depositprocessed**
-   * - Materialized view in database
-   */
-  export namespace depositprocessed {
-    export type Table = 'depositprocessed';
-    export interface Selectable {
-      /**
-      * **depositprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **depositprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **depositprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **depositprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **depositprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **depositprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **depositprocessed.data___amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount_and_rewards: db.NumericString | null;
-      /**
-      * **depositprocessed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain: db.Int8String | null;
-      /**
-      * **depositprocessed.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch: db.Int8String | null;
-      /**
-      * **depositprocessed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **depositprocessed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **depositprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **depositprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **depositprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **depositprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **depositprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **depositprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **depositprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **depositprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **depositprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **depositprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **depositprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **depositprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **depositprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **depositprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **depositprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **depositprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **depositprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **depositprocessed.data___amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount_and_rewards: (number | db.NumericString) | null;
-      /**
-      * **depositprocessed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain: (number | db.Int8String) | null;
-      /**
-      * **depositprocessed.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch: (number | db.Int8String) | null;
-      /**
-      * **depositprocessed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **depositprocessed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **depositprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **depositprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **depositprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **depositprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **depositprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **depositprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **depositprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **depositprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **depositprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **depositprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **depositprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **depositprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.data___amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount_and_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.data___epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **depositprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
     export type Column = keyof Selectable;
     export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
     export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
@@ -3662,13 +1708,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('destination_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.data**
       * - `text` in database
@@ -3698,13 +1744,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.id**
       * - `bpchar` in database
@@ -3740,7 +1786,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.origin**
       * - `varchar` in database
@@ -3758,7 +1804,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.receiver**
       * - `varchar` in database
@@ -3788,7 +1834,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.transaction_hash**
       * - `bpchar` in database
@@ -3800,13 +1846,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      ttl?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **destination_intents.tx_origin**
       * - `varchar` in database
@@ -3826,13 +1872,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('destination_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment;
       /**
       * **destination_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      block_number: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **destination_intents.data**
       * - `text` in database
@@ -3862,13 +1908,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      gas_limit: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **destination_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      gas_price: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **destination_intents.id**
       * - `bpchar` in database
@@ -3904,7 +1950,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      nonce: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **destination_intents.origin**
       * - `varchar` in database
@@ -3922,7 +1968,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      queue_idx: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      queue_idx: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **destination_intents.receiver**
       * - `varchar` in database
@@ -3952,7 +1998,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      timestamp: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **destination_intents.transaction_hash**
       * - `bpchar` in database
@@ -3964,13 +2010,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      ttl: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      ttl: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **destination_intents.tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      tx_nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **destination_intents.tx_origin**
       * - `varchar` in database
@@ -3990,13 +2036,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('destination_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment>;
       /**
       * **destination_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **destination_intents.data**
       * - `text` in database
@@ -4026,13 +2072,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **destination_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **destination_intents.id**
       * - `bpchar` in database
@@ -4068,7 +2114,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **destination_intents.origin**
       * - `varchar` in database
@@ -4086,7 +2132,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **destination_intents.receiver**
       * - `varchar` in database
@@ -4116,7 +2162,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **destination_intents.transaction_hash**
       * - `bpchar` in database
@@ -4128,13 +2174,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      ttl?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **destination_intents.tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **destination_intents.tx_origin**
       * - `varchar` in database
@@ -4586,1100 +2632,6 @@ declare module 'zapatos/schema' {
   }
 
   /**
-   * **finddepositdomain**
-   * - Materialized view in database
-   */
-  export namespace finddepositdomain {
-    export type Table = 'finddepositdomain';
-    export interface Selectable {
-      /**
-      * **finddepositdomain.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **finddepositdomain.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **finddepositdomain.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **finddepositdomain.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **finddepositdomain.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **finddepositdomain.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **finddepositdomain.data__amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount: db.NumericString | null;
-      /**
-      * **finddepositdomain.data__amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_and_rewards: db.NumericString | null;
-      /**
-      * **finddepositdomain.data__destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__destinations: db.JSONValue | null;
-      /**
-      * **finddepositdomain.data__highest_liquidity_destination**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__highest_liquidity_destination: db.NumericString | null;
-      /**
-      * **finddepositdomain.data__intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__intent_id: string | null;
-      /**
-      * **finddepositdomain.data__is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_deposit: boolean | null;
-      /**
-      * **finddepositdomain.data__liquidity_in_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__liquidity_in_destinations: db.JSONValue | null;
-      /**
-      * **finddepositdomain.data__origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__origin: db.Int8String | null;
-      /**
-      * **finddepositdomain.data__selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_destination: db.Int8String | null;
-      /**
-      * **finddepositdomain.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash: string | null;
-      /**
-      * **finddepositdomain.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **finddepositdomain.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **finddepositdomain.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **finddepositdomain.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **finddepositdomain.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **finddepositdomain.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **finddepositdomain.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **finddepositdomain.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **finddepositdomain.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **finddepositdomain.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **finddepositdomain.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **finddepositdomain.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **finddepositdomain.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **finddepositdomain.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **finddepositdomain.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **finddepositdomain.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **finddepositdomain.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **finddepositdomain.data__amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount: (number | db.NumericString) | null;
-      /**
-      * **finddepositdomain.data__amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_and_rewards: (number | db.NumericString) | null;
-      /**
-      * **finddepositdomain.data__destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__destinations: db.JSONValue | null;
-      /**
-      * **finddepositdomain.data__highest_liquidity_destination**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__highest_liquidity_destination: (number | db.NumericString) | null;
-      /**
-      * **finddepositdomain.data__intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__intent_id: string | null;
-      /**
-      * **finddepositdomain.data__is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_deposit: boolean | null;
-      /**
-      * **finddepositdomain.data__liquidity_in_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__liquidity_in_destinations: db.JSONValue | null;
-      /**
-      * **finddepositdomain.data__origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__origin: (number | db.Int8String) | null;
-      /**
-      * **finddepositdomain.data__selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_destination: (number | db.Int8String) | null;
-      /**
-      * **finddepositdomain.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash: string | null;
-      /**
-      * **finddepositdomain.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **finddepositdomain.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **finddepositdomain.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **finddepositdomain.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **finddepositdomain.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **finddepositdomain.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **finddepositdomain.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **finddepositdomain.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **finddepositdomain.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **finddepositdomain.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **finddepositdomain.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **finddepositdomain.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_and_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__destinations?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__highest_liquidity_destination**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__highest_liquidity_destination?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_deposit?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__liquidity_in_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__liquidity_in_destinations?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__origin?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_destination?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **finddepositdomain.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **findinvoicedomain**
-   * - Materialized view in database
-   */
-  export namespace findinvoicedomain {
-    export type Table = 'findinvoicedomain';
-    export interface Selectable {
-      /**
-      * **findinvoicedomain.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **findinvoicedomain.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **findinvoicedomain.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **findinvoicedomain.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **findinvoicedomain.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **findinvoicedomain.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **findinvoicedomain.data__amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_after_discount: db.NumericString | null;
-      /**
-      * **findinvoicedomain.data__amount_to_be_discoutned**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_to_be_discoutned: db.NumericString | null;
-      /**
-      * **findinvoicedomain.data__current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__current_epoch: db.Int8String | null;
-      /**
-      * **findinvoicedomain.data__discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      data__discount_dbps: number | null;
-      /**
-      * **findinvoicedomain.data__domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__domain: db.Int8String | null;
-      /**
-      * **findinvoicedomain.data__entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__entry_epoch: db.Int8String | null;
-      /**
-      * **findinvoicedomain.data__invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__invoice_amount: db.NumericString | null;
-      /**
-      * **findinvoicedomain.data__invoice_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_intent_id: string | null;
-      /**
-      * **findinvoicedomain.data__invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_owner: string | null;
-      /**
-      * **findinvoicedomain.data__liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__liquidity: db.NumericString | null;
-      /**
-      * **findinvoicedomain.data__rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__rewards_for_depositors: db.NumericString | null;
-      /**
-      * **findinvoicedomain.data__selected_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_domain: db.Int8String | null;
-      /**
-      * **findinvoicedomain.data__selected_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_liquidity: db.NumericString | null;
-      /**
-      * **findinvoicedomain.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash: string | null;
-      /**
-      * **findinvoicedomain.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **findinvoicedomain.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **findinvoicedomain.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **findinvoicedomain.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **findinvoicedomain.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **findinvoicedomain.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **findinvoicedomain.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **findinvoicedomain.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **findinvoicedomain.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **findinvoicedomain.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **findinvoicedomain.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **findinvoicedomain.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **findinvoicedomain.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **findinvoicedomain.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **findinvoicedomain.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **findinvoicedomain.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **findinvoicedomain.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **findinvoicedomain.data__amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_after_discount: (number | db.NumericString) | null;
-      /**
-      * **findinvoicedomain.data__amount_to_be_discoutned**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_to_be_discoutned: (number | db.NumericString) | null;
-      /**
-      * **findinvoicedomain.data__current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__current_epoch: (number | db.Int8String) | null;
-      /**
-      * **findinvoicedomain.data__discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      data__discount_dbps: number | null;
-      /**
-      * **findinvoicedomain.data__domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__domain: (number | db.Int8String) | null;
-      /**
-      * **findinvoicedomain.data__entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__entry_epoch: (number | db.Int8String) | null;
-      /**
-      * **findinvoicedomain.data__invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__invoice_amount: (number | db.NumericString) | null;
-      /**
-      * **findinvoicedomain.data__invoice_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_intent_id: string | null;
-      /**
-      * **findinvoicedomain.data__invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_owner: string | null;
-      /**
-      * **findinvoicedomain.data__liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__liquidity: (number | db.NumericString) | null;
-      /**
-      * **findinvoicedomain.data__rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__rewards_for_depositors: (number | db.NumericString) | null;
-      /**
-      * **findinvoicedomain.data__selected_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_domain: (number | db.Int8String) | null;
-      /**
-      * **findinvoicedomain.data__selected_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_liquidity: (number | db.NumericString) | null;
-      /**
-      * **findinvoicedomain.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash: string | null;
-      /**
-      * **findinvoicedomain.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **findinvoicedomain.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **findinvoicedomain.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **findinvoicedomain.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **findinvoicedomain.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **findinvoicedomain.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **findinvoicedomain.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **findinvoicedomain.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **findinvoicedomain.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **findinvoicedomain.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **findinvoicedomain.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **findinvoicedomain.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_after_discount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__amount_to_be_discoutned**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_to_be_discoutned?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__current_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      data__discount_dbps?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__invoice_amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__invoice_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__liquidity?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__rewards_for_depositors?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__selected_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__selected_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_liquidity?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **findinvoicedomain.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
    * **hub_deposits**
    * - Table in database
    */
@@ -5833,7 +2785,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_deposits_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_deposits.domain**
       * - `varchar` in database
@@ -5845,19 +2797,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_deposits.enqueued_tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_deposits.epoch**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_deposits.id**
       * - `bpchar` in database
@@ -5875,13 +2827,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      processed_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      processed_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_deposits.processed_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      processed_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      processed_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_deposits.ticker_hash**
       * - `bpchar` in database
@@ -5901,7 +2853,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_deposits_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment;
       /**
       * **hub_deposits.domain**
       * - `varchar` in database
@@ -5913,19 +2865,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_timestamp: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      enqueued_timestamp: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **hub_deposits.enqueued_tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_tx_nonce: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      enqueued_tx_nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **hub_deposits.epoch**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      epoch: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      epoch: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **hub_deposits.id**
       * - `bpchar` in database
@@ -5943,13 +2895,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      processed_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      processed_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_deposits.processed_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      processed_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      processed_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_deposits.ticker_hash**
       * - `bpchar` in database
@@ -5969,7 +2921,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_deposits_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_deposits.domain**
       * - `varchar` in database
@@ -5981,19 +2933,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **hub_deposits.enqueued_tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **hub_deposits.epoch**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **hub_deposits.id**
       * - `bpchar` in database
@@ -6011,13 +2963,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      processed_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      processed_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_deposits.processed_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      processed_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      processed_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_deposits.ticker_hash**
       * - `bpchar` in database
@@ -6252,19 +3204,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      added_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      added_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.added_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      added_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      added_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.domain**
       * - `varchar` in database
@@ -6276,13 +3228,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      filled_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      filled_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.filled_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      filled_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      filled_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.id**
       * - `bpchar` in database
@@ -6300,7 +3252,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.settlement_amount**
       * - `varchar` in database
@@ -6318,25 +3270,25 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_enqueued_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.settlement_enqueued_timestamp**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.settlement_enqueued_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.settlement_epoch**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_intents.status**
       * - `intent_status` in database
@@ -6356,19 +3308,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      added_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      added_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.added_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      added_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      added_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.domain**
       * - `varchar` in database
@@ -6380,13 +3332,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      filled_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      filled_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.filled_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      filled_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      filled_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.id**
       * - `bpchar` in database
@@ -6404,7 +3356,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.settlement_amount**
       * - `varchar` in database
@@ -6422,25 +3374,25 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      settlement_enqueued_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.settlement_enqueued_timestamp**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      settlement_enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.settlement_enqueued_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      settlement_enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.settlement_epoch**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      settlement_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_intents.status**
       * - `intent_status` in database
@@ -6460,19 +3412,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      added_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      added_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.added_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      added_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      added_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.domain**
       * - `varchar` in database
@@ -6484,13 +3436,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      filled_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      filled_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.filled_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      filled_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      filled_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.id**
       * - `bpchar` in database
@@ -6508,7 +3460,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.settlement_amount**
       * - `varchar` in database
@@ -6526,25 +3478,25 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      settlement_enqueued_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.settlement_enqueued_timestamp**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      settlement_enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.settlement_enqueued_tx_nonce**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      settlement_enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.settlement_epoch**
       * - `int8` in database
       * - Nullable, no default
       */
-      settlement_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      settlement_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_intents.status**
       * - `intent_status` in database
@@ -6862,19 +3814,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_invoices_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_invoices.enqueued_block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      enqueued_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_invoices.enqueued_timestamp**
       * - `int8` in database
       * - Nullable, no default
       */
-      enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_invoices.enqueued_transaction_hash**
       * - `varchar` in database
@@ -6886,13 +3838,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_invoices.entry_epoch**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      entry_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **hub_invoices.id**
       * - `varchar` in database
@@ -6930,19 +3882,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_invoices_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment;
       /**
       * **hub_invoices.enqueued_block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_block_number: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      enqueued_block_number: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **hub_invoices.enqueued_timestamp**
       * - `int8` in database
       * - Nullable, no default
       */
-      enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_invoices.enqueued_transaction_hash**
       * - `varchar` in database
@@ -6954,13 +3906,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **hub_invoices.entry_epoch**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      entry_epoch: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      entry_epoch: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **hub_invoices.id**
       * - `varchar` in database
@@ -6998,19 +3950,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('hub_invoices_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_invoices.enqueued_block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      enqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      enqueued_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **hub_invoices.enqueued_timestamp**
       * - `int8` in database
       * - Nullable, no default
       */
-      enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_invoices.enqueued_transaction_hash**
       * - `varchar` in database
@@ -7022,13 +3974,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **hub_invoices.entry_epoch**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      entry_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **hub_invoices.id**
       * - `varchar` in database
@@ -7055,373 +4007,6 @@ declare module 'zapatos/schema' {
       ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
     }
     export type UniqueIndex = 'hub_invoices_pkey';
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **intentprocessed**
-   * - Materialized view in database
-   */
-  export namespace intentprocessed {
-    export type Table = 'intentprocessed';
-    export interface Selectable {
-      /**
-      * **intentprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **intentprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **intentprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **intentprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **intentprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **intentprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **intentprocessed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **intentprocessed.data___status**
-      * - `int2` in database
-      * - Materialized view column
-      */
-      data___status: number | null;
-      /**
-      * **intentprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **intentprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **intentprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **intentprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **intentprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **intentprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **intentprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **intentprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **intentprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **intentprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **intentprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **intentprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **intentprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **intentprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **intentprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **intentprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **intentprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **intentprocessed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **intentprocessed.data___status**
-      * - `int2` in database
-      * - Materialized view column
-      */
-      data___status: number | null;
-      /**
-      * **intentprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **intentprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **intentprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **intentprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **intentprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **intentprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **intentprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **intentprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **intentprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **intentprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **intentprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **intentprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.data___status**
-      * - `int2` in database
-      * - Materialized view column
-      */
-      data___status?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intentprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
     export type Column = keyof Selectable;
     export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
     export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
@@ -7724,6 +4309,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations: string[] | null;
       /**
+      * **intents.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator: string | null;
+      /**
       * **intents.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -7760,11 +4351,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id: string | null;
       /**
+      * **intents.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee: string | null;
+      /**
       * **intents.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
       origin_nonce: db.Int8String | null;
+      /**
+      * **intents.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id: string | null;
       /**
       * **intents.origin_origin**
       * - `varchar` in database
@@ -7801,6 +4404,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp: db.Int8String | null;
+      /**
+      * **intents.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee: string | null;
       /**
       * **intents.origin_transaction_hash**
       * - `bpchar` in database
@@ -8200,6 +4809,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations: string[] | null;
       /**
+      * **intents.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator: string | null;
+      /**
       * **intents.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -8236,11 +4851,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id: string | null;
       /**
+      * **intents.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee: string | null;
+      /**
       * **intents.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
       origin_nonce: (number | db.Int8String) | null;
+      /**
+      * **intents.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id: string | null;
       /**
       * **intents.origin_origin**
       * - `varchar` in database
@@ -8277,6 +4904,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp: (number | db.Int8String) | null;
+      /**
+      * **intents.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee: string | null;
       /**
       * **intents.origin_transaction_hash**
       * - `bpchar` in database
@@ -8398,13 +5031,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      destination_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_block_number**
       * - `int8` in database
       * - Materialized view column
       */
-      destination_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_data**
       * - `text` in database
@@ -8434,13 +5067,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      destination_gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_gas_price**
       * - `int8` in database
       * - Materialized view column
       */
-      destination_gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_initiator**
       * - `varchar` in database
@@ -8464,7 +5097,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      destination_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_origin**
       * - `varchar` in database
@@ -8482,7 +5115,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      destination_queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_receiver**
       * - `varchar` in database
@@ -8512,7 +5145,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      destination_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_transaction_hash**
       * - `bpchar` in database
@@ -8524,13 +5157,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      destination_ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_ttl?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_tx_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      destination_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      destination_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_tx_origin**
       * - `varchar` in database
@@ -8548,19 +5181,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      hub_added_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_added_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_added_tx_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_added_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_added_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_auto_id**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_domain**
       * - `varchar` in database
@@ -8572,13 +5205,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      hub_filled_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_filled_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_filled_tx_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_filled_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_filled_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_message_id**
       * - `bpchar` in database
@@ -8590,7 +5223,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      hub_queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_settlement_amount**
       * - `varchar` in database
@@ -8608,25 +5241,25 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      hub_settlement_enqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_settlement_enqueued_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_settlement_enqueued_timestamp**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_settlement_enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_settlement_enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_settlement_enqueued_tx_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_settlement_enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_settlement_enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_settlement_epoch**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_settlement_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_settlement_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.hub_status**
       * - `intent_status` in database
@@ -8656,13 +5289,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      origin_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_block_number**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_data**
       * - `text` in database
@@ -8676,17 +5309,23 @@ declare module 'zapatos/schema' {
       */
       origin_destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **intents.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **intents.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_gas_price**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_initiator**
       * - `varchar` in database
@@ -8712,11 +5351,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **intents.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **intents.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **intents.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_origin**
       * - `varchar` in database
@@ -8734,7 +5385,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      origin_queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_receiver**
       * - `varchar` in database
@@ -8752,7 +5403,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      origin_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **intents.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_transaction_hash**
       * - `bpchar` in database
@@ -8764,13 +5421,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      origin_ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_ttl?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_tx_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_tx_origin**
       * - `varchar` in database
@@ -8794,13 +5451,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      settlement_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.settlement_block_number**
       * - `int8` in database
       * - Materialized view column
       */
-      settlement_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.settlement_domain**
       * - `varchar` in database
@@ -8812,13 +5469,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      settlement_gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.settlement_gas_price**
       * - `int8` in database
       * - Materialized view column
       */
-      settlement_gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.settlement_recipient**
       * - `varchar` in database
@@ -8836,7 +5493,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      settlement_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.settlement_transaction_hash**
       * - `bpchar` in database
@@ -8848,7 +5505,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      settlement_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      settlement_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.settlement_tx_origin**
       * - `varchar` in database
@@ -8861,2997 +5518,6 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       status?: intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **intents_with_shadow_data**
-   * - Materialized view in database
-   */
-  export namespace intents_with_shadow_data {
-    export type Table = 'intents_with_shadow_data';
-    export interface Selectable {
-      /**
-      * **intents_with_shadow_data.destination_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_amount: string | null;
-      /**
-      * **intents_with_shadow_data.destination_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_auto_id: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_block_number: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      destination_data: string | null;
-      /**
-      * **intents_with_shadow_data.destination_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      destination_destinations: string[] | null;
-      /**
-      * **intents_with_shadow_data.destination_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_fee: string | null;
-      /**
-      * **intents_with_shadow_data.destination_filled**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_filled: string | null;
-      /**
-      * **intents_with_shadow_data.destination_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_gas_limit: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_gas_price: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_initiator: string | null;
-      /**
-      * **intents_with_shadow_data.destination_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_input_asset: string | null;
-      /**
-      * **intents_with_shadow_data.destination_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      destination_message_id: string | null;
-      /**
-      * **intents_with_shadow_data.destination_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_nonce: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_origin: string | null;
-      /**
-      * **intents_with_shadow_data.destination_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_output_asset: string | null;
-      /**
-      * **intents_with_shadow_data.destination_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_queue_idx: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_receiver: string | null;
-      /**
-      * **intents_with_shadow_data.destination_return_data**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_return_data: string | null;
-      /**
-      * **intents_with_shadow_data.destination_solver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_solver: string | null;
-      /**
-      * **intents_with_shadow_data.destination_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      destination_status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.destination_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_timestamp: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      destination_transaction_hash: string | null;
-      /**
-      * **intents_with_shadow_data.destination_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_ttl: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_tx_nonce: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.destination_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_tx_origin: string | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_amount: db.NumericString | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_amount_and_rewards: db.NumericString | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      find_deposit_destinations: db.JSONValue | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_highest_liquidity_destination**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_highest_liquidity_destination: db.NumericString | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_liquidity_in_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      find_deposit_liquidity_in_destinations: db.JSONValue | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_deposit_origin: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_deposit_selected_destination: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.has_calldata**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      has_calldata: boolean | null;
-      /**
-      * **intents_with_shadow_data.hub_added_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_added_timestamp: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_added_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_added_tx_nonce: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_auto_id: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_domain: string | null;
-      /**
-      * **intents_with_shadow_data.hub_filled_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_filled_timestamp: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_filled_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_filled_tx_nonce: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_message_id: string | null;
-      /**
-      * **intents_with_shadow_data.hub_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_queue_idx: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_settlement_amount: string | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_settlement_domain: string | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_block_number: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_timestamp: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_tx_nonce: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_epoch: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.hub_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      hub_status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.hub_update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      hub_update_virtual_balance: boolean | null;
-      /**
-      * **intents_with_shadow_data.id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      id: string | null;
-      /**
-      * **intents_with_shadow_data.is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      is_deposit: boolean | null;
-      /**
-      * **intents_with_shadow_data.origin_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_amount: string | null;
-      /**
-      * **intents_with_shadow_data.origin_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_auto_id: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_block_number: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      origin_data: string | null;
-      /**
-      * **intents_with_shadow_data.origin_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      origin_destinations: string[] | null;
-      /**
-      * **intents_with_shadow_data.origin_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_limit: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_price: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_initiator: string | null;
-      /**
-      * **intents_with_shadow_data.origin_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_input_asset: string | null;
-      /**
-      * **intents_with_shadow_data.origin_max_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_max_fee: string | null;
-      /**
-      * **intents_with_shadow_data.origin_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_message_id: string | null;
-      /**
-      * **intents_with_shadow_data.origin_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_nonce: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_origin: string | null;
-      /**
-      * **intents_with_shadow_data.origin_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_output_asset: string | null;
-      /**
-      * **intents_with_shadow_data.origin_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_queue_idx: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_receiver: string | null;
-      /**
-      * **intents_with_shadow_data.origin_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      origin_status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.origin_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_timestamp: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_transaction_hash: string | null;
-      /**
-      * **intents_with_shadow_data.origin_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_ttl: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_tx_nonce: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.origin_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_tx_origin: string | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount: db.NumericString | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount_after_fees**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount_after_fees: db.NumericString | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount_and_rewards: db.NumericString | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      settle_deposit_destinations: db.JSONValue | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settle_deposit_input_asset: string | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_is_settlement**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      settle_deposit_is_settlement: boolean | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settle_deposit_origin: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settle_deposit_output_asset: string | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_rewards: db.NumericString | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settle_deposit_selected_destination: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.settlement_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_amount: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_asset: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_auto_id: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.settlement_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_block_number: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.settlement_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_domain: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_gas_limit: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.settlement_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_gas_price: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.settlement_recipient**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_recipient: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      settlement_status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.settlement_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_timestamp: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.settlement_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      settlement_transaction_hash: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_tx_nonce: db.Int8String | null;
-      /**
-      * **intents_with_shadow_data.settlement_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_tx_origin: string | null;
-      /**
-      * **intents_with_shadow_data.status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      ticker_hash: string | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **intents_with_shadow_data.destination_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_amount: string | null;
-      /**
-      * **intents_with_shadow_data.destination_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_auto_id: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_block_number: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      destination_data: string | null;
-      /**
-      * **intents_with_shadow_data.destination_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      destination_destinations: string[] | null;
-      /**
-      * **intents_with_shadow_data.destination_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_fee: string | null;
-      /**
-      * **intents_with_shadow_data.destination_filled**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_filled: string | null;
-      /**
-      * **intents_with_shadow_data.destination_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_gas_limit: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_gas_price: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_initiator: string | null;
-      /**
-      * **intents_with_shadow_data.destination_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_input_asset: string | null;
-      /**
-      * **intents_with_shadow_data.destination_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      destination_message_id: string | null;
-      /**
-      * **intents_with_shadow_data.destination_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_nonce: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_origin: string | null;
-      /**
-      * **intents_with_shadow_data.destination_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_output_asset: string | null;
-      /**
-      * **intents_with_shadow_data.destination_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_queue_idx: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_receiver: string | null;
-      /**
-      * **intents_with_shadow_data.destination_return_data**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_return_data: string | null;
-      /**
-      * **intents_with_shadow_data.destination_solver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_solver: string | null;
-      /**
-      * **intents_with_shadow_data.destination_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      destination_status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.destination_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_timestamp: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      destination_transaction_hash: string | null;
-      /**
-      * **intents_with_shadow_data.destination_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_ttl: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_tx_nonce: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.destination_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_tx_origin: string | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_amount: (number | db.NumericString) | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_amount_and_rewards: (number | db.NumericString) | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      find_deposit_destinations: db.JSONValue | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_highest_liquidity_destination**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_highest_liquidity_destination: (number | db.NumericString) | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_liquidity_in_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      find_deposit_liquidity_in_destinations: db.JSONValue | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_deposit_origin: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.find_deposit_selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_deposit_selected_destination: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.has_calldata**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      has_calldata: boolean | null;
-      /**
-      * **intents_with_shadow_data.hub_added_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_added_timestamp: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_added_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_added_tx_nonce: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_auto_id: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_domain: string | null;
-      /**
-      * **intents_with_shadow_data.hub_filled_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_filled_timestamp: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_filled_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_filled_tx_nonce: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_message_id: string | null;
-      /**
-      * **intents_with_shadow_data.hub_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_queue_idx: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_settlement_amount: string | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_settlement_domain: string | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_block_number: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_timestamp: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_tx_nonce: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_settlement_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_epoch: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.hub_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      hub_status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.hub_update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      hub_update_virtual_balance: boolean | null;
-      /**
-      * **intents_with_shadow_data.id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      id: string | null;
-      /**
-      * **intents_with_shadow_data.is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      is_deposit: boolean | null;
-      /**
-      * **intents_with_shadow_data.origin_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_amount: string | null;
-      /**
-      * **intents_with_shadow_data.origin_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_auto_id: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_block_number: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      origin_data: string | null;
-      /**
-      * **intents_with_shadow_data.origin_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      origin_destinations: string[] | null;
-      /**
-      * **intents_with_shadow_data.origin_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_limit: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_price: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_initiator: string | null;
-      /**
-      * **intents_with_shadow_data.origin_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_input_asset: string | null;
-      /**
-      * **intents_with_shadow_data.origin_max_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_max_fee: string | null;
-      /**
-      * **intents_with_shadow_data.origin_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_message_id: string | null;
-      /**
-      * **intents_with_shadow_data.origin_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_nonce: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_origin: string | null;
-      /**
-      * **intents_with_shadow_data.origin_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_output_asset: string | null;
-      /**
-      * **intents_with_shadow_data.origin_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_queue_idx: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_receiver: string | null;
-      /**
-      * **intents_with_shadow_data.origin_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      origin_status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.origin_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_timestamp: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_transaction_hash: string | null;
-      /**
-      * **intents_with_shadow_data.origin_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_ttl: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_tx_nonce: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.origin_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_tx_origin: string | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount: (number | db.NumericString) | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount_after_fees**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount_after_fees: (number | db.NumericString) | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount_and_rewards: (number | db.NumericString) | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      settle_deposit_destinations: db.JSONValue | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settle_deposit_input_asset: string | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_is_settlement**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      settle_deposit_is_settlement: boolean | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settle_deposit_origin: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settle_deposit_output_asset: string | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_rewards: (number | db.NumericString) | null;
-      /**
-      * **intents_with_shadow_data.settle_deposit_selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settle_deposit_selected_destination: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.settlement_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_amount: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_asset: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_auto_id: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.settlement_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_block_number: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.settlement_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_domain: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_gas_limit: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.settlement_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_gas_price: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.settlement_recipient**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_recipient: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      settlement_status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.settlement_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_timestamp: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.settlement_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      settlement_transaction_hash: string | null;
-      /**
-      * **intents_with_shadow_data.settlement_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_tx_nonce: (number | db.Int8String) | null;
-      /**
-      * **intents_with_shadow_data.settlement_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_tx_origin: string | null;
-      /**
-      * **intents_with_shadow_data.status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      status: intent_status | null;
-      /**
-      * **intents_with_shadow_data.ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      ticker_hash: string | null;
-    }
-    export interface Whereable {
-      /**
-      * **intents_with_shadow_data.destination_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      destination_data?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      destination_destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_filled**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_filled?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      destination_message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_output_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_receiver?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_return_data**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_return_data?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_solver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_solver?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      destination_status?: intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      destination_transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      destination_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.destination_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      destination_tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.find_deposit_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.find_deposit_amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_amount_and_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.find_deposit_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      find_deposit_destinations?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.find_deposit_highest_liquidity_destination**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_deposit_highest_liquidity_destination?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.find_deposit_liquidity_in_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      find_deposit_liquidity_in_destinations?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.find_deposit_origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_deposit_origin?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.find_deposit_selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_deposit_selected_destination?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.has_calldata**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      has_calldata?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_added_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_added_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_added_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_added_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_domain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_filled_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_filled_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_filled_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_filled_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_settlement_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_settlement_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_settlement_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_settlement_domain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_settlement_enqueued_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_settlement_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      hub_status?: intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.hub_update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      hub_update_virtual_balance?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      is_deposit?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      origin_data?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      origin_destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_max_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_max_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_output_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_receiver?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      origin_status?: intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.origin_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount_after_fees**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount_after_fees?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_amount_and_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      settle_deposit_destinations?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settle_deposit_input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_is_settlement**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      settle_deposit_is_settlement?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settle_deposit_origin?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settle_deposit_output_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settle_deposit_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settle_deposit_selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settle_deposit_selected_destination?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_domain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_domain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_recipient**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_recipient?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      settlement_status?: intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      settlement_transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlement_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.settlement_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlement_tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      status?: intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **intents_with_shadow_data.ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **invoice_enqueued_not_settled**
-   * - Materialized view in database
-   */
-  export namespace invoice_enqueued_not_settled {
-    export type Table = 'invoice_enqueued_not_settled';
-    export interface Selectable {
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_address: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_log_index: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_number: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_timestamp: Date | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_chain: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___amount: db.NumericString | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___entry_epoch: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___intent_id: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___owner: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___ticker_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_name: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_network: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_0: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_1: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_2: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_3: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_index: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_log_index: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_address: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_log_index: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_number: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_timestamp: Date | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_chain: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___amount: db.NumericString | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___asset: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___domain: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___entry_epoch: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___intent_id: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___owner: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___update_virtual_balance: boolean | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_name: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_network: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_0: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_1: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_2: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_3: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_index: db.Int8String | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_address: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_log_index: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_number: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_timestamp: db.TimestampString | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_chain: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___amount: (number | db.NumericString) | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___entry_epoch: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___intent_id: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___owner: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___ticker_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_name: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_network: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_0: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_1: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_2: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_3: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_index: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_log_index: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_address: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_log_index: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_number: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_timestamp: db.TimestampString | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_chain: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___amount: (number | db.NumericString) | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___asset: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___domain: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___entry_epoch: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___intent_id: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___owner: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___update_virtual_balance: boolean | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_name: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_network: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_0: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_1: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_2: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_3: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_hash: string | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_index: (number | db.Int8String) | null;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_data___ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.invoiceenqueued_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      invoiceenqueued_transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      settlementenqueued_block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_data___update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      settlementenqueued_data___update_virtual_balance?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoice_enqueued_not_settled.settlementenqueued_transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      settlementenqueued_transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **invoiceenqueued**
-   * - Materialized view in database
-   */
-  export namespace invoiceenqueued {
-    export type Table = 'invoiceenqueued';
-    export interface Selectable {
-      /**
-      * **invoiceenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **invoiceenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **invoiceenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **invoiceenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **invoiceenqueued.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **invoiceenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **invoiceenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount: db.NumericString | null;
-      /**
-      * **invoiceenqueued.data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___entry_epoch: db.Int8String | null;
-      /**
-      * **invoiceenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **invoiceenqueued.data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___owner: string | null;
-      /**
-      * **invoiceenqueued.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **invoiceenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **invoiceenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **invoiceenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **invoiceenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **invoiceenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **invoiceenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **invoiceenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **invoiceenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **invoiceenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **invoiceenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **invoiceenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **invoiceenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **invoiceenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **invoiceenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **invoiceenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **invoiceenqueued.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **invoiceenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **invoiceenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount: (number | db.NumericString) | null;
-      /**
-      * **invoiceenqueued.data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___entry_epoch: (number | db.Int8String) | null;
-      /**
-      * **invoiceenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id: string | null;
-      /**
-      * **invoiceenqueued.data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___owner: string | null;
-      /**
-      * **invoiceenqueued.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash: string | null;
-      /**
-      * **invoiceenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **invoiceenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **invoiceenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **invoiceenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **invoiceenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **invoiceenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **invoiceenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **invoiceenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **invoiceenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **invoiceenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **invoiceenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **invoiceenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.data___owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.data___ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoiceenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
     }
     export interface Insertable {
       [key: string]: never;
@@ -11976,6 +5642,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations: string[] | null;
       /**
+      * **invoices.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator: string | null;
+      /**
       * **invoices.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -12012,11 +5684,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id: string | null;
       /**
+      * **invoices.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee: string | null;
+      /**
       * **invoices.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
       origin_nonce: db.Int8String | null;
+      /**
+      * **invoices.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id: string | null;
       /**
       * **invoices.origin_origin**
       * - `varchar` in database
@@ -12053,6 +5737,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp: db.Int8String | null;
+      /**
+      * **invoices.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee: string | null;
       /**
       * **invoices.origin_transaction_hash**
       * - `bpchar` in database
@@ -12182,6 +5872,12 @@ declare module 'zapatos/schema' {
       */
       origin_destinations: string[] | null;
       /**
+      * **invoices.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator: string | null;
+      /**
       * **invoices.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
@@ -12218,11 +5914,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id: string | null;
       /**
+      * **invoices.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee: string | null;
+      /**
       * **invoices.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
       origin_nonce: (number | db.Int8String) | null;
+      /**
+      * **invoices.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id: string | null;
       /**
       * **invoices.origin_origin**
       * - `varchar` in database
@@ -12259,6 +5967,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_timestamp: (number | db.Int8String) | null;
+      /**
+      * **invoices.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee: string | null;
       /**
       * **invoices.origin_transaction_hash**
       * - `bpchar` in database
@@ -12296,25 +6010,25 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      hub_invoice_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_invoice_auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.hub_invoice_enqueued_timestamp**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_invoice_enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_invoice_enqueued_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.hub_invoice_enqueued_tx_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_invoice_enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_invoice_enqueued_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.hub_invoice_entry_epoch**
       * - `int8` in database
       * - Materialized view column
       */
-      hub_invoice_entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_invoice_entry_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.hub_invoice_id**
       * - `varchar` in database
@@ -12344,7 +6058,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      hub_settlement_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      hub_settlement_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.hub_status**
       * - `intent_status` in database
@@ -12368,13 +6082,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      origin_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_block_number**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_data**
       * - `text` in database
@@ -12388,17 +6102,23 @@ declare module 'zapatos/schema' {
       */
       origin_destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **invoices.origin_fee_adapter_initiator**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_fee_adapter_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **invoices.origin_gas_limit**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_gas_price**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_initiator**
       * - `varchar` in database
@@ -12424,11 +6144,23 @@ declare module 'zapatos/schema' {
       */
       origin_message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **invoices.origin_native_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **invoices.origin_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **invoices.origin_order_id**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_order_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_origin**
       * - `varchar` in database
@@ -12446,7 +6178,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      origin_queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_receiver**
       * - `varchar` in database
@@ -12464,7 +6196,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      origin_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **invoices.origin_token_fee**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_transaction_hash**
       * - `bpchar` in database
@@ -12476,1106 +6214,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Materialized view column
       */
-      origin_ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_ttl?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_tx_nonce**
       * - `int8` in database
       * - Materialized view column
       */
-      origin_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      origin_tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_tx_origin**
       * - `varchar` in database
       * - Materialized view column
       */
       origin_tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **invoices_with_shadow_data**
-   * - Materialized view in database
-   */
-  export namespace invoices_with_shadow_data {
-    export type Table = 'invoices_with_shadow_data';
-    export interface Selectable {
-      /**
-      * **invoices_with_shadow_data.find_invoice_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_amount_after_discount: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_amount_to_be_discoutned**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_amount_to_be_discoutned: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_current_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_current_domain: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_current_epoch: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      find_invoice_discount_dbps: number | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_entry_epoch: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_invoice_amount: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      find_invoice_invoice_owner: string | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_liquidity: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_rewards_for_depositors: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_selected_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_selected_domain: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_selected_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_selected_liquidity: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_amount: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_auto_id: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_enqueued_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_enqueued_timestamp: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_enqueued_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_enqueued_tx_nonce: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_entry_epoch: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_id: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_intent_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_intent_id: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_owner**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_owner: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_ticker_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_ticker_hash: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_settlement_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_epoch: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.hub_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      hub_status: intent_status | null;
-      /**
-      * **invoices_with_shadow_data.id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      id: string | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      match_deposit_discount_dbps: number | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      match_deposit_domain: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      match_deposit_intent_id: string | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_invoice_amount: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      match_deposit_invoice_owner: string | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_match_count**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_match_count: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_purchase_power**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_purchase_power: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_remaining_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_remaining_amount: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_rewards: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_amount_after_discount: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_amount_to_be_discounted**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_amount_to_be_discounted: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_rewards_for_depositors: db.NumericString | null;
-      /**
-      * **invoices_with_shadow_data.origin_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_amount: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_auto_id: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_block_number: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      origin_data: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      origin_destinations: string[] | null;
-      /**
-      * **invoices_with_shadow_data.origin_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_limit: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_price: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_initiator: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_input_asset: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_max_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_max_fee: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_message_id: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_nonce: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_origin: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_output_asset: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_queue_idx: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_receiver: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      origin_status: intent_status | null;
-      /**
-      * **invoices_with_shadow_data.origin_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_timestamp: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_transaction_hash: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_ttl: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_tx_nonce: db.Int8String | null;
-      /**
-      * **invoices_with_shadow_data.origin_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_tx_origin: string | null;
-      /**
-      * **invoices_with_shadow_data.ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      ticker_hash: string | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **invoices_with_shadow_data.find_invoice_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_amount_after_discount: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_amount_to_be_discoutned**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_amount_to_be_discoutned: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_current_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_current_domain: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_current_epoch: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      find_invoice_discount_dbps: number | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_entry_epoch: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_invoice_amount: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      find_invoice_invoice_owner: string | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_liquidity: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_rewards_for_depositors: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_selected_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_selected_domain: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.find_invoice_selected_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_selected_liquidity: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_amount: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_auto_id: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_enqueued_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_enqueued_timestamp: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_enqueued_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_enqueued_tx_nonce: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_entry_epoch: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_id: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_intent_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_intent_id: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_owner**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_owner: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_ticker_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_ticker_hash: string | null;
-      /**
-      * **invoices_with_shadow_data.hub_settlement_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_epoch: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.hub_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      hub_status: intent_status | null;
-      /**
-      * **invoices_with_shadow_data.id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      id: string | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      match_deposit_discount_dbps: number | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      match_deposit_domain: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      match_deposit_intent_id: string | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_invoice_amount: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      match_deposit_invoice_owner: string | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_match_count**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_match_count: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_purchase_power**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_purchase_power: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_remaining_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_remaining_amount: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_rewards: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_amount_after_discount: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_amount_to_be_discounted**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_amount_to_be_discounted: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_rewards_for_depositors: (number | db.NumericString) | null;
-      /**
-      * **invoices_with_shadow_data.origin_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_amount: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_auto_id: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_block_number: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      origin_data: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      origin_destinations: string[] | null;
-      /**
-      * **invoices_with_shadow_data.origin_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_limit: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_price: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_initiator: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_input_asset: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_max_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_max_fee: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_message_id: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_nonce: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_origin: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_output_asset: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_queue_idx: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_receiver: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      origin_status: intent_status | null;
-      /**
-      * **invoices_with_shadow_data.origin_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_timestamp: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_transaction_hash: string | null;
-      /**
-      * **invoices_with_shadow_data.origin_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_ttl: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_tx_nonce: (number | db.Int8String) | null;
-      /**
-      * **invoices_with_shadow_data.origin_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_tx_origin: string | null;
-      /**
-      * **invoices_with_shadow_data.ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      ticker_hash: string | null;
-    }
-    export interface Whereable {
-      /**
-      * **invoices_with_shadow_data.find_invoice_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_amount_after_discount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_amount_to_be_discoutned**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_amount_to_be_discoutned?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_current_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_current_domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_current_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      find_invoice_discount_dbps?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_invoice_amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      find_invoice_invoice_owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_liquidity?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_rewards_for_depositors?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_selected_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      find_invoice_selected_domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.find_invoice_selected_liquidity**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      find_invoice_selected_liquidity?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_enqueued_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_enqueued_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_enqueued_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_enqueued_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_invoice_entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_intent_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_owner**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_invoice_ticker_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      hub_invoice_ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_settlement_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      hub_settlement_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.hub_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      hub_status?: intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      match_deposit_discount_dbps?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      match_deposit_domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      match_deposit_intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_invoice_amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      match_deposit_invoice_owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_match_count**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_match_count?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_purchase_power**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_purchase_power?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_remaining_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_remaining_amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_amount_after_discount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_amount_to_be_discounted**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_amount_to_be_discounted?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.match_deposit_selected_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      match_deposit_selected_rewards_for_depositors?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_amount**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_auto_id**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_data**
-      * - `text` in database
-      * - Materialized view column
-      */
-      origin_data?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_destinations**
-      * - `_varchar` in database
-      * - Materialized view column
-      */
-      origin_destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_gas_limit**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_gas_price**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_initiator**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_max_fee**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_max_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_message_id**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_output_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_queue_idx**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_receiver**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_receiver?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_status**
-      * - `intent_status` in database
-      * - Materialized view column
-      */
-      origin_status?: intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, intent_status | db.Parameter<intent_status> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_timestamp**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_transaction_hash**
-      * - `bpchar` in database
-      * - Materialized view column
-      */
-      origin_transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_ttl**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_tx_nonce**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      origin_tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.origin_tx_origin**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      origin_tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **invoices_with_shadow_data.ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
     }
     export interface Insertable {
       [key: string]: never;
@@ -13660,13 +6311,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      expiry?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      expiry?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **lock_positions.start**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      start?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      start?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **lock_positions.user**
       * - `varchar` in database
@@ -13686,13 +6337,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      expiry: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      expiry: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **lock_positions.start**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      start: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      start: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **lock_positions.user**
       * - `varchar` in database
@@ -13712,13 +6363,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      expiry?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      expiry?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **lock_positions.start**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      start?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      start?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **lock_positions.user**
       * - `varchar` in database
@@ -13727,589 +6378,6 @@ declare module 'zapatos/schema' {
       user?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
     }
     export type UniqueIndex = 'lock_positions_user_start_pkey';
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **matchdeposit**
-   * - Materialized view in database
-   */
-  export namespace matchdeposit {
-    export type Table = 'matchdeposit';
-    export interface Selectable {
-      /**
-      * **matchdeposit.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **matchdeposit.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **matchdeposit.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **matchdeposit.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **matchdeposit.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **matchdeposit.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **matchdeposit.data__deposit_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__deposit_intent_id: string | null;
-      /**
-      * **matchdeposit.data__deposit_purchase_power**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__deposit_purchase_power: db.NumericString | null;
-      /**
-      * **matchdeposit.data__deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__deposit_rewards: db.NumericString | null;
-      /**
-      * **matchdeposit.data__discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      data__discount_dbps: number | null;
-      /**
-      * **matchdeposit.data__domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__domain: db.Int8String | null;
-      /**
-      * **matchdeposit.data__invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__invoice_amount: db.NumericString | null;
-      /**
-      * **matchdeposit.data__invoice_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_intent_id: string | null;
-      /**
-      * **matchdeposit.data__invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_owner: string | null;
-      /**
-      * **matchdeposit.data__match_count**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__match_count: db.NumericString | null;
-      /**
-      * **matchdeposit.data__remaining_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__remaining_amount: db.NumericString | null;
-      /**
-      * **matchdeposit.data__selected_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_amount_after_discount: db.NumericString | null;
-      /**
-      * **matchdeposit.data__selected_amount_to_be_discounted**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_amount_to_be_discounted: db.NumericString | null;
-      /**
-      * **matchdeposit.data__selected_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_rewards_for_depositors: db.NumericString | null;
-      /**
-      * **matchdeposit.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash: string | null;
-      /**
-      * **matchdeposit.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **matchdeposit.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **matchdeposit.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **matchdeposit.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **matchdeposit.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **matchdeposit.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **matchdeposit.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **matchdeposit.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **matchdeposit.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **matchdeposit.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **matchdeposit.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **matchdeposit.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **matchdeposit.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **matchdeposit.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **matchdeposit.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **matchdeposit.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **matchdeposit.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **matchdeposit.data__deposit_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__deposit_intent_id: string | null;
-      /**
-      * **matchdeposit.data__deposit_purchase_power**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__deposit_purchase_power: (number | db.NumericString) | null;
-      /**
-      * **matchdeposit.data__deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__deposit_rewards: (number | db.NumericString) | null;
-      /**
-      * **matchdeposit.data__discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      data__discount_dbps: number | null;
-      /**
-      * **matchdeposit.data__domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__domain: (number | db.Int8String) | null;
-      /**
-      * **matchdeposit.data__invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__invoice_amount: (number | db.NumericString) | null;
-      /**
-      * **matchdeposit.data__invoice_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_intent_id: string | null;
-      /**
-      * **matchdeposit.data__invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_owner: string | null;
-      /**
-      * **matchdeposit.data__match_count**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__match_count: (number | db.NumericString) | null;
-      /**
-      * **matchdeposit.data__remaining_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__remaining_amount: (number | db.NumericString) | null;
-      /**
-      * **matchdeposit.data__selected_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_amount_after_discount: (number | db.NumericString) | null;
-      /**
-      * **matchdeposit.data__selected_amount_to_be_discounted**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_amount_to_be_discounted: (number | db.NumericString) | null;
-      /**
-      * **matchdeposit.data__selected_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_rewards_for_depositors: (number | db.NumericString) | null;
-      /**
-      * **matchdeposit.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash: string | null;
-      /**
-      * **matchdeposit.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **matchdeposit.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **matchdeposit.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **matchdeposit.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **matchdeposit.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **matchdeposit.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **matchdeposit.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **matchdeposit.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **matchdeposit.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **matchdeposit.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **matchdeposit.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **matchdeposit.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__deposit_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__deposit_intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__deposit_purchase_power**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__deposit_purchase_power?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__deposit_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__deposit_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__discount_dbps**
-      * - `int4` in database
-      * - Materialized view column
-      */
-      data__discount_dbps?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__invoice_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__invoice_amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__invoice_intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__invoice_owner**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__invoice_owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__match_count**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__match_count?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__remaining_amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__remaining_amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__selected_amount_after_discount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_amount_after_discount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__selected_amount_to_be_discounted**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_amount_to_be_discounted?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__selected_rewards_for_depositors**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__selected_rewards_for_depositors?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.data__ticker_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **matchdeposit.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
     export type Column = keyof Selectable;
     export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
     export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
@@ -14781,13 +6849,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('messages_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **messages.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **messages.destination_domain**
       * - `varchar` in database
@@ -14805,19 +6873,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      first?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      first?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **messages.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **messages.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **messages.id**
       * - `varchar` in database
@@ -14835,7 +6903,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      last?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      last?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **messages.message_status**
       * - `message_status` in database
@@ -14859,7 +6927,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **messages.transaction_hash**
       * - `bpchar` in database
@@ -14871,7 +6939,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **messages.tx_origin**
       * - `varchar` in database
@@ -14891,13 +6959,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('messages_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment;
       /**
       * **messages.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      block_number: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **messages.destination_domain**
       * - `varchar` in database
@@ -14915,19 +6983,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      first: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      first: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **messages.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      gas_limit: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **messages.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      gas_price: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **messages.id**
       * - `varchar` in database
@@ -14945,7 +7013,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      last: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      last: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **messages.message_status**
       * - `message_status` in database
@@ -14969,7 +7037,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      timestamp: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **messages.transaction_hash**
       * - `bpchar` in database
@@ -14981,7 +7049,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      tx_nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **messages.tx_origin**
       * - `varchar` in database
@@ -15001,13 +7069,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('messages_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment>;
       /**
       * **messages.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **messages.destination_domain**
       * - `varchar` in database
@@ -15025,19 +7093,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      first?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      first?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **messages.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **messages.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **messages.id**
       * - `varchar` in database
@@ -15055,7 +7123,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      last?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      last?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **messages.message_status**
       * - `message_status` in database
@@ -15079,7 +7147,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **messages.transaction_hash**
       * - `bpchar` in database
@@ -15091,7 +7159,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **messages.tx_origin**
       * - `varchar` in database
@@ -15106,6 +7174,419 @@ declare module 'zapatos/schema' {
       type?: message_type | db.Parameter<message_type> | db.SQLFragment | db.SQLFragment<any, message_type | db.Parameter<message_type> | db.SQLFragment>;
     }
     export type UniqueIndex = 'messages_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
+   * **orders**
+   * - Table in database
+   */
+  export namespace orders {
+    export type Table = 'orders';
+    export interface Selectable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id: number;
+      /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number: db.Int8String;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: db.Int8String;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: db.Int8String;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator: string;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids: string[];
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      native_fee: string;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: db.Int8String;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      token_fee: string;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash: string;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce: db.Int8String;
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin: string;
+    }
+    export interface JSONSelectable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id: number;
+      /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number: (number | db.Int8String);
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: (number | db.Int8String);
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: (number | db.Int8String);
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator: string;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids: string[];
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      native_fee: string;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: (number | db.Int8String);
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      token_fee: string;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash: string;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce: (number | db.Int8String);
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin: string;
+    }
+    export interface Whereable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
+      /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids: string[] | db.Parameter<string[]> | db.SQLFragment;
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      native_fee: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      token_fee: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin: string | db.Parameter<string> | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **orders.auto_id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('orders_auto_id_seq'::regclass)`
+      */
+      auto_id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **orders.block_number**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.gas_limit**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.gas_price**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.initiator**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      initiator?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.intent_ids**
+      * - `_varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_ids?: string[] | db.Parameter<string[]> | db.SQLFragment | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment>;
+      /**
+      * **orders.native_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      native_fee?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.token_fee**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      token_fee?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.transaction_hash**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **orders.tx_nonce**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **orders.tx_origin**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      tx_origin?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'orders_pkey';
     export type Column = keyof Selectable;
     export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
     export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
@@ -15150,6 +7631,12 @@ declare module 'zapatos/schema' {
       */
       destinations: string[];
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator: string | null;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
@@ -15192,11 +7679,23 @@ declare module 'zapatos/schema' {
       */
       message_id: string | null;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee: string | null;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
       nonce: db.Int8String;
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id: string | null;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15233,6 +7732,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       timestamp: db.Int8String;
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee: string | null;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -15290,6 +7795,12 @@ declare module 'zapatos/schema' {
       */
       destinations: string[];
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator: string | null;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
@@ -15332,11 +7843,23 @@ declare module 'zapatos/schema' {
       */
       message_id: string | null;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee: string | null;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
       nonce: (number | db.Int8String);
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id: string | null;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15374,6 +7897,12 @@ declare module 'zapatos/schema' {
       */
       timestamp: (number | db.Int8String);
       /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee: string | null;
+      /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
       * - `NOT NULL`, no default
@@ -15410,13 +7939,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('origin_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.data**
       * - `text` in database
@@ -15430,17 +7959,23 @@ declare module 'zapatos/schema' {
       */
       destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.id**
       * - `bpchar` in database
@@ -15472,11 +8007,23 @@ declare module 'zapatos/schema' {
       */
       message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15494,7 +8041,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.receiver**
       * - `varchar` in database
@@ -15512,7 +8059,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -15524,13 +8077,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      ttl?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **origin_intents.tx_origin**
       * - `varchar` in database
@@ -15550,13 +8103,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('origin_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment;
       /**
       * **origin_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      block_number: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **origin_intents.data**
       * - `text` in database
@@ -15570,17 +8123,23 @@ declare module 'zapatos/schema' {
       */
       destinations: string[] | db.Parameter<string[]> | db.SQLFragment;
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      gas_limit: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **origin_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      gas_price: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **origin_intents.id**
       * - `bpchar` in database
@@ -15612,11 +8171,23 @@ declare module 'zapatos/schema' {
       */
       message_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      nonce: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15634,7 +8205,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      queue_idx: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      queue_idx: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **origin_intents.receiver**
       * - `varchar` in database
@@ -15652,7 +8223,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      timestamp: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -15664,13 +8241,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      ttl: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      ttl: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **origin_intents.tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      tx_nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **origin_intents.tx_origin**
       * - `varchar` in database
@@ -15690,13 +8267,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('origin_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment>;
       /**
       * **origin_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **origin_intents.data**
       * - `text` in database
@@ -15710,17 +8287,23 @@ declare module 'zapatos/schema' {
       */
       destinations?: string[] | db.Parameter<string[]> | db.SQLFragment | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment>;
       /**
+      * **origin_intents.fee_adapter_initiator**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_initiator?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
       * **origin_intents.gas_limit**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **origin_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **origin_intents.id**
       * - `bpchar` in database
@@ -15752,11 +8335,23 @@ declare module 'zapatos/schema' {
       */
       message_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
+      * **origin_intents.native_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      native_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
       * **origin_intents.nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **origin_intents.order_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      order_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **origin_intents.origin**
       * - `varchar` in database
@@ -15774,7 +8369,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      queue_idx?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      queue_idx?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **origin_intents.receiver**
       * - `varchar` in database
@@ -15792,7 +8387,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **origin_intents.token_fee**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      token_fee?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **origin_intents.transaction_hash**
       * - `bpchar` in database
@@ -15804,13 +8405,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      ttl?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      ttl?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **origin_intents.tx_nonce**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **origin_intents.tx_origin**
       * - `varchar` in database
@@ -15969,6 +8570,269 @@ declare module 'zapatos/schema' {
   }
 
   /**
+   * **otc_sale_table**
+   * - Table in database
+   */
+  export namespace otc_sale_table {
+    export type Table = 'otc_sale_table';
+    export interface Selectable {
+      /**
+      * **otc_sale_table.amount**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      amount: string;
+      /**
+      * **otc_sale_table.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at: Date | null;
+      /**
+      * **otc_sale_table.destination**
+      * - `_int4` in database
+      * - `NOT NULL`, no default
+      */
+      destination: number[];
+      /**
+      * **otc_sale_table.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id: string;
+      /**
+      * **otc_sale_table.origin**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      origin: number;
+      /**
+      * **otc_sale_table.partner_id**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      partner_id: string;
+      /**
+      * **otc_sale_table.token**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      token: string;
+      /**
+      * **otc_sale_table.total_fee**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      total_fee: string;
+    }
+    export interface JSONSelectable {
+      /**
+      * **otc_sale_table.amount**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      amount: string;
+      /**
+      * **otc_sale_table.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at: db.TimestampString | null;
+      /**
+      * **otc_sale_table.destination**
+      * - `_int4` in database
+      * - `NOT NULL`, no default
+      */
+      destination: number[];
+      /**
+      * **otc_sale_table.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id: string;
+      /**
+      * **otc_sale_table.origin**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      origin: number;
+      /**
+      * **otc_sale_table.partner_id**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      partner_id: string;
+      /**
+      * **otc_sale_table.token**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      token: string;
+      /**
+      * **otc_sale_table.total_fee**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      total_fee: string;
+    }
+    export interface Whereable {
+      /**
+      * **otc_sale_table.amount**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.destination**
+      * - `_int4` in database
+      * - `NOT NULL`, no default
+      */
+      destination?: number[] | db.Parameter<number[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number[] | db.Parameter<number[]> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.origin**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      origin?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.partner_id**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      partner_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.token**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      token?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.total_fee**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      total_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **otc_sale_table.amount**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      amount: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **otc_sale_table.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **otc_sale_table.destination**
+      * - `_int4` in database
+      * - `NOT NULL`, no default
+      */
+      destination: number[] | db.Parameter<number[]> | db.SQLFragment;
+      /**
+      * **otc_sale_table.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment;
+      /**
+      * **otc_sale_table.origin**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      origin: number | db.Parameter<number> | db.SQLFragment;
+      /**
+      * **otc_sale_table.partner_id**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      partner_id: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **otc_sale_table.token**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      token: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **otc_sale_table.total_fee**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      total_fee: string | db.Parameter<string> | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **otc_sale_table.amount**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      amount?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **otc_sale_table.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **otc_sale_table.destination**
+      * - `_int4` in database
+      * - `NOT NULL`, no default
+      */
+      destination?: number[] | db.Parameter<number[]> | db.SQLFragment | db.SQLFragment<any, number[] | db.Parameter<number[]> | db.SQLFragment>;
+      /**
+      * **otc_sale_table.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **otc_sale_table.origin**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      origin?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      /**
+      * **otc_sale_table.partner_id**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      partner_id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **otc_sale_table.token**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      token?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **otc_sale_table.total_fee**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      total_fee?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'otc_sale_table_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
    * **queues**
    * - Table in database
    */
@@ -16098,13 +8962,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **queues.first**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      first?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      first?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **queues.id**
       * - `varchar` in database
@@ -16116,19 +8980,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      last?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      last?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **queues.last_processed**
       * - `int8` in database
       * - Nullable, no default
       */
-      last_processed?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      last_processed?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **queues.size**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      size?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      size?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **queues.ticker_hash**
       * - `varchar` in database
@@ -16154,13 +9018,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **queues.first**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      first: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      first: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **queues.id**
       * - `varchar` in database
@@ -16172,19 +9036,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      last: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      last: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **queues.last_processed**
       * - `int8` in database
       * - Nullable, no default
       */
-      last_processed?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment;
+      last_processed?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **queues.size**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      size: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      size: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **queues.ticker_hash**
       * - `varchar` in database
@@ -16210,13 +9074,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - Nullable, no default
       */
-      epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **queues.first**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      first?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      first?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **queues.id**
       * - `varchar` in database
@@ -16228,19 +9092,19 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      last?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      last?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **queues.last_processed**
       * - `int8` in database
       * - Nullable, no default
       */
-      last_processed?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | null | db.DefaultType | db.SQLFragment>;
+      last_processed?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **queues.size**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      size?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      size?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **queues.ticker_hash**
       * - `varchar` in database
@@ -16841,553 +9705,6 @@ declare module 'zapatos/schema' {
   }
 
   /**
-   * **settledeposit**
-   * - Materialized view in database
-   */
-  export namespace settledeposit {
-    export type Table = 'settledeposit';
-    export interface Selectable {
-      /**
-      * **settledeposit.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **settledeposit.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **settledeposit.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **settledeposit.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **settledeposit.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **settledeposit.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **settledeposit.data__amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount: db.NumericString | null;
-      /**
-      * **settledeposit.data__amount_after_fees**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_after_fees: db.NumericString | null;
-      /**
-      * **settledeposit.data__amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_and_rewards: db.NumericString | null;
-      /**
-      * **settledeposit.data__destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__destinations: db.JSONValue | null;
-      /**
-      * **settledeposit.data__input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__input_asset: string | null;
-      /**
-      * **settledeposit.data__intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__intent_id: string | null;
-      /**
-      * **settledeposit.data__is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_deposit: boolean | null;
-      /**
-      * **settledeposit.data__is_settlement**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_settlement: boolean | null;
-      /**
-      * **settledeposit.data__origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__origin: db.Int8String | null;
-      /**
-      * **settledeposit.data__output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__output_asset: string | null;
-      /**
-      * **settledeposit.data__rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__rewards: db.NumericString | null;
-      /**
-      * **settledeposit.data__selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_destination: db.Int8String | null;
-      /**
-      * **settledeposit.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **settledeposit.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **settledeposit.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **settledeposit.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **settledeposit.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **settledeposit.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **settledeposit.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **settledeposit.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **settledeposit.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **settledeposit.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **settledeposit.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **settledeposit.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **settledeposit.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **settledeposit.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **settledeposit.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **settledeposit.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **settledeposit.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **settledeposit.data__amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount: (number | db.NumericString) | null;
-      /**
-      * **settledeposit.data__amount_after_fees**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_after_fees: (number | db.NumericString) | null;
-      /**
-      * **settledeposit.data__amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_and_rewards: (number | db.NumericString) | null;
-      /**
-      * **settledeposit.data__destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__destinations: db.JSONValue | null;
-      /**
-      * **settledeposit.data__input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__input_asset: string | null;
-      /**
-      * **settledeposit.data__intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__intent_id: string | null;
-      /**
-      * **settledeposit.data__is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_deposit: boolean | null;
-      /**
-      * **settledeposit.data__is_settlement**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_settlement: boolean | null;
-      /**
-      * **settledeposit.data__origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__origin: (number | db.Int8String) | null;
-      /**
-      * **settledeposit.data__output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__output_asset: string | null;
-      /**
-      * **settledeposit.data__rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__rewards: (number | db.NumericString) | null;
-      /**
-      * **settledeposit.data__selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_destination: (number | db.Int8String) | null;
-      /**
-      * **settledeposit.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **settledeposit.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **settledeposit.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **settledeposit.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **settledeposit.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **settledeposit.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **settledeposit.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **settledeposit.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **settledeposit.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **settledeposit.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **settledeposit.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **settledeposit.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__amount**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__amount_after_fees**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_after_fees?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__amount_and_rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__amount_and_rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__destinations**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__destinations?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__input_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__intent_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__is_deposit**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_deposit?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__is_settlement**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data__is_settlement?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__origin**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__origin?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__output_asset**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data__output_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__rewards**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data__rewards?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.data__selected_destination**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__selected_destination?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settledeposit.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
    * **settlement_intents**
    * - Table in database
    */
@@ -17595,13 +9912,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('settlement_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **settlement_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **settlement_intents.domain**
       * - `varchar` in database
@@ -17613,13 +9930,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **settlement_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **settlement_intents.id**
       * - `bpchar` in database
@@ -17649,7 +9966,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **settlement_intents.transaction_hash**
       * - `bpchar` in database
@@ -17661,7 +9978,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **settlement_intents.tx_origin**
       * - `varchar` in database
@@ -17687,13 +10004,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('settlement_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment;
       /**
       * **settlement_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      block_number: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **settlement_intents.domain**
       * - `varchar` in database
@@ -17705,13 +10022,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      gas_limit: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **settlement_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      gas_price: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **settlement_intents.id**
       * - `bpchar` in database
@@ -17741,7 +10058,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      timestamp: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **settlement_intents.transaction_hash**
       * - `bpchar` in database
@@ -17753,7 +10070,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      tx_nonce: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **settlement_intents.tx_origin**
       * - `varchar` in database
@@ -17779,13 +10096,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('settlement_intents_auto_id_seq'::regclass)`
       */
-      auto_id?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.DefaultType | db.SQLFragment>;
+      auto_id?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.DefaultType | db.SQLFragment>;
       /**
       * **settlement_intents.block_number**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      block_number?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **settlement_intents.domain**
       * - `varchar` in database
@@ -17797,13 +10114,13 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_limit?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **settlement_intents.gas_price**
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      gas_price?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      gas_price?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **settlement_intents.id**
       * - `bpchar` in database
@@ -17833,7 +10150,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      timestamp?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **settlement_intents.transaction_hash**
       * - `bpchar` in database
@@ -17845,7 +10162,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      tx_nonce?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      tx_nonce?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **settlement_intents.tx_origin**
       * - `varchar` in database
@@ -17861,1226 +10178,292 @@ declare module 'zapatos/schema' {
   }
 
   /**
-   * **settlementenqueued**
-   * - Materialized view in database
+   * **solana_lookup_tables**
+   * - Table in database
    */
-  export namespace settlementenqueued {
-    export type Table = 'settlementenqueued';
+  export namespace solana_lookup_tables {
+    export type Table = 'solana_lookup_tables';
     export interface Selectable {
       /**
-      * **settlementenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
       */
-      address: string | null;
+      chain_id: number;
       /**
-      * **settlementenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **settlementenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **settlementenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **settlementenqueued.block_timestamp**
+      * **solana_lookup_tables.created_at**
       * - `timestamp` in database
-      * - Materialized view column
+      * - Nullable, default: `now()`
       */
-      block_timestamp: Date | null;
+      created_at: Date | null;
       /**
-      * **settlementenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
       */
-      chain: string | null;
+      id: string;
       /**
-      * **settlementenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___amount: db.NumericString | null;
+      lookup_table_address: string;
       /**
-      * **settlementenqueued.data___asset**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___asset: string | null;
+      mint_address: string;
       /**
-      * **settlementenqueued.data___domain**
-      * - `int8` in database
-      * - Materialized view column
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___domain: db.Int8String | null;
+      program_vault_account: string;
       /**
-      * **settlementenqueued.data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
       */
-      data___entry_epoch: db.Int8String | null;
+      slot: number;
       /**
-      * **settlementenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___intent_id: string | null;
+      user_address: string;
       /**
-      * **settlementenqueued.data___owner**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___owner: string | null;
-      /**
-      * **settlementenqueued.data___update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data___update_virtual_balance: boolean | null;
-      /**
-      * **settlementenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **settlementenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **settlementenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **settlementenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **settlementenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **settlementenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **settlementenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **settlementenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **settlementenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **settlementenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **settlementenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
+      user_token_account: string;
     }
     export interface JSONSelectable {
       /**
-      * **settlementenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
       */
-      address: string | null;
+      chain_id: number;
       /**
-      * **settlementenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **settlementenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **settlementenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **settlementenqueued.block_timestamp**
+      * **solana_lookup_tables.created_at**
       * - `timestamp` in database
-      * - Materialized view column
+      * - Nullable, default: `now()`
       */
-      block_timestamp: db.TimestampString | null;
+      created_at: db.TimestampString | null;
       /**
-      * **settlementenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
       */
-      chain: string | null;
+      id: string;
       /**
-      * **settlementenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___amount: (number | db.NumericString) | null;
+      lookup_table_address: string;
       /**
-      * **settlementenqueued.data___asset**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___asset: string | null;
+      mint_address: string;
       /**
-      * **settlementenqueued.data___domain**
-      * - `int8` in database
-      * - Materialized view column
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___domain: (number | db.Int8String) | null;
+      program_vault_account: string;
       /**
-      * **settlementenqueued.data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
       */
-      data___entry_epoch: (number | db.Int8String) | null;
+      slot: number;
       /**
-      * **settlementenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___intent_id: string | null;
+      user_address: string;
       /**
-      * **settlementenqueued.data___owner**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___owner: string | null;
-      /**
-      * **settlementenqueued.data___update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data___update_virtual_balance: boolean | null;
-      /**
-      * **settlementenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **settlementenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **settlementenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **settlementenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **settlementenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **settlementenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **settlementenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **settlementenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **settlementenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **settlementenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **settlementenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
+      user_token_account: string;
     }
     export interface Whereable {
       /**
-      * **settlementenqueued.address**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
       */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      chain_id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **settlementenqueued.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.block_timestamp**
+      * **solana_lookup_tables.created_at**
       * - `timestamp` in database
-      * - Materialized view column
+      * - Nullable, default: `now()`
       */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **settlementenqueued.chain**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
       */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **settlementenqueued.data___amount**
-      * - `numeric` in database
-      * - Materialized view column
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___amount?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
+      lookup_table_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **settlementenqueued.data___asset**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      mint_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **settlementenqueued.data___domain**
-      * - `int8` in database
-      * - Materialized view column
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      program_vault_account?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **settlementenqueued.data___entry_epoch**
-      * - `int8` in database
-      * - Materialized view column
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
       */
-      data___entry_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      slot?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **settlementenqueued.data___intent_id**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      user_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **settlementenqueued.data___owner**
-      * - `varchar` in database
-      * - Materialized view column
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
       */
-      data___owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.data___update_virtual_balance**
-      * - `bool` in database
-      * - Materialized view column
-      */
-      data___update_virtual_balance?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementenqueued.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      user_token_account?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
     }
     export interface Insertable {
-      [key: string]: never;
+      /**
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      chain_id: number | db.Parameter<number> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      lookup_table_address: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      mint_address: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      program_vault_account: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      slot: number | db.Parameter<number> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_address: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_token_account: string | db.Parameter<string> | db.SQLFragment;
     }
     export interface Updatable {
-      [key: string]: never;
+      /**
+      * **solana_lookup_tables.chain_id**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      chain_id?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.created_at**
+      * - `timestamp` in database
+      * - Nullable, default: `now()`
+      */
+      created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.id**
+      * - `uuid` in database
+      * - `NOT NULL`, default: `gen_random_uuid()`
+      */
+      id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.lookup_table_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      lookup_table_address?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.mint_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      mint_address?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.program_vault_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      program_vault_account?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.slot**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      slot?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.user_address**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_address?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **solana_lookup_tables.user_token_account**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      user_token_account?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
     }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **settlementqueueprocessed**
-   * - Materialized view in database
-   */
-  export namespace settlementqueueprocessed {
-    export type Table = 'settlementqueueprocessed';
-    export interface Selectable {
-      /**
-      * **settlementqueueprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **settlementqueueprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **settlementqueueprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **settlementqueueprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **settlementqueueprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **settlementqueueprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **settlementqueueprocessed.data___amount**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___amount: db.Int8String | null;
-      /**
-      * **settlementqueueprocessed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain: db.Int8String | null;
-      /**
-      * **settlementqueueprocessed.data___message_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___message_id: string | null;
-      /**
-      * **settlementqueueprocessed.data___quote**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___quote: db.NumericString | null;
-      /**
-      * **settlementqueueprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **settlementqueueprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **settlementqueueprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **settlementqueueprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **settlementqueueprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **settlementqueueprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **settlementqueueprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **settlementqueueprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **settlementqueueprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **settlementqueueprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **settlementqueueprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **settlementqueueprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **settlementqueueprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **settlementqueueprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **settlementqueueprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **settlementqueueprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **settlementqueueprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **settlementqueueprocessed.data___amount**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___amount: (number | db.Int8String) | null;
-      /**
-      * **settlementqueueprocessed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain: (number | db.Int8String) | null;
-      /**
-      * **settlementqueueprocessed.data___message_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___message_id: string | null;
-      /**
-      * **settlementqueueprocessed.data___quote**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___quote: (number | db.NumericString) | null;
-      /**
-      * **settlementqueueprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **settlementqueueprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **settlementqueueprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **settlementqueueprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **settlementqueueprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **settlementqueueprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **settlementqueueprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **settlementqueueprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **settlementqueueprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **settlementqueueprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **settlementqueueprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **settlementqueueprocessed.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.data___amount**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___amount?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.data___domain**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data___domain?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.data___message_id**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      data___message_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.data___quote**
-      * - `numeric` in database
-      * - Materialized view column
-      */
-      data___quote?: (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.NumericString) | db.Parameter<(number | db.NumericString)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementqueueprocessed.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
-    export type Column = keyof Selectable;
-    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
-    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
-    export type SQL = SQLExpression | SQLExpression[];
-  }
-
-  /**
-   * **settlementsent**
-   * - Materialized view in database
-   */
-  export namespace settlementsent {
-    export type Table = 'settlementsent';
-    export interface Selectable {
-      /**
-      * **settlementsent.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **settlementsent.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **settlementsent.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: db.Int8String | null;
-      /**
-      * **settlementsent.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: db.Int8String | null;
-      /**
-      * **settlementsent.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: Date | null;
-      /**
-      * **settlementsent.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **settlementsent.data__current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__current_epoch: db.Int8String | null;
-      /**
-      * **settlementsent.data__intent_ids**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__intent_ids: db.JSONValue | null;
-      /**
-      * **settlementsent.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **settlementsent.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **settlementsent.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **settlementsent.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: Date | null;
-      /**
-      * **settlementsent.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **settlementsent.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **settlementsent.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **settlementsent.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **settlementsent.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **settlementsent.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: db.Int8String | null;
-      /**
-      * **settlementsent.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: db.Int8String | null;
-    }
-    export interface JSONSelectable {
-      /**
-      * **settlementsent.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address: string | null;
-      /**
-      * **settlementsent.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash: string | null;
-      /**
-      * **settlementsent.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index: (number | db.Int8String) | null;
-      /**
-      * **settlementsent.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number: (number | db.Int8String) | null;
-      /**
-      * **settlementsent.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp: db.TimestampString | null;
-      /**
-      * **settlementsent.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain: string | null;
-      /**
-      * **settlementsent.data__current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__current_epoch: (number | db.Int8String) | null;
-      /**
-      * **settlementsent.data__intent_ids**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__intent_ids: db.JSONValue | null;
-      /**
-      * **settlementsent.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency: string | null;
-      /**
-      * **settlementsent.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name: string | null;
-      /**
-      * **settlementsent.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network: string | null;
-      /**
-      * **settlementsent.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp: db.TimestampString | null;
-      /**
-      * **settlementsent.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0: string | null;
-      /**
-      * **settlementsent.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1: string | null;
-      /**
-      * **settlementsent.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2: string | null;
-      /**
-      * **settlementsent.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3: string | null;
-      /**
-      * **settlementsent.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash: string | null;
-      /**
-      * **settlementsent.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index: (number | db.Int8String) | null;
-      /**
-      * **settlementsent.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index: (number | db.Int8String) | null;
-    }
-    export interface Whereable {
-      /**
-      * **settlementsent.address**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.block_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      block_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.block_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.block_number**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      block_number?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.block_timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      block_timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.chain**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.data__current_epoch**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      data__current_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.data__intent_ids**
-      * - `jsonb` in database
-      * - Materialized view column
-      */
-      data__intent_ids?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.latency**
-      * - `interval` in database
-      * - Materialized view column
-      */
-      latency?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.name**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      name?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.network**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.timestamp**
-      * - `timestamp` in database
-      * - Materialized view column
-      */
-      timestamp?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.topic_0**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_0?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.topic_1**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_1?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.topic_2**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_2?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.topic_3**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      topic_3?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.transaction_hash**
-      * - `varchar` in database
-      * - Materialized view column
-      */
-      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.transaction_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **settlementsent.transaction_log_index**
-      * - `int8` in database
-      * - Materialized view column
-      */
-      transaction_log_index?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
-    }
-    export interface Insertable {
-      [key: string]: never;
-    }
-    export interface Updatable {
-      [key: string]: never;
-    }
-    export type UniqueIndex = never;
+    export type UniqueIndex = 'solana_lookup_tables_pkey' | 'solana_lookup_tables_user_address_mint_address_key';
     export type Column = keyof Selectable;
     export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
     export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
@@ -19175,7 +10558,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      discount_per_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      discount_per_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **tokens.fee_amounts**
       * - `_varchar` in database
@@ -19199,7 +10582,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      max_discount_bps?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+      max_discount_bps?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       /**
       * **tokens.prioritized_strategy**
       * - `varchar` in database
@@ -19213,7 +10596,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      discount_per_epoch: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      discount_per_epoch: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **tokens.fee_amounts**
       * - `_varchar` in database
@@ -19237,7 +10620,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      max_discount_bps: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+      max_discount_bps: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       /**
       * **tokens.prioritized_strategy**
       * - `varchar` in database
@@ -19251,7 +10634,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      discount_per_epoch?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      discount_per_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **tokens.fee_amounts**
       * - `_varchar` in database
@@ -19275,7 +10658,7 @@ declare module 'zapatos/schema' {
       * - `int8` in database
       * - `NOT NULL`, no default
       */
-      max_discount_bps?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+      max_discount_bps?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       /**
       * **tokens.prioritized_strategy**
       * - `varchar` in database
@@ -19293,20 +10676,20 @@ declare module 'zapatos/schema' {
   /* --- aggregate types --- */
 
   export namespace public {  
-    export type Table = assets.Table | balances.Table | checkpoints.Table | closedepochsprocessed.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | deposit_enqueued_not_processed.Table | depositenqueued.Table | depositors.Table | depositprocessed.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | finddepositdomain.Table | findinvoicedomain.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intentprocessed.Table | intents.Table | intents_with_shadow_data.Table | invoice_enqueued_not_settled.Table | invoiceenqueued.Table | invoices.Table | invoices_with_shadow_data.Table | lock_positions.Table | matchdeposit.Table | merkle_trees.Table | messages.Table | origin_intents.Table | origin_intents_status_log.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settledeposit.Table | settlement_intents.Table | settlementenqueued.Table | settlementqueueprocessed.Table | settlementsent.Table | tokens.Table;
-    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | closedepochsprocessed.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | deposit_enqueued_not_processed.Selectable | depositenqueued.Selectable | depositors.Selectable | depositprocessed.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | finddepositdomain.Selectable | findinvoicedomain.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intentprocessed.Selectable | intents.Selectable | intents_with_shadow_data.Selectable | invoice_enqueued_not_settled.Selectable | invoiceenqueued.Selectable | invoices.Selectable | invoices_with_shadow_data.Selectable | lock_positions.Selectable | matchdeposit.Selectable | merkle_trees.Selectable | messages.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settledeposit.Selectable | settlement_intents.Selectable | settlementenqueued.Selectable | settlementqueueprocessed.Selectable | settlementsent.Selectable | tokens.Selectable;
-    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | closedepochsprocessed.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | deposit_enqueued_not_processed.JSONSelectable | depositenqueued.JSONSelectable | depositors.JSONSelectable | depositprocessed.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | finddepositdomain.JSONSelectable | findinvoicedomain.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intentprocessed.JSONSelectable | intents.JSONSelectable | intents_with_shadow_data.JSONSelectable | invoice_enqueued_not_settled.JSONSelectable | invoiceenqueued.JSONSelectable | invoices.JSONSelectable | invoices_with_shadow_data.JSONSelectable | lock_positions.JSONSelectable | matchdeposit.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settledeposit.JSONSelectable | settlement_intents.JSONSelectable | settlementenqueued.JSONSelectable | settlementqueueprocessed.JSONSelectable | settlementsent.JSONSelectable | tokens.JSONSelectable;
-    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | closedepochsprocessed.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | deposit_enqueued_not_processed.Whereable | depositenqueued.Whereable | depositors.Whereable | depositprocessed.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | finddepositdomain.Whereable | findinvoicedomain.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intentprocessed.Whereable | intents.Whereable | intents_with_shadow_data.Whereable | invoice_enqueued_not_settled.Whereable | invoiceenqueued.Whereable | invoices.Whereable | invoices_with_shadow_data.Whereable | lock_positions.Whereable | matchdeposit.Whereable | merkle_trees.Whereable | messages.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settledeposit.Whereable | settlement_intents.Whereable | settlementenqueued.Whereable | settlementqueueprocessed.Whereable | settlementsent.Whereable | tokens.Whereable;
-    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | closedepochsprocessed.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | deposit_enqueued_not_processed.Insertable | depositenqueued.Insertable | depositors.Insertable | depositprocessed.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | finddepositdomain.Insertable | findinvoicedomain.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intentprocessed.Insertable | intents.Insertable | intents_with_shadow_data.Insertable | invoice_enqueued_not_settled.Insertable | invoiceenqueued.Insertable | invoices.Insertable | invoices_with_shadow_data.Insertable | lock_positions.Insertable | matchdeposit.Insertable | merkle_trees.Insertable | messages.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settledeposit.Insertable | settlement_intents.Insertable | settlementenqueued.Insertable | settlementqueueprocessed.Insertable | settlementsent.Insertable | tokens.Insertable;
-    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | closedepochsprocessed.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | deposit_enqueued_not_processed.Updatable | depositenqueued.Updatable | depositors.Updatable | depositprocessed.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | finddepositdomain.Updatable | findinvoicedomain.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intentprocessed.Updatable | intents.Updatable | intents_with_shadow_data.Updatable | invoice_enqueued_not_settled.Updatable | invoiceenqueued.Updatable | invoices.Updatable | invoices_with_shadow_data.Updatable | lock_positions.Updatable | matchdeposit.Updatable | merkle_trees.Updatable | messages.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settledeposit.Updatable | settlement_intents.Updatable | settlementenqueued.Updatable | settlementqueueprocessed.Updatable | settlementsent.Updatable | tokens.Updatable;
-    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | closedepochsprocessed.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | deposit_enqueued_not_processed.UniqueIndex | depositenqueued.UniqueIndex | depositors.UniqueIndex | depositprocessed.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | finddepositdomain.UniqueIndex | findinvoicedomain.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intentprocessed.UniqueIndex | intents.UniqueIndex | intents_with_shadow_data.UniqueIndex | invoice_enqueued_not_settled.UniqueIndex | invoiceenqueued.UniqueIndex | invoices.UniqueIndex | invoices_with_shadow_data.UniqueIndex | lock_positions.UniqueIndex | matchdeposit.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settledeposit.UniqueIndex | settlement_intents.UniqueIndex | settlementenqueued.UniqueIndex | settlementqueueprocessed.UniqueIndex | settlementsent.UniqueIndex | tokens.UniqueIndex;
-    export type Column = assets.Column | balances.Column | checkpoints.Column | closedepochsprocessed.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | deposit_enqueued_not_processed.Column | depositenqueued.Column | depositors.Column | depositprocessed.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | finddepositdomain.Column | findinvoicedomain.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intentprocessed.Column | intents.Column | intents_with_shadow_data.Column | invoice_enqueued_not_settled.Column | invoiceenqueued.Column | invoices.Column | invoices_with_shadow_data.Column | lock_positions.Column | matchdeposit.Column | merkle_trees.Column | messages.Column | origin_intents.Column | origin_intents_status_log.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settledeposit.Column | settlement_intents.Column | settlementenqueued.Column | settlementqueueprocessed.Column | settlementsent.Column | tokens.Column;
+    export type Table = assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | otc_sale_table.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | solana_lookup_tables.Table | tokens.Table;
+    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | otc_sale_table.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | solana_lookup_tables.Selectable | tokens.Selectable;
+    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | otc_sale_table.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | solana_lookup_tables.JSONSelectable | tokens.JSONSelectable;
+    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | otc_sale_table.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | solana_lookup_tables.Whereable | tokens.Whereable;
+    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | otc_sale_table.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | solana_lookup_tables.Insertable | tokens.Insertable;
+    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | otc_sale_table.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | solana_lookup_tables.Updatable | tokens.Updatable;
+    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | otc_sale_table.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | solana_lookup_tables.UniqueIndex | tokens.UniqueIndex;
+    export type Column = assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | otc_sale_table.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | solana_lookup_tables.Column | tokens.Column;
   
-    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, tokens.Table];
+    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, tokens.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
-    export type AllMaterializedViews = [closedepochsprocessed.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, deposit_enqueued_not_processed.Table, depositenqueued.Table, depositprocessed.Table, finddepositdomain.Table, findinvoicedomain.Table, intentprocessed.Table, intents.Table, intents_with_shadow_data.Table, invoice_enqueued_not_settled.Table, invoiceenqueued.Table, invoices.Table, invoices_with_shadow_data.Table, matchdeposit.Table, settledeposit.Table, settlementenqueued.Table, settlementqueueprocessed.Table, settlementsent.Table];
-    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, closedepochsprocessed.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, deposit_enqueued_not_processed.Table, depositenqueued.Table, depositors.Table, depositprocessed.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, finddepositdomain.Table, findinvoicedomain.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intentprocessed.Table, intents.Table, intents_with_shadow_data.Table, invoice_enqueued_not_settled.Table, invoiceenqueued.Table, invoices.Table, invoices_with_shadow_data.Table, lock_positions.Table, matchdeposit.Table, merkle_trees.Table, messages.Table, origin_intents.Table, origin_intents_status_log.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settledeposit.Table, settlement_intents.Table, settlementenqueued.Table, settlementqueueprocessed.Table, settlementsent.Table, tokens.Table];
+    export type AllMaterializedViews = [daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, intents.Table, invoices.Table];
+    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, tokens.Table];
   }
 
 
@@ -19582,7 +10965,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -19668,7 +11051,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -19754,7 +11137,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridge_in_error_pkey';
       export type Column = keyof Selectable;
@@ -20007,7 +11390,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -20087,7 +11470,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -20167,7 +11550,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridge_updated_pkey';
       export type Column = keyof Selectable;
@@ -20420,7 +11803,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -20500,7 +11883,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -20580,7 +11963,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridged_in_pkey';
       export type Column = keyof Selectable;
@@ -20851,7 +12234,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -20937,7 +12320,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -21023,7 +12406,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridged_lock_pkey';
       export type Column = keyof Selectable;
@@ -21294,7 +12677,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -21380,7 +12763,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -21466,7 +12849,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridged_lock_error_pkey';
       export type Column = keyof Selectable;
@@ -21737,7 +13120,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -21823,7 +13206,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -21909,7 +13292,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'bridged_out_pkey';
       export type Column = keyof Selectable;
@@ -22162,7 +13545,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -22242,7 +13625,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -22322,7 +13705,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'chain_gateway_added_pkey';
       export type Column = keyof Selectable;
@@ -22575,7 +13958,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -22655,7 +14038,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -22735,7 +14118,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'chain_gateway_removed_pkey';
       export type Column = keyof Selectable;
@@ -22988,7 +14371,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -23068,7 +14451,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -23148,7 +14531,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'early_exit_pkey';
       export type Column = keyof Selectable;
@@ -23347,7 +14730,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -23409,7 +14792,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -23471,7 +14854,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'eip712_domain_changed_pkey';
       export type Column = keyof Selectable;
@@ -23706,7 +15089,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -23780,7 +15163,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -23854,7 +15237,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'epoch_rewards_updated_pkey';
       export type Column = keyof Selectable;
@@ -24101,7 +15484,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
         /**
         * **tokenomics.eth_withdrawn.withdraw_id**
         * - `numeric` in database
@@ -24181,7 +15564,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
         /**
         * **tokenomics.eth_withdrawn.withdraw_id**
         * - `numeric` in database
@@ -24261,7 +15644,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
         /**
         * **tokenomics.eth_withdrawn.withdraw_id**
         * - `numeric` in database
@@ -24502,7 +15885,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -24576,7 +15959,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -24650,7 +16033,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'fee_info_pkey';
       export type Column = keyof Selectable;
@@ -24885,7 +16268,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -24959,7 +16342,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -25033,7 +16416,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'gateway_updated_pkey';
       export type Column = keyof Selectable;
@@ -25250,7 +16633,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -25318,7 +16701,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -25386,7 +16769,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'hub_gauge_updated_pkey';
       export type Column = keyof Selectable;
@@ -25639,7 +17022,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -25719,7 +17102,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -25799,7 +17182,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'lock_position_pkey';
       export type Column = keyof Selectable;
@@ -26052,7 +17435,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -26132,7 +17515,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -26212,7 +17595,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'mailbox_updated_pkey';
       export type Column = keyof Selectable;
@@ -26465,7 +17848,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -26545,7 +17928,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -26625,7 +18008,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'message_gas_limit_updated_pkey';
       export type Column = keyof Selectable;
@@ -26914,7 +18297,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -27006,7 +18389,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -27098,7 +18481,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'mint_message_sent_pkey';
       export type Column = keyof Selectable;
@@ -27387,7 +18770,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -27479,7 +18862,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -27571,7 +18954,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'new_lock_position_pkey';
       export type Column = keyof Selectable;
@@ -27824,7 +19207,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -27904,7 +19287,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -27984,7 +19367,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'ownership_transferred_pkey';
       export type Column = keyof Selectable;
@@ -28291,7 +19674,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -28389,7 +19772,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -28487,7 +19870,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'process_error_pkey';
       export type Column = keyof Selectable;
@@ -28758,7 +20141,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -28844,7 +20227,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -28930,7 +20313,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_bridge_out_pkey';
       export type Column = keyof Selectable;
@@ -29201,7 +20584,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -29287,7 +20670,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -29373,7 +20756,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_lock_pkey';
       export type Column = keyof Selectable;
@@ -29644,7 +21027,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -29730,7 +21113,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -29816,7 +21199,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_message_pkey';
       export type Column = keyof Selectable;
@@ -30087,7 +21470,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -30173,7 +21556,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -30259,7 +21642,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_mint_pkey';
       export type Column = keyof Selectable;
@@ -30530,7 +21913,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -30616,7 +21999,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -30702,7 +22085,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'retry_transfer_pkey';
       export type Column = keyof Selectable;
@@ -30955,7 +22338,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -31035,7 +22418,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -31115,7 +22498,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'return_fee_updated_pkey';
       export type Column = keyof Selectable;
@@ -31386,7 +22769,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -31472,7 +22855,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -31558,7 +22941,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'reward_claimed_pkey';
       export type Column = keyof Selectable;
@@ -31829,7 +23212,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -31915,7 +23298,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -32001,7 +23384,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'reward_metadata_updated_pkey';
       export type Column = keyof Selectable;
@@ -32254,7 +23637,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -32334,7 +23717,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -32414,7 +23797,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'rewards_claimed_pkey';
       export type Column = keyof Selectable;
@@ -32667,7 +24050,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -32747,7 +24130,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -32827,7 +24210,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'security_module_updated_pkey';
       export type Column = keyof Selectable;
@@ -32954,7 +24337,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -32992,7 +24375,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -33030,7 +24413,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'user_pkey';
       export type Column = keyof Selectable;
@@ -33295,7 +24678,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
         /**
         * **tokenomics.vote_cast.votes**
         * - `numeric` in database
@@ -33381,7 +24764,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
         /**
         * **tokenomics.vote_cast.votes**
         * - `numeric` in database
@@ -33467,7 +24850,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
         /**
         * **tokenomics.vote_cast.votes**
         * - `numeric` in database
@@ -33708,7 +25091,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -33782,7 +25165,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -33856,7 +25239,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'vote_delegated_pkey';
       export type Column = keyof Selectable;
@@ -34091,7 +25474,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -34165,7 +25548,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -34239,7 +25622,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'withdraw_pkey';
       export type Column = keyof Selectable;
@@ -34474,7 +25857,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.ParentColumn>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
       }
       export interface Insertable {
         /**
@@ -34548,7 +25931,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment;
+        vid: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
       }
       export interface Updatable {
         /**
@@ -34622,7 +26005,7 @@ declare module 'zapatos/schema' {
         * - `int8` in database
         * - `NOT NULL`, no default
         */
-        vid?: (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String) | db.Parameter<(number | db.Int8String)> | db.SQLFragment>;
+        vid?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
       }
       export type UniqueIndex = 'withdraw_eth_pkey';
       export type Column = keyof Selectable;
@@ -34676,44 +26059,31 @@ declare module 'zapatos/schema' {
     "assets": assets.Selectable;
     "balances": balances.Selectable;
     "checkpoints": checkpoints.Selectable;
-    "closedepochsprocessed": closedepochsprocessed.Selectable;
     "daily_metrics_by_chains_tokens": daily_metrics_by_chains_tokens.Selectable;
     "daily_metrics_by_date": daily_metrics_by_date.Selectable;
-    "deposit_enqueued_not_processed": deposit_enqueued_not_processed.Selectable;
-    "depositenqueued": depositenqueued.Selectable;
     "depositors": depositors.Selectable;
-    "depositprocessed": depositprocessed.Selectable;
     "destination_intents": destination_intents.Selectable;
     "destination_intents_status_log": destination_intents_status_log.Selectable;
     "epoch_results": epoch_results.Selectable;
-    "finddepositdomain": finddepositdomain.Selectable;
-    "findinvoicedomain": findinvoicedomain.Selectable;
     "hub_deposits": hub_deposits.Selectable;
     "hub_intents": hub_intents.Selectable;
     "hub_intents_status_log": hub_intents_status_log.Selectable;
     "hub_invoices": hub_invoices.Selectable;
-    "intentprocessed": intentprocessed.Selectable;
     "intents": intents.Selectable;
-    "intents_with_shadow_data": intents_with_shadow_data.Selectable;
-    "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Selectable;
-    "invoiceenqueued": invoiceenqueued.Selectable;
     "invoices": invoices.Selectable;
-    "invoices_with_shadow_data": invoices_with_shadow_data.Selectable;
     "lock_positions": lock_positions.Selectable;
-    "matchdeposit": matchdeposit.Selectable;
     "merkle_trees": merkle_trees.Selectable;
     "messages": messages.Selectable;
+    "orders": orders.Selectable;
     "origin_intents": origin_intents.Selectable;
     "origin_intents_status_log": origin_intents_status_log.Selectable;
+    "otc_sale_table": otc_sale_table.Selectable;
     "queues": queues.Selectable;
     "queues_type_log": queues_type_log.Selectable;
     "rewards": rewards.Selectable;
     "schema_migrations": schema_migrations.Selectable;
-    "settledeposit": settledeposit.Selectable;
     "settlement_intents": settlement_intents.Selectable;
-    "settlementenqueued": settlementenqueued.Selectable;
-    "settlementqueueprocessed": settlementqueueprocessed.Selectable;
-    "settlementsent": settlementsent.Selectable;
+    "solana_lookup_tables": solana_lookup_tables.Selectable;
     "tokens": tokens.Selectable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Selectable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Selectable;
@@ -34758,44 +26128,31 @@ declare module 'zapatos/schema' {
     "assets": assets.JSONSelectable;
     "balances": balances.JSONSelectable;
     "checkpoints": checkpoints.JSONSelectable;
-    "closedepochsprocessed": closedepochsprocessed.JSONSelectable;
     "daily_metrics_by_chains_tokens": daily_metrics_by_chains_tokens.JSONSelectable;
     "daily_metrics_by_date": daily_metrics_by_date.JSONSelectable;
-    "deposit_enqueued_not_processed": deposit_enqueued_not_processed.JSONSelectable;
-    "depositenqueued": depositenqueued.JSONSelectable;
     "depositors": depositors.JSONSelectable;
-    "depositprocessed": depositprocessed.JSONSelectable;
     "destination_intents": destination_intents.JSONSelectable;
     "destination_intents_status_log": destination_intents_status_log.JSONSelectable;
     "epoch_results": epoch_results.JSONSelectable;
-    "finddepositdomain": finddepositdomain.JSONSelectable;
-    "findinvoicedomain": findinvoicedomain.JSONSelectable;
     "hub_deposits": hub_deposits.JSONSelectable;
     "hub_intents": hub_intents.JSONSelectable;
     "hub_intents_status_log": hub_intents_status_log.JSONSelectable;
     "hub_invoices": hub_invoices.JSONSelectable;
-    "intentprocessed": intentprocessed.JSONSelectable;
     "intents": intents.JSONSelectable;
-    "intents_with_shadow_data": intents_with_shadow_data.JSONSelectable;
-    "invoice_enqueued_not_settled": invoice_enqueued_not_settled.JSONSelectable;
-    "invoiceenqueued": invoiceenqueued.JSONSelectable;
     "invoices": invoices.JSONSelectable;
-    "invoices_with_shadow_data": invoices_with_shadow_data.JSONSelectable;
     "lock_positions": lock_positions.JSONSelectable;
-    "matchdeposit": matchdeposit.JSONSelectable;
     "merkle_trees": merkle_trees.JSONSelectable;
     "messages": messages.JSONSelectable;
+    "orders": orders.JSONSelectable;
     "origin_intents": origin_intents.JSONSelectable;
     "origin_intents_status_log": origin_intents_status_log.JSONSelectable;
+    "otc_sale_table": otc_sale_table.JSONSelectable;
     "queues": queues.JSONSelectable;
     "queues_type_log": queues_type_log.JSONSelectable;
     "rewards": rewards.JSONSelectable;
     "schema_migrations": schema_migrations.JSONSelectable;
-    "settledeposit": settledeposit.JSONSelectable;
     "settlement_intents": settlement_intents.JSONSelectable;
-    "settlementenqueued": settlementenqueued.JSONSelectable;
-    "settlementqueueprocessed": settlementqueueprocessed.JSONSelectable;
-    "settlementsent": settlementsent.JSONSelectable;
+    "solana_lookup_tables": solana_lookup_tables.JSONSelectable;
     "tokens": tokens.JSONSelectable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.JSONSelectable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.JSONSelectable;
@@ -34840,44 +26197,31 @@ declare module 'zapatos/schema' {
     "assets": assets.Whereable;
     "balances": balances.Whereable;
     "checkpoints": checkpoints.Whereable;
-    "closedepochsprocessed": closedepochsprocessed.Whereable;
     "daily_metrics_by_chains_tokens": daily_metrics_by_chains_tokens.Whereable;
     "daily_metrics_by_date": daily_metrics_by_date.Whereable;
-    "deposit_enqueued_not_processed": deposit_enqueued_not_processed.Whereable;
-    "depositenqueued": depositenqueued.Whereable;
     "depositors": depositors.Whereable;
-    "depositprocessed": depositprocessed.Whereable;
     "destination_intents": destination_intents.Whereable;
     "destination_intents_status_log": destination_intents_status_log.Whereable;
     "epoch_results": epoch_results.Whereable;
-    "finddepositdomain": finddepositdomain.Whereable;
-    "findinvoicedomain": findinvoicedomain.Whereable;
     "hub_deposits": hub_deposits.Whereable;
     "hub_intents": hub_intents.Whereable;
     "hub_intents_status_log": hub_intents_status_log.Whereable;
     "hub_invoices": hub_invoices.Whereable;
-    "intentprocessed": intentprocessed.Whereable;
     "intents": intents.Whereable;
-    "intents_with_shadow_data": intents_with_shadow_data.Whereable;
-    "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Whereable;
-    "invoiceenqueued": invoiceenqueued.Whereable;
     "invoices": invoices.Whereable;
-    "invoices_with_shadow_data": invoices_with_shadow_data.Whereable;
     "lock_positions": lock_positions.Whereable;
-    "matchdeposit": matchdeposit.Whereable;
     "merkle_trees": merkle_trees.Whereable;
     "messages": messages.Whereable;
+    "orders": orders.Whereable;
     "origin_intents": origin_intents.Whereable;
     "origin_intents_status_log": origin_intents_status_log.Whereable;
+    "otc_sale_table": otc_sale_table.Whereable;
     "queues": queues.Whereable;
     "queues_type_log": queues_type_log.Whereable;
     "rewards": rewards.Whereable;
     "schema_migrations": schema_migrations.Whereable;
-    "settledeposit": settledeposit.Whereable;
     "settlement_intents": settlement_intents.Whereable;
-    "settlementenqueued": settlementenqueued.Whereable;
-    "settlementqueueprocessed": settlementqueueprocessed.Whereable;
-    "settlementsent": settlementsent.Whereable;
+    "solana_lookup_tables": solana_lookup_tables.Whereable;
     "tokens": tokens.Whereable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Whereable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Whereable;
@@ -34922,44 +26266,31 @@ declare module 'zapatos/schema' {
     "assets": assets.Insertable;
     "balances": balances.Insertable;
     "checkpoints": checkpoints.Insertable;
-    "closedepochsprocessed": closedepochsprocessed.Insertable;
     "daily_metrics_by_chains_tokens": daily_metrics_by_chains_tokens.Insertable;
     "daily_metrics_by_date": daily_metrics_by_date.Insertable;
-    "deposit_enqueued_not_processed": deposit_enqueued_not_processed.Insertable;
-    "depositenqueued": depositenqueued.Insertable;
     "depositors": depositors.Insertable;
-    "depositprocessed": depositprocessed.Insertable;
     "destination_intents": destination_intents.Insertable;
     "destination_intents_status_log": destination_intents_status_log.Insertable;
     "epoch_results": epoch_results.Insertable;
-    "finddepositdomain": finddepositdomain.Insertable;
-    "findinvoicedomain": findinvoicedomain.Insertable;
     "hub_deposits": hub_deposits.Insertable;
     "hub_intents": hub_intents.Insertable;
     "hub_intents_status_log": hub_intents_status_log.Insertable;
     "hub_invoices": hub_invoices.Insertable;
-    "intentprocessed": intentprocessed.Insertable;
     "intents": intents.Insertable;
-    "intents_with_shadow_data": intents_with_shadow_data.Insertable;
-    "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Insertable;
-    "invoiceenqueued": invoiceenqueued.Insertable;
     "invoices": invoices.Insertable;
-    "invoices_with_shadow_data": invoices_with_shadow_data.Insertable;
     "lock_positions": lock_positions.Insertable;
-    "matchdeposit": matchdeposit.Insertable;
     "merkle_trees": merkle_trees.Insertable;
     "messages": messages.Insertable;
+    "orders": orders.Insertable;
     "origin_intents": origin_intents.Insertable;
     "origin_intents_status_log": origin_intents_status_log.Insertable;
+    "otc_sale_table": otc_sale_table.Insertable;
     "queues": queues.Insertable;
     "queues_type_log": queues_type_log.Insertable;
     "rewards": rewards.Insertable;
     "schema_migrations": schema_migrations.Insertable;
-    "settledeposit": settledeposit.Insertable;
     "settlement_intents": settlement_intents.Insertable;
-    "settlementenqueued": settlementenqueued.Insertable;
-    "settlementqueueprocessed": settlementqueueprocessed.Insertable;
-    "settlementsent": settlementsent.Insertable;
+    "solana_lookup_tables": solana_lookup_tables.Insertable;
     "tokens": tokens.Insertable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Insertable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Insertable;
@@ -35004,44 +26335,31 @@ declare module 'zapatos/schema' {
     "assets": assets.Updatable;
     "balances": balances.Updatable;
     "checkpoints": checkpoints.Updatable;
-    "closedepochsprocessed": closedepochsprocessed.Updatable;
     "daily_metrics_by_chains_tokens": daily_metrics_by_chains_tokens.Updatable;
     "daily_metrics_by_date": daily_metrics_by_date.Updatable;
-    "deposit_enqueued_not_processed": deposit_enqueued_not_processed.Updatable;
-    "depositenqueued": depositenqueued.Updatable;
     "depositors": depositors.Updatable;
-    "depositprocessed": depositprocessed.Updatable;
     "destination_intents": destination_intents.Updatable;
     "destination_intents_status_log": destination_intents_status_log.Updatable;
     "epoch_results": epoch_results.Updatable;
-    "finddepositdomain": finddepositdomain.Updatable;
-    "findinvoicedomain": findinvoicedomain.Updatable;
     "hub_deposits": hub_deposits.Updatable;
     "hub_intents": hub_intents.Updatable;
     "hub_intents_status_log": hub_intents_status_log.Updatable;
     "hub_invoices": hub_invoices.Updatable;
-    "intentprocessed": intentprocessed.Updatable;
     "intents": intents.Updatable;
-    "intents_with_shadow_data": intents_with_shadow_data.Updatable;
-    "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Updatable;
-    "invoiceenqueued": invoiceenqueued.Updatable;
     "invoices": invoices.Updatable;
-    "invoices_with_shadow_data": invoices_with_shadow_data.Updatable;
     "lock_positions": lock_positions.Updatable;
-    "matchdeposit": matchdeposit.Updatable;
     "merkle_trees": merkle_trees.Updatable;
     "messages": messages.Updatable;
+    "orders": orders.Updatable;
     "origin_intents": origin_intents.Updatable;
     "origin_intents_status_log": origin_intents_status_log.Updatable;
+    "otc_sale_table": otc_sale_table.Updatable;
     "queues": queues.Updatable;
     "queues_type_log": queues_type_log.Updatable;
     "rewards": rewards.Updatable;
     "schema_migrations": schema_migrations.Updatable;
-    "settledeposit": settledeposit.Updatable;
     "settlement_intents": settlement_intents.Updatable;
-    "settlementenqueued": settlementenqueued.Updatable;
-    "settlementqueueprocessed": settlementqueueprocessed.Updatable;
-    "settlementsent": settlementsent.Updatable;
+    "solana_lookup_tables": solana_lookup_tables.Updatable;
     "tokens": tokens.Updatable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Updatable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Updatable;
@@ -35086,44 +26404,31 @@ declare module 'zapatos/schema' {
     "assets": assets.UniqueIndex;
     "balances": balances.UniqueIndex;
     "checkpoints": checkpoints.UniqueIndex;
-    "closedepochsprocessed": closedepochsprocessed.UniqueIndex;
     "daily_metrics_by_chains_tokens": daily_metrics_by_chains_tokens.UniqueIndex;
     "daily_metrics_by_date": daily_metrics_by_date.UniqueIndex;
-    "deposit_enqueued_not_processed": deposit_enqueued_not_processed.UniqueIndex;
-    "depositenqueued": depositenqueued.UniqueIndex;
     "depositors": depositors.UniqueIndex;
-    "depositprocessed": depositprocessed.UniqueIndex;
     "destination_intents": destination_intents.UniqueIndex;
     "destination_intents_status_log": destination_intents_status_log.UniqueIndex;
     "epoch_results": epoch_results.UniqueIndex;
-    "finddepositdomain": finddepositdomain.UniqueIndex;
-    "findinvoicedomain": findinvoicedomain.UniqueIndex;
     "hub_deposits": hub_deposits.UniqueIndex;
     "hub_intents": hub_intents.UniqueIndex;
     "hub_intents_status_log": hub_intents_status_log.UniqueIndex;
     "hub_invoices": hub_invoices.UniqueIndex;
-    "intentprocessed": intentprocessed.UniqueIndex;
     "intents": intents.UniqueIndex;
-    "intents_with_shadow_data": intents_with_shadow_data.UniqueIndex;
-    "invoice_enqueued_not_settled": invoice_enqueued_not_settled.UniqueIndex;
-    "invoiceenqueued": invoiceenqueued.UniqueIndex;
     "invoices": invoices.UniqueIndex;
-    "invoices_with_shadow_data": invoices_with_shadow_data.UniqueIndex;
     "lock_positions": lock_positions.UniqueIndex;
-    "matchdeposit": matchdeposit.UniqueIndex;
     "merkle_trees": merkle_trees.UniqueIndex;
     "messages": messages.UniqueIndex;
+    "orders": orders.UniqueIndex;
     "origin_intents": origin_intents.UniqueIndex;
     "origin_intents_status_log": origin_intents_status_log.UniqueIndex;
+    "otc_sale_table": otc_sale_table.UniqueIndex;
     "queues": queues.UniqueIndex;
     "queues_type_log": queues_type_log.UniqueIndex;
     "rewards": rewards.UniqueIndex;
     "schema_migrations": schema_migrations.UniqueIndex;
-    "settledeposit": settledeposit.UniqueIndex;
     "settlement_intents": settlement_intents.UniqueIndex;
-    "settlementenqueued": settlementenqueued.UniqueIndex;
-    "settlementqueueprocessed": settlementqueueprocessed.UniqueIndex;
-    "settlementsent": settlementsent.UniqueIndex;
+    "solana_lookup_tables": solana_lookup_tables.UniqueIndex;
     "tokens": tokens.UniqueIndex;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.UniqueIndex;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.UniqueIndex;
@@ -35168,44 +26473,31 @@ declare module 'zapatos/schema' {
     "assets": assets.Column;
     "balances": balances.Column;
     "checkpoints": checkpoints.Column;
-    "closedepochsprocessed": closedepochsprocessed.Column;
     "daily_metrics_by_chains_tokens": daily_metrics_by_chains_tokens.Column;
     "daily_metrics_by_date": daily_metrics_by_date.Column;
-    "deposit_enqueued_not_processed": deposit_enqueued_not_processed.Column;
-    "depositenqueued": depositenqueued.Column;
     "depositors": depositors.Column;
-    "depositprocessed": depositprocessed.Column;
     "destination_intents": destination_intents.Column;
     "destination_intents_status_log": destination_intents_status_log.Column;
     "epoch_results": epoch_results.Column;
-    "finddepositdomain": finddepositdomain.Column;
-    "findinvoicedomain": findinvoicedomain.Column;
     "hub_deposits": hub_deposits.Column;
     "hub_intents": hub_intents.Column;
     "hub_intents_status_log": hub_intents_status_log.Column;
     "hub_invoices": hub_invoices.Column;
-    "intentprocessed": intentprocessed.Column;
     "intents": intents.Column;
-    "intents_with_shadow_data": intents_with_shadow_data.Column;
-    "invoice_enqueued_not_settled": invoice_enqueued_not_settled.Column;
-    "invoiceenqueued": invoiceenqueued.Column;
     "invoices": invoices.Column;
-    "invoices_with_shadow_data": invoices_with_shadow_data.Column;
     "lock_positions": lock_positions.Column;
-    "matchdeposit": matchdeposit.Column;
     "merkle_trees": merkle_trees.Column;
     "messages": messages.Column;
+    "orders": orders.Column;
     "origin_intents": origin_intents.Column;
     "origin_intents_status_log": origin_intents_status_log.Column;
+    "otc_sale_table": otc_sale_table.Column;
     "queues": queues.Column;
     "queues_type_log": queues_type_log.Column;
     "rewards": rewards.Column;
     "schema_migrations": schema_migrations.Column;
-    "settledeposit": settledeposit.Column;
     "settlement_intents": settlement_intents.Column;
-    "settlementenqueued": settlementenqueued.Column;
-    "settlementqueueprocessed": settlementqueueprocessed.Column;
-    "settlementsent": settlementsent.Column;
+    "solana_lookup_tables": solana_lookup_tables.Column;
     "tokens": tokens.Column;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Column;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Column;
@@ -35250,44 +26542,31 @@ declare module 'zapatos/schema' {
     "assets": assets.SQL;
     "balances": balances.SQL;
     "checkpoints": checkpoints.SQL;
-    "closedepochsprocessed": closedepochsprocessed.SQL;
     "daily_metrics_by_chains_tokens": daily_metrics_by_chains_tokens.SQL;
     "daily_metrics_by_date": daily_metrics_by_date.SQL;
-    "deposit_enqueued_not_processed": deposit_enqueued_not_processed.SQL;
-    "depositenqueued": depositenqueued.SQL;
     "depositors": depositors.SQL;
-    "depositprocessed": depositprocessed.SQL;
     "destination_intents": destination_intents.SQL;
     "destination_intents_status_log": destination_intents_status_log.SQL;
     "epoch_results": epoch_results.SQL;
-    "finddepositdomain": finddepositdomain.SQL;
-    "findinvoicedomain": findinvoicedomain.SQL;
     "hub_deposits": hub_deposits.SQL;
     "hub_intents": hub_intents.SQL;
     "hub_intents_status_log": hub_intents_status_log.SQL;
     "hub_invoices": hub_invoices.SQL;
-    "intentprocessed": intentprocessed.SQL;
     "intents": intents.SQL;
-    "intents_with_shadow_data": intents_with_shadow_data.SQL;
-    "invoice_enqueued_not_settled": invoice_enqueued_not_settled.SQL;
-    "invoiceenqueued": invoiceenqueued.SQL;
     "invoices": invoices.SQL;
-    "invoices_with_shadow_data": invoices_with_shadow_data.SQL;
     "lock_positions": lock_positions.SQL;
-    "matchdeposit": matchdeposit.SQL;
     "merkle_trees": merkle_trees.SQL;
     "messages": messages.SQL;
+    "orders": orders.SQL;
     "origin_intents": origin_intents.SQL;
     "origin_intents_status_log": origin_intents_status_log.SQL;
+    "otc_sale_table": otc_sale_table.SQL;
     "queues": queues.SQL;
     "queues_type_log": queues_type_log.SQL;
     "rewards": rewards.SQL;
     "schema_migrations": schema_migrations.SQL;
-    "settledeposit": settledeposit.SQL;
     "settlement_intents": settlement_intents.SQL;
-    "settlementenqueued": settlementenqueued.SQL;
-    "settlementqueueprocessed": settlementqueueprocessed.SQL;
-    "settlementsent": settlementsent.SQL;
+    "solana_lookup_tables": solana_lookup_tables.SQL;
     "tokens": tokens.SQL;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.SQL;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.SQL;

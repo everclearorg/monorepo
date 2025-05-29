@@ -4,6 +4,16 @@ locals {
   default_db_endpoint      = "rds-postgres-cartographer-chimera.c64s9irwuemi.us-west-2.rds.amazonaws.com"
   default_db_url           = "postgresql://${var.postgres_user}:${var.postgres_password}@${local.default_db_endpoint}:5432/everclear"
 
+  lighthouse_intent_config_param_name = "lighthouse-intent-${var.environment}-${var.stage}-config"
+  lighthouse_fill_config_param_name = "lighthouse-fill-${var.environment}-${var.stage}-config"
+  lighthouse_settlement_config_param_name = "lighthouse-settlement-${var.environment}-${var.stage}-config"
+  lighthouse_expired_config_param_name = "lighthouse-expired-${var.environment}-${var.stage}-config"
+  lighthouse_invoice_config_param_name = "lighthouse-invoice-${var.environment}-${var.stage}-config"
+  lighthouse_reward_config_param_name = "lighthouse-reward-${var.environment}-${var.stage}-config"
+  lighthouse_reward_metadata_config_param_name = "lighthouse-reward_metadata-${var.environment}-${var.stage}-config"
+  lighthouse_solana_config_param_name = "lighthouse-solana-${var.environment}-${var.stage}-config"
+  monitor_poller_config_param_name = "monitor-poller-${var.environment}-${var.stage}-config"
+
   relayer_env_vars = [
     { name = "RELAYER_CONFIG", value = local.local_relayer_config },
     { name = "ENVIRONMENT", value = var.environment },
@@ -28,7 +38,6 @@ locals {
   ]
 
   monitor_poller_env_vars = {
-    MONITOR_CONFIG = local.local_monitor_config,
     ENVIRONMENT    = var.environment,
     STAGE          = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -39,7 +48,6 @@ locals {
   }
 
   lighthouse_env_vars = {
-    LIGHTHOUSE_CONFIG = local.local_lighthouse_config,
     ENVIRONMENT       = var.environment,
     STAGE             = var.stage,
     DD_LOGS_ENABLED   = true,
@@ -83,6 +91,12 @@ locals {
     environment = "production" 
     web3SignerUrl = "https://${module.relayer_web3signer.service_endpoint}"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json"
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
+    }
     chains = {
       "1" = {
         providers = [
@@ -124,6 +138,92 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.blastapi.io/${var.blast_key}",
+          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.era.zksync.io"
+        ]
+      }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          "https://avax-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
+        ]
+      },
+      "2020" = {
+        providers = [
+          "https://api.roninchain.com/rpc",
+          "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "1399811149" = {
+        providers = [
+          "https://api.mainnet-beta.solana.com"
+        ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          ""
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
+        ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.gnosis.gateway.fm"
         ]
       }
     }
@@ -150,6 +250,12 @@ locals {
     environment = "production" 
     web3SignerUrl = "https://${module.watchtower_web3signer.service_endpoint}"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json"
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
+    }
     chains = {
       "1" = {
         providers = [
@@ -191,6 +297,62 @@ locals {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
           "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://linea-mainnet.blastapi.io/${var.blast_key}"
+        ]
+      }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.era.zksync.io"
+        ]
+      }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          "https://avax-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
+        ]
+      },
+      "2020" = {
+        providers = [
+          "https://api.roninchain.com/rpc",
+          "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "1399811149" = {
+        providers = [
+          "https://api.mainnet-beta.solana.com"
         ]
       }
     }
@@ -223,47 +385,145 @@ locals {
     network = "mainnet"
     environment = "production" 
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json"
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
+    }
     chains = {
       "1" = {
         providers = [
           "https://eth-mainnet.blastapi.io/${var.blast_key}",
-          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          # "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "56" = {
         providers = [
           "https://bsc-mainnet.blastapi.io/${var.blast_key}",
-          "https://bnb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          # "https://bnb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "42161" = {
         providers = [
           "https://arbitrum-one.blastapi.io/${var.blast_key}",
-          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          # "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
-          "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          # "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "8453" = {
         providers = [
-          "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://base-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
       "48900" = {
         providers = [
           "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
-          "https://zircuit1-mainnet.p2pify.com"
+          # "https://zircuit1-mainnet.p2pify.com"
         ]
       }
       "81457" = {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
-          "https://blastl2-mainnet.public.blastapi.io"
+          # "https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.blastapi.io/${var.blast_key}",
+          # "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.era.zksync.io"
+        ]
+      }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          # "https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+        minGasOnRelayer = 500 
+        minGasOnGateway = 750 
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      # "33139" = {
+      #   providers = [
+      #     "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+      #     #"https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          #"https://avax-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
+        ]
+      },
+      "2020" = {
+        providers = [
+          "https://api.roninchain.com/rpc",
+          "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+        maxDelayedSubgraphBlock = 1000
+      },
+      "1399811149" = {
+        providers = [
+          "https://api.mainnet-beta.solana.com"
+        ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.berachain.com"
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+        minGasOnRelayer = 200 
+        minGasOnGateway = 300
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+        maxDelayedSubgraphBlock = 1000
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
         ]
       }
     }
@@ -312,16 +572,17 @@ locals {
       maxDepositQueueCount = 15
       maxDepositQueueLatency = 3600
       messageMaxDelay = 1800
-      maxDelayedSubgraphBlock = 250
+      maxDelayedSubgraphBlock = 500
       maxInvoiceProcessingTime = 64800
       minGasOnRelayer = 0.3
       minGasOnGateway = 0.5
       averageElapsedEpochs = 6
       averageElapsedEpochsAlertAmount = 10000
-      maxShadowExportDelay = 900
-      maxShadowExportLatency = 10
       maxTokenomicsExportDelay = 1800
       maxTokenomicsExportLatency = 10
+    }
+    solana = {
+      spokeAddress = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
     }
   })
 
@@ -349,48 +610,163 @@ locals {
       10 = { maxAge = 60, size = 1 },
       8453 = { maxAge = 60, size = 1 },
       48900 = { maxAge = 60, size = 1 },
+      25327 = { maxAge = 60, size = 1 },
+      81457 = { maxAge = 60, size = 1 },
+      59144 = { maxAge = 60, size = 1 },
+      137 = { maxAge = 60, size = 1 },
+      43114 = { maxAge = 60, size = 1 },
+      34443 = { maxAge = 60, size = 1 },
+      130 = { maxAge = 60, size = 1 },
+      324 = { maxAge = 60, size = 1 },
+      534352 = { maxAge = 60, size = 1 },
+      167000 = { maxAge = 60, size = 1 },
+      2020 = { maxAge = 60, size = 1 },
+      1399811149 = { maxAge = 60, size = 1 },
+      80094 = { maxAge = 60, size = 1 },
+      5000 = { maxAge = 60, size = 1 },
+      146 = { maxAge = 60, size = 1 },
+      57073 = { maxAge = 60, size = 1 },
+      100 = { maxAge = 60, size = 1 }
+    }
+    hub = {
+      domain = "25327",
+      providers = [
+        "https://rpc.everclear.raas.gelato.cloud/${var.gelato_everclear_rpc_key}"
+      ]
     }
     chains = {
       "1" = {
         providers = [
           "https://eth-mainnet.blastapi.io/${var.blast_key}",
-          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          #"https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "56" = {
         providers = [
           "https://bsc-mainnet.blastapi.io/${var.blast_key}",
-          "https://bnb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          #"https://bnb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "42161" = {
         providers = [
           "https://arbitrum-one.blastapi.io/${var.blast_key}",
-          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          #"https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
-          "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          #"https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://base-mainnet.blastapi.io/${var.blast_key}"
+          #"https://base-mainnet.blastapi.io/${var.blast_key}"
         ]
       }
       "48900" = {
         providers = [
           "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
-          "https://zircuit1-mainnet.p2pify.com"
+          #"https://zircuit1-mainnet.p2pify.com"
         ]
       }
       "81457" = {
         providers = [
           "https://lb.drpc.org/ogrpc?network=blast&dkey=${var.drpc_key}",
-          "https://blastl2-mainnet.public.blastapi.io"
+          #"https://blastl2-mainnet.public.blastapi.io"
+        ]
+      }
+      "59144" = {
+        providers = [
+          "https://linea-mainnet.blastapi.io/${var.blast_key}",
+          #"https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "324" = {
+        providers = [
+          "https://zksync-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.era.zksync.io"
+        ]
+      }
+      "137" = {
+        providers = [
+          "https://polygon-mainnet.blastapi.io/${var.blast_key}",
+          #"https://polygon-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "534352" = {
+        providers = [
+          "https://scroll-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "167000" = {
+        providers = [
+          "https://lb.drpc.org/ogrpc?network=taiko&dkey=${var.drpc_key}"
+        ]
+      }
+      # "33139" = {
+      #   providers = [
+      #     "https://apechain-mainnet.blastapi.io/${var.blast_key}",
+      #     #"https://apechain-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
+      "43114" = {
+        providers = [
+          "https://ava-mainnet.blastapi.io/${var.blast_key}/ext/bc/C/rpc",
+          #"https://avax-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "34443" = {
+        providers = [
+          "https://mode-mainnet.blastapi.io/${var.blast_key}",
+          "https://mainnet.mode.network"
+        ]
+      },
+      "130" = {
+        providers = [
+          "https://mainnet.unichain.org"
+        ]
+      },
+      "2020" = {
+        providers = [
+          "https://api.roninchain.com/rpc",
+          "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      },
+      "1399811149" = {
+        providers = [
+          "https://api.mainnet-beta.solana.com"
+        ]
+      },
+      "80094" = {
+        providers = [
+          "https://berachain-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.berachain.com"
+        ]
+      },
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.blastapi.io/${var.blast_key}",
+          "https://mantle.drpc.org"
+        ]
+      },
+      "146" = {
+        providers = [
+          "https://sonic-mainnet.blastapi.io/${var.blast_key}",
+          "https://sonic.drpc.org"
+        ]
+      },
+      "57073" = {
+        providers = [
+          "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://ink.drpc.org"
+        ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.gnosis.gateway.fm"
         ]
       }
     }
@@ -407,16 +783,13 @@ locals {
       invoice          = "${var.lighthouse_invoice_heartbeat}"
       reward           = "${var.lighthouse_reward_heartbeat}"
       reward_metadata  = "${var.lighthouse_reward_metadata_heartbeat}"
+      solana           = "${var.lighthouse_solana_heartbeat}"
     }
     coingecko = "${var.coingecko_api_key}"
     rewards = {
       clearAssetAddress = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
       volume = {
-        tokens = [
-          {
-            address = "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
-          }
-        ]
+        tokens = []
       }
       staking = {
         tokens = [
@@ -439,6 +812,10 @@ locals {
     betterUptime = {
       apiKey = var.betteruptime_api_key
       requesterEmail = var.betteruptime_requester_email
+    }
+    solana = {
+      signer = var.solana_signer
+      spokeAddress = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
     }
   })
 }

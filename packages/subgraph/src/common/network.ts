@@ -15,7 +15,7 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(56);
   } else if (network == 'chapel') {
     chainId = BigInt.fromI32(97);
-  } else if (network == 'gnosis') {
+  } else if (network == 'xdai') {
     chainId = BigInt.fromI32(100);
   } else if (network == 'matic') {
     chainId = BigInt.fromI32(137);
@@ -43,7 +43,7 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(280);
   } else if (network == 'linea-goerli') {
     chainId = BigInt.fromI32(59140);
-  } else if (network == 'linea-mainnet') {
+  } else if (network == 'linea') {
     chainId = BigInt.fromI32(59144);
   } else if (network == 'polygon-zkevm-testnet') {
     chainId = BigInt.fromI32(1442);
@@ -75,6 +75,24 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(6398);
   } else if (network == 'everclear') {
     chainId = BigInt.fromI32(25327);
+  } else if (network == 'taiko') {
+    chainId = BigInt.fromI32(167000);
+  } else if (network == 'apechain-mainnet') {
+    chainId = BigInt.fromI32(33139);
+  } else if (network == 'blast') {
+    chainId = BigInt.fromI32(81457);
+  } else if (network == 'zircuit') {
+    chainId = BigInt.fromI32(48900);
+  } else if (network == 'ronin') {
+    chainId = BigInt.fromI32(2020);
+  } else if (network == 'unichain') {
+    chainId = BigInt.fromI32(130);
+  } else if (network == 'berachain-mainnet') {
+    chainId = BigInt.fromI32(80094);
+  } else if (network == 'sonic') {
+    chainId = BigInt.fromI32(146);
+  } else if (network == 'ink') {
+    chainId = BigInt.fromI32(57073);
   } else {
     throw new Error(`No chainName for network ${network}`);
   }

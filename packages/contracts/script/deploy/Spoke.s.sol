@@ -316,6 +316,21 @@ contract MainnetStaging is DeploySpokeBase, MainnetStagingEnvironment {
       owner: OWNER,
       maxSolversFee: MAX_FEE
     });
+
+    //// Base
+    _deploymentParams[BASE] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(BASE_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
   }
 }
 
@@ -420,6 +435,216 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       watchtower: WATCHTOWER,
       ism: address(0), // using the default ism
       mailbox: address(BLAST_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    /// Linea
+    _deploymentParams[LINEA] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(LINEA_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    /// Polygon
+    _deploymentParams[POLYGON] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(POLYGON_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    /// Avalanche
+    _deploymentParams[AVALANCHE] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(AVALANCHE_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    /// zkSync
+    _deploymentParams[ZKSYNC] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(ZKSYNC_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Scroll
+    _deploymentParams[SCROLL] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(SCROLL_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Taiko
+    _deploymentParams[TAIKO] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(TAIKO_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Apechain
+    _deploymentParams[APECHAIN] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(APECHAIN_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Unichain
+    _deploymentParams[UNICHAIN] = DeploymentParams({ // set domain id as mapping key
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(UNICHAIN_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Ronin
+    _deploymentParams[RONIN] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(RONIN_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Gnosis
+    _deploymentParams[GNOSIS] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(GNOSIS_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Berachain
+    _deploymentParams[BERACHAIN] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(BERACHAIN_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Sonic
+    _deploymentParams[SONIC] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(SONIC_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Mantle
+    _deploymentParams[MANTLE] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(MANTLE_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Ink
+    _deploymentParams[INK] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(INK_MAILBOX), // domain mailbox
       hubDomain: EVERCLEAR_DOMAIN,
       hubGateway: address(HUB_GATEWAY),
       owner: OWNER,

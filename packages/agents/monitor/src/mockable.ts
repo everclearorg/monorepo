@@ -13,6 +13,9 @@ import {
   getHyperlaneMsgDelivered as _getHyperlaneMsgDelivered,
   sendAlerts as _sendAlerts,
   resolveAlerts as _resolveAlerts,
+  getSsmParameter as _getSsmParameter,
+  getMailboxInterface as _getMailboxInterface,
+  AssetConfig,
 } from '@chimera-monorepo/utils';
 
 export const getContract = (address: string, abi: ContractInterface, provider?: providers.JsonRpcProvider) =>
@@ -25,9 +28,27 @@ export const getDefaultABIConfig = _getDefaultABIConfig;
 export const getTokenPriceFromCoingecko = _getTokenPriceFromCoingecko;
 export const getEverclearConfig = _getEverclearConfig;
 export const getBestProvider = _getBestProvider;
-export const getTokenPriceFromChainlink = _getTokenPriceFromChainlink;
-export const getTokenPriceFromUniV2 = _getTokenPriceFromUniV2;
-export const getTokenPriceFromUniV3 = _getTokenPriceFromUniV3;
+export const getTokenPriceFromChainlink = _getTokenPriceFromChainlink as (
+  domain: string,
+  priceFeed: string,
+  provider: providers.JsonRpcProvider,
+) => Promise<number>;
+export const getTokenPriceFromUniV2 = _getTokenPriceFromUniV2 as (
+  domain: string,
+  pair: string,
+  token0: AssetConfig,
+  token1: AssetConfig,
+  provier: providers.JsonRpcProvider,
+) => Promise<number>;
+export const getTokenPriceFromUniV3 = _getTokenPriceFromUniV3 as (
+  domain: string,
+  pool: string,
+  token0: AssetConfig,
+  token1: AssetConfig,
+  provider: providers.JsonRpcProvider,
+) => Promise<number>;
 export const getHyperlaneMsgDelivered = _getHyperlaneMsgDelivered;
 export const sendAlerts = _sendAlerts;
 export const resolveAlerts = _resolveAlerts;
+export const getSsmParameter = _getSsmParameter;
+export const getMailboxInterface = _getMailboxInterface;

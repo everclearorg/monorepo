@@ -227,8 +227,10 @@ module "lighthouse_intent_cron" {
   container_family    = "lighthouse-intent"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = local.lighthouse_intent_config_param_name
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "intent"
+    CONFIG_PARAMETER_NAME = local.lighthouse_intent_config_param_name
   })
   schedule_expression    = "rate(1 minute)"
   timeout                = 300
@@ -236,6 +238,7 @@ module "lighthouse_intent_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_fill_cron" {
@@ -245,8 +248,10 @@ module "lighthouse_fill_cron" {
   container_family    = "lighthouse-fill"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = local.lighthouse_fill_config_param_name
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "fill"
+    CONFIG_PARAMETER_NAME = local.lighthouse_fill_config_param_name
   })
   schedule_expression    = "rate(3 minutes)"
   timeout                = 300
@@ -254,6 +259,7 @@ module "lighthouse_fill_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_settlement_cron" {
@@ -263,8 +269,10 @@ module "lighthouse_settlement_cron" {
   container_family    = "lighthouse-settlement"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = local.lighthouse_settlement_config_param_name
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "settlement"
+    CONFIG_PARAMETER_NAME = local.lighthouse_settlement_config_param_name
   })
   schedule_expression    = "rate(1 minute)"
   timeout                = 300
@@ -272,6 +280,7 @@ module "lighthouse_settlement_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_expired_cron" {
@@ -281,8 +290,10 @@ module "lighthouse_expired_cron" {
   container_family    = "lighthouse-expired"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = local.lighthouse_expired_config_param_name
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "expired"
+    CONFIG_PARAMETER_NAME = local.lighthouse_expired_config_param_name
   })
   schedule_expression    = "rate(10 minutes)"
   timeout                = 300
@@ -290,6 +301,7 @@ module "lighthouse_expired_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_invoice_cron" {
@@ -299,8 +311,10 @@ module "lighthouse_invoice_cron" {
   container_family    = "lighthouse-invoice"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = local.lighthouse_invoice_config_param_name
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "invoice"
+    CONFIG_PARAMETER_NAME = local.lighthouse_invoice_config_param_name
   })
   schedule_expression    = "rate(1 minute)"
   timeout                = 300
@@ -308,6 +322,7 @@ module "lighthouse_invoice_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_reward_cron" {
@@ -317,15 +332,18 @@ module "lighthouse_reward_cron" {
   container_family    = "lighthouse-reward"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = local.lighthouse_reward_config_param_name
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "reward"
+    CONFIG_PARAMETER_NAME = local.lighthouse_reward_config_param_name
   })
-  schedule_expression    = "rate(1 minute)"
+  schedule_expression    = "rate(1 day)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "lighthouse_reward_metadata_cron" {
@@ -335,8 +353,10 @@ module "lighthouse_reward_metadata_cron" {
   container_family    = "lighthouse-reward_metadata"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = local.lighthouse_reward_metadata_config_param_name
   container_env_vars  = merge(local.lighthouse_env_vars, {
     LIGHTHOUSE_SERVICE = "reward_metadata"
+    CONFIG_PARAMETER_NAME = local.lighthouse_reward_metadata_config_param_name
   })
   schedule_expression    = "cron(0 0 ? * TUE *)"
   timeout                = 300
@@ -344,6 +364,7 @@ module "lighthouse_reward_metadata_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_lighthouse_config
 }
 
 module "monitor_poller_cron" {
@@ -353,8 +374,10 @@ module "monitor_poller_cron" {
   container_family    = "monitor-poller"
   environment         = var.environment
   stage               = var.stage
+  config_param_name   = local.monitor_poller_config_param_name
   container_env_vars  = merge(local.monitor_poller_env_vars, {
     MONITOR_SERVICE = "poller"
+    CONFIG_PARAMETER_NAME = local.monitor_poller_config_param_name
   })
   schedule_expression    = "rate(10 minutes)"
   timeout                = 300
@@ -362,6 +385,7 @@ module "monitor_poller_cron" {
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  config                 = local.local_monitor_config
 }
 
 

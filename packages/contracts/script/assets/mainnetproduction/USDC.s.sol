@@ -29,14 +29,14 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
                               TOKEN FEES 
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](1);
-    _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 2}); // 0.2 BPS
+    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](0);
+    // _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 0}); // 0 BPS
 
     /*///////////////////////////////////////////////////////////////
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](5);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](19);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -83,16 +83,142 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    ///// Linea
+    _assetConfigs[5] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: LINEA_USDC.toBytes32(),
+      domain: LINEA,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Polygon
+    _assetConfigs[6] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: POLYGON_USDC.toBytes32(),
+      domain: POLYGON,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Avalanche
+    _assetConfigs[7] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: AVALANCHE_USDC.toBytes32(),
+      domain: AVALANCHE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Scroll
+    _assetConfigs[8] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SCROLL_USDC.toBytes32(),
+      domain: SCROLL,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Taiko
+    _assetConfigs[9] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: TAIKO_USDC.toBytes32(),
+      domain: TAIKO,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Mode
+    _assetConfigs[10] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MODE_USDC.toBytes32(),
+      domain: MODE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Unichain
+    _assetConfigs[11] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: UNICHAIN_USDC.toBytes32(),
+      domain: UNICHAIN,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// zkSync
+    _assetConfigs[12] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: ZKSYNC_USDC.toBytes32(),
+      domain: ZKSYNC,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Ronin
+    _assetConfigs[13] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: RONIN_USDC.toBytes32(),
+      domain: RONIN,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Berachain
+    _assetConfigs[14] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BERACHAIN_USDC.toBytes32(),
+      domain: BERACHAIN,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Sonic
+    _assetConfigs[15] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SONIC_USDC.toBytes32(),
+      domain: SONIC,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Mantle
+    _assetConfigs[16] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MANTLE_USDC.toBytes32(),
+      domain: MANTLE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Ink
+    _assetConfigs[17] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: INK_USDC.toBytes32(),
+      domain: INK,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ////// Solana
+    _assetConfigs[18] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SOLANA_USDC,
+      domain: SOLANA,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
                           TOKEN SETUP 
     //////////////////////////////////////////////////////////////*/
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: true,
+      initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
-      maxDiscountDbps: 12, // 1.2 BPS
-      discountPerEpoch: 3, // 0.3 BPS
+      maxDiscountDbps: 0, // 0 BPS
+      discountPerEpoch: 0, // 0 BPS
       fees: _fees,
       adoptedForAssets: _assetConfigs
     });

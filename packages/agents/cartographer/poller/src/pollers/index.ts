@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
 import {
   createMethodContext,

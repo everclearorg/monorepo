@@ -57,6 +57,7 @@ export const TChainConfig = Type.Object({
   ),
   // keyed on asset ticker
   assets: Type.Optional(Type.Record(Type.String(), TAssetConfig)),
+  network: Type.Optional(Type.String()),
 });
 export type ChainConfig = Static<typeof TChainConfig>;
 
@@ -154,8 +155,6 @@ export const TThresholdsConfig = Type.Object({
   maxInvoiceProcessingTime: Type.Optional(Type.Number()),
   minGasOnRelayer: Type.Optional(Type.Number()),
   minGasOnGateway: Type.Optional(Type.Number()),
-  maxShadowExportDelay: Type.Optional(Type.Number()),
-  maxShadowExportLatency: Type.Optional(Type.Number()),
   maxTokenomicsExportDelay: Type.Optional(Type.Number()),
   maxTokenomicsExportLatency: Type.Optional(Type.Number()),
 });
@@ -206,3 +205,9 @@ export const TSafeConfig = Type.Object({
   fallbackHandlerAddress: Type.String(),
 });
 export type SafeConfig = Static<typeof TSafeConfig>;
+
+export const TSolanaConfig = Type.Object({
+  signer: Type.Optional(Type.String()),
+  spokeAddress: Type.String(),
+});
+export type SolanaConfig = Static<typeof TSolanaConfig>;

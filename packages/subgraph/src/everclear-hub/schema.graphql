@@ -153,6 +153,7 @@ type DepositQueue @entity {
   size: BigInt!
   first: BigInt!
   last: BigInt!
+  blockNumber: BigInt!
 }
 
 type Deposit @entity {

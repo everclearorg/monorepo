@@ -42,12 +42,9 @@ variable "rmq_mgt_user" {
   description = "RabbitMQ management user"
 }
 
-
-
 variable "certificate_arn_mainnet" {
   default = "arn:aws:acm:us-west-2:679752396206:certificate/f075a99b-4908-45fc-8bb6-f17c2754e4f0"
 }
-
 
 variable "blast_key" {
   type      = string
@@ -85,6 +82,12 @@ variable "gelato_api_key" {
   type      = string
   sensitive = true
 }
+
+variable "gelato_everclear_rpc_key" {
+  type      = string
+  sensitive = true
+}
+
 variable "discord_webhook_token" {
   type      = string
   sensitive = true
@@ -145,7 +148,6 @@ variable "admin_token_lighthouse" {
   default   = "blahblah"
   sensitive = true
 }
-
 
 variable "admin_token_relayer" {
   type      = string
@@ -254,4 +256,14 @@ variable "coingecko_api_key" {
   type      = string
   sensitive = true
   default = "neverclear"
+}
+
+variable "lighthouse_solana_heartbeat" {
+  type      = string
+  sensitive = true
+}
+
+variable "solana_signer" {
+  type      = string
+  sensitive = true
 }

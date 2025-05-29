@@ -1,6 +1,7 @@
 import { select } from '@inquirer/prompts';
 
 import { deployContracts } from './tasks/deploy';
+import { deployAdapters } from './tasks/deployAdapters';
 
 import { returnUnsupportedIntent } from './tasks/returnUnsupportedIntent';
 import { handleExpiredIntents } from './tasks/handleExpiredIntents';
@@ -15,6 +16,7 @@ import { spokeDashboard } from './tasks/spokeDashboard';
 import { setModuleForStrategy } from './tasks/setModuleForStrategy';
 import { deployXERC20 } from './tasks/deployXERC20';
 import { assetDashboard } from './tasks/assetDashboard';
+import { logOwners } from './tasks/logOwners';
 
 async function main() {
   const mainTask = await select({
@@ -28,6 +30,10 @@ async function main() {
       {
         name: 'Deploy XERC20 module',
         value: 'deploy_xerc20',
+      },
+      {
+        name: 'Deploy Adapters',
+        value: 'deploy_adapters',
       },
       {
         name: 'Setup hub domains and gateways',
@@ -81,12 +87,19 @@ async function main() {
         name: 'Cancel',
         value: 'cancel',
       },
+      {
+        name: 'Log All Owners',
+        value: 'log_owners',
+      },
     ],
   });
 
   switch (mainTask) {
     case 'deploy':
       deployContracts();
+      break;
+    case 'deploy_adapters':
+      deployAdapters();
       break;
     case 'setup_hub_domains_and_gateways':
       setupDomainsAndGateways();
@@ -126,6 +139,9 @@ async function main() {
       break;
     case 'asset_dashboard':
       assetDashboard();
+      break;
+    case 'log_owners':
+      logOwners();
       break;
     case 'cancel':
       return;

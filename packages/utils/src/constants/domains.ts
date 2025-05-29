@@ -18,12 +18,22 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [43114, 43114], // Avalanche C-Chain
   [1088, 1088], // Metis Andromeda
   [5000, 5000], // Mantle
-  [34443, 34443], // Mode
+  [34443, 34443], // Mode Mainnet
   [534352, 534352], // Scroll
   [196, 196], // X Layer Mainnet
   [25327, 25327], // Everclear Mainnet
   [48900, 48900], // Zircuit Mainnet
   [81457, 81457], // Blast mainnet
+  [59140, 59140], // Linea Mainnet
+  [167000, 167000], // Taiko Mainnet
+  [33139, 33139], // ApeChain
+  [130, 130], // Unichain
+  [2020, 2020], // Ronin
+  [80094, 80094], // Berachain
+  [146, 146], // Sonic
+  [57073, 57073], // Ink
+  [1399811149, 1399811149], // Solana
+  [728126428, 728126428], // Tron
 ]);
 
 const TESTNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
@@ -40,6 +50,7 @@ const TESTNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [534351, 534351], // Scroll sepolia
   [6398, 6398], //Everclear sepolia
   [168587773, 168587773], //Blast sepolia
+  [2494104990, 2494104990], // Tron Shasta
 ]);
 
 const DEVNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
@@ -53,6 +64,8 @@ const DEVNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [31338, 31338],
   [31339, 31339],
 ]);
+
+export const SOLANA_CHAINID = '1399811149';
 
 // Hex domains calculated using `getHexDomainFromString`
 // alternative: ethers.BigNumber.from(ethers.utils.toUtf8Bytes("some string")).toNumber()

@@ -16,7 +16,7 @@ export const checkDepositQueueCount = async (): Promise<Map<string, number>> => 
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkDepositQueueCount.name);
 
-  const domains = Object.keys(config.chains);
+  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
   const enqueuedDepositsByDomain = await database.getAllEnqueuedDeposits(domains);
 
   const queueCountByKey: Map<string, number> = new Map();
@@ -56,11 +56,14 @@ export const checkDepositQueueCount = async (): Promise<Map<string, number>> => 
     timestamp: Date.now(),
     logger: logger,
     env: config.environment,
+    network: config.network || 'unknown',
   };
 
   if (!aboveThreshold.length) {
-    await resolveAlerts(report, logger, config, requestContext);
-    logger.info(`Deposit queue counts are within threshold`, requestContext, methodContext, { threshold });
+    const keys = [...queueCountByKey.keys()];
+    report.ids = keys;
+    await resolveAlerts(report, logger, { ...config, network: config.network || 'unknown' }, requestContext);
+    logger.info(`Deposit queue counts are within threshold`, requestContext, methodContext, { threshold, keys });
     return queueCountByKey;
   }
 
@@ -69,7 +72,7 @@ export const checkDepositQueueCount = async (): Promise<Map<string, number>> => 
     queues: aboveThreshold,
   });
 
-  await sendAlerts(report, logger, config, requestContext);
+  await sendAlerts(report, logger, { ...config, network: config.network || 'unknown' }, requestContext);
 
   return queueCountByKey;
 };
@@ -82,7 +85,7 @@ export const checkDepositQueueLatency = async (): Promise<Map<string, number>> =
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkDepositQueueLatency.name);
 
-  const domains = Object.keys(config.chains);
+  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
   logger.debug('Method start', requestContext, methodContext, {
     domains,
     hubDomain: config.hub.domain,
@@ -115,8 +118,9 @@ export const checkDepositQueueLatency = async (): Promise<Map<string, number>> =
             timestamp: Date.now(),
             logger: logger,
             env: config.environment,
+            network: config.network || 'unknown',
           };
-          return resolveAlerts(report, logger, config, requestContext);
+          return resolveAlerts(report, logger, { ...config, network: config.network || 'unknown' }, requestContext);
         });
       }),
     );
@@ -145,11 +149,12 @@ export const checkDepositQueueLatency = async (): Promise<Map<string, number>> =
         timestamp: Date.now(),
         logger: logger,
         env: config.environment,
+        network: config.network || 'unknown',
       };
 
       if (!latencyByDomainTicker.has(key)) {
         // Resolve report
-        await resolveAlerts(report, logger, config, requestContext);
+        await resolveAlerts(report, logger, { ...config, network: config.network || 'unknown' }, requestContext);
         return;
       }
 
@@ -161,13 +166,13 @@ export const checkDepositQueueLatency = async (): Promise<Map<string, number>> =
           threshold: config.thresholds.maxDepositQueueLatency,
         });
         report.reason = `${report.reason}. (age: ${age})`;
-        await sendAlerts(report, logger, config, requestContext);
+        await sendAlerts(report, logger, { ...config, network: config.network || 'unknown' }, requestContext);
       } else {
         logger.info(`Pending queue age for ${key} within threshold`, requestContext, methodContext, {
           age: age.toString(),
           threshold: config.thresholds.maxDepositQueueLatency,
         });
-        await resolveAlerts(report, logger, config, requestContext);
+        await resolveAlerts(report, logger, { ...config, network: config.network || 'unknown' }, requestContext);
       }
     }),
   );

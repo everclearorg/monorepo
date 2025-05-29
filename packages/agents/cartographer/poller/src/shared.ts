@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChainData, Logger } from '@chimera-monorepo/utils';
 import { SubgraphReader as _SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
 import { Database } from '@chimera-monorepo/database';

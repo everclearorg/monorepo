@@ -257,6 +257,7 @@ describe('SubgraphReader', () => {
       last: 11,
       epoch: 12321,
       tickerHash: mkBytes32('0x1'),
+      blockNumber: 123,
     };
     queue.id = `${queue.epoch}-${queue.domain}-${queue.tickerHash}`;
 

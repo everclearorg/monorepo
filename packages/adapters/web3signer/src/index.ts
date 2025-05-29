@@ -25,6 +25,10 @@ export class Web3Signer extends Signer {
   public provider?: providers.Provider;
   private api: Web3SignerApi;
 
+  public get signerApi(): Web3SignerApi {
+    return this.api;
+  }
+
   constructor(
     public readonly web3SignerUrl: string,
     provider?: providers.Provider,

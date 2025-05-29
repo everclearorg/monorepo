@@ -3,17 +3,21 @@ import { stub, SinonStub } from 'sinon';
 import { getConfig, loadConfig } from '../src/config';
 import { InvalidConfig } from '../src/errors';
 import { mock } from './globalTestHook';
+import * as Mockable from '../src/tasks/helpers/mockable';
 
 describe('Config', () => {
   let exitStub: SinonStub;
+  let ssmStub: SinonStub;
+
   beforeEach(() => {
     stub(process, 'env').value({
       ...process.env,
       ...mock.env(),
     });
     exitStub = stub(process, 'exit');
-
     exitStub.returns(1);
+    ssmStub = stub(Mockable, 'getSsmParameter');
+    ssmStub.resolves(undefined);
   });
   describe('#loadConfig', () => {
     it('should work', async () => {
@@ -51,7 +55,7 @@ describe('Config', () => {
       stub(process, 'env').value({
         LIGHTHOUSE_CONFIG: 'xxx',
         LIGHTHOUSE_CONFIG_FILE: './test/test_config.json',
-      }); 
+      });
       await expect(loadConfig()).to.be.fulfilled;
     })
 
@@ -75,6 +79,16 @@ describe('Config', () => {
       });
       await expect(getConfig()).to.be.rejected;
       expect(exitStub.calledOnce).to.be.true;
+    });
+
+    it('should read config from AWS SSM parameter store', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        CONFIG_PARAMETER_NAME: 'lighthouse-config',
+      });
+      ssmStub.resolves(JSON.stringify(mock.config({ coingecko: 'prices.com' })));
+      const config = await getConfig();
+      await expect(config.coingecko).to.be.equal('prices.com');
     });
   });
 

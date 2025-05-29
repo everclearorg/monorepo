@@ -8,6 +8,7 @@ import { mock } from './globalTestHook';
 describe('Config', () => {
   let exitStub: SinonStub;
   let getEverclearConfigStub: SinonStub;
+  let ssmStub: SinonStub;
 
   beforeEach(() => {
     stub(process, 'env').value({
@@ -18,8 +19,9 @@ describe('Config', () => {
       ...mock.config(),
     });
     exitStub = stub(process, 'exit');
-
     exitStub.returns(1);
+    ssmStub = stub(MockableFns, 'getSsmParameter');
+    ssmStub.resolves(undefined);
   });
 
   describe('#getConfig', () => {
@@ -60,9 +62,7 @@ describe('Config', () => {
       await expect(getConfig()).to.be.rejected;
       expect(exitStub.calledOnce).to.be.true;
     });
-  });
 
-  describe('#getConfig', () => {
     it('should load cached config', async () => {
       const config = await getConfig();
 
@@ -72,6 +72,17 @@ describe('Config', () => {
       });
       const config2 = await getConfig();
       expect(config2.logLevel).to.eq('info');
+    });
+
+    it('should read config from AWS SSM parameter store', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        CONFIG_PARAMETER_NAME: 'monitor-config',
+      });
+      const database = { url: 'https://database.com' };
+      ssmStub.resolves(JSON.stringify({ ...mock.config(), database }));
+      const config = await getConfig();
+      await expect(config.database).to.be.deep.equal(database);
     });
   });
 

@@ -5,7 +5,7 @@ import { config as dotenvConfig } from 'dotenv';
 import lodash from 'lodash';
 import * as fs from 'fs';
 import { getContext } from './context';
-import { getDefaultABIConfig, getEverclearConfig } from './mockable';
+import { getDefaultABIConfig, getEverclearConfig, getSsmParameter } from './mockable';
 
 dotenvConfig();
 const DEFAULT_POLL_INTERVAL = 5_000; // 5s
@@ -30,8 +30,6 @@ export const DefaultThresholds: ThresholdsConfig = {
   maxInvoiceProcessingTime: 23 * 3600,
   minGasOnRelayer: 1,
   minGasOnGateway: 1,
-  maxShadowExportDelay: 900,
-  maxShadowExportLatency: 10,
   maxTokenomicsExportDelay: 1800,
   maxTokenomicsExportLatency: 10,
 };
@@ -74,28 +72,31 @@ export const DefaultTokenomicsTables = [
   'withdraw_eth',
 ];
 
-export const DefaultShadowTables = [
-  'closedepochsprocessed',
-  'depositenqueued',
-  'depositprocessed',
-  'finddepositdomain',
-  'findinvoicedomain',
-  'invoiceenqueued',
-  'matchdeposit',
-  'settledeposit',
-  'settlementenqueued',
-  'settlementqueueprocessed',
-  'settlementsent',
-];
-
 export const getConfig = async (): Promise<MonitorConfig> => {
   let configJson: Record<string, any> = {};
   let configFile: any = {};
+  let configStr: string | undefined;
+
+  const paramName = process.env.CONFIG_PARAMETER_NAME;
+  if (paramName) {
+    try {
+      configStr = await getSsmParameter(paramName);
+      if (!configStr) {
+        console.info(paramName, 'is not found in parameter store');
+      }
+    } catch (e: unknown) {
+      console.info('Error getting', paramName, 'from parameter store', e);
+    }
+  } else {
+    console.info('Monitor CONFIG_PARAMETER_NAME is not set');
+  }
+
   try {
-    configJson = JSON.parse(process.env.MONITOR_CONFIG || '');
+    configJson = JSON.parse(configStr || process.env.MONITOR_CONFIG || '');
   } catch (e: unknown) {
     console.info('No MONITOR_CONFIG exists, using config file and individual env vars');
   }
+
   try {
     let json: string;
 
@@ -116,13 +117,35 @@ export const getConfig = async (): Promise<MonitorConfig> => {
   const everclearConfig = await getEverclearConfig(everclearConfigUrl);
   if (everclearConfig) cachedEverclearConfig = everclearConfig;
 
+  const hubDomain = configJson?.hub?.domain || configFile?.hub?.domain || everclearConfig?.hub.domain;
+  const hubProviders = configJson?.hub?.providers || configFile?.hub?.providers || everclearConfig?.hub.providers;
+  const hubDeployments =
+    configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments;
+  const hubAssets = configJson?.hub?.assets || configFile?.hub?.assets || everclearConfig?.hub?.assets;
+  const hubSubgraphUrls =
+    configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [];
+
+  // Get hub-specific gas thresholds if provided
+  const hubMinGasOnRelayer =
+    configJson?.hub?.minGasOnRelayer ||
+    configFile?.hub?.minGasOnRelayer ||
+    configJson?.thresholds?.minGasOnRelayer ||
+    configFile?.thresholds?.minGasOnRelayer;
+  const hubMinGasOnGateway =
+    configJson?.hub?.minGasOnGateway ||
+    configFile?.hub?.minGasOnGateway ||
+    configJson?.thresholds?.minGasOnGateway ||
+    configFile?.thresholds?.minGasOnGateway;
+
   const hubConfig = {
-    domain: configJson?.hub?.domain || configFile?.hub?.domain || everclearConfig?.hub.domain,
-    providers: configJson?.hub?.providers || configFile?.hub?.providers || everclearConfig?.hub.providers,
-    deployments: configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments,
-    assets: configJson?.hub?.assets || configFile?.hub?.assets || everclearConfig?.hub?.assets,
-    subgraphUrls:
-      configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [],
+    domain: hubDomain,
+    providers: hubProviders,
+    deployments: hubDeployments,
+    assets: hubAssets,
+    subgraphUrls: hubSubgraphUrls,
+    // Only include these properties if they were specified
+    ...(hubMinGasOnRelayer !== undefined && { minGasOnRelayer: hubMinGasOnRelayer }),
+    ...(hubMinGasOnGateway !== undefined && { minGasOnGateway: hubMinGasOnGateway }),
   };
 
   const environment = configJson.environment || configFile.environment || 'production';
@@ -146,6 +169,11 @@ export const getConfig = async (): Promise<MonitorConfig> => {
 
     const deployments: any = localChainConfig?.deployments || everclearChainConfig?.deployments || {};
     const assets: any = localChainConfig?.assets || everclearChainConfig?.assets || {};
+    const network: string = localChainConfig?.network || everclearChainConfig?.network || 'evm';
+
+    // Include chain-specific gas thresholds if provided
+    const minGasOnRelayer = localChainConfig?.minGasOnRelayer || localThresholds?.minGasOnRelayer;
+    const minGasOnGateway = localChainConfig?.minGasOnGateway || localThresholds?.minGasOnGateway;
 
     chainsForMonitorConfig[domainId] = {
       providers,
@@ -153,6 +181,10 @@ export const getConfig = async (): Promise<MonitorConfig> => {
       confirmations,
       deployments,
       assets,
+      network,
+      // Only include these properties if they were specified
+      ...(minGasOnRelayer !== undefined && { minGasOnRelayer }),
+      ...(minGasOnGateway !== undefined && { minGasOnGateway }),
     };
   }
 
@@ -186,8 +218,8 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},
     telegram: configJson.telegram || configFile.telegram || {},
     healthUrls: process.env.MONITOR_HEALTH_URLS || configJson.healthUrls || configFile.healthUrls || {},
-    shadowTables: configJson.shadowTables || configFile.shadowTables || DefaultShadowTables,
     tokenomicsTables: configJson.tokenomicsTables || configFile.tokenomicsTables || DefaultTokenomicsTables,
+    solana: configJson?.solana || configFile?.solana || {},
   };
 
   const validate = ajv.compile(TMonitorConfigSchema);

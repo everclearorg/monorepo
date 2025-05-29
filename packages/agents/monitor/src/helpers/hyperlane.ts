@@ -5,13 +5,13 @@ import {
   jsonifyError,
   HyperlaneMessageResponse,
   HyperlaneStatus,
-  getMailboxInterface,
   Message,
+  SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 import { Interface, hexlify, solidityPack } from 'ethers/lib/utils';
 import { NoDispatchEventOnMessage, NoGatewayConfigured } from '../types/errors';
 import { getContext } from '../context';
-import { getHyperlaneMessageStatus, getHyperlaneMsgDelivered } from './../mockable';
+import { getHyperlaneMessageStatus, getHyperlaneMsgDelivered, getMailboxInterface } from './../mockable';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 
 export const getMessageStatus = async (
@@ -36,6 +36,14 @@ export const getMessageStatus = async (
   if (!message.destinationDomain) {
     return { status: 'pending' };
   }
+  // Check if destination is Solana chain
+  if (message.destinationDomain === SOLANA_CHAINID) {
+    logger.warn('Skipping Solana destination chain', requestContext, methodContext, {
+      messageId: id,
+      destinationDomain: message.destinationDomain,
+    });
+    return { status: 'none' };
+  }
 
   // If the message is pending, check to see if it has been delivered onchain.
   // NOTE: graphql api returns `pending` if the message has been self-relayed.
@@ -54,6 +62,7 @@ export const getMessageStatus = async (
       to: gateway,
       domain: +message.destinationDomain,
       data: gatewayIface.encodeFunctionData('mailbox'),
+      funcSig: gatewayIface.getFunction('mailbox').format(),
     },
     'latest',
   );
@@ -104,6 +113,7 @@ export const getMessageStatus = async (
         hyperlaneMessage,
       ]),
       value: '0',
+      funcSig: iface.getFunction('process').format(),
     };
     logger.debug('Estimating gas for hyperlane relay tx', requestContext, methodContext, { tx });
     const gas = await chainreader.getGasEstimateWithRevertCode(tx);
