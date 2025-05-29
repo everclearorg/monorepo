@@ -5,6 +5,7 @@ on:
     branches:
       - testnet-staging
       - testnet-prod
+      - mainnet-staging
       - mainnet-prod
   pull_request:
 
@@ -32,6 +33,8 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/mainnet-prod" ]]; then
             echo "AWS_REGION=us-west-2" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/mainnet-staging" ]]; then
+            echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" == "refs/heads/testnet-prod" ]]; then
             echo "AWS_REGION=eu-north-1" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" == "refs/heads/testnet-staging" ]]; then
@@ -371,23 +374,23 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: stable
+      # - name: Install Foundry
+      #   uses: foundry-rs/foundry-toolchain@v1
+      #   with:
+      #     version: stable
 
-      - name: Install Node
-        uses: actions/setup-node@v4
-        with:
-          registry-url: 'https://registry.npmjs.org'
-          node-version: 18.x
-          cache: 'yarn'
+      # - name: Install Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     registry-url: 'https://registry.npmjs.org'
+      #     node-version: 18.x
+      #     cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
+      # - name: Install dependencies
+      #   run: yarn --frozen-lockfile
 
-      - name: Build project and generate out directory
-        run: yarn build
+      # - name: Build project and generate out directory
+      #   run: yarn build
 
       # - name: Integration Tests
       #   run: yarn test:integration
@@ -829,4 +832,129 @@ jobs:
           terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
 
     outputs:
+      cartographer-tags: ${{ needs.e2e-tests.outputs.cartographer-tags }}
+
+  terraform-services-backend-mainnet-staging:
+    if: github.ref == 'refs/heads/mainnet-staging'
+    needs: [e2e-tests]
+    env:
+      AWS_PROFILE: aws-deployer-connext
+      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Sops
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: '3.7.2'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: Fooji/create-aws-profile-action@v1
+        with:
+          profile: aws-deployer-connext
+          region: us-east-1
+          key: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          secret: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Decrypt Mainnet Staging Secrets
+        id: decrypt
+        run: sops -d ops/env/mainnet/backend/secrets.staging.json > ops/mainnet/staging/backend/tfvars.json
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./ops/mainnet/staging/backend
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./ops/mainnet/staging/backend
+        run: |
+          terraform plan -var-file=tfvars.json > /dev/null 2>&1
+
+      - name: Terraform Docker Image onto AWS
+        if: github.ref == 'refs/heads/mainnet-staging'
+        id: apply
+        working-directory: ./ops/mainnet/staging/backend
+        run: |
+          terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
+
+  terraform-services-core-mainnet-staging:
+    if: github.ref == 'refs/heads/mainnet-staging'
+    needs: [e2e-tests]
+    env:
+      AWS_PROFILE: aws-deployer-connext
+      TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_watchtower: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
+      TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
+      TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Sops
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        with:
+          version: '3.7.2'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: Fooji/create-aws-profile-action@v1
+        with:
+          profile: aws-deployer-connext
+          region: us-east-1
+          key: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          secret: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Decrypt Mainnet Staging Secrets
+        id: decrypt
+        run: sops -d ops/env/mainnet/core/secrets.staging.json > ops/mainnet/staging/core/tfvars.json
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./ops/mainnet/staging/core
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./ops/mainnet/staging/core
+        run: |
+          terraform plan -var-file=tfvars.json > /dev/null 2>&1
+
+      - name: Terraform Docker Image onto AWS
+        if: github.ref == 'refs/heads/mainnet-staging'
+        id: apply
+        working-directory: ./ops/mainnet/staging/core
+        run: |
+          terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
+
+    outputs:
+      relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}
+      watchtower-tags: ${{ needs.e2e-tests.outputs.watchtower-tags }}
+      monitor-tags: ${{ needs.e2e-tests.outputs.monitor-tags }}
+      monitor-poller-tags: ${{ needs.e2e-tests.outputs.monitor-poller-tags }}
+      lighthouse-tags: ${{ needs.e2e-tests.outputs.lighthouse-tags }}
       cartographer-tags: ${{ needs.e2e-tests.outputs.cartographer-tags }}
