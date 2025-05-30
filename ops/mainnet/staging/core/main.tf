@@ -190,34 +190,35 @@ module "watchtower_web3signer" {
   container_env_vars       = local.watchtower_web3signer_env_vars
 }
 
-module "monitor" {
-  source                   = "../../../modules/service"
-  stage                    = var.stage
-  environment              = var.environment
-  domain                   = var.domain
-  region                   = var.region
-  dd_api_key               = var.dd_api_key
-  zone_id                  = data.aws_route53_zone.primary.zone_id
-  execution_role_arn       = data.aws_iam_role.ecr_admin_role.arn
-  cluster_id               = module.ecs.ecs_cluster_id
-  vpc_id                   = module.network.vpc_id
-  lb_subnets               = module.network.public_subnets
-  docker_image             = "${local.repository_url_prefix}chimera-monitor:${var.full_image_name_monitor}"
-  container_family         = "monitor"
-  health_check_path        = "/ping"
-  container_port           = 8080
-  loadbalancer_port        = 80
-  cpu                      = 8192
-  memory                   = 16384
-  instance_count           = 1
-  timeout                  = 180
-  internal_lb              = false
-  ingress_cdir_blocks      = [module.network.vpc_cdir_block]
-  ingress_ipv6_cdir_blocks = []
-  service_security_groups  = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  cert_arn                 = var.certificate_arn_mainnet
-  container_env_vars       = concat(local.monitor_env_vars, [{ name = "MONITOR_SERVICE", value = "server" }])
-}
+# Enable this once stable and alerts can go to a different slack channel
+# module "monitor" {
+#   source                   = "../../../modules/service"
+#   stage                    = var.stage
+#   environment              = var.environment
+#   domain                   = var.domain
+#   region                   = var.region
+#   dd_api_key               = var.dd_api_key
+#   zone_id                  = data.aws_route53_zone.primary.zone_id
+#   execution_role_arn       = data.aws_iam_role.ecr_admin_role.arn
+#   cluster_id               = module.ecs.ecs_cluster_id
+#   vpc_id                   = module.network.vpc_id
+#   lb_subnets               = module.network.public_subnets
+#   docker_image             = "${local.repository_url_prefix}chimera-monitor:${var.full_image_name_monitor}"
+#   container_family         = "monitor"
+#   health_check_path        = "/ping"
+#   container_port           = 8080
+#   loadbalancer_port        = 80
+#   cpu                      = 8192
+#   memory                   = 16384
+#   instance_count           = 1
+#   timeout                  = 180
+#   internal_lb              = false
+#   ingress_cdir_blocks      = [module.network.vpc_cdir_block]
+#   ingress_ipv6_cdir_blocks = []
+#   service_security_groups  = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   cert_arn                 = var.certificate_arn_mainnet
+#   container_env_vars       = concat(local.monitor_env_vars, [{ name = "MONITOR_SERVICE", value = "server" }])
+# }
 
 
 module "lighthouse_intent_cron" {
@@ -367,26 +368,27 @@ module "lighthouse_invoice_cron" {
 #   config                 = local.local_lighthouse_config
 # }
 
-module "monitor_poller_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-monitor-poller"
-  docker_image_tag    = var.full_image_name_monitor_poller
-  container_family    = "monitor-poller"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.monitor_poller_config_param_name
-  container_env_vars  = merge(local.monitor_poller_env_vars, {
-    MONITOR_SERVICE = "poller"
-    CONFIG_PARAMETER_NAME = local.monitor_poller_config_param_name
-  })
-  schedule_expression    = "rate(10 minutes)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_monitor_config
-}
+# Enable this once stable and alerts can go to a different slack channel
+# module "monitor_poller_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-monitor-poller"
+#   docker_image_tag    = var.full_image_name_monitor_poller
+#   container_family    = "monitor-poller"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.monitor_poller_config_param_name
+#   container_env_vars  = merge(local.monitor_poller_env_vars, {
+#     MONITOR_SERVICE = "poller"
+#     CONFIG_PARAMETER_NAME = local.monitor_poller_config_param_name
+#   })
+#   schedule_expression    = "rate(10 minutes)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_monitor_config
+# }
 
 
 module "lighthouse_solana_cron" {
