@@ -38,7 +38,7 @@ variable "full_image_name_sdk_server" {
 }
 
 variable "certificate_arn_mainnet" {
-  default = "arn:aws:acm:us-east-1:679752396206:certificate/8c1faa0e-4df5-4deb-96fa-4d462f4cd6df"
+  default = "arn:aws:acm:us-east-1:679752396206:certificate/d074136f-5b70-4a38-98d4-21df40273d63"
 }
 
 variable "postgres_password" {
