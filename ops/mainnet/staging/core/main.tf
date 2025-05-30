@@ -316,27 +316,6 @@ module "lighthouse_invoice_cron" {
     LIGHTHOUSE_SERVICE = "invoice"
     CONFIG_PARAMETER_NAME = local.lighthouse_invoice_config_param_name
   })
-  schedule_expression    = "rate(1 minute)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_lighthouse_config
-}
-
-module "lighthouse_reward_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-lighthouse"
-  docker_image_tag    = var.lighthouse_image_tag
-  container_family    = "lighthouse-reward"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.lighthouse_reward_config_param_name
-  container_env_vars  = merge(local.lighthouse_env_vars, {
-    LIGHTHOUSE_SERVICE = "reward"
-    CONFIG_PARAMETER_NAME = local.lighthouse_reward_config_param_name
-  })
   schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
@@ -346,26 +325,47 @@ module "lighthouse_reward_cron" {
   config                 = local.local_lighthouse_config
 }
 
-module "lighthouse_reward_metadata_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-lighthouse"
-  docker_image_tag    = var.lighthouse_image_tag
-  container_family    = "lighthouse-reward_metadata"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.lighthouse_reward_metadata_config_param_name
-  container_env_vars  = merge(local.lighthouse_env_vars, {
-    LIGHTHOUSE_SERVICE = "reward_metadata"
-    CONFIG_PARAMETER_NAME = local.lighthouse_reward_metadata_config_param_name
-  })
-  schedule_expression    = "rate(1 hour)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_lighthouse_config
-}
+# module "lighthouse_reward_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-lighthouse"
+#   docker_image_tag    = var.lighthouse_image_tag
+#   container_family    = "lighthouse-reward"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.lighthouse_reward_config_param_name
+#   container_env_vars  = merge(local.lighthouse_env_vars, {
+#     LIGHTHOUSE_SERVICE = "reward"
+#     CONFIG_PARAMETER_NAME = local.lighthouse_reward_config_param_name
+#   })
+#   schedule_expression    = "rate(1 hour)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_lighthouse_config
+# }
+
+# module "lighthouse_reward_metadata_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-lighthouse"
+#   docker_image_tag    = var.lighthouse_image_tag
+#   container_family    = "lighthouse-reward_metadata"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.lighthouse_reward_metadata_config_param_name
+#   container_env_vars  = merge(local.lighthouse_env_vars, {
+#     LIGHTHOUSE_SERVICE = "reward_metadata"
+#     CONFIG_PARAMETER_NAME = local.lighthouse_reward_metadata_config_param_name
+#   })
+#   schedule_expression    = "rate(1 hour)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_lighthouse_config
+# }
 
 module "monitor_poller_cron" {
   source              = "../../../modules/lambda"
