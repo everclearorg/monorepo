@@ -1,7 +1,7 @@
 locals {
 
   base_domain         = "everclear.ninja"
-  default_db_endpoint = "rds-postgres-cartographer-chimera.c64s9irwuemi.us-east-1.rds.amazonaws.com"
+  default_db_endpoint = "rds-postgres-cartographer-chimera.cq3x287427jh.us-east-1.rds.amazonaws.com"
   default_db_url      = "postgresql://${var.postgres_user}:${var.postgres_password}@${local.default_db_endpoint}:5432/everclear"
 
   lighthouse_intent_config_param_name          = "lighthouse-intent-${var.environment}-${var.stage}-config"
@@ -98,24 +98,24 @@ locals {
       ]
     }
     chains = {
-      "1" = {
-        providers = [
-          "https://eth-mainnet.blastapi.io/${var.blast_key}",
-          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "1" = {
+      #   providers = [
+      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
+      #     "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      "42161" = {
-        providers = [
-          "https://arbitrum-one.blastapi.io/${var.blast_key}",
-          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "42161" = {
+      #   providers = [
+      #     "https://arbitrum-one.blastapi.io/${var.blast_key}",
+      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
@@ -158,24 +158,24 @@ locals {
       ]
     }
     chains = {
-      "1" = {
-        providers = [
-          "https://eth-mainnet.blastapi.io/${var.blast_key}",
-          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "1" = {
+      #   providers = [
+      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
+      #     "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      "42161" = {
-        providers = [
-          "https://arbitrum-one.blastapi.io/${var.blast_key}",
-          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "42161" = {
+      #   providers = [
+      #     "https://arbitrum-one.blastapi.io/${var.blast_key}",
+      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
@@ -224,24 +224,24 @@ locals {
       ]
     }
     chains = {
-      "1" = {
-        providers = [
-          "https://eth-mainnet.blastapi.io/${var.blast_key}",
-          # "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "1" = {
+      #   providers = [
+      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
+      #     # "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
           # "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      "42161" = {
-        providers = [
-          "https://arbitrum-one.blastapi.io/${var.blast_key}",
-          # "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "42161" = {
+      #   providers = [
+      #     "https://arbitrum-one.blastapi.io/${var.blast_key}",
+      #     # "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "8453" = {
         providers = [
           # "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
@@ -309,7 +309,7 @@ locals {
       maxTokenomicsExportLatency      = 10
     }
     solana = {
-      spokeAddress = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
+      spokeAddress = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
     }
   })
 
@@ -331,9 +331,9 @@ locals {
       }
     ]
     thresholds = {
-      1          = { maxAge = 60, size = 1 },
+      # 1          = { maxAge = 60, size = 1 },
       10         = { maxAge = 60, size = 1 },
-      42161      = { maxAge = 60, size = 1 },
+      # 42161      = { maxAge = 60, size = 1 },
       8453       = { maxAge = 60, size = 1 },
       25327      = { maxAge = 60, size = 1 },
       1399811149 = { maxAge = 60, size = 1 }
@@ -345,24 +345,24 @@ locals {
       ]
     }
     chains = {
-      "1" = {
-        providers = [
-          "https://eth-mainnet.blastapi.io/${var.blast_key}",
-          #"https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "1" = {
+      #   providers = [
+      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
+      #     #"https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
           #"https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      "42161" = {
-        providers = [
-          "https://arbitrum-one.blastapi.io/${var.blast_key}",
-          #"https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-        ]
-      }
+      # "42161" = {
+      #   providers = [
+      #     "https://arbitrum-one.blastapi.io/${var.blast_key}",
+      #     #"https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+      #   ]
+      # }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
@@ -409,10 +409,10 @@ locals {
     }
     safe = {
       txService              = "https://transaction.safe.everclear.org/api"
-      safeAddress            = "0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8"
+      safeAddress            = "0x0000000000000000000000000000000000000000"
       signer                 = "${var.lighthouse_web3_signer_private_key}"
-      masterCopyAddress      = "0xfb1bffC9d739B8D520DaF37dF666da4C687191EA"
-      fallbackHandlerAddress = "0x017062a1dE2FE6b99BE3d9d37841FeD19F573804"
+      masterCopyAddress      = "0x0000000000000000000000000000000000000000"
+      fallbackHandlerAddress = "0x0000000000000000000000000000000000000000"
     }
     betterUptime = {
       apiKey         = var.betteruptime_api_key
@@ -420,7 +420,7 @@ locals {
     }
     solana = {
       signer       = var.solana_signer
-      spokeAddress = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
+      spokeAddress = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
     }
   })
 }
