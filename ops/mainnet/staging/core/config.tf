@@ -280,7 +280,7 @@ locals {
     ]
     agents = {
       relayer          = "https://${module.relayer_server.service_endpoint}/ping"
-      monitor          = "https://${module.monitor.service_endpoint}/ping"
+      # monitor          = "https://${module.monitor.service_endpoint}/ping"
       lighthouseSigner = "https://${module.lighthouse_web3signer.service_endpoint}/upcheck"
       relayerSigner    = "https://${module.relayer_web3signer.service_endpoint}/upcheck"
       watchtowerSigner = "https://${module.watchtower_web3signer.service_endpoint}/upcheck"
