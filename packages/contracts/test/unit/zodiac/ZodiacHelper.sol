@@ -623,6 +623,7 @@ abstract contract ZodiacHelper is Test {
   address public constant INVALID_CALLER = address(0x123);
   address public constant INVALID_SPENDER = address(0x456);
   address public constant INVALID_RECEIVER = address(0x789);
+  bytes32 public constant INVALID_ROLE_KEY = bytes32(0x1000000000000000000000000000000000000000000000000000000000000001);
   uint48 public constant ZERO_TTL = 0;
   uint24 public constant ZERO_FEE = 0;
   uint48 public constant NONZERO_TTL = 1 days;

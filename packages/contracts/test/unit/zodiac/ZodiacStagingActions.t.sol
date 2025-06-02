@@ -464,6 +464,9 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, INVALID_ROLE_KEY, true);
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -667,6 +670,9 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, INVALID_ROLE_KEY, true);
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -870,6 +876,9 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, INVALID_ROLE_KEY, true);
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -1059,6 +1068,9 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, INVALID_ROLE_KEY, true);
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -1259,6 +1271,9 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, INVALID_ROLE_KEY, true);
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -1430,6 +1445,9 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, INVALID_ROLE_KEY, true);
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -1572,6 +1590,9 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendDepositV3(_params, config, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, INVALID_ROLE_KEY, true);
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
 
@@ -1739,6 +1760,9 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, INVALID_ROLE_KEY, true);
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -1888,6 +1912,11 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    config.roleKey = INVALID_ROLE_KEY;
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, true);
+    config.roleKey = SONIC_ROLE_KEY;
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -2032,6 +2061,11 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    config.roleKey = INVALID_ROLE_KEY;
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, true);
+    config.roleKey = BERACHAIN_ROLE_KEY;
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -2164,6 +2198,11 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    config.roleKey = INVALID_ROLE_KEY;
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, true);
+    config.roleKey = MANTLE_ROLE_KEY;
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -2324,6 +2363,11 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    config.roleKey = INVALID_ROLE_KEY;
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, true);
+    config.roleKey = INK_ROLE_KEY;
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -2500,6 +2544,11 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    config.roleKey = INVALID_ROLE_KEY;
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, true);
+    config.roleKey = UNICHAIN_ROLE_KEY;
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -2661,6 +2710,11 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendDepositV3(_params, config, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    config.roleKey = INVALID_ROLE_KEY;
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, true);
+    config.roleKey = MODE_ROLE_KEY;
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -2800,6 +2854,11 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     );
 
     //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    config.roleKey = INVALID_ROLE_KEY;
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, true);
+    config.roleKey = RONIN_ROLE_KEY;
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
@@ -2920,6 +2979,11 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
+    // invalidRoleKey: transferring ETH to Binance
+    config.roleKey = INVALID_ROLE_KEY;
+    _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, true);
+    config.roleKey = AVALANCHE_ROLE_KEY;
+
     // invalidCaller: checking an invalid address cannot set approvals for each asset
     _approveAsset(config.weth, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
