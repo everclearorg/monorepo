@@ -2980,7 +2980,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     vm.deal(config.safeAddress, 100 ether);
     _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
-    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);    
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
     // invalidCaller: checking an invalid address cannot set approvals for each asset

@@ -18,7 +18,9 @@ interface IRoleModule {
 
 interface IWETH {
   function deposit() external payable;
-  function withdraw(uint256 wad) external;
+  function withdraw(
+    uint256 wad
+  ) external;
 }
 
 interface ISafe {

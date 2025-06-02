@@ -2772,7 +2772,15 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, STAGING_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, STAGING_MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      STAGING_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -2780,7 +2788,15 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, STAGING_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, STAGING_MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      STAGING_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     //////////////////////////// Reverting Actions ////////////////////////////
@@ -2901,7 +2917,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
 
     vm.deal(config.safeAddress, 100 ether);
     _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
-    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);    
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////
     // invalidCaller: checking an invalid address cannot set approvals for each asset

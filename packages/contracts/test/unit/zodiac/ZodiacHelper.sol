@@ -31,12 +31,12 @@ abstract contract EthereumStaging is Ethereum {
 }
 
 abstract contract EthereumProduction is Ethereum {
-    // API Inputs
+  // API Inputs
   uint256 public constant ETHEREUM_FEE = 0;
-  uint256 public constant ETHEREUM_DEADLINE = 1748857065;
+  uint256 public constant ETHEREUM_DEADLINE = 1_748_857_065;
   bytes public constant ETHEREUM_SIG =
     hex'639772df946ecc9c79ec939c79eba11e14254a8969bc59f8621b9316066bc32251af1c6bf9830c2a2e5e2a6c2a731a424e95721315e29961fe8e4252bbff95541b';
-  uint256 public constant ETHEREUM_FIXED_BLOCK = 22616104;
+  uint256 public constant ETHEREUM_FIXED_BLOCK = 22_616_104;
 }
 
 ///////////////////////////////// Arbitrum /////////////////////////////////////////
@@ -44,7 +44,7 @@ abstract contract Arbitrum {
   address public constant ARBITRUM_STAGING_ROLE_MODULE = 0xfc62b8FBC8fdDdd1997130923fD44BB785033B12;
   address public constant ARBITRUM_PROD_ROLE_MODULE = 0x76fCd80859Ef20440BEba00240467733D2482375;
   bytes32 public constant ARBITRUM_ROLE_KEY = 0x6c69717569646974795f6d616e616765725f6172620000000000000000000000;
-  
+
   // Bridges
   address public constant ARBITRUM_ACROSS_SPOKE_POOL = 0xe35e9842fceaCA96570B734083f4a58e8F7C5f2A;
   address public constant ARBITRUM_STARGATE_WETH_POOL = 0xA45B5130f36CDcA45667738e2a258AB09f4A5f7F;
@@ -53,7 +53,7 @@ abstract contract Arbitrum {
 }
 
 abstract contract ArbitrumStaging is Arbitrum {
-    // API Inputs
+  // API Inputs
   uint256 public constant ARBITRUM_FEE = 0;
   uint256 public constant ARBITRUM_DEADLINE = 1_747_061_416;
   bytes public constant ARBITRUM_SIG =
@@ -62,12 +62,12 @@ abstract contract ArbitrumStaging is Arbitrum {
 }
 
 abstract contract ArbitrumProduction is Arbitrum {
-      // API Inputs
+  // API Inputs
   uint256 public constant ARBITRUM_FEE = 0;
-  uint256 public constant ARBITRUM_DEADLINE = 1748859652;
+  uint256 public constant ARBITRUM_DEADLINE = 1_748_859_652;
   bytes public constant ARBITRUM_SIG =
     hex'075f688399aaa2842ac0ed482614a63d1af58f3e3afd4b09b1659e1f46a783050de3cb047ed2c2dfffbd061f53f88b7ffa3bb57f137ff0856d53c270f689bd851c';
-  uint256 public constant ARBITRUM_FIXED_BLOCK = 343097778;
+  uint256 public constant ARBITRUM_FIXED_BLOCK = 343_097_778;
 }
 
 ///////////////////////////////// Optimism /////////////////////////////////////////
@@ -84,7 +84,7 @@ abstract contract Optimism {
 }
 
 abstract contract OptimismStaging is Optimism {
-    // API Inputs
+  // API Inputs
   uint256 public constant OPTIMISM_FEE = 0;
   uint256 public constant OPTIMISM_DEADLINE = 1_747_128_274;
   bytes public constant OPTIMISM_SIG =
@@ -93,12 +93,12 @@ abstract contract OptimismStaging is Optimism {
 }
 
 abstract contract OptimismProduction is Optimism {
-      // API Inputs
+  // API Inputs
   uint256 public constant OPTIMISM_FEE = 0;
-  uint256 public constant OPTIMISM_DEADLINE = 1748859907;
+  uint256 public constant OPTIMISM_DEADLINE = 1_748_859_907;
   bytes public constant OPTIMISM_SIG =
     hex'93bf6b7bbd199d3f8391ba97f87ea42c74058ec0dbd2931fbec138a4caa5bc0a0cbd44aa662df2fb98782fdd8f0936508d63c9a70ecf4208c6f187db7386ed1c1c';
-  uint256 public constant OPTIMISM_FIXED_BLOCK = 136630273;
+  uint256 public constant OPTIMISM_FIXED_BLOCK = 136_630_273;
 }
 
 ///////////////////////////////// Polygon /////////////////////////////////////////
@@ -114,7 +114,7 @@ abstract contract Polygon {
 }
 
 abstract contract PolygonStaging is Polygon {
-    // API Inputs
+  // API Inputs
   uint256 public constant POLYGON_FEE = 0.000107 ether;
   uint256 public constant POLYGON_DEADLINE = 1_747_130_983;
   bytes public constant POLYGON_SIG =
@@ -123,12 +123,12 @@ abstract contract PolygonStaging is Polygon {
 }
 
 abstract contract PolygonProduction is Polygon {
-      // API Inputs
+  // API Inputs
   uint256 public constant POLYGON_FEE = 0.0 ether;
-  uint256 public constant POLYGON_DEADLINE = 1748860461;
+  uint256 public constant POLYGON_DEADLINE = 1_748_860_461;
   bytes public constant POLYGON_SIG =
     hex'9647949db2c6b3071c006eea4f60a6df6d9455e12c913358cd9a40dfe74164e46dbdf1fa9f8f9eeea58d134bbe65b24c663e666287dea12ad1973a47cc919bd91c';
-  uint256 public constant POLYGON_FIXED_BLOCK = 72269016;
+  uint256 public constant POLYGON_FIXED_BLOCK = 72_269_016;
 }
 
 ///////////////////////////////// Base /////////////////////////////////////////
@@ -144,7 +144,7 @@ abstract contract Base {
 }
 
 abstract contract BaseStaging is Base {
-    // API Inputs
+  // API Inputs
   uint256 public constant BASE_FEE = 0;
   uint256 public constant BASE_DEADLINE = 1_747_215_864;
   bytes public constant BASE_SIG =
@@ -153,12 +153,12 @@ abstract contract BaseStaging is Base {
 }
 
 abstract contract BaseProduction is Base {
-      // API Inputs
+  // API Inputs
   uint256 public constant BASE_FEE = 0;
-  uint256 public constant BASE_DEADLINE = 1748860591;
+  uint256 public constant BASE_DEADLINE = 1_748_860_591;
   bytes public constant BASE_SIG =
     hex'17801c4a8bfd2f8c5d2bf13127878997fd338ea575b40c7b92a497f8f44b06ed1d213d3f0240ab6f9b1d7fbea4a551be47687ca649c1f50a5d2cdee60196f2911c';
-  uint256 public constant BASE_FIXED_BLOCK = 31035330;
+  uint256 public constant BASE_FIXED_BLOCK = 31_035_330;
 }
 
 ///////////////////////////////// BSC /////////////////////////////////////////
@@ -173,7 +173,7 @@ abstract contract Bsc {
 }
 
 abstract contract BscStaging is Bsc {
-    // API Inputs
+  // API Inputs
   uint256 public constant BSC_FEE = 0;
   uint256 public constant BSC_DEADLINE = 1_747_132_224;
   bytes public constant BSC_SIG =
@@ -182,12 +182,12 @@ abstract contract BscStaging is Bsc {
 }
 
 abstract contract BscProduction is Bsc {
-      // API Inputs
+  // API Inputs
   uint256 public constant BSC_FEE = 0;
-  uint256 public constant BSC_DEADLINE = 1748860777;
+  uint256 public constant BSC_DEADLINE = 1_748_860_777;
   bytes public constant BSC_SIG =
     hex'd778458520627d5f6b2581508d0f1bbaee0e0ce790679ee84763c137a78a48792a2840d8142c508f8e6ada61bca2e77af3cb335e9c375723a12c7bfd50aa2e7d1c';
-  uint256 public constant BSC_FIXED_BLOCK = 50744214;
+  uint256 public constant BSC_FIXED_BLOCK = 50_744_214;
 }
 
 ///////////////////////////////// Sonic /////////////////////////////////////////
@@ -201,7 +201,7 @@ abstract contract Sonic {
 }
 
 abstract contract SonicStaging is Sonic {
-    // API Inputs
+  // API Inputs
   uint256 public constant SONIC_FEE = 0.0005 ether;
   uint256 public constant SONIC_DEADLINE = 1_747_140_590;
   bytes public constant SONIC_SIG =
@@ -210,12 +210,12 @@ abstract contract SonicStaging is Sonic {
 }
 
 abstract contract SonicProduction is Sonic {
-      // API Inputs
+  // API Inputs
   uint256 public constant SONIC_FEE = 0.0 ether;
-  uint256 public constant SONIC_DEADLINE = 1748861421;
+  uint256 public constant SONIC_DEADLINE = 1_748_861_421;
   bytes public constant SONIC_SIG =
     hex'ad74cf50f2857af923cc268b8cca4f52d954fda8466021ecd066bb138cdd1b58378308afc0dbad7e76c8161bc6f69ff6024eaffcb614a367565b628c405a40cd1b';
-  uint256 public constant SONIC_FIXED_BLOCK = 31310691;
+  uint256 public constant SONIC_FIXED_BLOCK = 31_310_691;
 }
 
 ///////////////////////////////// Berachain /////////////////////////////////////////
@@ -230,7 +230,7 @@ abstract contract Berachain {
 }
 
 abstract contract BerachainStaging is Berachain {
-    // API Inputs
+  // API Inputs
   uint256 public constant BERACHAIN_FEE = 0.0001 ether;
   uint256 public constant BERACHAIN_DEADLINE = 1_747_141_728;
   bytes public constant BERACHAIN_SIG =
@@ -239,12 +239,12 @@ abstract contract BerachainStaging is Berachain {
 }
 
 abstract contract BerachainProduction is Berachain {
-      // API Inputs
+  // API Inputs
   uint256 public constant BERACHAIN_FEE = 0.0 ether;
-  uint256 public constant BERACHAIN_DEADLINE = 1748861774;
+  uint256 public constant BERACHAIN_DEADLINE = 1_748_861_774;
   bytes public constant BERACHAIN_SIG =
     hex'44a52681594bb8d4eb2b71f2a6ecdb12add6ceafc08132ee5522179eb353924947110ef29bac3f53660b0705da7cf80c26d9e2b039c1e31c2936a6008bab68961b';
-  uint256 public constant BERACHAIN_FIXED_BLOCK = 5833923;
+  uint256 public constant BERACHAIN_FIXED_BLOCK = 5_833_923;
 }
 
 ///////////////////////////////// Mantle /////////////////////////////////////////
@@ -260,7 +260,7 @@ abstract contract Mantle {
 }
 
 abstract contract MantleStaging is Mantle {
-    // Api Inputs
+  // Api Inputs
   uint256 public constant MANTLE_FEE = 0.0005 ether;
   uint256 public constant MANTLE_DEADLINE = 1_747_142_792;
   bytes public constant MANTLE_SIG =
@@ -269,12 +269,12 @@ abstract contract MantleStaging is Mantle {
 }
 
 abstract contract MantleProduction is Mantle {
-   // Api Inputs
+  // Api Inputs
   uint256 public constant MANTLE_FEE = 0.0 ether;
-  uint256 public constant MANTLE_DEADLINE = 1748861883;
+  uint256 public constant MANTLE_DEADLINE = 1_748_861_883;
   bytes public constant MANTLE_SIG =
     hex'2ad78fe17890fb30826f322bf93da1896e7dad7503518296f1ec7f34279d2b1c250602be572721084903cf883a3effc0c3d6bc74fcb9d0736ac9d028f73aa8cb1c';
-  uint256 public constant MANTLE_FIXED_BLOCK = 80365499;
+  uint256 public constant MANTLE_FIXED_BLOCK = 80_365_499;
 }
 
 ///////////////////////////////// Blast /////////////////////////////////////////
@@ -291,7 +291,7 @@ abstract contract Blast {
 }
 
 abstract contract BlastStaging is Blast {
-    // API Inputs
+  // API Inputs
   uint256 public constant BLAST_FEE = 0.006 ether;
   uint256 public constant BLAST_DEADLINE = 1_747_138_533;
   bytes public constant BLAST_SIG =
@@ -300,12 +300,12 @@ abstract contract BlastStaging is Blast {
 }
 
 abstract contract BlastProduction is Blast {
-      // API Inputs
+  // API Inputs
   uint256 public constant BLAST_FEE = 0.0 ether;
-  uint256 public constant BLAST_DEADLINE = 1748867578;
+  uint256 public constant BLAST_DEADLINE = 1_748_867_578;
   bytes public constant BLAST_SIG =
     hex'c6e1208b32a538bb2936287c13955e895208185b4801a795b896d3df4976e34f64d5daf2a7ad4891bc84a99cb0c0e44546307879a878eb4db22667f5cd0fc68e1c';
-  uint256 public constant BLAST_FIXED_BLOCK = 20028594;
+  uint256 public constant BLAST_FIXED_BLOCK = 20_028_594;
 }
 
 ///////////////////////////////// Scroll /////////////////////////////////////////
@@ -321,7 +321,7 @@ abstract contract Scroll {
 }
 
 abstract contract ScrollStaging is Scroll {
-    // Api Inputs
+  // Api Inputs
   uint256 public constant SCROLL_FEE = 0.000106 ether;
   uint256 public constant SCROLL_DEADLINE = 1_747_139_007;
   bytes public constant SCROLL_SIG =
@@ -330,12 +330,12 @@ abstract contract ScrollStaging is Scroll {
 }
 
 abstract contract ScrollProduction is Scroll {
-      // Api Inputs
+  // Api Inputs
   uint256 public constant SCROLL_FEE = 0.0 ether;
-  uint256 public constant SCROLL_DEADLINE = 1748862172;
+  uint256 public constant SCROLL_DEADLINE = 1_748_862_172;
   bytes public constant SCROLL_SIG =
     hex'95360e8a51c76f24cde27addd1d536db3cda6289af26d19b254830133217caa716d8a19e71f915d9f0c4c62c8ac60bb92268d3f6569adda4947a1e47b145c91c1c';
-  uint256 public constant SCROLL_FIXED_BLOCK = 16167846;
+  uint256 public constant SCROLL_FIXED_BLOCK = 16_167_846;
 }
 
 ///////////////////////////////// Ink /////////////////////////////////////////
@@ -350,7 +350,7 @@ abstract contract Ink {
 }
 
 abstract contract InkStaging is Ink {
-    // Api Inputs
+  // Api Inputs
   uint256 public constant INK_FEE = 0.0001 ether;
   uint256 public constant INK_DEADLINE = 1_747_143_461;
   bytes public constant INK_SIG =
@@ -359,12 +359,12 @@ abstract contract InkStaging is Ink {
 }
 
 abstract contract InkProduction is Ink {
-      // Api Inputs
+  // Api Inputs
   uint256 public constant INK_FEE = 0.0 ether;
-  uint256 public constant INK_DEADLINE = 1748862242;
+  uint256 public constant INK_DEADLINE = 1_748_862_242;
   bytes public constant INK_SIG =
     hex'e8d07b1a60c32a6852f2e4cea0d5eb2aa88b303be324a9539f234419430d1e6d020ce3742af66a4da699801e997e223bc5e955ba596d0d510d63a745a18b22fa1c';
-  uint256 public constant INK_FIXED_BLOCK = 15363260;
+  uint256 public constant INK_FIXED_BLOCK = 15_363_260;
 }
 
 ///////////////////////////////// Unichain /////////////////////////////////////////
@@ -379,7 +379,7 @@ abstract contract Unichain {
 }
 
 abstract contract UnichainStaging is Unichain {
-    // Api Inputs
+  // Api Inputs
   uint256 public constant UNICHAIN_FEE = 0.0007 ether;
   uint256 public constant UNICHAIN_DEADLINE = 1_747_144_179;
   bytes public constant UNICHAIN_SIG =
@@ -388,12 +388,12 @@ abstract contract UnichainStaging is Unichain {
 }
 
 abstract contract UnichainProduction is Unichain {
-      // Api Inputs
+  // Api Inputs
   uint256 public constant UNICHAIN_FEE = 0.0 ether;
-  uint256 public constant UNICHAIN_DEADLINE = 1748867094;
+  uint256 public constant UNICHAIN_DEADLINE = 1_748_867_094;
   bytes public constant UNICHAIN_SIG =
     hex'24ad6a6a47ec86289c35700646cff903faadc8b8b282b5efcdc6c6a5b01111a551362fd8e57ac85d8f7008d6951c2195f5bd6a1c0ad1c68311ed40fb9aae9ca31b';
-  uint256 public constant UNICHAIN_FIXED_BLOCK = 18118164;
+  uint256 public constant UNICHAIN_FIXED_BLOCK = 18_118_164;
 }
 
 ///////////////////////////////// Mode /////////////////////////////////////////
@@ -407,7 +407,7 @@ abstract contract Mode {
 }
 
 abstract contract ModeStaging is Mode {
-    // Api Inputs
+  // Api Inputs
   uint256 public constant MODE_FEE = 0.004 ether;
   uint256 public constant MODE_DEADLINE = 1_747_145_892;
   bytes public constant MODE_SIG =
@@ -416,12 +416,12 @@ abstract contract ModeStaging is Mode {
 }
 
 abstract contract ModeProduction is Mode {
-      // Api Inputs
+  // Api Inputs
   uint256 public constant MODE_FEE = 0.0 ether;
-  uint256 public constant MODE_DEADLINE = 1748867230;
+  uint256 public constant MODE_DEADLINE = 1_748_867_230;
   bytes public constant MODE_SIG =
     hex'e42103156e712e5a55362c0299787edc77902220ef2a5950e87b47a4b87f57ad751978d71c0f656b276d0b69471313dd8843612157444bf04940f64563efb3d21c';
-  uint256 public constant MODE_FIXED_BLOCK = 24349642;
+  uint256 public constant MODE_FIXED_BLOCK = 24_349_642;
 }
 
 ///////////////////////////////// Ronin /////////////////////////////////////////
@@ -432,7 +432,7 @@ abstract contract Ronin {
 }
 
 abstract contract RoninStaging is Ronin {
-    // Api Inputs
+  // Api Inputs
   uint256 public constant RONIN_FEE = 0.00025 ether;
   uint256 public constant RONIN_DEADLINE = 1_747_151_912;
   bytes public constant RONIN_SIG =
@@ -441,12 +441,12 @@ abstract contract RoninStaging is Ronin {
 }
 
 abstract contract RoninProduction is Ronin {
-      // Api Inputs
+  // Api Inputs
   uint256 public constant RONIN_FEE = 0.0 ether;
-  uint256 public constant RONIN_DEADLINE = 1748868475;
+  uint256 public constant RONIN_DEADLINE = 1_748_868_475;
   bytes public constant RONIN_SIG =
     hex'6c3505c857b7a88158d6a7cd356ee73fae234538cdb265273d8b04fa66f8197c60faf0763f1ab16995f5e3479581bd8151281f63d14730f162a32b5b386396801c';
-  uint256 public constant RONIN_FIXED_BLOCK = 45671551;
+  uint256 public constant RONIN_FIXED_BLOCK = 45_671_551;
 }
 
 ///////////////////////////////// Avalanche /////////////////////////////////////////
@@ -461,21 +461,21 @@ abstract contract Avalanche {
 }
 
 abstract contract AvalancheStaging is Avalanche {
-    // Api Inputs
+  // Api Inputs
   uint256 public constant AVALANCHE_FEE = 0.00025 ether;
   uint256 public constant AVALANCHE_DEADLINE = 1_747_228_398;
   bytes public constant AVALANCHE_SIG =
     hex'3866c3de5bbcda9fffc32292b35abd1df99a5f478614c964e782fe9750005e3c51f0260d252da42f191f7c35b82f333abf75054c036aad079bc03d144ef9e05a1b';
-  uint256 public constant AVALANCHE_FIXED_BLOCK = 62017749;
+  uint256 public constant AVALANCHE_FIXED_BLOCK = 62_017_749;
 }
 
 abstract contract AvalancheProduction is Avalanche {
-      // Api Inputs
+  // Api Inputs
   uint256 public constant AVALANCHE_FEE = 0.0 ether;
-  uint256 public constant AVALANCHE_DEADLINE = 1748867706;
+  uint256 public constant AVALANCHE_DEADLINE = 1_748_867_706;
   bytes public constant AVALANCHE_SIG =
     hex'21ec1bf427a7d0f40083abdc0e1140bd06e310c4600ef95cc4b57b4c7f7b24ff77d212cef13e685d7d35db7f2e9efc387bde1e603f1b4464ee7a2bd3235ed9dc1c';
-  uint256 public constant AVALANCHE_FIXED_BLOCK = 63174337;
+  uint256 public constant AVALANCHE_FIXED_BLOCK = 63_174_337;
 }
 
 // // NOTE: Unsupported in the API
@@ -528,7 +528,7 @@ abstract contract AvalancheProduction is Avalanche {
 
 abstract contract ZodiacProductionEnvironment is
   EthereumProduction,
-    ArbitrumProduction,
+  ArbitrumProduction,
   BlastProduction,
   OptimismProduction,
   PolygonProduction,
@@ -543,8 +543,7 @@ abstract contract ZodiacProductionEnvironment is
   ModeProduction,
   RoninProduction,
   AvalancheProduction
-{
-}
+{}
 
 abstract contract ZodiacStagingEnvironment is
   EthereumStaging,
@@ -563,12 +562,9 @@ abstract contract ZodiacStagingEnvironment is
   ModeStaging,
   RoninStaging,
   AvalancheStaging
-{
-}
+{}
 
-abstract contract ZodiacHelper is
-  Test
-{
+abstract contract ZodiacHelper is Test {
   using TypeCasts for address;
   using TypeCasts for bytes32;
 
