@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IERC20, IFeeAdapter, IRoleModule, ZodiacHelper} from './ZodiacHelper.sol';
+import {IERC20, IFeeAdapter, IRoleModule, ZodiacHelper, ZodiacProductionEnvironment} from './ZodiacHelper.sol';
 import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {MainnetProductionEnvironment} from 'script/MainnetProduction.sol';
 
-contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
+contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, ZodiacProductionEnvironment {
   function setUp() public {
     // Ethereum
     _zodiacConfig[ETHEREUM] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: ETHEREUM_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: ETHEREUM_PROD_ROLE_MODULE,
       feeAdapter: ETHEREUM_FEE_ADAPTER,
       roleKey: ETHEREUM_ROLE_KEY,
       validFee: ETHEREUM_FEE,
@@ -32,8 +32,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Arbitrum
     _zodiacConfig[ARBITRUM_ONE] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: ARBITRUM_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: ARBITRUM_PROD_ROLE_MODULE,
       feeAdapter: ARBITRUM_FEE_ADAPTER,
       roleKey: ARBITRUM_ROLE_KEY,
       validFee: ARBITRUM_FEE,
@@ -54,8 +54,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Optimism
     _zodiacConfig[OPTIMISM] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: OPTIMISM_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: OPTIMISM_PROD_ROLE_MODULE,
       feeAdapter: OPTIMISM_FEE_ADAPTER,
       roleKey: OPTIMISM_ROLE_KEY,
       validFee: OPTIMISM_FEE,
@@ -76,8 +76,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Polygon
     _zodiacConfig[POLYGON] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: POLYGON_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: POLYGON_PROD_ROLE_MODULE,
       feeAdapter: POLYGON_FEE_ADAPTER,
       roleKey: POLYGON_ROLE_KEY,
       validFee: POLYGON_FEE,
@@ -98,8 +98,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Base
     _zodiacConfig[BASE] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: BASE_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: BASE_PROD_ROLE_MODULE,
       feeAdapter: BASE_FEE_ADAPTER,
       roleKey: BASE_ROLE_KEY,
       validFee: BASE_FEE,
@@ -120,8 +120,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // BNB
     _zodiacConfig[BNB] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: BSC_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: BSC_PROD_ROLE_MODULE,
       feeAdapter: BNB_FEE_ADAPTER,
       roleKey: BSC_ROLE_KEY,
       validFee: BSC_FEE,
@@ -142,8 +142,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Blast
     _zodiacConfig[BLAST] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: BLAST_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: BLAST_PROD_ROLE_MODULE,
       feeAdapter: BLAST_FEE_ADAPTER,
       roleKey: BLAST_ROLE_KEY,
       validFee: BLAST_FEE,
@@ -164,8 +164,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Sonic
     _zodiacConfig[SONIC] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: SONIC_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: SONIC_PROD_ROLE_MODULE,
       feeAdapter: SONIC_FEE_ADAPTER,
       roleKey: SONIC_ROLE_KEY,
       validFee: SONIC_FEE,
@@ -186,8 +186,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Mantle
     _zodiacConfig[MANTLE] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: MANTLE_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: MANTLE_PROD_ROLE_MODULE,
       feeAdapter: MANTLE_FEE_ADAPTER,
       roleKey: MANTLE_ROLE_KEY,
       validFee: MANTLE_FEE,
@@ -208,8 +208,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Ink
     _zodiacConfig[INK] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: INK_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: INK_PROD_ROLE_MODULE,
       feeAdapter: INK_FEE_ADAPTER,
       roleKey: INK_ROLE_KEY,
       validFee: INK_FEE,
@@ -230,8 +230,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Scroll
     _zodiacConfig[SCROLL] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: SCROLL_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: SCROLL_PROD_ROLE_MODULE,
       feeAdapter: SCROLL_FEE_ADAPTER,
       roleKey: SCROLL_ROLE_KEY,
       validFee: SCROLL_FEE,
@@ -252,8 +252,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Berachain
     _zodiacConfig[BERACHAIN] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: BERACHAIN_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: BERACHAIN_PROD_ROLE_MODULE,
       feeAdapter: BERACHAIN_FEE_ADAPTER,
       roleKey: BERACHAIN_ROLE_KEY,
       validFee: BERACHAIN_FEE,
@@ -274,8 +274,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Unichain
     _zodiacConfig[UNICHAIN] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: UNICHAIN_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: UNICHAIN_PROD_ROLE_MODULE,
       feeAdapter: UNICHAIN_FEE_ADAPTER,
       roleKey: UNICHAIN_ROLE_KEY,
       validFee: UNICHAIN_FEE,
@@ -296,8 +296,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Mode
     _zodiacConfig[MODE] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: MODE_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: MODE_PROD_ROLE_MODULE,
       feeAdapter: MODE_FEE_ADAPTER,
       roleKey: MODE_ROLE_KEY,
       validFee: MODE_FEE,
@@ -318,8 +318,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Ronin
     _zodiacConfig[RONIN] = ZodiacConfiguration({
-      safeAddress: RONIN_SAFE_ADDRESS,
-      roleModule: RONIN_STAGING_ROLE_MODULE,
+      safeAddress: PROD_RONIN_SAFE_ADDRESS,
+      roleModule: RONIN_PROD_ROLE_MODULE,
       feeAdapter: RONIN_FEE_ADAPTER,
       roleKey: RONIN_ROLE_KEY,
       validFee: RONIN_FEE,
@@ -333,8 +333,8 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Avalanche
     _zodiacConfig[AVALANCHE] = ZodiacConfiguration({
-      safeAddress: MULTI_SIG_ADDRESS,
-      roleModule: AVALANCHE_STAGING_ROLE_MODULE,
+      safeAddress: PROD_MULTI_SIG_ADDRESS,
+      roleModule: AVALANCHE_PROD_ROLE_MODULE,
       feeAdapter: AVALANCHE_FEE_ADAPTER,
       roleKey: AVALANCHE_ROLE_KEY,
       validFee: AVALANCHE_FEE,
@@ -354,7 +354,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     });
   }
 
-  function test_zodiacConfiguration_ethereum() public {
+  function test_zodiacProdConfiguration_ethereum() public {
     vm.createSelectFork(vm.envString('MAINNET_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -405,6 +405,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     vm.deal(config.safeAddress, 100 ether);
     _wrapWETH(config.weth, 10 ether, config.roleKey, APPROVED_CALLER, false);
 
+    // ETH: transferring to Binance
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
+
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
     _destinations[0] = 1;
@@ -473,6 +476,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
     _transferAsset(config.usdc, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
 
+    // invalidCaller: transferring ETH to Binance
+    _transferEth(INVALID_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, true);
+
     // invalidCaller: checking a random address cannot send a new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
@@ -485,6 +491,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
     _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: transferring ETH to invalid receiver
+    _transferEth(APPROVED_CALLER, INVALID_RECEIVER, 1 ether, config.roleKey, true);
 
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
@@ -561,7 +570,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_arbitrum() public {
+  function test_zodiacProdConfiguration_arbitrum() public {
     vm.createSelectFork(vm.envString('ARBITRUM_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -598,6 +607,10 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     deal(config.usdt, config.safeAddress, 100_000e6);
     _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    // ETH: transferring to Binance
+    vm.deal(config.safeAddress, 100 ether);
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
@@ -652,10 +665,10 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendDepositV3(_params, config, false);
 
     // Stargate: sending an order
-    _params.inputAmount = 100e6;
-    _params.outputAmount = 90e6;
+    _params.inputAmount = 200e6;
+    _params.outputAmount = 180e6;
     _params.nativeFee = 0.01 ether;
-    _params.destination = 30_110;
+    _params.destination = 30_101;
 
     vm.deal(config.safeAddress, 100 ether);
     _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
@@ -672,9 +685,12 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdc, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
     _approveAsset(config.usdt, INVALID_CALLER, config.feeAdapter, config, 100 ether, true);
 
-    // invalidCaller: transferring to invalid receiver
+    // invalidCaller: transferring with invalid caller
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
     _transferAsset(config.usdc, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
+
+    // invalidCaller: transferring to Binance with invalid caller
+    _transferEth(INVALID_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, true);
 
     // invalidCaller: checking a random address cannot send a new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
@@ -688,6 +704,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
     _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: transferring to invalid receiver
+    _transferEth(APPROVED_CALLER, INVALID_RECEIVER, 1 ether, config.roleKey, true);
 
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
@@ -764,7 +783,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_optimism() public {
+  function test_zodiacProdConfiguration_optimism() public {
     vm.createSelectFork(vm.envString('OPTIMISM_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -801,6 +820,10 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     deal(config.usdt, config.safeAddress, 100_000e6);
     _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    // ETH: transferring to Binance
+    vm.deal(config.safeAddress, 100 ether);
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
@@ -879,6 +902,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
     _transferAsset(config.usdc, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
 
+    // invalidCaller: transferring to Binance
+    _transferEth(INVALID_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, true);
+
     // invalidCaller: checking a random address cannot send a new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
@@ -891,6 +917,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
     _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: transferring to invalid receiver
+    _transferEth(APPROVED_CALLER, INVALID_RECEIVER, 1 ether, config.roleKey, true);
 
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
@@ -967,7 +996,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_polygon() public {
+  function test_zodiacProdConfiguration_polygon() public {
     vm.createSelectFork(vm.envString('POLYGON_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -1004,6 +1033,10 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     deal(config.usdt, config.safeAddress, 100_000e6);
     _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    // POL: transferring to Binance
+    vm.deal(config.safeAddress, 100 ether);
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
@@ -1068,6 +1101,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
     _transferAsset(config.usdc, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
 
+    // invalidCaller: transferring to Binance
+    _transferEth(INVALID_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, true);
+
     // invalidCaller: checking a random address cannot send a new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
@@ -1080,6 +1116,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
     _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: transferring to invalid receiver
+    _transferEth(APPROVED_CALLER, INVALID_RECEIVER, 1 ether, config.roleKey, true);
 
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
@@ -1156,7 +1195,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_base() public {
+  function test_zodiacProdConfiguration_base() public {
     vm.createSelectFork(vm.envString('BASE_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -1190,6 +1229,10 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Binance: testing can transfer to Binance
     deal(config.usdc, config.safeAddress, 100_000e6);
     _transferAsset(config.usdc, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    // ETH: transferring to Binance
+    vm.deal(config.safeAddress, 100 ether);
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
@@ -1269,6 +1312,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
     _transferAsset(config.usdc, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
 
+    // invalidCaller: transferring to Binance
+    _transferEth(INVALID_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, true);
+
     // invalidCaller: checking a random address cannot send a new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
@@ -1282,6 +1328,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
     _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: transferring to Binance
+    _transferEth(APPROVED_CALLER, INVALID_RECEIVER, 1 ether, config.roleKey, true);
 
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
@@ -1356,7 +1405,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_bsc() public {
+  function test_zodiacProdConfiguration_bsc() public {
     vm.createSelectFork(vm.envString('BNB_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -1383,11 +1432,15 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.stargateUsdt, config, 100 ether, false);
 
     // Binance: testing can transfer to Binance
-    deal(config.usdc, config.safeAddress, 100_000e6);
+    deal(config.usdc, config.safeAddress, 100_000e18);
     _transferAsset(config.usdc, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
 
-    deal(config.usdt, config.safeAddress, 100_000e6);
+    deal(config.usdt, config.safeAddress, 100_000e18);
     _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    // BNB: transferring to Binance
+    vm.deal(config.safeAddress, 100 ether);
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
@@ -1419,18 +1472,14 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _params.caller = APPROVED_CALLER;
     _params.receiver = config.safeAddress;
     _params.depositor = config.safeAddress;
-    _params.inputToken = config.weth;
-    _params.quoteTimestamp = uint32(block.timestamp);
-    _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
-    _params.across = addressConfig.across;
-    _params.inputAmount = 100e6;
-    _params.outputAmount = 90e6;
+    _params.inputAmount = 100e18;
+    _params.outputAmount = 99e18;
     _params.nativeFee = 0.01 ether;
     _params.destination = 30_101;
 
     vm.deal(config.safeAddress, 100 ether);
-    _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
+    deal(config.usdt, config.safeAddress, 100_000e18);
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
@@ -1442,6 +1491,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidCaller: transferring to invalid receiver
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
     _transferAsset(config.usdc, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
+
+    // invalidCaller: transferring to Binance
+    _transferEth(INVALID_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, true);
 
     // invalidCaller: checking a random address cannot send a new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
@@ -1455,6 +1507,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
     _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // BNB: transferring to invalid receiver
+    _transferEth(APPROVED_CALLER, INVALID_RECEIVER, 1 ether, config.roleKey, true);
 
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
@@ -1505,7 +1560,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_blast() public {
+  function test_zodiacProdConfiguration_blast() public {
     vm.createSelectFork(vm.envString('BLAST_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -1641,7 +1696,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _params.message = '';
   }
 
-  function test_zodiacConfiguration_scroll() public {
+  function test_zodiacProdConfiguration_scroll() public {
     vm.createSelectFork(vm.envString('SCROLL_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -1674,6 +1729,10 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Binance: testing can transfer to Binance
     deal(config.usdt, config.safeAddress, 100_000e6);
     _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    // ETH: transferring to Binance
+    vm.deal(config.safeAddress, 100 ether);
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
@@ -1751,6 +1810,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidCaller: transferring to invalid receiver
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
 
+    // ETH: transferring to Binance
+    _transferEth(INVALID_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, true);
+
     // invalidCaller: checking a random address cannot send a new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
@@ -1762,6 +1824,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdt, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: transferring to Binance
+    _transferEth(APPROVED_CALLER, INVALID_RECEIVER, 1 ether, config.roleKey, true);
 
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
@@ -1819,7 +1884,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _params.message = '';
   }
 
-  function test_zodiacConfiguration_sonic() public {
+  function test_zodiacProdConfiguration_sonic() public {
     vm.createSelectFork(vm.envString('SONIC_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -1968,7 +2033,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _params.message = '';
   }
 
-  function test_zodiacConfiguration_berachain() public {
+  function test_zodiacProdConfiguration_berachain() public {
     vm.createSelectFork(vm.envString('BERACHAIN_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -2094,7 +2159,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_mantle() public {
+  function test_zodiacProdConfiguration_mantle() public {
     vm.createSelectFork(vm.envString('MANTLE_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -2123,6 +2188,11 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // Binance: testing can transfer to Binance
     deal(config.usdc, config.safeAddress, 100_000e6);
     _transferAsset(config.usdc, APPROVED_CALLER, BYBIT_EVM_ADDRESS, config, 1000e6, false);
+
+    // ETH: transferring to Binance
+    vm.deal(config.safeAddress, 100 ether);
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
+    _transferEth(APPROVED_CALLER, BYBIT_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
@@ -2160,7 +2230,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _params.message = '';
     _params.inputAmount = 100e6;
     _params.outputAmount = 90e6;
-    _params.nativeFee = 10 ether;
+    _params.nativeFee = 40 ether;
     _params.destination = 30_101;
 
     vm.deal(config.safeAddress, 100 ether);
@@ -2176,6 +2246,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // invalidCaller: transferring to invalid receiver
     _transferAsset(config.usdt, INVALID_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, true);
 
+    // invalidCaller: transferring to Binance
+    _transferEth(INVALID_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, true);
+
     // invalidCaller: checking a random address cannot send a new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, INVALID_CALLER, config.safeAddress, true);
@@ -2187,6 +2260,9 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // invalidReceiver: transferring to invalid receiver
     _transferAsset(config.usdc, APPROVED_CALLER, INVALID_RECEIVER, config, 1000e6, true);
+
+    // invalidReceiver: transferring to an invalid receiver
+    _transferEth(APPROVED_CALLER, INVALID_RECEIVER, 1 ether, config.roleKey, true);
 
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
@@ -2237,7 +2313,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_ink() public {
+  function test_zodiacProdConfiguration_ink() public {
     vm.createSelectFork(vm.envString('INK_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -2412,7 +2488,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_unichain() public {
+  function test_zodiacProdConfiguration_unichain() public {
     vm.createSelectFork(vm.envString('UNI_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -2586,7 +2662,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateWeth, true, '', '0x123');
   }
 
-  function test_zodiacConfiguration_mode() public {
+  function test_zodiacProdConfiguration_mode() public {
     vm.createSelectFork(vm.envString('MODE_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
@@ -2606,7 +2682,6 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     // FeeAdapter: testing the test address can set approvals for each asset
     _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
-    _approveAsset(config.usdt, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
 
     // // Across: testing across spoke pool can be set as spender for each asset
     _approveAsset(config.weth, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
@@ -2735,7 +2810,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     _params.message = '';
   }
 
-  function test_zodiacConfiguration_ronin() public {
+  function test_zodiacProdConfiguration_ronin() public {
     vm.createSelectFork(vm.envString('RONIN_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
@@ -2773,18 +2848,18 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
 
     // Everclear: ending new intent
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, MULTI_SIG_ADDRESS, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
     );
 
     // Everclear: sending new order
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, MULTI_SIG_ADDRESS, false);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
     );
 
     //////////////////////////// Reverting Actions ////////////////////////////
@@ -2830,7 +2905,7 @@ contract ZodiacActions is MainnetProductionEnvironment, ZodiacHelper {
     );
   }
 
-  function test_zodiacConfiguration_avalanche() public {
+  function test_zodiacProdConfiguration_avalanche() public {
     vm.createSelectFork(vm.envString('AVALANCHE_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
