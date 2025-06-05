@@ -30,7 +30,7 @@ interface IUsersManager {
 
   /**
    * @notice Thrown when the minimum supported domains is not met
-   * @param _minSupportedDomains The mininum amount of domains a solver must support
+   * @param _minSupportedDomains The minimum amount of domains a solver must support
    * @param _supportedDomainsLength The amount of domains the solver is trying to set
    */
   error UsersManager_SetUser_MinimumSupportedDomainsNotMet(
