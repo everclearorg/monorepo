@@ -50,7 +50,7 @@ export const pauseProtocol = async (report: Report, requestContext: RequestConte
  * @param domainId The domain to pause
  * @param gasMultiplier The gas multiplier to use
  * @param requestContext The request context for the logger
- * @param isStaging The enviroment we are running it in (staging or production)
+ * @param isStaging The environment we are running it in (staging or production)
  * @returns The action status for the domain
  */
 export const pauseDomain = async (domainId: string, requestContext: RequestContext): Promise<ActionStatus> => {
