@@ -502,6 +502,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -717,6 +723,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
 
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -934,6 +946,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -1135,6 +1153,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
 
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -1351,6 +1375,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -1533,6 +1563,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -1665,6 +1701,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
 
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -1856,6 +1898,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -2010,6 +2058,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -2150,6 +2204,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
 
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -2307,6 +2367,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -2463,6 +2529,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
 
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -2647,6 +2719,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -2812,6 +2890,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
 
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
     _sendNewOrderInvalidSecondArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -2937,6 +3021,12 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
 
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
@@ -3072,6 +3162,18 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // invalidReceiver: checking a random address cannot receive funds
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, INVALID_RECEIVER, true);
+
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+
+    // invalidReceiver: Proposers
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_1, true);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROPOSER_2, true);
 
     // invalidReceiver: checking the receiver invalidity in different arrays
     _sendNewOrderInvalidFirstArrayReceiver(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
