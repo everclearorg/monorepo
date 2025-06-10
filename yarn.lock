@@ -995,6 +995,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/adapters-web3signer@workspace:packages/adapters/web3signer"
   dependencies:
+    "@chimera-monorepo/chainservice": "workspace:*"
     "@chimera-monorepo/utils": "workspace:*"
     "@typescript-eslint/eslint-plugin": 5.52.0
     eslint: 8.34.0
