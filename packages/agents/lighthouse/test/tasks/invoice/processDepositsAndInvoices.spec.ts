@@ -14,9 +14,9 @@ describe('#processDepositsAndInvoices', () => {
   let logger: SinonStubbedInstance<Logger>;
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
-  let sendWithRelayerWithBackup: SinonStub;
   let chains: LighthouseConfig['chains'];
   let database: SinonStubbedInstance<Database>;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   const tickers = ['USDC'];
   beforeEach(() => {
@@ -68,6 +68,8 @@ describe('#processDepositsAndInvoices', () => {
       taskId: '123',
       relayerType: RelayerType.Everclear,
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
 
     getContextStub.returns({
       ...mock.context(),

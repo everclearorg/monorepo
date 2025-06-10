@@ -1,14 +1,30 @@
-#!/bin/sh
+#!/usr/bin/env sh
+set -e
 
-. "$(dirname "$0")/_/husky.sh"
-#
-# Fetch changes that are staged for commit
+###############################################################################
+# 1 — Secret scan (staged diff only)
+###############################################################################
+# Detect whether gitleaks is available (global install or yarn script)
+if command -v gitleaks >/dev/null 2>&1; then
+  GITLEAKS_CMD="gitleaks"
+else
+  # fall back to the yarn script you added with `yarn add -D @gitleaks/gitleaks`
+  GITLEAKS_CMD="yarn gitleaks"
+fi
+
+echo "🔍  Running Gitleaks on staged changes…"
+# --staged → only the index, so it’s fast; --redact hides the secret in output
+$GITLEAKS_CMD protect --staged --redact --no-banner --log-level error --config .gitleaks.toml
+
+###############################################################################
+# 2 — Contracts build/lint (only if packages/contracts changed)
+###############################################################################
 STAGED_CHANGES=$(git diff --cached --name-only -- packages/contracts)
 
-# Check if there are staged changes in the packages/contract directory
 if [ -z "$STAGED_CHANGES" ]; then
-  echo "No changes in packages/contract directory. Skipping build."
+  echo "✅  No changes in packages/contracts – skipping build."
 else
-  echo "Changes detected in packages/contract directory. Running yarn build."
-  yarn workspace @chimera-monorepo/contracts build:sol && yarn workspace @chimera-monorepo/contracts lint:fix
+  echo "🏗️   Building & linting contracts (because they changed)…"
+  yarn workspace @chimera-monorepo/contracts build:sol
+  yarn workspace @chimera-monorepo/contracts lint:fix
 fi

@@ -223,7 +223,7 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
 
   const rewards = configJson.rewards || configFile.rewards || {};
   if (rewards.volume?.tokens) {
-    rewards.volume.tokens = rewards.volume.tokens.map((item: TokenVolumeReward, index: number) => {
+    rewards.volume.tokens = rewards.volume.tokens.map((item: TokenVolumeReward) => {
       // return { ...DEFAULT_REWARDS_CONFIG.volume.tokens[index], ...item };
       return { ...item };
     });

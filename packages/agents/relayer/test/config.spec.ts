@@ -45,7 +45,6 @@ describe('Config', () => {
         EVERCLEAR_CONFIG_FILE: '',
         RELAYER_CONFIG_FILE: 'test-config.json',
       });
-      console.error(await getEnvConfig());
       await expect(getEnvConfig()).to.be.fulfilled;
     });
   });

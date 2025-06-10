@@ -24,6 +24,7 @@ export const pauseProtocol = async (report: Report, requestContext: RequestConte
   try {
     const { config, logger } = getContext();
     const methodContext = createMethodContext(pauseProtocol.name);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { logger: _, ...toLog } = report;
     logger.info('Pausing protocol.', requestContext, methodContext, { report: toLog });
 
@@ -188,6 +189,7 @@ export const isDomainPaused = async (
       domain: +domain,
       to: everclearAddress,
       data: everclearInterface.encodeFunctionData('paused'),
+      funcSig: everclearInterface.getFunction('paused').format(),
     },
     'latest',
   );
@@ -225,6 +227,7 @@ export const sendPauseDomainTx = async (
       from: await wallet.getAddress(),
       gasPrice: BigNumber.from(price).mul(gasMultiplier).toString(),
       gasLimit: BigNumber.from(100_000).toString(), // NOTE: fails on e2e tests without it, we can safely hardcode this since this function is not computationally expensive
+      funcSig: everclearInterface.getFunction('pause').format(),
     };
     const receipt = await chainservice.sendTx(tx, requestContext);
     if (!receipt.status) throw new Error(`Transaction failed with status: ${receipt.status}`);

@@ -300,6 +300,7 @@ describe('RpcProviderAggregator', () => {
       from: mkAddress(),
       data: mkBytes32(),
       value: utils.parseUnits('1', 'ether').toString(),
+      funcSig: 'bar()',
     };
 
     beforeEach(() => {

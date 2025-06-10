@@ -17,11 +17,14 @@ describe('Checklist:intent', () => {
     let subgraph: SinonStubbedInstance<SubgraphReader>;
     let decodeStub: SinonStub;
     let encodeStub: SinonStub;
+    const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
+
     beforeEach(() => {
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
       subgraph = mock.context().adapters.subgraph as SinonStubbedInstance<SubgraphReader>;
       encodeStub = stub(Interface.prototype, 'encodeFunctionData').returns('0x1234');
       decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns(['0x1234']);
+      stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
 
       encodeStub.returns('0x1234');
       decodeStub.returns(['0x1234']);
