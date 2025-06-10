@@ -135,6 +135,7 @@ export class OnchainTransaction {
       nonce: this.nonce,
       type: this.type,
       gasLimit: this.gas.limit,
+      funcSig: this.minTx.funcSig,
       ...this.gasFee,
     };
   }

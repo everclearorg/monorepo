@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
 import { Logger, RequestContext, createLoggingContext, createMethodContext } from '@chimera-monorepo/utils';
 import { StoreManager } from '@chimera-monorepo/adapters-cache';

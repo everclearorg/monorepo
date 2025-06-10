@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { constants } from 'ethers';
 import {
   RequestContext,
@@ -41,6 +42,7 @@ export const createTask = async (
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { apiKey, ...sanitized } = params;
 
   const { data, fee, to } = sanitized;
@@ -58,6 +60,7 @@ export const createTask = async (
     to,
     data,
     fee,
+    funcSig: params.funcSig,
   });
   logger.info('Created a new task.', requestContext, methodContext, { taskId });
   return taskId;

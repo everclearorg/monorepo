@@ -34,6 +34,7 @@ export const getIntentContextFromContract = async (intentId: string): Promise<In
       to: hubEverclear.address,
       domain: +config.hub.domain,
       data: hubEverclear.interface.encodeFunctionData('contexts', [intentId]),
+      funcSig: hubEverclear.interface.getFunction('contexts').format(),
     },
     'latest',
   );
@@ -55,6 +56,7 @@ export const getCurrentEpoch = async (): Promise<number> => {
       to: hubEverclear.address,
       domain: +config.hub.domain,
       data: hubEverclear.interface.encodeFunctionData('getCurrentEpoch', []),
+      funcSig: hubEverclear.interface.getFunction('getCurrentEpoch').format(),
     },
     'latest',
   );

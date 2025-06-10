@@ -59,6 +59,7 @@ export const updateRewardsMetadata = async () => {
     data: encodedData,
     domain: +config.hub.domain,
     value: '0',
+    funcSig: iface.getFunction('updateRewardsMetadata').format(),
   };
   try {
     const txHash = await safeservice.proposeTransaction(tx, requestContext);

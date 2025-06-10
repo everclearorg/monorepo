@@ -62,6 +62,7 @@ describe('Relayer:Tasks', () => {
           to: task.to,
           data: task.data,
           fee: task.fee,
+          funcSig: task.funcSig,
         }),
       ).to.be.true;
     });

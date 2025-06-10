@@ -65,7 +65,12 @@ export const processDepositsAndInvoices = async () => {
     }
     const encodedDataForInvoices = iface.encodeFunctionData('invoices', [tickerHash]);
     const encodedDataForInvoicesRes = await chainservice.readTx(
-      { to: hub.deployments.everclear, domain: +hub.domain, data: encodedDataForInvoices },
+      {
+        to: hub.deployments.everclear,
+        domain: +hub.domain,
+        data: encodedDataForInvoices,
+        funcSig: iface.getFunction('invoices').format(),
+      },
       'latest',
     );
 
@@ -73,7 +78,12 @@ export const processDepositsAndInvoices = async () => {
 
     const encodedDataForLastClosedEpoch = iface.encodeFunctionData('lastClosedEpochsProcessed', [tickerHash]);
     const encodedDataForLastClosedEpochRes = await chainservice.readTx(
-      { to: hub.deployments.everclear, domain: +hub.domain, data: encodedDataForLastClosedEpoch },
+      {
+        to: hub.deployments.everclear,
+        domain: +hub.domain,
+        data: encodedDataForLastClosedEpoch,
+        funcSig: iface.getFunction('lastClosedEpochsProcessed').format(),
+      },
       'latest',
     );
     const [lastClosedEpochProcessed] = iface.decodeFunctionResult(
@@ -83,7 +93,12 @@ export const processDepositsAndInvoices = async () => {
 
     const encodedDataForEpochLength = iface.encodeFunctionData('epochLength', []);
     const encodedDataForEpochLengthRes = await chainservice.readTx(
-      { to: hub.deployments.everclear, domain: +hub.domain, data: encodedDataForEpochLength },
+      {
+        to: hub.deployments.everclear,
+        domain: +hub.domain,
+        data: encodedDataForEpochLength,
+        funcSig: iface.getFunction('epochLength').format(),
+      },
       'latest',
     );
     const [epochLength] = iface.decodeFunctionResult('epochLength', encodedDataForEpochLengthRes);
@@ -133,6 +148,7 @@ export const processDepositsAndInvoices = async () => {
       hub.deployments.everclear,
       encodedDataToProcess,
       '0',
+      iface.getFunction('processDepositsAndInvoices').format(),
       relayers,
       chainservice,
       logger,

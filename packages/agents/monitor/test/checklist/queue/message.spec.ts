@@ -26,6 +26,7 @@ describe('checkMessageStatus', () => {
   let getHyperlaneMsgDeliveredStub: SinonStub;
   let getHyperlaneMessageStatusStub: SinonStub;
   let database: SinonStubbedInstance<Database>;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     stub(process, 'env').value({
@@ -38,6 +39,7 @@ describe('checkMessageStatus', () => {
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     encode = stub(Interface.prototype, 'encodeFunctionData');
     decode = stub(Interface.prototype, 'decodeFunctionResult');
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
     getContextStub.returns({
       ...mock.context(),
       config: { ...mock.config() },

@@ -1,0 +1,13 @@
+[extend]  # keep default rules
+
+[[rules]]
+id          = "tron-hex-private-key"
+description = "64-char hex TRON private key"
+regex       = '''(?i)\b[0-9a-f]{64}\b'''
+severity    = "HIGH"
+
+[[rules]]
+id          = "tron-base58-private-key"
+description = "Base58 private key starting with T"
+regex       = '''\bT[1-9A-HJ-NP-Za-km-z]{50,55}\b'''
+severity    = "HIGH"

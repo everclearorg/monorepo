@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EverclearError, Values } from '@chimera-monorepo/utils';
 
 export class UnsupportedFeeToken extends EverclearError {

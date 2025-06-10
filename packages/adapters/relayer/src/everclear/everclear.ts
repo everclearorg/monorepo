@@ -28,6 +28,7 @@ export const everclearRelayerSend = async (
   destinationAddress: string,
   encodedData: string,
   value: string,
+  funcSig: string,
   apiKey: string,
   chainReader: ChainReader,
   logger: Logger,
@@ -40,6 +41,7 @@ export const everclearRelayerSend = async (
     data: encodedData,
     fee: { amount: value, chain: chainId, token: constants.AddressZero },
     to: destinationAddress,
+    funcSig,
   };
 
   // Validate the call will succeed on chain.

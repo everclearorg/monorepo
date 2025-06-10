@@ -18,6 +18,7 @@ describe('Process Message Queue', () => {
   let getMessageQueueContentsStub: SinonStub;
   let encodeStub: SinonStub;
   let decodeStub: SinonStub;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     const config = {
@@ -59,6 +60,8 @@ describe('Process Message Queue', () => {
       taskId: '123',
       relayerType: RelayerType.Everclear,
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   describe('#processMessageQueue', () => {
