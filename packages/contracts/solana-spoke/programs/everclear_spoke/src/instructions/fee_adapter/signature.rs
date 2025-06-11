@@ -20,7 +20,7 @@ const MESSAGE_DATA_OFFSET: usize = SIGNATURE_OFFSET.saturating_add(SIGNATURE_SER
 
 pub fn verify_signature(
     fee: &FeeData,
-    signature: [u8; 64],
+    signature: Vec<u8>,
     accounts: SignatureAccounts,
 ) -> Result<()> {
     let mut encoded_message = vec![];

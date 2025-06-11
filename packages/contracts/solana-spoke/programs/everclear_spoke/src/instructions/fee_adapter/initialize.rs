@@ -32,7 +32,6 @@ pub fn initialize_fee_adapter(
 #[derive(Accounts)]
 pub struct InitializeFeeAdapter<'info> {
     #[account(
-        mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump
     )]

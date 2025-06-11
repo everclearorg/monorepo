@@ -66,7 +66,7 @@ pub struct FeeAdapterState {
 }
 
 impl FeeAdapterState {
-    pub const SIZE: usize = 1 // bool
+    pub const SIZE: usize = 2 // 2 bool
         + 32 * 2 // 2 Pubkey
         + 1; // u8
 }

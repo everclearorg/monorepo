@@ -10,10 +10,12 @@ pub struct FeeParams {
     pub token_fee: u64,
     pub native_fee: u64,
     pub deadline: u64,
-    pub signature: [u8; 64],
+    pub signature: Vec<u8>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
+// HACK: Mark as event for serde derivation and expose it in idl types
+// note this is not really an event.
+#[event]
 pub struct FeeData {
     pub token_fee: u64,
     pub native_fee: u64,
@@ -37,7 +39,7 @@ pub struct HandleFeeAccounts<'info> {
 }
 
 /// NOTE: the account is expected to be validated before the function invoke
-pub fn handle_fees(fee: FeeData, signature: [u8; 64], accounts: HandleFeeAccounts) -> Result<()> {
+pub fn handle_fees(fee: FeeData, signature: Vec<u8>, accounts: HandleFeeAccounts) -> Result<()> {
     verify_signature(&fee, signature, accounts.signature_accounts)?;
 
     let clock = Clock::get()?;

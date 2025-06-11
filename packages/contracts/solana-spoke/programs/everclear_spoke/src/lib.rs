@@ -231,7 +231,7 @@ pub mod everclear_spoke {
         fee_recipient: Pubkey,
         fee_signer: Pubkey,
     ) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
+        let state = &ctx.accounts.spoke_state;
         require!(
             state.owner == ctx.accounts.payer.key(),
             SpokeError::OnlyOwner
