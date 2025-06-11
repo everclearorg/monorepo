@@ -2,9 +2,8 @@ import { Logger, RelayerType, createLoggingContext, jsonifyError, sendHeartbeat 
 import { Relayer, setupEverclearRelayer, setupGelatoRelayer } from '@chimera-monorepo/adapters-relayer';
 import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
 import { LighthouseConfig, LighthouseService } from './config';
-import { ChainService, SafeService } from '@chimera-monorepo/chainservice';
+import { ChainService, SafeService, EthWallet } from '@chimera-monorepo/chainservice';
 import { Database, getDatabase } from '@chimera-monorepo/database';
-import { Wallet } from 'ethers';
 import { HistoricPrice } from './tasks/reward/historicPrice';
 
 export type LighthouseContext = {
@@ -12,7 +11,7 @@ export type LighthouseContext = {
   config: LighthouseConfig;
   historicPrice: HistoricPrice;
   adapters: {
-    wallet: Web3Signer | Wallet;
+    wallet: Web3Signer | EthWallet;
     database: Database;
     chainservice: ChainService;
     safeservice: SafeService;
@@ -54,8 +53,8 @@ export const makeLighthouseTask = async (
     context.adapters.wallet = config.signer.startsWith('http')
       ? new Web3Signer(config.signer)
       : config.signer.startsWith('0x')
-        ? new Wallet(config.signer)
-        : Wallet.fromMnemonic(config.signer);
+        ? new EthWallet(config.signer)
+        : EthWallet.fromMnemonic(config.signer);
 
     // Adapters - chain service
     context.adapters.chainservice = new ChainService(

@@ -1,11 +1,10 @@
 import { Logger, chainDataToMap, mkAddress } from '@chimera-monorepo/utils';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 
-import { ChainService } from '@chimera-monorepo/chainservice';
+import { ChainService, EthWallet } from '@chimera-monorepo/chainservice';
 import { TasksCache } from '@chimera-monorepo/adapters-cache';
 import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
 import { WatcherConfig, AppContext, Report, Severity } from '../src/lib/entities';
-import { Wallet } from 'ethers';
 
 let mockLogger: SinonStubbedInstance<Logger>;
 
@@ -129,7 +128,7 @@ export const createAppContext = (overrides: Partial<WatcherConfig> = {}): AppCon
       ...overrides,
     }) as WatcherConfig,
     adapters: {
-      wallet: createStubInstance(Wallet),
+      wallet: createStubInstance(EthWallet),
       chainservice: createStubInstance(ChainService),
       cache: {
         tasks: createStubInstance(TasksCache),

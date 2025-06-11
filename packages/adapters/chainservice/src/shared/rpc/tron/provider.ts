@@ -328,6 +328,9 @@ export class TronSyncProvider extends SyncProvider {
     if (typeof signer === 'string') {
       this.tronWeb.setPrivateKey(signer);
       return new TronWeb3Signer(this.tronWeb);
+    } else if ((signer as any).privateKey) {
+      this.tronWeb.setPrivateKey((signer as any).privateKey);
+      return new TronWeb3Signer(this.tronWeb);
     }
     return new TronWeb3Signer(this.tronWeb, signer.signerApi);
   }

@@ -1,7 +1,7 @@
-import { ChainService } from '@chimera-monorepo/chainservice';
+import { ChainService, EthWallet } from '@chimera-monorepo/chainservice';
 import { TasksCache } from '@chimera-monorepo/adapters-cache';
 import { RelayerTaskStatus, delay, expect, mkAddress, mkBytes32, mock } from '@chimera-monorepo/utils';
-import { BigNumber, Wallet } from 'ethers';
+import { BigNumber } from 'ethers';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { FastifyInstance } from 'fastify';
 
@@ -15,7 +15,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 describe('Relayer:Relays', () => {
   describe('#pollCache', () => {
     let cache: { tasks: SinonStubbedInstance<TasksCache> };
-    let wallet: SinonStubbedInstance<Wallet>;
+    let wallet: SinonStubbedInstance<EthWallet>;
     let chainservice: SinonStubbedInstance<ChainService>;
     let provider: SinonStubbedInstance<JsonRpcProvider>;
 
@@ -29,7 +29,7 @@ describe('Relayer:Relays', () => {
 
     beforeEach(() => {
       cache = mockAppContext.adapters.cache as unknown as { tasks: SinonStubbedInstance<TasksCache> };
-      wallet = mockAppContext.adapters.wallet as SinonStubbedInstance<Wallet>;
+      wallet = mockAppContext.adapters.wallet as SinonStubbedInstance<EthWallet>;
       chainservice = mockAppContext.adapters.chainservice as SinonStubbedInstance<ChainService>;
       provider = createStubInstance(JsonRpcProvider);
 
