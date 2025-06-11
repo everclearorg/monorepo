@@ -135,6 +135,7 @@ export const dispatchMessageQueueViaRelayers = async (
       to: everclear,
       data: everclearIface.encodeFunctionData('nonces', [walletAddr]),
       domain: +transactionDomain,
+      funcSig: everclearIface.getFunction('nonces').format(),
     },
     blockTag,
   );
@@ -147,9 +148,11 @@ export const dispatchMessageQueueViaRelayers = async (
     const trimmedIntents = sortedContents.slice(i, i + toDequeue);
     if (trimmedIntents.length !== toDequeue) {
       logger.error('Trimmed intents do not match dequeue target', requestContext, methodContext, undefined, {
-        trimmedIntents,
+        trimmedIntents: trimmedIntents.length ? trimmedIntents : '[]',
         toDequeue,
-        sortedContents,
+        sortedContents: sortedContents.length ? sortedContents : '[]',
+        totalIntents,
+        index: i,
       });
       break;
     }
@@ -204,8 +207,9 @@ export const dispatchMessageQueueViaRelayers = async (
           signer: walletAddr,
         });
 
+        const queueMethodName = getQueueMethodName(type);
         const tx: WriteTransaction = {
-          data: everclearIface.encodeFunctionData(getQueueMethodName(type), [
+          data: everclearIface.encodeFunctionData(queueMethodName, [
             queue.domain,
             type === 'INTENT' ? trimmedIntents : toDequeue,
             relayerAddress,
@@ -217,6 +221,7 @@ export const dispatchMessageQueueViaRelayers = async (
           to: everclear,
           value: '0',
           domain: +transactionDomain,
+          funcSig: everclearIface.getFunction(queueMethodName).format(),
         };
 
         logger.debug('Sending process queue transaction to relayer', requestContext, methodContext, {
@@ -237,6 +242,7 @@ export const dispatchMessageQueueViaRelayers = async (
           tx.to,
           tx.data,
           tx.value,
+          tx.funcSig,
           [relayer],
           chainservice,
           logger,

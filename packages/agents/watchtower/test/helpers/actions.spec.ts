@@ -276,6 +276,7 @@ describe('Actions', () => {
         from: from,
         gasPrice: '10',
         gasLimit: '100000',
+        funcSig: 'pause()',
       });
       expect(result.receipt).to.be.deep.eq({
         blockNumber: 123,

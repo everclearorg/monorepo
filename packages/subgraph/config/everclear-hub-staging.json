@@ -7,5 +7,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-hub",
+    "network": "everclear",
+    "domain": "25327",
+    "environment": "staging",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]

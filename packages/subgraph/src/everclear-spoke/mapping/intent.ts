@@ -71,6 +71,28 @@ function getOrCreateFillQueueMapping(queueIdx: BigInt): FillQueueMapping {
   return mapping;
 }
 
+function createEmptyOriginIntent(intentId: Bytes, initiator: Bytes, timestamp: BigInt): OriginIntent {
+  const intent = new OriginIntent(intentId);
+  intent.status = 'ADDED';
+  intent.initiator = initiator;
+  intent.queueIdx = BigInt.zero();
+  intent.maxFee = BigInt.zero();
+  intent.amount = BigInt.zero();
+  intent.timestamp = timestamp;
+  intent.ttl = BigInt.zero();
+  // Set empty values for required fields that will be populated by IntentAdded
+  intent.receiver = Bytes.empty();
+  intent.inputAsset = Bytes.empty();
+  intent.outputAsset = Bytes.empty();
+  intent.origin = BigInt.zero();
+  intent.nonce = BigInt.zero();
+  intent.data = Bytes.empty();
+  intent.destinations = [];
+  intent.addEvent = Bytes.empty();
+
+  return intent;
+}
+
 /**
  * Creates subgraph records when IntentAdded events are emitted.
  *
@@ -461,23 +483,7 @@ export function handleIntentFeesAdded(event: IntentWithFeesAdded): void {
   let intent = OriginIntent.load(intentId);
   if (intent == null) {
     // Create a new intent if it doesn't exist yet.
-    intent = new OriginIntent(intentId);
-    // Set default values that will be overwritten when IntentAdded is processed
-    intent.status = 'ADDED';
-    intent.initiator = event.params._initiator;
-    intent.queueIdx = BigInt.zero();
-    intent.maxFee = BigInt.zero();
-    intent.amount = BigInt.zero();
-    intent.timestamp = event.block.timestamp;
-    intent.ttl = BigInt.zero();
-    // Set empty values for required fields that will be populated by IntentAdded
-    intent.receiver = Bytes.empty();
-    intent.inputAsset = Bytes.empty();
-    intent.outputAsset = Bytes.empty();
-    intent.origin = BigInt.zero();
-    intent.nonce = BigInt.zero();
-    intent.data = Bytes.empty();
-    intent.destinations = [];
+    intent = createEmptyOriginIntent(intentId, event.params._initiator, event.block.timestamp);
   }
 
   // Create the IntentFeesAdded entity
@@ -537,22 +543,7 @@ export function handleOrderCreated(event: OrderCreatedEvent): void {
     // If intent doesn't exist yet (which can happen due to event ordering),
     // create a placeholder that will be populated when IntentAdded is processed
     if (intent == null) {
-      intent = new OriginIntent(intentId);
-      intent.status = 'ADDED';
-      intent.initiator = event.params._initiator;
-      intent.queueIdx = BigInt.zero();
-      intent.maxFee = BigInt.zero();
-      intent.amount = BigInt.zero();
-      intent.timestamp = event.block.timestamp;
-      intent.ttl = BigInt.zero();
-      // Set empty values for required fields that will be populated by IntentAdded
-      intent.receiver = Bytes.empty();
-      intent.inputAsset = Bytes.empty();
-      intent.outputAsset = Bytes.empty();
-      intent.origin = BigInt.zero();
-      intent.nonce = BigInt.zero();
-      intent.data = Bytes.empty();
-      intent.destinations = [];
+      intent = createEmptyOriginIntent(intentId, event.params._initiator, event.block.timestamp);
     }
 
     // Link intent to order

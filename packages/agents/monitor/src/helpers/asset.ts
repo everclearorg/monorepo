@@ -23,6 +23,7 @@ export const getRegisteredAssetHashFromContract = async (tickerHash: string, dom
       to: hubEverclear.address,
       domain: +config.hub.domain,
       data: hubEverclear.interface.encodeFunctionData('assetHash', [tickerHash, domain]),
+      funcSig: hubEverclear.interface.getFunction('assetHash').format(),
     },
     'latest',
   );
@@ -47,6 +48,7 @@ export const getAssetFromContract = async (address: string, domain: string): Pro
       to: hubEverclear.address,
       domain: +config.hub.domain,
       data: hubEverclear.interface.encodeFunctionData('adoptedForAssets', [assetHash]),
+      funcSig: hubEverclear.interface.getFunction('adoptedForAssets').format(),
     },
     'latest',
   );
@@ -68,6 +70,7 @@ export const getTokenFromContract = async (tickerHash: string): Promise<Token> =
       to: hubEverclear.address,
       domain: +config.hub.domain,
       data: hubEverclear.interface.encodeFunctionData('tokenConfigs', [tickerHash]),
+      funcSig: hubEverclear.interface.getFunction('tokenConfigs').format(),
     },
     'latest',
   );
@@ -78,6 +81,7 @@ export const getTokenFromContract = async (tickerHash: string): Promise<Token> =
       to: hubEverclear.address,
       domain: +config.hub.domain,
       data: hubEverclear.interface.encodeFunctionData('tokenFees', [tickerHash]),
+      funcSig: hubEverclear.interface.getFunction('tokenFees').format(),
     },
     'latest',
   );
@@ -106,6 +110,7 @@ export const getCustodiedAssetsFromHubContract = async (assetHash: string): Prom
       to: hubEverclear.address,
       domain: +config.hub.domain,
       data: hubEverclear.interface.encodeFunctionData('custodiedAssets', [assetHash]),
+      funcSig: hubEverclear.interface.getFunction('custodiedAssets').format(),
     },
     'latest',
   );

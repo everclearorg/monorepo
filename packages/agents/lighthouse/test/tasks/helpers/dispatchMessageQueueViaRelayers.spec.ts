@@ -20,6 +20,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   let encodeStub: SinonStub;
   let decodeStub: SinonStub;
   let wallet: SinonStubbedInstance<Wallet>;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     // Interface stubs
@@ -61,6 +62,8 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
       taskId: '123',
       relayerType: RelayerType.Everclear,
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   it('should return early if chain is not configured', async () => {
@@ -124,6 +127,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
         mock.chains()[queue.domain].deployments?.everclear,
         '0xencoded', // encode stub value
         '0',
+        'foo()',
         [context.adapters.relayers[0]],
         context.adapters.chainservice,
         context.logger,

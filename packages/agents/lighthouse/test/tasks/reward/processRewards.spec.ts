@@ -37,6 +37,7 @@ describe('#getGenesisEpoch', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockGenesis = 1734307200;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
@@ -51,6 +52,8 @@ describe('#getGenesisEpoch', () => {
       ...mock.context(),
       config: { ...mock.config() },
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   afterEach(() => {
@@ -73,6 +76,7 @@ describe('#getEpochDuration', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockDuration = 7200;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
@@ -87,6 +91,8 @@ describe('#getEpochDuration', () => {
       ...mock.context(),
       config: { ...mock.config() },
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   afterEach(() => {
@@ -109,6 +115,7 @@ describe('#getRewardDistributorUpdateCount', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockUpdateCount = 25;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
@@ -123,6 +130,8 @@ describe('#getRewardDistributorUpdateCount', () => {
       proof: '0x',
       updateCount: mockUpdateCount
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
 
     getContextStub.returns({
       ...mock.context(),
@@ -153,6 +162,7 @@ describe('#processRewards', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   let processNewLockPositionsStub: SinonStub;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   const genesisEpoch = 1734307200;
   const epochDuration = 7200;
@@ -271,6 +281,8 @@ describe('#processRewards', () => {
       proof: '',
       updateCount: rewardDistributorUpdateCount
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
 
     getContextStub.returns({
       ...mock.context(),

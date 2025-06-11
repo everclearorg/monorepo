@@ -28,6 +28,7 @@ export const processExpiredIntents = async () => {
       data: iface.encodeFunctionData('expiryTimeBuffer', []),
       domain: +hub.domain,
       to: hub.deployments.everclear,
+      funcSig: iface.getFunction('expiryTimeBuffer').format(),
     },
     'latest',
   );
@@ -71,6 +72,7 @@ export const processExpiredIntents = async () => {
     hub.deployments.everclear,
     data,
     '0',
+    iface.getFunction('handleExpiredIntents').format(),
     relayers,
     chainservice,
     logger,
