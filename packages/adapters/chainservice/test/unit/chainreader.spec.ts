@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { providers, utils, Wallet } from 'ethers';
+import { providers, utils } from 'ethers';
 import { stub, restore, reset, createStubInstance, SinonStubbedInstance } from 'sinon';
 import { mkBytes32, mkAddress, expect, Logger } from '@chimera-monorepo/utils';
 
-import { ChainReader } from '../../src/chainreader';
 import { RpcProviderAggregator } from '../../src/aggregator';
-import { ConfigurationError, ProviderNotConfigured, RpcError } from '../../src/shared';
+import { ConfigurationError, ProviderNotConfigured, RpcError, ChainReader, EthWallet } from '../../src';
 import {
   TEST_TX,
   TEST_READ_TX,
@@ -21,7 +20,7 @@ const logger = new Logger({
   name: 'ChainReaderTest',
 });
 
-let signer: SinonStubbedInstance<Wallet>;
+let signer: SinonStubbedInstance<EthWallet>;
 let chainReader: ChainReader;
 let provider: SinonStubbedInstance<RpcProviderAggregator>;
 
@@ -30,8 +29,8 @@ let provider: SinonStubbedInstance<RpcProviderAggregator>;
 describe('ChainReader', () => {
   beforeEach(() => {
     provider = createStubInstance(RpcProviderAggregator);
-    const privateKey = Wallet.createRandom().privateKey;
-    signer = createStubInstance(Wallet);
+    const privateKey = EthWallet.createRandom().privateKey;
+    signer = createStubInstance(EthWallet);
     signer.connect.returns(signer);
     signer._signingKey = () => privateKey;
 
