@@ -42,18 +42,12 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @notice emitted when an intent is filled on destination
    * @param _intentId The ID of the intent
    * @param _solver The address of the intent solver
-   * @param _receiver The address of the intent receiver
    * @param _amountOut The total amount the user has been transferred
    * @param _queueIdx The index of the FillMessage in the FillQueue
    * @param _intent The full intent object
    */
   event IntentFilled(
-    bytes32 indexed _intentId,
-    address indexed _solver,
-    bytes32 indexed _receiver,
-    uint256 _amountOut,
-    uint256 _queueIdx,
-    Intent _intent
+    bytes32 indexed _intentId, address indexed _solver, uint256 _amountOut, uint256 _queueIdx, Intent _intent
   );
 
   /**
@@ -103,13 +97,6 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   event FeeAdapterUpdated(address _newFeeAdapter);
 
-  /**
-   * @notice Emitted when fill signer is updated
-   * @param _oldFillSigner The old fill signer
-   * @param _newFillSigner The new fill signer
-   */
-  event FillSignerUpdated(address _oldFillSigner, address _newFillSigner);
-
   /*///////////////////////////////////////////////////////////////
                               ERRORS
   //////////////////////////////////////////////////////////////*/
@@ -132,16 +119,6 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   error EverclearSpoke_NewIntent_InvalidIntent();
 
   /**
-   * @notice Thrown when the ttl is non-zero and outputAsset is null
-   */
-  error EverclearSpoke_NewIntent_OutputAssetNull();
-
-  /**
-   * @notice Thrown when the destination array > 1 and outputAsset is not null
-   */
-  error EverclearSpoke_NewIntent_OutputAssetNotNull();
-
-  /**
    * @notice Thrown when the maxFee is exceeded
    * @param _amountOut The amount sent by the solver
    * @param _amountOutMin The min amount out
@@ -161,9 +138,11 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   error EverclearSpoke_FillIntent_InsufficientFunds(uint256 _requested, uint256 _available);
 
   /**
-   * @notice Thrown when the destination array is empty
+   * @notice Thrown when the fee exceeds the maximum fee
+   * @param _fee The fee chosen by the solver
+   * @param _maxFee The actual fee the intent solver set for his intent
    */
-  error EverclearSpoke_FillIntent_InvalidDestinationArray();
+  error EverclearSpoke_FillIntent_MaxFeeExceeded(uint256 _fee, uint24 _maxFee);
 
   /**
    * @notice Thrown when the intent calldata exceeds the limit
@@ -208,26 +187,6 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   error EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed();
 
-  /**
-   * @notice Thrown when the queues are non-empty
-   */
-  error EverclearSpoke_Initialize_IntentQueueNotEmpty();
-
-  /**
-   * @notice Thrown when the queues are non-empty
-   */
-  error EverclearSpoke_Initialize_FillQueueNotEmpty();
-
-  /**
-   * @notice Thrown when the array length invalid in a batch fill
-   */
-  error EverclearSpoke_FillIntent_InvalidArrayLengths();
-
-  /**
-   * @notice Thrown when the fill signature is invalid
-   */
-  error EverclearSpoke_InvalidFillSignature();
-
   /*///////////////////////////////////////////////////////////////
                               LOGIC
   //////////////////////////////////////////////////////////////*/
@@ -249,20 +208,14 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _asset The asset address
    * @param _strategy The strategy id (see `enum Strategy`)
    */
-  function setStrategyForAsset(
-    address _asset,
-    IEverclearV2.Strategy _strategy
-  ) external;
+  function setStrategyForAsset(address _asset, IEverclearV2.Strategy _strategy) external;
 
   /**
    * @notice Sets a module for a strategy
    * @param _strategy The strategy id (see `enum Strategy`)
    * @param _module The module contract
    */
-  function setModuleForStrategy(
-    IEverclearV2.Strategy _strategy,
-    ISettlementModule _module
-  ) external;
+  function setModuleForStrategy(IEverclearV2.Strategy _strategy, ISettlementModule _module) external;
 
   /**
    * @notice Updates the security module
@@ -282,17 +235,16 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
 
   /**
    * @notice Initialize the EverclearSpoke contract
+   * @param _feeAdapter The fee adapter
    */
   function initialize(
-    address _feeAdapter,
-    address _messageReceiver,
-    address _fillSigner
+    address _feeAdapter
   ) external;
 
   /**
    * @notice Creates a new intent
    * @param _destinations The possible destination chains of the intent
-   * @param _receiver The destination address of the intent
+   * @param _receiver The destinantion address of the intent
    * @param _inputAsset The asset address on origin
    * @param _outputAsset The asset address on destination
    * @param _amount The amount of the asset
@@ -311,12 +263,12 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     uint256 _amountOutMin,
     uint48 _ttl,
     bytes calldata _data
-  ) external returns (bytes32 _intentId, Intent memory _intent);
+  ) external returns (bytes32 _intentId, Intent calldata _intent);
 
   /**
    * @notice Creates a new intent
    * @param _destinations The possible destination chains of the intent
-   * @param _receiver The destination address of the intent
+   * @param _receiver The destinantion address of the intent
    * @param _inputAsset The asset address on origin
    * @param _outputAsset The asset address on destination
    * @param _amount The amount of the asset
@@ -335,22 +287,33 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     uint256 _amountOutMin,
     uint48 _ttl,
     bytes calldata _data
-  ) external returns (bytes32 _intentId, Intent memory _intent);
+  ) external returns (bytes32 _intentId, Intent calldata _intent);
 
   /**
-   * @notice Fills a batch of intents
-   * @param _intents The intents to fill
-   * @param _amountOut The amounts of the assets the solver is sending to the users
-   * @param _destinations The destinations for the repayment
+   * @notice Creates a new intent with permit2
+   * @param _destinations The possible destination chains of the intent
+   * @param _receiver The destinantion address of the intent
+   * @param _inputAsset The asset address on origin
+   * @param _outputAsset The asset address on destination
+   * @param _amount The amount of the asset
+   * @param _amountOutMin The minimum amount out the solver should return
+   * @param _ttl The time to live of the intent
+   * @param _data The data of the intent
+   * @param _permit2Params The parameters needed to execute a permit2
+   * @return _intentId The ID of the intent
+   * @return _intent The intent object
    */
-  function batchFillIntent(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    bytes32[] calldata _receivers,
-    uint32[][] calldata _destinations,
-    bytes calldata _signature,
-    bool _pullFunds
-  ) external returns (FillMessage[] memory _fillMessages);
+  function newIntent(
+    uint32[] memory _destinations,
+    address _receiver,
+    address _inputAsset,
+    address _outputAsset,
+    uint256 _amount,
+    uint256 _amountOutMin,
+    uint48 _ttl,
+    bytes calldata _data,
+    Permit2Params calldata _permit2Params
+  ) external returns (bytes32 _intentId, Intent calldata _intent);
 
   /**
    * @notice fills an intent
@@ -358,13 +321,23 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _amountOut The amount of the asset the solver is sending to the user
    * @return _fillMessage The enqueued fill message
    */
-  function fillIntent(
+  function fillIntent(Intent calldata _intent, uint256 _amountOut) external returns (FillMessage calldata _fillMessage);
+
+  /**
+   * @notice Allows a relayer to fill an intent for a solver
+   * @param _solver The address of the solver
+   * @param _intent The intent structure
+   * @param _nonce The nonce of the signature
+   * @param _amountOut The amount of the asset the solver is sending to the user
+   * @param _signature The solver signature
+   * @return _fillMessage The enqueued fill message
+   */
+  function fillIntentForSolver(
+    address _solver,
     Intent calldata _intent,
+    uint256 _nonce,
     uint256 _amountOut,
-    bytes32 _receiver,
-    uint32[] memory _destinations,
-    bytes calldata _signature,
-    bool _pullFunds
+    bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -429,10 +402,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function deposit(
-    address _asset,
-    uint256 _amount
-  ) external;
+  function deposit(address _asset, uint256 _amount) external;
 
   /**
    * @notice withdraws an asset from the EverclearSpoke
@@ -440,10 +410,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function withdraw(
-    address _asset,
-    uint256 _amount
-  ) external;
+  function withdraw(address _asset, uint256 _amount) external;
 
   /**
    * @notice Updates the gateway
@@ -467,14 +434,6 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   function updateMessageGasLimit(
     uint256 _newGasLimit
-  ) external;
-
-  /**
-   * @notice Updates the fill signer
-   * @param _fillSigner The address of the new fill signer
-   */
-  function updateFillSigner(
-    address _fillSigner
   ) external;
 
   /**

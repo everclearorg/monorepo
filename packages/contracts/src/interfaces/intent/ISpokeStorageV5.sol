@@ -206,20 +206,6 @@ interface ISpokeStorageV5 is IEverclearV2 {
   function PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH() external view returns (bytes32 _typeHash);
 
   /**
-   * @notice returns the typehash for `fillIntentSolver
-   * @dev used to verify the destinations array is valid with off-chain API
-   * @return _typeHash The `fillIntentSolver` type hash
-   */
-  function FILL_INTENT_TYPEHASH() external view returns (bytes32 _typeHash);
-
-  /**
-   * @notice returns the typehash for `batchFillIntentSolver
-   * @dev used to verify the destinations array is valid with off-chain API
-   * @return _typeHash The `batchFillIntentSolver` type hash
-   */
-  function BATCH_FILL_INTENT_TYPEHASH() external view returns (bytes32 _typeHash);
-
-  /**
    * @notice returns the permit2 contract
    * @return _permit2 The Permit2 singleton address
    */
