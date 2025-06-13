@@ -44,7 +44,6 @@ import {IEverclearSpokeV5} from 'interfaces/intent/IEverclearSpokeV5.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
 import {SpokeStorageV5} from 'contracts/intent/SpokeStorageV5.sol';
-
 /**
  * @title EverclearSpoke
  * @notice Spoke contract for Everclear
@@ -205,55 +204,11 @@ contract EverclearSpokeV5 is
   }
 
   /// @inheritdoc IEverclearSpokeV5
-  function batchFillIntent(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations
-  ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
-    uint256 length = _intents.length;
-    if (length != _amountOut.length || length != _destinations.length) {
-      revert EverclearSpoke_FillIntent_InvalidArrayLengths();
-    }
-
-    _fillMessages = new FillMessage[](length);
-    for (uint256 i; i < length; i++) {
-      _fillMessages[i] = _fillIntent(_intents[i], msg.sender, _amountOut[i], _destinations[i], false);
-    }
-  }
-
-  /// @inheritdoc IEverclearSpokeV5
-  function batchFillIntentWithPull(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations
-  ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
-    uint256 length = _intents.length;
-    if (length != _amountOut.length || length != _destinations.length) {
-      revert EverclearSpoke_FillIntent_InvalidArrayLengths();
-    }
-
-    _fillMessages = new FillMessage[](_intents.length);
-    for (uint256 i; i < _intents.length; i++) {
-      _fillMessages[i] = _fillIntent(_intents[i], msg.sender, _amountOut[i], _destinations[i], true);
-    }
-  }
-
-  /// @inheritdoc IEverclearSpokeV5
   function fillIntent(
     Intent calldata _intent,
-    uint256 _amountOut,
-    uint32[] memory _destinations
+    uint256 _amountOut
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, false);
-  }
-
-  /// @inheritdoc IEverclearSpokeV5
-  function fillIntentWithPull(
-    Intent calldata _intent,
-    uint256 _amountOut,
-    uint32[] memory _destinations
-  ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, true);
+    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut);
   }
 
   /// @inheritdoc IEverclearSpokeV5
