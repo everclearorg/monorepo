@@ -11,6 +11,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Ethereum
     _zodiacConfig[ETHEREUM] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: ETHEREUM_STAGING_ROLE_MODULE,
       feeAdapter: ETHEREUM_FEE_ADAPTER,
       roleKey: ETHEREUM_ROLE_KEY,
@@ -33,6 +34,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Arbitrum
     _zodiacConfig[ARBITRUM_ONE] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: STAGING_MULTI_SIG_ADDRESS_2,
       roleModule: ARBITRUM_STAGING_ROLE_MODULE,
       feeAdapter: ARBITRUM_FEE_ADAPTER,
       roleKey: ARBITRUM_ROLE_KEY,
@@ -55,6 +57,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Optimism
     _zodiacConfig[OPTIMISM] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: OPTIMISM_STAGING_ROLE_MODULE,
       feeAdapter: OPTIMISM_FEE_ADAPTER,
       roleKey: OPTIMISM_ROLE_KEY,
@@ -77,6 +80,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Polygon
     _zodiacConfig[POLYGON] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: POLYGON_STAGING_ROLE_MODULE,
       feeAdapter: POLYGON_FEE_ADAPTER,
       roleKey: POLYGON_ROLE_KEY,
@@ -99,6 +103,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Base
     _zodiacConfig[BASE] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: BASE_STAGING_ROLE_MODULE,
       feeAdapter: BASE_FEE_ADAPTER,
       roleKey: BASE_ROLE_KEY,
@@ -121,6 +126,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // BNB
     _zodiacConfig[BNB] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: BSC_STAGING_ROLE_MODULE,
       feeAdapter: BNB_FEE_ADAPTER,
       roleKey: BSC_ROLE_KEY,
@@ -143,6 +149,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Blast
     _zodiacConfig[BLAST] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: BLAST_STAGING_ROLE_MODULE,
       feeAdapter: BLAST_FEE_ADAPTER,
       roleKey: BLAST_ROLE_KEY,
@@ -165,6 +172,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Sonic
     _zodiacConfig[SONIC] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: SONIC_STAGING_ROLE_MODULE,
       feeAdapter: SONIC_FEE_ADAPTER,
       roleKey: SONIC_ROLE_KEY,
@@ -187,6 +195,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Mantle
     _zodiacConfig[MANTLE] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: MANTLE_STAGING_ROLE_MODULE,
       feeAdapter: MANTLE_FEE_ADAPTER,
       roleKey: MANTLE_ROLE_KEY,
@@ -209,6 +218,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Ink
     _zodiacConfig[INK] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: INK_STAGING_ROLE_MODULE,
       feeAdapter: INK_FEE_ADAPTER,
       roleKey: INK_ROLE_KEY,
@@ -231,6 +241,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Scroll
     _zodiacConfig[SCROLL] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: SCROLL_STAGING_ROLE_MODULE,
       feeAdapter: SCROLL_FEE_ADAPTER,
       roleKey: SCROLL_ROLE_KEY,
@@ -253,6 +264,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Berachain
     _zodiacConfig[BERACHAIN] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: BERACHAIN_STAGING_ROLE_MODULE,
       feeAdapter: BERACHAIN_FEE_ADAPTER,
       roleKey: BERACHAIN_ROLE_KEY,
@@ -275,6 +287,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Unichain
     _zodiacConfig[UNICHAIN] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: UNICHAIN_STAGING_ROLE_MODULE,
       feeAdapter: UNICHAIN_FEE_ADAPTER,
       roleKey: UNICHAIN_ROLE_KEY,
@@ -297,6 +310,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Mode
     _zodiacConfig[MODE] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: MODE_STAGING_ROLE_MODULE,
       feeAdapter: MODE_FEE_ADAPTER,
       roleKey: MODE_ROLE_KEY,
@@ -318,7 +332,8 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
 
     // Ronin
     _zodiacConfig[RONIN] = ZodiacConfiguration({
-      safeAddress: STAGING_RONIN_SAFE_ADDRESS,
+      safeAddress: STAGING_MULTI_SIG_ADDRESS_2,
+      safeAddress2: address(0),
       roleModule: RONIN_STAGING_ROLE_MODULE,
       feeAdapter: RONIN_FEE_ADAPTER,
       roleKey: RONIN_ROLE_KEY,
@@ -334,6 +349,7 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     // Avalanche
     _zodiacConfig[AVALANCHE] = ZodiacConfiguration({
       safeAddress: STAGING_MULTI_SIG_ADDRESS,
+      safeAddress2: address(0),
       roleModule: AVALANCHE_STAGING_ROLE_MODULE,
       feeAdapter: AVALANCHE_FEE_ADAPTER,
       roleKey: AVALANCHE_ROLE_KEY,
@@ -628,12 +644,28 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
       _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
     );
 
+    // Everclear: sending new intent to safe2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress2, false, ZERO_TTL, ZERO_FEE
+    );
+
     // Everclear: sending new order
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+    );
+
+    // Everclear: sending new order to safe2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress2, false, ZERO_TTL, ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -654,19 +686,36 @@ contract ZodiacStagingActions is MainnetProductionEnvironment, ZodiacHelper, Zod
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendDepositV3(_params, config, false);
 
+    // Across: sending an order to safe2
+    _params.receiver = config.safeAddress2;
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendDepositV3(_params, config, false);
+
     // Stargate: sending an order
+    _params.receiver = config.safeAddress;
     _params.inputAmount = 100e6;
     _params.outputAmount = 90e6;
     _params.nativeFee = 0.01 ether;
     _params.destination = 30_101;
 
+    // Sending via non-native stargate bridge
     vm.deal(config.safeAddress, 100 ether);
     _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
+    // Sending via non-native stargate bridge to safe2
+    _params.receiver = config.safeAddress2;
+    _dealFunds(config.usdc, _amounts, config.validFee, config.safeAddress);
+    _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
+
     // Stargate: sending an order in native
+    _params.receiver = config.safeAddress;
     _params.inputAmount = 1 ether;
     _params.outputAmount = 0.9 ether;
+    _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
+
+    // Stargate: sending an order in native to safe2
+    _params.receiver = config.safeAddress2;
     _sendStargateWeth(_params, config, config.safeAddress, addressConfig.stargateWeth, false);
 
     // //////////////////////////// Reverting Actions ////////////////////////////

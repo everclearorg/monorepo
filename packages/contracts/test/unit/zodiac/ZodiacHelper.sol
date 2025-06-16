@@ -54,11 +54,11 @@ abstract contract Arbitrum {
 
 abstract contract ArbitrumStaging is Arbitrum {
   // API Inputs
-  uint256 public constant ARBITRUM_FEE = 0;
-  uint256 public constant ARBITRUM_DEADLINE = 1_747_061_416;
+  uint256 public constant ARBITRUM_FEE = 0.000112 ether;
+  uint256 public constant ARBITRUM_DEADLINE = 1_749_825_624;
   bytes public constant ARBITRUM_SIG =
-    hex'3742402cc4e0c9c3f8f0afc5f253b353cd7412579e9939c341feeb458e711c9a588e5547fbfc4096efc52fe6fd364bdc9548549a9c612f8f15f8d04223cac7431c';
-  uint256 public constant ARBITRUM_FIXED_BLOCK = 335_940_880;
+    hex'49febfbcd40ba1bfbee1be6a4804a3b05808a7044dba05e8d3e64fd7ac39c2df39a8b4ca475ce640ae3fdaee10609260ce980fbe93191dc2a63dd13e68178f921b';
+  uint256 public constant ARBITRUM_FIXED_BLOCK = 346_947_078;
 }
 
 abstract contract ArbitrumProduction is Arbitrum {
@@ -570,6 +570,7 @@ abstract contract ZodiacHelper is Test {
 
   struct ZodiacConfiguration {
     address safeAddress;
+    address safeAddress2;
     address roleModule;
     address feeAdapter;
     bytes32 roleKey;
@@ -614,9 +615,10 @@ abstract contract ZodiacHelper is Test {
   address public constant SAFE_TEST_ADDRESS = 0x2eEd1440842990Fa61F0c396f981375Fa6004131;
   address public constant APPROVED_CALLER = SAFE_TEST_ADDRESS;
   address public constant STAGING_MULTI_SIG_ADDRESS = 0xC55749A006f6B2098dF802b1711522498b83Fae3;
+  address public constant STAGING_MULTI_SIG_ADDRESS_2 = 0x1B1435cc68074bc8DC7BD798498b4d90DB0A94B0;
   address public constant PROD_MULTI_SIG_ADDRESS = 0xe569ea3158bB89aD5CFD8C06f0ccB3aD69e0916B;
-  address public constant STAGING_RONIN_SAFE_ADDRESS = 0x1B1435cc68074bc8DC7BD798498b4d90DB0A94B0;
-  address public constant PROD_RONIN_SAFE_ADDRESS = 0x1d09f3b11A8FF71F4177da1969A53658A801dC0e;
+  address public constant PROD_MULTI_SIG_ADDRESS_2 = 0x1d09f3b11A8FF71F4177da1969A53658A801dC0e;
+
   uint256 public constant EXPECTED_THRESHOLD = 1;
   bytes4 public constant NEW_INTENT_ADDRESS_SELECTOR =
     bytes4(keccak256('newIntent(uint32[],address,address,address,uint256,uint24,uint48,bytes,(uint256,uint256,bytes))'));
