@@ -26,6 +26,7 @@ import {
   OnchainTransaction,
   TransactionBuffer,
   ITransactionReceipt,
+  ISigner,
 } from './shared';
 import { ChainConfig } from './config';
 import { RpcProviderAggregator } from './aggregator';
@@ -75,10 +76,9 @@ export class TransactionDispatch extends RpcProviderAggregator {
     logger: Logger,
     public readonly domain: number,
     config: ChainConfig,
-    signer: string,
     startLoops = true,
   ) {
-    super(logger, domain, config, signer);
+    super(logger, domain, config);
     this.inflightBuffer = new TransactionBuffer(logger, TransactionDispatch.MAX_INFLIGHT_TRANSACTIONS, {
       name: 'INFLIGHT',
       domain: this.domain,
@@ -90,6 +90,10 @@ export class TransactionDispatch extends RpcProviderAggregator {
     if (startLoops) {
       this.startLoops();
     }
+  }
+
+  public async setSigner(signer: ISigner | string) {
+    await super.setSigner(signer);
   }
 
   /**

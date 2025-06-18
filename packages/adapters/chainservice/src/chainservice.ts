@@ -115,7 +115,7 @@ export class ChainService extends ChainReader {
    * @param context - The request context object used for logging.
    * @param signer - The signer that will be used for onchain operations.
    */
-  protected setupProviders(context: RequestContext, signer: string) {
+  protected async setupProviders(context: RequestContext, signer: string) {
     const { methodContext } = createLoggingContext(this.setupProviders.name, context);
     // For each domain / provider, map out all the utils needed for each chain.
     Object.keys(this.config).forEach((_domain) => {
@@ -143,8 +143,10 @@ export class ChainService extends ChainReader {
         });
         throw error;
       }
-      const provider = new TransactionDispatch(this.logger, domain, chain, signer);
-      this.providers.set(domain, provider);
+      const provider = new TransactionDispatch(this.logger, domain, chain);
+      provider.setSigner(signer).then(() => {
+        this.providers.set(domain, provider);
+      });
     });
   }
 }

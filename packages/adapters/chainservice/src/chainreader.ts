@@ -234,7 +234,12 @@ export class ChainReader {
         throw error;
       }
       const domainNumber = parseInt(domain);
-      const provider = new RpcProviderAggregator(this.logger, domainNumber, chain, signer);
+      const provider = new RpcProviderAggregator(this.logger, domainNumber, chain);
+      if (signer) {
+        provider.setSigner(signer).then(() => {
+          this.providers.set(domainNumber, provider);
+        });
+      }
       this.providers.set(domainNumber, provider);
     });
   }
