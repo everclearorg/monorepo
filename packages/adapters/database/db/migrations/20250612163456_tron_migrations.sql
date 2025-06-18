@@ -175,7 +175,7 @@ BEGIN
 
     FOR i IN 0..(destination_count - 1) LOOP
         pos := pos + 64;
-		destinations[i] := to_int(SUBSTRING(rec.data, pos + 56, 8));
+        destinations[i] := to_int(SUBSTRING(rec.data, pos + 56, 8));
     END LOOP;
 
     pos := pos + 64;
@@ -185,73 +185,73 @@ BEGIN
     data := '0x' || SUBSTRING(rec.data, pos, data_length);
 
     INSERT INTO public.origin_intents(
-		id,
-		queue_idx,
-		receiver,
-		input_asset,
-		output_asset,
-		amount,
-		max_fee,
-		origin,
-		nonce,
-		data,
-		transaction_hash,
-		"timestamp",
-		block_number,
-		tx_origin,
-		tx_nonce,
-		gas_limit,
-		gas_price,
-		status,
-		initiator,
-		ttl,
-		destinations
+        id,
+        queue_idx,
+        receiver,
+        input_asset,
+        output_asset,
+        amount,
+        max_fee,
+        origin,
+        nonce,
+        data,
+        transaction_hash,
+        "timestamp",
+        block_number,
+        tx_origin,
+        tx_nonce,
+        gas_limit,
+        gas_price,
+        status,
+        initiator,
+        ttl,
+        destinations
     )
     VALUES (
-		intent_id,
+        intent_id,
         queue_idx,
-		receiver,
-		input_asset,
-		output_asset,
-		amount,
-		max_fee,
-		origin,
-		nonce,
-		data,
-		rec.transaction_hash,
-		timestamp,
-		rec.block_number,
-		initiator,
-		0,
-		0,
-		1,
-		'ADDED',
-		initiator,
-		ttl,
-		destinations
+        receiver,
+        input_asset,
+        output_asset,
+        amount,
+        max_fee,
+        origin,
+        nonce,
+        data,
+        rec.transaction_hash,
+        timestamp,
+        rec.block_number,
+        initiator,
+        0,
+        0,
+        1,
+        'ADDED',
+        initiator,
+        ttl,
+        destinations
     )
     ON CONFLICT (id)
     DO UPDATE SET
-		queue_idx = EXCLUDED.queue_idx,
-		receiver = EXCLUDED.receiver,
-		input_asset = EXCLUDED.input_asset,
-		output_asset = EXCLUDED.output_asset,
-		amount = EXCLUDED.amount,
-		max_fee = EXCLUDED.max_fee,
-		origin = EXCLUDED.origin,
-		nonce = EXCLUDED.nonce,
-		data = EXCLUDED.data,
-		transaction_hash = EXCLUDED.transaction_hash,
-		"timestamp" = EXCLUDED."timestamp",
-		block_number = EXCLUDED.block_number,
-		tx_origin = EXCLUDED.tx_origin,
-		tx_nonce = EXCLUDED.tx_nonce,
-		gas_limit = EXCLUDED.gas_limit,
-		gas_price = EXCLUDED.gas_price,
-		status = EXCLUDED.status,
-		initiator = EXCLUDED.initiator,
-		ttl = EXCLUDED.ttl,
-		destinations = EXCLUDED.destinations;
+        queue_idx = EXCLUDED.queue_idx,
+        receiver = EXCLUDED.receiver,
+        input_asset = EXCLUDED.input_asset,
+        output_asset = EXCLUDED.output_asset,
+        amount = EXCLUDED.amount,
+        max_fee = EXCLUDED.max_fee,
+        origin = EXCLUDED.origin,
+        nonce = EXCLUDED.nonce,
+        data = EXCLUDED.data,
+        transaction_hash = EXCLUDED.transaction_hash,
+        "timestamp" = EXCLUDED."timestamp",
+        block_number = EXCLUDED.block_number,
+        tx_origin = EXCLUDED.tx_origin,
+        tx_nonce = EXCLUDED.tx_nonce,
+        gas_limit = EXCLUDED.gas_limit,
+        gas_price = EXCLUDED.gas_price,
+        status = EXCLUDED.status,
+        initiator = EXCLUDED.initiator,
+        ttl = EXCLUDED.ttl,
+        destinations = EXCLUDED.destinations;
 
     SELECT * INTO queue_rec
     FROM public.queues
@@ -347,7 +347,7 @@ BEGIN
 
     FOR i IN 0..(destination_count - 1) LOOP
         pos := pos + 64;
-		destinations[i] := to_int(SUBSTRING(rec.data, pos + 56, 8));
+        destinations[i] := to_int(SUBSTRING(rec.data, pos + 56, 8));
     END LOOP;
 
     pos := pos + 64;
