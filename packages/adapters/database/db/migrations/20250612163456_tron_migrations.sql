@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS tron.fill_queue
 
 CREATE OR REPLACE FUNCTION public.process_tron_spoke_events() RETURNS TRIGGER AS $$
 DECLARE
-	res BOOLEAN;
+    res BOOLEAN;
 BEGIN
     -- IntentAdded event
     IF NEW.topics LIKE '0xefe68281645929e2db845c5b42e12f7c73485fb5f18737b7b29379da006fa5f7%' THEN
@@ -97,7 +97,7 @@ FOR EACH ROW EXECUTE FUNCTION public.process_tron_spoke_events();
 
 CREATE OR REPLACE FUNCTION public.process_tron_gateway_events() RETURNS TRIGGER AS $$
 DECLARE
-	res BOOLEAN;
+    res BOOLEAN;
 BEGIN
     -- IntentQueueProcessed event
     IF NEW.topics LIKE '0x43a52e9a77f317a192970b363b14ece56df243fe0dd94f459f63029d657efec3%' THEN
@@ -142,8 +142,8 @@ DECLARE
     destinations VARCHAR(66)[];
     data_length INT;
     data TEXT;
-	pos INT := 3;
-	i INT;
+    pos INT := 3;
+    i INT;
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
 BEGIN
@@ -151,13 +151,13 @@ BEGIN
 
     queue_idx := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
-	initiator := '0x' || SUBSTRING(rec.data, pos, 64);
-	pos := pos + 64;
-	receiver := '0x' || SUBSTRING(rec.data, pos, 64);
-	pos := pos + 64;
-	input_asset := '0x' || SUBSTRING(rec.data, pos, 64);
-	pos := pos + 64;
-	output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
+    initiator := '0x' || SUBSTRING(rec.data, pos, 64);
+    pos := pos + 64;
+    receiver := '0x' || SUBSTRING(rec.data, pos, 64);
+    pos := pos + 64;
+    input_asset := '0x' || SUBSTRING(rec.data, pos, 64);
+    pos := pos + 64;
+    output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
     max_fee := to_int(SUBSTRING(rec.data, pos + 56, 8));
     pos := pos + 64;
@@ -168,23 +168,23 @@ BEGIN
     timestamp := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
     ttl := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
-	pos := pos + 64;
-	amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
-	pos := pos + 64 + 64 + 64; -- Skip destination and data offsets
-	destination_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
+    pos := pos + 64;
+    amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
+    pos := pos + 64 + 64 + 64; -- Skip destination and data offsets
+    destination_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
 
-	FOR i IN 0..(destination_count - 1) LOOP
+    FOR i IN 0..(destination_count - 1) LOOP
         pos := pos + 64;
 		destinations[i] := to_int(SUBSTRING(rec.data, pos + 56, 8));
-	END LOOP;
+    END LOOP;
 
     pos := pos + 64;
-	data_length := to_int(SUBSTRING(rec.data, pos + 56, 8));
+    data_length := to_int(SUBSTRING(rec.data, pos + 56, 8));
 
     pos := pos + 64;
-	data := '0x' || SUBSTRING(rec.data, pos, data_length);
+    data := '0x' || SUBSTRING(rec.data, pos, data_length);
 
-	INSERT INTO public.origin_intents(
+    INSERT INTO public.origin_intents(
 		id,
 		queue_idx,
 		receiver,
@@ -206,8 +206,8 @@ BEGIN
 		initiator,
 		ttl,
 		destinations
-	)
-	VALUES (
+    )
+    VALUES (
 		intent_id,
         queue_idx,
 		receiver,
@@ -229,9 +229,9 @@ BEGIN
 		initiator,
 		ttl,
 		destinations
-	)
-	ON CONFLICT (id)
-	DO UPDATE SET
+    )
+    ON CONFLICT (id)
+    DO UPDATE SET
 		queue_idx = EXCLUDED.queue_idx,
 		receiver = EXCLUDED.receiver,
 		input_asset = EXCLUDED.input_asset,
@@ -311,8 +311,8 @@ DECLARE
     destinations VARCHAR(66)[];
     data_length INT;
     data TEXT;
-	pos INT := 3;
-	i INT;
+    pos INT := 3;
+    i INT;
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
 BEGIN
@@ -323,13 +323,13 @@ BEGIN
     pos := pos + 64;
     queue_idx := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
-	initiator := '0x' || SUBSTRING(rec.data, pos, 64);
-	pos := pos + 64;
-	receiver := '0x' || SUBSTRING(rec.data, pos, 64);
-	pos := pos + 64;
-	input_asset := '0x' || SUBSTRING(rec.data, pos, 64);
-	pos := pos + 64;
-	output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
+    initiator := '0x' || SUBSTRING(rec.data, pos, 64);
+    pos := pos + 64;
+    receiver := '0x' || SUBSTRING(rec.data, pos, 64);
+    pos := pos + 64;
+    input_asset := '0x' || SUBSTRING(rec.data, pos, 64);
+    pos := pos + 64;
+    output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
     max_fee := to_int(SUBSTRING(rec.data, pos + 56, 8));
     pos := pos + 64;
@@ -340,21 +340,21 @@ BEGIN
     timestamp := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
     ttl := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
-	pos := pos + 64;
-	amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
-	pos := pos + 64 + 64 + 64; -- Skip destination and data offsets
-	destination_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
+    pos := pos + 64;
+    amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
+    pos := pos + 64 + 64 + 64; -- Skip destination and data offsets
+    destination_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
 
-	FOR i IN 0..(destination_count - 1) LOOP
+    FOR i IN 0..(destination_count - 1) LOOP
         pos := pos + 64;
 		destinations[i] := to_int(SUBSTRING(rec.data, pos + 56, 8));
-	END LOOP;
+    END LOOP;
 
     pos := pos + 64;
-	data_length := to_int(SUBSTRING(rec.data, pos + 56, 8));
+    data_length := to_int(SUBSTRING(rec.data, pos + 56, 8));
 
     pos := pos + 64;
-	data := '0x' || SUBSTRING(rec.data, pos, data_length);
+    data := '0x' || SUBSTRING(rec.data, pos, data_length);
 
     INSERT INTO public.destination_intents(
         id,
@@ -478,7 +478,7 @@ DECLARE
     recipient TEXT;
     asset TEXT;
     amount NUMERIC;
-	pos INT := 3;
+    pos INT := 3;
 BEGIN
     intent_id := SUBSTRING(rec.topics, 68, 66);
     
@@ -553,6 +553,7 @@ DECLARE
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
     intent_id TEXT;
+    i INT;
 BEGIN
     message_id := SUBSTRING(rec.topics, 68, 66);
 
@@ -660,6 +661,7 @@ DECLARE
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
     intent_id TEXT;
+    i INT;
 BEGIN
     message_id := SUBSTRING(rec.topics, 68, 66);
 
