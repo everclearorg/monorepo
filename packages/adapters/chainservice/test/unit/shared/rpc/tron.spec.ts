@@ -198,19 +198,24 @@ describe('TronSyncProvider', () => {
             parameter: {
               value: {
                 owner_address: '0xowner',
-                contract_address: '0xcontract',
+                to_address: '0xcontract',
                 data: '0xdata',
                 call_value: '1000000000'
               },
-              type_url: 'type.googleapis.com/protocol.TriggerSmartContract'
+              type_url: 'type.googleapis.com/protocol.TransferContract'
             }
-          }]
-        }
+          }],
+        },
+        ret: [{ contractRet: 'SUCCESS' }],
       } as any;
 
       const mockTxInfo = {
         blockNumber: 12340,
-        result: 'SUCCESS'
+        result: 'SUCCESS',
+        receipt: {
+          energy_usage: 100000,
+          energy_usage_total: 100000
+        }
       } as any;
 
       const mockCurrentBlock = {
@@ -264,19 +269,25 @@ describe('TronSyncProvider', () => {
             parameter: {
               value: {
                 owner_address: '0xowner',
-                contract_address: '0xcontract',
+                to_address: '0xcontract',
                 data: '0xdata',
                 call_value: '1000000000'
-              }
+              },
+              type_url: 'type.googleapis.com/protocol.TransferContract'
             }
-          }]
-        }
-      };
+          }],
+        },
+        ret: [{ contractRet: 'SUCCESS' }],
+      } as any;
 
       const mockTxInfo = {
         blockNumber: undefined,
-        result: 'SUCCESS'
-      };
+        result: 'SUCCESS',
+        receipt: {
+          energy_usage: 100000,
+          energy_usage_total: 100000
+        }
+      } as any;
 
       const mockCurrentBlock = {
         block_header: {
@@ -284,7 +295,7 @@ describe('TronSyncProvider', () => {
             number: 12345
           }
         }
-      };
+      } as any;
 
       mockTronWeb.trx.getTransaction.resolves(mockTx);
       mockTronWeb.trx.getTransactionInfo.resolves(mockTxInfo);
@@ -309,17 +320,22 @@ describe('TronSyncProvider', () => {
             parameter: {
               value: {
                 owner_address: '0xowner'
-                // Missing contract_address and data
+                // Missing to_address and data
               },
-              type_url: 'type.googleapis.com/protocol.TriggerSmartContract'
+              type_url: 'type.googleapis.com/protocol.TransferContract'
             }
-          }]
-        }
+          }],
+        },
+        ret: [{ contractRet: 'SUCCESS' }],
       } as any;
 
       const mockTxInfo = {
         blockNumber: 12340,
-        result: 'SUCCESS'
+        result: 'SUCCESS',
+        receipt: {
+          energy_usage: 100000,
+          energy_usage_total: 100000
+        }
       } as any;
 
       const mockCurrentBlock = {
@@ -342,7 +358,7 @@ describe('TronSyncProvider', () => {
       const result = await provider.getTransaction('0x123');
 
       expect(result).to.deep.include({
-        to: undefined,
+        to: '',
         data: undefined,
         value: BigNumber.from(0)
       });
@@ -385,7 +401,8 @@ describe('TronSyncProvider', () => {
               }
             }
           }]
-        }
+        },
+        ret: [{ contractRet: 'SUCCESS' }],
       };
 
       const mockTxInfo = {
@@ -434,7 +451,8 @@ describe('TronSyncProvider', () => {
               }
             }
           }]
-        }
+        },
+        ret: [{ contractRet: 'SUCCESS' }],
       };
 
       const mockTxInfo = {
@@ -466,7 +484,8 @@ describe('TronSyncProvider', () => {
               }
             }
           }]
-        }
+        },
+        ret: [{ contractRet: 'SUCCESS' }],
       };
 
       const mockReceipt = {
@@ -1085,6 +1104,77 @@ describe('TronSyncProvider', () => {
       expect(mockTronWeb.trx.sign.called).to.be.false;
       expect(getPublicKeyStub.calledOnce).to.be.true;
       expect(signStub.calledOnce).to.be.true;
+    });
+  });
+
+  describe('getTransactionCount', () => {
+    it('should return 0 for new address', async () => {
+      const address = 'T000000000000000000000000000000000000001';
+      const count = await provider.getTransactionCount(address);
+      expect(count).to.equal(0);
+    });
+
+    it('should increment nonce after sending transaction', async () => {
+      const address = 'T000000000000000000000000000000000000001';
+      provider.tronWeb.defaultAddress.hex = address;
+
+      // Initial count should be 0
+      const initialCount = await provider.getTransactionCount(address);
+      expect(initialCount).to.equal(0);
+
+      // Send a transaction
+      const signer = provider.getSigner('private_key');
+      mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id' });
+      mockTronWeb.trx.getTransactionInfo.resolves({ blockNumber: 1 });
+      mockTronWeb.trx.getCurrentBlock.resolves({ block_header: { raw_data: { number: 2 } } });
+
+      await signer.sendTransaction({
+        to: address,
+        value: '1000',
+        data: '0x',
+        funcSig: '',
+      });
+
+      // Count should be incremented
+      const updatedCount = await provider.getTransactionCount(address);
+      expect(updatedCount).to.equal(1);
+    });
+
+    it('should maintain separate nonces for different addresses', async () => {
+      const address1 = 'T000000000000000000000000000000000000001';
+      const address2 = 'T000000000000000000000000000000000000002';
+
+      // Send transaction from address1
+      provider.tronWeb.defaultAddress.hex = address1;
+      const signer1 = provider.getSigner('private_key');
+      mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id_1' });
+      mockTronWeb.trx.getTransactionInfo.resolves({ blockNumber: 1 });
+      mockTronWeb.trx.getCurrentBlock.resolves({ block_header: { raw_data: { number: 2 } } });
+
+      await signer1.sendTransaction({
+        to: address2,
+        value: '1000',
+        data: '0x',
+        funcSig: '',
+      });
+
+      // Send transaction from address2
+      provider.tronWeb.defaultAddress.hex = address2;
+      const signer2 = provider.getSigner('private_key');
+      mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id_2' });
+
+      await signer2.sendTransaction({
+        to: address1,
+        value: '1000',
+        data: '0x',
+        funcSig: '',
+      });
+
+      // Check nonces for both addresses
+      const count1 = await provider.getTransactionCount(address1);
+      const count2 = await provider.getTransactionCount(address2);
+      expect(count1).to.equal(1);
+      expect(count2).to.equal(1);
     });
   });
 }); 
