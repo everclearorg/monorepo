@@ -1,13 +1,14 @@
 import { Logger, RelayerType, Settlement, domainToChainId, expect, mkBytes32 } from '@chimera-monorepo/utils';
 import * as Relayer from '@chimera-monorepo/adapters-relayer';
 import { Bytes, Interface } from 'ethers/lib/utils';
-import { constants, Wallet } from 'ethers';
+import { constants } from 'ethers';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
+import { EthWallet } from '@chimera-monorepo/chainservice';
 
 import { dispatchMessageQueueViaRelayers, getQueueMethodName } from '../../../src/tasks/helpers';
 import { createIntentQueues, getContextStub, mock } from '../../globalTestHook';
 import { LighthouseContext } from '../../../src/context';
-import { RelayerSendFailed } from '../../../src/errors/tasks';
+import { RelayerSendFailed } from '../../../src/errors';
 
 describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   const [queue] = createIntentQueues();
@@ -19,12 +20,12 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   let sendWithRelayerWithBackupStub: SinonStub;
   let encodeStub: SinonStub;
   let decodeStub: SinonStub;
-  let wallet: SinonStubbedInstance<Wallet>;
+  let wallet: SinonStubbedInstance<EthWallet>;
   const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     // Interface stubs
-    wallet = createStubInstance(Wallet, {
+    wallet = createStubInstance(EthWallet, {
       signMessage: stub<[string | Bytes], Promise<string>>().resolves('0xsigned'),
     });
 
