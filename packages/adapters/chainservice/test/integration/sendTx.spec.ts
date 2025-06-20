@@ -1,6 +1,6 @@
 import { Logger, expect } from '@chimera-monorepo/utils';
 import { BigNumber, Wallet } from 'ethers';
-import { ChainService } from '../../src/chainservice';
+import { ChainService } from '../../src';
 import { TEST_REQUEST_CONTEXT } from '../utils';
 
 describe('ChainService.sendTx', () => {
