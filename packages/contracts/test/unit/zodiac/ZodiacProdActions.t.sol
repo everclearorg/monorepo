@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IERC20, IFeeAdapter, IRoleModule, ZodiacHelper, ZodiacProductionEnvironment} from './ZodiacHelper.sol';
-import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
-import {IEverclear} from 'interfaces/common/IEverclear.sol';
-import {MainnetProductionEnvironment} from 'script/MainnetProduction.sol';
+import { IERC20, IFeeAdapter, IRoleModule, ZodiacHelper, ZodiacProductionEnvironment } from './ZodiacHelper.sol';
+import { EverclearSpoke } from 'contracts/intent/EverclearSpoke.sol';
+import { IEverclear } from 'interfaces/common/IEverclear.sol';
+import { MainnetProductionEnvironment } from 'script/MainnetProduction.sol';
 
 contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, ZodiacProductionEnvironment {
   function setUp() public {
@@ -438,7 +438,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -446,7 +454,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -457,7 +473,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -531,22 +547,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -660,7 +713,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -668,7 +729,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -679,7 +748,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -753,22 +822,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -882,7 +988,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -890,7 +1004,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -901,7 +1023,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -975,22 +1097,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -1095,7 +1254,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -1103,7 +1270,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -1114,7 +1289,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -1183,22 +1358,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -1309,7 +1521,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -1317,7 +1537,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -1328,7 +1556,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -1404,22 +1632,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -1517,7 +1782,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -1525,7 +1798,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -1592,22 +1873,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidReceiver: checking random address cannot receive funds wih Stargate
@@ -1674,13 +1992,29 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // Everclear: sending new intent
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -1691,7 +2025,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -1731,22 +2065,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -1836,7 +2207,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -1844,7 +2223,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -1855,7 +2242,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -1927,22 +2314,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -2015,7 +2439,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -2023,7 +2455,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -2087,22 +2527,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -2170,7 +2647,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -2178,7 +2663,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Stargate: configuring the bridge inputs
@@ -2234,22 +2727,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidReceiver: checking random address cannot receive funds wih Stargate
@@ -2318,7 +2848,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -2326,7 +2864,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Stargate: configuring the bridge inputs
@@ -2396,22 +2942,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidReceiver: checking random address cannot receive funds wih Stargate
@@ -2485,7 +3068,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -2493,7 +3084,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -2504,7 +3103,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -2559,22 +3158,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -2670,7 +3306,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -2678,7 +3322,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -2689,7 +3341,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -2748,22 +3400,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -2853,7 +3542,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -2861,7 +3558,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Bridges: configuring the bridge inputs
@@ -2872,7 +3577,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.depositor = config.safeAddress;
     _params.inputToken = config.weth;
     _params.inputAmount = _amounts[0]; // 1 ether
-    _params.outputAmount = _amounts[0] * 90_000 / 100_000;
+    _params.outputAmount = (_amounts[0] * 90_000) / 100_000;
     _params.quoteTimestamp = uint32(block.timestamp);
     _params.fillDeadline = uint32(block.timestamp + 30 minutes);
     _params.message = '';
@@ -2919,22 +3624,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidDepositor: checking random address cannot receive funds with Across
@@ -3005,7 +3747,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -3013,7 +3763,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     //////////////////////////// Reverting Actions ////////////////////////////
@@ -3051,22 +3809,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
   }
 
@@ -3117,7 +3912,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Everclear: sending new order
@@ -3125,7 +3928,15 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false, ZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
     );
 
     // Stargate: sending an order
@@ -3198,22 +4009,59 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // invalidTTl: checking the order cannot be sent with a non-zero ttl
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, NONZERO_TTL, ZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      NONZERO_TTL,
+      ZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayTtl(_destinations, _amounts, config, config.weth, APPROVED_CALLER);
 
     // invalidMaxFee: checking the order cannot be sent with a non-zero max fee
     _sendNewIntent(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrder(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, true, ZERO_TTL, NONZERO_FEE
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress,
+      true,
+      ZERO_TTL,
+      NONZERO_FEE
     );
     _sendNewOrderInvalidFifthArrayMaxFee(
-      _destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      config.safeAddress
     );
 
     // invalidReceiver: checking random address cannot receive funds wih Stargate
