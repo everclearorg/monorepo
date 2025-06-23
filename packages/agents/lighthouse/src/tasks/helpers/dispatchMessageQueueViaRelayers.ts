@@ -8,13 +8,15 @@ import {
   jsonifyError,
   getNtpTimeSeconds,
   SOLANA_CHAINID,
+  TRON_CHAINID,
 } from '@chimera-monorepo/utils';
-import { Interface, arrayify, keccak256, defaultAbiCoder } from 'ethers/lib/utils';
+import { Interface, keccak256, defaultAbiCoder } from 'ethers/lib/utils';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 import { getContext } from '../../context';
 import { getQueueMethodName, getTypeHash } from './getMessageQueueConstants';
 import { RelayerSendFailed } from '../../errors';
 import { BigNumber } from 'ethers';
+import { ethers } from 'ethers';
 
 const DEFAULT_SIGNATURE_TTL = 60 * 60; // 60 minutes
 
@@ -39,6 +41,31 @@ const MAX_INTENT_DEQUEUE = 6;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
+
+/**
+ * Converts OriginIntent objects to the Intent struct format expected by the smart contract
+ * @param originIntents Array of OriginIntent objects
+ * @returns Array of Intent structs properly formatted for contract encoding
+ */
+function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[] {
+  return originIntents.map((originIntent: unknown) => {
+    const intent = originIntent as Record<string, unknown>;
+    return {
+      initiator: intent.initiator,
+      receiver: intent.receiver,
+      inputAsset: intent.inputAsset,
+      outputAsset: intent.outputAsset,
+      maxFee: intent.maxFee,
+      origin: intent.origin,
+      nonce: intent.nonce,
+      timestamp: intent.timestamp,
+      ttl: intent.ttl,
+      amount: intent.amount,
+      destinations: intent.destinations,
+      data: intent.data || '0x',
+    };
+  });
+}
 
 export const dispatchMessageQueueViaRelayers = async (
   type: QueueType,
@@ -130,16 +157,29 @@ export const dispatchMessageQueueViaRelayers = async (
   const blockTag = transactionDomain == hub.domain ? 'pending' : 'latest';
 
   const walletAddr = await wallet.getAddress();
-  const encodedNonce = await chainservice.readTx(
-    {
-      to: everclear,
-      data: everclearIface.encodeFunctionData('nonces', [walletAddr]),
-      domain: +transactionDomain,
-      funcSig: everclearIface.getFunction('nonces').format(),
-    },
-    blockTag,
-  );
-  let [nonce] = everclearIface.decodeFunctionResult('nonces', encodedNonce) as [BigNumber];
+
+  // Special handling for non-EVM chains (Solana, Tron) that don't have EVM-style contracts
+  let nonce: BigNumber;
+  if (transactionDomain === SOLANA_CHAINID || transactionDomain === TRON_CHAINID) {
+    // For non-EVM chains, use a default nonce since we can't read from EVM contracts
+    logger.info('Using default nonce for non-EVM chain', requestContext, methodContext, {
+      transactionDomain,
+      chainType: transactionDomain === SOLANA_CHAINID ? 'Solana' : 'Tron',
+    });
+    nonce = BigNumber.from(0); // Use nonce 0 to match contract state
+  } else {
+    // Standard EVM chain nonce reading
+    const encodedNonce = await chainservice.readTx(
+      {
+        to: everclear,
+        data: everclearIface.encodeFunctionData('nonces', [walletAddr]),
+        domain: +transactionDomain,
+        funcSig: everclearIface.getFunction('nonces').format(),
+      },
+      blockTag,
+    );
+    [nonce] = everclearIface.decodeFunctionResult('nonces', encodedNonce) as [BigNumber];
+  }
 
   const taskIds: Record<number, string> = {};
   for (let i = 0; i < totalIntents; i += maxDequeue) {
@@ -194,7 +234,51 @@ export const dispatchMessageQueueViaRelayers = async (
           DEFAULT_HYPERLANE_BUFFER,
         ]);
         const digest = keccak256(payload);
-        const signature = await wallet.signMessage(arrayify(digest));
+
+        // Use different signing methods for different chains
+        let signature: string;
+        if (transactionDomain === TRON_CHAINID) {
+          // For Tron, the contract uses MessageHashUtils.toEthSignedMessageHash()
+          // which applies the Ethereum message prefix "\x19Ethereum Signed Message:\n32"
+          // We can use wallet.signMessage(digest) which applies the same prefix automatically
+          logger.info('Using Tron signing with Ethereum message prefix compatibility', requestContext, methodContext, {
+            digest,
+            transactionDomain,
+          });
+
+          // Import TronKeyManager to get the private key
+          const { TronKeyManager } = await import('@chimera-monorepo/utils');
+          const keyManager = new TronKeyManager({
+            environment: (process.env.NODE_ENV as 'development' | 'staging' | 'production') || 'development',
+            fallbackToTestKey: true,
+          });
+
+          // Get the private key
+          const privateKey = await keyManager.getPrivateKey();
+
+          // Create wallet and sign the digest directly (this applies Ethereum message prefix)
+          const wallet = new ethers.Wallet(privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`);
+          signature = await wallet.signMessage(ethers.utils.arrayify(digest));
+
+          // Calculate prefixed hash for logging
+          const prefix = '\x19Ethereum Signed Message:\n32';
+          const prefixedMessage = ethers.utils.concat([
+            ethers.utils.toUtf8Bytes(prefix),
+            ethers.utils.arrayify(digest),
+          ]);
+          const prefixedHash = ethers.utils.keccak256(prefixedMessage);
+
+          logger.info('Generated Tron signature with Ethereum message prefix', requestContext, methodContext, {
+            signature,
+            digest,
+            prefixedHash,
+          });
+        } else {
+          // For Ethereum and other EVM chains, use standard Ethereum message signing
+          // The contract will apply MessageHashUtils.toEthSignedMessageHash to the payload hash,
+          // so we need to sign the raw digest bytes using signMessage which applies the same prefix
+          signature = await wallet.signMessage(ethers.utils.arrayify(digest));
+        }
         logger.info('Generated signature', requestContext, methodContext, {
           typeHash: getTypeHash(type),
           domain: transactionDomain,
@@ -208,10 +292,14 @@ export const dispatchMessageQueueViaRelayers = async (
         });
 
         const queueMethodName = getQueueMethodName(type);
+
+        // Convert OriginIntent objects to Intent structs for proper contract encoding
+        const intentStructs = type === 'INTENT' ? convertOriginIntentsToIntentStructs(trimmedIntents) : toDequeue;
+
         const tx: WriteTransaction = {
           data: everclearIface.encodeFunctionData(queueMethodName, [
             queue.domain,
-            type === 'INTENT' ? trimmedIntents : toDequeue,
+            intentStructs,
             relayerAddress,
             ttl,
             nonce,

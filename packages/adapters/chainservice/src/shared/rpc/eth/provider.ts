@@ -115,6 +115,7 @@ class BaseSyncProvider extends StaticJsonRpcProvider {
       try {
         sendTimestamp = Date.now();
         this.cpsTimestamps.push(sendTimestamp);
+        console.log(`=== ETH PROVIDER SEND called with method: ${method}, domain: ${this.domain}, params:`, params);
         return await Promise.race(
           [
             new Promise((resolve, reject) => {

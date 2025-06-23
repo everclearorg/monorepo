@@ -346,6 +346,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
    * @returns A list of receipts or errors that occurred for each.
    */
   public async send(minTx: WriteTransaction, context: RequestContext): Promise<ITransactionReceipt> {
+    console.log(`=== DISPATCH SEND called for domain ${this.domain} ===`);
     const method = this.send.name;
     const { requestContext, methodContext } = createLoggingContext(method, context);
     const txsId = getUuid();
@@ -520,6 +521,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
    * @param transaction - OnchainTransaction object to modify based on submit result.
    */
   private async submit(transaction: OnchainTransaction) {
+    console.log(`=== DISPATCH SUBMIT called for domain ${this.domain} ===`);
     const method = this.submit.name;
     const { requestContext, methodContext } = createLoggingContext(method, transaction.context);
     this.logger.debug('Method start', requestContext, methodContext, {
@@ -537,6 +539,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
 
     // Send the tx.
     try {
+      console.log(`=== DISPATCH SUBMIT about to call this.sendTransaction ===`);
       const response = await this.sendTransaction(transaction);
       // Add this response to our local response history.
       if (transaction.hashes.includes(response.hash)) {
