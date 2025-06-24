@@ -3,6 +3,8 @@ import { EverclearSpoke } from '../target/types/everclear_spoke';
 import { expect } from '@chimera-monorepo/utils';
 import * as token from '@solana/spl-token';
 import { concat } from 'viem';
+import * as nacl from 'tweetnacl';
+import * as solana from '@solana-developers/helpers';
 
 describe('#everclear_spoke', () => {
   anchor.setProvider(anchor.AnchorProvider.local());
@@ -14,6 +16,17 @@ describe('#everclear_spoke', () => {
     [Buffer.from('spoke-state')],
     program.programId,
   );
+
+  const [feeAdapterStateAddress, feeAdapterStateBump] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('fee-adapter-state')],
+    program.programId,
+  );
+
+  const feeSigner = nacl.sign.keyPair();
+  const feeSignerAnchor = anchor.web3.Keypair.fromSecretKey(feeSigner.secretKey);
+
+  const feeRecipient = anchor.web3.Keypair.generate();
+
   const [vaultAuthority, vaultAuthorityBump] = anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from('vault')],
     program.programId,
@@ -132,6 +145,22 @@ describe('#everclear_spoke', () => {
     });
   });
 
+  describe('#initialize_fee_adapter', () => {
+    it('should work', async () => {
+      const tx = await program.methods.initializeFeeAdapter(feeRecipient.publicKey, feeSignerAnchor.publicKey).accounts({
+        program: program.programId,
+      }).rpc();
+
+      // Assert
+      const feeAdapterState = await program.account.feeAdapterState.fetch(feeAdapterStateAddress);
+      expect(feeAdapterState.initialized).to.be.equal(true);
+      expect(feeAdapterState.paused).to.be.equal(false);
+      expect(feeAdapterState.feeRecipient.toBase58()).to.be.equal(feeRecipient.publicKey.toBase58());
+      expect(feeAdapterState.feeSigner.toBase58()).to.be.equal(feeSignerAnchor.publicKey.toBase58());
+      expect(feeAdapterState.bump).to.be.equal(feeAdapterStateBump);
+    });
+  });
+
   describe('#new_intent', () => {
     it('should work', async () => {
       // Arrange
@@ -143,6 +172,14 @@ describe('#everclear_spoke', () => {
         mint.publicKey, // mint authority
         mint.publicKey, // freeze authority
         TOKEN_DECIMALS, // decimals
+      );
+      
+      // Create a token account for fee recipient
+      const feeRecipientTokenAccount = await token.createAssociatedTokenAccount(
+        connection,
+        user, // fee payer
+        mintPubkey, // mint
+        feeRecipient.publicKey, // owner,
       );
 
       // Create a user token account
@@ -173,6 +210,24 @@ describe('#everclear_spoke', () => {
         true, // allowOwnerOffCurve is true because the owner is a PDA
       );
 
+      const time = Date.now() / 1000;
+      const feeData = {
+        token_fee: new anchor.BN(1000),
+        native_fee: new anchor.BN(0),
+        input_asset: mint.publicKey,
+        deadline: new anchor.BN(time),
+      };
+
+      const buf = program.coder.types.encode('feeData', feeData);
+      const signature = nacl.sign.detached(buf, feeSigner.secretKey);
+
+      const signVerifyIx = anchor.web3.Ed25519Program.createInstructionWithPublicKey({
+        publicKey: feeSigner.publicKey,
+        message: buf,
+        signature: signature,
+      });
+      
+
       // Act
       await program.methods
         .newIntent(
@@ -185,17 +240,19 @@ describe('#everclear_spoke', () => {
           [1], // destinations
           Buffer.from(''), // data
           new anchor.BN(4321), // message_gas_limit
+          {
+            tokenFee: feeData.token_fee,
+            nativeFee: feeData.native_fee,
+            deadline: feeData.deadline,
+            signature: Buffer.from(signature),
+          },
         )
         .accounts({
-          spokeState: spokeStateAddress,
           authority: user.publicKey,
           mint: mintPubkey,
           userTokenAccount,
           programVaultAccount: programVault.address,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
           hyperlaneMailbox,
-          systemProgram: anchor.web3.SystemProgram.programId,
-          splNoopProgram,
           mailboxOutbox,
           dispatchAuthority,
           uniqueMessageAccount: uniqueMessageAccountKeypair.publicKey,
@@ -205,7 +262,12 @@ describe('#everclear_spoke', () => {
           igpPaymentPda,
           configuredIgpAccount,
           innerIgpAccount,
+          feeRecipient: feeRecipient.publicKey,
+          feeSigner: feeSignerAnchor.publicKey,
+          feeRecipientTokenAccount: feeRecipientTokenAccount,
+          program: program.programId
         })
+        .preInstructions([signVerifyIx])
         .signers([uniqueMessageAccountKeypair])
         .rpc();
 

@@ -52,6 +52,14 @@ pub fn compute_intent_hash(intent: &EVMIntent) -> [u8; 32] {
     keccak_256(&encoded)
 }
 
+pub fn hash_intent_id_array(intent_ids: &[[u8; 32]]) -> [u8; 32] {
+    let mut bytes: Vec<u8> = Vec::with_capacity(intent_ids.len() * 32);
+    for id in intent_ids {
+        bytes.extend_from_slice(id);
+    }
+    keccak_256(&bytes)
+}
+
 pub(crate) fn encode_single_intent(intent: &EVMIntent) -> Vec<u8> {
     let mut out = Vec::new();
 
