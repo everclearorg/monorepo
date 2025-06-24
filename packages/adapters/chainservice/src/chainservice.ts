@@ -35,9 +35,8 @@ export class ChainService extends ChainReader {
    * multiple txservice instances) and want to prevent this instantiation from being saved as the singleton.
    */
   constructor(logger: Logger, config: unknown, signer: string | ISigner, _ghostInstance = false) {
-    const { requestContext, methodContext } = createLoggingContext('ChainService.constructor');
-    logger.warn('here', requestContext, methodContext, {config, signer});
     super(logger, config, signer);
+    const { requestContext, methodContext } = createLoggingContext('ChainService.constructor');
     // TODO: #152 See above TODO. Should we have a getInstance() method and make constructor private ??
     // const _signer: string = typeof signer === "string" ? signer : signer.getAddress();
     // if (ChainService._instances.has(_signer)) {}
@@ -92,11 +91,12 @@ export class ChainService extends ChainReader {
     let provider: RpcProviderAggregator;
     if (chainId) {
       provider = await this.getProvider(chainId);
-    }
-    // Ensure that a signer, provider, etc are present to execute on this domain.
-    [chainId, provider] = [...this.providers.entries()][0];
-    if (!chainId) {
-      throw new ProviderNotConfigured(chainId.toString());
+    } else {
+      // Ensure that a signer, provider, etc are present to execute on this domain.
+      [chainId, provider] = [...this.providers.entries()][0];
+      if (!chainId) {
+        throw new ProviderNotConfigured(chainId.toString());
+      }
     }
     return provider.getAddress();
   }
@@ -122,7 +122,7 @@ export class ChainService extends ChainReader {
   protected async setupProviders(context: RequestContext, signer: string) {
     const { methodContext } = createLoggingContext(this.setupProviders.name, context);
     // For each domain / provider, map out all the utils needed for each chain.
-    Object.keys(this.config).forEach((_domain) => {
+    for (const _domain in this.config) {
       // Convert to number
       const domain = +_domain;
       // Get this chain's config.
@@ -148,9 +148,8 @@ export class ChainService extends ChainReader {
         throw error;
       }
       const provider = new TransactionDispatch(this.logger, domain, chain);
-      provider.setSigner(signer).then(() => {
-        this.providers.set(domain, provider);
-      });
-    });
+      await provider.setSigner(signer);
+      this.providers.set(domain, provider);
+    }
   }
 }

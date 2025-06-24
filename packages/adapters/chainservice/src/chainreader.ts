@@ -250,7 +250,6 @@ export class ChainReader {
       const provider = new RpcProviderAggregator(this.logger, domainNumber, chain);
       if (signer) {
         await provider.setSigner(signer);
-        this.providers.set(domainNumber, provider);
       }
       this.providers.set(domainNumber, provider);
     }
