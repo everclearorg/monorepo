@@ -8597,9 +8597,9 @@ declare module 'zapatos/schema' {
       /**
       * **otc_sale_table.expires_at**
       * - `timestamp` in database
-      * - `NOT NULL`, no default
+      * - Nullable, no default
       */
-      expires_at: Date;
+      expires_at: Date | null;
       /**
       * **otc_sale_table.order_id**
       * - `uuid` in database
@@ -8659,9 +8659,9 @@ declare module 'zapatos/schema' {
       /**
       * **otc_sale_table.expires_at**
       * - `timestamp` in database
-      * - `NOT NULL`, no default
+      * - Nullable, no default
       */
-      expires_at: db.TimestampString;
+      expires_at: db.TimestampString | null;
       /**
       * **otc_sale_table.order_id**
       * - `uuid` in database
@@ -8721,7 +8721,7 @@ declare module 'zapatos/schema' {
       /**
       * **otc_sale_table.expires_at**
       * - `timestamp` in database
-      * - `NOT NULL`, no default
+      * - Nullable, no default
       */
       expires_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
       /**
@@ -8783,9 +8783,9 @@ declare module 'zapatos/schema' {
       /**
       * **otc_sale_table.expires_at**
       * - `timestamp` in database
-      * - `NOT NULL`, no default
+      * - Nullable, no default
       */
-      expires_at: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment;
+      expires_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
       /**
       * **otc_sale_table.order_id**
       * - `uuid` in database
@@ -8845,9 +8845,9 @@ declare module 'zapatos/schema' {
       /**
       * **otc_sale_table.expires_at**
       * - `timestamp` in database
-      * - `NOT NULL`, no default
+      * - Nullable, no default
       */
-      expires_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment>;
+      expires_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **otc_sale_table.order_id**
       * - `uuid` in database
