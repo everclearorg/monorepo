@@ -8,7 +8,7 @@ ALTER TABLE public.otc_sale_table RENAME COLUMN token TO ticker_hash;
 
 -- Add new columns
 ALTER TABLE public.otc_sale_table ADD COLUMN transaction_hash TEXT NULL;
-ALTER TABLE public.otc_sale_table ADD COLUMN expires_at TIMESTAMP NOT NULL;
+ALTER TABLE public.otc_sale_table ADD COLUMN expires_at TIMESTAMP;
 
 -- migrate:down
 -- Revert schema changes
