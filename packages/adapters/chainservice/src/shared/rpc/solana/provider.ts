@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { RpcProvider } from '..';
+import { MAX_CONFIRMATION, RpcProvider } from '..';
 import {
   IBlock,
   ISigner,
@@ -10,7 +10,7 @@ import {
   ReadTransaction,
   WriteTransaction,
 } from '../../types';
-import { appendTransactionMessageInstruction, createKeyPairSignerFromPrivateKeyBytes, createSolanaRpc, createSolanaRpcSubscriptions, createTransactionMessage, lamports, KeyPairSigner, pipe, Rpc, RpcSubscriptions, sendAndConfirmTransactionFactory, SendTransactionApi, setTransactionMessageFeePayer, SolanaRpcApiMainnet, SolanaRpcSubscriptionsApi, signTransactionMessageWithSigners, getSignatureFromTransaction, createSignableMessage, setTransactionMessageLifetimeUsingBlockhash, Address, address, signAndSendTransactionMessageWithSigners, getTransactionDecoder, TransactionMessage, FullySignedTransaction, signTransaction, assertIsTransactionMessageWithBlockhashLifetime, Transaction, compileTransaction, isTransactionMessageWithBlockhashLifetime, getBase58Encoder, Base64EncodedBytes, Base64EncodedWireTransaction, Signature, getAddressEncoder, getProgramDerivedAddress, getBase64EncodedWireTransaction, getBase64Encoder } from '@solana/kit';
+import { appendTransactionMessageInstruction, createKeyPairSignerFromPrivateKeyBytes, createSolanaRpc, createSolanaRpcSubscriptions, createTransactionMessage, lamports, KeyPairSigner, pipe, Rpc, RpcSubscriptions, sendAndConfirmTransactionFactory, SendTransactionApi, setTransactionMessageFeePayer, SolanaRpcApiMainnet, SolanaRpcSubscriptionsApi, signTransactionMessageWithSigners, getSignatureFromTransaction, createSignableMessage, setTransactionMessageLifetimeUsingBlockhash, Address, address, signAndSendTransactionMessageWithSigners, getTransactionDecoder, TransactionMessage, FullySignedTransaction, signTransaction, assertIsTransactionMessageWithBlockhashLifetime, Transaction, compileTransaction, Base64EncodedWireTransaction, Signature, getAddressEncoder, getProgramDerivedAddress, getBase64EncodedWireTransaction } from '@solana/kit';
 import { getTransferSolInstruction } from '@solana-program/system';
 
 // In Solana, system program address is nomrally used as a zero address
@@ -74,7 +74,7 @@ class SolanaWeb3Signer implements ISigner {
       tx = transactionDecoder.decode(Uint8Array.from(transactionBytes));
     }
  
-    const signedTx = await signTransaction([this.signer], tx);
+    const signedTx = await signTransaction([this.signer.keyPair], tx);
     const signedTxWithLifetime = {
       ...signedTx,
       lifetimeConstraint: {
@@ -92,7 +92,7 @@ class SolanaWeb3Signer implements ISigner {
 
     return {
       hash: signature,
-      confirmations: 0,
+      confirmations: MAX_CONFIRMATION,
       nonce: 0, // Solana does not use nonces in the same way as EVM
       gasPrice: '0', // Solana does not use gas price
       gasLimit: transaction.gasLimit || '0',
@@ -185,7 +185,11 @@ export class SolanaProvider implements RpcProvider {
 
   public async getTransaction(hash: string): Promise<ITransactionResponse | undefined> {
     // Implement getTransaction method
-    const result = await this.rpc.getTransaction(hash as Signature).send();
+    const result = await this.rpc.getTransaction(hash as Signature, {
+      // NOTE: this is required to also support v0 transactions
+      maxSupportedTransactionVersion: 0,
+      encoding: 'json'
+    }).send();
     return {
       hash: hash,
       confirmations: 0, // this is assume to only obtain finalized transactions
@@ -207,10 +211,14 @@ export class SolanaProvider implements RpcProvider {
 
   public async getTransactionReceipt(hash: string): Promise<ITransactionReceipt> {
     // Implement getTransactionReceipt method
-    const result = await this.rpc.getTransaction(hash as Signature).send();
+    const result = await this.rpc.getTransaction(hash as Signature, {
+      // NOTE: this is required to also support v0 transactions
+      maxSupportedTransactionVersion: 0,
+      encoding: 'json'
+    }).send();
     return {
       blockNumber: Number(result?.slot) || 0,
-      status: result?.meta?.err ? 1 : 0,
+      status: result?.meta?.err ? 0 : 1,
       transactionHash: hash,
       confirmations: 0,
       logs: result?.meta?.logMessages?.map((logLine, index) => {
@@ -281,7 +289,7 @@ export class SolanaProvider implements RpcProvider {
         ]
     });
     const result = await this.rpc.getTokenAccountBalance(userTokenAccountPublicKey as Address).send();
-    return result.value.toString();
+    return result.value.amount;
   }
 
   public async getDecimals(address: string): Promise<number> {

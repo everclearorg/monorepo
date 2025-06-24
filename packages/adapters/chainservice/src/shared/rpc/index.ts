@@ -23,6 +23,8 @@ export const SupportedVms = {
 } as const;
 export type SupportedVm = (typeof SupportedVms)[keyof typeof SupportedVms];
 
+export const MAX_CONFIRMATION = 10000;
+
 export interface SignerTypeMaps {
   [SupportedVms.evm]: Signer;
 }
