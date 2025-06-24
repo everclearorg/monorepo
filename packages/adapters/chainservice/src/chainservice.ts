@@ -5,6 +5,7 @@ import { ChainConfig } from './config';
 import { WriteTransaction, ConfigurationError, ProviderNotConfigured, ITransactionReceipt, ISigner } from './shared';
 import { ChainReader } from './chainreader';
 import { TransactionDispatch } from './dispatch';
+import { RpcProviderAggregator } from './aggregator';
 
 // TODO: Should take on the logic of Dispatch (rename to TransactionDispatch) and consume ChainReader instead of extending it.
 /**
@@ -34,8 +35,9 @@ export class ChainService extends ChainReader {
    * multiple txservice instances) and want to prevent this instantiation from being saved as the singleton.
    */
   constructor(logger: Logger, config: unknown, signer: string | ISigner, _ghostInstance = false) {
-    super(logger, config, signer);
     const { requestContext, methodContext } = createLoggingContext('ChainService.constructor');
+    logger.warn('here', requestContext, methodContext, {config, signer});
+    super(logger, config, signer);
     // TODO: #152 See above TODO. Should we have a getInstance() method and make constructor private ??
     // const _signer: string = typeof signer === "string" ? signer : signer.getAddress();
     // if (ChainService._instances.has(_signer)) {}
@@ -75,7 +77,8 @@ export class ChainService extends ChainReader {
     this.logger.debug('Method start', requestContext, methodContext, {
       tx: { ...tx, value: tx.value.toString(), data: `${tx.data.substring(0, 9)}...` },
     });
-    return await this.getProvider(tx.domain).send(tx, context);
+    const provider = await this.getProvider(tx.domain);
+    return await provider.send(tx, context);
   }
 
   /// HELPERS
@@ -85,11 +88,15 @@ export class ChainService extends ChainReader {
    * @throws TransactionError.reasons.ProviderNotFound if provider is not configured for
    * that ID.
    */
-  public getAddress(): Promise<string> {
+  public async getAddress(chainId?: number): Promise<string> {
+    let provider: RpcProviderAggregator;
+    if (chainId) {
+      provider = await this.getProvider(chainId);
+    }
     // Ensure that a signer, provider, etc are present to execute on this domain.
-    const [chain, provider] = [...this.providers.entries()][0];
-    if (!chain) {
-      throw new ProviderNotConfigured(chain.toString());
+    [chainId, provider] = [...this.providers.entries()][0];
+    if (!chainId) {
+      throw new ProviderNotConfigured(chainId.toString());
     }
     return provider.getAddress();
   }
@@ -101,12 +108,9 @@ export class ChainService extends ChainReader {
    * @throws TransactionError.reasons.ProviderNotFound if provider is not configured for
    * that ID.
    */
-  public getProvider(domain: number): TransactionDispatch {
-    // Ensure that a signer, provider, etc are present to execute on this domain.
-    if (!this.providers.has(domain)) {
-      throw new ProviderNotConfigured(domain.toString());
-    }
-    return this.providers.get(domain)! as TransactionDispatch;
+  public async getProvider(domain: number): Promise<TransactionDispatch> {
+    const provider = await super.getProvider(domain);
+    return provider as TransactionDispatch;
   }
 
   // TODO: Use a generic type in ChainReader.setupProviders for this method such that we don't have to overload it here.

@@ -77,7 +77,8 @@ export const pollCache = async () => {
     const chain = Number(chainIdKey);
     const domain = chainIdToDomain(chain)!;
 
-    const rpcProvider = chainservice.getProvider(domain).leadProvider;
+    const _provider = await chainservice.getProvider(domain);
+    const rpcProvider = await _provider.leadProvider;
     if (!rpcProvider) {
       logger.debug('Bad rpcs', _requestContext, methodContext, { domain, providers: config.chains[domain].providers });
       continue;

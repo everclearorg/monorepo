@@ -10,9 +10,8 @@ import {
   ReadTransaction,
   WriteTransaction,
 } from '../../types';
-import { appendTransactionMessageInstruction, createKeyPairSignerFromPrivateKeyBytes, createSolanaRpc, createSolanaRpcSubscriptions, createTransactionMessage, lamports, KeyPairSigner, pipe, Rpc, RpcSubscriptions, sendAndConfirmTransactionFactory, SendTransactionApi, setTransactionMessageFeePayer, SolanaRpcApiMainnet, SolanaRpcSubscriptionsApi, signTransactionMessageWithSigners, getSignatureFromTransaction, createSignableMessage, setTransactionMessageLifetimeUsingBlockhash, Address, address, signAndSendTransactionMessageWithSigners, getTransactionDecoder, TransactionMessage, FullySignedTransaction, signTransaction, assertIsTransactionMessageWithBlockhashLifetime, Transaction, compileTransaction, isTransactionMessageWithBlockhashLifetime, getBase58Encoder, Base64EncodedBytes, Base64EncodedWireTransaction, Signature, getAddressEncoder, getProgramDerivedAddress } from '@solana/kit';
+import { appendTransactionMessageInstruction, createKeyPairSignerFromPrivateKeyBytes, createSolanaRpc, createSolanaRpcSubscriptions, createTransactionMessage, lamports, KeyPairSigner, pipe, Rpc, RpcSubscriptions, sendAndConfirmTransactionFactory, SendTransactionApi, setTransactionMessageFeePayer, SolanaRpcApiMainnet, SolanaRpcSubscriptionsApi, signTransactionMessageWithSigners, getSignatureFromTransaction, createSignableMessage, setTransactionMessageLifetimeUsingBlockhash, Address, address, signAndSendTransactionMessageWithSigners, getTransactionDecoder, TransactionMessage, FullySignedTransaction, signTransaction, assertIsTransactionMessageWithBlockhashLifetime, Transaction, compileTransaction, isTransactionMessageWithBlockhashLifetime, getBase58Encoder, Base64EncodedBytes, Base64EncodedWireTransaction, Signature, getAddressEncoder, getProgramDerivedAddress, getBase64EncodedWireTransaction, getBase64Encoder } from '@solana/kit';
 import { getTransferSolInstruction } from '@solana-program/system';
-import { base64EncodeToString } from 'tronweb/lib/esm/utils';
 
 // In Solana, system program address is nomrally used as a zero address
 const SOLANA_NATIVE_ASSET_ID = '11111111111111111111111111111111';
@@ -146,14 +145,17 @@ export class SolanaProvider implements RpcProvider {
   }
 
   public async getSigner(signer: ISigner | string): Promise<ISigner> {
+    let key;
     if (typeof signer === 'string') {
-      const keypairSigner = await createKeyPairSignerFromPrivateKeyBytes(Uint8Array.from(Buffer.from(signer, 'hex')));
-      return new SolanaWeb3Signer(this.rpc, this.rpcSubscription, keypairSigner);
+      key = signer;
     } else if ((signer as any).privateKey) {
-      const keypairSigner = await createKeyPairSignerFromPrivateKeyBytes(Uint8Array.from((signer as any).privateKey));
-      return new SolanaWeb3Signer(this.rpc, this.rpcSubscription, keypairSigner);
+      key = (signer as any).privateKey;
+    } else {
+      return signer;
     }
-    return signer;
+    const buffer = key.startsWith('0x') ? Buffer.from(key.slice(2), 'hex') : Buffer.from(key);
+    const keypairSigner = await createKeyPairSignerFromPrivateKeyBytes(Uint8Array.from(buffer));
+    return new SolanaWeb3Signer(this.rpc, this.rpcSubscription, keypairSigner);
   }
 
   public async connect(signer: ISigner | string): Promise<ISigner> {
@@ -169,7 +171,9 @@ export class SolanaProvider implements RpcProvider {
     } else {
       transactionBytes = Buffer.from(tx.data, 'base64');
     }
-    const base64Encoded = base64EncodeToString(Uint8Array.from(transactionBytes))
+    const transactionDecoder = getTransactionDecoder();
+    const txObject = transactionDecoder.decode(Uint8Array.from(transactionBytes));
+    const base64Encoded = getBase64EncodedWireTransaction(txObject);
     const result = await this.rpc.simulateTransaction(base64Encoded as Base64EncodedWireTransaction, { encoding: 'base64' }).send();
     return result.value.returnData?.data.toString() || '';
   }
@@ -231,7 +235,7 @@ export class SolanaProvider implements RpcProvider {
     let sum = 0n;
     let count = 0n;
     result.forEach(value => {
-      sum += value.prioritizationFee.valueOf();
+      sum += value.prioritizationFee.valueOf() as bigint;
       count++;
     });
     return (sum / count).toString();
