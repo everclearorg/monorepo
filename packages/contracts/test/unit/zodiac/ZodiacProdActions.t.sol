@@ -375,6 +375,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -412,6 +413,30 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     deal(config.weth, config.safeAddress, 1 ether);
     _transferAsset(config.weth, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1 ether, false);
 
+    // ETH: transferring to Binance
+    vm.deal(config.safeAddress, 100 ether);
+    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
+
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
     deal(config.weth, config.safeAddress, 10 ether);
@@ -420,9 +445,6 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // WETH: wrapping weth
     vm.deal(config.safeAddress, 100 ether);
     _wrapWETH(config.weth, 10 ether, config.roleKey, APPROVED_CALLER, false);
-
-    // ETH: transferring to Binance
-    _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
@@ -433,9 +455,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -443,15 +465,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -459,7 +497,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -653,6 +707,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -690,6 +745,26 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     vm.deal(config.safeAddress, 100 ether);
     _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
     deal(config.weth, config.safeAddress, 10 ether);
@@ -708,9 +783,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -718,15 +793,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -734,7 +825,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -928,6 +1035,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -965,6 +1073,26 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     vm.deal(config.safeAddress, 100 ether);
     _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
     deal(config.weth, config.safeAddress, 10 ether);
@@ -985,7 +1113,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // Everclear: sending new intent
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -993,7 +1121,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new intent to multisig 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -1001,7 +1145,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // Everclear: sending new order
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -1009,7 +1153,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to multisig 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -1203,6 +1363,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -1236,6 +1397,29 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     deal(config.usdt, config.safeAddress, 100_000e6);
     _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
 
+    deal(config.weth, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
+
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // POL: transferring to Binance
     vm.deal(config.safeAddress, 100 ether);
     _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
@@ -1249,9 +1433,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: Sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -1259,15 +1443,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -1275,7 +1475,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -1464,6 +1680,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -1498,6 +1715,28 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     vm.deal(config.safeAddress, 100 ether);
     _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
+    // FIXME: cbbtc rebalancing??
+
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    // deal(config.usdt, config.safeAddress, 100_000e6);
+    // _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
     deal(config.weth, config.safeAddress, 10 ether);
@@ -1516,9 +1755,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: Sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -1526,15 +1765,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -1542,7 +1797,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -1736,6 +2007,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -1768,6 +2040,26 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     vm.deal(config.safeAddress, 100 ether);
     _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
     _destinations[0] = 1;
@@ -1777,9 +2069,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -1787,15 +2079,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -1803,7 +2111,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -1818,10 +2142,10 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.inputAmount = 100e18;
     _params.outputAmount = 99e18;
     _params.nativeFee = 0.01 ether;
-    _params.destination = 30_101;
+    _params.destination = 30_184;
 
     vm.deal(config.safeAddress, 100 ether);
-    deal(config.usdt, config.safeAddress, 100_000e18);
+    deal(config.usdc, config.safeAddress, 100_000e18);
     _sendStargate(_params, config, config.safeAddress, addressConfig.stargateUsdc, false);
 
     //////////////////////////// Reverting Actions ////////////////////////////
@@ -1953,6 +2277,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -1970,6 +2295,14 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // Across: testing across spoke pool can be set as spender for each asset
     _approveAsset(config.weth, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
+
+    // Fallback 1: testing can transfer to fallback 1
+    _dealFundsFromActive(config.weth, 1 ether, BLAST_WHALE, config.safeAddress);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    _dealFundsFromActive(config.weth, 1 ether, BLAST_WHALE, config.safeAddress);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
 
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
@@ -1990,28 +2323,54 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[1] = 0.001 ether;
 
     // Everclear: sending new intent
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _sendNewIntent(
       _destinations,
       _amounts,
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
     // Everclear: sending new order
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _sendNewOrder(
       _destinations,
       _amounts,
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -2151,6 +2510,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -2184,6 +2544,26 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     vm.deal(config.safeAddress, 100 ether);
     _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
     deal(config.weth, config.safeAddress, 10 ether);
@@ -2202,9 +2582,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -2212,15 +2592,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -2228,7 +2624,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -2401,6 +2813,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -2425,6 +2838,26 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     deal(config.usdc, config.safeAddress, 100_000e6);
     _transferAsset(config.usdc, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
     _destinations[0] = 1;
@@ -2434,9 +2867,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -2444,15 +2877,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -2460,7 +2909,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -2477,7 +2942,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _params.message = '';
     _params.inputAmount = 100e6;
     _params.outputAmount = 90e6;
-    _params.nativeFee = 10 ether;
+    _params.nativeFee = 30 ether;
     _params.destination = 30_101;
 
     vm.deal(config.safeAddress, 100 ether);
@@ -2614,6 +3079,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -2633,6 +3099,20 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // Stargate: testing stargate can be approved for each asset
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
     _destinations[0] = 1;
@@ -2642,9 +3122,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -2652,15 +3132,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -2668,7 +3164,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -2804,6 +3316,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -2834,6 +3347,26 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _transferEth(APPROVED_CALLER, BINANCE_EVM_ADDRESS, 1 ether, config.roleKey, false);
     _transferEth(APPROVED_CALLER, BYBIT_EVM_ADDRESS, 1 ether, config.roleKey, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
     _destinations[0] = 1;
@@ -2843,9 +3376,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -2853,15 +3386,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -2869,7 +3418,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -3022,6 +3587,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -3045,6 +3611,22 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // Stargate: testing stargate can be approved for each asset
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.stargateUsdc, config, 100 ether, false);
 
+    // FIXME: Kraken transfer?
+
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
     deal(config.weth, config.safeAddress, 10 ether);
@@ -3063,9 +3645,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -3073,15 +3655,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -3089,7 +3687,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -3261,6 +3875,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -3283,6 +3898,26 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
     _approveAsset(config.usdt, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
     deal(config.weth, config.safeAddress, 10 ether);
@@ -3303,7 +3938,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // Everclear: sending new intent
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -3311,7 +3946,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new intent to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -3319,7 +3970,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
 
     // Everclear: sending new order
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -3327,7 +3978,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -3499,6 +4166,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -3514,10 +4182,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     // FeeAdapter: testing the test address can set approvals for each asset
     _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
+    _approveAsset(config.usdt, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
 
     // // Across: testing across spoke pool can be set as spender for each asset
     _approveAsset(config.weth, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, addressConfig.across, config, 100 ether, false);
+
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
 
     // WETH: approving weth to burn WETH then unwrapping
     _approveAsset(config.weth, APPROVED_CALLER, config.weth, config, 100 ether, false);
@@ -3537,9 +4226,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: ending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -3547,15 +4236,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -3563,7 +4268,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE
@@ -3710,6 +4431,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     vm.createSelectFork(vm.envString('RONIN_RPC'));
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -3726,12 +4448,28 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _approveAsset(config.weth, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
     _approveAsset(config.usdc, APPROVED_CALLER, config.feeAdapter, config, 100 ether, false);
 
+    // FIXME: native bridge?
+
     // Binance: testing can transfer to Binance
     deal(config.usdc, config.safeAddress, 100_000e6);
     _transferAsset(config.usdc, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
 
     deal(config.weth, config.safeAddress, 10 ether);
     _transferAsset(config.weth, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 10 ether, false);
+
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
 
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
@@ -3742,7 +4480,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: ending new intent
+    // Everclear: sending new intent
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
@@ -3870,6 +4608,7 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     ZodiacConfiguration memory config = _zodiacConfig[block.chainid];
     ExternalAddresses memory addressConfig = _addressConfig[block.chainid];
     vm.rollFork(config.fixedBlock);
+    vm.warp(config.validDeadline - 600);
 
     // Setting up the environment
     feeAdapter = IFeeAdapter(config.feeAdapter);
@@ -3898,6 +4637,26 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     deal(config.usdt, config.safeAddress, 100_000e6);
     _transferAsset(config.usdt, APPROVED_CALLER, BINANCE_EVM_ADDRESS, config, 1000e6, false);
 
+    // Fallback 1: testing can transfer to fallback 1
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_1, config, 1 ether, false);
+
+    // Fallback 2: testing can transfer to fallback 2
+    deal(config.usdc, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdc, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.usdt, config.safeAddress, 100_000e6);
+    _transferAsset(config.usdt, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1000e6, false);
+
+    deal(config.weth, config.safeAddress, 1 ether);
+    _transferAsset(config.weth, APPROVED_CALLER, FALLBACK_ADDRESS_2, config, 1 ether, false);
+
     // Everclear: sending an order via newOrder - payload pulled related to WETH and already approved via test above
     uint32[] memory _destinations = new uint32[](2);
     _destinations[0] = 1;
@@ -3907,9 +4666,9 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
     _amounts[0] = 1 ether;
     _amounts[1] = 0.001 ether;
 
-    // Everclear: sending new intent
+    // Everclear: sending new intent to prod safe 1
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewIntent(
       _destinations,
@@ -3917,15 +4676,31 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
       false,
       ZERO_TTL,
       ZERO_FEE
     );
 
-    // Everclear: sending new order
+    // Everclear: sending new intent to prod safe 2
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
-    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, config.safeAddress, false);
+    _sendNewIntent(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewIntent(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 1
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS, false);
     _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
     _sendNewOrder(
       _destinations,
@@ -3933,7 +4708,23 @@ contract ZodiacProdActions is MainnetProductionEnvironment, ZodiacHelper, Zodiac
       config,
       config.weth,
       APPROVED_CALLER,
-      config.safeAddress,
+      PROD_MULTI_SIG_ADDRESS,
+      false,
+      ZERO_TTL,
+      ZERO_FEE
+    );
+
+    // Everclear: sending new order to prod safe 2
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(_destinations, _amounts, config, config.weth, APPROVED_CALLER, PROD_MULTI_SIG_ADDRESS_2, false);
+    _dealFunds(config.weth, _amounts, config.validFee, config.safeAddress);
+    _sendNewOrder(
+      _destinations,
+      _amounts,
+      config,
+      config.weth,
+      APPROVED_CALLER,
+      PROD_MULTI_SIG_ADDRESS_2,
       false,
       ZERO_TTL,
       ZERO_FEE

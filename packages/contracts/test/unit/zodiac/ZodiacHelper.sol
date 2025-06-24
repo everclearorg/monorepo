@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IAcrossSpokePool, IRoleModule, ISafe, IStargatePool, IWETH} from './IHelpers.sol';
-import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import { IAcrossSpokePool, IRoleModule, ISafe, IStargatePool, IWETH } from './IHelpers.sol';
+import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 import 'forge-std/Test.sol';
-import {IFeeAdapter} from 'interfaces/intent/IFeeAdapter.sol';
+import { IFeeAdapter } from 'interfaces/intent/IFeeAdapter.sol';
 
 ///////////////////////////////// Ethereum /////////////////////////////////////////
 abstract contract Ethereum {
@@ -36,7 +36,7 @@ abstract contract EthereumProduction is Ethereum {
   uint256 public constant ETHEREUM_DEADLINE = 1_748_857_065;
   bytes public constant ETHEREUM_SIG =
     hex'639772df946ecc9c79ec939c79eba11e14254a8969bc59f8621b9316066bc32251af1c6bf9830c2a2e5e2a6c2a731a424e95721315e29961fe8e4252bbff95541b';
-  uint256 public constant ETHEREUM_FIXED_BLOCK = 22_616_104;
+  uint256 public constant ETHEREUM_FIXED_BLOCK = 22_775_516;
 }
 
 ///////////////////////////////// Arbitrum /////////////////////////////////////////
@@ -67,7 +67,7 @@ abstract contract ArbitrumProduction is Arbitrum {
   uint256 public constant ARBITRUM_DEADLINE = 1_748_859_652;
   bytes public constant ARBITRUM_SIG =
     hex'075f688399aaa2842ac0ed482614a63d1af58f3e3afd4b09b1659e1f46a783050de3cb047ed2c2dfffbd061f53f88b7ffa3bb57f137ff0856d53c270f689bd851c';
-  uint256 public constant ARBITRUM_FIXED_BLOCK = 343_097_778;
+  uint256 public constant ARBITRUM_FIXED_BLOCK = 350_774_417;
 }
 
 ///////////////////////////////// Optimism /////////////////////////////////////////
@@ -98,7 +98,7 @@ abstract contract OptimismProduction is Optimism {
   uint256 public constant OPTIMISM_DEADLINE = 1_748_859_907;
   bytes public constant OPTIMISM_SIG =
     hex'93bf6b7bbd199d3f8391ba97f87ea42c74058ec0dbd2931fbec138a4caa5bc0a0cbd44aa662df2fb98782fdd8f0936508d63c9a70ecf4208c6f187db7386ed1c1c';
-  uint256 public constant OPTIMISM_FIXED_BLOCK = 136_630_273;
+  uint256 public constant OPTIMISM_FIXED_BLOCK = 137_592_962;
 }
 
 ///////////////////////////////// Polygon /////////////////////////////////////////
@@ -128,7 +128,7 @@ abstract contract PolygonProduction is Polygon {
   uint256 public constant POLYGON_DEADLINE = 1_748_860_461;
   bytes public constant POLYGON_SIG =
     hex'9647949db2c6b3071c006eea4f60a6df6d9455e12c913358cd9a40dfe74164e46dbdf1fa9f8f9eeea58d134bbe65b24c663e666287dea12ad1973a47cc919bd91c';
-  uint256 public constant POLYGON_FIXED_BLOCK = 72_269_016;
+  uint256 public constant POLYGON_FIXED_BLOCK = 73_170_500;
 }
 
 ///////////////////////////////// Base /////////////////////////////////////////
@@ -158,7 +158,7 @@ abstract contract BaseProduction is Base {
   uint256 public constant BASE_DEADLINE = 1_748_860_591;
   bytes public constant BASE_SIG =
     hex'17801c4a8bfd2f8c5d2bf13127878997fd338ea575b40c7b92a497f8f44b06ed1d213d3f0240ab6f9b1d7fbea4a551be47687ca649c1f50a5d2cdee60196f2911c';
-  uint256 public constant BASE_FIXED_BLOCK = 31_035_330;
+  uint256 public constant BASE_FIXED_BLOCK = 31_997_694;
 }
 
 ///////////////////////////////// BSC /////////////////////////////////////////
@@ -187,7 +187,7 @@ abstract contract BscProduction is Bsc {
   uint256 public constant BSC_DEADLINE = 1_748_860_777;
   bytes public constant BSC_SIG =
     hex'd778458520627d5f6b2581508d0f1bbaee0e0ce790679ee84763c137a78a48792a2840d8142c508f8e6ada61bca2e77af3cb335e9c375723a12c7bfd50aa2e7d1c';
-  uint256 public constant BSC_FIXED_BLOCK = 50_744_214;
+  uint256 public constant BSC_FIXED_BLOCK = 52_026_951;
 }
 
 ///////////////////////////////// Sonic /////////////////////////////////////////
@@ -215,7 +215,7 @@ abstract contract SonicProduction is Sonic {
   uint256 public constant SONIC_DEADLINE = 1_748_861_421;
   bytes public constant SONIC_SIG =
     hex'ad74cf50f2857af923cc268b8cca4f52d954fda8466021ecd066bb138cdd1b58378308afc0dbad7e76c8161bc6f69ff6024eaffcb614a367565b628c405a40cd1b';
-  uint256 public constant SONIC_FIXED_BLOCK = 31_310_691;
+  uint256 public constant SONIC_FIXED_BLOCK = 35_719_712;
 }
 
 ///////////////////////////////// Berachain /////////////////////////////////////////
@@ -244,7 +244,7 @@ abstract contract BerachainProduction is Berachain {
   uint256 public constant BERACHAIN_DEADLINE = 1_748_861_774;
   bytes public constant BERACHAIN_SIG =
     hex'44a52681594bb8d4eb2b71f2a6ecdb12add6ceafc08132ee5522179eb353924947110ef29bac3f53660b0705da7cf80c26d9e2b039c1e31c2936a6008bab68961b';
-  uint256 public constant BERACHAIN_FIXED_BLOCK = 5_833_923;
+  uint256 public constant BERACHAIN_FIXED_BLOCK = 6_830_513;
 }
 
 ///////////////////////////////// Mantle /////////////////////////////////////////
@@ -274,7 +274,7 @@ abstract contract MantleProduction is Mantle {
   uint256 public constant MANTLE_DEADLINE = 1_748_861_883;
   bytes public constant MANTLE_SIG =
     hex'2ad78fe17890fb30826f322bf93da1896e7dad7503518296f1ec7f34279d2b1c250602be572721084903cf883a3effc0c3d6bc74fcb9d0736ac9d028f73aa8cb1c';
-  uint256 public constant MANTLE_FIXED_BLOCK = 80_365_499;
+  uint256 public constant MANTLE_FIXED_BLOCK = 81_327_255;
 }
 
 ///////////////////////////////// Blast /////////////////////////////////////////
@@ -305,7 +305,7 @@ abstract contract BlastProduction is Blast {
   uint256 public constant BLAST_DEADLINE = 1_748_867_578;
   bytes public constant BLAST_SIG =
     hex'c6e1208b32a538bb2936287c13955e895208185b4801a795b896d3df4976e34f64d5daf2a7ad4891bc84a99cb0c0e44546307879a878eb4db22667f5cd0fc68e1c';
-  uint256 public constant BLAST_FIXED_BLOCK = 20_028_594;
+  uint256 public constant BLAST_FIXED_BLOCK = 20_993_251;
 }
 
 ///////////////////////////////// Scroll /////////////////////////////////////////
@@ -335,7 +335,7 @@ abstract contract ScrollProduction is Scroll {
   uint256 public constant SCROLL_DEADLINE = 1_748_862_172;
   bytes public constant SCROLL_SIG =
     hex'95360e8a51c76f24cde27addd1d536db3cda6289af26d19b254830133217caa716d8a19e71f915d9f0c4c62c8ac60bb92268d3f6569adda4947a1e47b145c91c1c';
-  uint256 public constant SCROLL_FIXED_BLOCK = 16_167_846;
+  uint256 public constant SCROLL_FIXED_BLOCK = 16_713_263;
 }
 
 ///////////////////////////////// Ink /////////////////////////////////////////
@@ -364,7 +364,7 @@ abstract contract InkProduction is Ink {
   uint256 public constant INK_DEADLINE = 1_748_862_242;
   bytes public constant INK_SIG =
     hex'e8d07b1a60c32a6852f2e4cea0d5eb2aa88b303be324a9539f234419430d1e6d020ce3742af66a4da699801e997e223bc5e955ba596d0d510d63a745a18b22fa1c';
-  uint256 public constant INK_FIXED_BLOCK = 15_363_260;
+  uint256 public constant INK_FIXED_BLOCK = 17_286_492;
 }
 
 ///////////////////////////////// Unichain /////////////////////////////////////////
@@ -393,7 +393,7 @@ abstract contract UnichainProduction is Unichain {
   uint256 public constant UNICHAIN_DEADLINE = 1_748_867_094;
   bytes public constant UNICHAIN_SIG =
     hex'24ad6a6a47ec86289c35700646cff903faadc8b8b282b5efcdc6c6a5b01111a551362fd8e57ac85d8f7008d6951c2195f5bd6a1c0ad1c68311ed40fb9aae9ca31b';
-  uint256 public constant UNICHAIN_FIXED_BLOCK = 18_118_164;
+  uint256 public constant UNICHAIN_FIXED_BLOCK = 20_036_563;
 }
 
 ///////////////////////////////// Mode /////////////////////////////////////////
@@ -421,7 +421,7 @@ abstract contract ModeProduction is Mode {
   uint256 public constant MODE_DEADLINE = 1_748_867_230;
   bytes public constant MODE_SIG =
     hex'e42103156e712e5a55362c0299787edc77902220ef2a5950e87b47a4b87f57ad751978d71c0f656b276d0b69471313dd8843612157444bf04940f64563efb3d21c';
-  uint256 public constant MODE_FIXED_BLOCK = 24_349_642;
+  uint256 public constant MODE_FIXED_BLOCK = 25_308_680;
 }
 
 ///////////////////////////////// Ronin /////////////////////////////////////////
@@ -446,7 +446,7 @@ abstract contract RoninProduction is Ronin {
   uint256 public constant RONIN_DEADLINE = 1_748_868_475;
   bytes public constant RONIN_SIG =
     hex'6c3505c857b7a88158d6a7cd356ee73fae234538cdb265273d8b04fa66f8197c60faf0763f1ab16995f5e3479581bd8151281f63d14730f162a32b5b386396801c';
-  uint256 public constant RONIN_FIXED_BLOCK = 45_671_551;
+  uint256 public constant RONIN_FIXED_BLOCK = 46_310_380;
 }
 
 ///////////////////////////////// Avalanche /////////////////////////////////////////
@@ -475,7 +475,7 @@ abstract contract AvalancheProduction is Avalanche {
   uint256 public constant AVALANCHE_DEADLINE = 1_748_867_706;
   bytes public constant AVALANCHE_SIG =
     hex'21ec1bf427a7d0f40083abdc0e1140bd06e310c4600ef95cc4b57b4c7f7b24ff77d212cef13e685d7d35db7f2e9efc387bde1e603f1b4464ee7a2bd3235ed9dc1c';
-  uint256 public constant AVALANCHE_FIXED_BLOCK = 63_174_337;
+  uint256 public constant AVALANCHE_FIXED_BLOCK = 64_404_953;
 }
 
 // // NOTE: Unsupported in the API
@@ -543,7 +543,9 @@ abstract contract ZodiacProductionEnvironment is
   ModeProduction,
   RoninProduction,
   AvalancheProduction
-{}
+{
+
+}
 
 abstract contract ZodiacStagingEnvironment is
   EthereumStaging,
@@ -610,6 +612,8 @@ abstract contract ZodiacHelper is Test {
   }
 
   // Constants
+  address public constant FALLBACK_ADDRESS_1 = 0x9dbD7D37FA5EE9164011EF73D6BB4EE77f60a403;
+  address public constant FALLBACK_ADDRESS_2 = 0xD976faAa19135dB4B846e43DdAaA9C66db842B7B;
   address public constant BINANCE_EVM_ADDRESS = 0x815c54AbEdD9f4dB64f8B0Da39513f6bFB11eA03;
   address public constant BYBIT_EVM_ADDRESS = 0x0e35B40A780DfEe1D3fE9955602C3cF65c7A6a16;
   address public constant SAFE_TEST_ADDRESS = 0x2eEd1440842990Fa61F0c396f981375Fa6004131;
@@ -619,15 +623,18 @@ abstract contract ZodiacHelper is Test {
   address public constant PROD_MULTI_SIG_ADDRESS = 0xe569ea3158bB89aD5CFD8C06f0ccB3aD69e0916B;
   address public constant PROD_MULTI_SIG_ADDRESS_2 = 0x1d09f3b11A8FF71F4177da1969A53658A801dC0e;
 
-  uint256 public constant EXPECTED_THRESHOLD = 1;
+  uint256 public constant EXPECTED_THRESHOLD = 3;
   bytes4 public constant NEW_INTENT_ADDRESS_SELECTOR =
-    bytes4(keccak256('newIntent(uint32[],address,address,address,uint256,uint24,uint48,bytes,(uint256,uint256,bytes))'));
+    bytes4(
+      keccak256('newIntent(uint32[],address,address,address,uint256,uint24,uint48,bytes,(uint256,uint256,bytes))')
+    );
   address public constant INVALID_CALLER = address(0x123);
   address public constant INVALID_SPENDER = address(0x456);
   address public constant INVALID_RECEIVER = address(0x789);
   address public constant PROPOSER_1 = 0xb60d0C2E8309518373b40f8Eaa2CAd0d1De3deCb;
   address public constant PROPOSER_2 = 0xbB318a1ab8E46DFd93b3B0Bca3d0EBF7d00187B9;
-  bytes32 public constant INVALID_ROLE_KEY = bytes32(0x1000000000000000000000000000000000000000000000000000000000000001);
+  bytes32 public constant INVALID_ROLE_KEY =
+    bytes32(0x1000000000000000000000000000000000000000000000000000000000000001);
   uint48 public constant ZERO_TTL = 0;
   uint24 public constant ZERO_FEE = 0;
   uint48 public constant NONZERO_TTL = 1 days;
@@ -640,19 +647,15 @@ abstract contract ZodiacHelper is Test {
   mapping(uint256 => ExternalAddresses) public _addressConfig;
 
   ///////////////////////////////////////////// Helper Functions /////////////////////////////////////////////
-  function _checkRolesConfiguration(
-    ZodiacConfiguration memory config
-  ) public view {
+  function _checkRolesConfiguration(ZodiacConfiguration memory config) public view {
     assertEq(roleModule.owner(), config.safeAddress);
     assertEq(roleModule.avatar(), config.safeAddress);
     assertEq(roleModule.target(), config.safeAddress);
   }
 
-  function _checkSafeConfiguration(
-    ZodiacConfiguration memory config
-  ) public view {
+  function _checkSafeConfiguration(ZodiacConfiguration memory config) public view {
     ISafe safe = ISafe(config.safeAddress);
-    assertEq(safe.getThreshold(), EXPECTED_THRESHOLD);
+    assertGe(safe.getThreshold(), EXPECTED_THRESHOLD);
     assertEq(safe.isModuleEnabled(config.roleModule), true);
   }
 
@@ -729,7 +732,13 @@ abstract contract ZodiacHelper is Test {
     vm.stopPrank();
   }
 
-  function _wrapWETH(address _weth, uint256 _ethAmount, bytes32 _roleKey, address _caller, bool _expectRevert) internal {
+  function _wrapWETH(
+    address _weth,
+    uint256 _ethAmount,
+    bytes32 _roleKey,
+    address _caller,
+    bool _expectRevert
+  ) internal {
     vm.startPrank(_caller);
     if (_expectRevert) vm.expectRevert();
     bytes memory depositCalldata = abi.encodeWithSelector(IWETH.deposit.selector);
@@ -768,7 +777,7 @@ abstract contract ZodiacHelper is Test {
         composeMsg: _composeMsg,
         oftCmd: ''
       }),
-      IStargatePool.MessagingFee({nativeFee: _params.nativeFee, lzTokenFee: 0}),
+      IStargatePool.MessagingFee({ nativeFee: _params.nativeFee, lzTokenFee: 0 }),
       _refundAddress
     );
 
@@ -798,7 +807,7 @@ abstract contract ZodiacHelper is Test {
         composeMsg: '',
         oftCmd: ''
       }),
-      IStargatePool.MessagingFee({nativeFee: _params.nativeFee, lzTokenFee: 0}),
+      IStargatePool.MessagingFee({ nativeFee: _params.nativeFee, lzTokenFee: 0 }),
       _refundAddress
     );
 
@@ -806,12 +815,21 @@ abstract contract ZodiacHelper is Test {
     vm.startPrank(_params.caller);
     if (_expectRevert) vm.expectRevert();
     roleModule.execTransactionWithRole(
-      _stargate, _params.inputAmount + _params.nativeFee, sendCalldata, 0, _config.roleKey, true
+      _stargate,
+      _params.inputAmount + _params.nativeFee,
+      sendCalldata,
+      0,
+      _config.roleKey,
+      true
     );
     vm.stopPrank();
   }
 
-  function _sendDepositV3(BridgeParams memory _params, ZodiacConfiguration memory _config, bool _expectRevert) internal {
+  function _sendDepositV3(
+    BridgeParams memory _params,
+    ZodiacConfiguration memory _config,
+    bool _expectRevert
+  ) internal {
     // configuring the calldata
     bytes memory depositCalldata = abi.encodeWithSelector(
       IAcrossSpokePool.depositV3.selector,
@@ -860,10 +878,22 @@ abstract contract ZodiacHelper is Test {
     uint24 _maxFee
   ) public {
     // Configuring the calldata
-    IFeeAdapter.FeeParams memory feeParams =
-      IFeeAdapter.FeeParams({fee: config.validFee, deadline: config.validDeadline, sig: config.validSignature});
+    IFeeAdapter.FeeParams memory feeParams = IFeeAdapter.FeeParams({
+      fee: config.validFee,
+      deadline: config.validDeadline,
+      sig: config.validSignature
+    });
     bytes memory newIntentCalldata = abi.encodeWithSelector(
-      NEW_INTENT_ADDRESS_SELECTOR, _destinations, _receiver, _asset, address(0), 1 ether, _ttl, _maxFee, '', feeParams
+      NEW_INTENT_ADDRESS_SELECTOR,
+      _destinations,
+      _receiver,
+      _asset,
+      address(0),
+      1 ether,
+      _ttl,
+      _maxFee,
+      '',
+      feeParams
     );
 
     // Calling the module
@@ -921,7 +951,11 @@ abstract contract ZodiacHelper is Test {
 
     // Configuring the calldata
     bytes memory newOrderCalldata = abi.encodeWithSelector(
-      IFeeAdapter.newOrder.selector, config.validFee, config.validDeadline, config.validSignature, _orderParams
+      IFeeAdapter.newOrder.selector,
+      config.validFee,
+      config.validDeadline,
+      config.validSignature,
+      _orderParams
     );
 
     // Calling the module
@@ -963,7 +997,11 @@ abstract contract ZodiacHelper is Test {
 
     // Configuring the calldata
     bytes memory newOrderCalldata = abi.encodeWithSelector(
-      IFeeAdapter.newOrder.selector, config.validFee, config.validDeadline, config.validSignature, _orderParams
+      IFeeAdapter.newOrder.selector,
+      config.validFee,
+      config.validDeadline,
+      config.validSignature,
+      _orderParams
     );
 
     // Calling the module
@@ -1005,7 +1043,11 @@ abstract contract ZodiacHelper is Test {
 
     // Configuring the calldata
     bytes memory newOrderCalldata = abi.encodeWithSelector(
-      IFeeAdapter.newOrder.selector, config.validFee, config.validDeadline, config.validSignature, _orderParams
+      IFeeAdapter.newOrder.selector,
+      config.validFee,
+      config.validDeadline,
+      config.validSignature,
+      _orderParams
     );
 
     // Calling the module
@@ -1077,7 +1119,11 @@ abstract contract ZodiacHelper is Test {
 
     // Configuring the calldata
     bytes memory newOrderCalldata = abi.encodeWithSelector(
-      IFeeAdapter.newOrder.selector, config.validFee, config.validDeadline, config.validSignature, _orderParams
+      IFeeAdapter.newOrder.selector,
+      config.validFee,
+      config.validDeadline,
+      config.validSignature,
+      _orderParams
     );
 
     // Calling the module
@@ -1149,7 +1195,11 @@ abstract contract ZodiacHelper is Test {
 
     // Configuring the calldata
     bytes memory newOrderCalldata = abi.encodeWithSelector(
-      IFeeAdapter.newOrder.selector, config.validFee, config.validDeadline, config.validSignature, _orderParams
+      IFeeAdapter.newOrder.selector,
+      config.validFee,
+      config.validDeadline,
+      config.validSignature,
+      _orderParams
     );
 
     // Calling the module
@@ -1222,7 +1272,11 @@ abstract contract ZodiacHelper is Test {
 
     // Configuring the calldata
     bytes memory newOrderCalldata = abi.encodeWithSelector(
-      IFeeAdapter.newOrder.selector, config.validFee, config.validDeadline, config.validSignature, _orderParams
+      IFeeAdapter.newOrder.selector,
+      config.validFee,
+      config.validDeadline,
+      config.validSignature,
+      _orderParams
     );
 
     // Calling the module
