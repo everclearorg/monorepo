@@ -86,7 +86,8 @@ describe('RpcProviderAggregator', () => {
     stub(transaction, 'params').get(() => TEST_FULL_TX);
 
     // Testing instance
-    chainProvider = new RpcProviderAggregator(logger, domain, config, privateKey);
+    chainProvider = new RpcProviderAggregator(logger, domain, config);
+    await chainProvider.setSigner(privateKey);
     // // One block = 10ms for the purposes of testing.
     // (chainProvider as any).blockPeriod = 10;
     // stub(chainProvider as any, 'execute').callsFake(fakeExecuteMethod as any);
