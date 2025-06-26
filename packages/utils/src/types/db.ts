@@ -35,6 +35,9 @@ export const TIntentStatus = {
   // hub -> settlement message sent, or unsupported intent returned via hyperlane
   // origin -> intent message sent
   // destination -> fill message sent (optional)
+
+  // NOTE: This status is used only for Solana transactions
+  Delivered: 'DELIVERED',
 } as const;
 export type TIntentStatus = (typeof TIntentStatus)[keyof typeof TIntentStatus];
 
@@ -87,7 +90,7 @@ export const IntentSchema = Type.Object({
 export type Intent = Static<typeof IntentSchema>;
 
 export const OnchainTransactionContextSchema = Type.Object({
-  transactionHash: Type.String({ maxLength: 66 }),
+  transactionHash: Type.String({ maxLength: 130 }),
   blockNumber: Type.Integer(),
   gasLimit: TIntegerString,
   gasPrice: TIntegerString,
@@ -116,6 +119,10 @@ export const OriginIntentSchema = Type.Intersect([
     queueIdx: Type.Integer(),
     messageId: Type.Optional(Type.String({ maxLength: 66 })),
     status: Type.Enum(TIntentStatus),
+    nativeFee: Type.Optional(TIntegerString),
+    tokenFee: Type.Optional(TIntegerString),
+    feeAdapterInitiator: Type.Optional(TAddress),
+    orderId: Type.Optional(TBytes32),
   }),
 ]);
 export type OriginIntent = Static<typeof OriginIntentSchema>;
@@ -232,6 +239,9 @@ export type HubDeposit = Static<typeof HubDepositSchema>;
 export const DepositQueueSchema = Type.Intersect([
   MessageQueueSchema,
   Type.Object({
+    blockNumber: Type.Integer(),
+  }),
+  Type.Object({
     type: Type.Literal(QueueType.Deposit),
     tickerHash: TBytes32,
     epoch: Type.Integer(),
@@ -344,22 +354,6 @@ export const DepoitorEventSchema = Type.Intersect([
 ]);
 export type DepositorEvent = Static<typeof DepoitorEventSchema>;
 
-export const ShadowEventSchema = Type.Object({
-  address: Type.String({ maxLength: 66 }),
-  blockHash: Type.String({ maxLength: 66 }),
-  blockNumber: Type.Number(),
-  blockTimestamp: Type.Date(),
-  chain: Type.String({ maxLength: 20 }),
-  network: Type.String({ maxLength: 20 }),
-  topic0: Type.String({ maxLength: 66 }),
-  transactionHash: Type.String({ maxLength: 66 }),
-  transactionIndex: Type.Number(),
-  transactionLogIndex: Type.Number(),
-  timestamp: Type.Date(),
-  latency: Type.String(),
-});
-export type ShadowEvent = Static<typeof ShadowEventSchema>;
-
 export const VoteSchema = Type.Object({
   domain: Type.Number(),
   votes: Type.String(),
@@ -437,3 +431,16 @@ export const LockPositionSchema = Type.Object({
   expiry: Type.Number(),
 });
 export type LockPosition = Static<typeof LockPositionSchema>;
+
+export const OrderSchema = Type.Intersect([
+  OnchainTransactionContextSchema,
+  Type.Object({
+    id: Type.String({ maxLength: 66 }),
+    autoId: Type.Number(),
+    tokenFee: TIntegerString,
+    nativeFee: TIntegerString,
+    intentIds: Type.Array(TBytes32),
+    initiator: TAddress,
+  }),
+]);
+export type Order = Static<typeof OrderSchema>;

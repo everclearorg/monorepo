@@ -51,6 +51,11 @@ variable "postgres_user" {
   default = "everclear"
 }
 
+variable "postgrest_jwt_secret" {
+  type    = string
+  default = "neverclear"
+}
+
 variable "dd_api_key" {
   type      = string
   sensitive = true

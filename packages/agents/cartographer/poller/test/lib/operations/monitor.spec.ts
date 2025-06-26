@@ -109,7 +109,7 @@ describe('Monitor operations', () => {
     it('should work', async () => {
       const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
       // should work for both hub and spoke destination domain
-      const messages = createMessages(5, [{  destinationDomain: mockAppContext.config.hub.domain }]);
+      const messages = createMessages(5, [{ destinationDomain: mockAppContext.config.hub.domain }]);
       (mockAppContext.adapters.database.getMessagesByStatus as SinonStub).resolves(messages);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 

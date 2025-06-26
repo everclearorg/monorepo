@@ -26,6 +26,8 @@ import {
   OnchainTransaction,
   TransactionBuffer,
   ITransactionReceipt,
+  ISigner,
+  getVmFromDomainId,
 } from './shared';
 import { ChainConfig } from './config';
 import { RpcProviderAggregator } from './aggregator';
@@ -75,10 +77,9 @@ export class TransactionDispatch extends RpcProviderAggregator {
     logger: Logger,
     public readonly domain: number,
     config: ChainConfig,
-    signer: string,
     startLoops = true,
   ) {
-    super(logger, domain, config, signer);
+    super(logger, domain, config);
     this.inflightBuffer = new TransactionBuffer(logger, TransactionDispatch.MAX_INFLIGHT_TRANSACTIONS, {
       name: 'INFLIGHT',
       domain: this.domain,
@@ -90,6 +91,10 @@ export class TransactionDispatch extends RpcProviderAggregator {
     if (startLoops) {
       this.startLoops();
     }
+  }
+
+  public async setSigner(signer: ISigner | string) {
+    await super.setSigner(signer);
   }
 
   /**
@@ -372,23 +377,33 @@ export class TransactionDispatch extends RpcProviderAggregator {
             }
           }
 
-          // Estimate gas here will throw if the transaction is going to revert on-chain for "legit" reasons. This means
-          // that, if we get past this method, we can *generally* assume that the transaction will go through on submit - although it's
-          // still possible to revert due to a state change below.
-          const attemptedNonces: number[] = [];
-          const [gasLimit, gasPrice, nonceInfo] = await Promise.all([
-            minTx.gasLimit ? Promise.resolve(minTx.gasLimit) : this.estimateGas(minTx),
-            minTx.gasPrice ? Promise.resolve(minTx.gasPrice) : this.getGasPrice(requestContext),
-            this.determineNonce(attemptedNonces),
-          ]);
-          let { nonce, backfill, transactionCount } = nonceInfo;
-
           // TODO: Remove hardcoded (exposed gasLimitInflation config var should replace this).
           const gas: Gas = {
-            limit: gasLimit,
-            price: gasPrice,
+            limit: '0',
+            price: '0',
           };
+          let nonce = 0;
+          let backfill = false;
+          let transactionCount = 0;
+          const attemptedNonces: number[] = [];
 
+
+          if (getVmFromDomainId(this.domain) !== 'svm') {
+            // Estimate gas here will throw if the transaction is going to revert on-chain for "legit" reasons. This means
+            // that, if we get past this method, we can *generally* assume that the transaction will go through on submit - although it's
+            // still possible to revert due to a state change below.
+            const [gasLimit, gasPrice, nonceInfo] = await Promise.all([
+              minTx.gasLimit ? Promise.resolve(minTx.gasLimit) : this.estimateGas(minTx),
+              minTx.gasPrice ? Promise.resolve(minTx.gasPrice) : this.getGasPrice(requestContext),
+              this.determineNonce(attemptedNonces),
+            ]);
+            gas.limit = gasLimit;
+            gas.price = gasPrice;
+            nonce = nonceInfo.nonce;
+            backfill = nonceInfo.backfill;
+            transactionCount = nonceInfo.transactionCount;
+          }
+          
           switch (this.domain) {
             // Arbitrum gasLimit hardcode
             case 42161:

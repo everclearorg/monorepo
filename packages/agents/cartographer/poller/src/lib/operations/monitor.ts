@@ -5,8 +5,9 @@ import {
   TMessageType,
   TSettlementMessageType,
   createLoggingContext,
-  getMaxEpoch,
+  getMaxBlockNumber,
   getMaxTxNonce,
+  SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 
 import { getContext } from '../../shared';
@@ -44,8 +45,8 @@ export const updateMessages = async () => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateMessages.name);
 
-  const domains = Object.keys(config.chains).concat(config.hub.domain);
-  for (const domain of domains) {
+  const evmDomains = Object.keys(config.chains).filter(d => config.chains[d].network === 'evm').concat(config.hub.domain);
+  for (const domain of evmDomains) {
     // Retrieve the most recent timestamp
     const latestNonce = await database.getCheckPoint('message_' + domain);
 
@@ -124,8 +125,8 @@ export const updateQueues = async () => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateQueues.name);
 
-  const spokes = Object.keys(config.chains).filter((c) => c !== config.hub.domain);
-  logger.debug('Method start', requestContext, methodContext, { spokes, hub: config.hub.domain });
+  const evmDomains = Object.keys(config.chains).filter((c) => c !== config.hub.domain && config.chains[c].network === 'evm');
+  logger.debug('Method start', requestContext, methodContext, { spokes: evmDomains, hub: config.hub.domain });
 
   const settlementQueues = await subgraph.getSettlementQueues(config.hub.domain);
   logger.debug('Retrieved settlement queues', requestContext, methodContext, {
@@ -134,10 +135,13 @@ export const updateQueues = async () => {
 
   // Deposit queues are configured by `epoch-origin_domain-tickerhash`
   // There could be many more deposit queues than message queues, so these require a checkpoint
-  const prevEpoch = await database.getCheckPoint('hub_queue_deposit');
-  const depositQueues = await subgraph.getDepositQueues(config.hub.domain, prevEpoch);
+  const prevBlock = await database.getCheckPoint('hub_queue_deposit');
+  const depositQueues = await subgraph.getDepositQueues(config.hub.domain, prevBlock);
+  logger.debug('Retrieved deposit queues', requestContext, methodContext, {
+    depositQueues
+  });
 
-  const spokeSubgraphReturn = await Promise.all(spokes.map((s) => subgraph.getSpokeQueues(s)));
+  const spokeSubgraphReturn = await Promise.all(evmDomains.map((s) => subgraph.getSpokeQueues(s)));
   const spokeQueues = [...spokeSubgraphReturn.flat()];
   logger.debug('Retrieved spoke queues', requestContext, methodContext, {
     spokeQueues: spokeQueues.length,
@@ -149,9 +153,9 @@ export const updateQueues = async () => {
     queues: new Set(queues.map((q) => q.id)).size,
   });
 
-  const latestEpoch = getMaxEpoch(depositQueues);
-  await database.saveCheckPoint('hub_queue_deposit', latestEpoch);
-  logger.debug('Saved checkpoint', requestContext, methodContext, { latestEpoch });
+  const latestBlock = getMaxBlockNumber(depositQueues);
+  await database.saveCheckPoint('hub_queue_deposit', latestBlock);
+  logger.debug('Saved checkpoint', requestContext, methodContext, { latestBlock });
 
   logger.debug('Method complete', requestContext, methodContext, {
     queues: queues.map((q) => ({ id: q.id, domain: q.domain, size: q.size, lastProcessed: q.lastProcessed })),
@@ -178,8 +182,11 @@ export const updateMessageStatus = async () => {
       result: uncompletedMessages.length,
     });
 
+    // Skip messages going to solana, they will be updated by lighthouse
+    const messagesToProcess = uncompletedMessages.filter(message => message.destinationDomain !== SOLANA_CHAINID);
+
     const statusRes = await Promise.all(
-      uncompletedMessages.map(async (message) => {
+      messagesToProcess.map(async (message) => {
         const status = await getMessageStatus(message.id, config, message.destinationDomain);
         return { id: message.id, status };
       }),

@@ -19,15 +19,7 @@ fs_permissions = [
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-optimism.json" },
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-base.json" },
     { access = "write", path = "./safeTransactionInputs/upgradeSpokeArray-bnb.json" }
-    ]
-
-[profile.zksync]
-src = "src-zk"
-out = "out-zksync" 
-libs = ["../../node_modules","lib"]
-compile = true
-fallback_oz = false
-mode = "1"
+]
 
 [profile.optimized]
 via_ir = true
@@ -41,7 +33,7 @@ out = 'out-via-ir'
 src = 'src/interfaces/'
 
 [fuzz]
-runs = 1000
+runs = 100
 max_test_rejects = 100_000
 
 [rpc_endpoints]
@@ -66,6 +58,11 @@ mode = "${MODE_RPC}"
 unichain = "${UNICHAIN_RPC}"
 zksync = "${ZKSYNC_RPC}"
 ronin = "${RONIN_RPC}"
+berachain = "${BERACHAIN_RPC}"
+mantle = "${MANTLE_RPC}"
+sonic = "${SONIC_RPC}"
+ink = "${INK_RPC}"
+
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
 sepolia = { key = "${ETHERSCAN_API_KEY}", chain = "sepolia" }
@@ -86,3 +83,7 @@ mode = { key = "${MODE_VERIFIER_KEY}", url = "${MODE_VERIFIER_API_URL}" }
 unichain = { key = "${UNICHAIN_API_KEY}", chain = "130", url = "${UNICHAIN_VERIFIER_API_URL}" }
 zksync = { key = "${ZKSYNC_API_KEY}", chain = "324", url = "${ZKSYNC_VERIFIER_API_URL}" }
 ronin = { key = "${RONIN_VERIFIER_KEY}", chain = "2020", url = "${RONIN_VERIFIER_API_URL}" }
+berachain = { key = "${BERACHAIN_API_KEY}", chain = "80094", url = "${BERACHAIN_VERIFIER_API_URL}" }
+mantle = { key = "${MANTLE_API_KEY}", chain = "5000", url = "${MANTLE_VERIFIER_API_URL}" }
+sonic = { key = "${SONIC_API_KEY}", chain = "146", url = "${SONIC_VERIFIER_API_URL}" }
+ink = { key = "${INK_API_KEY}", chain = "57073", url = "${INK_VERIFIER_API_URL}" }

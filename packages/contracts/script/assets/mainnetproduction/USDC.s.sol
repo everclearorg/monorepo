@@ -29,14 +29,14 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
                               TOKEN FEES 
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](1);
-    _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 2}); // 0.2 BPS
+    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](0);
+    // _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 0}); // 0 BPS
 
     /*///////////////////////////////////////////////////////////////
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](14);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](19);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -164,6 +164,51 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    ///// Berachain
+    _assetConfigs[14] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BERACHAIN_USDC.toBytes32(),
+      domain: BERACHAIN,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Sonic
+    _assetConfigs[15] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SONIC_USDC.toBytes32(),
+      domain: SONIC,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Mantle
+    _assetConfigs[16] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MANTLE_USDC.toBytes32(),
+      domain: MANTLE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Ink
+    _assetConfigs[17] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: INK_USDC.toBytes32(),
+      domain: INK,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ////// Solana
+    _assetConfigs[18] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SOLANA_USDC,
+      domain: SOLANA,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
                           TOKEN SETUP 
     //////////////////////////////////////////////////////////////*/
@@ -172,8 +217,8 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
-      maxDiscountDbps: 12, // 1.2 BPS
-      discountPerEpoch: 3, // 0.3 BPS
+      maxDiscountDbps: 0, // 0 BPS
+      discountPerEpoch: 0, // 0 BPS
       fees: _fees,
       adoptedForAssets: _assetConfigs
     });

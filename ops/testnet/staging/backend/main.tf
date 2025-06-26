@@ -23,7 +23,7 @@ data "aws_route53_zone" "primary" {
 }
 
 locals {
-  db_alarm_emails = ["preetham@proximalabs.io", "wang@proximalabs.io", "layne@proximalabs.io"]
+  db_alarm_emails = ["preetham@proximalabs.io", "layne@proximalabs.io"]
 }
 
 module "cartographer_db" {

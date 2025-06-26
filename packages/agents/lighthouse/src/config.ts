@@ -19,6 +19,7 @@ import {
   TSafeConfig,
   TokenVolumeReward,
   TokenStakingReward,
+  TSolanaConfig,
 } from '@chimera-monorepo/utils';
 import { InvalidConfig } from './errors';
 import { getSsmParameter } from './tasks/helpers/mockable';
@@ -31,14 +32,7 @@ const DEFAULT_GAS_LIMIT = 30_000_000;
 const DEFAULT_HEALTH_BASE_URI = 'https://uptime.betterstack.com/api/v1/heartbeat/';
 const DEFAULT_REWARDS_CONFIG = {
   volume: {
-    tokens: [
-      {
-        // 750000 CLEAR
-        epochVolumeReward: '750000000000000000000000',
-        baseRewardDbps: 12,
-        maxBpsUsdVolumeCap: 250000000,
-      },
-    ],
+    tokens: [],
   },
   staking: {
     tokens: [
@@ -73,6 +67,7 @@ export const TLighthouseService = Type.Union([
   Type.Literal('invoice'),
   Type.Literal('reward'),
   Type.Literal('reward_metadata'),
+  Type.Literal('solana'),
 ]);
 export type LighthouseService = Static<typeof TLighthouseService>;
 
@@ -106,6 +101,7 @@ export const TLighthouseConfig = Type.Object({
       requesterEmail: Type.Optional(Type.String()),
     }),
   ),
+  solana: TSolanaConfig,
 });
 export type LighthouseConfig = Static<typeof TLighthouseConfig>;
 
@@ -164,7 +160,15 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     (x) => +x,
   );
 
-  const hubConfig = configJson.hub || configFile.hub || everclearConfig?.hub || {};
+  const hubConfig = {
+    domain: configJson?.hub?.domain || configFile?.hub?.domain || everclearConfig?.hub.domain,
+    providers: configJson?.hub?.providers || configFile?.hub?.providers || everclearConfig?.hub.providers,
+    deployments: configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments,
+    subgraphUrls:
+      configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [],
+    confirmations: configJson?.hub?.confirmations || configFile?.hub?.confirmations,
+    assets: configJson?.hub?.assets || configFile?.hub?.assets || everclearConfig?.hub.assets,
+  };
   const abiConfig =
     configJson.abis || configFile.abis || everclearConfig?.abis || getDefaultABIConfig(environment, hubConfig.domain);
 
@@ -219,8 +223,9 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
 
   const rewards = configJson.rewards || configFile.rewards || {};
   if (rewards.volume?.tokens) {
-    rewards.volume.tokens = rewards.volume.tokens.map((item: TokenVolumeReward, index: number) => {
-      return { ...DEFAULT_REWARDS_CONFIG.volume.tokens[index], ...item };
+    rewards.volume.tokens = rewards.volume.tokens.map((item: TokenVolumeReward) => {
+      // return { ...DEFAULT_REWARDS_CONFIG.volume.tokens[index], ...item };
+      return { ...item };
     });
   }
   if (rewards.staking?.tokens) {
@@ -241,7 +246,7 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     signer: process.env.LIGHTHOUSE_SIGNER || configJson?.signer || configFile?.signer || '',
     relayers: configJson.relayers || configFile.relayers || [],
     rewards,
-    logLevel: (process.env.LIGHTHOUSE_LOG_LEVEL || configFile?.logLevel || 'info') as LogLevel,
+    logLevel: (process.env.LIGHTHOUSE_LOG_LEVEL || configJson?.logLevel || configFile?.logLevel || 'info') as LogLevel,
     environment,
     network,
     service: (process.env.LIGHTHOUSE_SERVICE || configFile?.service || 'intent') as LighthouseService,
@@ -249,6 +254,7 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     coingecko: configJson?.coingecko || configFile?.coingecko || '',
     safe: configJson?.safe || configFile?.safe || {},
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},
+    solana: configJson?.solana || configFile?.solana || {},
   };
 
   // Validate schema

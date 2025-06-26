@@ -201,6 +201,7 @@ export const send = async (
   destinationAddress: string,
   encodedData: string,
   value: string,
+  funcSig: string,
   gelatoApiKey: string,
   chainReader: ChainReader,
   logger: Logger,
@@ -230,6 +231,7 @@ export const send = async (
     data: encodedData,
     from: relayerAddress,
     value: '0',
+    funcSig,
   });
 
   logger.info('Sending tx to relayer', requestContext, methodContext, {

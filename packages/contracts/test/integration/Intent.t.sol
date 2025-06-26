@@ -7,7 +7,7 @@ import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecuri
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 import {Vm} from 'forge-std/Vm.sol';
-import {console} from 'forge-std/console.sol';
+import {console2 as console} from 'forge-std/console2.sol';
 
 import {MessageLib} from 'contracts/common/MessageLib.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
@@ -68,6 +68,8 @@ contract Intent_Integration is IntegrationBase {
 
     bytes memory _intentCalldata = abi.encode(makeAddr('target'), abi.encodeWithSignature('doSomething()'));
 
+    uint256 _intentAmount = 100 * 10 ** 6;
+
     _intent = IEverclear.Intent({
       initiator: _user.toBytes32(),
       receiver: _user.toBytes32(),
@@ -78,7 +80,7 @@ contract Intent_Integration is IntegrationBase {
       nonce: 1,
       timestamp: uint48(block.timestamp),
       ttl: uint48(1 days),
-      amount: 1e32,
+      amount: 100 * 10 ** 18, // scaled
       destinations: _dest,
       data: _intentCalldata
     });
@@ -91,11 +93,11 @@ contract Intent_Integration is IntegrationBase {
     // create new intent
     vm.prank(_user);
     (_intentId, _intent) = sepoliaEverclearSpoke.newIntent(
-      _dest, _user, address(oUSDT), address(dUSDT), 100 ether, Constants.MAX_FEE, uint48(1 days), _intentCalldata
+      _dest, _user, address(oUSDT), address(dUSDT), _intentAmount, Constants.MAX_FEE, uint48(1 days), _intentCalldata
     );
 
-    assertEq(oUSDT.balanceOf(_user), _prevUserBalance - 100 ether);
-    assertEq(oUSDT.balanceOf(address(sepoliaEverclearSpoke)), _prevSpokeBalance + 100 ether);
+    assertEq(oUSDT.balanceOf(_user), _prevUserBalance - _intentAmount);
+    assertEq(oUSDT.balanceOf(address(sepoliaEverclearSpoke)), _prevSpokeBalance + _intentAmount);
 
     // create intent message
     IEverclear.Intent[] memory _intents = new IEverclear.Intent[](1);
@@ -144,52 +146,61 @@ contract Intent_Integration is IntegrationBase {
                         DESTINATION DOMAIN 
   //////////////////////////////////////////////////////////////*/
 
-    // switch to destination fork
-    vm.selectFork(BSC_TESTNET_FORK);
+    {
+      // switch to destination fork
+      vm.selectFork(BSC_TESTNET_FORK);
 
-    // deal output asset to solver
-    uint256 _depositAmount = 100 ether * (10 ** (18 - 6));
-    deal(address(dUSDT), _solver2, _depositAmount);
+      // deal output asset to solver
+      uint256 _depositAmount = _intent.amount; // 18 decimals
+      deal(address(dUSDT), _solver2, _depositAmount);
 
-    vm.startPrank(_solver2);
-    // approve Everclear spoke
-    dUSDT.approve(address(bscEverclearSpoke), type(uint256).max);
+      vm.startPrank(_solver2);
+      // approve Everclear spoke
+      dUSDT.approve(address(bscEverclearSpoke), type(uint256).max);
 
-    uint256 _prevSolverBalance = dUSDT.balanceOf(_solver2);
-    _prevSpokeBalance = dUSDT.balanceOf(address(bscEverclearSpoke));
+      uint256 _prevSolverBalance = dUSDT.balanceOf(_solver2);
+      _prevSpokeBalance = dUSDT.balanceOf(address(bscEverclearSpoke));
 
-    vm.expectEmit(address(bscEverclearSpoke));
-    emit Deposited(_solver2, address(dUSDT), _depositAmount);
+      vm.expectEmit(address(bscEverclearSpoke));
+      emit Deposited(_solver2, address(dUSDT), _depositAmount);
 
-    // deposit output asset
-    bscEverclearSpoke.deposit(address(dUSDT), _depositAmount);
+      // deposit output asset
+      bscEverclearSpoke.deposit(address(dUSDT), _depositAmount);
 
-    assertEq(dUSDT.balanceOf(_solver2), _prevSolverBalance - _depositAmount);
-    assertEq(dUSDT.balanceOf(address(bscEverclearSpoke)), _prevSpokeBalance + _depositAmount);
+      assertEq(dUSDT.balanceOf(_solver2), _prevSolverBalance - _depositAmount, 'post-deposit solver balance incorrect');
+      assertEq(
+        dUSDT.balanceOf(address(bscEverclearSpoke)),
+        _prevSpokeBalance + _depositAmount,
+        'post-deposit contract balance incorrect'
+      );
 
-    vm.mockCall(makeAddr('target'), abi.encodeWithSignature('doSomething()'), abi.encode(true));
+      vm.mockCall(makeAddr('target'), abi.encodeWithSignature('doSomething()'), abi.encode(true));
 
-    vm.expectEmit(address(bscEverclearSpoke));
-    emit ExternalCalldataExecuted(_intentId, abi.encode(true));
+      vm.expectEmit(address(bscEverclearSpoke));
+      emit ExternalCalldataExecuted(_intentId, abi.encode(true));
 
-    vm.expectEmit(address(bscEverclearSpoke));
-    emit IntentFilled(_intentId, _solver2, _intent.maxFee, 1, _intent);
+      vm.expectEmit(address(bscEverclearSpoke));
+      emit IntentFilled(_intentId, _solver2, _intent.maxFee, 1, _intent);
 
-    // execute user intent
-    _fillMessage = bscEverclearSpoke.fillIntent(_intent, _intent.maxFee);
+      // execute user intent
+      _fillMessage = bscEverclearSpoke.fillIntent(_intent, _intent.maxFee);
 
-    assertEq(
-      dUSDT.balanceOf(address(bscEverclearSpoke)), _prevSpokeBalance + (_depositAmount * _intent.maxFee / 100_000)
-    );
+      uint256 _out = _intentAmount - (_intentAmount * _intent.maxFee / 100_000);
+      assertEq(
+        dUSDT.balanceOf(address(bscEverclearSpoke)),
+        _prevSpokeBalance + _depositAmount - _out,
+        'post-fill contract balance incorrect'
+      );
 
-    vm.stopPrank();
+      vm.stopPrank();
 
-    // deal lighthouse
-    vm.deal(LIGHTHOUSE, 100 ether);
+      // deal lighthouse
+      vm.deal(LIGHTHOUSE, 100 ether);
 
-    // process fill queue
-    vm.prank(LIGHTHOUSE);
-    bscEverclearSpoke.processFillQueue{value: 1 ether}(1);
+      // process fill queue
+      vm.prank(LIGHTHOUSE);
+      bscEverclearSpoke.processFillQueue{value: 1 ether}(1);
+    }
 
     /*///////////////////////////////////////////////////////////////
                          EVERCLEAR DOMAIN 
@@ -271,7 +282,7 @@ contract Intent_Integration is IntegrationBase {
     );
 
     vm.expectEmit(address(bscEverclearSpoke));
-    emit Settled(_intentId, _solver2, address(oUSDT), 100 ether - (100 ether * 3000 / 100_000));
+    emit Settled(_intentId, _solver2, address(oUSDT), _intentAmount - (_intentAmount * 3000 / 100_000));
 
     // deliver settlement message to spoke
     vm.prank(makeAddr('caller'));

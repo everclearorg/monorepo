@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber, utils, Wallet } from 'ethers';
-import { createStubInstance, reset, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { BigNumber, utils } from 'ethers';
+import { reset, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { mkBytes32, Logger, mkAddress, mock, expect } from '@chimera-monorepo/utils';
 
-import { ChainConfig, DEFAULT_CHAIN_CONFIG } from '../../src/config';
 import { TransactionDispatch } from '../../src/dispatch';
 import { RpcProviderAggregator } from '../../src/aggregator';
 import {
@@ -16,7 +15,10 @@ import {
   TransactionProcessingError,
   TransactionReplaced,
   TransactionReverted,
-} from '../../src/shared';
+  ChainConfig,
+  DEFAULT_CHAIN_CONFIG,
+  EthWallet,
+} from '../../src';
 import {
   makeChaiReadable,
   MockOnchainTransactionState,
@@ -38,7 +40,7 @@ const ADDRESS = mkAddress('0xaaa');
 const OG_MAX_INFLIGHT_TRANSACTIONS = (TransactionDispatch as any).MAX_INFLIGHT_TRANSACTIONS;
 const txReceiptMock = mock.ethers.receipt();
 
-let signer: SinonStubbedInstance<Wallet>;
+let signer: SinonStubbedInstance<EthWallet>;
 let transaction: OnchainTransaction;
 let txDispatch: TransactionDispatch;
 let getGasPriceStub: SinonStub;
@@ -83,8 +85,8 @@ describe('TransactionDispatch', () => {
 
     ({ state: mockTransactionState, transaction } = getMockOnchainTransaction());
 
-    const wallet = Wallet.createRandom();
-    signer = stub(Wallet.prototype);
+    const wallet = EthWallet.createRandom();
+    signer = stub(EthWallet.prototype);
     signer.sendTransaction.resolves(TEST_TX_RESPONSE);
     signer.getTransactionCount.resolves(TEST_TX_RESPONSE.nonce);
     signer.connect.returns(signer);

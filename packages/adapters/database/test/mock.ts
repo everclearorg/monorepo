@@ -17,7 +17,6 @@ import {
   mkAddress,
   mkBytes32,
   mkHash,
-  ShadowEvent,
   TokenomicsEvent,
   MerkleTree,
   NewLockPositionEvent,
@@ -66,7 +65,6 @@ export const createMockDatabase = (): Database => {
     refreshInvoicesView: stub().resolves(),
     getInvoicesByStatus: stub().resolves([]),
     getLatestTimestamp: stub().resolves(Date.UTC(2024, 0)),
-    getShadowEvents: stub().resolves([]),
     getVotes: stub().resolves([]),
     getTokenomicsEvents: stub().resolves([]),
     getSettledIntentsInEpoch: stub().resolves([]),
@@ -78,6 +76,7 @@ export const createMockDatabase = (): Database => {
     saveEpochResults: stub().resolves(),
     getLockPositions: stub().resolves([]),
     saveLockPositions: stub().resolves(),
+    getOriginIntentsLastNonce: stub().resolves(0),
   };
 };
 
@@ -110,6 +109,10 @@ export const createOriginIntent = (overrides: Partial<OriginIntent> = {}): Origi
   gasPrice: '12234234',
   txOrigin: mkAddress('0x123'),
   txNonce: 1,
+  tokenFee: undefined,
+  nativeFee: undefined,
+  feeAdapterInitiator: undefined,
+  orderId: undefined,
   ...overrides,
 });
 
@@ -289,7 +292,7 @@ export const createInvoices = (num: number, overrides: Partial<Invoice>[] = []):
   let a = overrides[0].originIntent;
   return Array(num)
     .fill(0)
-    .map((_, i) => 
+    .map((_, i) =>
       createInvoice({
         id: mkBytes32(`0xaa`),
         originIntent: createOriginIntent(overrides[i].originIntent),
@@ -429,24 +432,12 @@ export const createHubDeposit = (overrides: Partial<HubDeposit> = {}): HubDeposi
   ...overrides,
 });
 
-export const createShadowEvent = (overrides: Partial<ShadowEvent> = {}): ShadowEvent => ({
-  address: mkBytes32('0x1'),
-  blockHash: mkBytes32('0x1'),
+export const createTokenomicsEvent = (overrides: Partial<TokenomicsEvent> = {}): TokenomicsEvent & { vid: number } => ({
+  vid: 1,
   blockNumber: 1,
-  blockTimestamp: new Date(),
-  chain: 'Everclear',
-  network: '25327',
-  topic0: mkBytes32('0x1'),
+  blockTimestamp: Math.floor(Date.now() / 1000),
   transactionHash: mkBytes32('0x1'),
-  transactionIndex: 0,
-  transactionLogIndex: 0,
-  ...overrides,
-});
-
-export const createTokenomicsEvent = (overrides: Partial<TokenomicsEvent> = {}): TokenomicsEvent => ({
-  blockNumber: 1,
-  blockTimestamp: Date.now() / 1000,
-  transactionHash: mkBytes32('0x1'),
+  insertTimestamp: Math.floor(Date.now() / 1000),
   ...overrides,
 });
 

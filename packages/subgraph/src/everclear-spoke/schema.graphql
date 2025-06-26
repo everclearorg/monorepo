@@ -34,6 +34,12 @@ type OriginIntent @entity {
 
   # Add Intent Transaction
   addEvent: IntentAddEvent!
+
+  # Fees information
+  fees: IntentFeesAdded
+
+  # Order information (if part of an order)
+  order: OrderCreated
 }
 
 type IntentAddEvent @entity(immutable: true) {
@@ -275,6 +281,7 @@ type Meta @entity {
   gateway: Bytes
   lighthouse: Bytes
   messageReceiver: Bytes
+  feeAdapterRecipient: Bytes
 }
 
 type StrategyForAsset @entity {
@@ -287,4 +294,59 @@ type ModuleForStrategy @entity {
   id: Bytes!
   strategy: BigInt!
   module: Bytes!
+}
+
+type IntentFeesAdded @entity(immutable: true) {
+  id: Bytes!
+
+  intent: OriginIntent!
+  initiator: Bytes!
+
+  nativeFee: BigInt!
+  tokenFee: BigInt!
+
+  # Transaction info
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+type FeeRecipientUpdated @entity(immutable: true) {
+  id: Bytes!
+
+  updated: Bytes!
+  previous: Bytes!
+
+  # Transaction info
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
+}
+
+type OrderCreated @entity(immutable: true) {
+  id: Bytes! # order id (hash of intent ids)
+  initiator: Bytes!
+  intents: [OriginIntent!]! # all intents in this order
+  tokenFee: BigInt!
+  nativeFee: BigInt!
+
+  # Transaction info
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+
+  txNonce: BigInt!
 }

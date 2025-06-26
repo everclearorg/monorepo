@@ -1,0 +1,19 @@
+{
+  "chainId": "167000",
+  "createdAt": "1744732583000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Taiko | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000391bbeaffe82ccb3570f18f615ae5ab4d6ea2fc000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

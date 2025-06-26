@@ -9,7 +9,28 @@ import {
   TThresholdsConfig,
   TRelayerConfig,
   TLogLevel,
+  TSolanaConfig,
 } from '@chimera-monorepo/utils';
+
+// Extend the chain config to include gas threshold properties
+export const TExtendedChainConfig = Type.Intersect([
+  TChainConfig,
+  Type.Object({
+    minGasOnRelayer: Type.Optional(Type.Number()),
+    minGasOnGateway: Type.Optional(Type.Number()),
+    maxDelayedSubgraphBlock: Type.Optional(Type.Number()),
+  }),
+]);
+
+// Extend the hub config to include gas threshold properties
+export const TExtendedHubConfig = Type.Intersect([
+  THubConfig,
+  Type.Object({
+    minGasOnRelayer: Type.Optional(Type.Number()),
+    minGasOnGateway: Type.Optional(Type.Number()),
+    maxDelayedSubgraphBlock: Type.Optional(Type.Number()),
+  }),
+]);
 
 export enum CheckItem {
   All = 'all',
@@ -46,8 +67,8 @@ export const TServerConfig = Type.Object({
 export const TMonitorConfigSchema = Type.Object({
   environment: Type.String(),
   network: Type.String(),
-  hub: THubConfig,
-  chains: Type.Record(Type.String(), TChainConfig),
+  hub: TExtendedHubConfig,
+  chains: Type.Record(Type.String(), TExtendedChainConfig),
   agents: TAgents,
   redis: TOptionalPeripheralConfig,
   server: TServerConfig,
@@ -80,9 +101,18 @@ export const TMonitorConfigSchema = Type.Object({
     }),
   ),
   healthUrls: Type.Partial(Type.Record(TService, Type.String({ format: 'uri' }))),
-  shadowTables: Type.Optional(Type.Array(Type.String())),
   tokenomicsTables: Type.Optional(Type.Array(Type.String())),
+  solana: TSolanaConfig,
 });
-export type MonitorConfig = Static<typeof TMonitorConfigSchema>;
+
+// Type definitions for the extended configs
+export type ExtendedChainConfig = Static<typeof TExtendedChainConfig>;
+export type ExtendedHubConfig = Static<typeof TExtendedHubConfig>;
+
+export type MonitorConfig = Static<typeof TMonitorConfigSchema> & {
+  chains: Record<string, ExtendedChainConfig>;
+  hub: ExtendedHubConfig;
+};
+
 export type TelegramConfig = Static<typeof TMonitorConfigSchema>['telegram'];
 export type BetterUptimeConfig = Static<typeof TMonitorConfigSchema>['betterUptime'];

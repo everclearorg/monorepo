@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'fs';
 import { getEverclearConfig, ajv, EVERCLEAR_CONFIG_URL, getDefaultABIConfig } from '@chimera-monorepo/utils';
 import { RelayerConfig, RelayerConfigSchema } from './lib/entities';

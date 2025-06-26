@@ -1,10 +1,9 @@
 import { Logger, mkAddress } from '@chimera-monorepo/utils';
 import { CachedTaskData, TasksCache } from '@chimera-monorepo/adapters-cache';
-import { Wallet } from 'ethers';
 import { createStubInstance } from 'sinon';
 
-import { AppContext, RelayerConfig } from '../src/lib/entities';
-import { ChainService } from '@chimera-monorepo/chainservice';
+import { AppContext, RelayerConfig } from '../src/lib';
+import { ChainService, EthWallet } from '@chimera-monorepo/chainservice';
 
 export const createRelayerConfig = (overrides: Partial<RelayerConfig> = {}) => {
   const config = {
@@ -67,7 +66,7 @@ export const createAppContext = (overrides: Partial<RelayerConfig> = {}): AppCon
       ...overrides,
     }) as RelayerConfig,
     adapters: {
-      wallet: createStubInstance(Wallet),
+      wallet: createStubInstance(EthWallet),
       cache: {
         tasks: createStubInstance(TasksCache),
       },
@@ -86,6 +85,7 @@ export const createTask = (overrides: Partial<CachedTaskData> = {}): CachedTaskD
       token: mkAddress(),
       chain: 1338,
     },
+    funcSig: 'foo()',
     ...overrides,
   };
 };

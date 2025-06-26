@@ -17,6 +17,7 @@ import {
   DepositQueue,
   SettlementIntent,
   TIntentStatus,
+  Order,
 } from '@chimera-monorepo/utils';
 import { SubgraphConfig } from './lib/entities';
 import { getHelpers } from './lib/helpers';
@@ -44,6 +45,7 @@ import {
   getHubIntentByIdQuery,
   getSettlementIntentEventQuery,
   getInvoiceEnqueuedByIntentId,
+  getOrdersByNonce,
 } from './lib';
 
 import {
@@ -65,6 +67,7 @@ import {
   DepositQueueEntity,
   IntentStatus,
   IntentSettlementEventEntity,
+  OrderEntity,
 } from './lib/operations/entities';
 
 let context: { config: SubgraphConfig };
@@ -122,6 +125,9 @@ export class SubgraphReader {
       if (response[i].status === 'fulfilled') {
         const data = (response[i] as PromiseFulfilledResult<QueryResponse<{ _meta: MetaEntity }>>).value;
         result.set(data.domain, data.data._meta.block.number);
+      } else {
+        // Check if the response is a rejected promise before accessing reason
+        console.error(jsonifyError((response[i] as PromiseRejectedResult).reason as Error), { domain: domains[i] });
       }
     }
 
@@ -222,10 +228,10 @@ export class SubgraphReader {
     return queues;
   }
 
-  public async getDepositQueues(hubDomain: string, fromEpoch: number): Promise<DepositQueue[]> {
+  public async getDepositQueues(hubDomain: string, fromBlock: number): Promise<DepositQueue[]> {
     const { parser } = getHelpers();
     const response = await this.query<{ depositQueues: DepositQueueEntity[]; _meta: MetaEntity }>(hubDomain, [
-      getDepositQueuesQuery(fromEpoch),
+      getDepositQueuesQuery(fromBlock),
     ]);
 
     const queues = (response?.data.depositQueues ?? []).map((e) => parser.depositQueue(e));
@@ -322,7 +328,7 @@ export class SubgraphReader {
     queryParams: Map<string, SubgraphQueryMetaParams>,
   ): Promise<DestinationIntent[]> {
     const { parser } = getHelpers();
-    const domains = queryParams.keys();
+    const domains = Array.from(queryParams.keys());
     const requests = [];
     for (const domain of domains) {
       const param = queryParams.get(domain)!;
@@ -379,5 +385,24 @@ export class SubgraphReader {
       requests!.data.invoiceEnqueuedEvents.map((e) => parser.hubInvoiceFromInvoiceEnqueued(domain, e)),
       requests!.data.invoiceEnqueuedEvents.map((e) => parser.hubIntentFromInvoiceEnqueued(domain, e)),
     ];
+  }
+
+  public async getOrdersByNonce(
+    queryParams: Map<string, SubgraphQueryMetaParams>,
+  ): Promise<(Order & { domain: string })[]> {
+    const { parser } = getHelpers();
+    const domains = [...queryParams.keys()];
+    const requests = [];
+    for (const domain of domains) {
+      const param = queryParams.get(domain)!;
+      requests.push(
+        this.query<{ orderCreateds: OrderEntity[]; _meta: MetaEntity }>(domain, [
+          getOrdersByNonce(param.latestNonce, param.maxBlockNumber, param.orderDirection),
+        ]),
+      );
+    }
+
+    const response = (await Promise.allSettled(requests)).filter(isFulfilled).map((r) => r.value);
+    return response.flatMap((data, idx) => (data?.data?.orderCreateds ?? []).map((e) => parser.order(domains[idx], e)));
   }
 }

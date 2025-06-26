@@ -17,7 +17,6 @@ import {
   HubInvoice,
   HubDeposit,
   SettlementIntent,
-  ShadowEvent,
   Vote,
   TokenomicsEvent,
   MerkleTree,
@@ -25,6 +24,7 @@ import {
   EpochResult,
   NewLockPositionEvent,
   LockPosition,
+  Order,
 } from '@chimera-monorepo/utils';
 import { Pool } from 'pg';
 import { TxnClientForRepeatableRead } from 'zapatos/db';
@@ -68,7 +68,6 @@ import {
   getLatestInvoicesByTickerHash,
   getLatestHubInvoicesByTickerHash,
   getLatestTimestamp,
-  getShadowEvents,
   getVotes,
   getTokenomicsEvents,
   getSettledIntentsInEpoch,
@@ -80,6 +79,11 @@ import {
   getNewLockPositionEvents,
   getLockPositions,
   saveLockPositions,
+  saveOrders,
+  getOrders,
+  getOriginIntentsLastNonce,
+  getDeliveredSettlements,
+  updateSettlementStatus,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
@@ -216,12 +220,6 @@ export type Database = {
     timestampColumnName: string,
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<Date>;
-  getShadowEvents: (
-    table: string,
-    from: Date,
-    limit: number,
-    _pool?: Pool | TxnClientForRepeatableRead,
-  ) => Promise<ShadowEvent[]>;
   getVotes: (epoch: number, _pool?: Pool | TxnClientForRepeatableRead) => Promise<Vote[]>;
   getTokenomicsEvents: (
     table: string,
@@ -230,7 +228,11 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<TokenomicsEvent[]>;
   getMerkleTrees: (epochEnd: number, _pool?: Pool | TxnClientForRepeatableRead) => Promise<MerkleTree[]>;
-  getLatestMerkleTree: (asset: string, epochEndMillis: number, _pool?: Pool | TxnClientForRepeatableRead) => Promise<MerkleTree[]>;
+  getLatestMerkleTree: (
+    asset: string,
+    epochEndMillis: number,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<MerkleTree[]>;
   saveMerkleTrees: (merkleTree: MerkleTree[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveRewards: (rewards: Reward[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveEpochResults: (epochResult: EpochResult[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
@@ -249,6 +251,15 @@ export type Database = {
     check: string,
     point: number,
     lockPositions: LockPosition[],
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<void>;
+  saveOrders: (orders: Order[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  getOrders: (orderIds: string[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<Order[]>;
+  getOriginIntentsLastNonce: (origin: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
+  getDeliveredSettlements: (domain: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<SettlementIntent[]>;
+  updateSettlementStatus: (
+    intentId: string,
+    status: intent_status,
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
 };
@@ -307,7 +318,6 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getLatestHubInvoicesByTickerHash,
     getTokens,
     getLatestTimestamp,
-    getShadowEvents,
     getVotes,
     getTokenomicsEvents,
     getMerkleTrees,
@@ -318,6 +328,11 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getNewLockPositionEvents,
     getLockPositions,
     saveLockPositions,
+    saveOrders,
+    getOrders,
+    getOriginIntentsLastNonce,
+    getDeliveredSettlements,
+    updateSettlementStatus,
   };
 };
 

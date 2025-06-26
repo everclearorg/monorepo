@@ -8,6 +8,8 @@ import {
   ITransactionReceipt,
 } from '../types';
 import { getEthRpcProvider } from './eth';
+import { getTronRpcProvider } from './tron';
+import { getSolanaRpcProvider } from './solana';
 export { SyncProvider } from './eth';
 
 // VM Type mappings
@@ -16,8 +18,12 @@ export { SyncProvider } from './eth';
 // NOTE: These can be used to strongly type the RpcProvider responses
 export const SupportedVms = {
   evm: 'evm',
+  tvm: 'tvm',
+  svm: 'svm',
 } as const;
 export type SupportedVm = (typeof SupportedVms)[keyof typeof SupportedVms];
+
+export const MAX_CONFIRMATION = 10000;
 
 export interface SignerTypeMaps {
   [SupportedVms.evm]: Signer;
@@ -73,8 +79,8 @@ export type RpcProvider = {
   getDecimals: (address: string) => Promise<number>;
   // Signer Methods
   getTransactionCount: (address: string, block: number | string) => Promise<number>;
-  getSigner: (signer: string | ISigner) => ISigner;
-  connect: (signer: ISigner | string) => ISigner;
+  getSigner: (signer: string | ISigner) => Promise<ISigner>;
+  connect: (signer: ISigner | string) => Promise<ISigner>;
 };
 
 /**
@@ -85,7 +91,15 @@ export const getVmFromDomainId = (domainId: number): SupportedVm => {
   if (domainId === 0) {
     throw new Error(`Invalid domain id: ${domainId}`);
   }
-  return 'evm';
+  switch (domainId) {
+    case 728126428:
+    case 2494104990:
+      return SupportedVms.tvm;
+    case 1399811149:
+      return SupportedVms.svm;
+    default:
+      return SupportedVms.evm;
+  }
 };
 
 /**
@@ -97,6 +111,10 @@ export const getRpcClient = (domainId: number, url: string): RpcProvider => {
   switch (vm) {
     case SupportedVms.evm:
       return getEthRpcProvider(domainId, url);
+    case SupportedVms.tvm:
+      return getTronRpcProvider(domainId, url);
+    case SupportedVms.svm:
+      return getSolanaRpcProvider(domainId, url);
     default:
       throw new Error(`Unsupported vm: ${vm}`);
   }

@@ -51,12 +51,22 @@ variable "postgres_user" {
   default = "everclear"
 }
 
+variable "postgrest_jwt_secret" {
+  type    = string
+  default = "neverclear"
+}
+
 variable "dd_api_key" {
   type      = string
   sensitive = true
 }
 
 variable "graph_api_key" {
+  type      = string
+  sensitive = true
+}
+
+variable "gelato_everclear_rpc_key" {
   type      = string
   sensitive = true
 }

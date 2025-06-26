@@ -46,14 +46,14 @@
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "5.0.1",
-    "husky": "8.0.3",
+    "husky": "^9.1.7",
     "prettier": "3.2.5",
     "rimraf": "5.0.1",
     "sort-package-json": "2.10.0"
   },
   "dependencies": {
     "fastify": "4.26.2",
-    "zapatos": "6.4.0"
+    "zapatos": "6.5.0"
   },
   "packageManager": "yarn@3.3.1"
 }

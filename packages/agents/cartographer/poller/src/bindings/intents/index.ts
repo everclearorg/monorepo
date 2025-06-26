@@ -6,6 +6,7 @@ import {
   updateDestinationIntents,
   updateSettlementIntents,
   updateHubIntents,
+  updateOrders,
 } from '../../lib/operations';
 
 export const bindIntents = async (context: AppContext) => {
@@ -16,6 +17,7 @@ export const bindIntents = async (context: AppContext) => {
   const { requestContext, methodContext } = createLoggingContext(bindIntents.name);
   try {
     logger.debug('Bind intents polling loop start', requestContext, methodContext);
+    await updateOrders();
     await updateOriginIntents();
     await updateDestinationIntents();
     await updateHubIntents();

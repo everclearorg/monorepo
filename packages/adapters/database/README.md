@@ -9,7 +9,8 @@ docker build --tag db:latest --file ./docker/db/Dockerfile .
 - Run Postgres locally:
 
 ```sh
-docker run --name cartographer-db --rm -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=qwerty db
+# Use this command to ensure when `dbmate up` is run the proper schema is generated
+yarn workspace @chimera-monorepo/database docker:start:postgres
 ```
 
 - Run database migrations:
@@ -33,6 +34,9 @@ DATABASE_URL=postgres://postgres:qwerty@localhost:5432/everclear?sslmode=disable
 
 # Updating DB Schema
 
+**NOTE:** If you are using goldsky sinks, you will have to create a migration to ensure zapatos types are
+properly generated during local development.
+
 In order to update the database schema, create a new migration:
 
 ```sh
@@ -48,6 +52,7 @@ yarn workspace @chimera-monorepo/database dbmate up
 Create the Typescript schema using [Zapatos](https://jawj.github.io/zapatos/):
 
 ```sh
+# See note above re: goldksy sinks
 yarn workspace @chimera-monorepo/database zapatos
 ```
 

@@ -16,7 +16,7 @@ export const jsonifyError = (error: EverclearError | Error): ErrorJson => {
   return {
     message: error.message,
     type: error.name,
-    context: {},
+    context: (error as any).context ?? {},
     stack: error.stack,
   };
 };

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {EverclearSpoke, IEverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
+import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
+import {EverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
+import {EverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {SafeTxBuilder} from 'test/utils/SafeTxBuilder.sol';
 
@@ -64,8 +66,16 @@ contract UpgradeHelper is SafeTxBuilder {
     address spokeImpl;
   }
 
+  struct DeploymentParamsV4 {
+    address owner;
+    address spokeProxy;
+    address spokeImpl;
+    address feeAdapter;
+  }
+
   error Create3DeploymentFailed();
   error UpgradeFailed();
+  error NoFeeAdapter();
 
   bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
   address constant CREATE_3 = 0x9fBB3DF7C40Da2e5A0dE984fFE2CCB7C47cd0ABf;
@@ -78,9 +88,73 @@ contract UpgradeHelper is SafeTxBuilder {
   address public MAILBOX_MAINNET = 0xc005dc82818d67AF737725bD4bf75435d065D239;
   uint256 public FIXED_MAIN_BLOCK = 21_244_576;
   uint32 constant HUB_ID = 25_327;
+  address public HUB_GATEWAY_PROD = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
 
   EverclearSpoke public spokeProxy;
   DeploymentParams public _params;
+  DeploymentParamsV4 public _paramsV3;
 
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
+
+  /**
+   * **********************  Solana Upgrade  **********************
+   */
+  EverclearSpokeV3 public spokeProxyV3;
+
+  /**
+   * **********************  FeeAdapter Upgrade  **********************
+   */
+  EverclearSpokeV4 public spokeProxyV4;
+
+  address public SPOKE_IMPL_MAINNET_V2 = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+
+  address public FEE_RECIPIENT_MAINNET = SPOKE_PROXY_MAINNET_OWNER;
+  uint256 public FEE_SIGNER_PK = 1;
+  address public FEE_SIGNER = vm.addr(FEE_SIGNER_PK);
+  address XERC20_MODULE_MAINNET;
+  uint256 public FIXED_MAIN_BLOCK_UP2 = 22_146_818;
+
+  mapping(uint256 _chainId => DeploymentParamsV4 _params) internal _deploymentParamsV4;
+
+  function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
+    state.permit = address(spokeProxy.PERMIT2());
+    state.EVERCLEAR = spokeProxy.EVERCLEAR();
+    state.DOMAIN = spokeProxy.DOMAIN();
+    state.lighthouse = spokeProxy.lighthouse();
+    state.watchtower = spokeProxy.watchtower();
+    state.messageReceiver = spokeProxy.messageReceiver();
+    state.gateway = address(spokeProxy.gateway());
+    state.callExecutor = address(spokeProxy.callExecutor());
+    state.paused = spokeProxy.paused();
+    state.nonce = spokeProxy.nonce();
+    state.messageGasLimit = spokeProxy.messageGasLimit();
+  }
+
+  function _cacheSpokeStateV3() internal view returns (CachedSpokeState memory state) {
+    state.permit = address(spokeProxyV3.PERMIT2());
+    state.EVERCLEAR = spokeProxyV3.EVERCLEAR();
+    state.DOMAIN = spokeProxyV3.DOMAIN();
+    state.lighthouse = spokeProxyV3.lighthouse();
+    state.watchtower = spokeProxyV3.watchtower();
+    state.messageReceiver = spokeProxyV3.messageReceiver();
+    state.gateway = address(spokeProxyV3.gateway());
+    state.callExecutor = address(spokeProxyV3.callExecutor());
+    state.paused = spokeProxyV3.paused();
+    state.nonce = spokeProxyV3.nonce();
+    state.messageGasLimit = spokeProxyV3.messageGasLimit();
+  }
+
+  function _cacheSpokeStateV4() internal view returns (CachedSpokeState memory state) {
+    state.permit = address(spokeProxyV4.PERMIT2());
+    state.EVERCLEAR = spokeProxyV4.EVERCLEAR();
+    state.DOMAIN = spokeProxyV4.DOMAIN();
+    state.lighthouse = spokeProxyV4.lighthouse();
+    state.watchtower = spokeProxyV4.watchtower();
+    state.messageReceiver = spokeProxyV4.messageReceiver();
+    state.gateway = address(spokeProxyV4.gateway());
+    state.callExecutor = address(spokeProxyV4.callExecutor());
+    state.paused = spokeProxyV4.paused();
+    state.nonce = spokeProxyV4.nonce();
+    state.messageGasLimit = spokeProxyV4.messageGasLimit();
+  }
 }

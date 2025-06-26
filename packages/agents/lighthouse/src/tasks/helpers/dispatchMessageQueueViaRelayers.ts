@@ -7,12 +7,13 @@ import {
   domainToChainId,
   jsonifyError,
   getNtpTimeSeconds,
+  SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 import { Interface, arrayify, keccak256, defaultAbiCoder } from 'ethers/lib/utils';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 import { getContext } from '../../context';
 import { getQueueMethodName, getTypeHash } from './getMessageQueueConstants';
-import { RelayerSendFailed } from '../../errors/tasks';
+import { RelayerSendFailed } from '../../errors';
 import { BigNumber } from 'ethers';
 
 const DEFAULT_SIGNATURE_TTL = 60 * 60; // 60 minutes
@@ -30,6 +31,11 @@ const DESTINATION_GAS_CONSUMPTION: Record<QueueType, number> = {
 // NOTE: When sending messages from hub, may hit the gas limit on the origin if the destination chain
 // has a higher gas limit. These values are derived from forge.
 const MAX_SETTLEMENT_DEQUEUE = 900;
+// Solana settlement message is limited because of the 1kb tx size limit.
+const MAX_SETTLEMENT_DEQUEUE_SOLANA = 1;
+
+// NOTE: We are now capping intents because of hyperlane gas calculations
+const MAX_INTENT_DEQUEUE = 6;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
@@ -87,7 +93,19 @@ export const dispatchMessageQueueViaRelayers = async (
     .div(BPS_DENOMINATOR + DEFAULT_GAS_BUFFER)
     .sub(BASE_GAS);
   const calculatedMax = gasAvailable.div(DESTINATION_GAS_CONSUMPTION[type]).toNumber();
-  const maxDequeue = type === QueueType.Settlement ? Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE) : calculatedMax;
+  let maxDequeue = calculatedMax;
+  switch (type) {
+    case QueueType.Settlement:
+      if (destinationDomain === SOLANA_CHAINID) {
+        maxDequeue = Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE_SOLANA);
+      } else {
+        maxDequeue = Math.min(calculatedMax, MAX_SETTLEMENT_DEQUEUE);
+      }
+      break;
+    case QueueType.Intent:
+      maxDequeue = Math.min(calculatedMax, MAX_INTENT_DEQUEUE);
+      break;
+  }
 
   if (maxDequeue === 0) {
     logger.warn('Unable to retrieve max dequeue elements', requestContext, methodContext, {
@@ -117,6 +135,7 @@ export const dispatchMessageQueueViaRelayers = async (
       to: everclear,
       data: everclearIface.encodeFunctionData('nonces', [walletAddr]),
       domain: +transactionDomain,
+      funcSig: everclearIface.getFunction('nonces').format(),
     },
     blockTag,
   );
@@ -127,6 +146,16 @@ export const dispatchMessageQueueViaRelayers = async (
     const toDequeue = Math.min(maxDequeue, totalIntents - i);
     // Trim intents to match max elements, sorted by block number
     const trimmedIntents = sortedContents.slice(i, i + toDequeue);
+    if (trimmedIntents.length !== toDequeue) {
+      logger.error('Trimmed intents do not match dequeue target', requestContext, methodContext, undefined, {
+        trimmedIntents: trimmedIntents.length ? trimmedIntents : '[]',
+        toDequeue,
+        sortedContents: sortedContents.length ? sortedContents : '[]',
+        totalIntents,
+        index: i,
+      });
+      break;
+    }
 
     // NOTE: the signature _must_ include the relayer address, meaning a different
     // relayer transaction will be required for each configured relayer.
@@ -178,8 +207,9 @@ export const dispatchMessageQueueViaRelayers = async (
           signer: walletAddr,
         });
 
+        const queueMethodName = getQueueMethodName(type);
         const tx: WriteTransaction = {
-          data: everclearIface.encodeFunctionData(getQueueMethodName(type), [
+          data: everclearIface.encodeFunctionData(queueMethodName, [
             queue.domain,
             type === 'INTENT' ? trimmedIntents : toDequeue,
             relayerAddress,
@@ -191,6 +221,7 @@ export const dispatchMessageQueueViaRelayers = async (
           to: everclear,
           value: '0',
           domain: +transactionDomain,
+          funcSig: everclearIface.getFunction(queueMethodName).format(),
         };
 
         logger.debug('Sending process queue transaction to relayer', requestContext, methodContext, {
@@ -211,6 +242,7 @@ export const dispatchMessageQueueViaRelayers = async (
           tx.to,
           tx.data,
           tx.value,
+          tx.funcSig,
           [relayer],
           chainservice,
           logger,

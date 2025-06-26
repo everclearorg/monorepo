@@ -1,0 +1,19 @@
+{
+  "chainId": "56",
+  "createdAt": "1744279631000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | BNB | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000d18c19169e7c87e7d84f27ad412a56c5d743d56000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000024c4d66de800000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c7500000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

@@ -91,6 +91,12 @@ interface IEverclearSpoke is ISpokeStorage {
    */
   event ExternalCalldataExecuted(bytes32 indexed _intentId, bytes _returnData);
 
+  /**
+   * @notice Emitted when feeAdapter is updated
+   * @param _newFeeAdapter The new fee adapter
+   */
+  event FeeAdapterUpdated(address _newFeeAdapter);
+
   /*///////////////////////////////////////////////////////////////
                               ERRORS
   //////////////////////////////////////////////////////////////*/

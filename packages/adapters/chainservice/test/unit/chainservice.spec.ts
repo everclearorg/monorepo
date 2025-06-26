@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Wallet } from 'ethers';
 import { restore, reset, createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { expect, Logger, EverclearError } from '@chimera-monorepo/utils';
 
-import { ChainService } from '../../src/chainservice';
 import { TransactionDispatch } from '../../src/dispatch';
-import { ConfigurationError, ProviderNotConfigured, TransactionReverted } from '../../src/shared';
-import { ChainConfig, DEFAULT_CHAIN_CONFIG } from '../../src/config';
+import {
+  ChainConfig,
+  DEFAULT_CHAIN_CONFIG,
+  ConfigurationError,
+  ProviderNotConfigured,
+  TransactionReverted,
+  ChainService,
+  EthWallet,
+} from '../../src';
 import {
   makeChaiReadable,
   TEST_TX,
@@ -21,7 +26,7 @@ const logger = new Logger({
   name: 'ChainServiceTest',
 });
 
-let signer: SinonStubbedInstance<Wallet>;
+let signer: SinonStubbedInstance<EthWallet>;
 let chainService: ChainService;
 let dispatch: SinonStubbedInstance<TransactionDispatch>;
 const chains = {
@@ -31,7 +36,7 @@ const chains = {
     confirmations: 1,
   } as ChainConfig,
 };
-const wallet = Wallet.createRandom();
+const wallet = EthWallet.createRandom();
 
 /// In these tests, we are testing the outer shell of chainservice - the interface, not the core functionality.
 /// For core functionality tests, see dispatch.spec.ts and provider.spec.ts.
@@ -39,8 +44,8 @@ const wallet = Wallet.createRandom();
 describe('ChainService', () => {
   beforeEach(() => {
     dispatch = createStubInstance(TransactionDispatch);
-    const wallet = Wallet.createRandom();
-    signer = stub(Wallet.prototype);
+    const wallet = EthWallet.createRandom();
+    signer = stub(EthWallet.prototype);
     signer.sendTransaction.resolves(TEST_TX_RESPONSE);
     signer.getTransactionCount.resolves(TEST_TX_RESPONSE.nonce);
     signer.connect.returns(signer);
@@ -101,7 +106,7 @@ describe('ChainService', () => {
           confirmations: 1,
         },
       };
-      expect(() => (chainService as any).setupProviders(context, signer)).to.throw(ConfigurationError);
+      expect((chainService as any).setupProviders(context, signer)).to.be.rejectedWith(ConfigurationError);
     });
   });
 });

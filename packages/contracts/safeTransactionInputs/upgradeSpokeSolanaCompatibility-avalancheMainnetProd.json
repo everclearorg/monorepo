@@ -1,0 +1,19 @@
+{
+  "chainId": "43114",
+  "createdAt": "1743691499000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Avalanche | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000ae6e59eb86ccccc17165bd83a27c3904ccd1a78200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

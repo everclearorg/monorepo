@@ -30,6 +30,11 @@ const checkAssetSpokeBalance = async (
   // spokeBalances stores a mapping of domains to (balance and representing decimals).
   const spokeBalances: Record<string, [string, number]> = {};
   for (const domainId of Object.keys(config.chains)) {
+    const chainConfig = config.chains[domainId];
+    if (chainConfig.network === 'svm') {
+      continue;
+    }
+
     const assetHash = await getRegisteredAssetHashFromContract(assetConfig.tickerHash, domainId);
 
     const hubCallback = async () => {
@@ -40,7 +45,6 @@ const checkAssetSpokeBalance = async (
     };
     getCustodiedAssetCalls.push(hubCallback());
 
-    const chainConfig = config.chains[domainId];
     if (chainConfig.deployments?.everclear === undefined) {
       logger.error(`Missing spoke contract config in domain ${domainId}`, requestContext, methodContext);
       continue;
@@ -135,7 +139,7 @@ export const checkSpokeBalance = async () => {
 
   const checkAssetSpokeBalanceCalls = [];
   const checkedAsset = new Set();
-  for (const domain of Object.keys(config.chains)) {
+  for (const domain of Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm')) {
     const chainConfig = config.chains[domain];
     if (chainConfig.assets) {
       for (const assetName of Object.keys(chainConfig.assets)) {
