@@ -116,7 +116,7 @@ describe('TronSyncProvider', () => {
 
     // Create a mock factory that returns our mock TronWeb
     mockTronWebFactory = {
-      create: (config: { fullHost: string }) => mockTronWeb as unknown as InstanceType<typeof TronWeb>
+      create: (config: { fullHost: string; apiKey?: string }) => mockTronWeb as unknown as InstanceType<typeof TronWeb>
     };
 
     // Create provider with mock factory
@@ -158,6 +158,44 @@ describe('TronSyncProvider', () => {
     it('should allow setting synced status', () => {
       provider.synced = true;
       expect(provider.synced).to.equal(true);
+    });
+
+    it('should extract API key from URL and pass to TronWebFactory', () => {
+      const testApiKey = 'test-api-key-123';
+      const urlWithApiKey = `http://tron.test?apiKey=${testApiKey}`;
+      const createStub = stub(mockTronWebFactory, 'create');
+      
+      new TronSyncProvider(
+        TEST_SENDER_DOMAIN,
+        urlWithApiKey,
+        testStallTimeout,
+        process.env.LOG_LEVEL === 'debug',
+        mockTronWebFactory
+      );
+      
+      expect(createStub.calledOnce).to.be.true;
+      expect(createStub.firstCall.args[0]).to.deep.equal({
+        fullHost: 'http://tron.test/',
+        apiKey: testApiKey
+      });
+    });
+
+    it('should work without API key in URL', () => {
+      const createStub = stub(mockTronWebFactory, 'create');
+      
+      new TronSyncProvider(
+        TEST_SENDER_DOMAIN,
+        'http://tron.test',
+        testStallTimeout,
+        process.env.LOG_LEVEL === 'debug',
+        mockTronWebFactory
+      );
+      
+      expect(createStub.calledOnce).to.be.true;
+      expect(createStub.firstCall.args[0]).to.deep.equal({
+        fullHost: 'http://tron.test/',
+        apiKey: undefined
+      });
     });
   });
 

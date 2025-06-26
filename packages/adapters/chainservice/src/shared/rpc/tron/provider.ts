@@ -28,12 +28,16 @@ interface TronLog {
 type TronWebInstance = InstanceType<typeof TronWeb>;
 
 export interface TronWebFactory {
-  create(config: { fullHost: string }): TronWebInstance;
+  create(config: { fullHost: string; apiKey?: string }): TronWebInstance;
 }
 
 class DefaultTronWebFactory implements TronWebFactory {
-  create(config: { fullHost: string }): TronWebInstance {
-    return new TronWeb(config);
+  create(config: { fullHost: string; apiKey?: string }): TronWebInstance {
+    const tronWebConfig: any = { fullHost: config.fullHost };
+    if (config.apiKey) {
+      tronWebConfig.headers = { "TRON-PRO-API-KEY": config.apiKey };
+    }
+    return new TronWeb(tronWebConfig);
   }
 }
 
@@ -138,8 +142,16 @@ export class TronSyncProvider extends SyncProvider {
     debugLogging = false,
     private readonly tronWebFactory: TronWebFactory = new DefaultTronWebFactory(),
   ) {
-    super(url, domain, stallTimeout, debugLogging);
-    this.tronWeb = this.tronWebFactory.create({ fullHost: url });
+    // Extract API key from URL if present
+    const urlObj = new URL(url);
+    const apiKey = urlObj.searchParams.get('apiKey');
+    
+    // Remove API key from URL to get clean fullHost
+    urlObj.searchParams.delete('apiKey');
+    const cleanUrl = urlObj.toString();
+    
+    super(cleanUrl, domain, stallTimeout, debugLogging);
+    this.tronWeb = this.tronWebFactory.create({ fullHost: cleanUrl, apiKey: apiKey || undefined });
   }
 
   public async sync(): Promise<void> {
