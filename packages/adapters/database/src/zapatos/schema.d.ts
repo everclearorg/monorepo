@@ -8589,17 +8589,23 @@ declare module 'zapatos/schema' {
       */
       created_at: Date | null;
       /**
-      * **otc_sale_table.destination**
+      * **otc_sale_table.destinations**
       * - `_int4` in database
       * - `NOT NULL`, no default
       */
-      destination: number[];
+      destinations: number[];
       /**
-      * **otc_sale_table.id**
+      * **otc_sale_table.expires_at**
+      * - `timestamp` in database
+      * - Nullable, no default
+      */
+      expires_at: Date | null;
+      /**
+      * **otc_sale_table.order_id**
       * - `uuid` in database
       * - `NOT NULL`, default: `gen_random_uuid()`
       */
-      id: string;
+      order_id: string;
       /**
       * **otc_sale_table.origin**
       * - `int4` in database
@@ -8613,17 +8619,23 @@ declare module 'zapatos/schema' {
       */
       partner_id: string;
       /**
-      * **otc_sale_table.token**
+      * **otc_sale_table.ticker_hash**
       * - `text` in database
       * - `NOT NULL`, no default
       */
-      token: string;
+      ticker_hash: string;
       /**
       * **otc_sale_table.total_fee**
       * - `text` in database
       * - `NOT NULL`, no default
       */
       total_fee: string;
+      /**
+      * **otc_sale_table.transaction_hash**
+      * - `text` in database
+      * - Nullable, no default
+      */
+      transaction_hash: string | null;
     }
     export interface JSONSelectable {
       /**
@@ -8639,17 +8651,23 @@ declare module 'zapatos/schema' {
       */
       created_at: db.TimestampString | null;
       /**
-      * **otc_sale_table.destination**
+      * **otc_sale_table.destinations**
       * - `_int4` in database
       * - `NOT NULL`, no default
       */
-      destination: number[];
+      destinations: number[];
       /**
-      * **otc_sale_table.id**
+      * **otc_sale_table.expires_at**
+      * - `timestamp` in database
+      * - Nullable, no default
+      */
+      expires_at: db.TimestampString | null;
+      /**
+      * **otc_sale_table.order_id**
       * - `uuid` in database
       * - `NOT NULL`, default: `gen_random_uuid()`
       */
-      id: string;
+      order_id: string;
       /**
       * **otc_sale_table.origin**
       * - `int4` in database
@@ -8663,17 +8681,23 @@ declare module 'zapatos/schema' {
       */
       partner_id: string;
       /**
-      * **otc_sale_table.token**
+      * **otc_sale_table.ticker_hash**
       * - `text` in database
       * - `NOT NULL`, no default
       */
-      token: string;
+      ticker_hash: string;
       /**
       * **otc_sale_table.total_fee**
       * - `text` in database
       * - `NOT NULL`, no default
       */
       total_fee: string;
+      /**
+      * **otc_sale_table.transaction_hash**
+      * - `text` in database
+      * - Nullable, no default
+      */
+      transaction_hash: string | null;
     }
     export interface Whereable {
       /**
@@ -8689,17 +8713,23 @@ declare module 'zapatos/schema' {
       */
       created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **otc_sale_table.destination**
+      * **otc_sale_table.destinations**
       * - `_int4` in database
       * - `NOT NULL`, no default
       */
-      destination?: number[] | db.Parameter<number[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number[] | db.Parameter<number[]> | db.SQLFragment | db.ParentColumn>;
+      destinations?: number[] | db.Parameter<number[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number[] | db.Parameter<number[]> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **otc_sale_table.id**
+      * **otc_sale_table.expires_at**
+      * - `timestamp` in database
+      * - Nullable, no default
+      */
+      expires_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.order_id**
       * - `uuid` in database
       * - `NOT NULL`, default: `gen_random_uuid()`
       */
-      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      order_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **otc_sale_table.origin**
       * - `int4` in database
@@ -8713,17 +8743,23 @@ declare module 'zapatos/schema' {
       */
       partner_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **otc_sale_table.token**
+      * **otc_sale_table.ticker_hash**
       * - `text` in database
       * - `NOT NULL`, no default
       */
-      token?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **otc_sale_table.total_fee**
       * - `text` in database
       * - `NOT NULL`, no default
       */
       total_fee?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **otc_sale_table.transaction_hash**
+      * - `text` in database
+      * - Nullable, no default
+      */
+      transaction_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
     }
     export interface Insertable {
       /**
@@ -8739,17 +8775,23 @@ declare module 'zapatos/schema' {
       */
       created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
       /**
-      * **otc_sale_table.destination**
+      * **otc_sale_table.destinations**
       * - `_int4` in database
       * - `NOT NULL`, no default
       */
-      destination: number[] | db.Parameter<number[]> | db.SQLFragment;
+      destinations: number[] | db.Parameter<number[]> | db.SQLFragment;
       /**
-      * **otc_sale_table.id**
+      * **otc_sale_table.expires_at**
+      * - `timestamp` in database
+      * - Nullable, no default
+      */
+      expires_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **otc_sale_table.order_id**
       * - `uuid` in database
       * - `NOT NULL`, default: `gen_random_uuid()`
       */
-      id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment;
+      order_id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment;
       /**
       * **otc_sale_table.origin**
       * - `int4` in database
@@ -8763,17 +8805,23 @@ declare module 'zapatos/schema' {
       */
       partner_id: string | db.Parameter<string> | db.SQLFragment;
       /**
-      * **otc_sale_table.token**
+      * **otc_sale_table.ticker_hash**
       * - `text` in database
       * - `NOT NULL`, no default
       */
-      token: string | db.Parameter<string> | db.SQLFragment;
+      ticker_hash: string | db.Parameter<string> | db.SQLFragment;
       /**
       * **otc_sale_table.total_fee**
       * - `text` in database
       * - `NOT NULL`, no default
       */
       total_fee: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **otc_sale_table.transaction_hash**
+      * - `text` in database
+      * - Nullable, no default
+      */
+      transaction_hash?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
     }
     export interface Updatable {
       /**
@@ -8789,17 +8837,23 @@ declare module 'zapatos/schema' {
       */
       created_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
       /**
-      * **otc_sale_table.destination**
+      * **otc_sale_table.destinations**
       * - `_int4` in database
       * - `NOT NULL`, no default
       */
-      destination?: number[] | db.Parameter<number[]> | db.SQLFragment | db.SQLFragment<any, number[] | db.Parameter<number[]> | db.SQLFragment>;
+      destinations?: number[] | db.Parameter<number[]> | db.SQLFragment | db.SQLFragment<any, number[] | db.Parameter<number[]> | db.SQLFragment>;
       /**
-      * **otc_sale_table.id**
+      * **otc_sale_table.expires_at**
+      * - `timestamp` in database
+      * - Nullable, no default
+      */
+      expires_at?: (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampString | Date) | db.Parameter<(db.TimestampString | Date)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **otc_sale_table.order_id**
       * - `uuid` in database
       * - `NOT NULL`, default: `gen_random_uuid()`
       */
-      id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.DefaultType | db.SQLFragment>;
+      order_id?: string | db.Parameter<string> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.DefaultType | db.SQLFragment>;
       /**
       * **otc_sale_table.origin**
       * - `int4` in database
@@ -8813,17 +8867,23 @@ declare module 'zapatos/schema' {
       */
       partner_id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
       /**
-      * **otc_sale_table.token**
+      * **otc_sale_table.ticker_hash**
       * - `text` in database
       * - `NOT NULL`, no default
       */
-      token?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      ticker_hash?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
       /**
       * **otc_sale_table.total_fee**
       * - `text` in database
       * - `NOT NULL`, no default
       */
       total_fee?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **otc_sale_table.transaction_hash**
+      * - `text` in database
+      * - Nullable, no default
+      */
+      transaction_hash?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
     }
     export type UniqueIndex = 'otc_sale_table_pkey';
     export type Column = keyof Selectable;
