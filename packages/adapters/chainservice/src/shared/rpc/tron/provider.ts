@@ -160,6 +160,7 @@ export class TronSyncProvider extends SyncProvider {
       tx.funcSig,
       {},
       decodeParameters(tx.data, tx.funcSig),
+      this.tronWeb.defaultAddress.hex || '410000000000000000000000000000000000000000',
     );
 
     if (!result.constant_result || result.constant_result.length === 0) {
@@ -301,7 +302,7 @@ export class TronSyncProvider extends SyncProvider {
     const originalAddress = this.tronWeb.defaultAddress.hex;
     try {
       // Use a default address for the contract call
-      this.tronWeb.defaultAddress.hex = '0x0000000000000000000000000000000000000000';
+      this.tronWeb.defaultAddress.hex = '410000000000000000000000000000000000000000';
       const decimals = await contract.decimals().call();
       return Number(decimals);
     } finally {

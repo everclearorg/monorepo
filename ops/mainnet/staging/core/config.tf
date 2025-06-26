@@ -127,6 +127,12 @@ locals {
           "https://api.mainnet-beta.solana.com"
         ]
       }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io"
+        ]
+        privateKey = var.relayer_web3_signer_private_key
+      }
     }
     server = {
       port       = 8080
@@ -186,6 +192,12 @@ locals {
         providers = [
           "https://api.mainnet-beta.solana.com"
         ]
+      }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io"
+        ]
+        privateKey = var.watchtower_web3_signer_private_key
       }
     }
     server = {
@@ -251,6 +263,11 @@ locals {
       "1399811149" = {
         providers = [
           "https://api.mainnet-beta.solana.com"
+        ]
+      }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io"
         ]
       }
     }
@@ -336,7 +353,8 @@ locals {
       # 42161      = { maxAge = 60, size = 1 },
       8453       = { maxAge = 60, size = 1 },
       25327      = { maxAge = 60, size = 1 },
-      1399811149 = { maxAge = 60, size = 1 }
+      1399811149 = { maxAge = 60, size = 1 },
+      728126428  = { maxAge = 60, size = 1 }
     }
     hub = {
       domain = "25327",
@@ -373,6 +391,12 @@ locals {
         providers = [
           "https://api.mainnet-beta.solana.com"
         ]
+      }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io"
+        ]
+        privateKey = var.lighthouse_web3_signer_private_key
       }
     }
     database = { url = local.default_db_url }

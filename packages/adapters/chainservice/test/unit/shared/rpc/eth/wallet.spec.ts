@@ -1,9 +1,7 @@
 import { expect } from 'chai';
-import { stub, createStubInstance, SinonStub, SinonStubbedInstance } from 'sinon';
+import { stub, SinonStub } from 'sinon';
 import { providers, utils, BigNumber, Wallet } from 'ethers';
 import { EthWallet, ITransactionRequest } from '../../../../../src';
-import { Wordlist } from '@ethersproject/wordlists';
-import { Provider } from '@ethersproject/abstract-provider';
 
 describe('EthWallet', () => {
   const privateKey = '0x1234567890123456789012345678901234567890123456789012345678901234';

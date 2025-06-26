@@ -129,6 +129,12 @@ const ChainConfigSchema = Type.Intersect([
     providers: Type.Array(ProviderConfigSchema),
   }),
   CoreChainConfigSchema,
+  Type.Object({
+    /// CHAIN-SPECIFIC SIGNER PRIVATE KEY
+    // Optional private key for chains that require direct private key setting (e.g., Tron)
+    // If provided, this will override the global signer for this specific chain
+    privateKey: Type.Optional(Type.String()),
+  }),
 ]);
 
 export type ChainConfig = Static<typeof ChainConfigSchema>;
