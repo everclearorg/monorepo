@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ajv, EverclearConfig, createLoggingContext, getDefaultABIConfig } from '@chimera-monorepo/utils';
 import { config as dotenvConfig } from 'dotenv';
 import lodash from 'lodash';

@@ -77,7 +77,12 @@ export const checkIntentStatus = async (
 
       const encodedIntentStatusData = contract.interface.encodeFunctionData(methodName, [intentId]);
       const encodedIntentStatusDataRes = await chainreader.readTx(
-        { to: address, domain: +domain, data: encodedIntentStatusData },
+        {
+          to: address,
+          domain: +domain,
+          data: encodedIntentStatusData,
+          funcSig: contract.interface.getFunction(methodName).format(),
+        },
         'latest',
       );
       const [decoded] = contract.interface.decodeFunctionResult(methodName, encodedIntentStatusDataRes);

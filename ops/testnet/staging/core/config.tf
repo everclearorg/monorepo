@@ -247,24 +247,9 @@ locals {
     thresholds = {
       averageElapsedEpochs = 6
       averageElapsedEpochsAlertAmount = 1000000000
-      maxShadowExportDelay = 900
-      maxShadowExportLatency = 10
       maxTokenomicsExportDelay = 1800
       maxTokenomicsExportLatency = 10
     }
-    shadowTables = [
-      "closedepochsprocessed",
-      "depositenqueued",
-      "depositprocessed",
-      "finddepositdomain",
-      "findinvoicedomain",
-      "invoiceenqueued",
-      "matchdeposit",
-      "settledeposit",
-      "settlementenqueued",
-      "settlementqueueprocessed",
-      "settlementsent"
-    ]
     tokenomicsTables = [
         "bridge_in_error",
         "bridge_updated",
@@ -304,6 +289,9 @@ locals {
         "withdraw",
         "withdraw_eth"
     ]
+    solana = {
+      spokeAddress = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
+    }
   })
 
   local_lighthouse_config = jsonencode({
@@ -387,6 +375,10 @@ locals {
     betterUptime = {
       apiKey = var.betteruptime_api_key
       requesterEmail = var.betteruptime_requester_email
+    }
+    solana = {
+      signer = var.solana_signer
+      spokeAddress = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
     }
   })
 }

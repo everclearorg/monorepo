@@ -1,13 +1,12 @@
 export const NATIVE_TOKEN = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const GELATO_SERVER = 'https://api.gelato.digital';
 
-// Testnet addresses (2/5)
-// - On all networks except zkSync: 0xF9D64d54D32EE2BDceAAbFA60C4C438E224427d0
-// - On zkSync: 0x0c1B63765Be752F07147ACb80a7817A8b74d9831
-// So, for testnets you can already update the whitelist to these new addresses.
-
-export const getGelatoRelayerAddress = (domain: string): string =>
-  domain === '2053862260' || // zksync testnet
-  domain === '2053862243' // zksync mainnet
-    ? '0x0c1B63765Be752F07147ACb80a7817A8b74d9831'
-    : '0xF9D64d54D32EE2BDceAAbFA60C4C438E224427d0'; // all other networks
+export const getGelatoRelayerAddress = (domain: string): string => {
+  switch (domain) {
+    case '280': // zkSync testnet
+    case '324': // zkSync mainnet
+      return '0x30532F63B02c5bBb6D6f684Cbc7bebfC5deF407B';
+    default:
+      return '0xceA8aAa918bc6C19e5B77841ebD77ff3188385AF'; // all other networks
+  }
+};

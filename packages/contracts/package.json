@@ -51,9 +51,9 @@
     "lint:sol-logic": "solhint -c .solhint.json 'src/**/*.sol' 'script/**/*.sol'",
     "lint:sol-tests": "solhint -c .solhint.tests.json 'test/**/*.sol'",
     "new-intent:mainnet": "bash -c 'source .env && forge script script/spoke/NewIntent.s.sol:MainnetProduction --rpc-url $0 $1'",
+    "new-intent:mainnetstaging": "bash -c 'source .env && forge script script/spoke/NewIntent.s.sol:MainnetStaging --rpc-url $0 $1'",
     "new-intent:prod": "bash -c 'source .env && forge script script/spoke/NewIntent.s.sol:TestnetProduction --rpc-url $0 $1'",
     "new-intent:staging": "bash -c 'source .env && forge script script/spoke/NewIntent.s.sol:TestnetStaging --rpc-url $0 $1'",
-    "new-intent:mainnetstaging": "bash -c 'source .env && forge script script/spoke/NewIntent.s.sol:MainnetStaging --rpc-url $0 $1'",
     "prepare": "husky install",
     "receive-settlement:prod": "bash -c 'source .env && forge script script/spoke/ReceiveSettlementMessage.s.sol:TestnetProduction --rpc-url $0 $1'",
     "remove-liquidity:staging": "bash -c 'source .env && forge script script/spoke/RemoveLiquidity.s.sol:TestnetStaging --rpc-url $0 $1'",
@@ -76,6 +76,7 @@
     "package.json": "sort-package-json"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
     "@hyperlane-xyz/core": "3.8.1",
     "@inquirer/prompts": "^5.3.8",
     "@openzeppelin/contracts": "5.0.2",
@@ -95,6 +96,7 @@
     "lint-staged": ">=10",
     "solhint": "github:solhint-community/solhint-community#v4.0.0-rc01",
     "sort-package-json": "1.53.1",
+    "ts-mocha": "^10.0.0",
     "typescript": "^5.5.4"
   },
   "publishConfig": {

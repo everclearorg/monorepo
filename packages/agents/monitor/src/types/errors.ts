@@ -47,3 +47,15 @@ export class NoDispatchEventOnMessage extends EverclearError {
     super(`No 'Dispatch' event found on message`, { messageId, transactionHash, ...context });
   }
 }
+
+export class NoProvidersConfigured extends EverclearError {
+  constructor(context: object = {}) {
+    super(`No providers configured`, { ...context });
+  }
+}
+
+export class UnableToGetSpokeState extends EverclearError {
+  constructor(context: object = {}) {
+    super(`Unable to get spoke state`, { ...context });
+  }
+}

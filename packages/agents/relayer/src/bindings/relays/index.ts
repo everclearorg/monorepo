@@ -77,7 +77,8 @@ export const pollCache = async () => {
     const chain = Number(chainIdKey);
     const domain = chainIdToDomain(chain)!;
 
-    const rpcProvider = chainservice.getProvider(domain).leadProvider;
+    const _provider = await chainservice.getProvider(domain);
+    const rpcProvider = await _provider.leadProvider;
     if (!rpcProvider) {
       logger.debug('Bad rpcs', _requestContext, methodContext, { domain, providers: config.chains[domain].providers });
       continue;
@@ -96,13 +97,14 @@ export const pollCache = async () => {
         continue;
       }
 
-      const { data, to, fee } = task;
+      const { data, to, fee, funcSig } = task;
       const transaction: WriteTransaction = {
         domain,
         to,
         data,
         from: await wallet.getAddress(),
         value: fee.amount ?? '0',
+        funcSig,
       };
       logger.debug(`Attempting to submit transaction`, requestContext, methodContext, {
         transaction,

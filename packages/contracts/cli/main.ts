@@ -1,6 +1,7 @@
 import { select } from '@inquirer/prompts';
 
 import { deployContracts } from './tasks/deploy';
+import { deployAdapters } from './tasks/deployAdapters';
 
 import { returnUnsupportedIntent } from './tasks/returnUnsupportedIntent';
 import { handleExpiredIntents } from './tasks/handleExpiredIntents';
@@ -29,6 +30,10 @@ async function main() {
       {
         name: 'Deploy XERC20 module',
         value: 'deploy_xerc20',
+      },
+      {
+        name: 'Deploy Adapters',
+        value: 'deploy_adapters',
       },
       {
         name: 'Setup hub domains and gateways',
@@ -92,6 +97,9 @@ async function main() {
   switch (mainTask) {
     case 'deploy':
       deployContracts();
+      break;
+    case 'deploy_adapters':
+      deployAdapters();
       break;
     case 'setup_hub_domains_and_gateways':
       setupDomainsAndGateways();

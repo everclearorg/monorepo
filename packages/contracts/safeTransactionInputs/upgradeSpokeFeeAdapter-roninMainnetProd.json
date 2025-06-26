@@ -1,0 +1,19 @@
+{
+  "chainId": "2020",
+  "createdAt": "1744279544000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Ronin | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000c192b47fd86c52d987fff2579b64c28037bf756700000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000024c4d66de800000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c7500000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

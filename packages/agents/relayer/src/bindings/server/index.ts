@@ -1,4 +1,4 @@
-import fastify, { FastifyInstance } from 'fastify';
+import { FastifyInstance } from 'fastify';
 import {
   RelayerApiPostTaskRequestParams,
   RelayerApiPostTaskResponse,

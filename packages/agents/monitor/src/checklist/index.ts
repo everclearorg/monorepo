@@ -19,8 +19,8 @@ import {
 } from './queue';
 import { getContext } from '../context';
 import { checkSpokeBalance } from './spoke';
-import { checkShadowExportLatency, checkShadowExportStatus } from './shadow';
 import { checkTokenomicsExportLatency, checkTokenomicsExportStatus } from './tokenomics';
+import { checkSolanaPipelineStatus } from './solana';
 
 export const runChecks = async () => {
   const { requestContext, methodContext } = createLoggingContext(runChecks.name);
@@ -44,10 +44,9 @@ export const runChecks = async () => {
     checkElapsedEpochsByTickerHash,
     checkInvoices,
     checkInvoiceAmount,
-    checkShadowExportStatus,
-    checkShadowExportLatency,
     checkTokenomicsExportStatus,
     checkTokenomicsExportLatency,
+    checkSolanaPipelineStatus,
   ];
 
   const { logger } = getContext();

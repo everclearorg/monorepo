@@ -31,7 +31,7 @@ contract FillIntent_ReceiveRewardsOnSettlement is IntegrationBase {
   IEverclear.FillMessage internal _fillMessage;
 
   uint256 internal _intentAmountEthereum = 100 ether;
-  uint256 internal _intentAmountBSC = 100 ether * 1e12;
+  uint256 internal _intentAmountBSC = 100 ether;
 
   function test_FillIntentAndSettleWithRewards() public {
     // switch to everclear fork

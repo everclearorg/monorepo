@@ -54,6 +54,12 @@
     "environment": "MainnetStaging"
   },
   {
+    "address": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
+    "domainName": "Base",
+    "domainId": 8453,
+    "environment": "MainnetStaging"
+  },
+  {
     "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
     "domainName": "Optimism",
     "domainId": 10,
@@ -147,6 +153,36 @@
     "address": "0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64",
     "domainName": "Ronin",
     "domainId": 2020,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xe0F010e465f15dcD42098dF9b99F1038c11B3056",
+    "domainName": "Gnosis",
+    "domainId": 100,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Berachain",
+    "domainId": 80094,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xe0F010e465f15dcD42098dF9b99F1038c11B3056",
+    "domainName": "Mantle",
+    "domainId": 5000,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Sonic",
+    "domainId": 146,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "domainName": "Ink",
+    "domainId": 57073,
     "environment": "MainnetProduction"
   }
 ]

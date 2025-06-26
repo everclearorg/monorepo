@@ -39,7 +39,6 @@ import {
   getSettlementIntentsByStatus,
   getMessagesByIds,
   getLatestTimestamp,
-  getShadowEvents,
   getVotes,
   getTokenomicsEvents,
   saveMerkleTrees,
@@ -48,6 +47,9 @@ import {
   getNewLockPositionEvents,
   saveLockPositions,
   getLockPositions,
+  getOriginIntentsLastNonce,
+  getDeliveredSettlements,
+  updateSettlementStatus,
 } from '../src/client';
 import {
   expect,
@@ -58,7 +60,6 @@ import {
   QueueType,
   HyperlaneStatus,
   mkHash,
-  ShadowEvent,
   TokenomicsEvent,
   NewLockPositionEvent,
   LockPosition,
@@ -79,7 +80,6 @@ import {
   createHubDeposits,
   createSettlementIntents,
   createInvoices,
-  createShadowEvent,
   createTokenomicsEvent,
   createMerkleTree,
   createNewLockPositionEvent,
@@ -96,19 +96,41 @@ describe('Database Adapter:Client', () => {
       idleTimeoutMillis: 3000,
       allowExitOnIdle: true,
     });
-    await pool.query('CREATE TABLE tokenomics.vote_cast(domain numeric, votes numeric, epoch numeric)');
 
-    await pool.query('CREATE TABLE tokenomics.reward_claimed(block_number numeric, block_timestamp numeric, transaction_hash bytea, insert_timestamp timestamp, latency interval)');
-    await pool.query('CREATE TRIGGER reward_claimed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.reward_claimed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency()');
-    await pool.query('CREATE INDEX reward_claimed_timestamp_idx ON tokenomics.reward_claimed(insert_timestamp)');
+    await pool.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM pg_trigger WHERE tgname = 'reward_claimed_set_timestamp_and_latency'
+          ) THEN
+            CREATE TRIGGER reward_claimed_set_timestamp_and_latency
+            BEFORE INSERT ON tokenomics.reward_claimed
+            FOR EACH ROW
+            EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
+          END IF;
+        END;
+        $$
+      `);
+    await pool.query('CREATE INDEX IF NOT EXISTS reward_claimed_timestamp_idx ON tokenomics.reward_claimed(insert_timestamp)');
 
-    await pool.query('CREATE TABLE tokenomics.new_lock_position(vid bigint, "user" bytea, new_total_amount_locked numeric, block_timestamp numeric, expiry numeric)');
+    await pool.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM pg_trigger WHERE tgname = 'new_lock_position_set_timestamp_and_latency'
+          ) THEN
+            CREATE TRIGGER new_lock_position_set_timestamp_and_latency
+            BEFORE INSERT ON tokenomics.new_lock_position
+            FOR EACH ROW
+            EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
+          END IF;
+        END;
+        $$
+      `);
+    await pool.query('CREATE INDEX IF NOT EXISTS new_lock_position_timestamp_idx ON tokenomics.new_lock_position(insert_timestamp)');
   });
 
   after(async () => {
-    await pool.query('DROP TABLE tokenomics.vote_cast');
-    await pool.query('DROP TABLE tokenomics.reward_claimed');
-    await pool.query('DROP TABLE tokenomics.new_lock_position');
     await pool.end();
   });
 
@@ -128,10 +150,8 @@ describe('Database Adapter:Client', () => {
     await pool.query('DELETE FROM checkpoints CASCADE');
     await pool.query('DELETE FROM merkle_trees CASCADE');
     await pool.query('DELETE FROM lock_positions CASCADE');
-    await pool.query('DELETE FROM shadow.closedepochsprocessed_fa915858_73f6f386 CASCADE');
-    await pool.query('DELETE FROM shadow.depositenqueued_2f2b1630_73f6f386 CASCADE');
-    await pool.query('REFRESH MATERIALIZED VIEW closedepochsprocessed');
-    await pool.query('REFRESH MATERIALIZED VIEW depositenqueued');
+    await pool.query('DELETE FROM tokenomics.reward_claimed');
+    await pool.query('DELETE from tokenomics.new_lock_position');
   });
 
   describe('#saveOriginIntents / #getOriginIntents', () => {
@@ -681,131 +701,110 @@ describe('Database Adapter:Client', () => {
     });
   });
 
-  const saveShadowEvent = async (event: ShadowEvent, table: string) => {
-    await pool.query(`INSERT INTO shadow.${table}
-      (address, block_hash, block_number, block_timestamp, chain, network, topic_0, transaction_hash, transaction_index, transaction_log_index)
-      VALUES ('${event.address}', '${event.blockHash}', ${event.blockNumber}, '${event.blockTimestamp.toUTCString()}', '${event.chain}', '${event.network}',
-              '${event.topic0}', '${event.transactionHash}', ${event.transactionIndex}, ${event.transactionLogIndex})`);
-  };
-
-  describe('#getLatestTimestamp', () => {
-    it('should work', async () => {
-      const event = createShadowEvent();
-      await saveShadowEvent(event, 'depositenqueued_2f2b1630_73f6f386');
-      event.transactionHash = mkBytes32('0x2');
-      await saveShadowEvent(event, 'depositenqueued_2f2b1630_73f6f386');
-      event.transactionHash = mkBytes32('0x3');
-      await saveShadowEvent(event, 'depositenqueued_2f2b1630_73f6f386');
-      event.transactionHash = mkBytes32('0x4');
-      await saveShadowEvent(event, 'closedepochsprocessed_fa915858_73f6f386');
-      await pool.query('REFRESH MATERIALIZED VIEW closedepochsprocessed');
-      await pool.query('REFRESH MATERIALIZED VIEW depositenqueued');
-
-      const result = await pool.query('SELECT timestamp FROM closedepochsprocessed');
-      const expectedTimestamp = result.rows[0].timestamp;
-
-      const tables = [
-        'closedepochsprocessed',
-        'depositenqueued',
-        'depositprocessed',
-        'finddepositdomain',
-        'findinvoicedomain',
-        'invoiceenqueued',
-        'matchdeposit',
-        'settledeposit',
-        'settlementenqueued',
-        'settlementqueueprocessed',
-        'settlementsent'
-      ];
-
-      expect((await getLatestTimestamp(tables, 'timestamp', pool)).getTime()).to.be.eq(expectedTimestamp.getTime());
-    });
-  });
-
   const sleep = async (ms: number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
   };
 
-  describe('#getShadowEvents', () => {
-    it('respects timestamp and limit', async () => {
-      const event = createShadowEvent();
-      await saveShadowEvent(event, 'closedepochsprocessed_fa915858_73f6f386');
-      event.transactionHash = mkBytes32('0x2');
-      await saveShadowEvent(event, 'closedepochsprocessed_fa915858_73f6f386');
-
-      await sleep(100);
-      const from = new Date();
-
-      event.transactionHash = mkBytes32('0x3');
-      await saveShadowEvent(event, 'closedepochsprocessed_fa915858_73f6f386');
-      event.transactionHash = mkBytes32('0x4');
-      await saveShadowEvent(event, 'closedepochsprocessed_fa915858_73f6f386');
-      event.transactionHash = mkBytes32('0x5');
-      event.blockTimestamp = new Date(Date.parse('2004-10-24 10:23:54.1111'));
-      await saveShadowEvent(event, 'closedepochsprocessed_fa915858_73f6f386');
-
-      await pool.query('REFRESH MATERIALIZED VIEW closedepochsprocessed');
-
-      const events = await getShadowEvents('closedepochsprocessed', from, 2, pool);
-
-      expect(events.length).to.be.eq(2);
-      expect(events[0].transactionHash).to.be.eq(mkBytes32('0x3'));
-      expect(events[1].transactionHash).to.be.eq(mkBytes32('0x4'));
-    });
-  });
-
   describe('#getVotes', () => {
+    beforeEach(async () => {
+      await pool.query('DELETE FROM tokenomics.vote_cast');
+    })
     it('no data', async () => {
       const votes = await getVotes(1, pool);
-
       expect(votes).to.be.empty;
     });
 
     it('happy case', async () => {
-      const saveVotes = async (domain: number, epoch: number, votes: number) => {
-        await pool.query(`INSERT INTO tokenomics.vote_cast (domain, epoch, votes) VALUES (${domain}, ${epoch}, ${votes})`);
+      const saveVotes = async (domain: number, epoch: number, votes: number, index: number) => {
+        const uniqueId = mkBytes32(index.toString());
+        await pool.query(`INSERT INTO tokenomics.vote_cast (domain, epoch, votes, vid, block, id, block_number, block_timestamp, transaction_hash, _gs_chain, _gs_gid, owner) 
+          VALUES (${domain}, ${epoch}, ${votes}, ${10}, ${1}, '${uniqueId}', ${1}, ${Date.now()}, '\\x0000000000000000000000000000000000000000000000000000000000000001', 'test', '${uniqueId}', '${uniqueId}')`);
       };
-      await saveVotes(10, 1, 1234);
-      await saveVotes(10, 2, 2345);
-      await saveVotes(10, 1, 3456);
-      await saveVotes(421614, 1, 4567);
-      await saveVotes(421614, 2, 5678);
-      await saveVotes(421614, 1, 6789);
-      await saveVotes(421614, 1, 7890);
+
+      let index = 0;
+      await saveVotes(10, 1, 1234, index++);
+      await saveVotes(10, 2, 2345, index++);
+      await saveVotes(10, 1, 3456, index++);
+      await saveVotes(421614, 1, 4567, index++);
+      await saveVotes(421614, 2, 5678, index++);
+      await saveVotes(421614, 1, 6789, index++);
+      await saveVotes(421614, 1, 7890, index++);
 
       const votes = await getVotes(1, pool);
 
-      expect(votes).to.be.deep.eq([
+      expect(votes.sort((a, b) => a.domain - b.domain)).to.be.deep.eq([
         { domain: 10, votes: "4690" },
         { domain: 421614, votes: "19246" },
       ]);
     });
   });
 
-  const saveTokenomicsEvent = async (event: TokenomicsEvent, table: string) => {
+  const saveRewardClaimedEvent = async (event: TokenomicsEvent) => {
+    const uniqueId = `\\x${event.blockNumber.toString(16).padStart(32, '0')}${event.transactionHash.slice(2).padStart(32, '0')}`;
     await pool.query({
-      text: `INSERT INTO tokenomics.${table} (block_number, block_timestamp, transaction_hash) VALUES ($1, $2, $3)`,
-      values: [ event.blockNumber, event.blockTimestamp, Buffer.from(event.transactionHash.slice(2), 'hex') ],
-  });
+      text: `INSERT INTO tokenomics.reward_claimed (vid, block, id, block_number, block_timestamp, transaction_hash, _gs_chain, _gs_gid, token, account, amount, update_count) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+      values: [10, 1, Buffer.from(uniqueId.slice(2), 'hex'),
+        event.blockNumber, event.blockTimestamp, Buffer.from(event.transactionHash.slice(2), 'hex'),
+        'test', uniqueId, Buffer.from('0000000000000000000000000000000000000002', 'hex'),
+        Buffer.from('0000000000000000000000000000000000000003', 'hex'),
+        '1000000000000000000',
+        1
+      ],
+    });
   };
+
+  const saveNewLockPositionEvent = async (event: NewLockPositionEvent) => {
+    const user = '\\x000000000000000000000000' + event.user.slice(2)
+    const uniqueId = `\\x${event.vid.toString(16).padStart(32, '0')}${Math.floor(event.blockTimestamp).toString(16).padStart(32, '0')}`;
+    await pool.query(`INSERT INTO tokenomics.new_lock_position
+        (vid, "user", new_total_amount_locked, block_timestamp, expiry, block, id, block_number, transaction_hash, _gs_chain, _gs_gid, caller, new_vb_balance)
+        VALUES ('${event.vid}', '${user}', '${event.newTotalAmountLocked}', '${event.blockTimestamp}', '${event.expiry}', '${1}', 
+        '${uniqueId}', ${1}, '\\x0000000000000000000000000000000000000000000000000000000000000001', 'test', '${uniqueId}', '${user}', '${event.newTotalAmountLocked}')`);
+  };
+
+  describe('#getLatestTimestamp', () => {
+    it('should work', async () => {
+      await saveRewardClaimedEvent(createTokenomicsEvent({ transactionHash: mkBytes32('0x2') }));
+      await saveRewardClaimedEvent(createTokenomicsEvent({ transactionHash: mkBytes32('0x3') }));
+      await saveNewLockPositionEvent(createNewLockPositionEvent({ vid: 4, user: mkAddress(`0x4`) }));
+      await saveNewLockPositionEvent(createNewLockPositionEvent({ vid: 5, user: mkAddress(`0x5`) }));
+      await saveRewardClaimedEvent(createTokenomicsEvent({ transactionHash: mkBytes32('0x6') }));
+      await saveRewardClaimedEvent(createTokenomicsEvent({ transactionHash: mkBytes32('0x7') }));
+
+      const result = await pool.query(
+        'SELECT insert_timestamp FROM tokenomics.reward_claimed WHERE transaction_hash = $1',
+        [Buffer.from(mkBytes32('0x7').slice(2), 'hex')]
+      );
+      const expectedTimestamp = result.rows[0].insert_timestamp;
+
+      const tables = [
+        'tokenomics.reward_claimed',
+        'tokenomics.new_lock_position',
+        'tokenomics.vote_delegated',
+      ];
+
+      expect((await getLatestTimestamp(tables, 'insert_timestamp', pool)).getTime()).to.be.eq(expectedTimestamp.getTime());
+    });
+  });
 
   describe('#getTokenomicsEvents', () => {
     it('respects timestamp and limit', async () => {
       const event = createTokenomicsEvent();
-      await saveTokenomicsEvent(event, 'reward_claimed');
+      await saveRewardClaimedEvent(event);
       event.transactionHash = mkBytes32('0x2');
-      await saveTokenomicsEvent(event, 'reward_claimed');
+      await saveRewardClaimedEvent(event);
 
       await sleep(100);
       const from = new Date();
 
       event.transactionHash = mkBytes32('0x3');
-      await saveTokenomicsEvent(event, 'reward_claimed');
+      await saveRewardClaimedEvent(event);
       event.transactionHash = mkBytes32('0x4');
-      await saveTokenomicsEvent(event, 'reward_claimed');
+      await saveRewardClaimedEvent(event);
       event.transactionHash = mkBytes32('0x5');
-      event.blockTimestamp = Date.now() / 1000 - 5000;
-      await saveTokenomicsEvent(event, 'reward_claimed');
+      event.blockTimestamp = Math.floor(Date.now() / 1000) - 5000;
+      await saveRewardClaimedEvent(event);
 
       const events = await getTokenomicsEvents('reward_claimed', from, 2, pool);
 
@@ -875,12 +874,6 @@ describe('Database Adapter:Client', () => {
   })
 
   describe('#getNewLockPositionEvents', () => {
-    const saveNewLockPositionEvent = async (event: NewLockPositionEvent) => {
-      const user = '\\x000000000000000000000000' + event.user.slice(2)
-      await pool.query(`INSERT INTO tokenomics.new_lock_position
-        (vid, "user", new_total_amount_locked, block_timestamp, expiry)
-        VALUES ('${event.vid}', '${user}', '${event.newTotalAmountLocked}', '${event.blockTimestamp}', '${event.expiry}')`);
-    };
     const saveNewLockPositionEvents = async (count: number) => {
       let events: NewLockPositionEvent[] = [];
       for (let i = 0; i < count; ++i) {
@@ -926,13 +919,13 @@ describe('Database Adapter:Client', () => {
 
       await saveLockPositions('lock_position_test', 1, lockPositions, pool);
       expect(await getLockPositions(undefined, undefined, undefined, pool)).to.be.deep.eq(lockPositions);
-      expect(await getLockPositions(undefined, lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[2], lockPositions[3], lockPositions[4] ]);
-      expect(await getLockPositions(mkAddress(`0x1`), undefined, undefined, pool)).to.be.deep.eq([ lockPositions[1], lockPositions[3] ]);
-      expect(await getLockPositions(mkAddress(`0x1`), lockPositions[2].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[3] ]);
-      expect(await getLockPositions(mkAddress(`0x2`), undefined, undefined, pool)).to.be.deep.eq([ lockPositions[0], lockPositions[2], lockPositions[4] ]);
-      expect(await getLockPositions(mkAddress(`0x2`), lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([ lockPositions[2], lockPositions[4] ]);
+      expect(await getLockPositions(undefined, lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([lockPositions[2], lockPositions[3], lockPositions[4]]);
+      expect(await getLockPositions(mkAddress(`0x1`), undefined, undefined, pool)).to.be.deep.eq([lockPositions[1], lockPositions[3]]);
+      expect(await getLockPositions(mkAddress(`0x1`), lockPositions[2].expiry, undefined, pool)).to.be.deep.eq([lockPositions[3]]);
+      expect(await getLockPositions(mkAddress(`0x2`), undefined, undefined, pool)).to.be.deep.eq([lockPositions[0], lockPositions[2], lockPositions[4]]);
+      expect(await getLockPositions(mkAddress(`0x2`), lockPositions[1].expiry, undefined, pool)).to.be.deep.eq([lockPositions[2], lockPositions[4]]);
       expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[2].start, pool)).to.be.deep.eq([]);
-      expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[3].start, pool)).to.be.deep.eq([ lockPositions[2] ]);
+      expect(await getLockPositions(undefined, lockPositions[1].expiry, lockPositions[3].start, pool)).to.be.deep.eq([lockPositions[2]]);
 
 
       lockPositions[0].amountLocked = '0';
@@ -940,6 +933,62 @@ describe('Database Adapter:Client', () => {
 
       await saveLockPositions('lock_position_test', 2, lockPositions, pool);
       expect(await getLockPositions(undefined, undefined, undefined, pool)).to.be.deep.eq(lockPositions.slice(2));
+    });
+  });
+
+  describe('#getOriginIntentsLastNonce', () => {
+    const intents = createOriginIntents(3, [
+      { nonce: 1, origin: '12345' },
+      { nonce: 3, origin: '12345' },
+      { nonce: 7, origin: '12345' },
+    ]);
+
+    it('should work', async () => {
+      expect(await getOriginIntentsLastNonce('12345', pool)).to.be.deep.eq(0);
+      await saveOriginIntents(intents, pool);
+      expect(await getOriginIntentsLastNonce('12345', pool)).to.be.deep.eq(7);
+    });
+  });
+
+  describe('#getDeliveredSettlements', () => {
+    const deliveredIntents = createSettlementIntents(2, [
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1399811149' },
+      { intentId: mkBytes32('0x2'), status: TIntentStatus.Delivered, domain: '1399811149' }
+    ]);
+    
+    const otherIntents = createSettlementIntents(2, [
+      { intentId: mkBytes32('0x3'), status: TIntentStatus.Settled, domain: '1399811149' },
+      { intentId: mkBytes32('0x4'), status: TIntentStatus.Settled, domain: '1339' },
+      { intentId: mkBytes32('0x5'), status: TIntentStatus.None, domain: '1340' }
+    ]);
+
+    it('should return only settlement intents with DELIVERED status and the set domain', async () => {
+      expect(await getDeliveredSettlements('1399811149', pool)).to.be.deep.eq([]);
+      
+      // Save all intents
+      await saveSettlementIntents([...deliveredIntents, ...otherIntents], pool);
+      
+      // Verify only DELIVERED intents that belong to the set domain are returned
+      const result = await getDeliveredSettlements('1399811149', pool);
+      expect(result).to.be.deep.eq(deliveredIntents);
+    });
+  });
+
+  describe('#updateSettlementStatus', () => {
+    const intents = createSettlementIntents(2, [
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1339' },
+      { intentId: mkBytes32('0x2'), status: TIntentStatus.Delivered, domain: '1340' },
+    ]);
+
+    const expectedIntents = createSettlementIntents(1, [
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Settled, domain: '1339' },
+    ]);
+
+    it('should work', async () => {
+      await saveSettlementIntents(intents, pool);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.empty;
+      await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Settled, pool);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.deep.eq(expectedIntents);
     });
   });
 });

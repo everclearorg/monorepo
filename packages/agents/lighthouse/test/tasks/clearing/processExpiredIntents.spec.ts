@@ -16,6 +16,7 @@ describe('#processExpiredIntents', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   let sendWithRelayerWithBackup: SinonStub;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   const TTL = 1_000;
 
@@ -45,6 +46,7 @@ describe('#processExpiredIntents', () => {
 
     encodeFunctionData = stub(Interface.prototype, 'encodeFunctionData').returns('0xencoded');
     decodeFunctionResult = stub(Interface.prototype, 'decodeFunctionResult').returns([{ status: 2 }]);
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
     decodeFunctionResult.onCall(0).returns([TTL.toString()]);
 
     sendWithRelayerWithBackup = stub(Relayer, 'sendWithRelayerWithBackup').resolves({

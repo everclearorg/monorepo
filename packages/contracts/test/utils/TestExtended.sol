@@ -14,9 +14,12 @@ import {Mocker} from './mocks/Mocker.sol';
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 
+import {ECDSA} from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+
 contract TestExtended is Mocker {
   using TypeCasts for address;
   using TypeCasts for bytes32;
+  using MessageHashUtils for bytes32;
 
   uint256 public constant BLOCK_TIME = 12 seconds;
   uint256 public constant MAX_FUZZED_ARRAY_LENGTH = 10;
@@ -130,5 +133,11 @@ contract TestExtended is Mocker {
 
     _intent.destinations = _destinations;
     return _intent;
+  }
+
+  function _generateSignature(uint256 _feeSignerPk, bytes memory _data) internal pure returns (bytes memory) {
+    bytes32 _digest = keccak256(_data).toEthSignedMessageHash();
+    (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
+    return abi.encodePacked(_r, _s, _v);
   }
 }

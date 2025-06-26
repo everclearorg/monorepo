@@ -6,8 +6,8 @@ import { Logger, createRequestContext, expect, mkAddress, mkHash } from '@chimer
 import { mockAppContext } from '../globalTestHook';
 import { WatcherConfig } from '../../src/lib/entities';
 import { TEST_REPORT } from '../mock';
-import { ChainService, ITransactionReceipt, WriteTransaction } from '@chimera-monorepo/chainservice';
-import { BigNumber, Wallet, utils } from 'ethers';
+import { ChainService, ITransactionReceipt, WriteTransaction, EthWallet } from '@chimera-monorepo/chainservice';
+import { utils } from 'ethers';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 describe('Actions', () => {
@@ -17,7 +17,7 @@ describe('Actions', () => {
   let config = {} as WatcherConfig;
   let logger: SinonStubbedInstance<Logger>;
   let chainService: SinonStubbedInstance<ChainService>;
-  let wallet: SinonStubbedInstance<Wallet>;
+  let wallet: SinonStubbedInstance<EthWallet>;
 
   let mockWriteTransaction: WriteTransaction = {
     domain: 1337,
@@ -35,7 +35,7 @@ describe('Actions', () => {
   beforeEach(async () => {
     logger = mockAppContext.logger as SinonStubbedInstance<Logger>;
     chainService = mockAppContext.adapters.chainservice as SinonStubbedInstance<ChainService>;
-    wallet = mockAppContext.adapters.wallet as SinonStubbedInstance<Wallet>;
+    wallet = mockAppContext.adapters.wallet as SinonStubbedInstance<EthWallet>;
     config = mockAppContext.config;
     domainIds = Object.keys(config.chains).concat(config.hub.domain);
   });
@@ -276,6 +276,7 @@ describe('Actions', () => {
         from: from,
         gasPrice: '10',
         gasLimit: '100000',
+        funcSig: 'pause()',
       });
       expect(result.receipt).to.be.deep.eq({
         blockNumber: 123,

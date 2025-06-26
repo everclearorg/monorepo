@@ -1,16 +1,18 @@
 import { Logger, RelayerType, Settlement, domainToChainId, expect, mkBytes32 } from '@chimera-monorepo/utils';
 import * as Relayer from '@chimera-monorepo/adapters-relayer';
 import { Bytes, Interface } from 'ethers/lib/utils';
-import { constants, Wallet } from 'ethers';
+import { constants } from 'ethers';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
+import { EthWallet } from '@chimera-monorepo/chainservice';
 
 import { dispatchMessageQueueViaRelayers, getQueueMethodName } from '../../../src/tasks/helpers';
 import { createIntentQueues, getContextStub, mock } from '../../globalTestHook';
 import { LighthouseContext } from '../../../src/context';
-import { RelayerSendFailed } from '../../../src/errors/tasks';
+import { RelayerSendFailed } from '../../../src/errors';
 
 describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   const [queue] = createIntentQueues();
+  queue.size = 1;
   const intents = [mock.destinationIntent({ origin: queue.domain })];
   const rc = mock.requestContext();
   let context: LighthouseContext;
@@ -18,11 +20,12 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   let sendWithRelayerWithBackupStub: SinonStub;
   let encodeStub: SinonStub;
   let decodeStub: SinonStub;
-  let wallet: SinonStubbedInstance<Wallet>;
+  let wallet: SinonStubbedInstance<EthWallet>;
+  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     // Interface stubs
-    wallet = createStubInstance(Wallet, {
+    wallet = createStubInstance(EthWallet, {
       signMessage: stub<[string | Bytes], Promise<string>>().resolves('0xsigned'),
     });
 
@@ -60,6 +63,8 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
       taskId: '123',
       relayerType: RelayerType.Everclear,
     });
+
+    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   it('should return early if chain is not configured', async () => {
@@ -123,6 +128,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
         mock.chains()[queue.domain].deployments?.everclear,
         '0xencoded', // encode stub value
         '0',
+        'foo()',
         [context.adapters.relayers[0]],
         context.adapters.chainservice,
         context.logger,
@@ -148,9 +154,9 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   it('should not dispatch more than 15 intents for a 10M gas limit message destination', async () => {
     context.config.chains['1337'].gasLimit = 10_000_000;
     const largeQueue = mock.queue({ type: 'INTENT', size: 150, lastProcessed: 0, domain: '1337' });
-    const contents = new Array(queue.size)
+    const contents = new Array(largeQueue.size)
       .fill(0)
-      .map((_, i) => mock.originIntent({ origin: queue.domain, id: mkBytes32(`0x${i}${i}${i}`) }));
+      .map((_, i) => mock.originIntent({ origin: largeQueue.domain, id: mkBytes32(`0x${i}${i}${i}`) }));
     await dispatchMessageQueueViaRelayers('INTENT', largeQueue, contents, rc);
     // FIXME: revert this to 15 once batching is implemented 
     expect(sendWithRelayerWithBackupStub.callCount).to.be.greaterThanOrEqual(1); // 150 / 15, should dispatch 10 tasks
