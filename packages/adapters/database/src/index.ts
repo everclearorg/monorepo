@@ -263,7 +263,7 @@ export type Database = {
     status: intent_status,
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
-  updateSolanaMessageStatuses: () => Promise<number>;
+  updateSolanaMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
 };
 
 export let pool: Pool;
