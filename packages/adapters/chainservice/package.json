@@ -23,13 +23,13 @@
     "version": "yarn version"
   },
   "devDependencies": {
-    "eslint": "8.34.0",
+    "eslint": "9.17.0",
     "mocha": "8.2.0",
     "nyc": "15.1.0",
-    "rimraf": "5.0.1",
+    "rimraf": "6.0.1",
     "sinon": "17.0.1",
     "ts-mocha": "10.0.0",
-    "typescript": "5.3.3"
+    "typescript": "5.7.2"
   },
   "dependencies": {
     "@chimera-monorepo/utils": "workspace:*",
@@ -37,6 +37,9 @@
     "@safe-global/protocol-kit": "^5.1.1",
     "@safe-global/types-kit": "^1.0.1",
     "@sinclair/typebox": "0.25.21",
+    "@solana-program/system": "^0.7.0",
+    "@solana/kit": "^2.1.1",
+    "ajv": "8.17.1",
     "ethers": "5.7.2",
     "interval-promise": "1.4.0",
     "p-queue": "6.6.2",

@@ -269,7 +269,10 @@ describe('ChainReader', () => {
           gasStations: [],
         },
       };
-      expect(() => (chainReader as any).setupProviders(context, signer)).to.throw(ConfigurationError);
+
+      expect((chainReader as any).setupProviders(TEST_REQUEST_CONTEXT, signer)).to.be.rejectedWith(
+        ConfigurationError,
+      );
     });
   });
 });

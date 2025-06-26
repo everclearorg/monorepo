@@ -106,7 +106,7 @@ describe('ChainService', () => {
           confirmations: 1,
         },
       };
-      expect(() => (chainService as any).setupProviders(context, signer)).to.throw(ConfigurationError);
+      expect((chainService as any).setupProviders(context, signer)).to.be.rejectedWith(ConfigurationError);
     });
   });
 });
