@@ -761,7 +761,7 @@ describe('TronSyncProvider', () => {
       expect(result).to.exist;
     });
 
-    it('should set signer API and return tronWeb instance', () => {
+    it('should set signer API and return tronWeb instance', async () => {
       const mockSignerApi = {
         getPublicKey: () => Promise.resolve('0xpublickey'),
         sign: (identifier: string, data: string | Bytes) => Promise.resolve('signed_data')
@@ -777,7 +777,7 @@ describe('TronSyncProvider', () => {
         }),
         signerApi: mockSignerApi,
       };
-      const result = provider.getSigner(mockSigner);
+      const result = await provider.getSigner(mockSigner);
       expect(result.signerApi).to.equal(mockSignerApi);
     });
 
@@ -788,7 +788,7 @@ describe('TronSyncProvider', () => {
         expect(result).to.exist;
       });
 
-      it('should set signer API and return tronWeb instance', () => {
+      it('should set signer API and return tronWeb instance', async () => {
         const mockSignerApi = {
           getPublicKey: () => Promise.resolve('0xpublickey'),
           sign: (identifier: string, data: string | Bytes) => Promise.resolve('signed_data')
@@ -804,7 +804,7 @@ describe('TronSyncProvider', () => {
           }),
           signerApi: mockSignerApi,
         };
-        const result = provider.connect(mockSigner);
+        const result = await provider.connect(mockSigner);
         expect(result.signerApi).to.equal(mockSignerApi);
       });
     });
@@ -886,7 +886,7 @@ describe('TronSyncProvider', () => {
           gasLimit: BigNumber.from(0)
         }),
       };
-      const signer = provider.getSigner(mockSigner);
+      const signer = await provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -943,7 +943,7 @@ describe('TronSyncProvider', () => {
         }),
         signerApi: mockSignerApi,
       };
-      const signer = provider.getSigner(mockSigner);
+      const signer = await provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -1006,7 +1006,7 @@ describe('TronSyncProvider', () => {
           gasLimit: BigNumber.from(0)
         }),
       };
-      const signer = provider.getSigner(mockSigner);
+      const signer = await provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -1075,7 +1075,7 @@ describe('TronSyncProvider', () => {
         }),
         signerApi: mockSignerApi,
       };
-      const signer = provider.getSigner(mockSigner);
+      const signer = await provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -1123,7 +1123,7 @@ describe('TronSyncProvider', () => {
       expect(initialCount).to.equal(0);
 
       // Send a transaction
-      const signer = provider.getSigner('private_key');
+      const signer = await provider.getSigner('private_key');
       mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id' });
       mockTronWeb.trx.getTransactionInfo.resolves({ blockNumber: 1 });
       mockTronWeb.trx.getCurrentBlock.resolves({ block_header: { raw_data: { number: 2 } } });
@@ -1146,7 +1146,7 @@ describe('TronSyncProvider', () => {
 
       // Send transaction from address1
       provider.tronWeb.defaultAddress.hex = address1;
-      const signer1 = provider.getSigner('private_key');
+      const signer1 = await provider.getSigner('private_key');
       mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id_1' });
       mockTronWeb.trx.getTransactionInfo.resolves({ blockNumber: 1 });
       mockTronWeb.trx.getCurrentBlock.resolves({ block_header: { raw_data: { number: 2 } } });
@@ -1160,7 +1160,7 @@ describe('TronSyncProvider', () => {
 
       // Send transaction from address2
       provider.tronWeb.defaultAddress.hex = address2;
-      const signer2 = provider.getSigner('private_key');
+      const signer2 = await provider.getSigner('private_key');
       mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id_2' });
 
       await signer2.sendTransaction({

@@ -87,7 +87,8 @@ describe('RpcProviderAggregator', () => {
     stub(transaction, 'params').get(() => TEST_FULL_TX);
 
     // Testing instance
-    chainProvider = new RpcProviderAggregator(logger, domain, config, privateKey);
+    chainProvider = new RpcProviderAggregator(logger, domain, config);
+    await chainProvider.setSigner(privateKey);
     // // One block = 10ms for the purposes of testing.
     // (chainProvider as any).blockPeriod = 10;
     // stub(chainProvider as any, 'execute').callsFake(fakeExecuteMethod as any);
@@ -109,7 +110,8 @@ describe('RpcProviderAggregator', () => {
         privateKey: chainSpecificPrivateKey,
       };
 
-      const aggregator = new RpcProviderAggregator(logger, TEST_SENDER_DOMAIN, configWithPrivateKey, globalSignerPrivateKey);
+      const aggregator = new RpcProviderAggregator(logger, TEST_SENDER_DOMAIN, configWithPrivateKey);
+      await aggregator.setSigner(globalSignerPrivateKey);
 
       // The signer should be set using the chain-specific private key, not the global one
       expect((aggregator as any).signer).to.be.instanceof(EthWallet);
@@ -123,7 +125,8 @@ describe('RpcProviderAggregator', () => {
         privateKey: chainSpecificPrivateKey,
       };
 
-      const aggregator = new RpcProviderAggregator(logger, TRON_DOMAIN, configWithPrivateKey, globalSignerPrivateKey);
+      const aggregator = new RpcProviderAggregator(logger, TRON_DOMAIN, configWithPrivateKey);
+      await aggregator.setSigner(globalSignerPrivateKey);
 
       expect(await (aggregator as any).signer.getAddress()).to.be.equal('412e988a386a799f506693793c6a5af6b54dfaabfb');
     });

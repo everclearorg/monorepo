@@ -124,10 +124,10 @@ CREATE FUNCTION public.add_new_tron_destination_intent(rec record) RETURNS boole
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    intent_id TEXT;
+    destination_intent_id TEXT;
     solver TEXT;
     totalFeeDBPS NUMERIC;
-    queue_idx NUMERIC;
+    queue_index NUMERIC;
     initiator TEXT;
     receiver TEXT;
     input_asset TEXT;
@@ -147,12 +147,12 @@ DECLARE
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
 BEGIN
-    intent_id := SUBSTRING(rec.topics, 68, 66);
+    destination_intent_id := SUBSTRING(rec.topics, 68, 66);
     solver := SUBSTRING(rec.topics, 135, 66);
 
     totalFeeDBPS := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
-    queue_idx := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
+    queue_index := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
     initiator := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
@@ -214,8 +214,8 @@ BEGIN
         ttl
     )
     VALUES (
-        intent_id,
-        queue_idx,
+        destination_intent_id,
+        queue_index,
         initiator,
         receiver,
         solver,
@@ -282,19 +282,19 @@ BEGIN
             queue_id,
             '728126428',
             1,
-            queue_idx,
-            queue_idx,
+            queue_index,
+            queue_index,
             'FILL'
         );
     ELSE
         UPDATE public.queues
         SET size = queue_rec.size + 1,
-            last = queue_idx
+            last = queue_index
         WHERE id = queue_id;
     END IF;
 
     INSERT INTO tron.fill_queue(queue_idx, intent_id)
-    VALUES (queue_idx, intent_id)
+    VALUES (queue_index, destination_intent_id)
     ON CONFLICT (queue_idx)
     DO UPDATE SET intent_id = EXCLUDED.intent_id;
 
@@ -319,7 +319,7 @@ DECLARE
     pos INT := 3;
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
-    intent_id TEXT;
+    fill_intent_id TEXT;
     i INT;
 BEGIN
     message_id := SUBSTRING(rec.topics, 68, 66);
@@ -331,12 +331,12 @@ BEGIN
     quote := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
 
     FOR i IN first_idx..last_idx LOOP
-        SELECT intent_id INTO intent_id
+        SELECT intent_id INTO fill_intent_id
         FROM tron.fill_queue
         WHERE queue_idx = i;
 
         IF FOUND THEN
-            intent_ids := array_append(intent_ids, intent_id);
+            intent_ids := array_append(intent_ids, fill_intent_id);
         END IF;
     END LOOP;
 
@@ -432,7 +432,7 @@ DECLARE
     pos INT := 3;
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
-    intent_id TEXT;
+    origin_intent_id TEXT;
     i INT;
 BEGIN
     message_id := SUBSTRING(rec.topics, 68, 66);
@@ -444,12 +444,12 @@ BEGIN
     quote := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
 
     FOR i IN first_idx..last_idx LOOP
-        SELECT intent_id INTO intent_id
+        SELECT intent_id INTO origin_intent_id
         FROM tron.intent_queue
         WHERE queue_idx = i;
 
         IF FOUND THEN
-            intent_ids := array_append(intent_ids, intent_id);
+            intent_ids := array_append(intent_ids, origin_intent_id);
         END IF;
     END LOOP;
 
@@ -536,8 +536,8 @@ CREATE FUNCTION public.add_new_tron_origin_intent(rec record) RETURNS boolean
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    intent_id TEXT;
-    queue_idx NUMERIC;
+    origin_intent_id TEXT;
+    queue_index NUMERIC;
     initiator TEXT;
     receiver TEXT;
     input_asset TEXT;
@@ -557,9 +557,9 @@ DECLARE
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
 BEGIN
-    intent_id := SUBSTRING(rec.topics, 68, 66);
+    origin_intent_id := SUBSTRING(rec.topics, 68, 66);
 
-    queue_idx := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
+    queue_index := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
     initiator := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
@@ -618,8 +618,8 @@ BEGIN
         destinations
     )
     VALUES (
-        intent_id,
-        queue_idx,
+        origin_intent_id,
+        queue_index,
         receiver,
         input_asset,
         output_asset,
@@ -680,19 +680,19 @@ BEGIN
             queue_id,
             '728126428',
             1,
-            queue_idx,
-            queue_idx,
+            queue_index,
+            queue_index,
             'INTENT'
         );
     ELSE
         UPDATE public.queues
         SET size = queue_rec.size + 1,
-            last = queue_idx
+            last = queue_index
         WHERE id = queue_id;
     END IF;
 
     INSERT INTO tron.intent_queue(queue_idx, intent_id)
-    VALUES (queue_idx, intent_id)
+    VALUES (queue_index, origin_intent_id)
     ON CONFLICT (queue_idx)
     DO UPDATE SET intent_id = EXCLUDED.intent_id;
 
@@ -2474,14 +2474,16 @@ ALTER SEQUENCE public.origin_intents_status_log_id_seq OWNED BY public.origin_in
 --
 
 CREATE TABLE public.otc_sale_table (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    order_id uuid DEFAULT gen_random_uuid() NOT NULL,
     partner_id text NOT NULL,
     origin integer NOT NULL,
-    destination integer[] NOT NULL,
-    token text NOT NULL,
+    destinations integer[] NOT NULL,
+    ticker_hash text NOT NULL,
     amount text NOT NULL,
     total_fee text NOT NULL,
-    created_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now(),
+    transaction_hash text,
+    expires_at timestamp without time zone
 );
 
 
@@ -3739,7 +3741,7 @@ ALTER TABLE ONLY public.origin_intents_status_log
 --
 
 ALTER TABLE ONLY public.otc_sale_table
-    ADD CONSTRAINT otc_sale_table_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT otc_sale_table_pkey PRIMARY KEY (order_id);
 
 
 --
@@ -4566,4 +4568,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250522084000'),
     ('20250528030214'),
     ('20250530175841'),
-    ('20250612163456');
+    ('20250612163456'),
+    ('20250623193039'),
+    ('20250624105537');

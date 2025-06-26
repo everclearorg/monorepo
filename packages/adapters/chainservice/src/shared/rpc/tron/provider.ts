@@ -339,7 +339,7 @@ export class TronSyncProvider extends SyncProvider {
     return result.energy_required.toString();
   }
 
-  public getSigner(signer: ISigner | string): ISigner {
+  public async getSigner(signer: ISigner | string): Promise<ISigner> {
     if (typeof signer === 'string') {
       this.tronWeb.setPrivateKey(signer);
       return new TronWeb3Signer(this);
@@ -350,7 +350,7 @@ export class TronSyncProvider extends SyncProvider {
     return new TronWeb3Signer(this, signer.signerApi);
   }
 
-  public connect(signer: ISigner | string): ISigner {
+  public async connect(signer: ISigner | string): Promise<ISigner> {
     return this.getSigner(signer);
   }
 

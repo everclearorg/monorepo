@@ -31,7 +31,7 @@
     "clean": "yarn workspaces foreach -A --parallel run clean",
     "purge": "yarn workspaces foreach -A --parallel run purge && rimraf './node_modules'",
     "test": "yarn workspaces foreach -A --parallel run test",
-    "test:unit": "yarn workspaces foreach -v -A --parallel run test:unit",
+    "test:unit": "yarn workspaces foreach -v -A run test:unit",
     "test:integration": "yarn workspaces foreach -v -A --parallel run test:integration"
   },
   "devDependencies": {
