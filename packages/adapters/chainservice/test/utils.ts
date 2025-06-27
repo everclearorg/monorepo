@@ -5,6 +5,7 @@ import { OnchainTransaction, ReadTransaction, WriteTransaction } from '../src/sh
 
 export const TEST_SENDER_CHAIN_ID = 1337;
 export const TEST_SENDER_DOMAIN = 1337;
+export const TRON_DOMAIN = 728126428;
 export const DEFAULT_GAS_LIMIT = BigNumber.from('21004');
 
 export const TEST_REQUEST_CONTEXT = mock.log.requestContext();

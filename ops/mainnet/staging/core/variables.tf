@@ -267,3 +267,9 @@ variable "solana_signer" {
   type      = string
   sensitive = true
 }
+
+variable "trongrid_api_key" {
+  type      = string
+  sensitive = true
+  default   = "neverclear"
+}

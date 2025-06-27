@@ -143,7 +143,10 @@ export class RpcProviderAggregator {
   }
 
   public async setSigner(signer: ISigner | string) {
-    if (signer) {
+    // Use chain-specific private key if available, otherwise use the global signer
+    if (this.config.privateKey) {
+      this.signer = await this.providers[0].getSigner(this.config.privateKey);
+    } else if (signer) {
       this.signer = await this.providers[0].getSigner(signer);
     } else {
       this.signer = undefined;
@@ -172,7 +175,7 @@ export class RpcProviderAggregator {
       gasPrice: transaction.params.gasPrice ? BigNumber.from(transaction.params.gasPrice) : undefined,
       value: BigNumber.from(transaction.params.value || 0),
     };
-    const provider = await this.leadProvider!.connect(this.signer!)
+    const provider = await this.leadProvider!.connect(this.signer!);
     return provider.sendTransaction(toSend as unknown as ITransactionRequest);
   }
 
