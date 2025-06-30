@@ -1,7 +1,8 @@
 // Run command: yarn ts-node --files --project tsconfig.json tron/deploy/spoke.ts
-import TronWeb from 'tronweb';
+import * as TronWeb from 'tronweb';
 import dotenv from 'dotenv';
 dotenv.config();
+import { Interface } from '@ethersproject/abi';
 
 // The JSON artifacts produced by TronBox or another compiler
 import EverclearSpokeArtifact from '../build/contracts/EverclearSpoke.json';
@@ -10,7 +11,7 @@ import ERC1967ProxyArtifact from '../build/contracts/ERC1967Proxy.json';
 import CallExecutorArtifact from '../build/contracts/CallExecutor.json';
 import MessageReceiverArtifact from '../build/contracts/SpokeMessageReceiver.json';
 
-const tronWeb = new TronWeb({
+const tronWeb = new TronWeb.TronWeb({
   fullHost: process.env.TRON_MAINNET_RPC!,
   privateKey: process.env.TRON_KEY,
 });
@@ -123,6 +124,11 @@ async function deploySpokeProxy(
   return proxyAddress;
 }
 
+function toEthHex(tronAddr: string): `0x${string}` {
+  const hex41 = tronWeb.address.toHex(tronAddr);
+  return ('0x' + hex41.slice(2)) as `0x${string}`; // drop the 0x41 prefix
+}
+
 async function deployGatewayProxy(
   implAbi: unknown[],
   implBytecode: string,
@@ -136,22 +142,25 @@ async function deployGatewayProxy(
   console.log(`Implementation deployed at ${implAddress}`);
 
   // 2) Deploy the proxy, passing (implementation, initCall) to constructor
+  const iface = new Interface(implAbi as any);
+  const initData = iface.encodeFunctionData('initialize', [
+    toEthHex(params.owner),
+    toEthHex(params.mailbox),
+    toEthHex(receiver),
+    toEthHex(params.ism),
+    params.hubDomain,
+    HUB_GATEWAY,
+  ]);
+  console.log(`Gateway init calldata: ${initData}`);
+
   const contractInstance = await tronWeb.contract().new({
     abi: proxyAbi,
     bytecode: proxyBytecode,
     feeLimit: 1_000_000_000,
     callValue: 0,
-    parameters: [implAddress, '0x'],
+    parameters: [implAddress, initData],
   });
   const proxyAddress = contractInstance.address;
-
-  // 3) Call the initialize function on the proxy
-  const gatewayInstance = await tronWeb.contract(implAbi, proxyAddress);
-
-  await gatewayInstance.initialize(params.owner, params.mailbox, receiver, params.ism, hubDomain, HUB_GATEWAY).send({
-    feeLimit: 1_000_000_000,
-  });
-
   console.log(`Gateway proxy deployed at ${proxyAddress}`);
   return proxyAddress;
 }
