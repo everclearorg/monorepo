@@ -105,14 +105,22 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
    */
   QueueLibV2.IntentQueue public intentQueue;
   /**
-   * @notice The fill queue
+   * @notice The deprecated fill queue with previous FillMessage struct
    */
-  QueueLibV2.FillQueue public fillQueue;
+  QueueLib.FillQueue public deprecated_fillQueue;
 
   /**
    * @notice Address for the fillSigner
    */
   address public fillSigner;
+
+  /**
+   * **********************  Swap Upgrade  **********************
+   */
+  /**
+   * @notice The fill queue
+   */
+  QueueLibV2.FillQueue public fillQueue;
 
   /**
    * @notice Checks that the address is valid
