@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
+import {QueueLib} from 'contracts/common/QueueLib.sol';
 import {QueueLibV2} from 'contracts/common/QueueLibV2.sol';
 
 import {IPermit2} from 'interfaces/common/IPermit2.sol';
