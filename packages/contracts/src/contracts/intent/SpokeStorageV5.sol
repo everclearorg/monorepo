@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
+import {QueueLib} from 'contracts/common/QueueLib.sol';
 import {QueueLibV2} from 'contracts/common/QueueLibV2.sol';
 
 import {IPermit2} from 'interfaces/common/IPermit2.sol';
@@ -17,7 +18,7 @@ import {ISpokeStorageV5} from 'interfaces/intent/ISpokeStorageV5.sol';
 abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant FILL_INTENT_FOR_SOLVER_TYPEHASH = keccak256(
-    'function fillIntentForSolver(address _solver, Intent calldata _intent, uint256 _nonce, uint24 _fee, bytes memory _signature)'
+    'function fillIntentForSolver(address _solver, Intent calldata _intent, uint256 _nonce, uint256 _amountOut, bytes memory _signature)'
   );
 
   /// @inheritdoc ISpokeStorageV5
@@ -80,14 +81,22 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
    */
   QueueLibV2.IntentQueue public intentQueue;
   /**
-   * @notice The fill queue
+   * @notice The deprecated fill queue with previous FillMessage struct
    */
-  QueueLibV2.FillQueue public fillQueue;
+  QueueLib.FillQueue public deprecated_fillQueue;
 
   /**
    * **********************  FeeAdapter Upgrade  **********************
    */
   address public feeAdapter;
+
+  /**
+   * **********************  Swap Upgrade  **********************
+   */
+  /**
+   * @notice The fill queue
+   */
+  QueueLibV2.FillQueue public fillQueue;
 
   /**
    * @notice Checks that the address is valid

@@ -369,7 +369,7 @@ contract EverclearSpokeV5 is
   /// @inheritdoc IEverclearSpokeV5
   function initialize(
     address _feeAdapter
-  ) public reinitializer(2) {
+  ) public reinitializer(3) {
     feeAdapter = _feeAdapter;
   }
 
@@ -438,15 +438,14 @@ contract EverclearSpokeV5 is
       receiver: _receiver,
       inputAsset: _inputAsset.toBytes32(),
       outputAsset: _outputAsset,
-      maxFee: 0, // maxFee is not used in this version
       origin: DOMAIN,
       nonce: ++nonce,
       timestamp: uint48(block.timestamp),
       ttl: _ttl,
       amount: _normalizedAmount,
+      amountOutMin: _amountOutMin,
       destinations: _destinations,
-      data: _data,
-      amountOutMin: _amountOutMin
+      data: _data
     });
 
     _intentId = keccak256(abi.encode(_intent));
@@ -507,7 +506,6 @@ contract EverclearSpokeV5 is
       initiator: _intent.initiator,
       solver: _solver.toBytes32(),
       executionTimestamp: uint48(block.timestamp),
-      fee: 0,
       amountOut: _amountOut
     });
 

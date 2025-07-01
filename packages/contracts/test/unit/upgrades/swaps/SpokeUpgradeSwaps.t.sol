@@ -30,7 +30,6 @@ import 'forge-std/StdStorage.sol';
 import 'forge-std/console2.sol';
 
 contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
-  using TypeCasts for address;
   using TypeCasts for bytes32;
   using stdStorage for StdStorage;
 
@@ -46,19 +45,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
   FeeAdapterV2 public feeAdapterV2;
   SpokeMessageReceiverV2 public messageReceiverV2;
-
-  // ============ Upgrade ============ //
-  function test_spokeSwapUpgrade_upgrade() public {
-    vm.createSelectFork(vm.envString('MAINNET_RPC'), FIXED_MAIN_BLOCK_UP5);
-
-    // Deploying the new FeeAdapter
-    feeAdapterV2 = new FeeAdapterV2(
-      SPOKE_PROXY_MAINNET, FEE_RECIPIENT_MAINNET, FEE_SIGNER, XERC20_MODULE_MAINNET, SPOKE_PROXY_MAINNET_OWNER
-    );
-
-    // deploying messageReceiverV2
-    messageReceiverV2 = new SpokeMessageReceiverV2();
-
     // Checking implementation correct and caching the state variables
     spokeProxyV5 = EverclearSpokeV5(SPOKE_PROXY_MAINNET);
     address oldImplementation = (vm.load(SPOKE_PROXY_MAINNET, IMPLEMENTATION_SLOT)).toAddress();
