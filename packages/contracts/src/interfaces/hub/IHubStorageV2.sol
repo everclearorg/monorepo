@@ -160,7 +160,7 @@ interface IHubStorageV2 {
    * @param status The status of the intent
    * @param intent The intent object
    */
-  struct IntentContext {
+  struct DeprecatedIntentContext {
     bytes32 solver;
     uint24 fee;
     uint24 totalProtocolFee;
@@ -169,7 +169,28 @@ interface IHubStorageV2 {
     uint256 pendingRewards;
     IEverclearV2.IntentStatus status;
     IEverclearV2.Intent intent;
+  }
+
+  /**
+   * @notice Rich intent information
+   * @param solver The address of the solver
+   * @param fee The fee charged by the solver when filling the intent (solver fee + protocol fee) in DBPS
+   * @param totalProtocolFee The total protocol fee of the intent
+   * @param fillTimestamp The timestamp of the fill
+   * @param amountAfterFees The amount after fees
+   * @param pendingRewards The pending rewards
+   * @param status The status of the intent
+   * @param intent The intent object
+   */
+  struct IntentContext {
+    bytes32 solver;
+    uint24 totalProtocolFee;
+    uint256 fillTimestamp;
+    uint256 amountAfterFees;
+    uint256 pendingRewards;
     uint256 amountOut;
+    IEverclearV2.IntentStatus status;
+    IEverclearV2.Intent intent;
   }
 
   /*//////////////////////////////////////////////////////////////
