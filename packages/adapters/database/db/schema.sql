@@ -144,7 +144,7 @@ DECLARE
     data TEXT;
     pos INT := 3;
     i INT;
-    queue_id TEXT = '728126428-0x494e54454e54';
+    queue_id TEXT = '728126428-0x46494c4c';
     queue_rec RECORD;
 BEGIN
     destination_intent_id := SUBSTRING(rec.topics, 68, 66);
@@ -317,7 +317,7 @@ DECLARE
     everclear_domain VARCHAR(66) = '25327';
     intent_ids VARCHAR(66)[] := ARRAY[]::VARCHAR(66)[];
     pos INT := 3;
-    queue_id TEXT = '728126428-0x494e54454e54';
+    queue_id TEXT = '728126428-0x46494c4c';
     queue_rec RECORD;
     fill_intent_id TEXT;
     i INT;
@@ -2474,14 +2474,16 @@ ALTER SEQUENCE public.origin_intents_status_log_id_seq OWNED BY public.origin_in
 --
 
 CREATE TABLE public.otc_sale_table (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    order_id uuid DEFAULT gen_random_uuid() NOT NULL,
     partner_id text NOT NULL,
     origin integer NOT NULL,
-    destination integer[] NOT NULL,
-    token text NOT NULL,
+    destinations integer[] NOT NULL,
+    ticker_hash text NOT NULL,
     amount text NOT NULL,
     total_fee text NOT NULL,
-    created_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now(),
+    transaction_hash text,
+    expires_at timestamp without time zone
 );
 
 
@@ -3739,7 +3741,7 @@ ALTER TABLE ONLY public.origin_intents_status_log
 --
 
 ALTER TABLE ONLY public.otc_sale_table
-    ADD CONSTRAINT otc_sale_table_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT otc_sale_table_pkey PRIMARY KEY (order_id);
 
 
 --
@@ -4567,4 +4569,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250528030214'),
     ('20250530175841'),
     ('20250612163456'),
-    ('20250623193039');
+    ('20250623193039'),
+    ('20250624105537'),
+    ('20250701013945');
