@@ -14,7 +14,7 @@ const tronWeb = new TronWeb.TronWeb({
 
 const EVERCLEAR_SPOKE = '419b266df36c882a73d45b18876104d5728424828f';
 // const EVERCLEAR_SPOKE_GATEWAY_IMPL = '417039676630aba9606afa13bfb4b822d67c05282a'; // TLCbT376siRg4PvzGBXYq4a1xafWJyzM5n || 417039676630aba9606afa13bfb4b822d67c05282a
-const EVERCLEAR_SPOKE_GATEWAY_PROXY = '41a35c21eb3b0a2211998fc407eb0bc6912baf6522'; // Newly deployed
+const EVERCLEAR_SPOKE_GATEWAY = '4154ea655e20e515c85143dab8a6baae0b11d137a6';
 
 (async () => {
   try {
@@ -24,7 +24,7 @@ const EVERCLEAR_SPOKE_GATEWAY_PROXY = '41a35c21eb3b0a2211998fc407eb0bc6912baf652
     const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE);
 
     // Construct gateway (proxy) state 
-    const gatewayInstance = await tronWeb.contract(SpokeGatewayArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_PROXY);
+    const gatewayInstance = await tronWeb.contract(SpokeGatewayArtifact.abi, EVERCLEAR_SPOKE_GATEWAY);
 
     // Reading the Spoke instance state //
     const spokeOwner = await spokeInstance.owner().call();
@@ -41,6 +41,10 @@ const EVERCLEAR_SPOKE_GATEWAY_PROXY = '41a35c21eb3b0a2211998fc407eb0bc6912baf652
     // Get the mailbox address
     const mailbox = await gatewayInstance.mailbox().call();
     console.log('Mailbox address:', mailbox);
+
+    // Getting the ism address
+    const ismAddress = await gatewayInstance.interchainSecurityModule().call();
+    console.log('ISM address:', ismAddress);
 
     // Get the receiver address
     const receiver = await gatewayInstance.receiver().call();

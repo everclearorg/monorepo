@@ -36,8 +36,8 @@ const hubGateway: string = '41EFfAB7cCEBF63FbEFB4884964b12259d4374FaAa';
 const tronOwner: string = 'TXE2CSwYQFCuuAp7ZStdLzUFQEKEvfqhsV'; // NOTE: Using EOA to enable the update of the gateway
 const tronMaxSolversFee: number = 5000;
 const hubDomain: number = 25327;
-const tronIsm: string = '410000000000000000000000000000000000000000';
-const tronMailbox: string = 'TFDcY4nc4L6S6pMrSVsew34AgqciJfvkHj';
+const tronIsm: string = '41cbcbc532cf88bacf1c8a6359604c784d042bb692';
+const tronMailbox: string = '415b34081e9d453fc2ba925d893583d89d1b7175dd';
 const HUB_GATEWAY = '0x000000000000000000000000effab7ccebf63fbefb4884964b12259d4374faaa';
 
 function configureDeploymentParameters(): DeploymentParams {
@@ -137,11 +137,12 @@ async function deployGatewayProxy(
   params: DeploymentParams,
   receiver: string,
 ): Promise<string> {
-  // 1) Deploy the implementation
-  const implAddress = await deployContract(implAbi, implBytecode);
-  console.log(`Implementation deployed at ${implAddress}`);
+  // // 1) Deploy the implementation
+  // const implAddress = await deployContract(implAbi, implBytecode);
+  // console.log(`Implementation deployed at ${implAddress}`);
 
-  // 2) Deploy the proxy, passing (implementation, initCall) to constructor
+  // // 2) Deploy the proxy, passing (implementation, initCall) to constructor
+  const implAddress = '417039676630aba9606afa13bfb4b822d67c05282a';
   const iface = new Interface(implAbi as any);
   const initData = iface.encodeFunctionData('initialize', [
     toEthHex(params.owner),
@@ -198,25 +199,26 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     const params = configureDeploymentParameters();
     console.log('Deployment parameters:', params);
 
-    // Deploy Call Executor (no proxy for example)
-    const executorAddr = await deployContract(CallExecutorArtifact.abi, CallExecutorArtifact.bytecode);
-    console.log('CallExecutor at:', executorAddr);
+    // // Deploy Call Executor (no proxy for example)
+    // const executorAddr = await deployContract(CallExecutorArtifact.abi, CallExecutorArtifact.bytecode);
+    // console.log('CallExecutor at:', executorAddr);
 
-    // Deploy MessageReceiver (no proxy for example)
-    const messageReceiverAddr = await deployContract(MessageReceiverArtifact.abi, MessageReceiverArtifact.bytecode);
-    console.log('MessageReceiver at:', messageReceiverAddr);
+    // // Deploy MessageReceiver (no proxy for example)
+    // const messageReceiverAddr = await deployContract(MessageReceiverArtifact.abi, MessageReceiverArtifact.bytecode);
+    // console.log('MessageReceiver at:', messageReceiverAddr);
 
-    // Deploy Spoke (UUPS style)
-    const spokeAddress = await deploySpokeProxy(
-      EverclearSpokeArtifact.abi,
-      EverclearSpokeArtifact.bytecode,
-      ERC1967ProxyArtifact.abi,
-      ERC1967ProxyArtifact.bytecode.object,
-      params,
-    );
-    console.log('Everclear Spoke (proxy) at:', spokeAddress);
+    // // Deploy Spoke (UUPS style)
+    // const spokeAddress = await deploySpokeProxy(
+    //   EverclearSpokeArtifact.abi,
+    //   EverclearSpokeArtifact.bytecode,
+    //   ERC1967ProxyArtifact.abi,
+    //   ERC1967ProxyArtifact.bytecode.object,
+    //   params,
+    // );
+    // console.log('Everclear Spoke (proxy) at:', spokeAddress);
 
     // Deploy Gateway (UUPS style)
+    const spokeAddress = '419b266df36c882a73d45b18876104d5728424828f';
     const gatewayAddress = await deployGatewayProxy(
       SpokeGatewayArtifact.abi,
       SpokeGatewayArtifact.bytecode,
