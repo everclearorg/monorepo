@@ -187,7 +187,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
    * @notice Tests the deposit function of the spoke proxy
    * @dev This function is used to deposit tokens into the spoke proxy
    */
-
   function test_spokeUpgradeSwaps_deposit() public {
     _upgradeSpoke();
 
