@@ -15,10 +15,10 @@ import {IHubMessageReceiverV2, IMessageReceiver} from 'interfaces/hub/IHubMessag
 import {SettlerLogicV2} from 'contracts/hub/modules/SettlerLogicV2.sol';
 
 /**
- * @title HubMessageReceiver
+ * @title HubMessageReceiverV2
  * @notice Contract for processing incoming cross-chain messages
  */
-contract HubMessageReceiver is SettlerLogicV2, IHubMessageReceiverV2 {
+contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
   using InvoiceListLibV2 for InvoiceListLibV2.InvoiceList;
   using HubQueueLibV2 for HubQueueLibV2.DepositQueue;
   using HubQueueLibV2 for HubQueueLibV2.SettlementQueue;
