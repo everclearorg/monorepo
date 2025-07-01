@@ -1,17 +1,35 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
+import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+
 import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
 import {EverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
 import {EverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
+import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
+import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
+
+import {IHubStorageV2} from 'interfaces/hub/IHubStorageV2.sol';
 import {SafeTxBuilder} from 'test/utils/SafeTxBuilder.sol';
+
+import {UUPSUpgradeable} from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
+
+import {EverclearHubV2, IEverclearHubV2} from 'contracts/hub/EverclearHubV2.sol';
+import {HandlerV2, IHandlerV2} from 'contracts/hub/modules/HandlerV2.sol';
+import {HubMessageReceiverV2, IHubMessageReceiverV2} from 'contracts/hub/modules/HubMessageReceiverV2.sol';
+
+import {IManagerV2, ManagerV2} from 'contracts/hub/modules/ManagerV2.sol';
+import {ISettlerV2, SettlerV2} from 'contracts/hub/modules/SettlerV2.sol';
 
 interface ICREATE3 {
   function deploy(bytes32 _salt, bytes calldata _creationCode) external payable returns (address _deployed);
 }
 
 contract UpgradeHelper is SafeTxBuilder {
+  using TypeCasts for address;
+  using TypeCasts for bytes32;
+
   event IntentQueueProcessed(bytes32 indexed _messageId, uint256 _firstIdx, uint256 _lastIdx, uint256 _quote);
   event FillQueueProcessed(bytes32 indexed _messageId, uint256 _firstIdx, uint256 _lastIdx, uint256 _quote);
   event IntentExecuted(
@@ -58,6 +76,7 @@ contract UpgradeHelper is SafeTxBuilder {
     bool paused;
     uint64 nonce;
     uint256 messageGasLimit;
+    address feeAdapter;
   }
 
   struct DeploymentParams {
@@ -116,6 +135,17 @@ contract UpgradeHelper is SafeTxBuilder {
 
   mapping(uint256 _chainId => DeploymentParamsV4 _params) internal _deploymentParamsV4;
 
+  /**
+   * **********************  FeeAdapter Upgrade  **********************
+   */
+  address public SPOKE_IMPL_MAINNET_V4 = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  uint256 public FIXED_MAIN_BLOCK_UP5 = 22_716_806;
+
+  EverclearSpokeV5 public spokeProxyV5;
+
+  /**
+   * **********************  Helpers  **********************
+   */
   function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
     state.permit = address(spokeProxy.PERMIT2());
     state.EVERCLEAR = spokeProxy.EVERCLEAR();
@@ -156,5 +186,155 @@ contract UpgradeHelper is SafeTxBuilder {
     state.paused = spokeProxyV4.paused();
     state.nonce = spokeProxyV4.nonce();
     state.messageGasLimit = spokeProxyV4.messageGasLimit();
+  }
+
+  /**
+   * **********************  Swap Upgrade  **********************
+   */
+  struct CachedHubState {
+    address owner;
+    address lighthouse;
+    address watchtower;
+    address hubGateway;
+    uint48 epochLength;
+    uint48 expiryTimeBuffer;
+    address settlementModule;
+    address managerModule;
+    address handlerModule;
+    address messageReceiverModule;
+  }
+
+  bytes32 internal constant _SETTLEMENT_MODULE = keccak256('settlement_module');
+  bytes32 internal constant _HANDLER_MODULE = keccak256('handler_module');
+  bytes32 internal constant _MESSAGE_RECEIVER_MODULE = keccak256('message_receiver_module');
+  bytes32 internal constant _MANAGER_MODULE = keccak256('manager_module');
+  address public constant HUB_PROXY = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+  address public constant HUB_PROXY_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant HUB_PROXY_OWNER = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
+  uint256 internal constant FIXED_EVERCLEAR_BLOCK = 1_667_352;
+  address internal constant USDC_ARBITRUM = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
+  address public immutable MANAGER = makeAddr('Manager');
+
+  IEverclearHubV2 public hubProxy;
+  IHubMessageReceiverV2 public hubMessageReceiverV2;
+  IHandlerV2 public handlerV2;
+  ISettlerV2 public settlerV2;
+  IManagerV2 public managerV2;
+  IEverclearHubV2 public everclearHubV2;
+  uint64 public testNonce;
+
+  function _getDestinations(IEverclearV2.Intent memory _intent, uint32 _destination) internal {
+    uint32[] memory _destinations = new uint32[](1);
+    _destinations[0] = _destination;
+    _intent.destinations = _destinations;
+  }
+
+  function _cacheSpokeStateV5() internal view returns (CachedSpokeState memory state) {
+    state.permit = address(spokeProxyV5.PERMIT2());
+    state.EVERCLEAR = spokeProxyV5.EVERCLEAR();
+    state.DOMAIN = spokeProxyV5.DOMAIN();
+    state.lighthouse = spokeProxyV5.lighthouse();
+    state.watchtower = spokeProxyV5.watchtower();
+    state.messageReceiver = spokeProxyV5.messageReceiver();
+    state.gateway = address(spokeProxyV5.gateway());
+    state.callExecutor = address(spokeProxyV5.callExecutor());
+    state.paused = spokeProxyV5.paused();
+    state.nonce = spokeProxyV5.nonce();
+    state.messageGasLimit = spokeProxyV5.messageGasLimit();
+    state.feeAdapter = spokeProxyV5.feeAdapter();
+  }
+
+  function _cacheHubState() internal view returns (CachedHubState memory state) {
+    state.owner = hubProxy.owner();
+    state.lighthouse = hubProxy.lighthouse();
+    state.watchtower = hubProxy.watchtower();
+    state.hubGateway = address(hubProxy.hubGateway());
+    state.epochLength = hubProxy.epochLength();
+    state.expiryTimeBuffer = hubProxy.expiryTimeBuffer();
+    state.settlementModule = hubProxy.modules(_SETTLEMENT_MODULE);
+    state.managerModule = hubProxy.modules(_MANAGER_MODULE);
+    state.handlerModule = hubProxy.modules(_HANDLER_MODULE);
+    state.messageReceiverModule = hubProxy.modules(_MESSAGE_RECEIVER_MODULE);
+  }
+
+  function _upgradeHub() internal {
+    vm.createSelectFork(vm.envString('EVERCLEAR_RPC'), FIXED_EVERCLEAR_BLOCK);
+
+    // Deploying
+    // 1 - HubMessageReceiverV2 (incl. SettlerLogicV2)
+    hubMessageReceiverV2 = new HubMessageReceiverV2();
+    // 2 - HandlerV2
+    handlerV2 = new HandlerV2();
+    // 3 - SettlerV2
+    settlerV2 = new SettlerV2();
+    // 4 - Manager
+    managerV2 = new ManagerV2();
+    // 5 - EverclearHubV2
+    everclearHubV2 = new EverclearHubV2();
+
+    // Checking implementation correct and caching the state variables
+    hubProxy = IEverclearHubV2(HUB_PROXY);
+    address oldImplementation = (vm.load(HUB_PROXY, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, HUB_PROXY_IMPL);
+
+    // Caching state variables
+    CachedHubState memory state = _cacheHubState();
+
+    // Initializing with new feeAdapter and upgrading
+    bytes memory initializeCalldata = abi.encodeWithSelector(
+      EverclearHubV2.initialize.selector,
+      address(settlerV2),
+      address(managerV2),
+      address(handlerV2),
+      address(hubMessageReceiverV2)
+    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, everclearHubV2, initializeCalldata);
+
+    vm.prank(HUB_PROXY_OWNER);
+    (bool success,) = address(hubProxy).call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(HUB_PROXY, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, address(everclearHubV2));
+
+    // Checking the cached state
+    assertEq(state.owner, hubProxy.owner());
+    assertEq(state.lighthouse, hubProxy.lighthouse());
+    assertEq(state.watchtower, hubProxy.watchtower());
+    assertEq(state.hubGateway, address(hubProxy.hubGateway()));
+    assertEq(state.epochLength, hubProxy.epochLength());
+    assertEq(state.expiryTimeBuffer, hubProxy.expiryTimeBuffer());
+    assertEq(address(settlerV2), hubProxy.modules(_SETTLEMENT_MODULE));
+    assertEq(address(managerV2), hubProxy.modules(_MANAGER_MODULE));
+    assertEq(address(handlerV2), hubProxy.modules(_HANDLER_MODULE));
+    assertEq(address(hubMessageReceiverV2), hubProxy.modules(_MESSAGE_RECEIVER_MODULE));
+  }
+
+  function _generateConfigs(
+    IHubStorageV2.TokenSetup[] memory _configs,
+    uint8 _adoptedForAssetsNumber,
+    uint8 _feesNumber
+  ) internal {
+    for (uint8 _i; _i < _configs.length; _i++) {
+      _configs[_i].tickerHash = keccak256(abi.encode(1));
+      _configs[_i].fees = new IHubStorageV2.Fee[](_feesNumber);
+      _configs[_i].adoptedForAssets = new IHubStorageV2.AssetConfig[](_adoptedForAssetsNumber);
+
+      for (uint8 _j; _j < _feesNumber; _j++) {
+        _configs[_i].fees[_j] = IHubStorageV2.Fee({recipient: vm.addr(_j + 1), fee: _j + 2});
+      }
+
+      for (uint8 _j; _j < _adoptedForAssetsNumber; _j++) {
+        _configs[_i].adoptedForAssets[_j] = IHubStorageV2.AssetConfig({
+          tickerHash: _configs[_i].tickerHash,
+          adopted: vm.addr(_j + 1).toBytes32(),
+          domain: _j,
+          approval: _j % 2 == 0,
+          strategy: IEverclearV2.Strategy.DEFAULT
+        });
+      }
+    }
   }
 }
