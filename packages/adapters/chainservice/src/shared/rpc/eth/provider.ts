@@ -393,14 +393,14 @@ export class SyncProvider implements RpcProvider {
     return this.provider.getTransactionCount(address, block);
   }
 
-  public getSigner(signer: ISigner | string) {
+  public async getSigner(signer: ISigner | string): Promise<ISigner> {
     if (typeof signer === 'string') {
       return new EthWallet(signer, this.provider);
     }
     return signer;
   }
 
-  public connect(signer: ISigner | string): ISigner {
+  public async connect(signer: ISigner | string): Promise<ISigner> {
     return (signer as SignerTypeMaps['evm']).connect(this.provider);
   }
 }

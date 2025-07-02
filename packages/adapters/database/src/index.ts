@@ -84,6 +84,7 @@ import {
   getOriginIntentsLastNonce,
   getDeliveredSettlements,
   updateSettlementStatus,
+  updateSolanaMessageStatuses,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
@@ -262,6 +263,7 @@ export type Database = {
     status: intent_status,
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
+  updateSolanaMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
 };
 
 export let pool: Pool;
@@ -333,6 +335,7 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getOriginIntentsLastNonce,
     getDeliveredSettlements,
     updateSettlementStatus,
+    updateSolanaMessageStatuses,
   };
 };
 

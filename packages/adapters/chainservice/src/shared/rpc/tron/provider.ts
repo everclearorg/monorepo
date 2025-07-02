@@ -28,12 +28,16 @@ interface TronLog {
 type TronWebInstance = InstanceType<typeof TronWeb>;
 
 export interface TronWebFactory {
-  create(config: { fullHost: string }): TronWebInstance;
+  create(config: { fullHost: string; apiKey?: string }): TronWebInstance;
 }
 
 class DefaultTronWebFactory implements TronWebFactory {
-  create(config: { fullHost: string }): TronWebInstance {
-    return new TronWeb(config);
+  create(config: { fullHost: string; apiKey?: string }): TronWebInstance {
+    const tronWebConfig: any = { fullHost: config.fullHost };
+    if (config.apiKey) {
+      tronWebConfig.headers = { "TRON-PRO-API-KEY": config.apiKey };
+    }
+    return new TronWeb(tronWebConfig);
   }
 }
 
@@ -138,8 +142,16 @@ export class TronSyncProvider extends SyncProvider {
     debugLogging = false,
     private readonly tronWebFactory: TronWebFactory = new DefaultTronWebFactory(),
   ) {
-    super(url, domain, stallTimeout, debugLogging);
-    this.tronWeb = this.tronWebFactory.create({ fullHost: url });
+    // Extract API key from URL if present
+    const urlObj = new URL(url);
+    const apiKey = urlObj.searchParams.get('apiKey');
+    
+    // Remove API key from URL to get clean fullHost
+    urlObj.searchParams.delete('apiKey');
+    const cleanUrl = urlObj.toString();
+    
+    super(cleanUrl, domain, stallTimeout, debugLogging);
+    this.tronWeb = this.tronWebFactory.create({ fullHost: cleanUrl, apiKey: apiKey || undefined });
   }
 
   public async sync(): Promise<void> {
@@ -156,17 +168,18 @@ export class TronSyncProvider extends SyncProvider {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async call(tx: ReadTransaction, _block: number | string): Promise<string> {
     const result = await this.tronWeb.transactionBuilder.triggerConstantContract(
-      tx.to,
+      this.getTronAddress(tx.to),
       tx.funcSig,
       {},
       decodeParameters(tx.data, tx.funcSig),
+      this.tronWeb.defaultAddress.hex || '410000000000000000000000000000000000000000',
     );
 
     if (!result.constant_result || result.constant_result.length === 0) {
       throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { error: result.Error });
     }
 
-    return result.constant_result[0];
+    return `0x${result.constant_result[0]}`;
   }
 
   private async getTransactionData(hash: string): Promise<any> {
@@ -306,7 +319,7 @@ export class TronSyncProvider extends SyncProvider {
     const originalAddress = this.tronWeb.defaultAddress.hex;
     try {
       // Use a default address for the contract call
-      this.tronWeb.defaultAddress.hex = '0x0000000000000000000000000000000000000000';
+      this.tronWeb.defaultAddress.hex = '410000000000000000000000000000000000000000';
       const decimals = await contract.decimals().call();
       return Number(decimals);
     } finally {
@@ -322,10 +335,7 @@ export class TronSyncProvider extends SyncProvider {
     // If from address is provided, convert it to Tron format if needed
     let fromAddress = writeTx?.from;
     if (fromAddress) {
-      // If it's an Ethereum-style address, convert to Tron format
-      if (fromAddress.startsWith('0x')) {
-        fromAddress = this.tronWeb.address.fromHex(fromAddress);
-      }
+      fromAddress = this.getTronAddress(fromAddress);
     }
 
     const result = await this.tronWeb.transactionBuilder.estimateEnergy(
@@ -343,23 +353,30 @@ export class TronSyncProvider extends SyncProvider {
     return result.energy_required.toString();
   }
 
-  public getSigner(signer: ISigner | string): ISigner {
-    if (typeof signer === 'string') {
-      this.tronWeb.setPrivateKey(signer);
-      return new TronWeb3Signer(this);
-    } else if ((signer as any).privateKey) {
-      this.tronWeb.setPrivateKey((signer as any).privateKey);
+  public async getSigner(signer: ISigner | string): Promise<ISigner> {
+    const privateKey = typeof signer === 'string' ? signer : (signer as any).privateKey;
+    if (privateKey) {
+      this.tronWeb.setPrivateKey(privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey);
       return new TronWeb3Signer(this);
     }
-    return new TronWeb3Signer(this, signer.signerApi);
+
+    return new TronWeb3Signer(this, (signer as ISigner).signerApi);
   }
 
-  public connect(signer: ISigner | string): ISigner {
+  public async connect(signer: ISigner | string): Promise<ISigner> {
     return this.getSigner(signer);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getTransactionCount(address: string, _blockTag: string | number = 'latest'): Promise<number> {
     return this.nonces.get(address) || 0;
+  }
+
+  public getTronAddress(address: string): string {
+    if (address.startsWith('0x')) {
+      return this.tronWeb.address.fromHex(`0x${address.slice(-40)}`);
+    }
+
+    return address;
   }
 }
