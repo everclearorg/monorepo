@@ -226,6 +226,10 @@ export const validateChainServiceConfig = (_config: any): ChainServiceConfig => 
           : provider,
       ),
     } as ChainConfig;
+
+    if (chainConfig.privateKey) {
+      config[domain].privateKey = chainConfig.privateKey;
+    }
   });
   ajv.compile(ChainServiceConfigSchema)(config);
   return config;
