@@ -1,22 +1,16 @@
 import { Logger, expect } from '@chimera-monorepo/utils';
-import { restore, reset, stub, SinonStubbedInstance, SinonStub } from 'sinon';
+import { restore, reset, stub, SinonStub } from 'sinon';
 import { checkRpcs } from '../../src/checklist/rpc';
 import { getContextStub, mock } from '../globalTestHook';
 import { createProcessEnv } from '../mock';
-import { Database } from '@chimera-monorepo/database';
-import { ChainReader } from '@chimera-monorepo/chainservice';
-import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
 import * as Mockable from '../../src/mockable';
 
 describe('checkRpcs', () => {
-  let database: SinonStubbedInstance<Database>;
-  let chainreader: SinonStubbedInstance<ChainReader>;
-  let subgraph: SinonStubbedInstance<SubgraphReader>;
-  let logger: SinonStubbedInstance<Logger>;
   let sendAlertsStub: SinonStub;
   let resolveAlertsStub: SinonStub;
 
   beforeEach(() => {
+    reset();
     stub(process, 'env').value({
       ...process.env,
       ...createProcessEnv(),
@@ -25,10 +19,6 @@ describe('checkRpcs', () => {
       ...mock.context(),
       config: { ...mock.config() },
     });
-    database = mock.instances.database() as SinonStubbedInstance<Database>;
-    chainreader = mock.instances.chainreader() as SinonStubbedInstance<ChainReader>;
-    logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
-    subgraph = mock.instances.subgraph() as SinonStubbedInstance<SubgraphReader>;
 
     sendAlertsStub = stub(Mockable, 'sendAlerts');
     sendAlertsStub.resolves();
