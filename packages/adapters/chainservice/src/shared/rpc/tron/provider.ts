@@ -278,6 +278,11 @@ export class TronSyncProvider extends SyncProvider {
     };
   }
 
+  public async getBlockNumber(): Promise<number> {
+    const blockData = await this.tronWeb.trx.getBlock('latest');
+    return blockData.block_header.raw_data.number;
+  }
+
   public async getCode(address: string): Promise<string> {
     const contract = await this.tronWeb.trx.getContract(address);
     return contract.bytecode || '0x';
