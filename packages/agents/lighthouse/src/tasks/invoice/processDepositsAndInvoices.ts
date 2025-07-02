@@ -103,7 +103,8 @@ export const processDepositsAndInvoices = async () => {
     );
     const [epochLength] = iface.decodeFunctionResult('epochLength', encodedDataForEpochLengthRes);
 
-    const blockNumber = await chainservice.getBlockNumber(+hub.domain);
+    // NOTE: Use L1 block to compute current epoch, as getBlockNumber(+hub.domain) returns L2 block
+    const blockNumber = await chainservice.getBlockNumber(1);
     const currentEpoch = Math.floor(blockNumber / +epochLength.toString());
     const lastClosedEpoch = currentEpoch > 0 ? currentEpoch - 1 : 0;
 
