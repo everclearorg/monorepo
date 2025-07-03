@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber, constants, providers, utils, Wallet } from 'ethers';
+import { BigNumber, constants, providers, utils } from 'ethers';
 import { stub, restore, reset, createStubInstance, SinonStubbedInstance, SinonStub } from 'sinon';
 import { mkAddress, mkBytes32, expect, Logger, EverclearError, mock } from '@chimera-monorepo/utils';
 
 import { RpcProviderAggregator } from '../../src/aggregator';
 import * as Mockable from '../../src/mockable';
-import { ChainConfig, DEFAULT_CHAIN_CONFIG } from '../../src/config';
 import {
   OnchainTransaction,
   GasEstimateInvalid,
@@ -16,7 +15,10 @@ import {
   QuorumNotMet,
   SyncProvider,
   MissingSigner,
-} from '../../src/shared';
+  ChainConfig,
+  DEFAULT_CHAIN_CONFIG,
+  EthWallet,
+} from '../../src';
 import {
   makeChaiReadable,
   TEST_FULL_TX,
@@ -28,6 +30,7 @@ import {
   TEST_TX_RECEIPT,
   TEST_TX_RESPONSE,
   TEST_REQUEST_CONTEXT,
+  TRON_DOMAIN,
 } from '../utils';
 
 const logger = new Logger({
@@ -35,7 +38,7 @@ const logger = new Logger({
   name: 'DispatchTest',
 });
 
-let signer: SinonStubbedInstance<Wallet>;
+let signer: SinonStubbedInstance<EthWallet>;
 let chainProvider: RpcProviderAggregator;
 let transaction: OnchainTransaction;
 
@@ -59,8 +62,8 @@ describe('RpcProviderAggregator', () => {
 
     // Ethers stubs
     providerStub = stub(providers.StaticJsonRpcProvider.prototype);
-    const privateKey = Wallet.createRandom().privateKey;
-    signer = stub(Wallet.prototype);
+    const privateKey = EthWallet.createRandom().privateKey;
+    signer = stub(EthWallet.prototype);
     signer.sendTransaction.resolves(TEST_TX_RESPONSE);
     signer.getTransactionCount.resolves(TEST_TX_RESPONSE.nonce);
     signer.connect.returns(signer);
@@ -84,7 +87,8 @@ describe('RpcProviderAggregator', () => {
     stub(transaction, 'params').get(() => TEST_FULL_TX);
 
     // Testing instance
-    chainProvider = new RpcProviderAggregator(logger, domain, config, privateKey);
+    chainProvider = new RpcProviderAggregator(logger, domain, config);
+    await chainProvider.setSigner(privateKey);
     // // One block = 10ms for the purposes of testing.
     // (chainProvider as any).blockPeriod = 10;
     // stub(chainProvider as any, 'execute').callsFake(fakeExecuteMethod as any);
@@ -93,6 +97,39 @@ describe('RpcProviderAggregator', () => {
   afterEach(async () => {
     restore();
     reset();
+  });
+
+  describe('#constructor', () => {
+    const chainSpecificPrivateKey = '1234567890123456789012345678901234567890123456789012345678901234';
+    const globalSignerPrivateKey = '9876543210987654321098765432109876543210987654321098765432109876';
+
+    it('should use chain-specific private key when provided (EVM)', async () => {
+      const configWithPrivateKey: ChainConfig = {
+        ...DEFAULT_CHAIN_CONFIG,
+        providers: [{ url: 'https://-------------' }],
+        privateKey: chainSpecificPrivateKey,
+      };
+
+      const aggregator = new RpcProviderAggregator(logger, TEST_SENDER_DOMAIN, configWithPrivateKey);
+      await aggregator.setSigner(globalSignerPrivateKey);
+
+      // The signer should be set using the chain-specific private key, not the global one
+      expect((aggregator as any).signer).to.be.instanceof(EthWallet);
+      expect((aggregator as any).signer.address.toLowerCase()).to.be.equal('0x2e988a386a799f506693793c6a5af6b54dfaabfb');
+    });
+
+    it('should use chain-specific private key when provided (Tron)', async () => {
+      const configWithPrivateKey: ChainConfig = {
+        ...DEFAULT_CHAIN_CONFIG,
+        providers: [{ url: 'https://api.trongrid.io' }],
+        privateKey: chainSpecificPrivateKey,
+      };
+
+      const aggregator = new RpcProviderAggregator(logger, TRON_DOMAIN, configWithPrivateKey);
+      await aggregator.setSigner(globalSignerPrivateKey);
+
+      expect(await (aggregator as any).signer.getAddress()).to.be.equal('412e988a386a799f506693793c6a5af6b54dfaabfb');
+    });
   });
 
   describe('#sendTransaction', () => {

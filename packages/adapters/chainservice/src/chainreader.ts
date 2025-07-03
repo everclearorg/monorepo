@@ -16,6 +16,7 @@ import { RpcProviderAggregator } from './aggregator';
 export class ChainReader {
   protected providers: Map<number, RpcProviderAggregator> = new Map();
   protected readonly config: ChainServiceConfig;
+  protected providerPromise: Promise<void>;
 
   /**
    * A singleton-like interface for handling all logic related to conducting on-chain transactions.
@@ -38,7 +39,7 @@ export class ChainReader {
     const { requestContext } = createLoggingContext(this.constructor.name);
     // Set up the config.
     this.config = validateChainServiceConfig(config);
-    this.setupProviders(requestContext, signer);
+    this.providerPromise = this.setupProviders(requestContext, signer);
   }
 
   /// CHAIN READING METHODS
@@ -54,7 +55,8 @@ export class ChainReader {
    * @returns Encoded hexdata representing result of the read from the chain.
    */
   public async readTx(tx: ReadTransaction, blockTag: number | string): Promise<string> {
-    return await this.getProvider(tx.domain).readContract(tx, blockTag);
+    const provider = await this.getProvider(tx.domain);
+    return await provider.readContract(tx, blockTag);
   }
 
   /**
@@ -71,7 +73,8 @@ export class ChainReader {
    * specified address.
    */
   public async getBalance(domain: number, address: string, assetId = constants.AddressZero): Promise<string> {
-    return await this.getProvider(domain).getBalance(address, assetId);
+    const provider = await this.getProvider(domain);
+    return await provider.getBalance(address, assetId);
   }
   /**
    * Get the current gas price for the chain for which this instance is servicing.
@@ -81,7 +84,8 @@ export class ChainReader {
    * @returns BigNumber representing the current gas price.
    */
   public async getGasPrice(domain: number, requestContext: RequestContext): Promise<string> {
-    return await this.getProvider(domain).getGasPrice(requestContext);
+    const provider = await this.getProvider(domain);
+    return await provider.getGasPrice(requestContext);
   }
 
   /**
@@ -92,7 +96,8 @@ export class ChainReader {
    * @returns number representing the decimals of the asset
    */
   public async getDecimalsForAsset(domain: number, assetId: string): Promise<number> {
-    return await this.getProvider(domain).getDecimalsForAsset(assetId);
+    const provider = await this.getProvider(domain);
+    return await provider.getDecimalsForAsset(assetId);
   }
 
   /**
@@ -102,7 +107,8 @@ export class ChainReader {
    * @returns block representing the specified
    */
   public async getBlock(domain: number, blockHashOrBlockTag: number | string) {
-    return await this.getProvider(domain).getBlock(blockHashOrBlockTag);
+    const provider = await this.getProvider(domain);
+    return await provider.getBlock(blockHashOrBlockTag);
   }
 
   /**
@@ -112,7 +118,8 @@ export class ChainReader {
    * @returns number representing the current blocktime
    */
   public async getBlockTime(domain: number): Promise<number> {
-    return await this.getProvider(domain).getBlockTime();
+    const provider = await this.getProvider(domain);
+    return await provider.getBlockTime();
   }
 
   /**
@@ -122,7 +129,8 @@ export class ChainReader {
    * @returns number representing the current block
    */
   public async getBlockNumber(domain: number): Promise<number> {
-    return await this.getProvider(domain).getBlockNumber();
+    const provider = await this.getProvider(domain);
+    return await provider.getBlockNumber();
   }
 
   /**
@@ -132,7 +140,8 @@ export class ChainReader {
    * @returns number representing the current blocktime
    */
   public async getTransactionReceipt(domain: number, hash: string) {
-    return await this.getProvider(domain).getTransactionReceipt(hash);
+    const provider = await this.getProvider(domain);
+    return await provider.getTransactionReceipt(hash);
   }
 
   /**
@@ -144,7 +153,8 @@ export class ChainReader {
    * @returns Hexcode string representation of contract code.
    */
   public async getCode(domain: number, address: string): Promise<string> {
-    return await this.getProvider(domain).getCode(address);
+    const provider = await this.getProvider(domain);
+    return await provider.getCode(address);
   }
 
   /**
@@ -157,7 +167,8 @@ export class ChainReader {
    * @throws Error if the transaction is invalid, or would be reverted onchain.
    */
   public async getGasEstimate(domain: number, tx: WriteTransaction): Promise<string> {
-    return await this.getProvider(domain).getGasEstimate(tx);
+    const provider = await this.getProvider(domain);
+    return await provider.getGasEstimate(tx);
   }
 
   /**
@@ -171,7 +182,8 @@ export class ChainReader {
    * @throws Error if the transaction is invalid, or would be reverted onchain.
    */
   public async getGasEstimateWithRevertCode(tx: WriteTransaction): Promise<string> {
-    return await this.getProvider(tx.domain).estimateGas(tx);
+    const provider = await this.getProvider(tx.domain);
+    return await provider.estimateGas(tx);
   }
 
   /// CONTRACT READ METHODS
@@ -194,7 +206,8 @@ export class ChainReader {
    * @throws TransactionError.reasons.ProviderNotFound if provider is not configured for
    * that ID.
    */
-  protected getProvider(domain: number): RpcProviderAggregator {
+  protected async getProvider(domain: number): Promise<RpcProviderAggregator> {
+    await this.providerPromise;
     // Ensure that a signer, provider, etc are present to execute on this domain.
     if (!this.providers.has(domain)) {
       throw new ProviderNotConfigured(domain.toString());
@@ -207,10 +220,10 @@ export class ChainReader {
    * @param context - The request context object used for logging.
    * @param signer - The signer that will be used for onchain operations.
    */
-  protected setupProviders(context: RequestContext, signer?: ISigner | string) {
+  protected async setupProviders(context: RequestContext, signer?: ISigner | string) {
     const { methodContext } = createLoggingContext(this.setupProviders.name, context);
     // For each domain / provider, map out all the utils needed for each chain.
-    Object.keys(this.config).forEach((domain) => {
+    for (const domain in this.config) {
       // Get this chain's config.
       const chain: ChainConfig = this.config[domain];
       // Ensure at least one provider is configured.
@@ -234,8 +247,11 @@ export class ChainReader {
         throw error;
       }
       const domainNumber = parseInt(domain);
-      const provider = new RpcProviderAggregator(this.logger, domainNumber, chain, signer);
+      const provider = new RpcProviderAggregator(this.logger, domainNumber, chain);
+      if (signer) {
+        await provider.setSigner(signer);
+      }
       this.providers.set(domainNumber, provider);
-    });
+    }
   }
 }

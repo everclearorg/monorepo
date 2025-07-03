@@ -17,12 +17,11 @@ import {
   RequestContext,
   SafeConfig, SolanaConfig
 } from "@chimera-monorepo/utils";
-import { ChainService, ReadTransaction, WriteTransaction } from '@chimera-monorepo/chainservice';
+import { ChainService, ReadTransaction, WriteTransaction, EthWallet } from '@chimera-monorepo/chainservice';
 import { Environment, LighthouseConfig, LighthouseService } from '../src/config';
 import { Database } from '@chimera-monorepo/database';
 import * as ChimeraDatabase from '@chimera-monorepo/database';
 import * as LighthouseContextFunctions from '../src/context';
-import { Wallet } from 'ethers';
 import { HistoricPrice } from '../src/tasks/reward/historicPrice';
 
 let mockChainService: SinonStubbedInstance<ChainService>;
@@ -31,7 +30,7 @@ let mockDatabase: Database;
 let mockHistoricPrice: HistoricPrice;
 export let getContextStub: SinonStub;
 
-const MOCK_WALLET = Wallet.createRandom();
+const MOCK_WALLET = EthWallet.createRandom();
 
 const MOCK_ASSETS = {
   ETH: {

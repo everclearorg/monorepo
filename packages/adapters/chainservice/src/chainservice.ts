@@ -5,6 +5,7 @@ import { ChainConfig } from './config';
 import { WriteTransaction, ConfigurationError, ProviderNotConfigured, ITransactionReceipt, ISigner } from './shared';
 import { ChainReader } from './chainreader';
 import { TransactionDispatch } from './dispatch';
+import { RpcProviderAggregator } from './aggregator';
 
 // TODO: Should take on the logic of Dispatch (rename to TransactionDispatch) and consume ChainReader instead of extending it.
 /**
@@ -75,7 +76,8 @@ export class ChainService extends ChainReader {
     this.logger.debug('Method start', requestContext, methodContext, {
       tx: { ...tx, value: tx.value.toString(), data: `${tx.data.substring(0, 9)}...` },
     });
-    return await this.getProvider(tx.domain).send(tx, context);
+    const provider = await this.getProvider(tx.domain);
+    return await provider.send(tx, context);
   }
 
   /// HELPERS
@@ -85,11 +87,16 @@ export class ChainService extends ChainReader {
    * @throws TransactionError.reasons.ProviderNotFound if provider is not configured for
    * that ID.
    */
-  public getAddress(): Promise<string> {
-    // Ensure that a signer, provider, etc are present to execute on this domain.
-    const [chain, provider] = [...this.providers.entries()][0];
-    if (!chain) {
-      throw new ProviderNotConfigured(chain.toString());
+  public async getAddress(chainId?: number): Promise<string> {
+    let provider: RpcProviderAggregator;
+    if (chainId) {
+      provider = await this.getProvider(chainId);
+    } else {
+      // Ensure that a signer, provider, etc are present to execute on this domain.
+      [chainId, provider] = [...this.providers.entries()][0];
+      if (!chainId) {
+        throw new ProviderNotConfigured(chainId.toString());
+      }
     }
     return provider.getAddress();
   }
@@ -101,12 +108,9 @@ export class ChainService extends ChainReader {
    * @throws TransactionError.reasons.ProviderNotFound if provider is not configured for
    * that ID.
    */
-  public getProvider(domain: number): TransactionDispatch {
-    // Ensure that a signer, provider, etc are present to execute on this domain.
-    if (!this.providers.has(domain)) {
-      throw new ProviderNotConfigured(domain.toString());
-    }
-    return this.providers.get(domain)! as TransactionDispatch;
+  public async getProvider(domain: number): Promise<TransactionDispatch> {
+    const provider = await super.getProvider(domain);
+    return provider as TransactionDispatch;
   }
 
   // TODO: Use a generic type in ChainReader.setupProviders for this method such that we don't have to overload it here.
@@ -115,10 +119,10 @@ export class ChainService extends ChainReader {
    * @param context - The request context object used for logging.
    * @param signer - The signer that will be used for onchain operations.
    */
-  protected setupProviders(context: RequestContext, signer: string) {
+  protected async setupProviders(context: RequestContext, signer: string) {
     const { methodContext } = createLoggingContext(this.setupProviders.name, context);
     // For each domain / provider, map out all the utils needed for each chain.
-    Object.keys(this.config).forEach((_domain) => {
+    for (const _domain in this.config) {
       // Convert to number
       const domain = +_domain;
       // Get this chain's config.
@@ -143,8 +147,9 @@ export class ChainService extends ChainReader {
         });
         throw error;
       }
-      const provider = new TransactionDispatch(this.logger, domain, chain, signer);
+      const provider = new TransactionDispatch(this.logger, domain, chain);
+      await provider.setSigner(signer);
       this.providers.set(domain, provider);
-    });
+    }
   }
 }

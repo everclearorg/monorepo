@@ -1,10 +1,11 @@
 import { EverclearError, delay, domainToChainId, parseHostname } from '@chimera-monorepo/utils';
-import { constants, providers, utils, Wallet } from 'ethers';
+import { constants, providers, utils } from 'ethers';
 
 import { parseError, RpcError, ServerError, StallTimeout } from '../../errors';
 import { ISigner, ReadTransaction, WriteTransaction } from '../../types';
 import { RpcProvider, SignerTypeMaps } from '..';
 import { Interface } from 'ethers/lib/utils';
+import { EthWallet } from './wallet';
 
 export const { StaticJsonRpcProvider } = providers;
 
@@ -394,14 +395,14 @@ export class SyncProvider implements RpcProvider {
     return this.provider.getTransactionCount(address, block);
   }
 
-  public getSigner(signer: ISigner | string) {
+  public async getSigner(signer: ISigner | string): Promise<ISigner> {
     if (typeof signer === 'string') {
-      return new Wallet(signer, this.provider);
+      return new EthWallet(signer, this.provider);
     }
     return signer;
   }
 
-  public connect(signer: ISigner | string): ISigner {
+  public async connect(signer: ISigner | string): Promise<ISigner> {
     return (signer as SignerTypeMaps['evm']).connect(this.provider);
   }
 }
