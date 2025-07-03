@@ -897,6 +897,9 @@ describe('TronSyncProvider', () => {
         funcSig: '' // Required by ITransactionRequest
       };
 
+      // Set up address conversion
+      mockTronWeb.address.fromHex.returns('0xrecipient');
+
       mockTronWeb.transactionBuilder.sendTrx.resolves({
         txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
       });
@@ -953,6 +956,9 @@ describe('TronSyncProvider', () => {
         data: '', // Empty data indicates TRX transfer
         funcSig: '' // Required by ITransactionRequest
       };
+
+      // Set up address conversion
+      mockTronWeb.address.fromHex.returns('0xrecipient');
 
       mockTronWeb.transactionBuilder.sendTrx.resolves({
         txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
@@ -1016,6 +1022,7 @@ describe('TronSyncProvider', () => {
           txID: '0x1234567890123456789012345678901234567890123456789012345678901234'
         }
       });
+      mockTronWeb.address.fromHex.returns('0xcontract');
 
       const signedTx = {
         txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
@@ -1062,12 +1069,10 @@ describe('TronSyncProvider', () => {
         'transfer(address,uint256)',
         {
           feeLimit: 100000,
-          callValue: 1000000
+          callValue: 1000000,
+          rawParameter: '000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         },
-        [
-          { type: 'address', value: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-          { type: 'uint256', value: '1000000000000000000' }
-        ],
+        [],
         '0x1234567890123456789012345678901234567890'
       ]);
       expect(mockTronWeb.trx.sign.calledOnce).to.be.true;
@@ -1089,6 +1094,7 @@ describe('TronSyncProvider', () => {
           txID: '0x1234567890123456789012345678901234567890123456789012345678901234'
         }
       });
+      mockTronWeb.address.fromHex.returns('0xcontract');
 
       mockTronWeb.trx.sendRawTransaction.resolves({ txid: '0x1234567890123456789012345678901234567890123456789012345678901234' });
       mockTronWeb.trx.getTransactionInfo.resolves({
@@ -1131,12 +1137,10 @@ describe('TronSyncProvider', () => {
         'transfer(address,uint256)',
         {
           feeLimit: 100000,
-          callValue: 1000000
+          callValue: 1000000,
+          rawParameter: '000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         },
-        [
-          { type: 'address', value: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-          { type: 'uint256', value: '1000000000000000000' }
-        ],
+        [],
         '0x1234567890123456789012345678901234567890'
       ]);
       expect(mockTronWeb.trx.sign.called).to.be.false;
