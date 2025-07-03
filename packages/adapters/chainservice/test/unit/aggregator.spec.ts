@@ -352,7 +352,7 @@ describe('RpcProviderAggregator', () => {
 
       // Now we make sure that all of the calls were made as expected.
       expect(providerStub.estimateGas.callCount).to.equal(1);
-      const { domain, ...expected } = testTx;
+      const { domain, funcSig, ...expected } = testTx;
       expect(providerStub.estimateGas.calledOnceWithExactly({ chainId: TEST_SENDER_CHAIN_ID, ...expected })).to.be.true;
     });
 
