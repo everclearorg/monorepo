@@ -3443,24 +3443,6 @@ CREATE TABLE tron.intent_queue (
 
 
 --
--- Name: tron_gateway_raw_logs; Type: TABLE; Schema: tron; Owner: -
---
-
-CREATE TABLE tron.tron_gateway_raw_logs (
-    id text NOT NULL,
-    block_number bigint,
-    block_hash text,
-    transaction_hash text,
-    transaction_index bigint,
-    log_index bigint,
-    address text,
-    data text,
-    topics text,
-    block_timestamp bigint
-);
-
-
---
 -- Name: tron_spoke_raw_logs; Type: TABLE; Schema: tron; Owner: -
 --
 
@@ -4104,14 +4086,6 @@ ALTER TABLE ONLY tron.fill_queue
 
 
 --
--- Name: tron_gateway_raw_logs tron_gateway_raw_logs_pkey; Type: CONSTRAINT; Schema: tron; Owner: -
---
-
-ALTER TABLE ONLY tron.tron_gateway_raw_logs
-    ADD CONSTRAINT tron_gateway_raw_logs_pkey PRIMARY KEY (id);
-
-
---
 -- Name: intent_queue tron_intent_queue_pkey; Type: CONSTRAINT; Schema: tron; Owner: -
 --
 
@@ -4549,4 +4523,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250624105537'),
     ('20250701013945'),
     ('20250708181540'),
-    ('20250708185702');
+    ('20250708185702'),
+    ('20250708190952');
