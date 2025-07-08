@@ -310,7 +310,7 @@ CREATE FUNCTION public.add_new_tron_fill_message(rec record) RETURNS boolean
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    message_id TEXT;
+    msg_id TEXT;
     first_idx NUMERIC;
     last_idx NUMERIC;
     quote NUMERIC;
@@ -322,7 +322,7 @@ DECLARE
     fill_intent_id TEXT;
     i INT;
 BEGIN
-    message_id := SUBSTRING(rec.topics, 68, 66);
+    msg_id := SUBSTRING(rec.topics, 68, 66);
 
     first_idx := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
@@ -360,7 +360,7 @@ BEGIN
         destination_domain
     )
     VALUES (
-        message_id,
+        msg_id,
         '728126428',
         'FILL',
         quote,
@@ -397,7 +397,7 @@ BEGIN
         origin_domain = EXCLUDED.origin_domain,
         destination_domain = EXCLUDED.destination_domain;
 
-    UPDATE public.destination_intents SET message_id = message_id WHERE id = ANY(intent_ids);
+    UPDATE public.destination_intents SET message_id = msg_id WHERE id = ANY(intent_ids);
 
     SELECT * INTO queue_rec
     FROM public.queues
@@ -423,7 +423,7 @@ CREATE FUNCTION public.add_new_tron_intent_message(rec record) RETURNS boolean
     LANGUAGE plpgsql
     AS $$
 DECLARE
-    message_id TEXT;
+    msg_id TEXT;
     first_idx NUMERIC;
     last_idx NUMERIC;
     quote NUMERIC;
@@ -435,7 +435,7 @@ DECLARE
     origin_intent_id TEXT;
     i INT;
 BEGIN
-    message_id := SUBSTRING(rec.topics, 68, 66);
+    msg_id := SUBSTRING(rec.topics, 68, 66);
 
     first_idx := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
@@ -473,7 +473,7 @@ BEGIN
         destination_domain
     )
     VALUES (
-        message_id,
+        msg_id,
         '728126428',
         'INTENT',
         quote,
@@ -510,7 +510,7 @@ BEGIN
         origin_domain = EXCLUDED.origin_domain,
         destination_domain = EXCLUDED.destination_domain;
 
-    UPDATE public.origin_intents SET message_id = message_id WHERE id = ANY(intent_ids);
+    UPDATE public.origin_intents SET message_id = msg_id WHERE id = ANY(intent_ids);
 
     SELECT * INTO queue_rec
     FROM public.queues
@@ -4548,4 +4548,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250623193039'),
     ('20250624105537'),
     ('20250701013945'),
-    ('20250708181540');
+    ('20250708181540'),
+    ('20250708185702');
