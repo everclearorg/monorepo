@@ -11,15 +11,24 @@ const tronWeb = new TronWeb.TronWeb({
   privateKey: process.env.TRON_KEY,
 });
 
-const EVERCLEAR_SPOKE = '419b266df36c882a73d45b18876104d5728424828f';
-// const EVERCLEAR_SPOKE_GATEWAY_IMPL = '417039676630aba9606afa13bfb4b822d67c05282a'; // TLCbT376siRg4PvzGBXYq4a1xafWJyzM5n || 417039676630aba9606afa13bfb4b822d67c05282a
-const EVERCLEAR_SPOKE_GATEWAY_PROXY = '4154ea655e20e515c85143dab8a6baae0b11d137a6';
+// Global //
 const POLYMER_ISM = '41cbcbc532cf88bacf1c8a6359604c784d042bb692';
 const POLYMER_MAILBOX = '415b34081e9d453fc2ba925d893583d89d1b7175dd';
+const EVERCLEAR_SPOKE_IMPL = 'TRooMrhE5VP2JFRyBf74fqMijMGx8usXuX';
+const EVERCLEAR_SPOKE_GATEWAY_IMPL = '417039676630aba9606afa13bfb4b822d67c05282a'; // TLCbT376siRg4PvzGBXYq4a1xafWJyzM5n || 417039676630aba9606afa13bfb4b822d67c05282a
+
+// Production //
+const EVERCLEAR_SPOKE_PROD = '419b266df36c882a73d45b18876104d5728424828f';
+const EVERCLEAR_SPOKE_GATEWAY_PROXY_PROD = '4154ea655e20e515c85143dab8a6baae0b11d137a6';
+
+// Staging //
+const EVERCLEAR_SPOKE_STAGING = '41d84173290e0e486b12b973f704cddef6e46a308e';
+const EVERCLEAR_SPOKE_GATEWAY_PROXY_STAGING = '411f7c443b1793e2223541ee90814fe2a1f8b8778f';
 
 async function updateGateway(newAddress: string): Promise<void> {
   // Updating the Spoke gateway address //
-  const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE);
+  console.log(`Updating the Spoke gateway address to: ${newAddress}`);
+  const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_STAGING);
   let spokeGateway = await spokeInstance.gateway().call();
   console.log('Gateway of the Spoke:', spokeGateway);
   spokeInstance.updateGateway(newAddress).send({ feeLimit: 1_000_000_000, callValue: 0 });
@@ -29,8 +38,8 @@ async function updateGateway(newAddress: string): Promise<void> {
 
 async function updateIsM(newAddress: string): Promise<void> {
   // Updating the ISM address //
-  const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE);
-  const gatewayInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_PROXY);
+  const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_STAGING);
+  const gatewayInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_PROXY_STAGING);
 
   let ismAddress = await gatewayInstance.interchainSecurityModule().call();
   console.log('ISM of the Spoke:', ismAddress);
@@ -41,8 +50,8 @@ async function updateIsM(newAddress: string): Promise<void> {
 
 async function updateMailbox(newAddress: string): Promise<void> {
   // Updating the Mailbox address //
-  const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE);
-  const gatewayInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_PROXY);
+  const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_STAGING);
+  const gatewayInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_PROXY_STAGING);
   let mailboxAddress = await gatewayInstance.mailbox().call();
   console.log('Mailbox of the Spoke:', mailboxAddress);
   spokeInstance.updateMailbox(newAddress).send({ feeLimit: 1_000_000_000, callValue: 0 });
@@ -54,7 +63,7 @@ async function updateMailbox(newAddress: string): Promise<void> {
   try {
     // Actions to execute//
     const shouldUpdateGateway = true;
-    const newGatewayAddress = EVERCLEAR_SPOKE_GATEWAY_PROXY;
+    const newGatewayAddress = EVERCLEAR_SPOKE_GATEWAY_PROXY_STAGING;
 
     const shouldUpdateIsM = false;
     const newISMAddress = POLYMER_ISM;

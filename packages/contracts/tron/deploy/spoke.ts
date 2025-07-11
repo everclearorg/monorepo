@@ -30,27 +30,40 @@ interface DeploymentParams {
   maxSolversFee: number;
 }
 
+// Global //
+const POLYMER_ISM: string = '41cbcbc532cf88bacf1c8a6359604c784d042bb692';
+const POLYMER_MAILBOX: string = '415b34081e9d453fc2ba925d893583d89d1b7175dd';
+const MESSAGE_RECEIVER: string = '4147120c330314b3929b3efa22234a069f84e2c80d';
+const CALL_EXECUTOR: string = '41902fdfc8e489100aadfc982d7c5144253b5dfb81';
+const GATEWAY_IMPL: string = '417039676630aba9606afa13bfb4b822d67c05282a';
+const SPOKE_IMPL: string = 'TRooMrhE5VP2JFRyBf74fqMijMGx8usXuX';
 const tronLighthouse: string = 'TFAJBqyUQmudXW1fanNN4a5V76qEDTouT7';
 const tronWatchtower: string = 'TJx4rVn6Nf2P1ZL9m5G737EYLD3BQdF7rj';
-const hubGateway: string = '41EFfAB7cCEBF63FbEFB4884964b12259d4374FaAa';
-const tronOwner: string = 'TXE2CSwYQFCuuAp7ZStdLzUFQEKEvfqhsV'; // NOTE: Using EOA to enable the update of the gateway
+const tronOwner: string = 'TATCzhQqxq9DRppGHiEFvFuoDW6tHaESqg'; // NOTE: Using EOA to enable the update of the gateway
 const tronMaxSolversFee: number = 5000;
 const hubDomain: number = 25327;
-const tronIsm: string = '41cbcbc532cf88bacf1c8a6359604c784d042bb692';
-const tronMailbox: string = '415b34081e9d453fc2ba925d893583d89d1b7175dd';
-const HUB_GATEWAY = '0x000000000000000000000000effab7ccebf63fbefb4884964b12259d4374faaa';
+const tronIsm: string = POLYMER_ISM;
+const tronMailbox: string = POLYMER_MAILBOX;
+
+// Production // 
+const hubGatewayProd: string = '41EFfAB7cCEBF63FbEFB4884964b12259d4374FaAa';
+const HUB_GATEWAY_PROD = '0x000000000000000000000000effab7ccebf63fbefb4884964b12259d4374faaa';
+
+// Staging //
+const hubGatewayStaging: string = '41e5f2f4afad6211cfbd6a882d5a6a435530ee3909'; // 0xe5F2F4afAd6211cfBD6a882D5a6a435530Ee3909
+const HUB_GATEWAY_STAGING = '0x000000000000000000000000e5f2f4afad6211cfbd6a882d5a6a435530ee3909';
 
 function configureDeploymentParameters(): DeploymentParams {
   return {
-    gateway: 'TXE2CSwYQFCuuAp7ZStdLzUFQEKEvfqhsV', // TODO: Need to change to valid address on Spoke via a call
-    executor: '0x',
-    messageReceiver: '0x',
+    gateway: 'TATCzhQqxq9DRppGHiEFvFuoDW6tHaESqg', // TODO: Need to change to valid address on Spoke via a call
+    executor: CALL_EXECUTOR,
+    messageReceiver: MESSAGE_RECEIVER,
     lighthouse: tronLighthouse,
     watchtower: tronWatchtower,
     ism: tronIsm,
     mailbox: tronMailbox,
     hubDomain: hubDomain,
-    hubGateway: hubGateway,
+    hubGateway: hubGatewayStaging,
     owner: tronOwner,
     maxSolversFee: tronMaxSolversFee,
   };
@@ -89,10 +102,11 @@ async function deploySpokeProxy(
   params: DeploymentParams,
 ): Promise<string> {
   // 1) Deploy the implementation
-  const implAddress = await deployContract(implAbi, implBytecode);
-  console.log(`Implementation deployed at ${implAddress}`);
+  // const implAddress = await deployContract(implAbi, implBytecode);
+  // console.log(`Implementation deployed at ${implAddress}`);
 
   // 2) Deploy the proxy, passing (implementation, initCall) to constructor
+  const implAddress = SPOKE_IMPL;
   const contractInstance = await tronWeb.contract().new({
     abi: proxyAbi,
     bytecode: proxyBytecode,
@@ -142,7 +156,7 @@ async function deployGatewayProxy(
   // console.log(`Implementation deployed at ${implAddress}`);
 
   // // 2) Deploy the proxy, passing (implementation, initCall) to constructor
-  const implAddress = '417039676630aba9606afa13bfb4b822d67c05282a';
+  const implAddress = GATEWAY_IMPL;
   const iface = new Interface(implAbi as any);
   const initData = iface.encodeFunctionData('initialize', [
     toEthHex(params.owner),
@@ -150,9 +164,8 @@ async function deployGatewayProxy(
     toEthHex(receiver),
     toEthHex(params.ism),
     params.hubDomain,
-    HUB_GATEWAY,
+    HUB_GATEWAY_STAGING,
   ]);
-  console.log(`Gateway init calldata: ${initData}`);
 
   const contractInstance = await tronWeb.contract().new({
     abi: proxyAbi,
@@ -162,7 +175,6 @@ async function deployGatewayProxy(
     parameters: [implAddress, initData],
   });
   const proxyAddress = contractInstance.address;
-  console.log(`Gateway proxy deployed at ${proxyAddress}`);
   return proxyAddress;
 }
 
@@ -218,7 +230,7 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     // console.log('Everclear Spoke (proxy) at:', spokeAddress);
 
     // Deploy Gateway (UUPS style)
-    const spokeAddress = '419b266df36c882a73d45b18876104d5728424828f';
+    const spokeAddress = '41d84173290e0e486b12b973f704cddef6e46a308e';
     const gatewayAddress = await deployGatewayProxy(
       SpokeGatewayArtifact.abi,
       SpokeGatewayArtifact.bytecode,

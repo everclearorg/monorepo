@@ -12,19 +12,22 @@ const tronWeb = new TronWeb.TronWeb({
   privateKey: process.env.TRON_KEY,
 });
 
-const EVERCLEAR_SPOKE = '419b266df36c882a73d45b18876104d5728424828f';
-// const EVERCLEAR_SPOKE_GATEWAY_IMPL = '417039676630aba9606afa13bfb4b822d67c05282a'; // TLCbT376siRg4PvzGBXYq4a1xafWJyzM5n || 417039676630aba9606afa13bfb4b822d67c05282a
-const EVERCLEAR_SPOKE_GATEWAY = '4154ea655e20e515c85143dab8a6baae0b11d137a6';
+const EVERCLEAR_SPOKE_PROD = '419b266df36c882a73d45b18876104d5728424828f';
+const EVERCLEAR_SPOKE_STAGING = '41d84173290e0e486b12b973f704cddef6e46a308e';
+const EVERCLEAR_SPOKE_IMPL = 'TRooMrhE5VP2JFRyBf74fqMijMGx8usXuX';
+const EVERCLEAR_SPOKE_GATEWAY_IMPL = '417039676630aba9606afa13bfb4b822d67c05282a'; // TLCbT376siRg4PvzGBXYq4a1xafWJyzM5n || 417039676630aba9606afa13bfb4b822d67c05282a
+const EVERCLEAR_SPOKE_GATEWAY_PROD = '4154ea655e20e515c85143dab8a6baae0b11d137a6';
+const EVERCLEAR_SPOKE_GATEWAY_STAGING = '411f7c443b1793e2223541ee90814fe2a1f8b8778f';
 
 (async () => {
   try {
     console.log('Logging the state of the deployed contracts...');
 
     // Construct spoke (proxy) state
-    const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE);
+    const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_STAGING);
 
-    // Construct gateway (proxy) state 
-    const gatewayInstance = await tronWeb.contract(SpokeGatewayArtifact.abi, EVERCLEAR_SPOKE_GATEWAY);
+    // Construct gateway (proxy) state
+    const gatewayInstance = await tronWeb.contract(SpokeGatewayArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_STAGING);
 
     // Reading the Spoke instance state //
     const spokeOwner = await spokeInstance.owner().call();
@@ -33,7 +36,14 @@ const EVERCLEAR_SPOKE_GATEWAY = '4154ea655e20e515c85143dab8a6baae0b11d137a6';
     const spokeGateway = await spokeInstance.gateway().call();
     console.log('Gateway address:', spokeGateway);
 
-    // Reading the gateway instance state // 
+    // Reading the messageReceiver and callExecutor //
+    const messageReceiver = await spokeInstance.messageReceiver().call();
+    console.log('Message Receiver address:', messageReceiver);
+
+    const callExecutor = await spokeInstance.callExecutor().call();
+    console.log('Call Executor address:', callExecutor);
+
+    // Reading the gateway instance state //
     // Get the owner of the contract
     const gatewayOwner = await gatewayInstance.owner().call();
     console.log('Owner of the Spoke Gateway:', gatewayOwner);
@@ -49,6 +59,10 @@ const EVERCLEAR_SPOKE_GATEWAY = '4154ea655e20e515c85143dab8a6baae0b11d137a6';
     // Get the receiver address
     const receiver = await gatewayInstance.receiver().call();
     console.log('Receiver address:', receiver);
+
+    // Hub gateway //
+    const hubGateway = await gatewayInstance.EVERCLEAR_GATEWAY().call();
+    console.log('Hub Gateway address:', hubGateway);
 
     console.log('DONE!');
   } catch (err) {
