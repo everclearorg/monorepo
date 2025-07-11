@@ -16,7 +16,7 @@ const EVERCLEAR_SPOKE_PROD = '419b266df36c882a73d45b18876104d5728424828f';
 const EVERCLEAR_SPOKE_STAGING = '41d84173290e0e486b12b973f704cddef6e46a308e';
 const EVERCLEAR_SPOKE_IMPL = 'TRooMrhE5VP2JFRyBf74fqMijMGx8usXuX';
 const EVERCLEAR_SPOKE_GATEWAY_IMPL = '417039676630aba9606afa13bfb4b822d67c05282a'; // TLCbT376siRg4PvzGBXYq4a1xafWJyzM5n || 417039676630aba9606afa13bfb4b822d67c05282a
-const EVERCLEAR_SPOKE_GATEWAY_PROD = '4154ea655e20e515c85143dab8a6baae0b11d137a6';
+const EVERCLEAR_SPOKE_GATEWAY_PROD = '418fd8a4d1980fa73f060a37af5bf23d8fb2b68a0b';
 const EVERCLEAR_SPOKE_GATEWAY_STAGING = '411f7c443b1793e2223541ee90814fe2a1f8b8778f';
 
 (async () => {
@@ -24,10 +24,12 @@ const EVERCLEAR_SPOKE_GATEWAY_STAGING = '411f7c443b1793e2223541ee90814fe2a1f8b87
     console.log('Logging the state of the deployed contracts...');
 
     // Construct spoke (proxy) state
-    const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_STAGING);
+    const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_PROD);
+    console.log('-- Spoke address:', spokeInstance.address);
 
     // Construct gateway (proxy) state
-    const gatewayInstance = await tronWeb.contract(SpokeGatewayArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_STAGING);
+    const gatewayInstance = await tronWeb.contract(SpokeGatewayArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_PROD);
+    console.log('-- Gateway address:', gatewayInstance.address);
 
     // Reading the Spoke instance state //
     const spokeOwner = await spokeInstance.owner().call();

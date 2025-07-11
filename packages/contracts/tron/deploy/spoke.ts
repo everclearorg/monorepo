@@ -46,10 +46,12 @@ const tronIsm: string = POLYMER_ISM;
 const tronMailbox: string = POLYMER_MAILBOX;
 
 // Production // 
+const SPOKE_PROD: string = '419b266df36c882a73d45b18876104d5728424828f';
 const hubGatewayProd: string = '41EFfAB7cCEBF63FbEFB4884964b12259d4374FaAa';
 const HUB_GATEWAY_PROD = '0x000000000000000000000000effab7ccebf63fbefb4884964b12259d4374faaa';
 
 // Staging //
+const SPOKE_STAGING: string = '41d84173290e0e486b12b973f704cddef6e46a308e';
 const hubGatewayStaging: string = '41e5f2f4afad6211cfbd6a882d5a6a435530ee3909'; // 0xe5F2F4afAd6211cfBD6a882D5a6a435530Ee3909
 const HUB_GATEWAY_STAGING = '0x000000000000000000000000e5f2f4afad6211cfbd6a882d5a6a435530ee3909';
 
@@ -164,7 +166,7 @@ async function deployGatewayProxy(
     toEthHex(receiver),
     toEthHex(params.ism),
     params.hubDomain,
-    HUB_GATEWAY_STAGING,
+    HUB_GATEWAY_PROD,
   ]);
 
   const contractInstance = await tronWeb.contract().new({
@@ -230,7 +232,7 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     // console.log('Everclear Spoke (proxy) at:', spokeAddress);
 
     // Deploy Gateway (UUPS style)
-    const spokeAddress = '41d84173290e0e486b12b973f704cddef6e46a308e';
+    const spokeAddress = SPOKE_PROD;
     const gatewayAddress = await deployGatewayProxy(
       SpokeGatewayArtifact.abi,
       SpokeGatewayArtifact.bytecode,
