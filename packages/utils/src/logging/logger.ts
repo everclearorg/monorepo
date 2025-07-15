@@ -15,6 +15,7 @@ const DEFAULT_REDACTED_PATHS = [
   'config.server.adminToken',
   'config.web3SignerUrl',
   'config.database.url',
+  'params.apiKey',
 ];
 for (const chainId of chainIds) {
   DEFAULT_REDACTED_PATHS.push(`config.chains[${chainId}].providers`);
@@ -26,7 +27,7 @@ for (const chainId of chainIds) {
  * @classdesc Designed to log information in a uniform way to make parsing easier
  */
 export class Logger {
-  private log: BaseLogger;
+  private readonly log: BaseLogger;
   public sanitizedValue: string = '**********';
   constructor(
     private readonly opts: LoggerOptions,
@@ -126,15 +127,16 @@ export class Logger {
         case 'poller':
         case 'url':
           return sanitizeUrl(value);
-        case 'providers':
-          // eslint-disable-next-line no-case-declarations
+        case 'providers': {
           const providers = [];
           for (const provider of value) {
             providers.push(isUrl(provider) ? sanitizeUrl(provider) : provider);
           }
           return providers;
+        }
         case 'adminToken':
         case 'privateKey':
+        case 'apiKey':
           return this.sanitizedValue;
         case 'web3SignerUrl':
           if (isUrl(value)) {
