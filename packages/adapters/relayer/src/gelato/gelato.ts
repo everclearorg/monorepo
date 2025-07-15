@@ -209,12 +209,6 @@ export const send = async (
 ): Promise<string> => {
   const { requestContext, methodContext } = createLoggingContext(send.name, _requestContext);
 
-  // Validate the call will succeed on chain.
-  const supported = await isChainSupportedByGelato(chainId);
-  if (!supported) {
-    logger.warn('Chain not supported by Gelato', requestContext, methodContext, { chainId });
-    throw new RelayerSendFailed({ supported });
-  }
   const relayerAddress = await getRelayerAddress(chainId);
 
   logger.debug('Getting gas estimate', requestContext, methodContext, {
