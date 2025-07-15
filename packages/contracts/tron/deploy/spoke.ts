@@ -10,6 +10,25 @@ import SpokeGatewayArtifact from '../build/contracts/SpokeGateway.json';
 import ERC1967ProxyArtifact from '../build/contracts/ERC1967Proxy.json';
 import CallExecutorArtifact from '../build/contracts/CallExecutor.json';
 import MessageReceiverArtifact from '../build/contracts/SpokeMessageReceiver.json';
+import XERC20ModuleArtifact from '../build/contracts/XERC20Module.json';
+import FeeAdapterArtifact from '../build/contracts/FeeAdapter.json';
+import {
+  SPOKE_PROD,
+  SPOKE_STAGING,
+  GATEWAY_IMPL,
+  CALL_EXECUTOR,
+  MESSAGE_RECEIVER,
+  tronLighthouse,
+  tronWatchtower,
+  tronIsm,
+  tronMailbox,
+  hubDomain,
+  hubGatewayStaging,
+  tronOwner,
+  tronMaxSolversFee,
+  FEE_SIGNER, 
+  XERC20_MODULE_PROD,
+} from './constants';
 
 const tronWeb = new TronWeb.TronWeb({
   fullHost: process.env.TRON_MAINNET_RPC!,
@@ -30,31 +49,6 @@ interface DeploymentParams {
   maxSolversFee: number;
 }
 
-// Global //
-const POLYMER_ISM: string = '41cbcbc532cf88bacf1c8a6359604c784d042bb692';
-const POLYMER_MAILBOX: string = '415b34081e9d453fc2ba925d893583d89d1b7175dd';
-const MESSAGE_RECEIVER: string = '4147120c330314b3929b3efa22234a069f84e2c80d';
-const CALL_EXECUTOR: string = '41902fdfc8e489100aadfc982d7c5144253b5dfb81';
-const GATEWAY_IMPL: string = '417039676630aba9606afa13bfb4b822d67c05282a';
-const SPOKE_IMPL: string = 'TRooMrhE5VP2JFRyBf74fqMijMGx8usXuX';
-const tronLighthouse: string = 'TFAJBqyUQmudXW1fanNN4a5V76qEDTouT7';
-const tronWatchtower: string = 'TJx4rVn6Nf2P1ZL9m5G737EYLD3BQdF7rj';
-const tronOwner: string = 'TATCzhQqxq9DRppGHiEFvFuoDW6tHaESqg'; // NOTE: Using EOA to enable the update of the gateway
-const tronMaxSolversFee: number = 5000;
-const hubDomain: number = 25327;
-const tronIsm: string = POLYMER_ISM;
-const tronMailbox: string = POLYMER_MAILBOX;
-
-// Production // 
-const SPOKE_PROD: string = '419b266df36c882a73d45b18876104d5728424828f';
-const hubGatewayProd: string = '41EFfAB7cCEBF63FbEFB4884964b12259d4374FaAa';
-const HUB_GATEWAY_PROD = '0x000000000000000000000000effab7ccebf63fbefb4884964b12259d4374faaa';
-
-// Staging //
-const SPOKE_STAGING: string = '41d84173290e0e486b12b973f704cddef6e46a308e';
-const hubGatewayStaging: string = '41e5f2f4afad6211cfbd6a882d5a6a435530ee3909'; // 0xe5F2F4afAd6211cfBD6a882D5a6a435530Ee3909
-const HUB_GATEWAY_STAGING = '0x000000000000000000000000e5f2f4afad6211cfbd6a882d5a6a435530ee3909';
-
 function configureDeploymentParameters(): DeploymentParams {
   return {
     gateway: 'TATCzhQqxq9DRppGHiEFvFuoDW6tHaESqg', // TODO: Need to change to valid address on Spoke via a call
@@ -73,10 +67,12 @@ function configureDeploymentParameters(): DeploymentParams {
 
 async function deployContract(abi: unknown[], bytecode: string, constructorArgs: unknown[] = []): Promise<string> {
   // Calculating and logging resource usage
+  console.log('Contract constructor args:', constructorArgs);
   const deployTx = await tronWeb.transactionBuilder.createSmartContract({
     abi,
     bytecode,
     feeLimit: 1_000_000_000,
+    parameters: constructorArgs,
   });
   await calculateResourceUsage(tronWeb.defaultAddress.base58, deployTx.raw_data_hex);
 
@@ -213,26 +209,26 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     const params = configureDeploymentParameters();
     console.log('Deployment parameters:', params);
 
-    // // Deploy Call Executor (no proxy for example)
-    // const executorAddr = await deployContract(CallExecutorArtifact.abi, CallExecutorArtifact.bytecode);
-    // console.log('CallExecutor at:', executorAddr);
+    // Deploy Call Executor (no proxy for example)
+    const executorAddr = await deployContract(CallExecutorArtifact.abi, CallExecutorArtifact.bytecode);
+    console.log('CallExecutor at:', executorAddr);
 
-    // // Deploy MessageReceiver (no proxy for example)
-    // const messageReceiverAddr = await deployContract(MessageReceiverArtifact.abi, MessageReceiverArtifact.bytecode);
-    // console.log('MessageReceiver at:', messageReceiverAddr);
+    // Deploy MessageReceiver (no proxy for example)
+    const messageReceiverAddr = await deployContract(MessageReceiverArtifact.abi, MessageReceiverArtifact.bytecode);
+    console.log('MessageReceiver at:', messageReceiverAddr);
 
-    // // Deploy Spoke (UUPS style)
-    // const spokeAddress = await deploySpokeProxy(
-    //   EverclearSpokeArtifact.abi,
-    //   EverclearSpokeArtifact.bytecode,
-    //   ERC1967ProxyArtifact.abi,
-    //   ERC1967ProxyArtifact.bytecode.object,
-    //   params,
-    // );
-    // console.log('Everclear Spoke (proxy) at:', spokeAddress);
+    // Deploy Spoke (UUPS style)
+    const spokeAddress = await deploySpokeProxy(
+      EverclearSpokeArtifact.abi,
+      EverclearSpokeArtifact.bytecode,
+      ERC1967ProxyArtifact.abi,
+      ERC1967ProxyArtifact.bytecode.object,
+      params,
+    );
+    console.log('Everclear Spoke (proxy) at:', spokeAddress);
 
     // Deploy Gateway (UUPS style)
-    const spokeAddress = SPOKE_PROD;
+    // const spokeAddress = SPOKE_PROD;
     const gatewayAddress = await deployGatewayProxy(
       SpokeGatewayArtifact.abi,
       SpokeGatewayArtifact.bytecode,
@@ -242,6 +238,20 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
       spokeAddress,
     );
     console.log('Spoke Gateway (proxy) at:', gatewayAddress);
+
+    // Deploying the XERC20Module
+    const xerc20ConstructorArgs = [spokeAddress];
+    const xerc20ModuleAddr = await deployContract(
+      XERC20ModuleArtifact.abi,
+      XERC20ModuleArtifact.bytecode,
+      xerc20ConstructorArgs,
+    );
+    console.log('XERC20Module at:', xerc20ModuleAddr);
+
+    // Deploy the FeeAdapter
+    const constructorArgs = [spokeAddress, tronOwner, FEE_SIGNER, XERC20_MODULE_PROD, tronOwner];
+    const feeAdapterAddr = await deployContract(FeeAdapterArtifact.abi, FeeAdapterArtifact.bytecode, constructorArgs);
+    console.log('FeeAdapter at:', feeAdapterAddr);
 
     console.log('DONE!');
   } catch (err) {

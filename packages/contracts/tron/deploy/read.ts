@@ -2,34 +2,40 @@
 const TronWeb = require('tronweb');
 import dotenv from 'dotenv';
 dotenv.config();
+import { fetchAddresses } from './constants';
 
 // The JSON artifacts produced by TronBox or another compiler
 import EverclearSpokeArtifact from '../build/contracts/EverclearSpoke.json';
 import SpokeGatewayArtifact from '../build/contracts/SpokeGateway.json';
+import XERC20ModuleArtifact from '../build/contracts/XERC20Module.json';
+import FeeAdapterArtifact from '../build/contracts/FeeAdapter.json';
 
 const tronWeb = new TronWeb.TronWeb({
   fullHost: process.env.TRON_MAINNET_RPC!,
   privateKey: process.env.TRON_KEY,
 });
 
-const EVERCLEAR_SPOKE_PROD = '419b266df36c882a73d45b18876104d5728424828f';
-const EVERCLEAR_SPOKE_STAGING = '41d84173290e0e486b12b973f704cddef6e46a308e';
-const EVERCLEAR_SPOKE_IMPL = 'TRooMrhE5VP2JFRyBf74fqMijMGx8usXuX';
-const EVERCLEAR_SPOKE_GATEWAY_IMPL = '417039676630aba9606afa13bfb4b822d67c05282a'; // TLCbT376siRg4PvzGBXYq4a1xafWJyzM5n || 417039676630aba9606afa13bfb4b822d67c05282a
-const EVERCLEAR_SPOKE_GATEWAY_PROD = '418fd8a4d1980fa73f060a37af5bf23d8fb2b68a0b';
-const EVERCLEAR_SPOKE_GATEWAY_STAGING = '411f7c443b1793e2223541ee90814fe2a1f8b8778f';
-
 (async () => {
   try {
-    console.log('Logging the state of the deployed contracts...');
+    const logProd = false;
+    const { spokeAddress, gatewayAddress, xerc20Module, feeAdapter } = fetchAddresses(logProd);
+    console.log(`Logging the state of the deployed contracts ${logProd ? 'on Production' : 'on Staging'}`);
 
     // Construct spoke (proxy) state
-    const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, EVERCLEAR_SPOKE_PROD);
+    const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, spokeAddress);
     console.log('-- Spoke address:', spokeInstance.address);
 
     // Construct gateway (proxy) state
-    const gatewayInstance = await tronWeb.contract(SpokeGatewayArtifact.abi, EVERCLEAR_SPOKE_GATEWAY_PROD);
+    const gatewayInstance = await tronWeb.contract(SpokeGatewayArtifact.abi, gatewayAddress);
     console.log('-- Gateway address:', gatewayInstance.address);
+
+    // XERC20 module //
+    const xerc20Instance = await tronWeb.contract(XERC20ModuleArtifact.abi, xerc20Module);
+    console.log('XERC20 module address:', xerc20Instance.address);
+
+    // Fee adapter //
+    const feeAdapterInstance = await tronWeb.contract(FeeAdapterArtifact.abi, feeAdapter);
+    console.log('Fee Adapter address:', feeAdapterInstance.address);
 
     // Reading the Spoke instance state //
     const spokeOwner = await spokeInstance.owner().call();
@@ -65,6 +71,26 @@ const EVERCLEAR_SPOKE_GATEWAY_STAGING = '411f7c443b1793e2223541ee90814fe2a1f8b87
     // Hub gateway //
     const hubGateway = await gatewayInstance.EVERCLEAR_GATEWAY().call();
     console.log('Hub Gateway address:', hubGateway);
+
+    // Reading XERC20 module state //
+    const xerc20ModuleSpoke = await xerc20Instance.spoke().call();
+    console.log('XERC20 module spoke address:', xerc20ModuleSpoke);
+
+    // Reading Fee Adapter state //
+    const feeAdapterSpoke = await feeAdapterInstance.spoke().call();
+    console.log('Fee Adapter spoke address:', feeAdapterSpoke);
+
+    const feeAdapterOwner = await feeAdapterInstance.owner().call();
+    console.log('Fee Adapter owner address:', feeAdapterOwner);
+
+    const feeAdapterXerc20Module = await feeAdapterInstance.xerc20Module().call();
+    console.log('Fee Adapter XERC20 Module address:', feeAdapterXerc20Module);
+
+    const feeAdapterFeeSigner = await feeAdapterInstance.feeSigner().call();
+    console.log('Fee Adapter Fee Signer address:', feeAdapterFeeSigner);
+
+    const feeAdapterFeeReceipient = await feeAdapterInstance.feeRecipient().call();
+    console.log('Fee Adapter Fee Recipient address:', feeAdapterFeeReceipient);
 
     console.log('DONE!');
   } catch (err) {
