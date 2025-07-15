@@ -11,5 +11,6 @@ export const setupRelayer = async (_url: string): Promise<Relayer> => {
     send: everclearRelayerSend,
     getTaskStatus,
     waitForTaskCompletion,
+    isChainSupported: async () => true,
   };
 };
