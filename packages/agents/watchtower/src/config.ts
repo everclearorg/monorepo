@@ -95,6 +95,10 @@ export const getConfig = async (): Promise<WatcherConfig> => {
       assets,
       gasMultiplier,
     };
+
+    if (localChainConfig?.privateKey) {
+      chainsForWatcherConfig[domainId].privateKey = localChainConfig.privateKey;
+    }
   }
 
   const watcherConfig: WatcherConfig = {
