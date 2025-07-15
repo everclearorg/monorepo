@@ -186,6 +186,10 @@ export const getConfig = async (): Promise<MonitorConfig> => {
       ...(minGasOnRelayer !== undefined && { minGasOnRelayer }),
       ...(minGasOnGateway !== undefined && { minGasOnGateway }),
     };
+
+    if (localChainConfig?.privateKey) {
+      chainsForMonitorConfig[domainId].privateKey = localChainConfig.privateKey;
+    }
   }
 
   const thresholdsConfig: ThresholdsConfig = { ...DefaultThresholds, ...localThresholds };
