@@ -279,3 +279,9 @@ variable "tron_drpc_api_key" {
   sensitive = true
   default   = "neverclear"
 }
+
+variable "tron_quicknode_api_key" {
+  type      = string
+  sensitive = true
+  default   = "neverclear"
+}

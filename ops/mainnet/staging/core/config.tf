@@ -130,7 +130,7 @@ locals {
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}",
-          "https://lb.drpc.org/tron/${var.tron_drpc_api_key}"
+          "https://misty-quaint-log.tron-mainnet.quiknode.pro/${var.tron_quicknode_api_key}/jsonrpc"
         ]
         privateKey = var.relayer_web3_signer_private_key
       }
@@ -197,7 +197,7 @@ locals {
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}",
-          "https://lb.drpc.org/tron/${var.tron_drpc_api_key}"
+          "https://misty-quaint-log.tron-mainnet.quiknode.pro/${var.tron_quicknode_api_key}/jsonrpc"
         ]
         privateKey = var.watchtower_web3_signer_private_key
       }
@@ -270,7 +270,7 @@ locals {
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}",
-          "https://lb.drpc.org/tron/${var.tron_drpc_api_key}"
+          "https://misty-quaint-log.tron-mainnet.quiknode.pro/${var.tron_quicknode_api_key}/jsonrpc"
         ]
       }
     }
@@ -398,7 +398,7 @@ locals {
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}",
-          "https://lb.drpc.org/tron/${var.tron_drpc_api_key}"
+          "https://misty-quaint-log.tron-mainnet.quiknode.pro/${var.tron_quicknode_api_key}/jsonrpc"
         ]
         privateKey = var.lighthouse_web3_signer_private_key
       }
