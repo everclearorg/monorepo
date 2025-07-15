@@ -24,7 +24,7 @@ export const EVERCLEAR_SPOKE_GATEWAY_PROD = '418fd8a4d1980fa73f060a37af5bf23d8fb
 export const hubGatewayProd: string = '41EFfAB7cCEBF63FbEFB4884964b12259d4374FaAa';
 export const HUB_GATEWAY_PROD = '0x000000000000000000000000effab7ccebf63fbefb4884964b12259d4374faaa';
 export const XERC20_MODULE_PROD: string = '41af50e223f96be03403e6a2535a2e4508bca1d778';
-export const FEE_ADAPTER_PROD: string = '';
+export const FEE_ADAPTER_PROD: string = 'TBCGBF9TpdGdTsoHJat7QjVEnz5Jc4F1oF';
 
 // Staging //
 export const SPOKE_STAGING: string = '41d84173290e0e486b12b973f704cddef6e46a308e';
