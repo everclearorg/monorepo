@@ -18,6 +18,8 @@ const DEFAULT_REDACTED_PATHS = [
 ];
 for (const chainId of chainIds) {
   DEFAULT_REDACTED_PATHS.push(`config.chains[${chainId}].providers`);
+  DEFAULT_REDACTED_PATHS.push(`chains[${chainId}].providers`);
+  DEFAULT_REDACTED_PATHS.push(`chains[${chainId}].privateKey`);
 }
 
 /**
@@ -120,24 +122,31 @@ export class Logger {
 
     const censor = (value: string, path: string[]) => {
       const fieldName = path[path.length - 1];
-      if (fieldName === 'poller' || fieldName === 'url') {
-        return sanitizeUrl(value);
-      } else if (fieldName === 'providers') {
-        const providers = [];
-        for (const provider of value) {
-          providers.push(isUrl(provider) ? sanitizeUrl(provider) : provider);
-        }
-        return providers;
-      } else if (fieldName === 'adminToken') {
-        return this.sanitizedValue;
-      } else if (fieldName === 'web3SignerUrl') {
-        if (isUrl(value)) {
+      switch (fieldName) {
+        case 'poller':
+        case 'url':
           return sanitizeUrl(value);
-        } else {
+        case 'providers':
+          // eslint-disable-next-line no-case-declarations
+          const providers = [];
+          for (const provider of value) {
+            providers.push(isUrl(provider) ? sanitizeUrl(provider) : provider);
+          }
+          return providers;
+        case 'adminToken':
+        case 'privateKey':
           return this.sanitizedValue;
-        }
+        case 'web3SignerUrl':
+          if (isUrl(value)) {
+            return sanitizeUrl(value);
+          } else {
+            return this.sanitizedValue;
+          }
+        default:
+          return value;
       }
     };
+
     return {
       paths: DEFAULT_REDACTED_PATHS,
       censor,
