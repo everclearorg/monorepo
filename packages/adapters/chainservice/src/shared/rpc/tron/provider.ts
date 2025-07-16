@@ -322,6 +322,11 @@ export class TronSyncProvider extends SyncProvider {
     }
   }
 
+  public async getGasPrice(): Promise<string> {
+    // Currently, the unit price of Energy is 210 sun
+    return '210';
+  }
+
   public async estimateGas(tx: ReadTransaction | WriteTransaction): Promise<string> {
     const isWriteTx = 'value' in tx || 'from' in tx;
     const writeTx = isWriteTx ? (tx as WriteTransaction) : undefined;
