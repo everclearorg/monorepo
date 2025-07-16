@@ -10,7 +10,7 @@ import {
   WriteTransaction,
 } from '../../types';
 import { SyncProvider } from '../eth';
-import { GasEstimateInvalid, TransactionReadError } from '../../errors';
+import { UnpredictableGasLimit, TransactionReadError } from '../../errors';
 import { TronWeb } from '../../../mockable';
 
 interface TronLog {
@@ -142,14 +142,18 @@ export class TronSyncProvider extends SyncProvider {
   }
 
   public async sync(): Promise<void> {
-    try {
-      const block = await this.tronWeb.trx.getCurrentBlock();
-      this.syncedBlockNumber = block.block_header.raw_data.number;
-      this.synced = true;
-    } catch (error) {
-      this.synced = false;
-      throw error;
-    }
+    // Tronweb does not have a concept of syncing like Ethereum, let's assume we are always synced
+    // and reduce the number of API calls.
+    this.syncedBlockNumber = 1;
+    this.synced = true;
+    // try {
+    //   const block = await this.tronWeb.trx.getCurrentBlock();
+    //   this.syncedBlockNumber = block.block_header.raw_data.number;
+    //   this.synced = true;
+    // } catch (error) {
+    //   this.synced = false;
+    //   throw error;
+    // }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -328,7 +332,7 @@ export class TronSyncProvider extends SyncProvider {
       fromAddress = this.getTronAddress(fromAddress);
     }
 
-    const result = await this.tronWeb.transactionBuilder.estimateEnergy(
+    const result = await this.tronWeb.transactionBuilder.triggerConstantContract(
       this.getTronAddress(tx.to),
       tx.funcSig,
       {
@@ -338,8 +342,8 @@ export class TronSyncProvider extends SyncProvider {
       [],
       fromAddress || (this.tronWeb.defaultAddress.hex as string),
     );
-    if (!result.result.result) {
-      throw new GasEstimateInvalid('failed to estimate energy');
+    if (!result.result.result || !result.energy_required) {
+      throw new UnpredictableGasLimit();
     }
     return result.energy_required.toString();
   }
