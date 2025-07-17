@@ -17,6 +17,7 @@ import { WriteTransaction } from '@chimera-monorepo/chainservice';
 import { getFastifyInstance } from '../../mockable';
 
 export const MIN_GAS_LIMIT = BigNumber.from(4_000_000);
+export const TRON_MIN_GAS_LIMIT = BigNumber.from(100_000_000); // 100 TRX for Tron domain 728126428
 export const MIN_HEART_INTERVAL_SECONDS = 60; // 1min
 let cachedHeartbeatSent = 0;
 
@@ -127,7 +128,10 @@ export const pollCache = async () => {
         logger.debug(`Got the gasLimit for domain: ${domain}`, requestContext, methodContext, {
           gasLimit: gasLimit.toString(),
         });
-        gasLimit = BigNumber.from(gasLimit).lt(MIN_GAS_LIMIT) ? MIN_GAS_LIMIT.toString() : gasLimit;
+        
+        // Use Tron-specific minimum gas limit for Tron domain (728126428)
+        const minGasForDomain = domain === 728126428 ? TRON_MIN_GAS_LIMIT : MIN_GAS_LIMIT;
+        gasLimit = BigNumber.from(gasLimit).lt(minGasForDomain) ? minGasForDomain.toString() : gasLimit;
 
         let bumpedGasPrice = BigNumber.from(gasPrice).mul(130).div(100);
         const bumpedGasLimit = BigNumber.from(gasLimit).mul(120).div(100);

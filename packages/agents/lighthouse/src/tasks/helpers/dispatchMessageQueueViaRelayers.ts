@@ -170,7 +170,17 @@ export const dispatchMessageQueueViaRelayers = async (
         });
         const relayerAddress = await relayer.instance.getRelayerAddress(domainToChainId(transactionDomain));
 
-        // Generate the signature
+        // SIMPLIFIED APPROACH: Use EVM address format for both signature and transaction data
+        // The TronSyncProvider's convertAddressesInTransactionData function will handle the 
+        // conversion of the _relayer parameter to T-address format at the provider level
+        logger.debug('Using EVM address format for Tron transaction', requestContext, methodContext, {
+          relayerAddress,
+          domain: transactionDomain,
+          isTron: transactionDomain === '728126428',
+          note: 'TronSyncProvider will convert _relayer parameter to T-address format automatically',
+        });
+
+        // Generate the signature using EVM address format
         const ttl = getNtpTimeSeconds() + DEFAULT_SIGNATURE_TTL;
         logger.debug('Generating signature', requestContext, methodContext, {
           typeHash: getTypeHash(type),
@@ -188,7 +198,7 @@ export const dispatchMessageQueueViaRelayers = async (
           getTypeHash(type),
           queue.domain,
           toDequeue,
-          relayerAddress,
+          relayerAddress, // Use EVM address for signature
           ttl,
           nonce,
           DEFAULT_HYPERLANE_BUFFER,
@@ -212,7 +222,7 @@ export const dispatchMessageQueueViaRelayers = async (
           data: everclearIface.encodeFunctionData(queueMethodName, [
             queue.domain,
             type === 'INTENT' ? trimmedIntents : toDequeue,
-            relayerAddress,
+            relayerAddress, // Use EVM address for transaction data (TronSyncProvider will convert)
             ttl,
             nonce,
             DEFAULT_HYPERLANE_BUFFER,
