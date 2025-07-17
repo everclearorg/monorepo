@@ -12,8 +12,6 @@ import {
 import { SyncProvider } from '../eth';
 import { UnpredictableGasLimit, TransactionReadError } from '../../errors';
 import { TronWeb } from '../../../mockable';
-import { Interface } from 'ethers/lib/utils';
-
 interface TronLog {
   address: string;
   topics: string[];
