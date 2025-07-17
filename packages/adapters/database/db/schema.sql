@@ -397,7 +397,7 @@ BEGIN
         origin_domain = EXCLUDED.origin_domain,
         destination_domain = EXCLUDED.destination_domain;
 
-    UPDATE public.destination_intents SET message_id = msg_id WHERE id = ANY(intent_ids);
+    UPDATE public.destination_intents SET message_id = msg_id, status = 'DISPATCHED' WHERE id = ANY(intent_ids);
 
     SELECT * INTO queue_rec
     FROM public.queues
@@ -510,7 +510,7 @@ BEGIN
         origin_domain = EXCLUDED.origin_domain,
         destination_domain = EXCLUDED.destination_domain;
 
-    UPDATE public.origin_intents SET message_id = msg_id WHERE id = ANY(intent_ids);
+    UPDATE public.origin_intents SET message_id = msg_id, status = 'DISPATCHED' WHERE id = ANY(intent_ids);
 
     SELECT * INTO queue_rec
     FROM public.queues
@@ -4524,4 +4524,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250701013945'),
     ('20250708181540'),
     ('20250708185702'),
-    ('20250708190952');
+    ('20250708190952'),
+    ('20250717210433');
