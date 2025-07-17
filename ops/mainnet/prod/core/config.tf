@@ -540,11 +540,11 @@ locals {
       port = module.monitor_cache.redis_instance_port
     }
     relayers = [
-      {
-        type   = "Gelato",
-        apiKey = "${var.gelato_api_key}",
-        url    = "https://relay.gelato.digital"
-      },
+      # {
+      #   type   = "Gelato",
+      #   apiKey = "${var.gelato_api_key}",
+      #   url    = "https://relay.gelato.digital"
+      # },
       {
         type   = "Everclear",
         apiKey = "${var.admin_token_relayer}",
@@ -592,11 +592,11 @@ locals {
     environment = "production"
     network = "mainnet"
     relayers = [
-      {
-        type   = "Gelato",
-        apiKey = "${var.gelato_api_key}",
-        url    = "https://relay.gelato.digital"
-      },
+      # {
+      #   type   = "Gelato",
+      #   apiKey = "${var.gelato_api_key}",
+      #   url    = "https://relay.gelato.digital"
+      # },
       {
         type   = "Everclear",
         apiKey = "${var.admin_token_relayer}",
