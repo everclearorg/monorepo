@@ -22,6 +22,7 @@ interface TronLog {
 type TronWebInstance = InstanceType<typeof TronWeb>;
 
 const DEFAULT_ADDRESS = '410000000000000000000000000000000000000000';
+const GAS_PRICE = '210'; // Currently, the unit price of Energy is 210 sun
 
 export interface TronWebFactory {
   create(config: { fullHost: string; apiKey?: string }): TronWebInstance;
@@ -67,7 +68,7 @@ class TronWeb3Signer implements ISigner {
         this.provider.getTronAddress(transaction.to),
         transaction.funcSig,
         {
-          feeLimit: Number.parseInt(transaction.gasLimit || '0'),
+          feeLimit: Number.parseInt(transaction.gasLimit || '0') * Number.parseInt(transaction.gasPrice || GAS_PRICE),
           callValue: Number.parseInt(transaction.value || '0'),
           rawParameter: transaction.data.slice(10), // Remove function selector
         },
@@ -323,8 +324,7 @@ export class TronSyncProvider extends SyncProvider {
   }
 
   public async getGasPrice(): Promise<string> {
-    // Currently, the unit price of Energy is 210 sun
-    return '210';
+    return GAS_PRICE;
   }
 
   public async estimateGas(tx: ReadTransaction | WriteTransaction): Promise<string> {
