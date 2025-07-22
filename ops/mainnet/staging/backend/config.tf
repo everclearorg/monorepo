@@ -45,12 +45,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
