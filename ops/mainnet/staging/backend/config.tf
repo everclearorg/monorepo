@@ -75,6 +75,12 @@ locals {
         ],
         network = "solana"
       }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ],
+        network = "tron"
+      }
     }
   })
 }
