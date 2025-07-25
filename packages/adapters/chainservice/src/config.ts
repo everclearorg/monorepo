@@ -227,7 +227,7 @@ export const validateChainServiceConfig = (_config: any): ChainServiceConfig => 
       ),
     } as ChainConfig;
 
-    if (chainConfig.privateKey) {
+    if (chainConfig?.privateKey) {
       config[domain].privateKey = chainConfig.privateKey;
     }
   });

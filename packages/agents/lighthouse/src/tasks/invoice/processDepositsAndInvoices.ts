@@ -103,10 +103,42 @@ export const processDepositsAndInvoices = async () => {
     );
     const [epochLength] = iface.decodeFunctionResult('epochLength', encodedDataForEpochLengthRes);
 
-    const blockNumber = await chainservice.getBlockNumber(+hub.domain);
+    // NOTE: Use L1 block to compute current epoch, as getBlockNumber(+hub.domain) returns L2 block
+    const blockNumber = await chainservice.getBlockNumber(1);
     const currentEpoch = Math.floor(blockNumber / +epochLength.toString());
     const lastClosedEpoch = currentEpoch > 0 ? currentEpoch - 1 : 0;
-
+    // Check if there are deposits to process in unprocessed epochs across all spokes
+    let hasDepositsToProcess = false;
+    if (lastClosedEpoch > +lastClosedEpochProcessed.toString()) {
+      for (const spokeDomain of spokes) {
+        for (let epoch = +lastClosedEpochProcessed.toString() + 1; epoch <= lastClosedEpoch; epoch++) {
+          const encodedDataForDepositsAvailable = iface.encodeFunctionData('depositsAvailableInEpoch', [
+            epoch,
+            +spokeDomain,
+            tickerHash,
+          ]);
+          const encodedDataForDepositsAvailableRes = await chainservice.readTx(
+            {
+              to: hub.deployments.everclear,
+              domain: +hub.domain,
+              data: encodedDataForDepositsAvailable,
+              funcSig: iface.getFunction('depositsAvailableInEpoch').format(),
+            },
+            'latest',
+          );
+          const [depositsAvailable] = iface.decodeFunctionResult(
+            'depositsAvailableInEpoch',
+            encodedDataForDepositsAvailableRes,
+          );
+          if (+depositsAvailable.toString() > 0) {
+            hasDepositsToProcess = true;
+            break;
+          }
+        }
+        if (hasDepositsToProcess) break;
+      }
+    }
+    const hasInvoicesToProcess = invoices.head != mkBytes32();
     logger.debug(
       'Checking the possibility of calling the processDepositsAndInvoices method',
       requestContext,
@@ -119,11 +151,17 @@ export const processDepositsAndInvoices = async () => {
         epochLength,
         currentEpoch,
         lastClosedEpoch,
+        hasInvoicesToProcess,
+        hasDepositsToProcess,
       },
     );
-
-    if (invoices.head == mkBytes32() && lastClosedEpoch == +lastClosedEpochProcessed.toString()) {
-      logger.debug('Skip to call the processDepositsAndInvoices method', requestContext, methodContext);
+    // Only call relayer if there are invoices to process OR deposits to process
+    if (!hasInvoicesToProcess && !hasDepositsToProcess) {
+      logger.debug(
+        'Skip to call the processDepositsAndInvoices method - no invoices or deposits to process',
+        requestContext,
+        methodContext,
+      );
       continue;
     }
 

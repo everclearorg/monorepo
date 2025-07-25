@@ -197,6 +197,10 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
       assets,
       gasLimit,
     };
+
+    if (localChainConfig?.privateKey) {
+      chainsForLighthouseConfig[domainId].privateKey = localChainConfig.privateKey;
+    }
   }
 
   // Get thresholds

@@ -3,7 +3,7 @@ import { GelatoRelay } from '@gelatonetwork/relay-sdk';
 
 import { Relayer } from '..';
 
-import { getRelayerAddress, getTaskStatus, send, waitForTaskCompletion } from './gelato';
+import { getRelayerAddress, getTaskStatus, send, waitForTaskCompletion, isChainSupportedByGelato } from './gelato';
 export let url: string;
 export let gelatoRelay: GelatoRelay;
 
@@ -15,5 +15,6 @@ export const setupRelayer = async (_url?: string): Promise<Relayer> => {
     send,
     getTaskStatus,
     waitForTaskCompletion,
+    isChainSupported: isChainSupportedByGelato,
   };
 };
