@@ -10,14 +10,8 @@ import {
   WriteTransaction,
 } from '../../types';
 import { SyncProvider } from '../eth';
-import { GasEstimateInvalid, TransactionReadError } from '../../errors';
+import { UnpredictableGasLimit, TransactionReadError } from '../../errors';
 import { TronWeb } from '../../../mockable';
-import { Interface } from 'ethers/lib/utils';
-
-interface ContractFunctionParameter {
-  type: string;
-  value: string;
-}
 
 interface TronLog {
   address: string;
@@ -27,24 +21,20 @@ interface TronLog {
 
 type TronWebInstance = InstanceType<typeof TronWeb>;
 
+const DEFAULT_ADDRESS = '410000000000000000000000000000000000000000';
+
 export interface TronWebFactory {
-  create(config: { fullHost: string }): TronWebInstance;
+  create(config: { fullHost: string; apiKey?: string }): TronWebInstance;
 }
 
 class DefaultTronWebFactory implements TronWebFactory {
-  create(config: { fullHost: string }): TronWebInstance {
-    return new TronWeb(config);
+  create(config: { fullHost: string; apiKey?: string }): TronWebInstance {
+    const tronWebConfig: any = { fullHost: config.fullHost };
+    if (config.apiKey) {
+      tronWebConfig.headers = { "TRON-PRO-API-KEY": config.apiKey };
+    }
+    return new TronWeb(tronWebConfig);
   }
-}
-
-function decodeParameters(data: string, funcSig: string, value?: string): ContractFunctionParameter[] {
-  const iface = new Interface([`function ${funcSig}`]);
-  const tx = iface.parseTransaction({ data, value });
-
-  return tx.args.map((arg, index) => ({
-    type: tx.functionFragment.inputs[index].type,
-    value: arg.toString(),
-  }));
 }
 
 class TronWeb3Signer implements ISigner {
@@ -68,19 +58,20 @@ class TronWeb3Signer implements ISigner {
     if (!transaction.data || !transaction.data.length || transaction.data === '0x') {
       // Handle TRX transfer
       tx.transaction = await this.provider.tronWeb.transactionBuilder.sendTrx(
-        transaction.to,
+        this.provider.getTronAddress(transaction.to),
         Number.parseInt(transaction.value || '0'),
       );
     } else {
       // Handle smart contract transaction
       tx = await this.provider.tronWeb.transactionBuilder.triggerSmartContract(
-        transaction.to,
+        this.provider.getTronAddress(transaction.to),
         transaction.funcSig,
         {
           feeLimit: Number.parseInt(transaction.gasLimit || '0'),
           callValue: Number.parseInt(transaction.value || '0'),
+          rawParameter: transaction.data.slice(10), // Remove function selector
         },
-        decodeParameters(transaction.data, transaction.funcSig, transaction.value),
+        [], // Empty parameters array since we're using rawParameter
         fromAddress,
       );
     }
@@ -138,35 +129,50 @@ export class TronSyncProvider extends SyncProvider {
     debugLogging = false,
     private readonly tronWebFactory: TronWebFactory = new DefaultTronWebFactory(),
   ) {
-    super(url, domain, stallTimeout, debugLogging);
-    this.tronWeb = this.tronWebFactory.create({ fullHost: url });
+    // Extract API key from URL if present
+    const urlObj = new URL(url);
+    const apiKey = urlObj.searchParams.get('apiKey');
+    
+    // Remove API key from URL to get clean fullHost
+    urlObj.searchParams.delete('apiKey');
+    const cleanUrl = urlObj.toString();
+    
+    super(cleanUrl, domain, stallTimeout, debugLogging);
+    this.tronWeb = this.tronWebFactory.create({ fullHost: cleanUrl, apiKey: apiKey || undefined });
   }
 
   public async sync(): Promise<void> {
-    try {
-      const block = await this.tronWeb.trx.getCurrentBlock();
-      this.syncedBlockNumber = block.block_header.raw_data.number;
-      this.synced = true;
-    } catch (error) {
-      this.synced = false;
-      throw error;
-    }
+    // Tronweb does not have a concept of syncing like Ethereum, let's assume we are always synced
+    // and reduce the number of API calls.
+    this.syncedBlockNumber = 1;
+    this.synced = true;
+    // try {
+    //   const block = await this.tronWeb.trx.getCurrentBlock();
+    //   this.syncedBlockNumber = block.block_header.raw_data.number;
+    //   this.synced = true;
+    // } catch (error) {
+    //   this.synced = false;
+    //   throw error;
+    // }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async call(tx: ReadTransaction, _block: number | string): Promise<string> {
     const result = await this.tronWeb.transactionBuilder.triggerConstantContract(
-      tx.to,
+      this.getTronAddress(tx.to),
       tx.funcSig,
-      {},
-      decodeParameters(tx.data, tx.funcSig),
+      {
+        rawParameter: tx.data.slice(10),
+      },
+      [],
+      this.tronWeb.defaultAddress.hex || DEFAULT_ADDRESS,
     );
 
     if (!result.constant_result || result.constant_result.length === 0) {
       throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { error: result.Error });
     }
 
-    return result.constant_result[0];
+    return `0x${result.constant_result[0]}`;
   }
 
   private async getTransactionData(hash: string): Promise<any> {
@@ -265,26 +271,32 @@ export class TronSyncProvider extends SyncProvider {
     };
   }
 
+  public async getBlockNumber(): Promise<number> {
+    const blockData = await this.tronWeb.trx.getBlock('latest');
+    return blockData.block_header.raw_data.number;
+  }
+
   public async getCode(address: string): Promise<string> {
-    const contract = await this.tronWeb.trx.getContract(address);
+    const contract = await this.tronWeb.trx.getContract(this.getTronAddress(address));
     return contract.bytecode || '0x';
   }
 
   public async getBalance(address: string, assetId: string): Promise<string> {
+    const tronAddress = this.getTronAddress(address);
     if (assetId === constants.AddressZero) {
       // Get TRX balance
-      const balance = await this.tronWeb.trx.getBalance(address);
+      const balance = await this.tronWeb.trx.getBalance(tronAddress);
       return balance.toString();
     }
 
     // Get TRC20 token balance
-    const contract = await this.tronWeb.contract().at(assetId);
+    const contract = await this.tronWeb.contract().at(this.getTronAddress(assetId));
     // Set the owner address to the address we want to check balance for
     const originalAddress = this.tronWeb.defaultAddress.hex;
     try {
       // Temporarily set the default address to the address we want to check
-      this.tronWeb.defaultAddress.hex = address;
-      const balance = await contract.balanceOf(address).call();
+      this.tronWeb.defaultAddress.hex = DEFAULT_ADDRESS;
+      const balance = await contract.balanceOf(tronAddress).call();
       return balance.toString();
     } finally {
       // Restore the original address
@@ -296,18 +308,23 @@ export class TronSyncProvider extends SyncProvider {
     if (address === constants.AddressZero) {
       return 6; // TRX has 6 decimals
     }
-    const contract = await this.tronWeb.contract().at(address);
+    const contract = await this.tronWeb.contract().at(this.getTronAddress(address));
     // Set a default owner address for the contract call
     const originalAddress = this.tronWeb.defaultAddress.hex;
     try {
       // Use a default address for the contract call
-      this.tronWeb.defaultAddress.hex = '0x0000000000000000000000000000000000000000';
+      this.tronWeb.defaultAddress.hex = DEFAULT_ADDRESS;
       const decimals = await contract.decimals().call();
       return Number(decimals);
     } finally {
       // Restore the original address
       this.tronWeb.defaultAddress.hex = originalAddress;
     }
+  }
+
+  public async getGasPrice(): Promise<string> {
+    // Currently, the unit price of Energy is 210 sun
+    return '210';
   }
 
   public async estimateGas(tx: ReadTransaction | WriteTransaction): Promise<string> {
@@ -317,36 +334,33 @@ export class TronSyncProvider extends SyncProvider {
     // If from address is provided, convert it to Tron format if needed
     let fromAddress = writeTx?.from;
     if (fromAddress) {
-      // If it's an Ethereum-style address, convert to Tron format
-      if (fromAddress.startsWith('0x')) {
-        fromAddress = this.tronWeb.address.fromHex(fromAddress);
-      }
+      fromAddress = this.getTronAddress(fromAddress);
     }
 
-    const result = await this.tronWeb.transactionBuilder.estimateEnergy(
-      tx.to,
+    const result = await this.tronWeb.transactionBuilder.triggerConstantContract(
+      this.getTronAddress(tx.to),
       tx.funcSig,
       {
         callValue: Number.parseInt(writeTx?.value || '0'),
+        rawParameter: tx.data.slice(10),
       },
-      decodeParameters(tx.data, tx.funcSig, writeTx?.value),
+      [],
       fromAddress || (this.tronWeb.defaultAddress.hex as string),
     );
-    if (!result.result.result) {
-      throw new GasEstimateInvalid('failed to estimate energy');
+    if (!result.result.result || !result.energy_required) {
+      throw new UnpredictableGasLimit();
     }
     return result.energy_required.toString();
   }
 
   public async getSigner(signer: ISigner | string): Promise<ISigner> {
-    if (typeof signer === 'string') {
-      this.tronWeb.setPrivateKey(signer);
-      return new TronWeb3Signer(this);
-    } else if ((signer as any).privateKey) {
-      this.tronWeb.setPrivateKey((signer as any).privateKey);
+    const privateKey = typeof signer === 'string' ? signer : (signer as any).privateKey;
+    if (privateKey) {
+      this.tronWeb.setPrivateKey(privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey);
       return new TronWeb3Signer(this);
     }
-    return new TronWeb3Signer(this, signer.signerApi);
+
+    return new TronWeb3Signer(this, (signer as ISigner).signerApi);
   }
 
   public async connect(signer: ISigner | string): Promise<ISigner> {
@@ -356,5 +370,13 @@ export class TronSyncProvider extends SyncProvider {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getTransactionCount(address: string, _blockTag: string | number = 'latest'): Promise<number> {
     return this.nonces.get(address) || 0;
+  }
+
+  public getTronAddress(address: string): string {
+    if (address.startsWith('0x')) {
+      return this.tronWeb.address.fromHex(`0x${address.slice(-40)}`);
+    }
+
+    return address;
   }
 }
