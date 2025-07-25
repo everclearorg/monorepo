@@ -53,7 +53,7 @@ export const checkRpcs = async () => {
 
   for (const badRpc of badRpcs) {
     // Skip alerts for Solana 429 errors
-    if (badRpc.domain === SOLANA_CHAINID && badRpc.error?.includes('429')) {
+    if (String(badRpc.domain) === String(SOLANA_CHAINID) && badRpc.error?.includes('429')) {
       continue;
     }
 
