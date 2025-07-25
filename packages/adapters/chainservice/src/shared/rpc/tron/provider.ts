@@ -65,7 +65,7 @@ class TronWeb3Signer implements ISigner {
       // Handle smart contract transaction
       tx = await this.provider.tronWeb.transactionBuilder.triggerSmartContract(
         this.provider.getTronAddress(transaction.to),
-        transaction.funcSig,
+        transaction.funcSig ?? '',
         {
           feeLimit: Number.parseInt(transaction.gasLimit || '0'),
           callValue: Number.parseInt(transaction.value || '0'),
@@ -160,7 +160,7 @@ export class TronSyncProvider extends SyncProvider {
   public async call(tx: ReadTransaction, _block: number | string): Promise<string> {
     const result = await this.tronWeb.transactionBuilder.triggerConstantContract(
       this.getTronAddress(tx.to),
-      tx.funcSig,
+      tx.funcSig ?? '',
       {
         rawParameter: tx.data.slice(10),
       },
@@ -339,7 +339,7 @@ export class TronSyncProvider extends SyncProvider {
 
     const result = await this.tronWeb.transactionBuilder.triggerConstantContract(
       this.getTronAddress(tx.to),
-      tx.funcSig,
+      tx.funcSig ?? '',
       {
         callValue: Number.parseInt(writeTx?.value || '0'),
         rawParameter: tx.data.slice(10),

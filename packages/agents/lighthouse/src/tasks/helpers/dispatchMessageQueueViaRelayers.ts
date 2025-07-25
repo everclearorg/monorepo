@@ -242,7 +242,7 @@ export const dispatchMessageQueueViaRelayers = async (
           tx.to,
           tx.data,
           tx.value,
-          tx.funcSig,
+          tx.funcSig ?? '',
           [relayer],
           chainservice,
           logger,

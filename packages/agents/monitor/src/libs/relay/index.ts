@@ -78,7 +78,7 @@ export const selfRelayHyperlaneMessages = async (
         relayTransaction!.to,
         relayTransaction!.data,
         relayTransaction!.value,
-        relayTransaction!.funcSig,
+        relayTransaction!.funcSig ?? '',
         relayers,
         chainreader,
         logger,
