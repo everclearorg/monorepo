@@ -42,5 +42,16 @@ describe('Config', () => {
 
       expect(() => validateChainServiceConfig(config)).to.throw(ConfigurationError);
     });
+
+    it('should accept valid configuration with private key', () => {
+      const config = {
+        [TEST_SENDER_CHAIN_ID.toString()]: {
+          providers: [{ url: 'https://-------------' }],
+          privateKey: '1234567890123456789012345678901234567890123456789012345678901234',
+        },
+      };
+
+      expect(() => validateChainServiceConfig(config)).to.not.throw();
+    });
   });
 });

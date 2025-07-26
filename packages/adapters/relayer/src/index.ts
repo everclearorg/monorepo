@@ -35,6 +35,7 @@ export type Relayer = {
     _timeout?: number,
     _pollInterval?: number,
   ) => Promise<RelayerTaskStatus>;
+  isChainSupported: (chainId: number) => Promise<boolean>;
 };
 
 export const setupGelatoRelayer = _setupGelatoRelayer;
@@ -56,6 +57,12 @@ export const sendWithRelayerWithBackup = async (
 
   let error_msg = '';
   for (const relayer of relayers) {
+    const supported = await relayer.instance.isChainSupported(chainId);
+    if (!supported) {
+      error_msg = `Chain ${chainId} not supported by ${relayer.type}`;
+      continue;
+    }
+
     logger.info(`Sending tx with ${relayer.type} relayer`, requestContext, methodContext, {
       chainId,
       domain,

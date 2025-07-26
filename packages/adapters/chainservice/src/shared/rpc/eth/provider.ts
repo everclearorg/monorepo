@@ -325,8 +325,9 @@ export class SyncProvider implements RpcProvider {
   }
 
   public async estimateGas(tx: ReadTransaction | WriteTransaction) {
-    // get formatted transaction
-    const { domain, ...toCall } = tx;
+    // get formatted transaction by excluding funcSig and getting chain id
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { domain, funcSig, ...toCall } = tx;
     const formatted = {
       ...toCall,
       chainId: domainToChainId(domain),
@@ -339,8 +340,9 @@ export class SyncProvider implements RpcProvider {
   }
 
   public call(tx: ReadTransaction, block: number | string): Promise<string> {
-    // get formatted transaction
-    const { domain, ...toCall } = tx;
+    // get formatted transaction by excluding funcSig and getting chain id
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { domain, funcSig, ...toCall } = tx;
     const formatted = {
       ...toCall,
       chainId: domainToChainId(domain),

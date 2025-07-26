@@ -13,7 +13,11 @@ use crate::{
 #[event_cpi]
 #[derive(Accounts)]
 pub struct AdminState<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [b"spoke-state"],
+        bump = spoke_state.bump
+    )]
     pub spoke_state: Account<'info, SpokeState>,
     pub admin: Signer<'info>,
 }

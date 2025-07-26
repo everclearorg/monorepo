@@ -22,6 +22,10 @@ pub enum SpokeError {
     InvalidIntentStatus,
     #[msg("Max fee exceeded.")]
     MaxFeeExceeded,
+    #[msg("Multiple input assets in a single order are not allowed.")]
+    MultipleOrderAssets,
+    #[msg("Empty Params in new order function are not allowed")]
+    EmptyParams,
     #[msg("Invalid origin for inbound message.")]
     InvalidOrigin,
     #[msg("Invalid sender for inbound message.")]
@@ -72,4 +76,12 @@ pub enum SpokeError {
     IncorrectSettlementAccounts,
     #[msg("Invalid intent id")]
     InvalidIntentId,
+    #[msg("Invalid deadline")]
+    InvalidDeadline,
+    #[msg("Missing ed25519 preinstructions")]
+    MissingEd25519Instruction,
+    #[msg("Invalid fee signature")]
+    InvalidFeeSignature,
+    #[msg("Fee adapter paused")]
+    FeeAdapterPaused,
 }

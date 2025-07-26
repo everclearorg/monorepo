@@ -1,6 +1,6 @@
 {
   "name": "@chimera-monorepo/contracts",
-  "version": "0.0.1-alpha.10",
+  "version": "0.0.1-alpha.11",
   "description": "Smart contracts for Everclear",
   "homepage": "https://github.com/defi-wonderland/chimera-monorepo/packages/contracts",
   "repository": {
@@ -81,9 +81,11 @@
     "@inquirer/prompts": "^5.3.8",
     "@openzeppelin/contracts": "5.0.2",
     "@openzeppelin/contracts-upgradeable": "5.0.2",
+    "@solana-developers/helpers": "^2.8.1",
     "dotenv": "^16.4.5",
     "solmate": "^6.8.0",
     "ts-node": "^10.9.2",
+    "tweetnacl": "^1.0.3",
     "viem": "^2.19.8"
   },
   "devDependencies": {

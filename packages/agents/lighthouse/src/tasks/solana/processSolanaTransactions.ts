@@ -26,6 +26,9 @@ export const processSolanaTransactions = async () => {
   // Create logging context
   const { requestContext, methodContext } = createLoggingContext(processSolanaTransactions.name);
 
+  const updatedCount = await database.updateSolanaMessageStatuses();
+  logger.info(`Bulk updated ${updatedCount} solana message statuses to delivered`, requestContext, methodContext);
+
   // Check if Solana chain is configured
   const chainConfig = chains[SOLANA_CHAINID];
   const idl = JSON.parse(JSON.stringify(idlFile));

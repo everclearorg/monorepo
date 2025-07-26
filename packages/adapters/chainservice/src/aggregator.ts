@@ -143,7 +143,10 @@ export class RpcProviderAggregator {
   }
 
   public async setSigner(signer: ISigner | string) {
-    if (signer) {
+    // Use chain-specific private key if available, otherwise use the global signer
+    if (this.config.privateKey) {
+      this.signer = await this.providers[0].getSigner(this.config.privateKey);
+    } else if (signer) {
       this.signer = await this.providers[0].getSigner(signer);
     } else {
       this.signer = undefined;
@@ -172,7 +175,7 @@ export class RpcProviderAggregator {
       gasPrice: transaction.params.gasPrice ? BigNumber.from(transaction.params.gasPrice) : undefined,
       value: BigNumber.from(transaction.params.value || 0),
     };
-    const provider = await this.leadProvider!.connect(this.signer!)
+    const provider = await this.leadProvider!.connect(this.signer!);
     return provider.sendTransaction(toSend as unknown as ITransactionRequest);
   }
 
@@ -445,7 +448,7 @@ export class RpcProviderAggregator {
     const max = BigNumber.from(gasPriceMaximum);
     // TODO: Could use a more sustainable method of separating out gas price abs min for certain
     // chains (such as arbitrum or zksync here) in particular:
-    if (gasPrice.lt(min) && ![1634886255, 1734439522, 2053862243, 2053862260].includes(this.domain)) {
+    if (gasPrice.lt(min) && ![1634886255, 1734439522, 2053862243, 2053862260, 728126428].includes(this.domain)) {
       gasPrice = min;
     } else if (gasPrice.gte(max)) {
       this.logger.warn('Hit the gas price absolute maximum.', requestContext, methodContext, {

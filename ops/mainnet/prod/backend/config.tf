@@ -146,6 +146,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ],
         network = "solana"

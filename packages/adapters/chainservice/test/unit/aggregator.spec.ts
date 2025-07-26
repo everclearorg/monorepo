@@ -30,6 +30,7 @@ import {
   TEST_TX_RECEIPT,
   TEST_TX_RESPONSE,
   TEST_REQUEST_CONTEXT,
+  TRON_DOMAIN,
 } from '../utils';
 
 const logger = new Logger({
@@ -96,6 +97,39 @@ describe('RpcProviderAggregator', () => {
   afterEach(async () => {
     restore();
     reset();
+  });
+
+  describe('#constructor', () => {
+    const chainSpecificPrivateKey = '1234567890123456789012345678901234567890123456789012345678901234';
+    const globalSignerPrivateKey = '9876543210987654321098765432109876543210987654321098765432109876';
+
+    it('should use chain-specific private key when provided (EVM)', async () => {
+      const configWithPrivateKey: ChainConfig = {
+        ...DEFAULT_CHAIN_CONFIG,
+        providers: [{ url: 'https://-------------' }],
+        privateKey: chainSpecificPrivateKey,
+      };
+
+      const aggregator = new RpcProviderAggregator(logger, TEST_SENDER_DOMAIN, configWithPrivateKey);
+      await aggregator.setSigner(globalSignerPrivateKey);
+
+      // The signer should be set using the chain-specific private key, not the global one
+      expect((aggregator as any).signer).to.be.instanceof(EthWallet);
+      expect((aggregator as any).signer.address.toLowerCase()).to.be.equal('0x2e988a386a799f506693793c6a5af6b54dfaabfb');
+    });
+
+    it('should use chain-specific private key when provided (Tron)', async () => {
+      const configWithPrivateKey: ChainConfig = {
+        ...DEFAULT_CHAIN_CONFIG,
+        providers: [{ url: 'https://api.trongrid.io' }],
+        privateKey: chainSpecificPrivateKey,
+      };
+
+      const aggregator = new RpcProviderAggregator(logger, TRON_DOMAIN, configWithPrivateKey);
+      await aggregator.setSigner(globalSignerPrivateKey);
+
+      expect(await (aggregator as any).signer.getAddress()).to.be.equal('412e988a386a799f506693793c6a5af6b54dfaabfb');
+    });
   });
 
   describe('#sendTransaction', () => {
@@ -318,7 +352,7 @@ describe('RpcProviderAggregator', () => {
 
       // Now we make sure that all of the calls were made as expected.
       expect(providerStub.estimateGas.callCount).to.equal(1);
-      const { domain, ...expected } = testTx;
+      const { domain, funcSig, ...expected } = testTx;
       expect(providerStub.estimateGas.calledOnceWithExactly({ chainId: TEST_SENDER_CHAIN_ID, ...expected })).to.be.true;
     });
 

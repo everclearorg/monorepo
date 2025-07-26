@@ -841,3 +841,27 @@ export const updateSettlementStatus = async (
   const poolToUse = _pool ?? pool;
   await db.update('settlement_intents', { status }, { id: intentId }).run(poolToUse);
 };
+
+export const updateSolanaMessageStatuses = async (_pool?: Pool | db.TxnClientForRepeatableRead): Promise<number> => {
+  const poolToUse = _pool ?? pool;
+
+  // Set message status to 'delivered' where:
+  // 1. destination_domain is Solana (1399811149)
+  // 2. message_status is not already 'delivered'
+  // 3. settlement intent exists with status 'SETTLED'
+  const result = await db.sql<s.messages.SQL>`
+      UPDATE messages 
+      SET message_status = 'delivered'
+      WHERE destination_domain = '1399811149' 
+        AND message_status != 'delivered'
+        AND EXISTS (
+          SELECT 1 
+          FROM settlement_intents si 
+          WHERE si.status = 'SETTLED' 
+            AND si.id = ANY(messages.intent_ids)
+        )
+      RETURNING id
+    `.run(poolToUse);
+
+  return result.length;
+};
