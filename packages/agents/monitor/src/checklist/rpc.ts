@@ -1,7 +1,7 @@
 import { providers } from 'ethers';
-import { createLoggingContext, Logger } from '@chimera-monorepo/utils';
+import { createLoggingContext, Logger, Severity, SOLANA_CHAINID } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
-import { Report, Severity } from '../types';
+import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
 import { Connection } from '@solana/web3.js';
 
@@ -52,6 +52,11 @@ export const checkRpcs = async () => {
   }
 
   for (const badRpc of badRpcs) {
+    // Skip alerts for Solana 429 errors
+    if (String(badRpc.domain) === String(SOLANA_CHAINID) && badRpc.error?.includes('429')) {
+      continue;
+    }
+
     const report = makeReport(badRpc, logger, config.environment);
     await sendAlerts(report, logger, config, requestContext);
   }
