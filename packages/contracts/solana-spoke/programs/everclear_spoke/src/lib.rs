@@ -13,12 +13,19 @@ use hyperlane::{
     mailbox::HandleInstruction, InterchainGasPaymasterType, SerializableAccountMeta,
     SimulationReturnData,
 };
+use instructions::fee_adapter::{
+    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter,
+    __client_accounts_fee_adapter_admin_state, __client_accounts_initialize_fee_adapter,
+};
+
+use instructions::new_order::OrderParameters;
 use instructions::*;
 
 declare_id!("everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm");
 
 #[program]
 pub mod everclear_spoke {
+
     use super::*;
 
     /// Initialize the global state.
@@ -69,6 +76,7 @@ pub mod everclear_spoke {
         destinations: Vec<u32>,
         data: Vec<u8>,
         message_gas_limit: u64,
+        fee_param: FeeParams,
     ) -> Result<()> {
         instructions::new_intent(
             ctx,
@@ -81,7 +89,16 @@ pub mod everclear_spoke {
             destinations,
             data,
             message_gas_limit,
+            fee_param,
         )
+    }
+
+    pub fn new_order(
+        ctx: Context<NewIntent>,
+        params: Vec<OrderParameters>,
+        fee_param: FeeParams,
+    ) -> Result<()> {
+        instructions::new_order(ctx, params, fee_param)
     }
 
     // Instruction relates to message receiving
@@ -205,5 +222,59 @@ pub mod everclear_spoke {
         );
 
         instructions::update_vault_authority_bump(ctx, new_bump)
+    }
+
+    // Fee Adapter Functions
+
+    pub fn initialize_fee_adapter(
+        ctx: Context<InitializeFeeAdapter>,
+        fee_recipient: Pubkey,
+        fee_signer: Pubkey,
+    ) -> Result<()> {
+        let state = &ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.payer.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer)
+    }
+
+    pub fn update_fee_recipient(
+        ctx: Context<FeeAdapterAdminState>,
+        fee_recipient: Pubkey,
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::update_fee_recipient(ctx, fee_recipient)
+    }
+
+    pub fn update_fee_signer(ctx: Context<FeeAdapterAdminState>, fee_signer: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::update_fee_signer(ctx, fee_signer)
+    }
+
+    pub fn pause_fee_adapter(ctx: Context<FeeAdapterAdminState>) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::pause_fee_adapter(ctx)
+    }
+
+    pub fn unpause_fee_adapter(ctx: Context<FeeAdapterAdminState>) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::unpause_fee_adapter(ctx)
     }
 }
