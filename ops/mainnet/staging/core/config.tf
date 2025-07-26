@@ -98,12 +98,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
@@ -164,12 +164,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
@@ -236,12 +236,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     # "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
@@ -267,7 +267,7 @@ locals {
       }
       "728126428" = {
         providers = [
-          "https://api.trongrid.io"
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
       }
     }
@@ -348,7 +348,7 @@ locals {
       }
     ]
     thresholds = {
-      # 1          = { maxAge = 60, size = 1 },
+      1          = { maxAge = 60, size = 1 },
       10         = { maxAge = 60, size = 1 },
       # 42161      = { maxAge = 60, size = 1 },
       8453       = { maxAge = 60, size = 1 },
@@ -363,12 +363,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     #"https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",

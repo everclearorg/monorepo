@@ -94,6 +94,9 @@ describe('#processDepositsAndInvoices', () => {
     // Mock iface.decodeFunctionResult('lastClosedEpochsProcessed', ...);
     decodeFunctionResult.onCall(2).returns([BigNumber.from(25)]);
 
+    // Mock iface.decodeFunctionResult('depositsAvailableInEpoch', ...);
+    decodeFunctionResult.onCall(3).returns([BigNumber.from(25)]);
+
     // Mock chainservice.getBlockNumber
     chainservice.getBlockNumber.resolves(100);
 

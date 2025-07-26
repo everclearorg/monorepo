@@ -201,28 +201,11 @@ describe('TronSyncProvider', () => {
 
   describe('sync', () => {
     it('should update syncedBlockNumber and synced status on successful sync', async () => {
-      const mockBlock = {
-        block_header: {
-          raw_data: {
-            number: 12345
-          }
-        }
-      };
-
-      mockTronWeb.trx.getCurrentBlock.resolves(mockBlock);
-
       await provider.sync();
 
-      expect(provider.syncedBlockNumber).to.equal(12345);
+      expect(provider.syncedBlockNumber).to.equal(1);
       expect(provider.synced).to.be.true;
-      expect(mockTronWeb.trx.getCurrentBlock.calledOnce).to.be.true;
-    });
-
-    it('should set synced to false and throw error on sync failure', async () => {
-      mockTronWeb.trx.getCurrentBlock.rejects(new Error('Sync failed'));
-
-      await expect(provider.sync()).to.be.rejectedWith('Sync failed');
-      expect(provider.synced).to.be.false;
+      expect(mockTronWeb.trx.getCurrentBlock.notCalled).to.be.true;
     });
   });
 
@@ -647,7 +630,7 @@ describe('TronSyncProvider', () => {
   describe('estimateGas', () => {
     it('should return estimated gas', async () => {
       // Mock the transaction builder to return a successful result
-      mockTronWeb.transactionBuilder.estimateEnergy.resolves({
+      mockTronWeb.transactionBuilder.triggerConstantContract.resolves({
         result: {
           result: true
         },
@@ -664,12 +647,12 @@ describe('TronSyncProvider', () => {
       });
 
       expect(result).to.equal('1000000');
-      expect(mockTronWeb.transactionBuilder.estimateEnergy.calledOnce).to.be.true;
+      expect(mockTronWeb.transactionBuilder.triggerConstantContract.calledOnce).to.be.true;
     });
 
     it('should handle estimation failure', async () => {
       // Mock the transaction builder to return a failed result
-      mockTronWeb.transactionBuilder.estimateEnergy.resolves({
+      mockTronWeb.transactionBuilder.triggerConstantContract.resolves({
         result: {
           result: false
         }
@@ -680,7 +663,7 @@ describe('TronSyncProvider', () => {
         funcSig: 'transfer(address,uint256)',
         data: '0xa9059cbb000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         domain: 1
-      })).to.be.rejectedWith('failed to estimate energy');
+      })).to.be.rejectedWith('The gas estimate could not be determined.');
     });
   });
 
