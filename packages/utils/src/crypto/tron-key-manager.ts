@@ -201,7 +201,12 @@ export class TronKeyManager {
    * Get test private key (development only)
    */
   private getTestPrivateKey(): string {
-    return 'da146374a75310b9666e834ee4ad0866d6f4035967bfc76217c5a495fff9f0d0';
+    const testPrivateKey = process.env.TEST_PRIVATE_KEY;
+    if (!testPrivateKey) {
+      this.logger.warn('Test private key is not set in the environment variables.');
+      throw new Error('Test private key is required but not set.');
+    }
+    return testPrivateKey;
   }
 
   /**
