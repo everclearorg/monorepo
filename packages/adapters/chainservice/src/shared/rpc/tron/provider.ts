@@ -360,7 +360,8 @@ export class TronSyncProvider extends SyncProvider {
       }
 
       // For TRON, we need to use the raw API approach that we know works
-      const response = await fetch('https://api.trongrid.io/wallet/triggerconstantcontract', {
+      const tronGridApiUrl = process.env.TRONGRID_API_URL || 'https://api.trongrid.io';
+      const response = await fetch(`${tronGridApiUrl}/wallet/triggerconstantcontract`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
