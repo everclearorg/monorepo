@@ -3,10 +3,6 @@ import { getContext } from '../../context';
 import { MissingThresholds, UnknownQueueType } from '../../errors';
 import { dispatchMessageQueueViaRelayers } from './dispatchMessageQueueViaRelayers';
 
-// Tron domain constants
-const TRON_MAINNET_DOMAIN = '728126428';
-const TRON_DOMAINS = [TRON_MAINNET_DOMAIN];
-
 /**
  * A message queue holds references to all hyperlane messages pending dispatch onchain.
  *
@@ -29,13 +25,9 @@ export const processMessageQueue = async (type: QueueType) => {
   const domains = Object.keys(chains);
   const spokes = domains.filter((d) => d !== hub.domain);
 
-  // Filter to only process Tron domains
-  const tronSpokes = spokes.filter((domain) => TRON_DOMAINS.includes(domain));
-
   logger.debug('Method start', requestContext, methodContext, {
     type,
-    allSpokes: spokes,
-    tronSpokes,
+    spokes,
     domains,
     hubDomain: hub.domain,
   });
@@ -45,31 +37,21 @@ export const processMessageQueue = async (type: QueueType) => {
     throw new UnknownQueueType(type, { details: 'Deposit queues are not message queues.' });
   }
 
-  // Exit early if no Tron domains are configured
-  if (tronSpokes.length === 0) {
-    logger.info('No Tron domains configured, skipping message queue processing', requestContext, methodContext, {
-      type,
-      configuredDomains: spokes,
-      tronDomains: TRON_DOMAINS,
-    });
-    return;
-  }
-
-  logger.info('Processing message queues for Tron domains only', requestContext, methodContext, {
+  logger.info('Processing message queues for all domains', requestContext, methodContext, {
     type,
-    tronSpokes,
-    totalConfiguredSpokes: spokes.length,
+    spokes,
+    totalSpokes: spokes.length,
   });
 
-  // Use database queries for all queue types, filtering to Tron domains only
-  const queues = await database.getMessageQueues(type, tronSpokes);
-  const queueContents = await database.getMessageQueueContents(type, tronSpokes);
+  // Use database queries for all queue types, processing all spoke domains
+  const queues = await database.getMessageQueues(type, spokes);
+  const queueContents = await database.getMessageQueueContents(type, spokes);
 
   logger.info('Retrieved queue data from database', requestContext, methodContext, {
     type,
     queuesCount: queues.length,
     queueContentsSize: queueContents.size,
-    tronDomains: tronSpokes,
+    domains: spokes,
   });
 
   // Determine the message queues to dispatch:
@@ -114,7 +96,7 @@ export const processMessageQueue = async (type: QueueType) => {
       type,
       queue: toLog,
       thresholds,
-      tronDomains: tronSpokes,
+      domains: spokes,
     });
     logger.debug('Method complete', requestContext, methodContext);
     return;
@@ -123,7 +105,7 @@ export const processMessageQueue = async (type: QueueType) => {
   logger.info('Dispatching queues', requestContext, methodContext, {
     type,
     queue: toLog ?? [],
-    tronDomains: tronSpokes,
+    domains: spokes,
   });
 
   // Dispatch the message queues via relayers
@@ -142,7 +124,6 @@ export const processMessageQueue = async (type: QueueType) => {
         domain: queue.domain,
         queueSize: domainQueue.length,
         sortedItemsCount: sorted.length,
-        isTronDomain: TRON_DOMAINS.includes(queue.domain),
       });
 
       // Get the associated contents
@@ -159,7 +140,7 @@ export const processMessageQueue = async (type: QueueType) => {
     attempted: toDispatch.length,
     successful: successful.length,
     rejected: rejected.length,
-    tronDomains: tronSpokes,
+    domains: spokes,
     errors: rejected.map((value: unknown) => (value as PromiseRejectedResult).reason),
   });
 };
