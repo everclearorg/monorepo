@@ -70,7 +70,7 @@ export async function signTransactionHash(privateKey: string, txHash: string): P
     fullHost: 'https://api.trongrid.io',
     privateKey: privateKey,
     headers: {
-      'TRON-PRO-API-KEY': 'b28bbd21-f962-4a02-94fe-57ef36f1d8d2',
+      'TRON-PRO-API-KEY': process.env.TRON_PRO_API_KEY || '',
     },
   });
   
