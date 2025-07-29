@@ -130,7 +130,7 @@ export function createTronWeb(privateKey: string, fullHost: string = 'https://ap
     fullHost,
     privateKey,
     headers: {
-      'TRON-PRO-API-KEY': 'b28bbd21-f962-4a02-94fe-57ef36f1d8d2',
+      'TRON-PRO-API-KEY': process.env.TRON_PRO_API_KEY || (() => { throw new Error('TRON_PRO_API_KEY is not set'); })(),
     },
   });
   return tronWeb;
