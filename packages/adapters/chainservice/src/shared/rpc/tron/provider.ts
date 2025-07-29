@@ -13,7 +13,6 @@ import { SyncProvider } from '../eth';
 import { UnpredictableGasLimit, TransactionReadError } from '../../errors';
 import { TronWeb } from '../../../mockable';
 import { Interface } from 'ethers/lib/utils';
-// @ts-ignore
 import fetch from 'node-fetch';
 
 interface ContractFunctionParameter {
@@ -511,7 +510,7 @@ export class TronSyncProvider extends SyncProvider {
       parentHash: blockData.block_header.raw_data.parentHash,
       number: blockData.block_header.raw_data.number,
       timestamp: blockData.block_header.raw_data.timestamp,
-      transactions: blockData.transactions?.map((tx) => tx.txID) || [],
+      transactions: blockData.transactions?.map((tx: any) => tx.txID) || [],
       nonce: '',
       difficulty: 0,
       _difficulty: BigNumber.from(0),
