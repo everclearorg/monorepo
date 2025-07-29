@@ -116,7 +116,7 @@ describe('TronSyncProvider', () => {
 
     // Create a mock factory that returns our mock TronWeb
     mockTronWebFactory = {
-      create: (config: { fullHost: string }) => mockTronWeb as unknown as InstanceType<typeof TronWeb>
+      create: (config: { fullHost: string; apiKey?: string }) => mockTronWeb as unknown as InstanceType<typeof TronWeb>
     };
 
     // Create provider with mock factory
@@ -159,32 +159,53 @@ describe('TronSyncProvider', () => {
       provider.synced = true;
       expect(provider.synced).to.equal(true);
     });
+
+    it('should extract API key from URL and pass to TronWebFactory', () => {
+      const testApiKey = 'test-api-key-123';
+      const urlWithApiKey = `http://tron.test?apiKey=${testApiKey}`;
+      const createStub = stub(mockTronWebFactory, 'create');
+      
+      new TronSyncProvider(
+        TEST_SENDER_DOMAIN,
+        urlWithApiKey,
+        testStallTimeout,
+        process.env.LOG_LEVEL === 'debug',
+        mockTronWebFactory
+      );
+      
+      expect(createStub.calledOnce).to.be.true;
+      expect(createStub.firstCall.args[0]).to.deep.equal({
+        fullHost: 'http://tron.test/',
+        apiKey: testApiKey
+      });
+    });
+
+    it('should work without API key in URL', () => {
+      const createStub = stub(mockTronWebFactory, 'create');
+      
+      new TronSyncProvider(
+        TEST_SENDER_DOMAIN,
+        'http://tron.test',
+        testStallTimeout,
+        process.env.LOG_LEVEL === 'debug',
+        mockTronWebFactory
+      );
+      
+      expect(createStub.calledOnce).to.be.true;
+      expect(createStub.firstCall.args[0]).to.deep.equal({
+        fullHost: 'http://tron.test/',
+        apiKey: undefined
+      });
+    });
   });
 
   describe('sync', () => {
     it('should update syncedBlockNumber and synced status on successful sync', async () => {
-      const mockBlock = {
-        block_header: {
-          raw_data: {
-            number: 12345
-          }
-        }
-      };
-
-      mockTronWeb.trx.getCurrentBlock.resolves(mockBlock);
-
       await provider.sync();
 
-      expect(provider.syncedBlockNumber).to.equal(12345);
+      expect(provider.syncedBlockNumber).to.equal(1);
       expect(provider.synced).to.be.true;
-      expect(mockTronWeb.trx.getCurrentBlock.calledOnce).to.be.true;
-    });
-
-    it('should set synced to false and throw error on sync failure', async () => {
-      mockTronWeb.trx.getCurrentBlock.rejects(new Error('Sync failed'));
-
-      await expect(provider.sync()).to.be.rejectedWith('Sync failed');
-      expect(provider.synced).to.be.false;
+      expect(mockTronWeb.trx.getCurrentBlock.notCalled).to.be.true;
     });
   });
 
@@ -609,7 +630,7 @@ describe('TronSyncProvider', () => {
   describe('estimateGas', () => {
     it('should return estimated gas', async () => {
       // Mock the transaction builder to return a successful result
-      mockTronWeb.transactionBuilder.estimateEnergy.resolves({
+      mockTronWeb.transactionBuilder.triggerConstantContract.resolves({
         result: {
           result: true
         },
@@ -626,12 +647,12 @@ describe('TronSyncProvider', () => {
       });
 
       expect(result).to.equal('1000000');
-      expect(mockTronWeb.transactionBuilder.estimateEnergy.calledOnce).to.be.true;
+      expect(mockTronWeb.transactionBuilder.triggerConstantContract.calledOnce).to.be.true;
     });
 
     it('should handle estimation failure', async () => {
       // Mock the transaction builder to return a failed result
-      mockTronWeb.transactionBuilder.estimateEnergy.resolves({
+      mockTronWeb.transactionBuilder.triggerConstantContract.resolves({
         result: {
           result: false
         }
@@ -642,7 +663,7 @@ describe('TronSyncProvider', () => {
         funcSig: 'transfer(address,uint256)',
         data: '0xa9059cbb000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         domain: 1
-      })).to.be.rejectedWith('failed to estimate energy');
+      })).to.be.rejectedWith('The gas estimate could not be determined.');
     });
   });
 
@@ -761,7 +782,7 @@ describe('TronSyncProvider', () => {
       expect(result).to.exist;
     });
 
-    it('should set signer API and return tronWeb instance', () => {
+    it('should set signer API and return tronWeb instance', async () => {
       const mockSignerApi = {
         getPublicKey: () => Promise.resolve('0xpublickey'),
         sign: (identifier: string, data: string | Bytes) => Promise.resolve('signed_data')
@@ -777,7 +798,7 @@ describe('TronSyncProvider', () => {
         }),
         signerApi: mockSignerApi,
       };
-      const result = provider.getSigner(mockSigner);
+      const result = await provider.getSigner(mockSigner);
       expect(result.signerApi).to.equal(mockSignerApi);
     });
 
@@ -788,7 +809,7 @@ describe('TronSyncProvider', () => {
         expect(result).to.exist;
       });
 
-      it('should set signer API and return tronWeb instance', () => {
+      it('should set signer API and return tronWeb instance', async () => {
         const mockSignerApi = {
           getPublicKey: () => Promise.resolve('0xpublickey'),
           sign: (identifier: string, data: string | Bytes) => Promise.resolve('signed_data')
@@ -804,7 +825,7 @@ describe('TronSyncProvider', () => {
           }),
           signerApi: mockSignerApi,
         };
-        const result = provider.connect(mockSigner);
+        const result = await provider.connect(mockSigner);
         expect(result.signerApi).to.equal(mockSignerApi);
       });
     });
@@ -859,6 +880,9 @@ describe('TronSyncProvider', () => {
         funcSig: '' // Required by ITransactionRequest
       };
 
+      // Set up address conversion
+      mockTronWeb.address.fromHex.returns('0xrecipient');
+
       mockTronWeb.transactionBuilder.sendTrx.resolves({
         txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
       });
@@ -886,7 +910,7 @@ describe('TronSyncProvider', () => {
           gasLimit: BigNumber.from(0)
         }),
       };
-      const signer = provider.getSigner(mockSigner);
+      const signer = await provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -916,6 +940,9 @@ describe('TronSyncProvider', () => {
         funcSig: '' // Required by ITransactionRequest
       };
 
+      // Set up address conversion
+      mockTronWeb.address.fromHex.returns('0xrecipient');
+
       mockTronWeb.transactionBuilder.sendTrx.resolves({
         txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
       });
@@ -943,7 +970,7 @@ describe('TronSyncProvider', () => {
         }),
         signerApi: mockSignerApi,
       };
-      const signer = provider.getSigner(mockSigner);
+      const signer = await provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -978,6 +1005,7 @@ describe('TronSyncProvider', () => {
           txID: '0x1234567890123456789012345678901234567890123456789012345678901234'
         }
       });
+      mockTronWeb.address.fromHex.returns('0xcontract');
 
       const signedTx = {
         txID: '0x1234567890123456789012345678901234567890123456789012345678901234',
@@ -1006,7 +1034,7 @@ describe('TronSyncProvider', () => {
           gasLimit: BigNumber.from(0)
         }),
       };
-      const signer = provider.getSigner(mockSigner);
+      const signer = await provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -1024,12 +1052,10 @@ describe('TronSyncProvider', () => {
         'transfer(address,uint256)',
         {
           feeLimit: 100000,
-          callValue: 1000000
+          callValue: 1000000,
+          rawParameter: '000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         },
-        [
-          { type: 'address', value: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-          { type: 'uint256', value: '1000000000000000000' }
-        ],
+        [],
         '0x1234567890123456789012345678901234567890'
       ]);
       expect(mockTronWeb.trx.sign.calledOnce).to.be.true;
@@ -1051,6 +1077,7 @@ describe('TronSyncProvider', () => {
           txID: '0x1234567890123456789012345678901234567890123456789012345678901234'
         }
       });
+      mockTronWeb.address.fromHex.returns('0xcontract');
 
       mockTronWeb.trx.sendRawTransaction.resolves({ txid: '0x1234567890123456789012345678901234567890123456789012345678901234' });
       mockTronWeb.trx.getTransactionInfo.resolves({
@@ -1075,7 +1102,7 @@ describe('TronSyncProvider', () => {
         }),
         signerApi: mockSignerApi,
       };
-      const signer = provider.getSigner(mockSigner);
+      const signer = await provider.getSigner(mockSigner);
 
       const result = await signer.sendTransaction(tx);
 
@@ -1093,12 +1120,10 @@ describe('TronSyncProvider', () => {
         'transfer(address,uint256)',
         {
           feeLimit: 100000,
-          callValue: 1000000
+          callValue: 1000000,
+          rawParameter: '000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         },
-        [
-          { type: 'address', value: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-          { type: 'uint256', value: '1000000000000000000' }
-        ],
+        [],
         '0x1234567890123456789012345678901234567890'
       ]);
       expect(mockTronWeb.trx.sign.called).to.be.false;
@@ -1123,7 +1148,7 @@ describe('TronSyncProvider', () => {
       expect(initialCount).to.equal(0);
 
       // Send a transaction
-      const signer = provider.getSigner('private_key');
+      const signer = await provider.getSigner('private_key');
       mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id' });
       mockTronWeb.trx.getTransactionInfo.resolves({ blockNumber: 1 });
       mockTronWeb.trx.getCurrentBlock.resolves({ block_header: { raw_data: { number: 2 } } });
@@ -1146,7 +1171,7 @@ describe('TronSyncProvider', () => {
 
       // Send transaction from address1
       provider.tronWeb.defaultAddress.hex = address1;
-      const signer1 = provider.getSigner('private_key');
+      const signer1 = await provider.getSigner('private_key');
       mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id_1' });
       mockTronWeb.trx.getTransactionInfo.resolves({ blockNumber: 1 });
       mockTronWeb.trx.getCurrentBlock.resolves({ block_header: { raw_data: { number: 2 } } });
@@ -1160,7 +1185,7 @@ describe('TronSyncProvider', () => {
 
       // Send transaction from address2
       provider.tronWeb.defaultAddress.hex = address2;
-      const signer2 = provider.getSigner('private_key');
+      const signer2 = await provider.getSigner('private_key');
       mockTronWeb.trx.sendRawTransaction.resolves({ txid: 'test_tx_id_2' });
 
       await signer2.sendTransaction({

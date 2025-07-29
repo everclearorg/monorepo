@@ -50,6 +50,7 @@ import {
   getOriginIntentsLastNonce,
   getDeliveredSettlements,
   updateSettlementStatus,
+  updateSolanaMessageStatuses,
 } from '../src/client';
 import {
   expect,
@@ -63,6 +64,7 @@ import {
   TokenomicsEvent,
   NewLockPositionEvent,
   LockPosition,
+  SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 import {
   createAssets,
@@ -84,6 +86,8 @@ import {
   createMerkleTree,
   createNewLockPositionEvent,
   createLockPosition,
+  createSettlementIntent,
+  createMessage,
 } from './mock';
 
 describe('Database Adapter:Client', () => {
@@ -955,7 +959,7 @@ describe('Database Adapter:Client', () => {
       { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1399811149' },
       { intentId: mkBytes32('0x2'), status: TIntentStatus.Delivered, domain: '1399811149' }
     ]);
-    
+
     const otherIntents = createSettlementIntents(2, [
       { intentId: mkBytes32('0x3'), status: TIntentStatus.Settled, domain: '1399811149' },
       { intentId: mkBytes32('0x4'), status: TIntentStatus.Settled, domain: '1339' },
@@ -964,10 +968,10 @@ describe('Database Adapter:Client', () => {
 
     it('should return only settlement intents with DELIVERED status and the set domain', async () => {
       expect(await getDeliveredSettlements('1399811149', pool)).to.be.deep.eq([]);
-      
+
       // Save all intents
       await saveSettlementIntents([...deliveredIntents, ...otherIntents], pool);
-      
+
       // Verify only DELIVERED intents that belong to the set domain are returned
       const result = await getDeliveredSettlements('1399811149', pool);
       expect(result).to.be.deep.eq(deliveredIntents);
@@ -989,6 +993,83 @@ describe('Database Adapter:Client', () => {
       expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.empty;
       await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Settled, pool);
       expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.deep.eq(expectedIntents);
+    });
+  });
+
+  describe('#updateSolanaMessageStatuses', () => {
+    it('should update Solana messages to delivered when intent is settled', async () => {
+      const settledIntentId = mkBytes32('0x123');
+      const unsettledIntentId = mkBytes32('0x456');
+
+      const settlementIntents = [
+        createSettlementIntent({ intentId: settledIntentId, status: TIntentStatus.Settled }),
+        createSettlementIntent({ intentId: unsettledIntentId, status: TIntentStatus.None }),
+      ];
+
+      await saveSettlementIntents(settlementIntents, pool);
+
+      const messages = [
+        createMessage({
+          id: mkBytes32('0xmsg1'),
+          intentIds: [settledIntentId],
+          destinationDomain: SOLANA_CHAINID,
+        }),
+        createMessage({
+          id: mkBytes32('0xmsg2'),
+          intentIds: [unsettledIntentId],
+          destinationDomain: SOLANA_CHAINID,
+        }),
+        createMessage({
+          id: mkBytes32('0xmsg3'),
+          intentIds: [mkBytes32('0x789')],
+          destinationDomain: '100'
+        }),
+      ];
+
+      await saveMessages(messages, [], [], [], pool);
+
+      // Initially, no messages should be delivered
+      const deliveredBefore = await getMessagesByStatus([HyperlaneStatus.delivered], 0, 100, pool);
+      expect(deliveredBefore.length).to.be.eq(0);
+
+      const updatedCount = await updateSolanaMessageStatuses(pool);
+
+      // Should have updated 1 message (the Solana message with settled intent)
+      expect(updatedCount).to.be.eq(1);
+
+      // Check that the correct message was updated
+      const deliveredAfter = await getMessagesByStatus([HyperlaneStatus.delivered], 0, 100, pool);
+      expect(deliveredAfter.length).to.be.eq(1);
+      expect(deliveredAfter[0].id).to.be.eq(messages[0].id);
+
+      // The other messages should remain unchanged
+      const pendingMessages = await getMessagesByStatus([HyperlaneStatus.none], 0, 100, pool);
+      expect(pendingMessages.length).to.be.eq(2);
+      expect(pendingMessages.map(m => m.id).sort()).to.be.deep.eq([messages[1].id, messages[2].id].sort());
+    });
+    
+    it('should not update already delivered messages', async () => {
+      const intentId = mkBytes32('0x789');
+
+      // Create settlement intent with SETTLED status
+      const settlementIntent = createSettlementIntent({ intentId, status: TIntentStatus.Settled });
+      await saveSettlementIntents([settlementIntent], pool);
+
+      // Create a message that's already delivered
+      const message = createMessage({
+        id: mkBytes32('0xmsg4'),
+        intentIds: [intentId],
+        destinationDomain: SOLANA_CHAINID,
+        status: HyperlaneStatus.delivered
+      });
+
+      await saveMessages([message], [], [], [], pool);
+
+      // Run the function
+      const updatedCount = await updateSolanaMessageStatuses(pool);
+
+      // Should not update any messages since it's already delivered
+      expect(updatedCount).to.be.eq(0);
     });
   });
 });

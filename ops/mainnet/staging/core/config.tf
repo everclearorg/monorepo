@@ -98,12 +98,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
@@ -126,6 +126,12 @@ locals {
         providers = [
           "https://api.mainnet-beta.solana.com"
         ]
+      }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.relayer_web3_signer_private_key
       }
     }
     server = {
@@ -158,12 +164,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
@@ -186,6 +192,12 @@ locals {
         providers = [
           "https://api.mainnet-beta.solana.com"
         ]
+      }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.watchtower_web3_signer_private_key
       }
     }
     server = {
@@ -224,12 +236,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     # "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
@@ -251,6 +263,11 @@ locals {
       "1399811149" = {
         providers = [
           "https://api.mainnet-beta.solana.com"
+        ]
+      }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
       }
     }
@@ -331,12 +348,13 @@ locals {
       }
     ]
     thresholds = {
-      # 1          = { maxAge = 60, size = 1 },
+      1          = { maxAge = 60, size = 1 },
       10         = { maxAge = 60, size = 1 },
       # 42161      = { maxAge = 60, size = 1 },
       8453       = { maxAge = 60, size = 1 },
       25327      = { maxAge = 60, size = 1 },
-      1399811149 = { maxAge = 60, size = 1 }
+      1399811149 = { maxAge = 60, size = 1 },
+      728126428  = { maxAge = 60, size = 1 }
     }
     hub = {
       domain = "25327",
@@ -345,12 +363,12 @@ locals {
       ]
     }
     chains = {
-      # "1" = {
-      #   providers = [
-      #     "https://eth-mainnet.blastapi.io/${var.blast_key}",
-      #     #"https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "1" = {
+        providers = [
+          "https://eth-mainnet.blastapi.io/${var.blast_key}",
+          "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "10" = {
         providers = [
           "https://optimism-mainnet.blastapi.io/${var.blast_key}",
@@ -373,6 +391,12 @@ locals {
         providers = [
           "https://api.mainnet-beta.solana.com"
         ]
+      }
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.lighthouse_web3_signer_private_key
       }
     }
     database = { url = local.default_db_url }

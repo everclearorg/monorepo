@@ -58,6 +58,8 @@ export const TChainConfig = Type.Object({
   // keyed on asset ticker
   assets: Type.Optional(Type.Record(Type.String(), TAssetConfig)),
   network: Type.Optional(Type.String()),
+  // Optional private key for chains that require direct private key setting (e.g., Tron)
+  privateKey: Type.Optional(Type.String()),
 });
 export type ChainConfig = Static<typeof TChainConfig>;
 

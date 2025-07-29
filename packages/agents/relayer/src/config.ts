@@ -67,6 +67,10 @@ export const getEnvConfig = async (): Promise<RelayerConfig> => {
       deployments,
       minGasPrice,
     };
+
+    if (localChainConfig?.privateKey) {
+      chainsForRelayerConfig[domainId].privateKey = localChainConfig.privateKey;
+    }
   }
 
   // Add hub chain to config chains

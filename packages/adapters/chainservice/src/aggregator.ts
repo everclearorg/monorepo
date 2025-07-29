@@ -53,7 +53,7 @@ export class RpcProviderAggregator {
   // The provider that's most in sync with the chain, and has an active block listener.
   public leadProvider: RpcProvider | undefined;
 
-  private readonly signer?: ISigner;
+  private signer?: ISigner;
 
   private lastUsedGasPrice: BigNumber | undefined = undefined;
 
@@ -83,7 +83,6 @@ export class RpcProviderAggregator {
     protected readonly logger: Logger,
     public readonly domain: number,
     protected readonly config: ChainConfig,
-    signer?: ISigner | string,
   ) {
     const { requestContext, methodContext } = createLoggingContext('ChainRpcProvider.constructor');
 
@@ -124,12 +123,6 @@ export class RpcProviderAggregator {
       );
     }
 
-    if (signer) {
-      this.signer = this.providers[0].getSigner(signer);
-    } else {
-      this.signer = undefined;
-    }
-
     // TODO: Make ttl/btl values below configurable ?
     this.cache = new ProviderCache<ChainRpcProviderCache>(this.logger, {
       gasPrice: {
@@ -147,6 +140,17 @@ export class RpcProviderAggregator {
     // Set up the initial value for block period. Will run asyncronously, and update the value (from the default) when
     // it completes.
     this.setBlockPeriod();
+  }
+
+  public async setSigner(signer: ISigner | string) {
+    // Use chain-specific private key if available, otherwise use the global signer
+    if (this.config.privateKey) {
+      this.signer = await this.providers[0].getSigner(this.config.privateKey);
+    } else if (signer) {
+      this.signer = await this.providers[0].getSigner(signer);
+    } else {
+      this.signer = undefined;
+    }
   }
 
   /**
@@ -197,7 +201,8 @@ export class RpcProviderAggregator {
       gasPrice: transaction.params.gasPrice ? BigNumber.from(transaction.params.gasPrice) : undefined,
       value: BigNumber.from(transaction.params.value || 0),
     };
-    return await this.leadProvider!.connect(this.signer!).sendTransaction(toSend as unknown as ITransactionRequest);
+    const provider = await this.leadProvider!.connect(this.signer!);
+    return provider.sendTransaction(toSend as unknown as ITransactionRequest);
   }
 
   /**
@@ -469,7 +474,7 @@ export class RpcProviderAggregator {
     const max = BigNumber.from(gasPriceMaximum);
     // TODO: Could use a more sustainable method of separating out gas price abs min for certain
     // chains (such as arbitrum or zksync here) in particular:
-    if (gasPrice.lt(min) && ![1634886255, 1734439522, 2053862243, 2053862260].includes(this.domain)) {
+    if (gasPrice.lt(min) && ![1634886255, 1734439522, 2053862243, 2053862260, 728126428].includes(this.domain)) {
       gasPrice = min;
     } else if (gasPrice.gte(max)) {
       this.logger.warn('Hit the gas price absolute maximum.', requestContext, methodContext, {

@@ -1045,17 +1045,20 @@ __metadata:
     "@safe-global/protocol-kit": ^5.1.1
     "@safe-global/types-kit": ^1.0.1
     "@sinclair/typebox": 0.25.21
-    eslint: 8.34.0
+    "@solana-program/system": ^0.7.0
+    "@solana/kit": ^2.1.1
+    ajv: 8.17.1
+    eslint: 9.17.0
     ethers: 5.7.2
     interval-promise: 1.4.0
     mocha: 8.2.0
     nyc: 15.1.0
     p-queue: 6.6.2
-    rimraf: 5.0.1
+    rimraf: 6.0.1
     sinon: 17.0.1
     tronweb: ^6.0.3
     ts-mocha: 10.0.0
-    typescript: 5.3.3
+    typescript: 5.7.2
   languageName: unknown
   linkType: soft
 
@@ -1758,6 +1761,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint-community/eslint-utils@npm:^4.2.0":
+  version: 4.7.0
+  resolution: "@eslint-community/eslint-utils@npm:4.7.0"
+  dependencies:
+    eslint-visitor-keys: ^3.4.3
+  peerDependencies:
+    eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
+  checksum: b177e3b75c0b8d0e5d71f1c532edb7e40b31313db61f0c879f9bf19c3abb2783c6c372b5deb2396dab4432f2946b9972122ac682e77010376c029dfd0149c681
+  languageName: node
+  linkType: hard
+
 "@eslint-community/eslint-utils@npm:^4.4.0":
   version: 4.5.1
   resolution: "@eslint-community/eslint-utils@npm:4.5.1"
@@ -1769,10 +1783,39 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint-community/regexpp@npm:^4.5.1":
+"@eslint-community/regexpp@npm:^4.12.1, @eslint-community/regexpp@npm:^4.5.1":
   version: 4.12.1
   resolution: "@eslint-community/regexpp@npm:4.12.1"
   checksum: 0d628680e204bc316d545b4993d3658427ca404ae646ce541fcc65306b8c712c340e5e573e30fb9f85f4855c0c5f6dca9868931f2fcced06417fbe1a0c6cd2d6
+  languageName: node
+  linkType: hard
+
+"@eslint/config-array@npm:^0.19.0":
+  version: 0.19.2
+  resolution: "@eslint/config-array@npm:0.19.2"
+  dependencies:
+    "@eslint/object-schema": ^2.1.6
+    debug: ^4.3.1
+    minimatch: ^3.1.2
+  checksum: 1c707e04fc2951079b32d2cb1c939ce25e863cd1329c1bd363a285b2a5caaaf88b97ddbf354cc46d1334097dc749f79b0fae33151dc2dfb9a60ba14288c65b39
+  languageName: node
+  linkType: hard
+
+"@eslint/core@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "@eslint/core@npm:0.13.0"
+  dependencies:
+    "@types/json-schema": ^7.0.15
+  checksum: 4d1a4163ba7f667297ba6e60de82f41d139b01951e2870b1bb609072c3c5df68b0288cc911ce3af0564dfa19bfda23cbf04eebd243ccb4960e0b5f927aa9a723
+  languageName: node
+  linkType: hard
+
+"@eslint/core@npm:^0.9.0":
+  version: 0.9.1
+  resolution: "@eslint/core@npm:0.9.1"
+  dependencies:
+    "@types/json-schema": ^7.0.15
+  checksum: 33c8159842cc3a646caa267c008cb567ca60e0220bcdcf6e426128409953b8f6a9b142246db616c71d06331edf769c192d7e2792b3f19c2a6b8179e491512d89
   languageName: node
   linkType: hard
 
@@ -1790,6 +1833,47 @@ __metadata:
     minimatch: ^3.1.2
     strip-json-comments: ^3.1.1
   checksum: cd3e5a8683db604739938b1c1c8b77927dc04fce3e28e0c88e7f2cd4900b89466baf83dfbad76b2b9e4d2746abdd00dd3f9da544d3e311633d8693f327d04cd7
+  languageName: node
+  linkType: hard
+
+"@eslint/eslintrc@npm:^3.2.0":
+  version: 3.3.1
+  resolution: "@eslint/eslintrc@npm:3.3.1"
+  dependencies:
+    ajv: ^6.12.4
+    debug: ^4.3.2
+    espree: ^10.0.1
+    globals: ^14.0.0
+    ignore: ^5.2.0
+    import-fresh: ^3.2.1
+    js-yaml: ^4.1.0
+    minimatch: ^3.1.2
+    strip-json-comments: ^3.1.1
+  checksum: 8241f998f0857abf5a615072273b90b1244d75c1c45d217c6a8eb444c6e12bbb5506b4879c14fb262eb72b7d8e3d2f0542da2db1a7f414a12496ebb790fb4d62
+  languageName: node
+  linkType: hard
+
+"@eslint/js@npm:9.17.0":
+  version: 9.17.0
+  resolution: "@eslint/js@npm:9.17.0"
+  checksum: b68a14ff518ffa12e3b85fa9c72b818faeff092285acfbf02da2d0fb12a681b76651638881e98845f2df2ed346ed0d33faeb1d9caac163daf232c223b7efe89c
+  languageName: node
+  linkType: hard
+
+"@eslint/object-schema@npm:^2.1.6":
+  version: 2.1.6
+  resolution: "@eslint/object-schema@npm:2.1.6"
+  checksum: e32e565319f6544d36d3fa69a3e163120722d12d666d1a4525c9a6f02e9b54c29d9b1f03139e25d7e759e08dda8da433590bc23c09db8d511162157ef1b86a4c
+  languageName: node
+  linkType: hard
+
+"@eslint/plugin-kit@npm:^0.2.3":
+  version: 0.2.8
+  resolution: "@eslint/plugin-kit@npm:0.2.8"
+  dependencies:
+    "@eslint/core": ^0.13.0
+    levn: ^0.4.1
+  checksum: b5bd769f3f96cb3bdc4051d9ebd973b30d1cd00a02953ded1eeb74fb5b2af73cf38c20cc76acddc8e74828f0dbf92ba9d725414b3026177935fc4b48784a7fba
   languageName: node
   linkType: hard
 
@@ -2828,6 +2912,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@humanfs/core@npm:^0.19.1":
+  version: 0.19.1
+  resolution: "@humanfs/core@npm:0.19.1"
+  checksum: 611e0545146f55ddfdd5c20239cfb7911f9d0e28258787c4fc1a1f6214250830c9367aaaeace0096ed90b6739bee1e9c52ad5ba8adaf74ab8b449119303babfe
+  languageName: node
+  linkType: hard
+
+"@humanfs/node@npm:^0.16.6":
+  version: 0.16.6
+  resolution: "@humanfs/node@npm:0.16.6"
+  dependencies:
+    "@humanfs/core": ^0.19.1
+    "@humanwhocodes/retry": ^0.3.0
+  checksum: f9cb52bb235f8b9c6fcff43a7e500669a38f8d6ce26593404a9b56365a1644e0ed60c720dc65ff6a696b1f85f3563ab055bb554ec8674f2559085ba840e47710
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.8":
   version: 0.11.14
   resolution: "@humanwhocodes/config-array@npm:0.11.14"
@@ -2850,6 +2951,20 @@ __metadata:
   version: 2.0.3
   resolution: "@humanwhocodes/object-schema@npm:2.0.3"
   checksum: d3b78f6c5831888c6ecc899df0d03bcc25d46f3ad26a11d7ea52944dc36a35ef543fad965322174238d677a43d5c694434f6607532cff7077062513ad7022631
+  languageName: node
+  linkType: hard
+
+"@humanwhocodes/retry@npm:^0.3.0":
+  version: 0.3.1
+  resolution: "@humanwhocodes/retry@npm:0.3.1"
+  checksum: 7e5517bb51dbea3e02ab6cacef59a8f4b0ca023fc4b0b8cbc40de0ad29f46edd50b897c6e7fba79366a0217e3f48e2da8975056f6c35cfe19d9cc48f1d03c1dd
+  languageName: node
+  linkType: hard
+
+"@humanwhocodes/retry@npm:^0.4.1":
+  version: 0.4.3
+  resolution: "@humanwhocodes/retry@npm:0.4.3"
+  checksum: d423455b9d53cf01f778603404512a4246fb19b83e74fe3e28c70d9a80e9d4ae147d2411628907ca983e91a855a52535859a8bb218050bc3f6dbd7a553b7b442
   languageName: node
   linkType: hard
 
@@ -3278,6 +3393,22 @@ __metadata:
   dependencies:
     multiformats: ^9.5.4
   checksum: 46b9a7dabf6e87698fc268f88d94b710ba3988e26ab7918bcdf10c4356e15eb32393b6ab56eaf0d8936b369cb77456e491495f1025f78b099f1bd26cc5ccda06
+  languageName: node
+  linkType: hard
+
+"@isaacs/balanced-match@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "@isaacs/balanced-match@npm:4.0.1"
+  checksum: 102fbc6d2c0d5edf8f6dbf2b3feb21695a21bc850f11bc47c4f06aa83bd8884fde3fe9d6d797d619901d96865fdcb4569ac2a54c937992c48885c5e3d9967fe8
+  languageName: node
+  linkType: hard
+
+"@isaacs/brace-expansion@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@isaacs/brace-expansion@npm:5.0.0"
+  dependencies:
+    "@isaacs/balanced-match": ^4.0.1
+  checksum: d7a3b8b0ddbf0ccd8eeb1300e29dd0a0c02147e823d8138f248375a365682360620895c66d113e05ee02389318c654379b0e538b996345b83c914941786705b1
   languageName: node
   linkType: hard
 
@@ -4788,6 +4919,57 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@solana-program/system@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "@solana-program/system@npm:0.7.0"
+  peerDependencies:
+    "@solana/kit": ^2.1.0
+  checksum: 491a7d780ddaf6d4148770c6c8ff0e2594a6c6adcc41689aff70d6b8554b69e8afebe1bc8d43205de6581bb08fd5b9616b28123e157b157292ef295d8518d447
+  languageName: node
+  linkType: hard
+
+"@solana/accounts@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/accounts@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/rpc-spec": 2.1.1
+    "@solana/rpc-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 11423c651a6bd62dd49031cbd29ce46fb9861acd6771ee5f0897ae8e1d69f41adc10d177709d1c03af8b22a08b2de867d2b69ebf7a0249fd6f85a080fed790f3
+  languageName: node
+  linkType: hard
+
+"@solana/addresses@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/addresses@npm:2.1.1"
+  dependencies:
+    "@solana/assertions": 2.1.1
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/nominal-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 48b639ef8c29332a9bc3a49906e210c78dc5f22105667dc284176dacc970f5569293af9aaca2071392cb4943f9292b916f3c8e66fe99de495de286aa05b7b183
+  languageName: node
+  linkType: hard
+
+"@solana/assertions@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/assertions@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 3409e492fcb42a0e990307fdde8d88a8284bbf67d0539531306b90dd0ccbd7f2fb0995ba5509961e67719cf5531c25fdc4f87ae8bc351c8d6446a17454b97f53
+  languageName: node
+  linkType: hard
+
 "@solana/buffer-layout-utils@npm:^0.2.0":
   version: 0.2.0
   resolution: "@solana/buffer-layout-utils@npm:0.2.0"
@@ -4820,6 +5002,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@solana/codecs-core@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/codecs-core@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 7791c890bcda60326cf240a4a828c1fd6d7686cf67b92186bed11a2643b5c648fe89ec8346b37e406825da43fc5aefbf55fded6c4b0dc23b698eb84974974cf5
+  languageName: node
+  linkType: hard
+
 "@solana/codecs-data-structures@npm:2.0.0-rc.1":
   version: 2.0.0-rc.1
   resolution: "@solana/codecs-data-structures@npm:2.0.0-rc.1"
@@ -4830,6 +5023,19 @@ __metadata:
   peerDependencies:
     typescript: ">=5"
   checksum: 7c24700be7c935fc066dc70e1a02c32d9f17393d3898074e6dcff2c2083012dc8c5583fff5ee04f8ce4578c57bb708688f5e52aad301aa5543aab293640a0b21
+  languageName: node
+  linkType: hard
+
+"@solana/codecs-data-structures@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/codecs-data-structures@npm:2.1.1"
+  dependencies:
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-numbers": 2.1.1
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 17970da9a55d57460055436f2720394791f23bce409fe231bc0f28766db053c5c3a35ca87c1daa303610399485b4aceb4c0e3131e8aa8ed6829f067f4f31b0e5
   languageName: node
   linkType: hard
 
@@ -4845,6 +5051,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@solana/codecs-numbers@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/codecs-numbers@npm:2.1.1"
+  dependencies:
+    "@solana/codecs-core": 2.1.1
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 5838cd7c2eaf894addffe14d756d6ec0804fcb06fb79d3987d6cd17708b6baa729683ffd5c3c35a493cb4d2f5b7d70bc76cbcac2942656eaf81d976deb10adbe
+  languageName: node
+  linkType: hard
+
 "@solana/codecs-strings@npm:2.0.0-rc.1":
   version: 2.0.0-rc.1
   resolution: "@solana/codecs-strings@npm:2.0.0-rc.1"
@@ -4856,6 +5074,20 @@ __metadata:
     fastestsmallesttextencoderdecoder: ^1.0.22
     typescript: ">=5"
   checksum: 0706605311508b02f7dc4bfde6f93237337ecde051c83f172a121b52676e2a21af90f916624f57c0e80bbe420412ed98c1e7ae90a583761b028cc6a883fa4a0e
+  languageName: node
+  linkType: hard
+
+"@solana/codecs-strings@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/codecs-strings@npm:2.1.1"
+  dependencies:
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-numbers": 2.1.1
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    fastestsmallesttextencoderdecoder: ^1.0.22
+    typescript: ">=5.3.3"
+  checksum: 6e3006eee318ef3ca7b65a0ec0d099678cf9384b8e6c5b5e85ef810a5046a7f0a75d410b4158a052c39d79a633e817c62d0ae0993277c474c7d4f265afaec486
   languageName: node
   linkType: hard
 
@@ -4874,6 +5106,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@solana/codecs@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/codecs@npm:2.1.1"
+  dependencies:
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-data-structures": 2.1.1
+    "@solana/codecs-numbers": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/options": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 5810a5d67c8770489c7dabe80407194e7099e19c2bf22330cc6a2855eecd93f64e390f1bb61d6c776aac7fba91febfb68b26b1e790246a86a6515a99d46ac367
+  languageName: node
+  linkType: hard
+
 "@solana/errors@npm:2.0.0-rc.1":
   version: 2.0.0-rc.1
   resolution: "@solana/errors@npm:2.0.0-rc.1"
@@ -4885,6 +5132,102 @@ __metadata:
   bin:
     errors: bin/cli.mjs
   checksum: 906892a892d250c2236449b875b174e0e19ade788146d0e63da23c83d89b98a762770c276341fae8f73959efc57d01090e0e979d111b12ac0e451f2402a8d092
+  languageName: node
+  linkType: hard
+
+"@solana/errors@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/errors@npm:2.1.1"
+  dependencies:
+    chalk: ^5.4.1
+    commander: ^13.1.0
+  peerDependencies:
+    typescript: ">=5.3.3"
+  bin:
+    errors: bin/cli.mjs
+  checksum: 902f36a53be991d03c2733f24ba928610e834c7b43a5a54e0795872bb6b9286580a4a1af818a0fbb5fd3bc9692e583223399ea5f30476f020920acffdd4bf908
+  languageName: node
+  linkType: hard
+
+"@solana/fast-stable-stringify@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/fast-stable-stringify@npm:2.1.1"
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 39873162dcb78d3539f23be05d5b442c205e8d6cc25dffc7990a61acefc9bafa020ac06e7d241ad1ce007cdc58e9ce7dbe6146e36862106df85ac29a416dd76a
+  languageName: node
+  linkType: hard
+
+"@solana/functional@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/functional@npm:2.1.1"
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 97279378a6c79e82c8b4540805858b8630f3b77522a3c58f770e0887065071d57f7731dc64a1aa56f0641828d4ff6c71d0f43ec49b567d6dd3e3be5ec2b17166
+  languageName: node
+  linkType: hard
+
+"@solana/instructions@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/instructions@npm:2.1.1"
+  dependencies:
+    "@solana/codecs-core": 2.1.1
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 2b58dd11dc3b52f9cd1162868e8e8e127168a4185edc640dec15b6a891613e4e9170ca436da2070cef2855f2aec6b3d92e354b1ff7d6276b38a4a7c6499c861d
+  languageName: node
+  linkType: hard
+
+"@solana/keys@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/keys@npm:2.1.1"
+  dependencies:
+    "@solana/assertions": 2.1.1
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/nominal-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: de496ec0bf4010393a4ec114bdaec3690192eca6cb85f66edb8ec5c4cef051c8fbd29592919a2435f606770764aaf9beaac9eb50b446a6f29627e7ae2df6a81c
+  languageName: node
+  linkType: hard
+
+"@solana/kit@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@solana/kit@npm:2.1.1"
+  dependencies:
+    "@solana/accounts": 2.1.1
+    "@solana/addresses": 2.1.1
+    "@solana/codecs": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/functional": 2.1.1
+    "@solana/instructions": 2.1.1
+    "@solana/keys": 2.1.1
+    "@solana/programs": 2.1.1
+    "@solana/rpc": 2.1.1
+    "@solana/rpc-parsed-types": 2.1.1
+    "@solana/rpc-spec-types": 2.1.1
+    "@solana/rpc-subscriptions": 2.1.1
+    "@solana/rpc-types": 2.1.1
+    "@solana/signers": 2.1.1
+    "@solana/sysvars": 2.1.1
+    "@solana/transaction-confirmation": 2.1.1
+    "@solana/transaction-messages": 2.1.1
+    "@solana/transactions": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: bae68e3cfeff28bb2c043f1ec01205a117458f6189e94e88c7973f5c4391a6e7469b75878538f61c6c2b89cfd15f7ad60d1056cf562f1854e21f396bedc0d925
+  languageName: node
+  linkType: hard
+
+"@solana/nominal-types@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/nominal-types@npm:2.1.1"
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: e114329abca077ae896bad26c82fd248fdd63034912021ccc17327bacfe7639e063c743c0becdba326e95fd4fd73e99f3e8b91e1a411e37b478ca72c5efae93b
   languageName: node
   linkType: hard
 
@@ -4900,6 +5243,242 @@ __metadata:
   peerDependencies:
     typescript: ">=5"
   checksum: 63f3ed04e56ca232023fcf35ddab8f01a1ba7aae932990908657dec833ff4133ad0af279417d4bce291367903dbd3b962287796a22dd0aaa1d3e3290613a442e
+  languageName: node
+  linkType: hard
+
+"@solana/options@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/options@npm:2.1.1"
+  dependencies:
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-data-structures": 2.1.1
+    "@solana/codecs-numbers": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 553951f2904116f3622daa89d50436efb1bc8d2e5aed6299c24076904700825de7e6bdd886fe7ce502cb546f264bfab41e584ed1e22368d6a292b701983b2ca6
+  languageName: node
+  linkType: hard
+
+"@solana/programs@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/programs@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 20b6e716cc2db4b527ff9ab40265bc0866786eb222865bb9fa5046621a5a000d379fde96f926a01ccc6a658aa1adf7dcfd4f3261009276477371fe6617a3edc1
+  languageName: node
+  linkType: hard
+
+"@solana/promises@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/promises@npm:2.1.1"
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 845b6d04a11994ff3719a167270ca25a53414d92aa5e3ed2779a70fa2c4815e0197aa3261fac2a992f0a6c9db3e2ebf2e5ff9bf7f6e47a1953e0370f9bb09b92
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-api@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-api@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/keys": 2.1.1
+    "@solana/rpc-parsed-types": 2.1.1
+    "@solana/rpc-spec": 2.1.1
+    "@solana/rpc-transformers": 2.1.1
+    "@solana/rpc-types": 2.1.1
+    "@solana/transaction-messages": 2.1.1
+    "@solana/transactions": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: d944fc729297cccba044129ecfb294176ae65eeae3bbc7881a23913a48ff9e8a4e0b519b4640e80a2d184fdf9dbac4c6957f99691883c520ad2eb65d85604d90
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-parsed-types@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-parsed-types@npm:2.1.1"
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: c1b990203cc74ee9d0486fba5d13ee8e89d3363e054adf86a7de947ae643d5635590fb8f36f9dba05e63c9b7b99c5055e9032d18af22adedea62f3c386d28555
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-spec-types@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-spec-types@npm:2.1.1"
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: e93e2f66ffeaed3a249b8bd2c4b0fc33c7d5f4b29a49bd9ea1b2319e1ac7057bf471792edb4518c78d8dc103c11243dc58655e09068943ddd81fc471790f0b36
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-spec@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-spec@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+    "@solana/rpc-spec-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 5db2324d93608e8ad52a670055b5bdab5d6dcbac0cb81a0c9867d91a0ee7f15f049f7fffd3f87bf91cdd017b3c261f8eaf092af6268953cea461e10baa40912b
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-subscriptions-api@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-subscriptions-api@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/keys": 2.1.1
+    "@solana/rpc-subscriptions-spec": 2.1.1
+    "@solana/rpc-transformers": 2.1.1
+    "@solana/rpc-types": 2.1.1
+    "@solana/transaction-messages": 2.1.1
+    "@solana/transactions": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: a9be43656b077b7f1f509eed065a60f74feda14e4e5ace1751e089b3b8cf1f87f13b28b1727e4a398ac01a6b4b26160c19195443547977840845cdee01a96f57
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-subscriptions-channel-websocket@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-subscriptions-channel-websocket@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+    "@solana/functional": 2.1.1
+    "@solana/rpc-subscriptions-spec": 2.1.1
+    "@solana/subscribable": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+    ws: ^8.18.0
+  checksum: ddfaf6f9fabc1eed755bb895397e03a816e8dddbfafe9119433f7ead0bc1f93b49a0770b5f952e7efb478423a00af6ce97b74be0864be22271cae6f8fd73572e
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-subscriptions-spec@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-subscriptions-spec@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+    "@solana/promises": 2.1.1
+    "@solana/rpc-spec-types": 2.1.1
+    "@solana/subscribable": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: eb64e4069db20daa0ebe35d6c92b87c2fdf06f70b856f704bb08ad2be5404ac8f693afffe6f6c9c6f8ea20d9b1671c5925760f1a4852b080fde84e86439672b8
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-subscriptions@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-subscriptions@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+    "@solana/fast-stable-stringify": 2.1.1
+    "@solana/functional": 2.1.1
+    "@solana/promises": 2.1.1
+    "@solana/rpc-spec-types": 2.1.1
+    "@solana/rpc-subscriptions-api": 2.1.1
+    "@solana/rpc-subscriptions-channel-websocket": 2.1.1
+    "@solana/rpc-subscriptions-spec": 2.1.1
+    "@solana/rpc-transformers": 2.1.1
+    "@solana/rpc-types": 2.1.1
+    "@solana/subscribable": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 3160ca5874612d4dced36f772b0a12898c79df862600397a3120606a36e799bcaf440789b9eca2f7e33234ba7866c66b0cc7f28c7d955874b704eb961618c357
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-transformers@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-transformers@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+    "@solana/functional": 2.1.1
+    "@solana/nominal-types": 2.1.1
+    "@solana/rpc-spec-types": 2.1.1
+    "@solana/rpc-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 8139dec31eac2509655fbc6b7288ec8c9fd63f898e98f659089269fce3cf0846ab6134981905589586d22c4b82715e870ca277bce402bae46cb2608d47607122
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-transport-http@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-transport-http@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+    "@solana/rpc-spec": 2.1.1
+    "@solana/rpc-spec-types": 2.1.1
+    undici-types: ^7.9.0
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 67697d9a79dac3738bebe370e1ba51d0ac419ad4e8b8d18a559aa22dbc8420af69fc258357d72b342ce1cdaae029fa67f3e9e677f0d90161e183b2af0ebf93ab
+  languageName: node
+  linkType: hard
+
+"@solana/rpc-types@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc-types@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-numbers": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/nominal-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 8baa6667aef522a87ed30ecf0e7b98946a52c31b8466a9387e58d44f37cbc253e28027f9200e99b36afee3068e5df4c3566946b7c3d0686d1bbb3d004ab87b42
+  languageName: node
+  linkType: hard
+
+"@solana/rpc@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/rpc@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+    "@solana/fast-stable-stringify": 2.1.1
+    "@solana/functional": 2.1.1
+    "@solana/rpc-api": 2.1.1
+    "@solana/rpc-spec": 2.1.1
+    "@solana/rpc-spec-types": 2.1.1
+    "@solana/rpc-transformers": 2.1.1
+    "@solana/rpc-transport-http": 2.1.1
+    "@solana/rpc-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: d45aadaa3aed0776033f8313a0d850b4ebcb17dc549d52e929b49a096134b33232b652b0292ec8635018d53cb728c5a6d586097f13eb5262e5260397b4066ba4
+  languageName: node
+  linkType: hard
+
+"@solana/signers@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/signers@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/codecs-core": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/instructions": 2.1.1
+    "@solana/keys": 2.1.1
+    "@solana/nominal-types": 2.1.1
+    "@solana/transaction-messages": 2.1.1
+    "@solana/transactions": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 3634949552400785124a1b6a71878873f7073a741233d950cbdbf209f420a55505b7f655a0621f0a1e8ac9c374c77274728cc834802aee94fe5c118b07d69b78
   languageName: node
   linkType: hard
 
@@ -4925,6 +5504,92 @@ __metadata:
   peerDependencies:
     "@solana/web3.js": ^1.88.0
   checksum: 84faef5e8ed798e21870728817f650d572a0d0b8c8ac6591f75325d7e89831df396f48384083a65f8b79c30ea4cbfabd0ccb4fbc7a4f20953d133b746ed8b99d
+  languageName: node
+  linkType: hard
+
+"@solana/subscribable@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/subscribable@npm:2.1.1"
+  dependencies:
+    "@solana/errors": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 218abd8644b91d91f0a0baeda4423ee06dc8314eafeefee470c508c33aa65ce9f3e031fae6b8001711474e80c8e12fc6e849518d2bc700ccaf584c41536a1017
+  languageName: node
+  linkType: hard
+
+"@solana/sysvars@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/sysvars@npm:2.1.1"
+  dependencies:
+    "@solana/accounts": 2.1.1
+    "@solana/codecs": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/rpc-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 55d75eab7af675ae017bae3046ffce6233d7aedde778638c6ccf73e6fa045cb8850778cc1b660622f8b6a8fef7668c82099ce3fddf9a8af67aa58d2fa1f8bc5e
+  languageName: node
+  linkType: hard
+
+"@solana/transaction-confirmation@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/transaction-confirmation@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/keys": 2.1.1
+    "@solana/promises": 2.1.1
+    "@solana/rpc": 2.1.1
+    "@solana/rpc-subscriptions": 2.1.1
+    "@solana/rpc-types": 2.1.1
+    "@solana/transaction-messages": 2.1.1
+    "@solana/transactions": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: ffbe25dc4b0d1add6df474d4d4e62fb21e360fa020470cd9edbc51fb1f7043571f307f90f45c9e219513afa467e98cc2f55af8a8d2dfdbac790b18fdb453b729
+  languageName: node
+  linkType: hard
+
+"@solana/transaction-messages@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/transaction-messages@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-data-structures": 2.1.1
+    "@solana/codecs-numbers": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/functional": 2.1.1
+    "@solana/instructions": 2.1.1
+    "@solana/nominal-types": 2.1.1
+    "@solana/rpc-types": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: 382fef85e8563951b74c994588e53367a8309902b6ca15da3bfec3ace42ea570cff01519d44559ac9e0dc66137c2f339901b4201d78ff7c39dfc32b7822627f0
+  languageName: node
+  linkType: hard
+
+"@solana/transactions@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@solana/transactions@npm:2.1.1"
+  dependencies:
+    "@solana/addresses": 2.1.1
+    "@solana/codecs-core": 2.1.1
+    "@solana/codecs-data-structures": 2.1.1
+    "@solana/codecs-numbers": 2.1.1
+    "@solana/codecs-strings": 2.1.1
+    "@solana/errors": 2.1.1
+    "@solana/functional": 2.1.1
+    "@solana/instructions": 2.1.1
+    "@solana/keys": 2.1.1
+    "@solana/nominal-types": 2.1.1
+    "@solana/rpc-types": 2.1.1
+    "@solana/transaction-messages": 2.1.1
+  peerDependencies:
+    typescript: ">=5.3.3"
+  checksum: e71fb82e955bf405823caff78c4b70eaf5d9fbb30e906590e5416f32edc5ad83f3b299f29c710adef7d437f26cbb222d1194355b0312664b2e458967e745acb4
   languageName: node
   linkType: hard
 
@@ -5127,6 +5792,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/estree@npm:^1.0.6":
+  version: 1.0.8
+  resolution: "@types/estree@npm:1.0.8"
+  checksum: bd93e2e415b6f182ec4da1074e1f36c480f1d26add3e696d54fb30c09bc470897e41361c8fd957bf0985024f8fbf1e6e2aff977d79352ef7eb93a5c6dcff6c11
+  languageName: node
+  linkType: hard
+
 "@types/form-data@npm:0.0.33":
   version: 0.0.33
   resolution: "@types/form-data@npm:0.0.33"
@@ -5169,7 +5841,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json-schema@npm:^7.0.12, @types/json-schema@npm:^7.0.9":
+"@types/json-schema@npm:^7.0.12, @types/json-schema@npm:^7.0.15, @types/json-schema@npm:^7.0.9":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
   checksum: 97ed0cb44d4070aecea772b7b2e2ed971e10c81ec87dd4ecc160322ffa55ff330dace1793489540e3e318d90942064bb697cc0f8989391797792d919737b3b98
@@ -5884,6 +6556,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"acorn@npm:^8.15.0":
+  version: 8.15.0
+  resolution: "acorn@npm:8.15.0"
+  bin:
+    acorn: bin/acorn
+  checksum: 309c6b49aedf1a2e34aaf266de06de04aab6eb097c02375c66fdeb0f64556a6a823540409914fb364d9a11bc30d79d485a2eba29af47992d3490e9886c4391c3
+  languageName: node
+  linkType: hard
+
 "aes-js@npm:3.0.0":
   version: 3.0.0
   resolution: "aes-js@npm:3.0.0"
@@ -5973,6 +6654,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ajv@npm:8.17.1, ajv@npm:^8.0.0, ajv@npm:^8.0.1, ajv@npm:^8.10.0, ajv@npm:^8.11.0":
+  version: 8.17.1
+  resolution: "ajv@npm:8.17.1"
+  dependencies:
+    fast-deep-equal: ^3.1.3
+    fast-uri: ^3.0.1
+    json-schema-traverse: ^1.0.0
+    require-from-string: ^2.0.2
+  checksum: 1797bf242cfffbaf3b870d13565bd1716b73f214bb7ada9a497063aada210200da36e3ed40237285f3255acc4feeae91b1fb183625331bad27da95973f7253d9
+  languageName: node
+  linkType: hard
+
 "ajv@npm:^6.10.0, ajv@npm:^6.12.3, ajv@npm:^6.12.4, ajv@npm:^6.12.6":
   version: 6.12.6
   resolution: "ajv@npm:6.12.6"
@@ -5982,18 +6675,6 @@ __metadata:
     json-schema-traverse: ^0.4.1
     uri-js: ^4.2.2
   checksum: 874972efe5c4202ab0a68379481fbd3d1b5d0a7bd6d3cc21d40d3536ebff3352a2a1fabb632d4fd2cc7fe4cbdcd5ed6782084c9bbf7f32a1536d18f9da5007d4
-  languageName: node
-  linkType: hard
-
-"ajv@npm:^8.0.0, ajv@npm:^8.0.1, ajv@npm:^8.10.0, ajv@npm:^8.11.0":
-  version: 8.17.1
-  resolution: "ajv@npm:8.17.1"
-  dependencies:
-    fast-deep-equal: ^3.1.3
-    fast-uri: ^3.0.1
-    json-schema-traverse: ^1.0.0
-    require-from-string: ^2.0.2
-  checksum: 1797bf242cfffbaf3b870d13565bd1716b73f214bb7ada9a497063aada210200da36e3ed40237285f3255acc4feeae91b1fb183625331bad27da95973f7253d9
   languageName: node
   linkType: hard
 
@@ -9010,6 +9691,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-scope@npm:^8.2.0":
+  version: 8.4.0
+  resolution: "eslint-scope@npm:8.4.0"
+  dependencies:
+    esrecurse: ^4.3.0
+    estraverse: ^5.2.0
+  checksum: cf88f42cd5e81490d549dc6d350fe01e6fe420f9d9ea34f134bb359b030e3c4ef888d36667632e448937fe52449f7181501df48c08200e3d3b0fee250d05364e
+  languageName: node
+  linkType: hard
+
 "eslint-utils@npm:^2.0.0":
   version: 2.1.0
   resolution: "eslint-utils@npm:2.1.0"
@@ -9048,6 +9739,13 @@ __metadata:
   version: 3.4.3
   resolution: "eslint-visitor-keys@npm:3.4.3"
   checksum: 36e9ef87fca698b6fd7ca5ca35d7b2b6eeaaf106572e2f7fd31c12d3bfdaccdb587bba6d3621067e5aece31c8c3a348b93922ab8f7b2cbc6aaab5e1d89040c60
+  languageName: node
+  linkType: hard
+
+"eslint-visitor-keys@npm:^4.2.0, eslint-visitor-keys@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "eslint-visitor-keys@npm:4.2.1"
+  checksum: 3a77e3f99a49109f6fb2c5b7784bc78f9743b834d238cdba4d66c602c6b52f19ed7bcd0a5c5dbbeae3a8689fd785e76c001799f53d2228b278282cf9f699fff5
   languageName: node
   linkType: hard
 
@@ -9100,6 +9798,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint@npm:9.17.0":
+  version: 9.17.0
+  resolution: "eslint@npm:9.17.0"
+  dependencies:
+    "@eslint-community/eslint-utils": ^4.2.0
+    "@eslint-community/regexpp": ^4.12.1
+    "@eslint/config-array": ^0.19.0
+    "@eslint/core": ^0.9.0
+    "@eslint/eslintrc": ^3.2.0
+    "@eslint/js": 9.17.0
+    "@eslint/plugin-kit": ^0.2.3
+    "@humanfs/node": ^0.16.6
+    "@humanwhocodes/module-importer": ^1.0.1
+    "@humanwhocodes/retry": ^0.4.1
+    "@types/estree": ^1.0.6
+    "@types/json-schema": ^7.0.15
+    ajv: ^6.12.4
+    chalk: ^4.0.0
+    cross-spawn: ^7.0.6
+    debug: ^4.3.2
+    escape-string-regexp: ^4.0.0
+    eslint-scope: ^8.2.0
+    eslint-visitor-keys: ^4.2.0
+    espree: ^10.3.0
+    esquery: ^1.5.0
+    esutils: ^2.0.2
+    fast-deep-equal: ^3.1.3
+    file-entry-cache: ^8.0.0
+    find-up: ^5.0.0
+    glob-parent: ^6.0.2
+    ignore: ^5.2.0
+    imurmurhash: ^0.1.4
+    is-glob: ^4.0.0
+    json-stable-stringify-without-jsonify: ^1.0.1
+    lodash.merge: ^4.6.2
+    minimatch: ^3.1.2
+    natural-compare: ^1.4.0
+    optionator: ^0.9.3
+  peerDependencies:
+    jiti: "*"
+  peerDependenciesMeta:
+    jiti:
+      optional: true
+  bin:
+    eslint: bin/eslint.js
+  checksum: 0caae58c53bf4dc9b4893d75e62339e4c40fe5589652a3cb63f30a15bad1f34f8f784ca4fca471bbffedabee516a9f9620ebc33818b55e1b715e8f000865c851
+  languageName: node
+  linkType: hard
+
 "esniff@npm:^2.0.1":
   version: 2.0.1
   resolution: "esniff@npm:2.0.1"
@@ -9109,6 +9856,17 @@ __metadata:
     event-emitter: ^0.3.5
     type: ^2.7.2
   checksum: d814c0e5c39bce9925b2e65b6d8767af72c9b54f35a65f9f3d6e8c606dce9aebe35a9599d30f15b0807743f88689f445163cfb577a425de4fb8c3c5bc16710cc
+  languageName: node
+  linkType: hard
+
+"espree@npm:^10.0.1, espree@npm:^10.3.0":
+  version: 10.4.0
+  resolution: "espree@npm:10.4.0"
+  dependencies:
+    acorn: ^8.15.0
+    acorn-jsx: ^5.3.2
+    eslint-visitor-keys: ^4.2.1
+  checksum: 5f9d0d7c81c1bca4bfd29a55270067ff9d575adb8c729a5d7f779c2c7b910bfc68ccf8ec19b29844b707440fc159a83868f22c8e87bbf7cbcb225ed067df6c85
   languageName: node
   linkType: hard
 
@@ -9133,7 +9891,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esquery@npm:^1.4.0":
+"esquery@npm:^1.4.0, esquery@npm:^1.5.0":
   version: 1.6.0
   resolution: "esquery@npm:1.6.0"
   dependencies:
@@ -9847,6 +10605,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"file-entry-cache@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "file-entry-cache@npm:8.0.0"
+  dependencies:
+    flat-cache: ^4.0.0
+  checksum: f67802d3334809048c69b3d458f672e1b6d26daefda701761c81f203b80149c35dea04d78ea4238969dd617678e530876722a0634c43031a0957f10cc3ed190f
+  languageName: node
+  linkType: hard
+
 "file-uri-to-path@npm:1.0.0":
   version: 1.0.0
   resolution: "file-uri-to-path@npm:1.0.0"
@@ -9979,6 +10746,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"flat-cache@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "flat-cache@npm:4.0.1"
+  dependencies:
+    flatted: ^3.2.9
+    keyv: ^4.5.4
+  checksum: 899fc86bf6df093547d76e7bfaeb900824b869d7d457d02e9b8aae24836f0a99fbad79328cfd6415ee8908f180699bf259dc7614f793447cb14f707caf5996f6
+  languageName: node
+  linkType: hard
+
 "flat@npm:^5.0.2":
   version: 5.0.2
   resolution: "flat@npm:5.0.2"
@@ -10024,7 +10801,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"foreground-child@npm:^3.1.0":
+"foreground-child@npm:^3.1.0, foreground-child@npm:^3.3.1":
   version: 3.3.1
   resolution: "foreground-child@npm:3.3.1"
   dependencies:
@@ -10516,6 +11293,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"glob@npm:^11.0.0":
+  version: 11.0.3
+  resolution: "glob@npm:11.0.3"
+  dependencies:
+    foreground-child: ^3.3.1
+    jackspeak: ^4.1.1
+    minimatch: ^10.0.3
+    minipass: ^7.1.2
+    package-json-from-dist: ^1.0.0
+    path-scurry: ^2.0.0
+  bin:
+    glob: dist/esm/bin.mjs
+  checksum: 65ddc1e3c969e87999880580048763cc8b5bdd375930dd43b8100a5ba481d2e2563e4553de42875790800c602522a98aa8d3ed1c5bd4d27621609e6471eb371d
+  languageName: node
+  linkType: hard
+
 "glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.1.6":
   version: 7.2.3
   resolution: "glob@npm:7.2.3"
@@ -10599,6 +11392,13 @@ __metadata:
   dependencies:
     type-fest: ^0.20.2
   checksum: 56066ef058f6867c04ff203b8a44c15b038346a62efbc3060052a1016be9f56f4cf0b2cd45b74b22b81e521a889fc7786c73691b0549c2f3a6e825b3d394f43c
+  languageName: node
+  linkType: hard
+
+"globals@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "globals@npm:14.0.0"
+  checksum: 534b8216736a5425737f59f6e6a5c7f386254560c9f41d24a9227d60ee3ad4a9e82c5b85def0e212e9d92162f83a92544be4c7fd4c902cb913736c10e08237ac
   languageName: node
   linkType: hard
 
@@ -12176,6 +12976,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jackspeak@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "jackspeak@npm:4.1.1"
+  dependencies:
+    "@isaacs/cliui": ^8.0.2
+  checksum: daca714c5adebfb80932c0b0334025307b68602765098d73d52ec546bc4defdb083292893384261c052742255d0a77d8fcf96f4c669bcb4a99b498b94a74955e
+  languageName: node
+  linkType: hard
+
 "jake@npm:^10.8.5":
   version: 10.9.2
   resolution: "jake@npm:10.9.2"
@@ -12528,7 +13337,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keyv@npm:^4.0.0, keyv@npm:^4.5.3":
+"keyv@npm:^4.0.0, keyv@npm:^4.5.3, keyv@npm:^4.5.4":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
   dependencies:
@@ -12996,6 +13805,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lru-cache@npm:^11.0.0":
+  version: 11.1.0
+  resolution: "lru-cache@npm:11.1.0"
+  checksum: 6274e90b5fdff87570fe26fe971467a5ae1f25f132bebe187e71c5627c7cd2abb94b47addd0ecdad034107667726ebde1abcef083d80f2126e83476b2c4e7c82
+  languageName: node
+  linkType: hard
+
 "lru-cache@npm:^5.1.1":
   version: 5.1.1
   resolution: "lru-cache@npm:5.1.1"
@@ -13298,6 +14114,15 @@ __metadata:
   dependencies:
     brace-expansion: ^2.0.1
   checksum: 253487976bf485b612f16bf57463520a14f512662e592e95c571afdab1442a6a6864b6c88f248ce6fc4ff0b6de04ac7aa6c8bb51e868e99d1d65eb0658a708b5
+  languageName: node
+  linkType: hard
+
+"minimatch@npm:^10.0.3":
+  version: 10.0.3
+  resolution: "minimatch@npm:10.0.3"
+  dependencies:
+    "@isaacs/brace-expansion": ^5.0.0
+  checksum: 20bfb708095a321cb43c20b78254e484cb7d23aad992e15ca3234a3331a70fa9cd7a50bc1a7c7b2b9c9890c37ff0685f8380028fcc28ea5e6de75b1d4f9374aa
   languageName: node
   linkType: hard
 
@@ -14228,7 +15053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"optionator@npm:^0.9.1":
+"optionator@npm:^0.9.1, optionator@npm:^0.9.3":
   version: 0.9.4
   resolution: "optionator@npm:0.9.4"
   dependencies:
@@ -14568,6 +15393,16 @@ __metadata:
     lru-cache: ^10.2.0
     minipass: ^5.0.0 || ^6.0.2 || ^7.0.0
   checksum: 890d5abcd593a7912dcce7cf7c6bf7a0b5648e3dee6caf0712c126ca0a65c7f3d7b9d769072a4d1baf370f61ce493ab5b038d59988688e0c5f3f646ee3c69023
+  languageName: node
+  linkType: hard
+
+"path-scurry@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "path-scurry@npm:2.0.0"
+  dependencies:
+    lru-cache: ^11.0.0
+    minipass: ^7.1.2
+  checksum: 9953ce3857f7e0796b187a7066eede63864b7e1dfc14bf0484249801a5ab9afb90d9a58fc533ebb1b552d23767df8aa6a2c6c62caf3f8a65f6ce336a97bbb484
   languageName: node
   linkType: hard
 
@@ -15722,6 +16557,18 @@ __metadata:
   bin:
     rimraf: dist/cjs/src/bin.js
   checksum: bafce85391349a2d960847980bf9b5caa2a8887f481af630f1ea27e08288217293cec72d75e9a2ba35495c212789f66a7f3d23366ba6197026ab71c535126857
+  languageName: node
+  linkType: hard
+
+"rimraf@npm:6.0.1":
+  version: 6.0.1
+  resolution: "rimraf@npm:6.0.1"
+  dependencies:
+    glob: ^11.0.0
+    package-json-from-dist: ^1.0.0
+  bin:
+    rimraf: dist/esm/bin.mjs
+  checksum: 8ba5b84131c1344e9417cb7e8c05d8368bb73cbe5dd4c1d5eb49fc0b558209781658d18c450460e30607d0b7865bb067482839a2f343b186b07ae87715837e66
   languageName: node
   linkType: hard
 
@@ -17773,6 +18620,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:5.7.2":
+  version: 5.7.2
+  resolution: "typescript@npm:5.7.2"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: b55300c4cefee8ee380d14fa9359ccb41ff8b54c719f6bc49b424899d662a5ce62ece390ce769568c7f4d14af844085255e63788740084444eb12ef423b13433
+  languageName: node
+  linkType: hard
+
 "typescript@npm:^4.6.4 || ^5.2.2, typescript@npm:^5.5.4":
   version: 5.8.2
   resolution: "typescript@npm:5.8.2"
@@ -17800,6 +18657,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: f61375590b3162599f0f0d5b8737877ac0a7bc52761dbb585d67e7b8753a3a4c42d9a554c4cc929f591ffcf3a2b0602f65ae3ce74714fd5652623a816862b610
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@5.7.2#~builtin<compat/typescript>":
+  version: 5.7.2
+  resolution: "typescript@patch:typescript@npm%3A5.7.2#~builtin<compat/typescript>::version=5.7.2&hash=ad5954"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 803430c6da2ba73c25a21880d8d4f08a56d9d2444e6db2ea949ac4abceeece8e4a442b7b9b585db7d8a0b47ebda2060e45fe8ee8b8aca23e27ec1d4844987ee6
   languageName: node
   linkType: hard
 
@@ -17845,6 +18712,13 @@ __metadata:
   version: 2.0.5
   resolution: "undefsafe@npm:2.0.5"
   checksum: f42ab3b5770fedd4ada175fc1b2eb775b78f609156f7c389106aafd231bfc210813ee49f54483d7191d7b76e483bc7f537b5d92d19ded27156baf57592eb02cc
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:^7.9.0":
+  version: 7.10.0
+  resolution: "undici-types@npm:7.10.0"
+  checksum: 6917fcd8c80963919fe918952f9243a6749af0e3f759a39f8d2c2486144a66c86ae4125aebbce700b636cb1dcd45e85eb8c49c60d60738a97b63f0e89ef9b053
   languageName: node
   linkType: hard
 
