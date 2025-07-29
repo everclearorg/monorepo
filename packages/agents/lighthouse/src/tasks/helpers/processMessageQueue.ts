@@ -1,14 +1,11 @@
-import {
-  createLoggingContext,
-  getNtpTimeSeconds,
-  Queue,
-  QueueType,
-  OriginIntent,
-  TIntentStatus,
-} from '@chimera-monorepo/utils';
+import { createLoggingContext, getNtpTimeSeconds, Queue, QueueType } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import { MissingThresholds, UnknownQueueType } from '../../errors';
 import { dispatchMessageQueueViaRelayers } from './dispatchMessageQueueViaRelayers';
+
+// Tron domain constants
+const TRON_MAINNET_DOMAIN = '728126428';
+const TRON_DOMAINS = [TRON_MAINNET_DOMAIN];
 
 /**
  * A message queue holds references to all hyperlane messages pending dispatch onchain.
@@ -27,104 +24,53 @@ export const processMessageQueue = async (type: QueueType) => {
     adapters: { database },
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(processMessageQueue.name);
+
   // Get the spoke domains
   const domains = Object.keys(chains);
   const spokes = domains.filter((d) => d !== hub.domain);
-  logger.debug('Method start', requestContext, methodContext, { type, spokes, domains, hubDomain: hub.domain });
+
+  // Filter to only process Tron domains
+  const tronSpokes = spokes.filter((domain) => TRON_DOMAINS.includes(domain));
+
+  logger.debug('Method start', requestContext, methodContext, {
+    type,
+    allSpokes: spokes,
+    tronSpokes,
+    domains,
+    hubDomain: hub.domain,
+  });
 
   // Throw if the type is not a message queue (i.e. deposit)
   if (type === 'DEPOSIT') {
     throw new UnknownQueueType(type, { details: 'Deposit queues are not message queues.' });
   }
 
-  let queues: Queue[];
-  let queueContents: Map<string, unknown[]>;
-
-  // HARDCODED TEST DATA FOR INTENT TYPE
-  if (type === 'INTENT') {
-    logger.info('🧪 USING HARDCODED TEST DATA FOR INTENT PROCESSING', requestContext, methodContext);
-
-    // Hardcoded queue data based on parsed values - TESTING WITH 1 INTENT ONLY
-    queues = [
-      {
-        id: '728126428-0x494e54454e54',
-        domain: '728126428',
-        lastProcessed: 0, // Old timestamp to trigger age-based dispatch
-        size: 1, // Testing with 1 intent only to avoid queue validation issues
-        first: 1,
-        last: 1,
-        type: 'INTENT' as QueueType,
-      },
-    ];
-
-    // Hardcoded origin intents based on parsed data from actual transactions
-    const hardcodedOriginIntent1: OriginIntent = {
-      id: '0x8a4dc5747b9c1ba052d83ce34c859f79ea09e0739a965a6f8e4fe15253e18f87',
-      queueIdx: 1,
-      messageId: undefined, // Not yet dispatched
-      status: TIntentStatus.Added,
-      receiver: '0x000000000000000000000000c0d710e4afc4b2e675300895124f220951f6ba18',
-      inputAsset: '0x000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c',
-      outputAsset: '0x000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c',
-      amount: '1000000', // 1 USDT (6 decimals)
-      maxFee: 10000,
-      ttl: 0,
-      destinations: ['8453'], // Base chain
-      origin: '728126428',
-      nonce: 1,
-      transactionHash: '0x10b3a32ee218106b6c20029656f832d35d007fb2e050dbb97169779bb67b3a9f',
-      timestamp: 1749772254,
-      blockNumber: 73038616,
-      txOrigin: '0x000000000000000000000000c0d710e4afc4b2e675300895124f220951f6ba18',
-      txNonce: 0,
-      initiator: '0x000000000000000000000000c0d710e4afc4b2e675300895124f220951f6ba18',
-      data: '0x',
-      gasLimit: '0',
-      gasPrice: '1',
-    };
-
-    const hardcodedOriginIntent2: OriginIntent = {
-      id: '0x3c1225f120511439d20ca4ceaebe302ef0eb27060806a457fd9562cee60888c4',
-      queueIdx: 2,
-      messageId: undefined, // Not yet dispatched
-      status: TIntentStatus.Added,
-      receiver: '0x000000000000000000000000c0d710e4afc4b2e675300895124f220951f6ba18',
-      inputAsset: '0x000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c',
-      outputAsset: '0x000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c',
-      amount: '1000000', // 1 USDT (6 decimals)
-      maxFee: 10000,
-      ttl: 0,
-      destinations: ['8453'], // Base chain
-      origin: '728126428',
-      nonce: 1,
-      transactionHash: '0xc90cbcb4b9831158670d468fe0a11dfa9ea85a92baec658dfd276f94407ed95b',
-      timestamp: 1750477569,
-      blockNumber: 73273648,
-      txOrigin: '0x000000000000000000000000c0d710e4afc4b2e675300895124f220951f6ba18',
-      txNonce: 0,
-      initiator: '0x000000000000000000000000c0d710e4afc4b2e675300895124f220951f6ba18',
-      data: '0x',
-      gasLimit: '0',
-      gasPrice: '1',
-    };
-
-    // Map domain to intent contents - TESTING WITH 1 INTENT ONLY
-    queueContents = new Map();
-    queueContents.set('728126428', [hardcodedOriginIntent1]); // Only process first intent
-
-    logger.info('🧪 Hardcoded test data created', requestContext, methodContext, {
-      queuesCount: queues.length,
-      queueContentsSize: queueContents.size,
-      intent1Id: hardcodedOriginIntent1.id,
-      intent2Id: hardcodedOriginIntent2.id,
-      domain: '728126428',
-      totalIntents: 2,
+  // Exit early if no Tron domains are configured
+  if (tronSpokes.length === 0) {
+    logger.info('No Tron domains configured, skipping message queue processing', requestContext, methodContext, {
+      type,
+      configuredDomains: spokes,
+      tronDomains: TRON_DOMAINS,
     });
-  } else {
-    // Normal database calls for non-INTENT types
-    queues = await database.getMessageQueues(type, spokes);
-    queueContents = await database.getMessageQueueContents(type, spokes);
+    return;
   }
+
+  logger.info('Processing message queues for Tron domains only', requestContext, methodContext, {
+    type,
+    tronSpokes,
+    totalConfiguredSpokes: spokes.length,
+  });
+
+  // Use database queries for all queue types, filtering to Tron domains only
+  const queues = await database.getMessageQueues(type, tronSpokes);
+  const queueContents = await database.getMessageQueueContents(type, tronSpokes);
+
+  logger.info('Retrieved queue data from database', requestContext, methodContext, {
+    type,
+    queuesCount: queues.length,
+    queueContentsSize: queueContents.size,
+    tronDomains: tronSpokes,
+  });
 
   // Determine the message queues to dispatch:
   // - If message queue is full, dispatch.
@@ -133,23 +79,22 @@ export const processMessageQueue = async (type: QueueType) => {
     const { size, lastProcessed } = queue;
     const age = getNtpTimeSeconds() - (lastProcessed ?? 0);
     const { maxAge, size: maxSize } = thresholds[queue.domain] ?? {};
+
     if (maxAge == undefined && maxSize == undefined) {
       throw new MissingThresholds(type, queue.domain, thresholds);
     }
+
     const shouldDispatch = size >= maxSize || (age >= maxAge && size > 0);
 
-    // For testing, log dispatch decision
-    if (type === 'INTENT') {
-      logger.info('🧪 Dispatch decision for test queue', requestContext, methodContext, {
-        domain: queue.domain,
-        size,
-        maxSize,
-        age,
-        maxAge,
-        shouldDispatch,
-        reason: shouldDispatch ? (size >= maxSize ? 'size threshold' : 'age threshold') : 'no dispatch needed',
-      });
-    }
+    logger.debug('Dispatch decision for queue', requestContext, methodContext, {
+      domain: queue.domain,
+      size,
+      maxSize,
+      age,
+      maxAge,
+      shouldDispatch,
+      reason: shouldDispatch ? (size >= maxSize ? 'size threshold' : 'age threshold') : 'no dispatch needed',
+    });
 
     return shouldDispatch;
   });
@@ -169,13 +114,16 @@ export const processMessageQueue = async (type: QueueType) => {
       type,
       queue: toLog,
       thresholds,
+      tronDomains: tronSpokes,
     });
     logger.debug('Method complete', requestContext, methodContext);
     return;
   }
+
   logger.info('Dispatching queues', requestContext, methodContext, {
     type,
     queue: toLog ?? [],
+    tronDomains: tronSpokes,
   });
 
   // Dispatch the message queues via relayers
@@ -183,21 +131,19 @@ export const processMessageQueue = async (type: QueueType) => {
     toDispatch.map(async (queue) => {
       // Get the contents associated with that domain
       const domainQueue = queueContents.get(queue.domain) ?? [];
-      const sorted = domainQueue.sort((a, b) => (a as OriginIntent).queueIdx! - (b as OriginIntent).queueIdx!);
+      const sorted = domainQueue.sort((a, b) => {
+        const aQueueIdx = 'queueIdx' in a ? (a as { queueIdx: number }).queueIdx : 0;
+        const bQueueIdx = 'queueIdx' in b ? (b as { queueIdx: number }).queueIdx : 0;
+        return aQueueIdx - bQueueIdx;
+      });
 
-      // For testing, log what we're about to dispatch
-      if (type === 'INTENT') {
-        logger.info('🧪 About to dispatch test intents', requestContext, methodContext, {
-          domain: queue.domain,
-          queueSize: domainQueue.length,
-          sortedIntents: sorted.map((intent) => ({
-            id: (intent as OriginIntent).id,
-            queueIdx: (intent as OriginIntent).queueIdx,
-            amount: (intent as OriginIntent).amount,
-            destinations: (intent as OriginIntent).destinations,
-          })),
-        });
-      }
+      logger.info('About to dispatch queue contents', requestContext, methodContext, {
+        type,
+        domain: queue.domain,
+        queueSize: domainQueue.length,
+        sortedItemsCount: sorted.length,
+        isTronDomain: TRON_DOMAINS.includes(queue.domain),
+      });
 
       // Get the associated contents
       const taskIds = await dispatchMessageQueueViaRelayers(type, queue, sorted, requestContext);
@@ -207,11 +153,13 @@ export const processMessageQueue = async (type: QueueType) => {
 
   const successful = results.filter((r) => r.status === 'fulfilled');
   const rejected = results.filter((r) => r.status === 'rejected');
+
   logger.info('Dispatched queues', requestContext, methodContext, {
     type,
     attempted: toDispatch.length,
     successful: successful.length,
     rejected: rejected.length,
+    tronDomains: tronSpokes,
     errors: rejected.map((value: unknown) => (value as PromiseRejectedResult).reason),
   });
 };

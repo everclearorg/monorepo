@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber, constants, utils } from 'ethers';
+import { BigNumber, constants } from 'ethers';
 import { Block, TransactionReceipt, TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   ISigner,
@@ -13,6 +13,8 @@ import { SyncProvider } from '../eth';
 import { GasEstimateInvalid, TransactionReadError } from '../../errors';
 import { TronWeb } from '../../../mockable';
 import { Interface } from 'ethers/lib/utils';
+// @ts-ignore
+import fetch from 'node-fetch';
 
 interface ContractFunctionParameter {
   type: string;
@@ -151,15 +153,58 @@ class TronWeb3Signer implements ISigner {
       try {
         // For complex contract calls, use triggerSmartContract with rawParameter
         // This bypasses TronWeb's parameter parsing and uses the raw data directly
-        const contractAddress = transaction.to;
-        const feeLimit = Math.min(Number.parseInt(transaction.gasLimit || '0'), 500000);
+        let contractAddress = transaction.to;
         
-        console.log('TRON DEBUG: Building contract transaction with rawParameter approach');
+        // Convert contract address from hex to TRON base58 if needed
+        if (transaction.to.startsWith('0x')) {
+          contractAddress = this.tronWeb.address.fromHex(transaction.to);
+          console.log('TRON DEBUG: Converted contract address from hex to base58 for sendTransaction', {
+            hexAddress: transaction.to,
+            base58Address: contractAddress,
+          });
+        }
         
-        // Use TronWeb's low-level contract call with raw parameter data
+        // 🎯 ENERGY FIX: Convert energy units to SUN for feeLimit
+        // TRON feeLimit is in SUN, not energy units
+        // Energy price ≈ 420 SUN per energy unit on mainnet
+        const providedGasLimit = Number.parseInt(transaction.gasLimit || '0');
+        const minEnergyUnits = 100000; // 100K energy minimum
+        const maxEnergyUnits = 600000; // 600K energy test level
+        const energyUnits = Math.max(minEnergyUnits, Math.min(providedGasLimit, maxEnergyUnits));
+        
+        // Convert energy units to SUN for feeLimit (420 SUN per energy unit)
+        const energyPriceInSun = 420;
+        const feeLimit = energyUnits * energyPriceInSun;
+        
+        console.log('TRON DEBUG: Building contract transaction with proper function signature');
+        console.log('TRON DEBUG: Energy calculation:', {
+          providedGasLimit,
+          minEnergyUnits,
+          maxEnergyUnits,
+          energyUnits,
+          energyPriceInSun,
+          finalFeeLimitInSun: feeLimit,
+        });
+        
+        // 🎯 CRITICAL FIX: Use function signature string instead of empty string
+        const functionSignature = transaction.funcSig || '';
+        console.log('TRON DEBUG: Using function signature:', functionSignature);
+        
+        // 🎯 ENHANCED DEBUG: Log all transaction parameters for contract validation analysis
+        console.log('TRON DEBUG: Contract call parameters:', {
+          contractAddress,
+          functionSignature,
+          feeLimit,
+          callValue: Number.parseInt(transaction.value || '0'),
+          parameterDataHex: parameterData,
+          fromAddress,
+          rawDataLength: rawData.length,
+        });
+        
+        // Use TronWeb's contract call with proper function signature
         const tx = await tronWeb.transactionBuilder.triggerSmartContract(
           contractAddress,
-          '', // Empty function signature - we're using raw data
+          functionSignature, // ✅ Use function signature string!
           {
             feeLimit,
             callValue: Number.parseInt(transaction.value || '0'),
@@ -291,18 +336,63 @@ export class TronSyncProvider extends SyncProvider {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async call(tx: ReadTransaction, _block: number | string): Promise<string> {
-    const result = await this.tronWeb.transactionBuilder.triggerConstantContract(
-      tx.to,
-      tx.funcSig,
-      {},
-      decodeSimpleParameters(tx.data, tx.funcSig),
-    );
+    console.log('TRON DEBUG: call method invoked', {
+      to: tx.to,
+      funcSig: tx.funcSig,
+      data: tx.data,
+    });
 
-    if (!result.constant_result || result.constant_result.length === 0) {
-      throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { error: result.Error });
+    try {
+      // Convert contract address from hex to TRON base58 if needed
+      let contractAddress = tx.to;
+      if (tx.to.startsWith('0x')) {
+        contractAddress = this.tronWeb.address.fromHex(tx.to);
+        console.log('TRON DEBUG: Converted contract address from hex to base58', {
+          hexAddress: tx.to,
+          base58Address: contractAddress,
+        });
+      }
+
+      // For TRON, we need to use the raw API approach that we know works
+      const response = await fetch('https://api.trongrid.io/wallet/triggerconstantcontract', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          owner_address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', // Default TRON address
+          contract_address: contractAddress, // Now properly converted to TRON base58 format
+          function_selector: tx.funcSig,
+          parameter: tx.data.startsWith('0x') ? tx.data.substring(10).padStart(64, '0') : tx.data.substring(8).padStart(64, '0'), // Remove function selector
+          visible: true
+        })
+      });
+
+      const data = await response.json();
+      console.log('TRON DEBUG: Raw API response', data);
+
+      if (data.constant_result && data.constant_result.length > 0) {
+        console.log('TRON DEBUG: Successfully read from contract', {
+          result: data.constant_result[0]
+        });
+        return '0x' + data.constant_result[0];
+      } else if (data.result && data.result.code) {
+        console.log('TRON DEBUG: Contract read failed', data.result);
+        throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { 
+          error: data.result.message 
+        });
+      } else {
+        console.log('TRON DEBUG: Unexpected response format', data);
+        throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { 
+          error: 'Unexpected response format' 
+        });
+      }
+    } catch (error) {
+      console.log('TRON DEBUG: Contract read exception', error);
+      throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { 
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
-
-    return result.constant_result[0];
   }
 
   private async getTransactionData(hash: string): Promise<any> {
@@ -345,7 +435,32 @@ export class TronSyncProvider extends SyncProvider {
   }
 
   public async getTransactionReceipt(hash: string): Promise<TransactionReceipt> {
-    const { txInfo, from, to, status, confirmations, blockHash } = await this.getTransactionData(hash);
+    const { tx, txInfo, from, to, status, confirmations, blockHash } = await this.getTransactionData(hash);
+
+    // 🎯 ENHANCED DEBUG: Log detailed transaction info for revert analysis
+    console.log('TRON DEBUG: Transaction receipt details:', {
+      hash,
+      status,
+      contractRet: (tx as any).ret[0]?.contractRet,
+      energyUsage: txInfo.receipt?.energy_usage,
+      energyUsageTotal: txInfo.receipt?.energy_usage_total,
+      netUsage: txInfo.receipt?.net_usage,
+      result: txInfo.result,
+      resMessage: txInfo.resMessage ? Buffer.from(txInfo.resMessage, 'hex').toString() : undefined,
+    });
+
+    // 🎯 ENHANCED DEBUG: If transaction failed, analyze failure reason
+    if (status === 0) {
+      console.log('TRON DEBUG: Transaction FAILED - analyzing failure reason:', {
+        contractRet: (tx as any).ret[0]?.contractRet,
+        energyUsage: txInfo.receipt?.energy_usage,
+        energyUsageTotal: txInfo.receipt?.energy_usage_total,
+        netUsage: txInfo.receipt?.net_usage,
+        result: txInfo.result,
+        resMessage: txInfo.resMessage ? Buffer.from(txInfo.resMessage, 'hex').toString() : undefined,
+        internalTransactions: txInfo.internal_transactions?.length || 0,
+      });
+    }
 
     return {
       transactionHash: hash,
@@ -457,11 +572,19 @@ export class TronSyncProvider extends SyncProvider {
       fromAddress = this.tronWeb.address.fromHex(fromAddress);
     }
 
+    console.log('TRON ENERGY ESTIMATION: Starting estimation', {
+      funcSig: tx.funcSig,
+      to: tx.to,
+      dataLength: tx.data.length,
+      fromAddress,
+    });
+
     try {
       const decodedParams = decodeSimpleParameters(tx.data, tx.funcSig, writeTx?.value);
       
       if (decodedParams.length > 0) {
         // Use decoded parameters for simple types
+        console.log('TRON ENERGY ESTIMATION: Using decoded parameters approach');
         const result = await this.tronWeb.transactionBuilder.estimateEnergy(
           tx.to,
           tx.funcSig,
@@ -472,11 +595,27 @@ export class TronSyncProvider extends SyncProvider {
           fromAddress,
         );
         if (!result.result.result) {
-          throw new GasEstimateInvalid('failed to estimate energy');
+          throw new GasEstimateInvalid('failed to estimate energy with decoded parameters');
         }
-        return result.energy_required.toString();
+        console.log('TRON ENERGY ESTIMATION: Success with decoded parameters', {
+          energyRequired: result.energy_required,
+        });
+        
+        // Apply safety multiplier for complex contract calls
+        let finalEstimate = result.energy_required;
+        if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
+          // Use 100x multiplier for complex relayer functions due to underestimation
+          finalEstimate = result.energy_required * 100;
+          console.log('TRON ENERGY ESTIMATION: Applied 100x safety multiplier for processIntentQueueViaRelayer', {
+            original: result.energy_required,
+            multiplied: finalEstimate,
+          });
+        }
+        
+        return finalEstimate.toString();
       } else {
         // For complex types, use rawParameter to bypass parameter validation
+        console.log('TRON ENERGY ESTIMATION: Using rawParameter approach');
         const rawParameter = tx.data.startsWith('0x') ? tx.data.slice(2) : tx.data;
         const paramData = rawParameter.length > 8 ? rawParameter.slice(8) : rawParameter;
         
@@ -491,20 +630,45 @@ export class TronSyncProvider extends SyncProvider {
           fromAddress,
         );
         if (!result.result.result) {
-          throw new GasEstimateInvalid('failed to estimate energy');
+          throw new GasEstimateInvalid('failed to estimate energy with rawParameter');
         }
-        return result.energy_required.toString();
+        console.log('TRON ENERGY ESTIMATION: Success with rawParameter', {
+          energyRequired: result.energy_required,
+        });
+        
+        // Apply safety multiplier for complex contract calls
+        let finalEstimate = result.energy_required;
+        if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
+          // Use 100x multiplier for complex relayer functions due to underestimation
+          finalEstimate = result.energy_required * 100;
+          console.log('TRON ENERGY ESTIMATION: Applied 100x safety multiplier for processIntentQueueViaRelayer', {
+            original: result.energy_required,
+            multiplied: finalEstimate,
+          });
+        }
+        
+        return finalEstimate.toString();
       }
     } catch (error) {
-      // If estimate energy is not supported or fails, provide a reasonable default
-      // Based on Tron documentation, complex contract calls typically use 50,000-200,000 energy
-      // For processIntentQueueViaRelayer with complex parameters, use a higher estimate
+      console.log('TRON ENERGY ESTIMATION: API estimation failed, using fallback', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        funcSig: tx.funcSig,
+      });
+      
+      // Enhanced fallback values based on actual Tron network requirements
+      // These values are derived from successful transactions and TronScan analysis
       if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
-        return '150000'; // 150k energy for complex relayer functions
+        console.log('TRON ENERGY ESTIMATION: Using high fallback for processIntentQueueViaRelayer');
+        return '10000000'; // 10M energy for complex relayer functions (increased from 150k)
+      } else if (tx.funcSig && tx.funcSig.includes('processFillQueueViaRelayer')) {
+        console.log('TRON ENERGY ESTIMATION: Using high fallback for processFillQueueViaRelayer');
+        return '10000000'; // 10M energy for complex relayer functions
       } else if (tx.funcSig && tx.funcSig.includes('transfer')) {
-        return '15000'; // 15k energy for simple transfers
+        console.log('TRON ENERGY ESTIMATION: Using standard fallback for transfer');
+        return '50000'; // 50k energy for simple transfers
       } else {
-        return '100000'; // 100k energy default for other contract calls
+        console.log('TRON ENERGY ESTIMATION: Using default fallback');
+        return '1000000'; // 1M energy default for other contract calls
       }
     }
   }
