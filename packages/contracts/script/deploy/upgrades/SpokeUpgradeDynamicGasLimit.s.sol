@@ -7,13 +7,13 @@ import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {Script} from 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
 
-import {EverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
+import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
 
 import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 import {MainnetStagingEnvironment} from '../../MainnetStaging.sol';
 import {ICREATE3} from './ICREATE3.sol';
 
-contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
+contract DeployDynamicGasLimitUpgrade is Script, ScriptUtils {
   using TypeCasts for bytes32;
 
   struct DeploymentParams {
@@ -42,10 +42,10 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
     address newEverclearSpoke;
 
     // Generating the inputs for CREATE3
-    uint8 version = 6;
+    uint8 version = 100;
     bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
-    bytes memory _creation = type(EverclearSpokeV4).creationCode;
+    bytes memory _creation = type(EverclearSpokeV5).creationCode;
 
     // Deploying the new implementation via CREATE3
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
@@ -62,7 +62,7 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
   }
 }
 
-contract MainnetStaging is DeployFeeAdapterUpgrade, MainnetStagingEnvironment {
+contract MainnetStaging is DeployDynamicGasLimitUpgrade, MainnetStagingEnvironment {
   function setUp() public {
     //// Ethereum
     _deploymentParams[ETHEREUM] =
@@ -81,7 +81,7 @@ contract MainnetStaging is DeployFeeAdapterUpgrade, MainnetStagingEnvironment {
   }
 }
 
-contract MainnetProduction is DeployFeeAdapterUpgrade, MainnetProductionEnvironment {
+contract MainnetProduction is DeployDynamicGasLimitUpgrade, MainnetProductionEnvironment {
   function setUp() public {
     //// Arbitrum One
     _deploymentParams[ARBITRUM_ONE] =
