@@ -115,7 +115,7 @@ export async function verifyMessage(message: string, signature: string): Promise
   const tronWeb = new TronWeb({
     fullHost: 'https://api.trongrid.io',
     headers: {
-      'TRON-PRO-API-KEY': 'b28bbd21-f962-4a02-94fe-57ef36f1d8d2',
+      'TRON-PRO-API-KEY': process.env.TRON_PRO_API_KEY || '',
     },
   });
   
