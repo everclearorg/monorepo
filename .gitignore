@@ -5,6 +5,9 @@ node_modules
 .vscode
 .secrets
 
+# Log files
+logs/
+
 # Foundry files
 contracts/cache
 out-via-ir

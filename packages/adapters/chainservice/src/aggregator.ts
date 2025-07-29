@@ -164,7 +164,33 @@ export class RpcProviderAggregator {
    * @returns The ethers TransactionResponse.
    */
   protected async sendTransaction(transaction: OnchainTransaction) {
+    console.log(`=== sendTransaction called with domain ${this.domain} ===`);
     this.checkSigner();
+
+    // For Tron domains (728126428 = mainnet, 2494104990 = testnet), use special handling
+    if (this.domain === 728126428 || this.domain === 2494104990) {
+      const { requestContext, methodContext } = createLoggingContext('sendTransaction');
+      this.logger.info('TRON DEBUG: Using Tron-specific transaction handling', requestContext, methodContext, {
+        domain: this.domain,
+      });
+
+      // For Tron, bypass the leadProvider.connect() method and use getSigner() directly
+      const tronSigner = this.leadProvider!.getSigner(this.signer!);
+
+      const toSend = {
+        ...transaction.params,
+        gasLimit: transaction.params.gasLimit ? BigNumber.from(transaction.params.gasLimit) : undefined,
+        gasPrice: transaction.params.gasPrice ? BigNumber.from(transaction.params.gasPrice) : undefined,
+        value: BigNumber.from(transaction.params.value || 0),
+      };
+
+      this.logger.info('TRON DEBUG: About to call tronSigner.sendTransaction', requestContext, methodContext);
+      const result = await tronSigner.sendTransaction(toSend as unknown as ITransactionRequest);
+      this.logger.info('TRON DEBUG: Transaction submitted successfully', requestContext, methodContext);
+      return result;
+    }
+
+    // For non-Tron domains, use the original logic
     // NOTE: We do not use execute for this call as it should be delegated to fallback provider, who
     // will call the method on all providers.
     // TODO: We may want to adapt execute to take on this functionality as it's the last step towards

@@ -1,0 +1,112 @@
+{
+    "betterUptime": {
+        "apiKey": "f1EXiztY3QANxDEe1XUkJdUh",
+        "requesterEmail": "preetham@proximalabs.io"
+    },
+    "chains": {
+        "10": {
+            "providers": [
+                "https://optimism-mainnet.blastapi.io/bce846ef-a6f8-4500-a0dd-2c447c068713"
+            ]
+        },
+        "1399811149": {
+            "providers": [
+                "https://api.mainnet-beta.solana.com"
+            ]
+        },
+        "728126428": {
+            "providers": [
+                "https://tron-rpc.publicnode.com"
+            ]
+        },
+        "8453": {
+            "providers": [
+                "https://base-mainnet.g.alchemy.com/v2/amBZzC_i0Dmmw2Pyap2IHauTQxWmlstf"
+            ]
+        }
+    },
+    "coingecko": "CG-kUM5D7gABm5CTdpqzpSoqrJ3",
+    "database": {
+        "url": "postgresql://everclear:qnoFvFr19eDVq6OzTxtvcMh7aY5ovo@rds-postgres-cartographer-chimera.cq3x287427jh.us-east-1.rds.amazonaws.com:5432/everclear"
+    },
+    "environment": "production",
+    "everclearConfig": "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json",
+    "healthUrls": {
+        "expired": "Ye4noYeVFSZXQP79kjEjA9s2",
+        "fill": "s3JE4LSk7C5Zf9gG8vyj8wqz",
+        "intent": "3nkHwLkqAP3DnYJy3p1RPtru",
+        "invoice": "Px6yBmvdv7xAg3rYL4vT9vRd",
+        "reward": "8YxNFucHFxXRP82dM6J8vnFg",
+        "reward_metadata": "HNLJudQx4BR8QhUYJFbKEsxy",
+        "settlement": "zJmDL9ujQ1NSZDURRRAurWm8",
+        "solana": "D41wACviAJS3f9TXB6Au7QQP"
+    },
+    "hub": {
+        "domain": "25327",
+        "providers": [
+            "https://rpc.everclear.raas.gelato.cloud/f76eb025e39a44489e7b689b3bd326d4"
+        ]
+    },
+    "logLevel": "debug",
+    "network": "mainnet",
+    "relayers": [
+        {
+            "apiKey": "UHuTMvDGUgPhkzaM0Wm1Y7mzpJXK67",
+            "type": "Everclear",
+            "url": "https://relayer-server.chimera.staging.everclear.ninja"
+        }
+    ],
+    "rewards": {
+        "clearAssetAddress": "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8",
+        "staking": {
+            "tokens": [
+                {
+                    "address": "0x58b9cb810a68a7f3e1e4f8cb45d1b9b3c79705e8"
+                },
+                {
+                    "address": "0x2e31ebd2eb114943630db6ba8c7f7687bda5835f"
+                }
+            ]
+        },
+        "volume": {
+            "tokens": []
+        }
+    },
+    "safe": {
+        "fallbackHandlerAddress": "0x0000000000000000000000000000000000000000",
+        "masterCopyAddress": "0x0000000000000000000000000000000000000000",
+        "safeAddress": "0x0000000000000000000000000000000000000000",
+        "signer": "0x42413a1521ffd99f11f1f27f7bb0291b283ac3f5ccd5e4c77f4b3f2c69a37a95",
+        "txService": "https://transaction.safe.everclear.org/api"
+    },
+    "server": {
+        "adminToken": "9d35pYBEsHUExa52PE1LYrirePiXay"
+    },
+    "signer": "http://localhost:9000",
+    "solana": {
+        "signer": "[76,37,100,127,58,131,1,194,95,189,203,208,96,224,8,98,17,22,73,69,206,173,33,165,108,204,68,236,116,185,150,34,2,102,223,157,199,117,147,87,254,21,221,174,225,1,187,229,197,229,112,77,207,1,60,108,231,250,109,56,115,240,76,223]",
+        "spokeAddress": "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw"
+    },
+    "thresholds": {
+        "10": {
+            "maxAge": 60,
+            "size": 1
+        },
+        "1399811149": {
+            "maxAge": 60,
+            "size": 1
+        },
+        "728126428": {
+            "maxAge": 60,
+            "size": 1
+        },
+        "25327": {
+            "maxAge": 60,
+            "size": 1
+        },
+        "8453": {
+            "maxAge": 60,
+            "size": 1
+        }
+    }
+}

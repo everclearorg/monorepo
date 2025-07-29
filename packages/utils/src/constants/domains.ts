@@ -66,6 +66,7 @@ const DEVNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
 ]);
 
 export const SOLANA_CHAINID = '1399811149';
+export const TRON_CHAINID = '728126428';
 
 // Hex domains calculated using `getHexDomainFromString`
 // alternative: ethers.BigNumber.from(ethers.utils.toUtf8Bytes("some string")).toNumber()
