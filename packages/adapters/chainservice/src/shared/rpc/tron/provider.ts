@@ -111,7 +111,12 @@ class TronWeb3Signer implements ISigner {
       environment: (process.env.NODE_ENV as any) || 'development',
       fallbackToTestKey: true,
     });
-    const tronWeb = (await keyManager.createTronWeb('https://api.trongrid.io')) as TronWebInstance;
+    
+    // Use the provider's TronWeb instance (which may be mocked in tests) but set the private key
+    const tronWeb = this.tronWeb;
+    const privateKey = await keyManager.getPrivateKey();
+    tronWeb.setPrivateKey(privateKey);
+    
     const fromAddress = tronWeb.defaultAddress.base58 as string;
     console.log('Using TronKeyManager address for transaction:', fromAddress);
 
@@ -129,6 +134,11 @@ class TronWeb3Signer implements ISigner {
       if (!result.result) {
         throw new Error(`Transaction broadcast failed: ${result.code || 'Unknown error'}`);
       }
+
+      // Update nonce count for sender address (TRX transfer)
+      const currentNonce = this.provider.nonces.get(fromAddress) || 0;
+      this.provider.nonces.set(fromAddress, currentNonce + 1);
+      console.log('TRON DEBUG: Updated nonce for TRX transfer address', fromAddress, 'from', currentNonce, 'to', currentNonce + 1);
 
       return {
         hash: result.txid,
@@ -263,6 +273,12 @@ class TronWeb3Signer implements ISigner {
         console.log('=== TRON TRANSACTION SUCCESS ===');
         console.log('Transaction Hash:', result.txid);
         console.log('Confirmations:', confirmations);
+
+        // Update nonce count for sender address
+        const senderAddress = fromAddress;
+        const currentNonce = this.provider.nonces.get(senderAddress) || 0;
+        this.provider.nonces.set(senderAddress, currentNonce + 1);
+        console.log('TRON DEBUG: Updated nonce for address', senderAddress, 'from', currentNonce, 'to', currentNonce + 1);
 
         return {
           hash: result.txid,
@@ -668,6 +684,11 @@ export class TronSyncProvider extends SyncProvider {
         return finalEstimate.toString();
       }
     } catch (error) {
+      // Re-throw UnpredictableGasLimit errors instead of using fallback
+      if (error instanceof UnpredictableGasLimit) {
+        throw error;
+      }
+      
       console.log('TRON ENERGY ESTIMATION: API estimation failed, using fallback', {
         error: error instanceof Error ? error.message : 'Unknown error',
         funcSig: tx.funcSig,
