@@ -44,5 +44,6 @@ packages/**/node_modules
 **/*/*.config.json
 **/*/config.*.json
 **/*/config.json
+**/*/config*.json
 
 .idea
