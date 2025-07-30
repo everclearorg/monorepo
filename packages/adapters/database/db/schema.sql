@@ -146,6 +146,11 @@ DECLARE
     i INT;
     queue_id TEXT = '728126428-0x46494c4c';
     queue_rec RECORD;
+    msg_id TEXT;
+    first_idx NUMERIC;
+    last_idx NUMERIC;
+    queue_size NUMERIC;
+    msg_timestamp BIGINT;
 BEGIN
     destination_intent_id := SUBSTRING(rec.topics, 68, 66);
     solver := SUBSTRING(rec.topics, 135, 66);
@@ -265,6 +270,22 @@ BEGIN
         destinations = EXCLUDED.destinations,
         ttl = EXCLUDED.ttl;
 
+    SELECT message_id, message_timestamp INTO msg_id, msg_timestamp
+    FROM tron.fill_queue
+    WHERE queue_idx = queue_index;
+
+    IF msg_id IS NOT NULL THEN
+        UPDATE public.destination_intents
+        SET message_id = msg_id,
+            status = 'DISPATCHED'
+        WHERE id = destination_intent_id;
+
+        UPDATE public.messages
+        SET intent_ids = array_append(intent_ids, destination_intent_id)
+        WHERE id = msg_id
+          AND NOT (destination_intent_id = ANY(intent_ids));
+    END IF;
+
     SELECT * INTO queue_rec
     FROM public.queues
     WHERE id = queue_id;
@@ -287,10 +308,28 @@ BEGIN
             'FILL'
         );
     ELSE
-        UPDATE public.queues
-        SET size = queue_rec.size + 1,
-            last = queue_index
-        WHERE id = queue_id;
+        IF msg_id IS NULL THEN
+            first_idx := LEAST(queue_rec.first, queue_index);
+            last_idx := GREATEST(queue_rec.last, queue_index);
+            queue_size := 1 + last_idx - first_idx;
+
+            UPDATE public.queues
+            SET size = queue_size,
+                first = first_idx,
+                last = last_idx
+            WHERE id = queue_id;
+        ELSE
+            first_idx := GREATEST(queue_rec.first, queue_index + 1);
+            last_idx := GREATEST(queue_rec.last, queue_index);
+            queue_size := 1 + last_idx - first_idx;
+
+            UPDATE public.queues
+            SET size = queue_size,
+                first = first_idx,
+                last = last_idx,
+                last_processed = GREATEST(queue_rec.last_processed, msg_timestamp)
+            WHERE id = queue_id;
+        END IF;
     END IF;
 
     INSERT INTO tron.fill_queue(queue_idx, intent_id)
@@ -313,6 +352,7 @@ DECLARE
     msg_id TEXT;
     first_idx NUMERIC;
     last_idx NUMERIC;
+    queue_size NUMERIC;
     quote NUMERIC;
     everclear_domain VARCHAR(66) = '25327';
     intent_ids VARCHAR(66)[] := ARRAY[]::VARCHAR(66)[];
@@ -330,14 +370,21 @@ BEGIN
     pos := pos + 64;
     quote := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
 
-    FOR i IN first_idx..last_idx LOOP
+    FOR i IN first_idx..(last_idx - 1) LOOP
         SELECT intent_id INTO fill_intent_id
         FROM tron.fill_queue
         WHERE queue_idx = i;
 
-        IF FOUND THEN
+        IF fill_intent_id IS NOT NULL THEN
             intent_ids := array_append(intent_ids, fill_intent_id);
         END IF;
+
+        INSERT INTO tron.fill_queue(queue_idx, message_id, message_timestamp)
+        VALUES (i, msg_id, rec.block_timestamp)
+        ON CONFLICT (queue_idx)
+        DO UPDATE SET
+            message_id = EXCLUDED.message_id,
+            message_timestamp = EXCLUDED.message_timestamp;
     END LOOP;
 
     INSERT INTO public.messages(
@@ -404,10 +451,15 @@ BEGIN
     WHERE id = queue_id;
 
     IF FOUND THEN
+        first_idx := GREATEST(queue_rec.first, last_idx);
+        last_idx := GREATEST(queue_rec.last, last_idx - 1);
+        queue_size := 1 + last_idx - first_idx;
+
         UPDATE public.queues
-        SET size = queue_rec.size - (last_idx - first_idx),
-            first = last_idx,
-            last_processed = rec.block_timestamp
+        SET size = queue_size,
+            first = first_idx,
+            last = last_idx,
+            last_processed = GREATEST(queue_rec.last_processed, rec.block_timestamp)
         WHERE id = queue_id;
     END IF;
 
@@ -426,6 +478,7 @@ DECLARE
     msg_id TEXT;
     first_idx NUMERIC;
     last_idx NUMERIC;
+    queue_size NUMERIC;
     quote NUMERIC;
     everclear_domain VARCHAR(66) = '25327';
     intent_ids VARCHAR(66)[] := ARRAY[]::VARCHAR(66)[];
@@ -443,14 +496,21 @@ BEGIN
     pos := pos + 64;
     quote := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
 
-    FOR i IN first_idx..last_idx LOOP
+    FOR i IN first_idx..(last_idx - 1) LOOP
         SELECT intent_id INTO origin_intent_id
         FROM tron.intent_queue
         WHERE queue_idx = i;
 
-        IF FOUND THEN
+        IF origin_intent_id IS NOT NULL THEN
             intent_ids := array_append(intent_ids, origin_intent_id);
         END IF;
+
+        INSERT INTO tron.intent_queue as queue(queue_idx, message_id, message_timestamp)
+        VALUES (i, msg_id, rec.block_timestamp)
+        ON CONFLICT (queue_idx)
+        DO UPDATE SET
+            message_id = EXCLUDED.message_id,
+            message_timestamp = EXCLUDED.message_timestamp;
     END LOOP;
 
     INSERT INTO public.messages(
@@ -517,10 +577,15 @@ BEGIN
     WHERE id = queue_id;
 
     IF FOUND THEN
+        first_idx := GREATEST(queue_rec.first, last_idx);
+        last_idx := GREATEST(queue_rec.last, last_idx - 1);
+        queue_size := 1 + last_idx - first_idx;
+
         UPDATE public.queues
-        SET size = queue_rec.size - (last_idx - first_idx),
-            first = last_idx,
-            last_processed = rec.block_timestamp
+        SET size = queue_size,
+            first = first_idx,
+            last = last_idx,
+            last_processed = GREATEST(queue_rec.last_processed, rec.block_timestamp)
         WHERE id = queue_id;
     END IF;
 
@@ -556,6 +621,11 @@ DECLARE
     i INT;
     queue_id TEXT = '728126428-0x494e54454e54';
     queue_rec RECORD;
+    msg_id TEXT;
+    msg_timestamp BIGINT;
+    first_idx NUMERIC;
+    last_idx NUMERIC;
+    queue_size NUMERIC;
 BEGIN
     origin_intent_id := SUBSTRING(rec.topics, 68, 66);
 
@@ -663,6 +733,22 @@ BEGIN
         ttl = EXCLUDED.ttl,
         destinations = EXCLUDED.destinations;
 
+    SELECT message_id, message_timestamp INTO msg_id, msg_timestamp
+    FROM tron.intent_queue
+    WHERE queue_idx = queue_index;
+
+    IF msg_id IS NOT NULL THEN
+        UPDATE public.origin_intents
+        SET message_id = msg_id,
+            status = 'DISPATCHED'
+        WHERE id = origin_intent_id;
+
+        UPDATE public.messages
+        SET intent_ids = array_append(intent_ids, origin_intent_id)
+        WHERE id = msg_id
+          AND NOT (origin_intent_id = ANY(intent_ids));
+    END IF;
+
     SELECT * INTO queue_rec
     FROM public.queues
     WHERE id = queue_id;
@@ -685,10 +771,28 @@ BEGIN
             'INTENT'
         );
     ELSE
-        UPDATE public.queues
-        SET size = queue_rec.size + 1,
-            last = queue_index
-        WHERE id = queue_id;
+        IF msg_id IS NULL THEN
+            first_idx := LEAST(queue_rec.first, queue_index);
+            last_idx := GREATEST(queue_rec.last, queue_index);
+            queue_size := 1 + last_idx - first_idx;
+
+            UPDATE public.queues
+            SET size = queue_size,
+                first = first_idx,
+                last = last_idx
+            WHERE id = queue_id;
+        ELSE
+            first_idx := GREATEST(queue_rec.first, queue_index + 1);
+            last_idx := GREATEST(queue_rec.last, queue_index);
+            queue_size := 1 + last_idx - first_idx;
+
+            UPDATE public.queues
+            SET size = queue_size,
+                first = first_idx,
+                last = last_idx,
+                last_processed = GREATEST(queue_rec.last_processed, msg_timestamp)
+            WHERE id = queue_id;
+        END IF;
     END IF;
 
     INSERT INTO tron.intent_queue(queue_idx, intent_id)
@@ -3428,7 +3532,9 @@ CREATE TABLE tokenomics.withdraw_eth (
 
 CREATE TABLE tron.fill_queue (
     queue_idx bigint NOT NULL,
-    intent_id text NOT NULL
+    intent_id text,
+    message_id text,
+    message_timestamp bigint
 );
 
 
@@ -3438,7 +3544,9 @@ CREATE TABLE tron.fill_queue (
 
 CREATE TABLE tron.intent_queue (
     queue_idx bigint NOT NULL,
-    intent_id text NOT NULL
+    intent_id text,
+    message_id text,
+    message_timestamp bigint
 );
 
 
@@ -4525,4 +4633,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250708181540'),
     ('20250708185702'),
     ('20250708190952'),
-    ('20250717210433');
+    ('20250717210433'),
+    ('20250726140256');
