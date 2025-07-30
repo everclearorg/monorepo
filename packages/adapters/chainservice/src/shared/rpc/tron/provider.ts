@@ -689,25 +689,92 @@ export class TronSyncProvider extends SyncProvider {
         throw error;
       }
       
-      console.log('TRON ENERGY ESTIMATION: API estimation failed, using fallback', {
+      console.log('TRON ENERGY ESTIMATION: estimateEnergy failed, trying triggerConstantContract fallback', {
         error: error instanceof Error ? error.message : 'Unknown error',
         funcSig: tx.funcSig,
       });
       
-      // Enhanced fallback values based on actual Tron network requirements
-      // These values are derived from successful transactions and TronScan analysis
-      if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
-        console.log('TRON ENERGY ESTIMATION: Using high fallback for processIntentQueueViaRelayer');
-        return '10000000'; // 10M energy for complex relayer functions (increased from 150k)
-      } else if (tx.funcSig && tx.funcSig.includes('processFillQueueViaRelayer')) {
-        console.log('TRON ENERGY ESTIMATION: Using high fallback for processFillQueueViaRelayer');
-        return '10000000'; // 10M energy for complex relayer functions
-      } else if (tx.funcSig && tx.funcSig.includes('transfer')) {
-        console.log('TRON ENERGY ESTIMATION: Using standard fallback for transfer');
-        return '50000'; // 50k energy for simple transfers
-      } else {
-        console.log('TRON ENERGY ESTIMATION: Using default fallback');
-        return '1000000'; // 1M energy default for other contract calls
+      try {
+        // Try triggerConstantContract as fallback to get energy usage from simulation
+        console.log('TRON ENERGY ESTIMATION: Using triggerConstantContract fallback');
+        
+        const decodedParams = decodeSimpleParameters(tx.data, tx.funcSig, writeTx?.value);
+        let contractAddress = tx.to;
+        
+        // Convert contract address from hex to TRON base58 if needed
+        if (tx.to.startsWith('0x')) {
+          contractAddress = this.tronWeb.address.fromHex(tx.to);
+        }
+        
+        let constantResult;
+        if (decodedParams.length > 0) {
+          // Use decoded parameters for simple types
+          constantResult = await this.tronWeb.transactionBuilder.triggerConstantContract(
+            contractAddress,
+            tx.funcSig,
+            {
+              callValue: Number.parseInt(writeTx?.value || '0'),
+            },
+            decodedParams,
+            fromAddress,
+          );
+        } else {
+          // For complex types, use rawParameter
+          const rawParameter = tx.data.startsWith('0x') ? tx.data.slice(2) : tx.data;
+          const paramData = rawParameter.length > 8 ? rawParameter.slice(8) : rawParameter;
+          
+          constantResult = await this.tronWeb.transactionBuilder.triggerConstantContract(
+            contractAddress,
+            tx.funcSig,
+            {
+              callValue: Number.parseInt(writeTx?.value || '0'),
+              rawParameter: paramData,
+            },
+            [],
+            fromAddress,
+          );
+        }
+        
+        if (constantResult.result && constantResult.result.result && constantResult.energy_used) {
+          console.log('TRON ENERGY ESTIMATION: triggerConstantContract success', {
+            energyUsed: constantResult.energy_used,
+          });
+          
+          // Apply safety multiplier for complex contract calls
+          let finalEstimate = constantResult.energy_used;
+          if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
+            finalEstimate = constantResult.energy_used * 100;
+            console.log('TRON ENERGY ESTIMATION: Applied 100x safety multiplier for processIntentQueueViaRelayer', {
+              original: constantResult.energy_used,
+              multiplied: finalEstimate,
+            });
+          }
+          
+          return finalEstimate.toString();
+        } else {
+          throw new Error('triggerConstantContract failed or returned no energy_used');
+        }
+      } catch (constantError) {
+        console.log('TRON ENERGY ESTIMATION: triggerConstantContract fallback also failed, using empirical constants', {
+          constantError: constantError instanceof Error ? constantError.message : 'Unknown error',
+          funcSig: tx.funcSig,
+        });
+        
+        // Enhanced fallback values based on actual Tron network requirements
+        // These values are derived from successful transactions and TronScan analysis
+        if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
+          console.log('TRON ENERGY ESTIMATION: Using high empirical fallback for processIntentQueueViaRelayer');
+          return '10000000'; // 10M energy for complex relayer functions (increased from 150k)
+        } else if (tx.funcSig && tx.funcSig.includes('processFillQueueViaRelayer')) {
+          console.log('TRON ENERGY ESTIMATION: Using high empirical fallback for processFillQueueViaRelayer');
+          return '10000000'; // 10M energy for complex relayer functions
+        } else if (tx.funcSig && tx.funcSig.includes('transfer')) {
+          console.log('TRON ENERGY ESTIMATION: Using standard empirical fallback for transfer');
+          return '50000'; // 50k energy for simple transfers
+        } else {
+          console.log('TRON ENERGY ESTIMATION: Using default empirical fallback');
+          return '1000000'; // 1M energy default for other contract calls
+        }
       }
     }
   }
