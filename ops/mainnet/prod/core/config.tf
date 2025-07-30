@@ -20,6 +20,7 @@ locals {
     { name = "STAGE", value = var.stage },
     { name = "DD_PROFILING_ENABLED", value = "true" },
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
+    { name = "TRON_PRIVATE_KEY", value = var.relayer_web3_signer_private_key },
   ]
   relayer_web3signer_env_vars = [
     { name = "WEB3_SIGNER_PRIVATE_KEY", value = var.relayer_web3_signer_private_key },
