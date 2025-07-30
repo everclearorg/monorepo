@@ -175,7 +175,7 @@ export class RpcProviderAggregator {
       });
 
       // For Tron, bypass the leadProvider.connect() method and use getSigner() directly
-      const tronSigner = this.leadProvider!.getSigner(this.signer!);
+      const tronSigner = await this.leadProvider!.getSigner(this.signer!);
 
       const toSend = {
         ...transaction.params,
