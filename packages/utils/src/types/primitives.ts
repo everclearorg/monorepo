@@ -44,9 +44,17 @@ export const TAssetConfig = Type.Object({
 });
 export type AssetConfig = Static<typeof TAssetConfig>;
 
+export const TMessageGasLimitConfig = Type.Object({
+  base: Type.Number(),
+  extraIntent: Type.Number(),
+});
+
+export type MessageGasLimitConfig = Static<typeof TMessageGasLimitConfig>;
+
 export const TChainConfig = Type.Object({
   providers: Type.Array(Type.String()),
   gasLimit: Type.Optional(Type.Number()), // defaults to 30M (evm standard)
+  messageGasLimit: Type.Optional(TMessageGasLimitConfig),
   subgraphUrls: Type.Array(Type.String()),
   confirmations: Type.Optional(Type.Number()),
   deployments: Type.Optional(
