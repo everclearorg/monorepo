@@ -49,6 +49,7 @@
     "chai-subset": "1.6.0",
     "hyperid": "3.2.0",
     "secp256k1": "4.0.3",
-    "sinon-chai": "3.7.0"
+    "sinon-chai": "3.7.0",
+    "tronweb": "^6.0.3"
   }
 }
