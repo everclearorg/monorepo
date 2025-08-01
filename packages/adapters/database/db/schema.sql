@@ -24,6 +24,13 @@ COMMENT ON EXTENSION pg_cron IS 'Job scheduler for PostgreSQL';
 
 
 --
+-- Name: crypto; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA crypto;
+
+
+--
 -- Name: public; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -49,6 +56,20 @@ CREATE SCHEMA tokenomics;
 --
 
 CREATE SCHEMA tron;
+
+
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA crypto;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 --
@@ -153,17 +174,17 @@ DECLARE
     msg_timestamp BIGINT;
 BEGIN
     destination_intent_id := SUBSTRING(rec.topics, 68, 66);
-    solver := SUBSTRING(rec.topics, 135, 66);
+    solver := get_tron_address(SUBSTRING(rec.topics, 135, 66));
 
     totalFeeDBPS := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
     queue_index := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
-    initiator := '0x' || SUBSTRING(rec.data, pos, 64);
+    initiator := get_tron_address(SUBSTRING(rec.data, pos, 64));
     pos := pos + 64;
     receiver := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
-    input_asset := '0x' || SUBSTRING(rec.data, pos, 64);
+    input_asset := get_tron_address(SUBSTRING(rec.data, pos, 64));
     pos := pos + 64;
     output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
@@ -232,7 +253,7 @@ BEGIN
         '728126428',
         nonce,
         data,
-        rec.transaction_hash,
+        SUBSTRING(rec.transaction_hash FROM 3),
         timestamp,
         rec.block_number,
         initiator,
@@ -415,7 +436,7 @@ BEGIN
         last_idx,
         intent_ids,
         '0x0000000000000000000000000000000000000000', -- Default tx_origin for gateway events
-        rec.transaction_hash,
+        SUBSTRING(rec.transaction_hash FROM 3),
         rec.block_timestamp,
         rec.block_number,
         0,
@@ -541,7 +562,7 @@ BEGIN
         last_idx,
         intent_ids,
         '0x0000000000000000000000000000000000000000', -- Default tx_origin for gateway events
-        rec.transaction_hash,
+        SUBSTRING(rec.transaction_hash FROM 3),
         rec.block_timestamp,
         rec.block_number,
         0,
@@ -594,6 +615,114 @@ END;$$;
 
 
 --
+-- Name: add_new_tron_intent_with_fees(record); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.add_new_tron_intent_with_fees(rec record) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    intent_id TEXT;
+    initiator TEXT;
+    fee_token NUMERIC;
+    fee_native NUMERIC;
+    origin_intent RECORD;
+    pos INT := 3;
+BEGIN
+    intent_id := SUBSTRING(rec.topics, 68, 66);
+    initiator := get_tron_address(SUBSTRING(rec.topics, 135, 66));
+
+    fee_token := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
+    pos := pos + 64;
+    fee_native := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
+
+    SELECT * INTO origin_intent
+    FROM public.origin_intents
+    WHERE id = intent_id;
+
+    IF FOUND THEN
+        UPDATE public.origin_intents
+        SET
+            native_fee = fee_native,
+            token_fee = fee_token,
+            tx_origin = initiator,
+            fee_adapter_initiator = initiator
+        WHERE
+            id = intent_id;
+    ELSE
+        INSERT INTO tron.origin_intents(
+            id,
+            native_fee,
+            token_fee,
+            fee_adapter_initiator
+        )
+        VALUES (
+            intent_id,
+            fee_native,
+            fee_token,
+            initiator
+        )
+        ON CONFLICT (id)
+        DO UPDATE SET
+            native_fee = EXCLUDED.native_fee,
+            token_fee = EXCLUDED.token_fee,
+            fee_adapter_initiator = EXCLUDED.fee_adapter_initiator;
+    END IF;
+
+    RETURN TRUE;
+END;$$;
+
+
+--
+-- Name: add_new_tron_order(record); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.add_new_tron_order(rec record) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    origin_order_id TEXT;
+    intent_id TEXT;
+    initiator TEXT;
+    intent_count INT;
+    origin_intent RECORD;
+    pos INT := 195;
+BEGIN
+    origin_order_id := SUBSTRING(rec.topics, 68, 66);
+    initiator := get_tron_address(SUBSTRING(rec.topics, 135, 66));
+
+    intent_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
+    FOR i IN 1..intent_count LOOP
+        pos := pos + 64;
+        intent_id := '0x' || SUBSTRING(rec.data, pos, 64);
+
+        SELECT * INTO origin_intent
+        FROM public.origin_intents
+        WHERE id = intent_id;
+
+        IF FOUND THEN
+            UPDATE public.origin_intents
+            SET
+                order_id = origin_order_id
+            WHERE
+                id = intent_id;
+        ELSE
+            INSERT INTO tron.origin_intents(
+                id,
+                order_id
+            )
+            VALUES (
+                intent_id,
+                origin_order_id
+            );
+        END IF;
+    END LOOP;
+
+    RETURN TRUE;
+END;$$;
+
+
+--
 -- Name: add_new_tron_origin_intent(record); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -626,16 +755,20 @@ DECLARE
     first_idx NUMERIC;
     last_idx NUMERIC;
     queue_size NUMERIC;
+    fee_native TEXT;
+    fee_token TEXT;
+    origin_intent_initiator TEXT;
+    origin_order_id TEXT;
 BEGIN
     origin_intent_id := SUBSTRING(rec.topics, 68, 66);
 
     queue_index := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
-    initiator := '0x' || SUBSTRING(rec.data, pos, 64);
+    initiator := get_tron_address(SUBSTRING(rec.data, pos, 64));
     pos := pos + 64;
     receiver := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
-    input_asset := '0x' || SUBSTRING(rec.data, pos, 64);
+    input_asset := get_tron_address(SUBSTRING(rec.data, pos, 64));
     pos := pos + 64;
     output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
@@ -664,6 +797,11 @@ BEGIN
     pos := pos + 64;
     data := '0x' || SUBSTRING(rec.data, pos, data_length);
 
+    SELECT native_fee, token_fee, fee_adapter_initiator, order_id
+    INTO fee_native, fee_token, origin_intent_initiator, origin_order_id
+    FROM tron.origin_intents
+    WHERE id = origin_intent_id;
+
     INSERT INTO public.origin_intents(
         id,
         queue_idx,
@@ -685,7 +823,11 @@ BEGIN
         status,
         initiator,
         ttl,
-        destinations
+        destinations,
+        native_fee,
+        token_fee,
+        fee_adapter_initiator,
+        order_id
     )
     VALUES (
         origin_intent_id,
@@ -698,17 +840,21 @@ BEGIN
         origin,
         nonce,
         data,
-        rec.transaction_hash,
+        SUBSTRING(rec.transaction_hash FROM 3),
         timestamp,
         rec.block_number,
-        initiator,
+        COALESCE(origin_intent_initiator, initiator),
         0,
         0,
         1,
         'ADDED',
         initiator,
         ttl,
-        destinations
+        destinations,
+        fee_native,
+        fee_token,
+        origin_intent_initiator,
+        origin_order_id
     )
     ON CONFLICT (id)
     DO UPDATE SET
@@ -731,7 +877,11 @@ BEGIN
         status = EXCLUDED.status,
         initiator = EXCLUDED.initiator,
         ttl = EXCLUDED.ttl,
-        destinations = EXCLUDED.destinations;
+        destinations = EXCLUDED.destinations,
+        native_fee = EXCLUDED.native_fee,
+        token_fee = EXCLUDED.token_fee,
+        fee_adapter_initiator = EXCLUDED.fee_adapter_initiator,
+        order_id = EXCLUDED.order_id;
 
     SELECT message_id, message_timestamp INTO msg_id, msg_timestamp
     FROM tron.intent_queue
@@ -820,9 +970,9 @@ DECLARE
 BEGIN
     intent_id := SUBSTRING(rec.topics, 68, 66);
 
-    recipient := '0x' || SUBSTRING(rec.data, pos, 64);
+    recipient := get_tron_address(SUBSTRING(rec.data, pos, 64));
     pos := pos + 64;
-    asset := '0x' || SUBSTRING(rec.data, pos, 64);
+    asset := get_tron_address(SUBSTRING(rec.data, pos, 64));
     pos := pos + 64;
     amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
 
@@ -847,7 +997,7 @@ BEGIN
         asset,
         recipient,
         '728126428',
-        rec.transaction_hash,
+        SUBSTRING(rec.transaction_hash FROM 3),
         rec.block_timestamp,
         rec.block_number,
         recipient,
@@ -906,6 +1056,69 @@ END;$$;
 
 
 --
+-- Name: base58_encode(bytea); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.base58_encode(input_bytes bytea) RETURNS text
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    alphabet TEXT := '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    base INT := 58;
+    digits INT[] := ARRAY[0];
+    carry INT;
+    i INT;
+    j INT;
+    digit INT;
+    result TEXT := '';
+BEGIN
+    IF input_bytes IS NULL OR length(input_bytes) = 0 THEN
+        RETURN '';
+    END IF;
+
+    FOR i IN 1..length(input_bytes) LOOP
+        -- Shift all digits left by 8 bits
+        FOR j IN 1..array_length(digits, 1) LOOP
+            digits[j] := digits[j] << 8;
+        END LOOP;
+
+        -- Add current byte
+        digits[1] := digits[1] + get_byte(input_bytes, i-1);
+
+        -- Handle carries
+        carry := 0;
+        FOR j IN 1..array_length(digits, 1) LOOP
+            digits[j] := digits[j] + carry;
+            carry := digits[j] / base;
+            digits[j] := digits[j] % base;
+        END LOOP;
+
+        -- Add new digits if carry remains
+        WHILE carry > 0 LOOP
+            digits := array_append(digits, carry % base);
+            carry := carry / base;
+        END LOOP;
+    END LOOP;
+
+    -- Add leading zeros for each leading zero byte
+    FOR i IN 1..length(input_bytes) LOOP
+        IF get_byte(input_bytes, i - 1) = 0 AND i < length(input_bytes) THEN
+            digits := array_append(digits, 0);
+        ELSE
+            EXIT;
+        END IF;
+    END LOOP;
+
+    -- Convert digits to base58 string
+    FOR i IN REVERSE array_length(digits, 1)..1 LOOP
+        result := result || substr(alphabet, digits[i] + 1, 1);
+    END LOOP;
+
+    RETURN result;
+END;$$;
+
+
+--
 -- Name: genstatus(public.intent_status, public.intent_status, public.intent_status, boolean); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -941,6 +1154,42 @@ BEGIN
     END IF;
 END;
 $$;
+
+
+--
+-- Name: get_tron_address(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_tron_address(evm_address text) RETURNS text
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    address_with_prefix TEXT;
+    address_bytes BYTEA;
+    hash0 BYTEA;
+    hash1 BYTEA;
+    checksum BYTEA;
+    final_bytes BYTEA;
+BEGIN
+    -- Trim to 20-bytes hex string without '0x' prefix and add TRON address prefix
+    address_with_prefix := '41' || lpad(regexp_replace(evm_address, '^0x?0*', ''), 40, '0');
+
+    -- Convert to bytes
+    address_bytes := decode(address_with_prefix, 'hex');
+
+    -- Apply SHA256 twice for checksum
+    hash0 := crypto.digest(address_bytes, 'sha256');
+    hash1 := crypto.digest(hash0, 'sha256');
+
+    -- Take first 4 bytes as checksum
+    checksum := substring(hash1 FROM 1 FOR 4);
+
+    -- Concatenate address bytes with checksum
+    final_bytes := address_bytes || checksum;
+
+    -- Encode to Base58
+    RETURN base58_encode(final_bytes);
+END$$;
 
 
 --
@@ -1496,6 +1745,18 @@ BEGIN
         res := add_new_tron_fill_message(NEW);
         IF res IS FALSE THEN
             RAISE WARNING 'Failed to parse and insert new tron fill message, transaction %', NEW.transaction_hash;
+        END IF;
+    -- IntentWithFeesAdded event
+    ELSIF NEW.topics LIKE '0x4cc03dfa265ccd4670a5059498b2551525947958b26b5e70f6a6dc62a950fd4e%' THEN
+        res := add_new_tron_intent_with_fees(NEW);
+        IF res IS FALSE THEN
+            RAISE WARNING 'Failed to parse and insert new tron intent with fees, transaction %', NEW.transaction_hash;
+        END IF;
+    -- OrderCreated event
+    ELSIF NEW.topics LIKE '0xc5929cfdbbc98a41855839bee1396d17ee4a149e40d5c324b6f4332655f5cffd%' THEN
+        res := add_new_tron_order(NEW);
+        IF res IS FALSE THEN
+            RAISE WARNING 'Failed to parse and insert new tron order, transaction %', NEW.transaction_hash;
         END IF;
     END IF;
 
@@ -3551,6 +3812,19 @@ CREATE TABLE tron.intent_queue (
 
 
 --
+-- Name: origin_intents; Type: TABLE; Schema: tron; Owner: -
+--
+
+CREATE TABLE tron.origin_intents (
+    id text NOT NULL,
+    native_fee text,
+    token_fee text,
+    fee_adapter_initiator text,
+    order_id text
+);
+
+
+--
 -- Name: tron_spoke_raw_logs; Type: TABLE; Schema: tron; Owner: -
 --
 
@@ -4186,6 +4460,14 @@ ALTER TABLE ONLY tokenomics.withdraw
 
 
 --
+-- Name: origin_intents origin_intents_pkey; Type: CONSTRAINT; Schema: tron; Owner: -
+--
+
+ALTER TABLE ONLY tron.origin_intents
+    ADD CONSTRAINT origin_intents_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: fill_queue tron_fill_queue_pkey; Type: CONSTRAINT; Schema: tron; Owner: -
 --
 
@@ -4634,4 +4916,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250708185702'),
     ('20250708190952'),
     ('20250717210433'),
-    ('20250726140256');
+    ('20250726140256'),
+    ('20250731212912');
