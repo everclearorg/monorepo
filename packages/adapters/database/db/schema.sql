@@ -703,17 +703,20 @@ BEGIN
         IF FOUND THEN
             UPDATE public.origin_intents
             SET
-                order_id = origin_order_id
+                order_id = origin_order_id,
+                tx_origin = initiator
             WHERE
                 id = intent_id;
         ELSE
             INSERT INTO tron.origin_intents(
                 id,
-                order_id
+                order_id,
+                order_initiator
             )
             VALUES (
                 intent_id,
-                origin_order_id
+                origin_order_id,
+                initiator
             );
         END IF;
     END LOOP;
@@ -759,6 +762,7 @@ DECLARE
     fee_token TEXT;
     origin_intent_initiator TEXT;
     origin_order_id TEXT;
+    origin_order_initiator TEXT;
 BEGIN
     origin_intent_id := SUBSTRING(rec.topics, 68, 66);
 
@@ -797,8 +801,8 @@ BEGIN
     pos := pos + 64;
     data := '0x' || SUBSTRING(rec.data, pos, data_length);
 
-    SELECT native_fee, token_fee, fee_adapter_initiator, order_id
-    INTO fee_native, fee_token, origin_intent_initiator, origin_order_id
+    SELECT native_fee, token_fee, fee_adapter_initiator, order_id, order_initiator
+    INTO fee_native, fee_token, origin_intent_initiator, origin_order_id, origin_order_initiator
     FROM tron.origin_intents
     WHERE id = origin_intent_id;
 
@@ -843,7 +847,7 @@ BEGIN
         SUBSTRING(rec.transaction_hash FROM 3),
         timestamp,
         rec.block_number,
-        COALESCE(origin_intent_initiator, initiator),
+        COALESCE(origin_intent_initiator, origin_order_initiator, initiator),
         0,
         0,
         1,
@@ -3820,7 +3824,8 @@ CREATE TABLE tron.origin_intents (
     native_fee text,
     token_fee text,
     fee_adapter_initiator text,
-    order_id text
+    order_id text,
+    order_initiator text
 );
 
 
@@ -4917,4 +4922,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250708190952'),
     ('20250717210433'),
     ('20250726140256'),
-    ('20250731212912');
+    ('20250731212912'),
+    ('20250801041441');
