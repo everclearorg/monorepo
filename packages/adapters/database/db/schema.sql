@@ -149,7 +149,7 @@ DECLARE
     solver TEXT;
     totalFeeDBPS NUMERIC;
     queue_index NUMERIC;
-    initiator TEXT;
+    tx_initiator TEXT;
     receiver TEXT;
     input_asset TEXT;
     output_asset TEXT;
@@ -180,7 +180,7 @@ BEGIN
     pos := pos + 64;
     queue_index := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
-    initiator := get_tron_address(SUBSTRING(rec.data, pos, 64));
+    tx_initiator := get_tron_address(SUBSTRING(rec.data, pos, 64));
     pos := pos + 64;
     receiver := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
@@ -242,7 +242,7 @@ BEGIN
     VALUES (
         destination_intent_id,
         queue_index,
-        initiator,
+        tx_initiator,
         receiver,
         solver,
         input_asset,
@@ -256,7 +256,7 @@ BEGIN
         SUBSTRING(rec.transaction_hash FROM 3),
         timestamp,
         rec.block_number,
-        initiator,
+        tx_initiator,
         0,
         max_fee,
         0,
@@ -623,14 +623,14 @@ CREATE FUNCTION public.add_new_tron_intent_with_fees(rec record) RETURNS boolean
     AS $$
 DECLARE
     intent_id TEXT;
-    initiator TEXT;
+    tx_initiator TEXT;
     fee_token NUMERIC;
     fee_native NUMERIC;
     origin_intent RECORD;
     pos INT := 3;
 BEGIN
     intent_id := SUBSTRING(rec.topics, 68, 66);
-    initiator := get_tron_address(SUBSTRING(rec.topics, 135, 66));
+    tx_initiator := get_tron_address(SUBSTRING(rec.topics, 135, 66));
 
     fee_token := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
     pos := pos + 64;
@@ -645,8 +645,8 @@ BEGIN
         SET
             native_fee = fee_native,
             token_fee = fee_token,
-            tx_origin = initiator,
-            fee_adapter_initiator = initiator
+            tx_origin = tx_initiator,
+            fee_adapter_initiator = tx_initiator
         WHERE
             id = intent_id;
     ELSE
@@ -660,7 +660,7 @@ BEGIN
             intent_id,
             fee_native,
             fee_token,
-            initiator
+            tx_initiator
         )
         ON CONFLICT (id)
         DO UPDATE SET
@@ -683,13 +683,13 @@ CREATE FUNCTION public.add_new_tron_order(rec record) RETURNS boolean
 DECLARE
     origin_order_id TEXT;
     intent_id TEXT;
-    initiator TEXT;
+    tx_initiator TEXT;
     intent_count INT;
     origin_intent RECORD;
     pos INT := 195;
 BEGIN
     origin_order_id := SUBSTRING(rec.topics, 68, 66);
-    initiator := get_tron_address(SUBSTRING(rec.topics, 135, 66));
+    tx_initiator := get_tron_address(SUBSTRING(rec.topics, 135, 66));
 
     intent_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
     FOR i IN 1..intent_count LOOP
@@ -704,7 +704,7 @@ BEGIN
             UPDATE public.origin_intents
             SET
                 order_id = origin_order_id,
-                tx_origin = initiator
+                tx_origin = tx_initiator
             WHERE
                 id = intent_id;
         ELSE
@@ -716,7 +716,7 @@ BEGIN
             VALUES (
                 intent_id,
                 origin_order_id,
-                initiator
+                tx_initiator
             );
         END IF;
     END LOOP;
@@ -735,7 +735,7 @@ CREATE FUNCTION public.add_new_tron_origin_intent(rec record) RETURNS boolean
 DECLARE
     origin_intent_id TEXT;
     queue_index NUMERIC;
-    initiator TEXT;
+    tx_initiator TEXT;
     receiver TEXT;
     input_asset TEXT;
     output_asset TEXT;
@@ -768,7 +768,7 @@ BEGIN
 
     queue_index := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
-    initiator := get_tron_address(SUBSTRING(rec.data, pos, 64));
+    tx_initiator := get_tron_address(SUBSTRING(rec.data, pos, 64));
     pos := pos + 64;
     receiver := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
@@ -847,12 +847,12 @@ BEGIN
         SUBSTRING(rec.transaction_hash FROM 3),
         timestamp,
         rec.block_number,
-        COALESCE(origin_intent_initiator, origin_order_initiator, initiator),
+        COALESCE(origin_intent_initiator, origin_order_initiator, tx_initiator),
         0,
         0,
         1,
         'ADDED',
-        initiator,
+        tx_initiator,
         ttl,
         destinations,
         fee_native,
@@ -4923,4 +4923,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250717210433'),
     ('20250726140256'),
     ('20250731212912'),
-    ('20250801041441');
+    ('20250801041441'),
+    ('20250801173912');
