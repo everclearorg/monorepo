@@ -528,6 +528,12 @@ locals {
           "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://ink.drpc.org"
         ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
+          "https://rpc.gnosis.gateway.fm"
+        ]
       }
     }
     betterUptime = {
