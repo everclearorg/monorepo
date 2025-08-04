@@ -179,6 +179,12 @@ locals {
           "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
           "https://rpc.gnosis.gateway.fm"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ],
+        network = "tron"
       }
     }
   })
