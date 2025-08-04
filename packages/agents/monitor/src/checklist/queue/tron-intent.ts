@@ -29,7 +29,7 @@ export const checkTronFillQueueCount = async (): Promise<Map<string, number>> =>
       const threshold = config.thresholds.maxExecutionQueueCount ?? 0;
       const report = {
         severity: Severity.Warning,
-        type: 'TronExecutionQueueCountExceeded',
+        type: 'TronExecutionQueueCountExceedsThreshold',
         ids: [domain],
         reason: `${requestContext.origin}, Tron execution queue count ${count} exceeds threshold ${config.thresholds.maxExecutionQueueCount} for domain ${domain}`,
         timestamp: Date.now(),
@@ -90,7 +90,7 @@ export const checkTronFillQueueLatency = async (): Promise<Map<string, number>> 
         const age = curTimestamp - latencyByDomain.get(domain)!;
         const report = {
           severity: Severity.Warning,
-          type: 'TronExecutionQueueLatencyExceeded',
+          type: 'TronExecutionQueueLatencyExceedsThreshold',
           ids: [domain],
           reason: `${requestContext.origin}, Tron pending queue latency ${age} exceeds threshold ${config.thresholds.maxExecutionQueueLatency} for domain ${domain}`,
           timestamp: Date.now(),
@@ -153,7 +153,7 @@ export const checkTronIntentQueueCount = async (): Promise<Map<string, number>> 
       const threshold = config.thresholds.maxIntentQueueCount ?? 0;
       const report = {
         severity: Severity.Warning,
-        type: 'TronIntentQueueCountExceeded',
+        type: 'TronIntentQueueCountExceedsThreshold',
         ids: [domain],
         reason: `${requestContext.origin}, Tron intent queue count ${count} exceeds threshold ${config.thresholds.maxIntentQueueCount} for domain ${domain}`,
         timestamp: Date.now(),
@@ -214,7 +214,7 @@ export const checkTronIntentQueueLatency = async (): Promise<Map<string, number>
         const age = curTimestamp - latencyByDomain.get(domain)!;
         const report = {
           severity: Severity.Warning,
-          type: 'TronIntentQueueLatencyExceeded',
+          type: 'TronIntentQueueLatencyExceedsThreshold',
           ids: [domain],
           reason: `${requestContext.origin}, Tron pending queue latency ${age.toString()} exceeds threshold ${config.thresholds.maxIntentQueueLatency} for domain ${domain}`,
           timestamp: Date.now(),

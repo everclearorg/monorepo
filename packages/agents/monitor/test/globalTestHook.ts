@@ -1,4 +1,6 @@
 import { reset, restore, createStubInstance, SinonStubbedInstance, stub, SinonStub } from 'sinon';
+import * as sinon from 'sinon';
+import { BigNumber } from 'ethers';
 import { AppContext } from '../src/context';
 import {
   DestinationIntent,
@@ -30,6 +32,9 @@ import { mockSubgraph as createMockSubgraph } from '@chimera-monorepo/adapters-s
 import { StoreManager } from '@chimera-monorepo/adapters-cache';
 import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
 import { createMockDatabase } from '@chimera-monorepo/database/test/mock';
+import * as AssetHelpers from '../src/helpers/asset';
+import * as IntentHelpers from '../src/helpers/intent';
+import * as HyperlaneHelpers from '../src/helpers/hyperlane';
 
 let mockChainReader: SinonStubbedInstance<ChainReader>;
 let mockLogger: SinonStubbedInstance<Logger>;
@@ -110,6 +115,45 @@ const MOCK_CHAINS = {
           'isStable': false,
           'priceFeed': '0x694AA1769357215DE4FAC081bf1f309aDC325306',
           'coingeckoId': 'ethereum',
+        },
+      },
+    },
+  },
+  // Tron mainnet mock chain
+  '728126428': {
+    providers: ['https://tron-rpc.publicnode.com', 'https://api.trongrid.io/jsonrpc'],
+    subgraphUrls: ['http://tron.mocksubgraph.com'],
+    deployments: {
+      everclear: 'TEverclearMockAddress1234567890123',
+      gateway: 'TGatewayMockAddress1234567890123',
+    },
+    confirmations: 3,
+    network: 'tvm',
+    minGasOnRelayer: 100, // 100 TRX
+    minGasOnGateway: 50,  // 50 TRX
+    assets: {
+      TRX: {
+        symbol: 'TRX',
+        address: '0x0000000000000000000000000000000000000000', // Native asset uses zero address
+        decimals: 6, // TRX has 6 decimals
+        isNative: true,
+        price: {
+          isStable: false,
+          priceFeed: '0x135deED16a0b31B0d3d8F87c2F16f2eC5F59b3b1', // Mock price feed
+          coingeckoId: 'tron',
+        },
+        tickerHash: "0xbbbbfcba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4",
+      },
+      USDT: {
+        symbol: 'USDT',
+        address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', // Tron USDT contract
+        decimals: 6,
+        isNative: false,
+        tickerHash: '0xccccfcba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4',
+        price: {
+          isStable: true,
+          priceFeed: '0x3f0CA9Ca8905b5Da218806706C1c69acc29aFd9',
+          coingeckoId: 'tether',
         },
       },
     },
@@ -424,7 +468,18 @@ export const mochaHooks = {
     // Create stubbed instance
     mockChainReader = createStubInstance(ChainReader, {
       readTx: stub<[ReadTransaction, number | string]>().resolves('0x'),
+      getBlockNumber: stub().resolves(100),
+      getBlock: stub().resolves({ number: 100, timestamp: Date.now(), hash: '0x123' }),
+      getBalance: stub().resolves(BigNumber.from('1000000000000000000')), // Default: 1 ETH in wei
     });
+    
+    // Add specific domain-based return values for getBalance (address, domain, tokenAddress)
+    mockChainReader.getBalance.withArgs(sinon.match.any, '728126428', sinon.match.any).resolves(BigNumber.from('1000000000')); // 1000 TRX (6 decimals)
+    mockChainReader.getBalance.withArgs(sinon.match.any, '1337', sinon.match.any).resolves(BigNumber.from('1000000000000000000')); // 1 ETH (18 decimals)
+    mockChainReader.getBalance.withArgs(sinon.match.any, '1338', sinon.match.any).resolves(BigNumber.from('1000000000000000000')); // 1 ETH (18 decimals)
+    
+    // Add fallback for any unmatched calls
+    mockChainReader.getBalance.callThrough().resolves(BigNumber.from('1000000000000000000'));
     mockLogger = createStubInstance(Logger);
     mockDatabase = createMockDatabase();
     mockSubgraph = createMockSubgraph();
@@ -438,6 +493,25 @@ export const mochaHooks = {
     mockLogger.info = stub(Logger.prototype, 'info').returns();
     mockLogger.warn = stub(Logger.prototype, 'warn').returns();
     mockLogger.error = stub(Logger.prototype, 'error').returns();
+
+    // Stub helper functions that are called by monitoring checks
+    stub(AssetHelpers, 'getCustodiedAssetsFromHubContract').resolves('1000000000000000000'); // 1 ETH
+    stub(AssetHelpers, 'getAssetFromContract').resolves({
+      tickerHash: '0xbbbbfcba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4',
+      symbol: 'ETH',
+      address: '0x0000000000000000000000000000000000000000',
+      decimals: 18,
+      isNative: true,
+    });
+    stub(AssetHelpers, 'getRegisteredAssetHashFromContract').resolves('0xaaa');
+    stub(IntentHelpers, 'getCurrentEpoch').resolves(1);
+    stub(IntentHelpers, 'getIntentContextFromContract').resolves({
+      nonce: 1,
+      inputAsset: '0x0000000000000000000000000000000000000000',
+      outputAsset: '0x0000000000000000000000000000000000000000',
+      maxFee: 100,
+    });
+    stub(HyperlaneHelpers, 'getMessageStatus').resolves({ status: 'delivered' });
 
     // Stub call to get context
     getContextStub = stub(AppContextFunctions, 'getContext').returns(mock.context());

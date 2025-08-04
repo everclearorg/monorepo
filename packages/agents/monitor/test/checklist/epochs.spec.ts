@@ -13,7 +13,7 @@ import * as Mockable from '../../src/mockable';
 
 describe('Checklist - epochs', () => {
   let database: SinonStubbedInstance<Database>;
-  let getCurrentEpochStub: SinonStub;
+  // getCurrentEpoch is globally stubbed
   let logger: SinonStubbedInstance<Logger>;
   let alertStub: SinonStub;
   let priceStub: SinonStub;
@@ -54,8 +54,8 @@ describe('Checklist - epochs', () => {
         )
       );
 
-      getCurrentEpochStub = stub(IntentHelpers, 'getCurrentEpoch');
-      getCurrentEpochStub.resolves(2_000);
+      // getCurrentEpoch is globally stubbed with value 1, override if needed
+      // Note: Global stub returns 1, tests may need to account for this
 
       alertStub = stub(Mockable, 'sendAlerts');
 

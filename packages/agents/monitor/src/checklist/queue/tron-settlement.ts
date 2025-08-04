@@ -28,6 +28,11 @@ export const checkTronSettlementQueueStatusCount = async (): Promise<Map<string,
   const queuedSettlements = await database.getAllQueuedSettlements(config.hub.domain);
   const statusCountByTicker = new Map<string, Map<string, number>>();
   
+  // Ensure queuedSettlements is a Map and handle empty case
+  if (!queuedSettlements || !(queuedSettlements instanceof Map) || queuedSettlements.size === 0) {
+    return statusCountByTicker;
+  }
+  
   await Promise.all(
     [...queuedSettlements].map(async (_record) => {
       const [settlementDomain, settlements] = _record;
@@ -88,6 +93,11 @@ export const checkTronSettlementQueueAmount = async (): Promise<Map<string, BigN
   // Get all of the queued settlements
   const queuedSettlements = await database.getAllQueuedSettlements(config.hub.domain);
   const amountByDomain = new Map<string, BigNumber>();
+
+  // Ensure queuedSettlements is a Map and handle empty case
+  if (!queuedSettlements || !(queuedSettlements instanceof Map) || queuedSettlements.size === 0) {
+    return amountByDomain;
+  }
 
   // Set up a map of decimals by ticker for Tron chains
   const decimalsByAsset = new Map<string, number>();
@@ -182,14 +192,15 @@ export const checkTronSettlementQueueLatency = async (): Promise<Map<string, num
   const curTimestamp = getNtpTimeSeconds();
   const latencyByTicker = new Map<string, number>();
 
-  if (queuedSettlements.size === 0) {
+  // Ensure queuedSettlements is a Map and handle empty case
+  if (!queuedSettlements || !(queuedSettlements instanceof Map) || queuedSettlements.size === 0) {
     // resolve all alerts. each alert has to include a settlement domain.
     // assume all registered Tron chains are valid settlement domains
     await Promise.all(
       tronDomains.map(async (settlementDomain) => {
         const report = {
           severity: Severity.Warning,
-          type: 'TronSettlementQueueLatencyExceeded',
+          type: 'TronSettlementQueueLatencyExceedsThreshold',
           ids: [settlementDomain],
           reason: `${requestContext.origin}, Tron settlement latency exceeds threshold ${config.thresholds.maxSettlementQueueLatency} for settlementDomain: ${settlementDomain}`,
           timestamp: Date.now(),
@@ -202,14 +213,16 @@ export const checkTronSettlementQueueLatency = async (): Promise<Map<string, num
     return latencyByTicker;
   }
 
+  // Filter for Tron domains from the queued settlements
+  const tronSettlements = [...queuedSettlements].filter(([domain]) => tronDomains.includes(domain));
+
+  if (tronSettlements.length === 0) {
+    return latencyByTicker;
+  }
+
   await Promise.all(
-    [...queuedSettlements].map(async (_record) => {
+    tronSettlements.map(async (_record) => {
       const [settlementDomain, settlements] = _record;
-      
-      // Only process if it's a Tron domain
-      if (!tronDomains.includes(settlementDomain)) {
-        return;
-      }
       
       settlements.forEach((settlement) => {
         // Identify latency by tickerhash
@@ -224,7 +237,7 @@ export const checkTronSettlementQueueLatency = async (): Promise<Map<string, num
 
       const report = {
         severity: Severity.Warning,
-        type: 'TronSettlementQueueLatencyExceeded',
+        type: 'TronSettlementQueueLatencyExceedsThreshold',
         ids: [settlementDomain],
         reason: `${requestContext.origin}, Tron settlement latency exceeds threshold ${config.thresholds.maxSettlementQueueLatency} for settlementDomain: ${settlementDomain}`,
         timestamp: Date.now(),

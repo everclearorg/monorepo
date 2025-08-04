@@ -56,7 +56,7 @@ export const checkTronDepositQueueCount = async (): Promise<Map<string, number>>
 
   const report = {
     severity: Severity.Warning,
-    type: 'TronDepositQueueCountExceeded',
+    type: 'TronDepositQueueCountExceedsThreshold',
     ids: aboveThreshold.map((it) => it.queueKey),
     reason: `Tron deposit queue counts exceed threshold (${threshold}). \nQueues: ${aboveThreshold.map((q) => `key: ${q.queueKey}, count: ${q.queueCount}`).join(`\n\t`)}`,
     timestamp: Date.now(),
@@ -119,7 +119,7 @@ export const checkTronDepositQueueLatency = async (): Promise<Map<string, number
           const key = `tron-${domain}-${tickerHash}`;
           const report = {
             severity: Severity.Warning,
-            type: 'TronDepositQueueLatencyExceeded',
+            type: 'TronDepositQueueLatencyExceedsThreshold',
             ids: [key],
             reason: `${requestContext.origin}, Tron pending queue latency exceeds threshold ${config.thresholds.maxDepositQueueLatency} for domain-tickerHash ${key}`,
             timestamp: Date.now(),
@@ -150,7 +150,7 @@ export const checkTronDepositQueueLatency = async (): Promise<Map<string, number
 
       const report = {
         severity: Severity.Warning,
-        type: 'TronDepositQueueLatencyExceeded',
+        type: 'TronDepositQueueLatencyExceedsThreshold',
         ids: [key],
         reason: `${requestContext.origin}, Tron pending queue latency exceeds threshold ${config.thresholds.maxDepositQueueLatency} for domain-tickerHash ${key}`,
         timestamp: Date.now(),

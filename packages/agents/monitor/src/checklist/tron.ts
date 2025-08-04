@@ -3,6 +3,7 @@ import { getContext } from '../context';
 import { Report, Severity, ChainStatusResponse, CheckGasResponse } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
 import { BigNumber, utils, constants } from 'ethers';
+import axios from 'axios';
 // Note: TronWeb integration is handled through the chainreader adapter
 
 /**
@@ -28,7 +29,7 @@ interface TronRpcError {
 
 const makeTronRpcReport = (e: TronRpcError, logger: Logger, env: string): Report => ({
   severity: Severity.Warning,
-  type: 'BadTronRpcDetected',
+  type: 'BadRpcDetected',
   ids: [e.domain, e.rpcOrigin],
   reason: `Bad Tron Rpcs:\n domain: ${e.domain}, url: ${e.rpcOrigin}, error: ${e.error}`,
   timestamp: Date.now(),
@@ -129,7 +130,7 @@ export const checkTronChains = async (shouldAlert = true): Promise<ChainStatusRe
 
     const report = {
       severity: Severity.Warning,
-      type: 'TronSubgraphDelayed',
+      type: 'SubgraphDelayed',
       ids: [domainId],
       reason: `${requestContext.origin}, The Tron subgraph of ${domainId} is behind by ${diff} blocks (threshold: ${threshold})`,
       timestamp: Date.now(),
@@ -246,7 +247,7 @@ export const checkTronGas = async (shouldAlert = true): Promise<CheckGasResponse
     const gatewayGasViolated = gatewayAddress && BigNumber.from(gatewayGas ?? '0').lt(gatewayThreshold);
     const gatewayReport = {
       severity: Severity.Warning,
-      type: 'LowTrxGateway',
+      type: 'LowGasGateway',
       ids: [domainId],
       reason: `${requestContext.origin}, The Tron gateway ${gatewayAddress} of ${domainId} has low TRX balance`,
       timestamp: Date.now(),
@@ -275,9 +276,8 @@ export const checkTronGas = async (shouldAlert = true): Promise<CheckGasResponse
  */
 async function fetchRelayerData(relayerUrl: string): Promise<string | undefined> {
   try {
-    const response = await fetch(`${relayerUrl}/address`);
-    const data = await response.text();
-    return data;
+    const response = await axios.get(`${relayerUrl}/address`);
+    return response.data;
   } catch (error) {
     console.error(`Error fetching address from ${relayerUrl}:`, error);
     return undefined;
