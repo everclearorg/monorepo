@@ -5506,6 +5506,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@solana/spl-token-group@npm:^0.0.7":
+  version: 0.0.7
+  resolution: "@solana/spl-token-group@npm:0.0.7"
+  dependencies:
+    "@solana/codecs": 2.0.0-rc.1
+  peerDependencies:
+    "@solana/web3.js": ^1.95.3
+  languageName: node
+  linkType: hard
+
 "@solana/spl-token-metadata@npm:^0.1.2, @solana/spl-token-metadata@npm:^0.1.4, @solana/spl-token-metadata@npm:^0.1.6":
   version: 0.1.6
   resolution: "@solana/spl-token-metadata@npm:0.1.6"
@@ -5514,16 +5524,6 @@ __metadata:
   peerDependencies:
     "@solana/web3.js": ^1.95.3
   checksum: a19d7d659c3fca375312e86cf4b0a2077327b220462b46a8627f0cc1892c97ce34cfbe9c3645620496d7b1177d56628b16a7357cd61314e079c1d9c73c944d98
-  languageName: node
-  linkType: hard
-
-"@solana/spl-token-group@npm:^0.0.7":
-  version: 0.0.7
-  resolution: "@solana/spl-token-group@npm:0.0.7"
-  dependencies:
-    "@solana/codecs": 2.0.0-rc.1
-  peerDependencies:
-    "@solana/web3.js": ^1.95.3
   languageName: node
   linkType: hard
 
