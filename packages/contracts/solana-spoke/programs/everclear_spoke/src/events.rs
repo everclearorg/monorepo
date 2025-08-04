@@ -105,3 +105,47 @@ pub struct VaultAuthorityBumpUpdatedEvent {
     pub old_bump: u8,
     pub new_bump: u8,
 }
+
+#[event]
+pub struct InitializedFeeAdapterEvent {
+    pub fee_recipient: Pubkey,
+    pub fee_signer: Pubkey,
+}
+
+#[event]
+pub struct FeeRecipientUpdatedEvent {
+    pub old_fee_recipient: Pubkey,
+    pub new_fee_recipient: Pubkey,
+}
+
+#[event]
+pub struct FeeSignerUpdatedEvent {
+    pub old_fee_signer: Pubkey,
+    pub new_fee_signer: Pubkey,
+}
+
+#[event]
+pub struct FeeAdapterPausedEvent {}
+
+#[event]
+pub struct FeeAdapterUnpausedEvent {}
+
+#[event]
+pub struct OrderCreated {
+    pub order_id: [u8; 32],
+    pub user: Pubkey,
+    pub intent_ids: Vec<[u8; 32]>,
+    pub fee: u64,
+    pub native_value: u64,
+}
+
+#[event]
+pub struct IntentWithFeesAddedEvent {
+    pub intent_id: [u8; 32],
+    pub initiator: Pubkey,
+    pub input_asset: Pubkey,
+    /// native amount in Solana
+    pub amount: u64,
+    /// native amount in Solana
+    pub fee: u64,
+}

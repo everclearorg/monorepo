@@ -57,6 +57,21 @@ impl SpokeState {
 }
 
 #[account]
+pub struct FeeAdapterState {
+    pub initialized: bool,
+    pub paused: bool,
+    pub fee_recipient: Pubkey,
+    pub fee_signer: Pubkey,
+    pub bump: u8,
+}
+
+impl FeeAdapterState {
+    pub const SIZE: usize = 2 // 2 bool
+        + 32 * 2 // 2 Pubkey
+        + 1; // u8
+}
+
+#[account]
 pub struct IntentStatusAccount {
     pub status: IntentStatus,
     pub accounts: Vec<SerializableAccountMeta>,

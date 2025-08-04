@@ -194,6 +194,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
       },
@@ -359,6 +360,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
       },
@@ -509,6 +511,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
       },
@@ -559,14 +562,14 @@ locals {
     }
     relayers = [
       {
-        type   = "Gelato",
-        apiKey = "${var.gelato_api_key}",
-        url    = "https://relay.gelato.digital"
-      },
-      {
         type   = "Everclear",
         apiKey = "${var.admin_token_relayer}",
         url    = "https://${module.relayer_server.service_endpoint}"
+      },
+      {
+        type   = "Gelato",
+        apiKey = "${var.gelato_api_key}",
+        url    = "https://relay.gelato.digital"
       }
     ]
     agents = {
@@ -611,14 +614,14 @@ locals {
     network = "mainnet"
     relayers = [
       {
-        type   = "Gelato",
-        apiKey = "${var.gelato_api_key}",
-        url    = "https://relay.gelato.digital"
-      },
-      {
         type   = "Everclear",
         apiKey = "${var.admin_token_relayer}",
         url    = "https://${module.relayer_server.service_endpoint}"
+      },
+      {
+        type   = "Gelato",
+        apiKey = "${var.gelato_api_key}",
+        url    = "https://relay.gelato.digital"
       }
     ]
     thresholds = {
@@ -755,6 +758,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
       },

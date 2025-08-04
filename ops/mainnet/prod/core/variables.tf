@@ -258,6 +258,12 @@ variable "coingecko_api_key" {
   default = "neverclear"
 }
 
+variable "quicknode_api_key" {
+  type      = string
+  sensitive = true
+  default = "neverclear"
+}
+
 variable "lighthouse_solana_heartbeat" {
   type      = string
   sensitive = true
