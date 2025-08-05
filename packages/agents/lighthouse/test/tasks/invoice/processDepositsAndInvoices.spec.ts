@@ -127,13 +127,10 @@ describe('#processDepositsAndInvoices', () => {
     decodeFunctionResult.onCall(0).returns({head: mkBytes32(), tail: mkBytes32(), length: 0, nodes: {}});
 
     // Mock iface.decodeFunctionResult('lastClosedEpochsProcessed', ...);
-    decodeFunctionResult.onCall(1).returns([[3]]);
+    decodeFunctionResult.onCall(1).returns([[24]]);
 
-    // Mock iface.decodeFunctionResult('lastClosedEpochsProcessed', ...);
+    // Mock iface.decodeFunctionResult('getCurrentEpoch', ...);
     decodeFunctionResult.onCall(2).returns([BigNumber.from(25)]);
-
-    // Mock chainservice.getBlockNumber
-    chainservice.getBlockNumber.resolves(100);
 
     await processDepositsAndInvoices();
 
