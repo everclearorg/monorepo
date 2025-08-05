@@ -91,10 +91,6 @@ const MOCK_CHAINS = {
     },
     assets: MOCK_ASSETS,
     gasLimit: 30_000_000,
-    messageGasLimit: {
-      base: 605_000,
-      extraIntent: 300_000,
-    },
   },
   '1338': {
     providers: ['http://localhost:8081'],
@@ -105,10 +101,6 @@ const MOCK_CHAINS = {
     },
     assets: MOCK_ASSETS,
     gasLimit: 30_000_000,
-    messageGasLimit: {
-      base: 0,
-      extraIntent: 0,
-    },
   },
 };
 
