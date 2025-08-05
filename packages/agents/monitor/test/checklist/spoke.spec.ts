@@ -25,9 +25,12 @@ describe('checkSpokeBalance', () => {
       ...process.env,
       ...createProcessEnv(),
     });
+    // Create config with all domains for spoke balance tests including Tron
+    const spokeTestConfig = { ...mock.config() };
+    
     getContextStub.returns({
       ...mock.context(),
-      config: { ...mock.config() },
+      config: spokeTestConfig,
     });
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     chainreader = mock.instances.chainreader() as SinonStubbedInstance<ChainReader>;
@@ -41,20 +44,23 @@ describe('checkSpokeBalance', () => {
     getRegisteredAssetHashFromContractStub = stub(asset, 'getRegisteredAssetHashFromContract');
     getRegisteredAssetHashFromContractStub.callsFake((tickerHash: string, domain: string) => (`${domain}/${tickerHash}`));
     custodiedAssets = {
-      // ETH
+      // ETH - EVM chains only
       '1337/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '1',
       '1338/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '1',
-      // WETH
+      // WETH - EVM chains only
       '1337/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '1',
       '1338/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '1',
     };
     getCustodiedAssetsFromHubContractStub = stub(asset, 'getCustodiedAssetsFromHubContract');
-    getCustodiedAssetsFromHubContractStub.callsFake(async (assetHash) => custodiedAssets[assetHash]);
+    getCustodiedAssetsFromHubContractStub.callsFake(async (assetHash) => {
+      // Return '0' for unknown asset hashes to prevent unexpected custodied amounts
+      return custodiedAssets[assetHash] || '0';
+    });
     spokeBalances = {
-      '1337/0': '10',
-      '1338/0': '10',
-      '1337/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '10',
-      '1338/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '10',
+      '1337/0': '10', // ETH native
+      '1338/0': '10', // ETH native
+      '1337/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '10', // WETH
+      '1338/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '10', // WETH
     };
     chainreader.getBalance.callsFake(async (domainId, _spokeAddress, assetId) => spokeBalances[`${domainId}/${assetId ?? 0}`])
   });
@@ -68,7 +74,7 @@ describe('checkSpokeBalance', () => {
     it('should not alert if spoke balance is normal', async () => {
       await checkSpokeBalance();
       expect(sendAlertsStub.callCount).to.be.eq(0);
-      expect(resolveAlertsStub.callCount).to.be.eq(2);
+      expect(resolveAlertsStub.callCount).to.be.eq(2); // 2 assets: ETH, WETH (only EVM chains processed)
 
       custodiedAssets = {
         '1337/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '10',
@@ -84,57 +90,58 @@ describe('checkSpokeBalance', () => {
       };
       await checkSpokeBalance();
       expect(sendAlertsStub.callCount).to.be.eq(0);
-      expect(resolveAlertsStub.callCount).to.be.eq(4);
+      expect(resolveAlertsStub.callCount).to.be.eq(4); // 4 total = 2 initial + 2 second test
     });
     it('should not alert if there is no spoke balance and custodied', async () => {
       custodiedAssets = {
-        '1337/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '0',
-        '1338/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '0',
-        '1337/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0',
-        '1338/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0',
+        '1337/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '0', // ETH
+        '1338/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '0', // ETH
+        '1337/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0', // WETH
+        '1338/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0', // WETH
       };
       spokeBalances = {
-        '1337/0': '0',
-        '1338/0': '0',
-        '1337/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0',
-        '1338/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0',
+        '1337/0': '0', // ETH native
+        '1338/0': '0', // ETH native  
+        '1337/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0', // WETH
+        '1338/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0', // WETH
       };
       await checkSpokeBalance();
-      expect(sendAlertsStub.callCount).to.be.eq(0);
-      expect(resolveAlertsStub.callCount).to.be.eq(2);
+      expect(sendAlertsStub.callCount).to.be.eq(0); // No alerts since both totals are 0
+      expect(resolveAlertsStub.callCount).to.be.eq(2); // 2 assets: ETH, WETH (only EVM chains processed)
     });
     it('should alert if spoke balance is abnormal', async () => {
+      // First scenario: ETH abnormal (total custodied 20 > total spoke 2), WETH normal
       custodiedAssets = {
-        '1337/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '10',
-        '1338/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '10',
-        '1337/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0',
-        '1338/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0',
+        '1337/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '10', // ETH
+        '1338/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '10', // ETH
+        '1337/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0', // WETH
+        '1338/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0', // WETH
       };
       spokeBalances = {
-        '1337/0': '1',
-        '1338/0': '1',
-        '1337/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0',
-        '1338/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0',
+        '1337/0': '1', // ETH native
+        '1338/0': '1', // ETH native
+        '1337/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0', // WETH
+        '1338/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0', // WETH
       };
       await checkSpokeBalance();
-      expect(sendAlertsStub.callCount).to.be.eq(1);
-      expect(resolveAlertsStub.callCount).to.be.eq(1);
+      expect(sendAlertsStub.callCount).to.be.eq(1); // Only ETH should alert
+      expect(resolveAlertsStub.callCount).to.be.eq(1); // Only WETH should resolve
       
       custodiedAssets = {
-        '1337/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '10',
-        '1338/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '0',
-        '1337/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0',
-        '1338/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0',
+        '1337/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '10', // ETH
+        '1338/0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4': '0', // ETH
+        '1337/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0', // WETH
+        '1338/0x0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8': '0', // WETH
       };
       spokeBalances = {
-        '1337/0': '0',
-        '1338/0': '5',
-        '1337/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0',
-        '1338/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0',
+        '1337/0': '0', // ETH native
+        '1338/0': '5', // ETH native
+        '1337/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0', // WETH
+        '1338/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': '0', // WETH
       };
       await checkSpokeBalance();
-      expect(sendAlertsStub.callCount).to.be.eq(2);
-      expect(resolveAlertsStub.callCount).to.be.eq(2);
+      expect(sendAlertsStub.callCount).to.be.eq(2); // 1 alert for ETH from first test + 1 alert for ETH from second test
+      expect(resolveAlertsStub.callCount).to.be.eq(2); // 1 from first test + 1 from second test (WETH)
     });
     it('should generate multiple alerts if multiple assets have abnormal spoke balance', async () => {
       custodiedAssets = {

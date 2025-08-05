@@ -41,7 +41,7 @@ export const createMockDatabase = (): Database => {
     getCheckPoint: stub().resolves(0),
     getMessageQueues: stub().resolves([]),
     getMessageQueueContents: stub().resolves(new Map()),
-    getAllQueuedSettlements: stub().resolves({}),
+    getAllQueuedSettlements: stub().resolves(new Map()),
     getOriginIntentsByStatus: stub().resolves([]),
     getDestinationIntentsByStatus: stub().resolves([]),
     getMessagesByIntentIds: stub().resolves([]),

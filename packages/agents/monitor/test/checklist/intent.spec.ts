@@ -30,6 +30,8 @@ describe('Checklist:intent', () => {
       decodeStub.returns(['0x1234']);
       chainreader.readTx.resolves('0x1234');
 
+      // Reset and configure decode stub call sequence for each test
+      decodeStub.resetBehavior();
       // origin intent status
       decodeStub.onFirstCall().returns([0]); // none
       // hub intent status

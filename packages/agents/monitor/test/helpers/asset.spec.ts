@@ -87,6 +87,11 @@ describe('Helpers:asset', () => {
     encodeStub = stub(Interface.prototype, 'encodeFunctionData').returns('0x1234');
     decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns([['0x1234']]);
     stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
+    
+    // Reset call counts for each test to prevent interference
+    chainreader.readTx.resetHistory();
+    encodeStub.resetHistory();
+    decodeStub.resetHistory();
   });
 
   for (const { name, fn, args, method, inputs, domain, to } of cases) {
