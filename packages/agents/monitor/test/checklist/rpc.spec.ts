@@ -38,5 +38,47 @@ describe('checkRpcs', () => {
       expect(sendAlertsStub.callCount).to.be.gte(4);
       expect((sendAlertsStub.getCall(0).args[0] as any).reason).to.not.contain("mock_api_key");
     });
+
+    it('should handle svm network branch', async () => {
+      const config = mock.config();
+      // Add a mock svm chain to test the network === 'svm' branch
+      config.chains['test-svm'] = {
+        providers: ['https://mock-svm-rpc.com'],
+        network: 'svm',
+        confirmations: 1,
+        deployments: {},
+        subgraphUrls: [],
+        assets: {}
+      };
+      getContextStub.returns({
+        ...mock.context(),
+        config,
+      });
+
+      await checkRpcs();
+      // The function should complete without errors, covering the svm branch
+      expect(sendAlertsStub.called).to.be.true;
+    });
+
+    it('should handle URL parsing branch', async () => {
+      const config = mock.config();
+      // Add a chain with malformed URL to test URL.canParse branch
+      config.chains['test-malformed'] = {
+        providers: ['not-a-valid-url'],
+        network: 'evm',
+        confirmations: 1,
+        deployments: {},
+        subgraphUrls: [],
+        assets: {}
+      };
+      getContextStub.returns({
+        ...mock.context(),
+        config,
+      });
+
+      await checkRpcs();
+      // Should handle malformed URLs gracefully
+      expect(sendAlertsStub.called).to.be.true;
+    });
   });
 });
