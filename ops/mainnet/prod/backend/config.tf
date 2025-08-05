@@ -146,6 +146,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ],
         network = "solana"
@@ -179,6 +180,12 @@ locals {
           "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
           "https://rpc.gnosis.gateway.fm"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ],
+        network = "tron"
       }
     }
   })

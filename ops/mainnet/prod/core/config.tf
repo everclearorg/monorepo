@@ -194,6 +194,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
       },
@@ -226,6 +227,12 @@ locals {
           "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
           "https://rpc.gnosis.gateway.fm"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.relayer_web3_signer_private_key
       }
     }
     server = {
@@ -353,8 +360,15 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.watchtower_web3_signer_private_key
       }
     }
     server = {
@@ -497,6 +511,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
       },
@@ -526,6 +541,11 @@ locals {
           "https://ink-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://ink.drpc.org"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
       }
     }
     betterUptime = {
@@ -542,14 +562,14 @@ locals {
     }
     relayers = [
       {
-        type   = "Gelato",
-        apiKey = "${var.gelato_api_key}",
-        url    = "https://relay.gelato.digital"
-      },
-      {
         type   = "Everclear",
         apiKey = "${var.admin_token_relayer}",
         url    = "https://${module.relayer_server.service_endpoint}"
+      },
+      {
+        type   = "Gelato",
+        apiKey = "${var.gelato_api_key}",
+        url    = "https://relay.gelato.digital"
       }
     ]
     agents = {
@@ -594,14 +614,14 @@ locals {
     network = "mainnet"
     relayers = [
       {
-        type   = "Gelato",
-        apiKey = "${var.gelato_api_key}",
-        url    = "https://relay.gelato.digital"
-      },
-      {
         type   = "Everclear",
         apiKey = "${var.admin_token_relayer}",
         url    = "https://${module.relayer_server.service_endpoint}"
+      },
+      {
+        type   = "Gelato",
+        apiKey = "${var.gelato_api_key}",
+        url    = "https://relay.gelato.digital"
       }
     ]
     thresholds = {
@@ -627,7 +647,8 @@ locals {
       5000 = { maxAge = 60, size = 1 },
       146 = { maxAge = 60, size = 1 },
       57073 = { maxAge = 60, size = 1 },
-      100 = { maxAge = 60, size = 1 }
+      100 = { maxAge = 60, size = 1 },
+      728126428 = { maxAge = 60, size = 1 }
     }
     hub = {
       domain = "25327",
@@ -737,6 +758,7 @@ locals {
       },
       "1399811149" = {
         providers = [
+          "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
       },
@@ -769,6 +791,12 @@ locals {
           "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
           "https://rpc.gnosis.gateway.fm"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.lighthouse_web3_signer_private_key
       }
     }
     database = { url = local.default_db_url }

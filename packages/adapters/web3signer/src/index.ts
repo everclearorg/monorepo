@@ -1,5 +1,6 @@
 import { Signer, providers, utils, Bytes, BigNumber } from 'ethers';
 import { getAddressFromPublicKey } from '@chimera-monorepo/utils';
+import { ITransactionRequest } from '@chimera-monorepo/chainservice';
 
 import { Web3SignerApi } from './api';
 
@@ -23,7 +24,7 @@ export class Web3Signer extends Signer {
 
   public address?: string;
   public provider?: providers.Provider;
-  private api: Web3SignerApi;
+  private readonly api: Web3SignerApi;
 
   public get signerApi(): Web3SignerApi {
     return this.api;
@@ -88,5 +89,12 @@ export class Web3Signer extends Signer {
 
     const signature = await this.api.sign(identifier, digestBytes);
     return utils.serializeTransaction(baseTx, signature);
+  }
+
+  public async sendTransaction(transaction: providers.TransactionRequest): Promise<providers.TransactionResponse> {
+    // exclude funcSig
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { funcSig, ...tx } = transaction as unknown as ITransactionRequest;
+    return await super.sendTransaction(tx);
   }
 }

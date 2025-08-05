@@ -91,21 +91,18 @@ export const processDepositsAndInvoices = async () => {
       encodedDataForLastClosedEpochRes,
     );
 
-    const encodedDataForEpochLength = iface.encodeFunctionData('epochLength', []);
-    const encodedDataForEpochLengthRes = await chainservice.readTx(
+    const encodedDataForGetCurrentEpoch = iface.encodeFunctionData('getCurrentEpoch', []);
+    const encodedDataForGetCurrentEpochRes = await chainservice.readTx(
       {
         to: hub.deployments.everclear,
         domain: +hub.domain,
-        data: encodedDataForEpochLength,
-        funcSig: iface.getFunction('epochLength').format(),
+        data: encodedDataForGetCurrentEpoch,
+        funcSig: iface.getFunction('getCurrentEpoch').format(),
       },
       'latest',
     );
-    const [epochLength] = iface.decodeFunctionResult('epochLength', encodedDataForEpochLengthRes);
+    const [currentEpoch] = iface.decodeFunctionResult('getCurrentEpoch', encodedDataForGetCurrentEpochRes);
 
-    // NOTE: Use L1 block to compute current epoch, as getBlockNumber(+hub.domain) returns L2 block
-    const blockNumber = await chainservice.getBlockNumber(1);
-    const currentEpoch = Math.floor(blockNumber / +epochLength.toString());
     const lastClosedEpoch = currentEpoch > 0 ? currentEpoch - 1 : 0;
     // Check if there are deposits to process in unprocessed epochs across all spokes
     let hasDepositsToProcess = false;
@@ -147,8 +144,6 @@ export const processDepositsAndInvoices = async () => {
         tickerHash,
         invoices: invoices.length,
         lastClosedEpochProcessed: lastClosedEpochProcessed.toString(),
-        blockNumber,
-        epochLength,
         currentEpoch,
         lastClosedEpoch,
         hasInvoicesToProcess,

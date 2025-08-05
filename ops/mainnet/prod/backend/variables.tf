@@ -109,3 +109,17 @@ variable "alchemy_key" {
   sensitive = true
   default   = "neverclear"
 }
+
+
+variable "trongrid_api_key" {
+  type      = string
+  sensitive = true
+  default   = "neverclear"
+}
+
+
+variable "quicknode_api_key" {
+  type      = string
+  sensitive = true
+  default   = "neverclear"
+}
