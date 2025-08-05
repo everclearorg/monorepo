@@ -27,7 +27,6 @@ import { getSsmParameter } from './tasks/helpers/mockable';
 // FIXME: read from chaindata
 const DEFAULT_SIZE = 10;
 const DEFAULT_AGE = 90 * 60; // 90 minutes
-
 const DEFAULT_CONFIRMATIONS = 3;
 const DEFAULT_GAS_LIMIT = 30_000_000;
 const DEFAULT_HEALTH_BASE_URI = 'https://uptime.betterstack.com/api/v1/heartbeat/';
@@ -57,11 +56,6 @@ const DEFAULT_REWARDS_CONFIG = {
     ],
   },
 };
-const DEFAULT_MESSAGE_GAS_LIMIT = {
-  base: 605_000,
-  extraIntent: 300_000,
-};
-
 
 dotenvConfig();
 
@@ -194,8 +188,6 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     const deployments = localChainConfig?.deployments || everclearChainConfig?.deployments || {};
     const assets = localChainConfig?.assets || everclearChainConfig?.assets || {};
     const gasLimit = localChainConfig?.gasLimit || everclearChainConfig?.gasLimit || DEFAULT_GAS_LIMIT;
-    const messageGasLimit =
-      localChainConfig?.messageGasLimit || everclearChainConfig?.messageGasLimit || DEFAULT_MESSAGE_GAS_LIMIT;
 
     chainsForLighthouseConfig[domainId] = {
       providers,
@@ -204,7 +196,6 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
       deployments,
       assets,
       gasLimit,
-      messageGasLimit,
     };
 
     if (localChainConfig?.privateKey) {
