@@ -41,8 +41,6 @@ const MAX_INTENT_DEQUEUE = 6;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
-const DEFAULT_BASE_MESSAGE_GAS_LIMIT = 605_000;
-const DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT = 300_000;
 
 /**
  * Converts OriginIntent objects to the Intent struct format expected by the smart contract
@@ -52,7 +50,7 @@ const DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT = 300_000;
 function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[] {
   return originIntents.map((originIntent: unknown) => {
     const intent = originIntent as Record<string, unknown>;
-
+    
     // Convert string addresses to bytes32 format for contract compatibility
     // The contract expects bytes32 for address fields, but database stores them as strings
     const convertAddressToBytes32 = (address: unknown): string => {
@@ -63,7 +61,7 @@ function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[
       }
       return address as string;
     };
-
+    
     return {
       initiator: convertAddressToBytes32(intent.initiator),
       receiver: convertAddressToBytes32(intent.receiver),
@@ -79,21 +77,6 @@ function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[
       data: intent.data || '0x',
     };
   });
-}
-
-function messageGasLimit(domain: string, intentCount: number): number {
-  const {
-    config: { hub, chains },
-  } = getContext();
-  const defaultMessageGasLimit = {
-    base: DEFAULT_BASE_MESSAGE_GAS_LIMIT,
-    extraIntent: DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT,
-  };
-  const chainMessageGasLimit = chains[domain]?.messageGasLimit ?? defaultMessageGasLimit;
-  // NOTE: if queue = hub, we call contract with _bufferDBPS as hub contract do not have dynamic message gas limit upgrade
-  return domain === hub.domain
-    ? DEFAULT_HYPERLANE_BUFFER
-    : chainMessageGasLimit.base + (intentCount - 1) * chainMessageGasLimit.extraIntent;
 }
 
 export const dispatchMessageQueueViaRelayers = async (
@@ -290,7 +273,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          messageGasLimit(queue.domain, toDequeue),
+          DEFAULT_HYPERLANE_BUFFER,
         ]);
         const digest = keccak256(payload);
 
@@ -348,7 +331,7 @@ export const dispatchMessageQueueViaRelayers = async (
         // CRITICAL FIX: Use the actual length of intentStructs for signature generation
         // This ensures the signature matches what the contract will validate
         const actualIntentCount = type === 'INTENT' ? (intentStructs as unknown[]).length : (intentStructs as number);
-
+        
         // Re-generate payload with the correct intent count
         const correctedPayload = defaultAbiCoder.encode(types, [
           getTypeHash(type),
@@ -357,7 +340,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          messageGasLimit(queue.domain, actualIntentCount),
+          DEFAULT_HYPERLANE_BUFFER,
         ]);
         const correctedDigest = keccak256(correctedPayload);
 
@@ -395,7 +378,7 @@ export const dispatchMessageQueueViaRelayers = async (
             relayerAddress,
             ttl,
             nonce,
-            messageGasLimit(queue.domain, actualIntentCount),
+            DEFAULT_HYPERLANE_BUFFER,
             correctedSignature, // Use corrected signature
           ]),
           to: everclear,
