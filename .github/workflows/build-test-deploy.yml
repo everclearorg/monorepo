@@ -88,11 +88,14 @@ jobs:
           node-version: 18.x
           cache: 'yarn'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Check Yarn version
         run: yarn --version
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Precompile using 0.8.14 and via-ir=false
         run: yarn build
@@ -445,8 +448,11 @@ jobs:
           node-version: 18.x
           cache: 'yarn'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Build project and generate out directory
         run: yarn build

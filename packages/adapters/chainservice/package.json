@@ -23,6 +23,8 @@
     "version": "yarn version"
   },
   "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@types/node-fetch": "^2.6.12",
     "eslint": "9.17.0",
     "mocha": "8.2.0",
     "nyc": "15.1.0",
