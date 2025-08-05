@@ -107,6 +107,10 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
       deployments,
       network,
     };
+
+    if (localChainConfig?.privateKey) {
+      chainsForConfig[domainId].privateKey = localChainConfig.privateKey;
+    }
   }
 
   const config: CartographerConfig = {

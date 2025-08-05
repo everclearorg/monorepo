@@ -47,6 +47,7 @@ export const pollCache = async () => {
   // Retrieve all pending tasks.
   const pending = await cache.tasks.getPending(0, 100);
   logger.debug('Retrieved pending tasks', _requestContext, methodContext, { pending: pending.length });
+  console.log(`=== CONSOLE LOG TEST: pending tasks = ${pending.length} ===`);
   if (pending.length === 0) {
     return;
   }
@@ -151,6 +152,7 @@ export const pollCache = async () => {
           nonce,
         });
 
+        console.log(`=== POLLCACHE about to call chainservice.sendTx for domain ${domain} ===`);
         const receipt = await chainservice.sendTx(
           {
             ...transaction,
@@ -159,6 +161,7 @@ export const pollCache = async () => {
           },
           requestContext,
         );
+        console.log(`=== POLLCACHE sendTx completed successfully ===`);
         await cache.tasks.setHash(taskId, receipt.transactionHash);
         logger.info('Transaction confirmed.', requestContext, methodContext, {
           chain,

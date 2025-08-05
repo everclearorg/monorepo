@@ -164,7 +164,9 @@ export class RpcProviderAggregator {
    * @returns The ethers TransactionResponse.
    */
   protected async sendTransaction(transaction: OnchainTransaction) {
+    console.log(`=== sendTransaction called with domain ${this.domain} ===`);
     this.checkSigner();
+
     // NOTE: We do not use execute for this call as it should be delegated to fallback provider, who
     // will call the method on all providers.
     // TODO: We may want to adapt execute to take on this functionality as it's the last step towards
@@ -448,7 +450,7 @@ export class RpcProviderAggregator {
     const max = BigNumber.from(gasPriceMaximum);
     // TODO: Could use a more sustainable method of separating out gas price abs min for certain
     // chains (such as arbitrum or zksync here) in particular:
-    if (gasPrice.lt(min) && ![1634886255, 1734439522, 2053862243, 2053862260].includes(this.domain)) {
+    if (gasPrice.lt(min) && ![1634886255, 1734439522, 2053862243, 2053862260, 728126428].includes(this.domain)) {
       gasPrice = min;
     } else if (gasPrice.gte(max)) {
       this.logger.warn('Hit the gas price absolute maximum.', requestContext, methodContext, {

@@ -20,6 +20,7 @@ locals {
     { name = "STAGE", value = var.stage },
     { name = "DD_PROFILING_ENABLED", value = "true" },
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
+    { name = "TRON_PRIVATE_KEY", value = var.relayer_web3_signer_private_key },
   ]
   relayer_web3signer_env_vars = [
     { name = "WEB3_SIGNER_PRIVATE_KEY", value = var.relayer_web3_signer_private_key },
@@ -226,6 +227,12 @@ locals {
           "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
           "https://rpc.gnosis.gateway.fm"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.relayer_web3_signer_private_key
       }
     }
     server = {
@@ -356,6 +363,12 @@ locals {
           "https://greatest-multi-market.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
           "https://api.mainnet-beta.solana.com"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.watchtower_web3_signer_private_key
       }
     }
     server = {
@@ -529,6 +542,12 @@ locals {
           "https://ink.drpc.org"
         ]
       },
+
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+      },
       "100" = {
         providers = [
           "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
@@ -635,7 +654,8 @@ locals {
       5000 = { maxAge = 60, size = 1 },
       146 = { maxAge = 60, size = 1 },
       57073 = { maxAge = 60, size = 1 },
-      100 = { maxAge = 60, size = 1 }
+      100 = { maxAge = 60, size = 1 },
+      728126428 = { maxAge = 60, size = 1 }
     }
     hub = {
       domain = "25327",
@@ -778,6 +798,12 @@ locals {
           "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
           "https://rpc.gnosis.gateway.fm"
         ]
+      },
+      "728126428" = {
+        providers = [
+          "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+        privateKey = var.lighthouse_web3_signer_private_key
       }
     }
     database = { url = local.default_db_url }
