@@ -542,16 +542,9 @@ locals {
           "https://ink.drpc.org"
         ]
       },
-
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
-        ]
-      },
-      "100" = {
-        providers = [
-          "https://gnosis-mainnet.blastapi.io/${var.blast_key}",
-          "https://rpc.gnosis.gateway.fm"
         ]
       }
     }
