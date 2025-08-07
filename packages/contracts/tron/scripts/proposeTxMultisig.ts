@@ -28,9 +28,9 @@ const tronGrid = new TronWeb.TronWeb({
 
   const { transaction: tx0 } = await tronWeb.transactionBuilder.triggerSmartContract(
     contract,
-    'upgradeTo(address)',
+    'upgradeToAndCall(address, bytes)',
     { permissionId: 0, feeLimit: 5_000_000 },
-    [{ type: 'address', value: newImplementation }],
+    [{ type: 'address', value: newImplementation }, { type: 'bytes', value: '0x' }],
     multiSigHex,
   );
   const tx = await tronWeb.transactionBuilder.extendExpiration(tx0, 86400); // extend expiration by 24 hours
