@@ -50,10 +50,14 @@ contract DeployDynamicGasLimitUpgrade is Script, ScriptUtils {
     bytes memory _creation = type(EverclearSpokeV5).creationCode;
 
     // Deploying the new implementation via CREATE3
-    bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
-    (bool success, bytes memory returnData) = _params.create3.call(create3Calldata);
-    if (!success) revert Create3DeploymentFailed();
-    newEverclearSpoke = abi.decode(returnData, (address));
+    if (_params.create3 == address(0)) {
+      newEverclearSpoke = address(new EverclearSpokeV5{salt: _implementationSalt}());
+    } else {
+      bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
+      (bool success, bytes memory returnData) = _params.create3.call(create3Calldata);
+      if (!success) revert Create3DeploymentFailed();
+      newEverclearSpoke = abi.decode(returnData, (address));
+    }
 
     vm.stopBroadcast();
 

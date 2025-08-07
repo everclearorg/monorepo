@@ -1,0 +1,19 @@
+{
+  "chainId": "43114",
+  "createdAt": "1754574943000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Dynamic Gas Limit | Avalanche | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460",
+      "value": "0",
+      "data": "0x4f1ef2860000000000000000000000005860eeb5506e8b4def8052bc9e3368f947bbafee00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

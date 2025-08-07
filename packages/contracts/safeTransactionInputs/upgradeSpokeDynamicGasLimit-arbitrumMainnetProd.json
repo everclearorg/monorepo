@@ -1,10 +1,10 @@
 {
-  "chainId": "10",
-  "createdAt": "1754574819000",
+  "chainId": "42161",
+  "createdAt": "1754574752000",
   "meta": {
     "createdFromOwnerAddress": "",
     "createdFromSafeAddress": "",
-    "description": "Spoke Upgrade - Dynamic Gas Limit | Optimism | Mainnet Prod",
+    "description": "Spoke Upgrade - Dynamic Gas Limit | Arbitrum | Mainnet Prod",
     "name": "Transactions Batch",
     "txBuilderVersion": "1.16.5"
   },
