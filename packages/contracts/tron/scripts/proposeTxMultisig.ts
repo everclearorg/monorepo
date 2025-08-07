@@ -1,4 +1,4 @@
-// Run with: yarn ts-node --files --project tsconfig.json tron/scripts/signMultisig.ts
+// Run with: yarn ts-node --files --project tsconfig.json tron/scripts/proposeTxMultisig.ts
 const TronWeb = require('tronweb');
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
 import Trx from '@ledgerhq/hw-app-trx';
@@ -22,7 +22,7 @@ const tronGrid = new TronWeb.TronWeb({
 
 (async () => {
   // 1. build
-  const contract = SPOKE_STAGING;
+  const contract = SPOKE_PROD;
   const newImplementation = EVERCLEAR_SPOKE_IMPL_V5;
   const multiSigHex = tronWeb.address.toHex(MULTI_SIG_ADDRESS); // convert Base58 → hex
 
