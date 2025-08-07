@@ -27,6 +27,9 @@ export const HUB_GATEWAY_PROD = '0x000000000000000000000000effab7ccebf63fbefb488
 export const XERC20_MODULE_PROD: string = '41af50e223f96be03403e6a2535a2e4508bca1d778';
 export const FEE_ADAPTER_PROD: string = 'TBCGBF9TpdGdTsoHJat7QjVEnz5Jc4F1oF';
 
+// Upgrades // 
+export const EVERCLEAR_SPOKE_IMPL_V5: string = 'TVNcMDJBV8V9mZaPqbxaj29QSiR4u7sMms';
+
 // Staging //
 export const SPOKE_STAGING: string = 'TVgfN2ewsCKmFd4NkP833NQzeFtZRXvp1g';
 export const hubGatewayStaging: string = '41e5f2f4afad6211cfbd6a882d5a6a435530ee3909'; // 0xe5F2F4afAd6211cfBD6a882D5a6a435530Ee3909

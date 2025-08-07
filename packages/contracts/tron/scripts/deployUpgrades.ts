@@ -1,11 +1,11 @@
-// Run command: yarn ts-node --files --project tsconfig.json tron/scripts/deploy.ts
+// Run command: yarn ts-node --files --project tsconfig.json tron/scripts/deployUpgrades.ts
 import * as TronWeb from 'tronweb';
 import dotenv from 'dotenv';
 dotenv.config();
 import { Interface } from '@ethersproject/abi';
 
 // The JSON artifacts produced by TronBox or another compiler
-import EverclearSpokeArtifact from '../build/contracts/EverclearSpoke.json';
+import EverclearSpokeV5Artifact from '../build/contracts/EverclearSpokeV5.json';
 
 import {
   CALL_EXECUTOR,
@@ -109,9 +109,9 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     const params = configureDeploymentParameters();
     console.log('Deployment parameters:', params);
 
-    // // Deploy EverclearSpoke Impl
-    // const spokeImpl = await deployContract(EverclearSpokeArtifact.abi, EverclearSpokeArtifact.bytecode);
-    // console.log('EverclearSpoke at:', spokeImpl);
+    // Deploy EverclearSpoke Impl
+    const spokeImpl = await deployContract(EverclearSpokeV5Artifact.abi, EverclearSpokeV5Artifact.bytecode);
+    console.log('EverclearSpoke at:', spokeImpl);
 
     console.log('DONE!');
   } catch (err) {

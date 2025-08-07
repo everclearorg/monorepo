@@ -1,3 +1,4 @@
+// Run with: yarn ts-node --files --project tsconfig.json tron/scripts/readMultisig.ts
 import axios from 'axios';
 
 async function readMultisig(address: string) {
@@ -22,6 +23,7 @@ async function readMultisig(address: string) {
         console.log(`    Key ${i + 1}: ${key.address} (weight: ${key.weight})`);
       });
     }
+    console.log(data);
     if (data.active_permission && Array.isArray(data.active_permission)) {
       data.active_permission.forEach((perm: any, idx: number) => {
         console.log(`Active Permission #${idx + 1}:`);

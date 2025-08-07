@@ -142,10 +142,10 @@ async function sendIntent(feeAdapterAddress: string): Promise<void> {
 
     const shouldSendIntent = false;
 
-    const shouldUpdateSpokeOwner = true;
+    const shouldUpdateSpokeOwner = false;
     const newOwnerAddress = 'TCx6QEfz24VYDTcwzyoEzhRe6a3YTAPmSp';
 
-    const shouldUpdateGatewayOwner = true;
+    const shouldUpdateGatewayOwner = false;
     const newGatewayOwnerAddress = 'TCx6QEfz24VYDTcwzyoEzhRe6a3YTAPmSp';
 
     // Logic //
