@@ -27,12 +27,12 @@ describe('getSpokeQueueConstants', () => {
   describe('getTypeHash', () => {
     it('should return correct type hash for INTENT', () => {
       const result = getTypeHash('INTENT');
-      expect(result).to.equal('0x8104c8a42e1531612796e696e327ea52a475d9583ee6d64ffdefcafad22c0b24');
+      expect(result).to.equal('0x87c42ffc42ddf0cd52b5e8a0b1fa6c45338db7d6e7c93f9d2943eb42b2706aca');
     });
 
     it('should return correct type hash for FILL', () => {
       const result = getTypeHash('FILL');
-      expect(result).to.equal('0x0afae807991f914b71165fd92589f1dc28648cb9fb1f8558f3a6c7507d56deff');
+      expect(result).to.equal('0xfff2306b4d1a2b16ba8a4ba32d8ed8136d2cc882aea58ada6b2baedcde647f57');
     });
 
     it('should return correct type hash for SETTLEMENT', () => {

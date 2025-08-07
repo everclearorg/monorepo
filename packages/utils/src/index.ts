@@ -4,3 +4,6 @@ export * from './helpers';
 export * from './constants';
 export * from './mocks';
 export * from './peripherals';
+export * from './crypto/tron';
+export * from './crypto/test-keys';
+export * from './crypto/tron-key-manager';

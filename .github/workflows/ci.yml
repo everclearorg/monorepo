@@ -47,8 +47,11 @@ jobs:
           node-version: 18.x
           cache: 'yarn'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Precompile using 0.8.14 and via-ir=false
         run: yarn build
@@ -75,8 +78,11 @@ jobs:
           node-version: 18.x
           cache: 'yarn'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Precompile using 0.8.14 and via-ir=false
         run: yarn build
@@ -116,7 +122,10 @@ jobs:
           node-version: 18.x
           cache: 'yarn'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - run: yarn lint:check

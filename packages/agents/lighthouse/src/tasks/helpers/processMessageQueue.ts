@@ -20,18 +20,39 @@ export const processMessageQueue = async (type: QueueType) => {
     adapters: { database },
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(processMessageQueue.name);
+
   // Get the spoke domains
   const domains = Object.keys(chains);
   const spokes = domains.filter((d) => d !== hub.domain);
-  logger.debug('Method start', requestContext, methodContext, { type, spokes, domains, hubDomain: hub.domain });
+
+  logger.debug('Method start', requestContext, methodContext, {
+    type,
+    spokes,
+    domains,
+    hubDomain: hub.domain,
+  });
 
   // Throw if the type is not a message queue (i.e. deposit)
   if (type === 'DEPOSIT') {
     throw new UnknownQueueType(type, { details: 'Deposit queues are not message queues.' });
   }
 
-  // Get the message queue sizes of all spokes
+  logger.info('Processing message queues for all domains', requestContext, methodContext, {
+    type,
+    spokes,
+    totalSpokes: spokes.length,
+  });
+
+  // Use database queries for all queue types, processing all spoke domains
   const queues = await database.getMessageQueues(type, spokes);
+  const queueContents = await database.getMessageQueueContents(type, spokes);
+
+  logger.info('Retrieved queue data from database', requestContext, methodContext, {
+    type,
+    queuesCount: queues.length,
+    queueContentsSize: queueContents.size,
+    domains: spokes,
+  });
 
   // Determine the message queues to dispatch:
   // - If message queue is full, dispatch.
@@ -40,10 +61,24 @@ export const processMessageQueue = async (type: QueueType) => {
     const { size, lastProcessed } = queue;
     const age = getNtpTimeSeconds() - (lastProcessed ?? 0);
     const { maxAge, size: maxSize } = thresholds[queue.domain] ?? {};
+
     if (maxAge == undefined && maxSize == undefined) {
       throw new MissingThresholds(type, queue.domain, thresholds);
     }
-    return size >= maxSize || (age >= maxAge && size > 0);
+
+    const shouldDispatch = size >= maxSize || (age >= maxAge && size > 0);
+
+    logger.debug('Dispatch decision for queue', requestContext, methodContext, {
+      domain: queue.domain,
+      size,
+      maxSize,
+      age,
+      maxAge,
+      shouldDispatch,
+      reason: shouldDispatch ? (size >= maxSize ? 'size threshold' : 'age threshold') : 'no dispatch needed',
+    });
+
+    return shouldDispatch;
   });
 
   const toLog = queues.map((queue: Queue) => {
@@ -61,27 +96,36 @@ export const processMessageQueue = async (type: QueueType) => {
       type,
       queue: toLog,
       thresholds,
+      domains: spokes,
     });
     logger.debug('Method complete', requestContext, methodContext);
     return;
   }
+
   logger.info('Dispatching queues', requestContext, methodContext, {
     type,
     queue: toLog ?? [],
+    domains: spokes,
   });
-
-  // Each message queue requires different dispatch inputs:
-  // - intent: Full intent object
-  // - fill: IntentId, Solver
-  // - settlement: Settlement object
-  const queueContents = await database.getMessageQueueContents(type, spokes);
 
   // Dispatch the message queues via relayers
   const results = await Promise.allSettled(
     toDispatch.map(async (queue) => {
       // Get the contents associated with that domain
       const domainQueue = queueContents.get(queue.domain) ?? [];
-      const sorted = domainQueue.sort((a, b) => a.queueIdx! - b.queueIdx!);
+      const sorted = domainQueue.sort((a, b) => {
+        const aQueueIdx = 'queueIdx' in a ? (a as { queueIdx: number }).queueIdx : 0;
+        const bQueueIdx = 'queueIdx' in b ? (b as { queueIdx: number }).queueIdx : 0;
+        return aQueueIdx - bQueueIdx;
+      });
+
+      logger.info('About to dispatch queue contents', requestContext, methodContext, {
+        type,
+        domain: queue.domain,
+        queueSize: domainQueue.length,
+        sortedItemsCount: sorted.length,
+      });
+
       // Get the associated contents
       const taskIds = await dispatchMessageQueueViaRelayers(type, queue, sorted, requestContext);
       logger.info('Submitted relayer tasks', requestContext, methodContext, { type, taskIds, queue });
@@ -90,11 +134,13 @@ export const processMessageQueue = async (type: QueueType) => {
 
   const successful = results.filter((r) => r.status === 'fulfilled');
   const rejected = results.filter((r) => r.status === 'rejected');
+
   logger.info('Dispatched queues', requestContext, methodContext, {
     type,
     attempted: toDispatch.length,
     successful: successful.length,
     rejected: rejected.length,
+    domains: spokes,
     errors: rejected.map((value: unknown) => (value as PromiseRejectedResult).reason),
   });
 };

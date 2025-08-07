@@ -5,6 +5,9 @@ node_modules
 .vscode
 .secrets
 
+# Log files
+logs/
+
 # Foundry files
 contracts/cache
 out-via-ir
@@ -41,5 +44,6 @@ packages/**/node_modules
 **/*/*.config.json
 **/*/config.*.json
 **/*/config.json
+**/*/config*.json
 
 .idea
