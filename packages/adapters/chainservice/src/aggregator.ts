@@ -164,7 +164,9 @@ export class RpcProviderAggregator {
    * @returns The ethers TransactionResponse.
    */
   protected async sendTransaction(transaction: OnchainTransaction) {
+    console.log(`=== sendTransaction called with domain ${this.domain} ===`);
     this.checkSigner();
+
     // NOTE: We do not use execute for this call as it should be delegated to fallback provider, who
     // will call the method on all providers.
     // TODO: We may want to adapt execute to take on this functionality as it's the last step towards
