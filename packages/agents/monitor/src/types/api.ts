@@ -1,4 +1,4 @@
-import { AdminSchema, ErrorJsonSchema, TIntegerString, TIntentStatus } from '@chimera-monorepo/utils';
+import { AdminSchema, ErrorJsonSchema, TIntegerString, TIntentStatus, GasType } from '@chimera-monorepo/utils';
 import { Type, Static } from '@sinclair/typebox';
 
 export const MonitorApiErrorResponseSchema = Type.Object({
@@ -101,6 +101,7 @@ export const CheckGasResponseSchema = Type.Array(
     gatewayAddress: Type.Optional(Type.String()),
     gatewayGas: Type.Optional(Type.String()),
     belowGatewayThreshold: Type.Optional(Type.Boolean()),
+    gasType: Type.Enum(GasType),
   }),
 );
 export type CheckGasResponse = Static<typeof CheckGasResponseSchema>;

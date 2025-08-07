@@ -1,9 +1,9 @@
-import { createLoggingContext } from '@chimera-monorepo/utils';
+import { createLoggingContext, GasType } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { CheckGasResponse, Severity } from '../types';
 import { BigNumber, utils } from 'ethers';
-import axios from 'axios';
 import { resolveAlerts, sendAlerts } from '../mockable';
+import { fetchRelayerData } from '../helpers';
 
 export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> => {
   const {
@@ -75,6 +75,7 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
 
     chainGas.push({
       domain: domainId,
+      gasType: GasType.Gas,
       relayerAddress,
       belowRelayerThreshold: relayerGas ? BigNumber.from(relayerGas).lt(relayerThreshold) : false,
       relayerGas,
@@ -198,16 +199,3 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
 
   return chainGas;
 };
-
-/**
- * Fetch address from the given relayer URL.
- */
-async function fetchRelayerData(relayerUrl: string): Promise<string | undefined> {
-  try {
-    const response = await axios.get(`${relayerUrl}/address`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching address from ${relayerUrl}:`, error);
-    return undefined;
-  }
-}

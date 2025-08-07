@@ -4,6 +4,7 @@ import { getContext } from '../context';
 import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
 import { Connection } from '@solana/web3.js';
+import { DefaultTronWebFactory } from '@chimera-monorepo/utils';
 
 interface RpcError {
   rpcOrigin: string;
@@ -26,6 +27,7 @@ export const checkRpcs = async () => {
   const { config, logger } = getContext();
 
   const { requestContext, methodContext } = createLoggingContext(checkRpcs.name);
+  const tronWebFactory = new DefaultTronWebFactory();
   const badRpcs: RpcError[] = [];
   const goodRpcs = [];
   for (const domainId of Object.keys(config.chains)) {
@@ -35,12 +37,23 @@ export const checkRpcs = async () => {
       const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
       try {
         let blockNumber: number;
-        if (chainConfig.network === 'svm') {
-          const connection = new Connection(rpcUrl);
-          blockNumber = await connection.getBlockHeight();
-        } else {
-          const provider = new providers.JsonRpcProvider(rpcUrl);
-          blockNumber = await provider.getBlockNumber();
+        switch (chainConfig.network) {
+          case 'svm': {
+            const connection = new Connection(rpcUrl);
+            blockNumber = await connection.getBlockHeight();
+            break;
+          }
+          case 'tvm': {
+            const tronWeb = tronWebFactory.create(rpcUrl);
+            const block = await tronWeb.trx.getCurrentBlock();
+            blockNumber = block.block_header.raw_data.number;
+            break;
+          }
+          default: {
+            const provider = new providers.JsonRpcProvider(rpcUrl);
+            blockNumber = await provider.getBlockNumber();
+            break;
+          }
         }
         goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
       } catch (error: unknown) {

@@ -5,9 +5,10 @@ import { getContext } from '../context';
 import { Severity } from '../types';
 import { getRegisteredAssetHashFromContract, getCustodiedAssetsFromHubContract } from '../helpers';
 import { resolveAlerts, sendAlerts } from '../mockable';
+import { getSupportedDomains } from '../helpers';
 
 // check sum of balance from all spokes contract >= hub custodied/unclaimed amount.
-// this ensure there were no missing balance, i.e. all custodied in hub have corresponding asset.
+// this ensures there were no missing balance, i.e. all custodied in hub have corresponding asset.
 const checkAssetSpokeBalance = async (
   assetName: string,
   assetConfig: AssetConfig,
@@ -29,12 +30,9 @@ const checkAssetSpokeBalance = async (
   const custodiedBalances: Record<string, string> = {};
   // spokeBalances stores a mapping of domains to (balance and representing decimals).
   const spokeBalances: Record<string, [string, number]> = {};
-  for (const domainId of Object.keys(config.chains)) {
+  const domains = getSupportedDomains(config.chains);
+  for (const domainId of domains) {
     const chainConfig = config.chains[domainId];
-    if (chainConfig.network === 'svm') {
-      continue;
-    }
-
     const assetHash = await getRegisteredAssetHashFromContract(assetConfig.tickerHash, domainId);
 
     const hubCallback = async () => {
@@ -139,7 +137,8 @@ export const checkSpokeBalance = async () => {
 
   const checkAssetSpokeBalanceCalls = [];
   const checkedAsset = new Set();
-  for (const domain of Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm')) {
+  const domains = getSupportedDomains(config.chains);
+  for (const domain of domains) {
     const chainConfig = config.chains[domain];
     if (chainConfig.assets) {
       for (const assetName of Object.keys(chainConfig.assets)) {

@@ -221,3 +221,9 @@ export const TSolanaConfig = Type.Object({
   spokeAddress: Type.String(),
 });
 export type SolanaConfig = Static<typeof TSolanaConfig>;
+
+export enum GasType {
+  Gas = 'gas',
+  Bandwidth = 'bandwidth',
+  Energy = 'energy',
+}

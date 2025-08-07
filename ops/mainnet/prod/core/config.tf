@@ -546,6 +546,10 @@ locals {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
+        minBandwidthOnRelayer = 0
+        minEnergyOnRelayer = 0
+        minBandwidthOnGateway = 0
+        minEnergyOnGateway = 0
       }
     }
     betterUptime = {

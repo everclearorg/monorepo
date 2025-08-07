@@ -8,6 +8,7 @@ import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
 import * as asset from '../../src/helpers/asset';
 import { checkSpokeBalance } from '../../src/checklist/spoke';
 import * as Mockable from '../../src/mockable';
+import * as ChainHelpers from '../../src/helpers/chain';
 
 describe('checkSpokeBalance', () => {
   let database: SinonStubbedInstance<Database>;
@@ -18,6 +19,7 @@ describe('checkSpokeBalance', () => {
   let resolveAlertsStub: SinonStub;
   let getRegisteredAssetHashFromContractStub: SinonStub;
   let getCustodiedAssetsFromHubContractStub: SinonStub;
+  let getSupportedDomainsStub: SinonStub;
   let custodiedAssets = {};
   let spokeBalances = {};
   beforeEach(() => {
@@ -36,6 +38,7 @@ describe('checkSpokeBalance', () => {
     chainreader = mock.instances.chainreader() as SinonStubbedInstance<ChainReader>;
     logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
     subgraph = mock.instances.subgraph() as SinonStubbedInstance<SubgraphReader>;
+    getSupportedDomainsStub = stub(ChainHelpers, 'getSupportedDomains').returns(['1337', '1338']);
 
     sendAlertsStub = stub(Mockable, 'sendAlerts');
     sendAlertsStub.resolves();

@@ -16,26 +16,12 @@ import {
   checkIntentQueueLatency,
   checkInvoiceAmount,
   checkInvoices,
-  // Tron queue monitoring
-  checkTronFillQueueCount,
-  checkTronFillQueueLatency,
-  checkTronIntentQueueCount,
-  checkTronIntentQueueLatency,
-  checkTronSettlementQueueStatusCount,
-  checkTronSettlementQueueLatency,
-  checkTronDepositQueueCount,
-  checkTronDepositQueueLatency,
 } from './queue';
 import { getContext } from '../context';
 import { checkSpokeBalance } from './spoke';
 import { checkTokenomicsExportLatency, checkTokenomicsExportStatus } from './tokenomics';
 import { checkSolanaPipelineStatus } from './solana';
-// Tron-specific monitoring imports
-import { checkTronChains, checkTronRpcs, checkTronGas } from './tron';
-import { checkTronSpokeBalance } from './tron-spoke';
-import { checkTronMessageStatus } from './tron-message';
-import { checkTronElapsedEpochsByTickerHash } from './tron-epochs';
-import { checkTronPipelineStatus } from './tron-pipeline';
+import { checkTronGas, checkTronPipelineStatus } from './tron';
 
 export const runChecks = async () => {
   const { requestContext, methodContext } = createLoggingContext(runChecks.name);
@@ -63,22 +49,7 @@ export const runChecks = async () => {
     checkTokenomicsExportStatus,
     checkTokenomicsExportLatency,
     checkSolanaPipelineStatus,
-    
-    // Tron monitoring checks - 1:1 parity with EVM
-    checkTronChains,
-    checkTronRpcs,
     checkTronGas,
-    checkTronSpokeBalance,
-    checkTronMessageStatus,
-    checkTronIntentQueueCount,
-    checkTronIntentQueueLatency,
-    checkTronFillQueueCount,
-    checkTronFillQueueLatency,
-    checkTronSettlementQueueStatusCount,
-    checkTronSettlementQueueLatency,
-    checkTronDepositQueueCount,
-    checkTronDepositQueueLatency,
-    checkTronElapsedEpochsByTickerHash,
     checkTronPipelineStatus,
   ];
 

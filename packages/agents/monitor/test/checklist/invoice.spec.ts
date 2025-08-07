@@ -92,6 +92,7 @@ describe('checkInvoiceAmount', () => {
     logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     sendAlertsStub = stub(Mockable, 'sendAlerts');
+    stub(Mockable, 'resolveAlerts').resolves();
     getCurrentEpochStub = stub(intents, 'getCurrentEpoch');
     getCustodiedAssetsFromHubContractStub = stub(asset, 'getCustodiedAssetsFromHubContract');
   });
