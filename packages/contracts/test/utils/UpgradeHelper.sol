@@ -118,9 +118,8 @@ contract UpgradeHelper is SafeTxBuilder {
   mapping(uint256 _chainId => DeploymentParamsV4 _params) internal _deploymentParamsV4;
 
   /**
-   * ********************** Dynamic Gas Limit Upgrade  - V5 ********************** 
+   * ********************** Dynamic Gas Limit Upgrade  - V5 **********************
    */
-
   EverclearSpokeV5 public spokeProxyV5;
   address public constant SPOKE_IMPL_MAINNET_V3 = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
   address public constant MAINNET_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
@@ -173,7 +172,7 @@ contract UpgradeHelper is SafeTxBuilder {
     state.messageGasLimit = spokeProxyV4.messageGasLimit();
   }
 
-    function _cacheSpokeStateV5() internal view returns (CachedSpokeState memory state) {
+  function _cacheSpokeStateV5() internal view returns (CachedSpokeState memory state) {
     state.permit = address(spokeProxyV5.PERMIT2());
     state.EVERCLEAR = spokeProxyV5.EVERCLEAR();
     state.DOMAIN = spokeProxyV5.DOMAIN();

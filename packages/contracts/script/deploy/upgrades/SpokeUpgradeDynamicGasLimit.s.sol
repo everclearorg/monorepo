@@ -5,7 +5,7 @@ import {ScriptUtils} from '../../utils/Utils.sol';
 
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {Script} from 'forge-std/Script.sol';
-import {console} from 'forge-std/console.sol';
+import {console2} from 'forge-std/console2.sol';
 
 import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
 
@@ -28,6 +28,8 @@ contract DeployDynamicGasLimitUpgrade is Script, ScriptUtils {
   // CREATE3 addresses
   address public constant LIFI_CREATE3 = 0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1;
   address public constant LIFI_LONDON_CREATE3 = 0x8437A5fE47A4Df14700c96DF1870824e72FA8499;
+  address public constant LIFI_INK_CREATE3 = 0xeBbbaC35500713C4AD49929e1bE4225c7efF6510;
+  address public constant LIFI_BERACHAIN_CREATE3 = 0x5f63A2d7850776465b84Bc0fe6284BBC8188dbC7;
 
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
 
@@ -42,7 +44,7 @@ contract DeployDynamicGasLimitUpgrade is Script, ScriptUtils {
     address newEverclearSpoke;
 
     // Generating the inputs for CREATE3
-    uint8 version = 100;
+    uint8 version = 1;
     bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
     bytes memory _creation = type(EverclearSpokeV5).creationCode;
@@ -55,10 +57,10 @@ contract DeployDynamicGasLimitUpgrade is Script, ScriptUtils {
 
     vm.stopBroadcast();
 
-    console.log('------------------------------------------------');
-    console.log('Deployed spoke impl to:', newEverclearSpoke, ' for chainId:', block.chainid);
-    console.log('Chain ID:', block.chainid);
-    console.log('------------------------------------------------');
+    console2.log('------------------------------------------------');
+    console2.log('Deployed spoke impl to:', newEverclearSpoke, ' for chainId:', block.chainid);
+    console2.log('Chain ID:', block.chainid);
+    console2.log('------------------------------------------------');
   }
 }
 
@@ -143,5 +145,19 @@ contract MainnetProduction is DeployDynamicGasLimitUpgrade, MainnetProductionEnv
 
     // Gnosis
     _deploymentParams[GNOSIS] = DeploymentParams({owner: OWNER, spokeProxy: address(GNOSIS_SPOKE), create3: CREATE_3}); // set domain id as mapping key
+
+    // Berachain
+    _deploymentParams[BERACHAIN] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(BERACHAIN_SPOKE), create3: LIFI_BERACHAIN_CREATE3}); // set domain id as mapping key
+
+    // Mantle
+    _deploymentParams[MANTLE] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(MANTLE_SPOKE), create3: LIFI_CREATE3}); // set domain id as mapping key
+
+    // Sonic
+    _deploymentParams[SONIC] = DeploymentParams({owner: OWNER, spokeProxy: address(SONIC_SPOKE), create3: LIFI_CREATE3}); // set domain id as mapping key
+
+    // Ink
+    _deploymentParams[INK] = DeploymentParams({owner: OWNER, spokeProxy: address(INK_SPOKE), create3: LIFI_INK_CREATE3}); // set domain id as mapping key
   }
 }
