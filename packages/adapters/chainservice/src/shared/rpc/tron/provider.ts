@@ -791,8 +791,6 @@ export class TronSyncProvider extends SyncProvider {
 
   public async getSigner(signer: ISigner | string): Promise<ISigner> {
     console.log('=== TronSyncProvider getSigner called ===');
-    console.log('signer type:', typeof signer);
-    console.log('signer value:', signer);
     
     const privateKey = typeof signer === 'string' ? signer : (signer as any).privateKey;
     if (privateKey) {
