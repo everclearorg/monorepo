@@ -3,6 +3,7 @@ pragma solidity 0.8.23;
 
 import {OwnableUpgradeable} from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 import {AssetUtils} from 'contracts/common/AssetUtils.sol';
 import {Constants as Common} from 'contracts/common/Constants.sol';
@@ -112,13 +113,16 @@ contract SpokeMessageReceiver is SpokeStorage, OwnableUpgradeable, IMessageRecei
         if (_message.updateVirtualBalance) {
           balances[_message.asset][_message.recipient] += _amount;
         } else {
+          // Cached the balance of the user
+          uint256 _prevBalance = IERC20(_asset).balanceOf(_recipient);
+
           // if transfer fails (eg. blacklisted recipient), increase virtual balance instead
           bytes memory _transferData = abi.encodeWithSignature('transfer(address,uint256)', _recipient, _amount);
-          (bool _success, bytes memory _res) = _asset.call(_transferData);
+          (bool _success, ) = _asset.call(_transferData);
 
           // doing the transfer as a low-level call to avoid reverting the whole batch if the transfer calls revert
           // applying the same checks as `SafeERC20` for the `transfer` as it can't be wrapped in a `try/catch` block
-          if (!_success || (_res.length != 0 && !abi.decode(_res, (bool)))) {
+          if(!_success || IERC20(_asset).balanceOf(_recipient) != _prevBalance + _amount) {
             balances[_message.asset][_message.recipient] += _amount;
             emit AssetTransferFailed(_asset, _recipient, _amount);
           }

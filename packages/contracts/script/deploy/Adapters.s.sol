@@ -284,6 +284,15 @@ contract MainnetProduction is DeployAdapterBase, MainnetProductionEnvironment {
 
 contract MainnetStaging is DeployAdapterBase, MainnetStagingEnvironment {
   function setUp() public {
+    //// Ethereum
+    _deploymentParams[ETHEREUM] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(ETHEREUM_SPOKE),
+      xerc20Module: address(ETHEREUM_XERC20_MODULE),
+      feeRecipient: ETHEREUM_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: ETHEREUM_ENG_MULTISIG
+    });
+
     //// Arbitrum One
     _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
       spoke: address(ARBITRUM_ONE_SPOKE),

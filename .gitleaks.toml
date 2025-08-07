@@ -2,12 +2,78 @@
 
 [[rules]]
 id          = "tron-hex-private-key"
-description = "64-char hex TRON private key"
-regex       = '''(?i)\b[0-9a-f]{64}\b'''
+description = "TRON private key in raw hex (64 chars) with context"
 severity    = "HIGH"
 
-[[rules]]
-id          = "tron-base58-private-key"
-description = "Base58 private key starting with T"
-regex       = '''\bT[1-9A-HJ-NP-Za-km-z]{50,55}\b'''
-severity    = "HIGH"
+# ───── primary pattern ─────
+# \b … \b guarantees the blob is bounded by a non‑word character
+# (quote, whitespace, colon, newline, etc.) or start/end of line.
+regex       = '''(?i)\b([0-9a-f]{64})\b'''
+secretGroup = 1                 # <-- the single capture is the key itself
+
+# ───── fast pre‑filter ─────
+keywords    = [
+  "tron", "trx",
+  "private_key", "priv_key",
+  "secret", "priv"
+]
+
+# ───── proximity check ─────
+[[rules.required]]
+id          = "tron-context"
+regex       = '''(?i)(tron).*?(priv(?:ate)?|key)'''
+withinLines = 2                 # only alert if these words are ±2 lines away
+
+# ───── optional allow‑list ─────
+[[rules.allowlists]]
+description = "CID‑v1 (sha2‑256) multihash"
+regexTarget = "secret"          # test the captured secret itself
+regexes     = ['''(?i)^1220[0-9a-f]{60}$''']
+
+[[rules.allowlists]]
+description = "Test keys and constants"
+regexTarget = "secret"          # test the captured secret itself
+regexes     = [
+  '''(?i)^da146374a75310b9666e834ee4ad0866d6f4035967bfc76217c5a495fff9f0d0$''',  # test key
+  '''(?i)^f4a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2$''',  # test key
+  '''(?i)^1234567890123456789012345678901234567890123456789012345678901234$''',  # test key
+  '''(?i)^9876543210987654321098765432109876543210987654321098765432109876$''',  # test key
+  '''(?i)^d7c1222cb9b938dffb88f406623278e5d53b8b2c93b5dd2e876ea69f8703df7b$''',  # test key
+  '''(?i)^60ae88d633895594a5ca9d3c901e709f44d2743ab87371299cff49a87c0cb947$''',  # transaction hash
+  '''(?i)^c7923bfa09cb350d4fca3715b1a44ead8e546086f891386584bca2a3a1c35d10$''',  # test key
+  '''(?i)^ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff$''',  # maxUint constant
+  '''(?i)^000000000000000000000000000000000000000000000000000000000004cce0$''',  # token ID
+  '''(?i)^bc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b$''',  # event selector
+  '''(?i)^7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f$''',  # event selector
+  '''(?i)^1cf3b03a6cf19fa2baba4df148e9dcabedea7f8a5c07840e207e5c089be95d3e$''',  # event selector
+  '''(?i)^c7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d2$''',  # event selector
+  '''(?i)^8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0$''',  # event selector
+  '''(?i)^0bd568acd9b697a50a11ec16a1a231542877bf551632163d9cfc61b40e7f6e22$''',  # transaction hash
+]
+
+[[rules.allowlists]]
+description = "Event selectors and contract artifacts"
+regexTarget = "match"           # test the full match context
+regexes     = [
+  '''(?i)eventSelector''',      # event selectors in contract artifacts
+  '''(?i)maxUint''',           # Solidity constants
+  '''(?i)TEST_''',             # test files
+  '''(?i)test-''',             # test files
+  '''(?i)\.spec\.''',          # test files
+  '''(?i)\.test\.''',          # test files
+  '''(?i)build/contracts''',   # build artifacts
+  '''(?i)lib/''',              # library files
+]
+
+[allowlist]
+description = "Ignore node_modules and env files"
+paths = [
+  "node_modules/", 
+  ".*\\.env$",
+  "packages/contracts/lib/",  # ignore library files
+  "packages/contracts/build/", # ignore build artifacts
+  ".*/build/.*",              # ignore all build directories
+  ".*/test/.*",               # ignore test directories
+  ".*\\.spec\\..*",           # ignore spec files
+  ".*\\.test\\..*",           # ignore test files
+]

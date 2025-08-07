@@ -1,4 +1,4 @@
-// Run command: yarn ts-node --files --project tsconfig.json tron/deploy/read.ts
+// Run command: yarn ts-node --files --project tsconfig.json tron/scripts/read.ts
 const TronWeb = require('tronweb');
 import dotenv from 'dotenv';
 dotenv.config();
@@ -17,7 +17,7 @@ const tronWeb = new TronWeb.TronWeb({
 
 (async () => {
   try {
-    const logProd = false;
+    const logProd = true;
     const { spokeAddress, gatewayAddress, xerc20Module, feeAdapter } = fetchAddresses(logProd);
     console.log(`Logging the state of the deployed contracts ${logProd ? 'on Production' : 'on Staging'}`);
 

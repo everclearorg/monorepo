@@ -488,6 +488,11 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @param _amount The amount of the asset
    */
   function _pushTokens(address _recipient, address _asset, uint256 _amount) internal {
-    IERC20(_asset).safeTransfer(_recipient, _amount);
+    IERC20 token = IERC20(_asset);
+
+    uint256 _balanceBefore = token.balanceOf(_recipient);
+    token.transfer(_recipient, _amount);
+
+    if(token.balanceOf(_recipient) != _balanceBefore + _amount) revert FeeAdapter_TransferFailed();
   }
 }

@@ -1,4 +1,5 @@
 // tron/types/tronweb.d.ts
+
 declare module 'tronweb' {
   interface TronWebOptions {
     fullHost: string;
@@ -13,7 +14,7 @@ declare module 'tronweb' {
     encodeFunctionSignature(fnABI: any): string;
     encodeParams(params: { type: string; value: any }[]): string;
     decodeParams(types: any[], encoded: string): any[];
-    // Add whatever else you need from TronWeb.utils.abi
+    // Extend as needed
   }
 
   /**
@@ -21,8 +22,6 @@ declare module 'tronweb' {
    */
   interface TronWebUtils {
     abi: TronWebUtilsAbi;
-    // Possibly more, like code for SHA3, etc. if you use them
-    // sha3(...): string;   // for example
   }
 
   /**
@@ -31,29 +30,40 @@ declare module 'tronweb' {
   export class TronWeb {
     constructor(options: TronWebOptions | { fullHost: string; privateKey: string });
 
-    // The important fix is here, so you can do tronWeb.contract(...):
+    // Contract factory
     contract(...args: any[]): any;
 
-    // For address conversions as instance methods:
+    // Address helpers as instance properties
     address: {
       toHex(address: string): string;
       fromHex(hex: string): string;
     };
 
-    // Also as static methods on the class:
+    // Address helpers as static properties
     static address: {
       toHex(address: string): string;
       fromHex(hex: string): string;
     };
 
-    // Add the utils interface so you can do TronWeb.utils.abi.encodeFunctionCall or tronWeb.utils.abi....
+    // Utils (instance & static)
     static utils: TronWebUtils;
     utils: TronWebUtils;
 
+    // TRX‑related remote procedure calls
     trx: {
       getBalance(address: string): Promise<number>;
       getAccountResources(address: string): Promise<any>;
-      // etc.
+      /**
+       * Fetch a raw transaction by its hash / ID
+       * Equivalent to `tronWeb.trx.getTransaction(txId)`
+       */
+      getTransaction(txId: string): Promise<any>;
+      /**
+       * Fetch execution info / receipt for a given transaction
+       * Equivalent to `tronWeb.trx.getTransactionInfo(txId)`
+       */
+      getTransactionInfo(txId: string): Promise<any>;
+      // …extend with more methods as required
     };
 
     transactionBuilder: {
@@ -64,7 +74,18 @@ declare module 'tronweb' {
         callValue?: number;
         parameters?: unknown[];
       }): Promise<any>;
-      // etc.
+
+      triggerConstantContract(
+        contractAddress: string,
+        functionSelectorOrData: string, // TronWeb lets you pass full 0x‑data
+        feeLimit: number,
+        callValue: number,
+        parameter?: string,
+        issuerAddress?: string,
+      ): Promise<{
+        result: { result: boolean; code?: string; message?: string };
+        constant_result: string[];
+      }>;
     };
 
     defaultAddress: {

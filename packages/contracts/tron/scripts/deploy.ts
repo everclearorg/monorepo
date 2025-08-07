@@ -1,4 +1,4 @@
-// Run command: yarn ts-node --files --project tsconfig.json tron/deploy/spoke.ts
+// Run command: yarn ts-node --files --project tsconfig.json tron/scripts/deploy.ts
 import * as TronWeb from 'tronweb';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -15,6 +15,8 @@ import FeeAdapterArtifact from '../build/contracts/FeeAdapter.json';
 import {
   SPOKE_PROD,
   SPOKE_STAGING,
+  SPOKE_IMPL,
+  HUB_GATEWAY_PROD,
   GATEWAY_IMPL,
   CALL_EXECUTOR,
   MESSAGE_RECEIVER,
@@ -28,6 +30,8 @@ import {
   tronMaxSolversFee,
   FEE_SIGNER, 
   XERC20_MODULE_PROD,
+  XERC20_MODULE_STAGING,
+  FEE_SIGNER_PROD,
 } from './constants';
 
 const tronWeb = new TronWeb.TronWeb({
@@ -209,47 +213,48 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     const params = configureDeploymentParameters();
     console.log('Deployment parameters:', params);
 
-    // Deploy Call Executor (no proxy for example)
-    const executorAddr = await deployContract(CallExecutorArtifact.abi, CallExecutorArtifact.bytecode);
-    console.log('CallExecutor at:', executorAddr);
+    // // Deploy Call Executor (no proxy for example)
+    // const executorAddr = await deployContract(CallExecutorArtifact.abi, CallExecutorArtifact.bytecode);
+    // console.log('CallExecutor at:', executorAddr);
 
-    // Deploy MessageReceiver (no proxy for example)
-    const messageReceiverAddr = await deployContract(MessageReceiverArtifact.abi, MessageReceiverArtifact.bytecode);
-    console.log('MessageReceiver at:', messageReceiverAddr);
+    // // Deploy MessageReceiver (no proxy for example)
+    // const messageReceiverAddr = await deployContract(MessageReceiverArtifact.abi, MessageReceiverArtifact.bytecode);
+    // console.log('MessageReceiver at:', messageReceiverAddr);
 
-    // Deploy Spoke (UUPS style)
-    const spokeAddress = await deploySpokeProxy(
-      EverclearSpokeArtifact.abi,
-      EverclearSpokeArtifact.bytecode,
-      ERC1967ProxyArtifact.abi,
-      ERC1967ProxyArtifact.bytecode.object,
-      params,
-    );
-    console.log('Everclear Spoke (proxy) at:', spokeAddress);
+    // // Deploy Spoke (UUPS style)
+    // const spokeAddress = await deploySpokeProxy(
+    //   EverclearSpokeArtifact.abi,
+    //   EverclearSpokeArtifact.bytecode,
+    //   ERC1967ProxyArtifact.abi,
+    //   ERC1967ProxyArtifact.bytecode.object,
+    //   params,
+    // );
+    // console.log('Everclear Spoke (proxy) at:', spokeAddress);
 
-    // Deploy Gateway (UUPS style)
-    // const spokeAddress = SPOKE_PROD;
-    const gatewayAddress = await deployGatewayProxy(
-      SpokeGatewayArtifact.abi,
-      SpokeGatewayArtifact.bytecode,
-      ERC1967ProxyArtifact.abi,
-      ERC1967ProxyArtifact.bytecode.object,
-      params,
-      spokeAddress,
-    );
-    console.log('Spoke Gateway (proxy) at:', gatewayAddress);
+    // // Deploy Gateway (UUPS style)
+    // // const spokeAddress = SPOKE_PROD;
+    // const gatewayAddress = await deployGatewayProxy(
+    //   SpokeGatewayArtifact.abi,
+    //   SpokeGatewayArtifact.bytecode,
+    //   ERC1967ProxyArtifact.abi,
+    //   ERC1967ProxyArtifact.bytecode.object,
+    //   params,
+    //   spokeAddress,
+    // );
+    // console.log('Spoke Gateway (proxy) at:', gatewayAddress);
 
-    // Deploying the XERC20Module
-    const xerc20ConstructorArgs = [spokeAddress];
-    const xerc20ModuleAddr = await deployContract(
-      XERC20ModuleArtifact.abi,
-      XERC20ModuleArtifact.bytecode,
-      xerc20ConstructorArgs,
-    );
-    console.log('XERC20Module at:', xerc20ModuleAddr);
+    // // Deploying the XERC20Module
+    // const xerc20ConstructorArgs = [spokeAddress];
+    // const xerc20ModuleAddr = await deployContract(
+    //   XERC20ModuleArtifact.abi,
+    //   XERC20ModuleArtifact.bytecode,
+    //   xerc20ConstructorArgs,
+    // );
+    // console.log('XERC20Module at:', xerc20ModuleAddr);
 
     // Deploy the FeeAdapter
-    const constructorArgs = [spokeAddress, tronOwner, FEE_SIGNER, XERC20_MODULE_PROD, tronOwner];
+    const spokeAddress = SPOKE_PROD;
+    const constructorArgs = [spokeAddress, tronOwner, FEE_SIGNER_PROD, XERC20_MODULE_PROD, tronOwner];
     const feeAdapterAddr = await deployContract(FeeAdapterArtifact.abi, FeeAdapterArtifact.bytecode, constructorArgs);
     console.log('FeeAdapter at:', feeAdapterAddr);
 

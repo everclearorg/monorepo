@@ -76,6 +76,11 @@ interface IFeeAdapter {
    */
   error FeeAdapter_InvalidDeadline();
 
+/**
+ * @notice Thrown when the transfer fails
+ */
+  error FeeAdapter_TransferFailed();
+
   /**
    * @notice Returns the spoke contract address
    * @return The EverclearSpoke contract interface

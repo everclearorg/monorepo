@@ -8,6 +8,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
   },
-  "include": ["src/**/*", "tron/build/contracts/**/*", "tron/deploy/**/*.ts", "tron/types/**/*.d.ts"],
+  "include": ["src/**/*", "tron/build/contracts/**/*", "tron/deploy/**/*.ts", "tron/types/**/*.d.ts", "tron/scripts/spoke.ts", "tron/scripts/read.ts"],
   "references": []
 }
