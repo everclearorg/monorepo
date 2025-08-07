@@ -17,6 +17,7 @@ import { getQueueMethodName, getTypeHash } from './getMessageQueueConstants';
 import { RelayerSendFailed } from '../../errors';
 import { BigNumber } from 'ethers';
 import { ethers } from 'ethers';
+import { TronWeb } from 'tronweb';
 
 const DEFAULT_SIGNATURE_TTL = 60 * 60; // 60 minutes
 
@@ -41,6 +42,8 @@ const MAX_INTENT_DEQUEUE = 6;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
+const DEFAULT_BASE_MESSAGE_GAS_LIMIT = 605_000;
+const DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT = 300_000;
 
 /**
  * Converts OriginIntent objects to the Intent struct format expected by the smart contract
@@ -50,23 +53,29 @@ const BPS_DENOMINATOR = 100_000;
 function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[] {
   return originIntents.map((originIntent: unknown) => {
     const intent = originIntent as Record<string, unknown>;
-    
+
     // Convert string addresses to bytes32 format for contract compatibility
     // The contract expects bytes32 for address fields, but database stores them as strings
-    const convertAddressToBytes32 = (address: unknown): string => {
+    const convertAddressToBytes32 = (address: unknown, origin: unknown): string => {
+      if (origin === TRON_CHAINID && typeof address === 'string' && !address.startsWith('0x')) {
+        // Convert Tron address to Ethereum format
+        return '0x' + TronWeb.address.toHex(address).slice(2).padStart(64, '0');
+      }
+
       if (typeof address === 'string' && address.startsWith('0x')) {
         // Left-pad the address to 32 bytes (64 hex characters + 0x)
         // Ethereum addresses are 20 bytes, so we need to left-pad with zeros to make 32 bytes
         return '0x' + address.slice(2).padStart(64, '0');
       }
+
       return address as string;
     };
-    
+
     return {
-      initiator: convertAddressToBytes32(intent.initiator),
-      receiver: convertAddressToBytes32(intent.receiver),
-      inputAsset: convertAddressToBytes32(intent.inputAsset),
-      outputAsset: convertAddressToBytes32(intent.outputAsset),
+      initiator: convertAddressToBytes32(intent.initiator, intent.origin),
+      receiver: convertAddressToBytes32(intent.receiver, intent.origin),
+      inputAsset: convertAddressToBytes32(intent.inputAsset, intent.origin),
+      outputAsset: convertAddressToBytes32(intent.outputAsset, intent.origin),
       maxFee: intent.maxFee,
       origin: intent.origin,
       nonce: intent.nonce,
@@ -77,6 +86,21 @@ function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[
       data: intent.data || '0x',
     };
   });
+}
+
+function messageGasLimit(domain: string, intentCount: number): number {
+  const {
+    config: { hub, chains },
+  } = getContext();
+  const defaultMessageGasLimit = {
+    base: DEFAULT_BASE_MESSAGE_GAS_LIMIT,
+    extraIntent: DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT,
+  };
+  const chainMessageGasLimit = chains[domain]?.messageGasLimit ?? defaultMessageGasLimit;
+  // NOTE: if queue = hub, we call contract with _bufferDBPS as hub contract do not have dynamic message gas limit upgrade
+  return domain === hub.domain
+    ? DEFAULT_HYPERLANE_BUFFER
+    : chainMessageGasLimit.base + (intentCount - 1) * chainMessageGasLimit.extraIntent;
 }
 
 export const dispatchMessageQueueViaRelayers = async (
@@ -273,7 +297,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          DEFAULT_HYPERLANE_BUFFER,
+          messageGasLimit(queue.domain, toDequeue),
         ]);
         const digest = keccak256(payload);
 
@@ -331,7 +355,7 @@ export const dispatchMessageQueueViaRelayers = async (
         // CRITICAL FIX: Use the actual length of intentStructs for signature generation
         // This ensures the signature matches what the contract will validate
         const actualIntentCount = type === 'INTENT' ? (intentStructs as unknown[]).length : (intentStructs as number);
-        
+
         // Re-generate payload with the correct intent count
         const correctedPayload = defaultAbiCoder.encode(types, [
           getTypeHash(type),
@@ -340,7 +364,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          DEFAULT_HYPERLANE_BUFFER,
+          messageGasLimit(queue.domain, actualIntentCount),
         ]);
         const correctedDigest = keccak256(correctedPayload);
 
@@ -378,7 +402,7 @@ export const dispatchMessageQueueViaRelayers = async (
             relayerAddress,
             ttl,
             nonce,
-            DEFAULT_HYPERLANE_BUFFER,
+            messageGasLimit(queue.domain, actualIntentCount),
             correctedSignature, // Use corrected signature
           ]),
           to: everclear,
