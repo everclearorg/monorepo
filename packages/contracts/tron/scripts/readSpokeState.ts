@@ -1,11 +1,11 @@
-// Run command: yarn ts-node --files --project tsconfig.json tron/scripts/read.ts
+// Run command: yarn ts-node --files --project tsconfig.json tron/scripts/readSpokeState.ts
 const TronWeb = require('tronweb');
 import dotenv from 'dotenv';
 dotenv.config();
 import { fetchAddresses } from './constants';
 
 // The JSON artifacts produced by TronBox or another compiler
-import EverclearSpokeArtifact from '../build/contracts/EverclearSpoke.json';
+import EverclearSpokeV5Artifact from '../build/contracts/EverclearSpokeV5.json';
 import SpokeGatewayArtifact from '../build/contracts/SpokeGateway.json';
 import XERC20ModuleArtifact from '../build/contracts/XERC20Module.json';
 import FeeAdapterArtifact from '../build/contracts/FeeAdapter.json';
@@ -17,12 +17,12 @@ const tronWeb = new TronWeb.TronWeb({
 
 (async () => {
   try {
-    const logProd = true;
+    const logProd = false;
     const { spokeAddress, gatewayAddress, xerc20Module, feeAdapter } = fetchAddresses(logProd);
     console.log(`Logging the state of the deployed contracts ${logProd ? 'on Production' : 'on Staging'}`);
 
     // Construct spoke (proxy) state
-    const spokeInstance = await tronWeb.contract(EverclearSpokeArtifact.abi, spokeAddress);
+    const spokeInstance = await tronWeb.contract(EverclearSpokeV5Artifact.abi, spokeAddress);
     console.log('-- Spoke address:', spokeInstance.address);
 
     // Construct gateway (proxy) state
@@ -50,6 +50,10 @@ const tronWeb = new TronWeb.TronWeb({
 
     const callExecutor = await spokeInstance.callExecutor().call();
     console.log('Call Executor address:', callExecutor);
+
+    // Reading the spoke FeeAdapter //
+    const spokeFeeAdapter = await spokeInstance.feeAdapter().call();
+    console.log('Spoke Fee Adapter address:', spokeFeeAdapter);
 
     // Reading the gateway instance state //
     // Get the owner of the contract

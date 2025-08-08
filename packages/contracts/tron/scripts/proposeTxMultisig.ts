@@ -5,7 +5,7 @@ import Trx from '@ledgerhq/hw-app-trx';
 import fs from "fs/promises";
 
 import dotenv from 'dotenv';
-import { EVERCLEAR_SPOKE_IMPL_V5, SPOKE_PROD, SPOKE_STAGING } from './constants';
+import { FEE_ADAPTER_PROD, SPOKE_STAGING } from './constants';
 dotenv.config();
 
 const tronWeb = new TronWeb.TronWeb({
@@ -22,15 +22,15 @@ const tronGrid = new TronWeb.TronWeb({
 
 (async () => {
   // 1. build
-  const contract = SPOKE_PROD;
-  const newImplementation = EVERCLEAR_SPOKE_IMPL_V5;
+  const contract = SPOKE_STAGING;
   const multiSigHex = tronWeb.address.toHex(MULTI_SIG_ADDRESS); // convert Base58 → hex
+  const transactionName = 'updateFeeAdapterProd'
 
   const { transaction: tx0 } = await tronWeb.transactionBuilder.triggerSmartContract(
     contract,
-    'upgradeToAndCall(address, bytes)',
+    'updateFeeAdapter(address)',
     { permissionId: 0, feeLimit: 5_000_000 },
-    [{ type: 'address', value: newImplementation }, { type: 'bytes', value: '0x' }],
+    [{ type: 'address', value: FEE_ADAPTER_PROD }, { type: 'bytes', value: '0x' }],
     multiSigHex,
   );
   const tx = await tronWeb.transactionBuilder.extendExpiration(tx0, 86400); // extend expiration by 24 hours
@@ -64,9 +64,12 @@ const tronGrid = new TronWeb.TronWeb({
   console.log(`Partially‑signed tx pushed: ${tx.txID}`);
   
   // Writing tx
-  await fs.writeFile('tron/pendingTransactions/tx.json', JSON.stringify(tx, null, 2));
+  await fs.writeFile(
+    `tron/pendingTransactions/${transactionName}.json`,
+    JSON.stringify(tx, null, 2)
+  );
   console.log('\nArtifacts written:');
-  console.log('  • tx.json         – full JSON for offline signers');
+  console.log(`  • pendingTransactions/${transactionName}.json         – full JSON for offline signers`);
 
   // Reviewing if the transaction is pending
   try {
