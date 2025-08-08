@@ -401,7 +401,7 @@ contract SpokeUpgradeDynamicGasLimitProdSafeInput is MainnetProductionEnvironmen
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '10';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/dynamicGasLimit/upgradeSpokeArray-optimismMainnetProd.json',
+      'safeTransactionInputs/dynamicGasLimit/upgradeSpokeDynamicGasLimit-optimismMainnetProd.json',
       'Spoke Upgrade - Dynamic Gas Limit | Optimism | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1169,7 +1169,7 @@ contract SpokeUpgradeDynamicGasLimitProdSafeInput is MainnetProductionEnvironmen
 
     // Pushing data to safe tx json //
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
-    string memory chainId = '2020';
+    string memory chainId = '100';
     _writeSafeTransactionInput(
       'safeTransactionInputs/dynamicGasLimit/upgradeSpokeDynamicGasLimit-gnosisMainnetProd.json',
       'Spoke Upgrade - Dynamic Gas Limit | Gnosis | Mainnet Prod',
