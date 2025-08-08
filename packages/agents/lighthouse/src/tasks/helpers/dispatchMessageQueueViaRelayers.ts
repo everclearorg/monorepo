@@ -42,6 +42,8 @@ const MAX_INTENT_DEQUEUE = 6;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
+const DEFAULT_BASE_MESSAGE_GAS_LIMIT = 605_000;
+const DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT = 300_000;
 
 /**
  * Converts OriginIntent objects to the Intent struct format expected by the smart contract
@@ -84,6 +86,21 @@ function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[
       data: intent.data || '0x',
     };
   });
+}
+
+function messageGasLimit(domain: string, intentCount: number): number {
+  const {
+    config: { hub, chains },
+  } = getContext();
+  const defaultMessageGasLimit = {
+    base: DEFAULT_BASE_MESSAGE_GAS_LIMIT,
+    extraIntent: DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT,
+  };
+  const chainMessageGasLimit = chains[domain]?.messageGasLimit ?? defaultMessageGasLimit;
+  // NOTE: if queue = hub, we call contract with _bufferDBPS as hub contract do not have dynamic message gas limit upgrade
+  return domain === hub.domain
+    ? DEFAULT_HYPERLANE_BUFFER
+    : chainMessageGasLimit.base + (intentCount - 1) * chainMessageGasLimit.extraIntent;
 }
 
 export const dispatchMessageQueueViaRelayers = async (
@@ -280,7 +297,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          DEFAULT_HYPERLANE_BUFFER,
+          messageGasLimit(queue.domain, toDequeue),
         ]);
         const digest = keccak256(payload);
 
@@ -347,7 +364,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          DEFAULT_HYPERLANE_BUFFER,
+          messageGasLimit(queue.domain, actualIntentCount),
         ]);
         const correctedDigest = keccak256(correctedPayload);
 
@@ -385,7 +402,7 @@ export const dispatchMessageQueueViaRelayers = async (
             relayerAddress,
             ttl,
             nonce,
-            DEFAULT_HYPERLANE_BUFFER,
+            messageGasLimit(queue.domain, actualIntentCount),
             correctedSignature, // Use corrected signature
           ]),
           to: everclear,
