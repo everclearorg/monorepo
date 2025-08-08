@@ -1,0 +1,19 @@
+{
+  "chainId": "2020",
+  "createdAt": "1754640908000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Dynamic Gas Limit | Ronin | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000502d018777158b0a3c818499fc94cb2041e0020100000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

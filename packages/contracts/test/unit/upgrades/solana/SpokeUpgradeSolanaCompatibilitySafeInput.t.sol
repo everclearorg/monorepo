@@ -275,7 +275,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '1';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-ethereumMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-ethereumMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Ethereum | Mainnet Prod',
       safeTransactions,
       chainId
@@ -341,7 +341,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '42161';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-arbitrumMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-arbitrumMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Arbitrum | Mainnet Prod',
       safeTransactions,
       chainId
@@ -407,7 +407,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '10';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-optimismMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-optimismMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Optimism | Mainnet Prod',
       safeTransactions,
       chainId
@@ -473,7 +473,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '8453';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-baseMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-baseMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Base | Mainnet Prod',
       safeTransactions,
       chainId
@@ -539,7 +539,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '56';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-bnbMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-bnbMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | BNB | Mainnet Prod',
       safeTransactions,
       chainId
@@ -605,7 +605,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '48900';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-zircuitMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-zircuitMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Zircuit | Mainnet Prod',
       safeTransactions,
       chainId
@@ -671,7 +671,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '81457';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-blastMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-blastMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Blast | Mainnet Prod',
       safeTransactions,
       chainId
@@ -737,7 +737,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '59144';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-lineaMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-lineaMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Linea | Mainnet Prod',
       safeTransactions,
       chainId
@@ -803,7 +803,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '137';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-polygonMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-polygonMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Polygon | Mainnet Prod',
       safeTransactions,
       chainId
@@ -869,7 +869,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '43114';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-avalancheMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-avalancheMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Avalanche | Mainnet Prod',
       safeTransactions,
       chainId
@@ -935,7 +935,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '534352';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-scrollMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-scrollMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Scroll | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1001,7 +1001,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '33139';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-apechainMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-apechainMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Apechain | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1067,7 +1067,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '167000';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-taikoMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-taikoMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Taiko | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1133,7 +1133,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '34443';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-modeMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-modeMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Mode | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1199,7 +1199,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '130';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-unichainMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-unichainMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Unichain | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1265,7 +1265,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '2020';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-roninMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-roninMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Ronin | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1331,7 +1331,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '100';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-gnosisMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-gnosisMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Gnosis | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1397,7 +1397,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '80094';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-berachainMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-berachainMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Berachain | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1463,7 +1463,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '146';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-sonicMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-sonicMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Sonic | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1529,7 +1529,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '57073';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-inkMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-inkMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Ink | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1595,7 +1595,7 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '5000';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeSolanaCompatibility-mantleMainnetProd.json',
+      'safeTransactionInputs/solanaCompatibility/upgradeSpokeSolanaCompatibility-mantleMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Mantle | Mainnet Prod',
       safeTransactions,
       chainId

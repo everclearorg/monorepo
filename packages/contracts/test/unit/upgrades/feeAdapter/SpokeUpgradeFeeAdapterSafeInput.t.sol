@@ -247,7 +247,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '1';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-ethereumMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-ethereumMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Ethereum | Mainnet Prod',
       safeTransactions,
       chainId
@@ -317,7 +317,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '42161';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-arbitrumMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-arbitrumMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Arbitrum | Mainnet Prod',
       safeTransactions,
       chainId
@@ -387,7 +387,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '10';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-optimismMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeArray-optimismMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Optimism | Mainnet Prod',
       safeTransactions,
       chainId
@@ -457,7 +457,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '8453';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-baseMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-baseMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Base | Mainnet Prod',
       safeTransactions,
       chainId
@@ -527,7 +527,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '56';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-bnbMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-bnbMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | BNB | Mainnet Prod',
       safeTransactions,
       chainId
@@ -597,7 +597,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '48900';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-zircuitMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-zircuitMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Zircuit | Mainnet Prod',
       safeTransactions,
       chainId
@@ -667,7 +667,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '81457';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-blastMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-blastMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Blast | Mainnet Prod',
       safeTransactions,
       chainId
@@ -737,7 +737,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '59144';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-lineaMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-lineaMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Linea | Mainnet Prod',
       safeTransactions,
       chainId
@@ -807,7 +807,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '137';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-polygonMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-polygonMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Polygon | Mainnet Prod',
       safeTransactions,
       chainId
@@ -877,7 +877,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '43114';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-avalancheMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-avalancheMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Avalanche | Mainnet Prod',
       safeTransactions,
       chainId
@@ -947,7 +947,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '534352';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-scrollMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-scrollMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Scroll | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1017,7 +1017,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '33139';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-apechainMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-apechainMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Apechain | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1087,7 +1087,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '167000';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-taikoMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-taikoMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Taiko | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1157,7 +1157,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '34443';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-modeMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-modeMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Mode | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1227,7 +1227,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '130';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-unichainMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-unichainMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Unichain | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1297,7 +1297,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '2020';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeFeeAdapter-roninMainnetProd.json',
+      'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-roninMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Ronin | Mainnet Prod',
       safeTransactions,
       chainId
@@ -1367,7 +1367,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
   //   safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
   //   string memory chainId = '2020';
   //   _writeSafeTransactionInput(
-  //     'safeTransactionInputs/upgradeSpokeFeeAdapter-gnosisMainnetProd.json',
+  //     'safeTransactionInputs/feeAdapter/upgradeSpokeFeeAdapter-gnosisMainnetProd.json',
   //     'Spoke Upgrade - Fee Adapter | Gnosis | Mainnet Prod',
   //     safeTransactions,
   //     chainId

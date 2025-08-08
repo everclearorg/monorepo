@@ -163,7 +163,7 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '1';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-ethereumMainnetProd.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-ethereumMainnetProd.json',
       'Spoke Upgrade Ethereum Mainnet Prod',
       safeTransactions,
       chainId
@@ -231,7 +231,7 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '42161';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-arbitrumMainnetProd.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-arbitrumMainnetProd.json',
       'Spoke Upgrade Arbitrum Mainnet Prod',
       safeTransactions,
       chainId
@@ -299,7 +299,7 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '10';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-optimismMainnetProd.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-optimismMainnetProd.json',
       'Spoke Upgrade Optimism Mainnet Prod',
       safeTransactions,
       chainId
@@ -367,7 +367,7 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '8453';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-baseMainnetProd.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-baseMainnetProd.json',
       'Spoke Upgrade Base Mainnet Prod',
       safeTransactions,
       chainId
@@ -435,7 +435,7 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '56';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-bnbMainnetProd.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-bnbMainnetProd.json',
       'Spoke Upgrade BNB Mainnet Prod',
       safeTransactions,
       chainId
@@ -503,7 +503,7 @@ contract SpokeArrayUpgradeProdSafeInput is MainnetProductionEnvironment, Upgrade
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '48900';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-zircuitMainnetProd.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-zircuitMainnetProd.json',
       'Spoke Upgrade Zircuit Mainnet Prod',
       safeTransactions,
       chainId
@@ -615,7 +615,7 @@ contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, 
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '1';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-ethereumMainnetStaging.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-ethereumMainnetStaging.json',
       'Spoke Upgrade Ethereum Mainnet Staging',
       safeTransactions,
       chainId
@@ -683,7 +683,7 @@ contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, 
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '42161';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-arbitrumMainnetStaging.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-arbitrumMainnetStaging.json',
       'Spoke Upgrade Arbitrum Mainnet Staging',
       safeTransactions,
       chainId
@@ -751,7 +751,7 @@ contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, 
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '10';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-optimismMainnetStaging.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-optimismMainnetStaging.json',
       'Spoke Upgrade Optimism Mainnet Staging',
       safeTransactions,
       chainId
@@ -865,7 +865,7 @@ contract SpokeArrayUpgradeTestnetStagingSafeInput is TestnetStagingEnvironment, 
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '11155111';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-ethereumSepolia.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-ethereumSepolia.json',
       'Spoke Upgrade Ethereum Sepolia',
       safeTransactions,
       chainId
@@ -932,7 +932,7 @@ contract SpokeArrayUpgradeTestnetStagingSafeInput is TestnetStagingEnvironment, 
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '421614';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-arbitrumSepolia.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-arbitrumSepolia.json',
       'Spoke Upgrade Arbitrum Sepolia',
       safeTransactions,
       chainId
@@ -999,7 +999,7 @@ contract SpokeArrayUpgradeTestnetStagingSafeInput is TestnetStagingEnvironment, 
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '11155420';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-optimismSepolia.json',
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-optimismSepolia.json',
       'Spoke Upgrade Optimism Sepolia',
       safeTransactions,
       chainId
@@ -1066,7 +1066,10 @@ contract SpokeArrayUpgradeTestnetStagingSafeInput is TestnetStagingEnvironment, 
     safeTransactions.push(_createTransaction(0, _params.spokeProxy, upgradeCalldata));
     string memory chainId = '97';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-bnbTestnet.json', 'Spoke Upgrade BNB Testnet', safeTransactions, chainId
+      'safeTransactionInputs/destinationLength/upgradeSpokeArray-bnbTestnet.json',
+      'Spoke Upgrade BNB Testnet',
+      safeTransactions,
+      chainId
     );
   }
 }
