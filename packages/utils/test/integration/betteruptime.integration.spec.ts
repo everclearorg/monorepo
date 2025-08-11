@@ -168,7 +168,7 @@ describe('Betterstack v3 Integration Tests', function () {
       expect(createdIncidents.length).to.be.eq(1);
       expect(incidents.data.data.length).to.be.eq(initial === 10 ? initial : initial + 1);
 
-      createdIncidentIds.push(createdIncidents.id);
+      createdIncidentIds.push(createdIncidents[0].id);
       console.log(`✅ Created incident for unique case: ${createdIncidents[0].id}`);
 
 
