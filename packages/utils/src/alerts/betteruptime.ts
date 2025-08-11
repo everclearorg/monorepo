@@ -8,7 +8,7 @@ export const createUniqueIds = (ids: string[]): string => {
   return `<ids: ${ids.join(',')}>`;
 };
 
-export const BETTERUPTIME_INCIDENTS_URL = 'https://uptime.betterstack.com/api/v2/incidents';
+export const BETTERUPTIME_INCIDENTS_URL = 'https://uptime.betterstack.com/api/v3/incidents';
 
 type BetteruptimeIncident = {
   id: string;
@@ -44,7 +44,6 @@ const validateBetterUptimeConfig = (
 const getMatchingIncidents = async (
   report: Report,
   betterUptime: BetterUptimeConfig,
-  byName: boolean,
   requestContext: RequestContext,
   methodContext: MethodContext,
 ): Promise<BetteruptimeIncident[]> => {
@@ -66,13 +65,26 @@ const getMatchingIncidents = async (
     name,
   });
 
-  // NOTE: only returns max 50 incidents from last 24h. can improve this logic by tracking the incident
-  // ids to report in the cache.
-  const from = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const formattedDate = from.toISOString().split('T')[0];
+  // NOTE: only returns max 50 incidents. can improve this logic by tracking the incident
+
+  // Use v3 API enhanced filtering - only get unresolved incidents
+  // Also filter by environment and report type for more precise matching
+  const queryParams = new URLSearchParams({
+    resolved: 'false',
+    per_page: '50'
+  });
+
+  // Add metadata filtering for better incident matching in v3
+  if (report.ids.length > 0) {
+    // Filter by unique identifier metadata for exact matching
+    queryParams.append(`metadata[unique_identifier][][value]`, createUniqueIds(report.ids))
+  }
+  queryParams.append(`metadata[everclear_env][][value]`, report.env);
+  queryParams.append(`metadata[report_type][][value]`, report.type);
+
   const {
     data: { data: incidents },
-  } = await axiosGet(`${BETTERUPTIME_INCIDENTS_URL}?per_page=50&from=${formattedDate}`, {
+  } = await axiosGet(`${BETTERUPTIME_INCIDENTS_URL}?${queryParams.toString()}`, {
     headers: {
       Authorization: `Bearer ${betterUptime!.apiKey}`,
     },
@@ -80,11 +92,24 @@ const getMatchingIncidents = async (
 
   const uniqueIds = createUniqueIds(report.ids);
 
+  // Enhanced filtering with v3 API - metadata filtering is already applied in the query
+  // but we still need client-side filtering for additional safety
   return incidents.filter(
-    (i: BetteruptimeIncident) =>
-      ['Started', 'Acknowledged'].includes(i.attributes.status) &&
-      (byName ? i.attributes.name === name : i.attributes.name === name && i.attributes.cause.includes(uniqueIds)),
-  );
+    (i: BetteruptimeIncident) => {
+      if (!['Started', 'Acknowledged'].includes(i.attributes.status)) {
+        return false;
+      }
+      if (i.attributes.name !== name) {
+        return false;
+      }
+      // incident active, shares a name
+      const uids: { type: string, value: string }[] = (i.attributes as any).metadata?.unique_identifier ?? [];
+      const values = uids.map(i => i.value);
+      if (!values.includes(uniqueIds)) {
+        return false;
+      }
+      return true;
+    });
 };
 
 /**
@@ -100,8 +125,7 @@ const getMatchingIncidents = async (
 export const alertViaBetterUptimeIfNeeded = async (
   report: Report,
   betterUptime: BetterUptimeConfig,
-  requestContext: RequestContext,
-  byName: boolean = false,
+  requestContext: RequestContext
 ) => {
   // Create method context for the logger
   const methodContext = createMethodContext(alertViaBetterUptime.name);
@@ -128,7 +152,7 @@ export const alertViaBetterUptimeIfNeeded = async (
   }
 
   // Get matching reports
-  const matching = await getMatchingIncidents(report, betterUptime, byName, requestContext, methodContext);
+  const matching = await getMatchingIncidents(report, betterUptime, requestContext, methodContext);
   if (matching.length) {
     logger.warn('Matching incidents found, not creating another.', requestContext, methodContext, {
       report: loggableReport,
@@ -183,12 +207,20 @@ export const alertViaBetterUptime = async (
           ids,
           env,
         }),
-        push: true,
-        sms: false,
         call: severity === Severity.Critical,
+        sms: false,
         email: true,
-        team_wait: 1,
+        critical_alert: severity === Severity.Critical,
         requester_email: betterUptime!.requesterEmail,
+        // Enhanced v3 metadata for better incident categorization and filtering
+        metadata: {
+          everclear_env: [env],
+          report_type: [type],
+          severity_level: [severity.toString()],
+          affected_ids: ids.length > 0 ? ids : ['none'],
+          timestamp: [timestamp.toString()],
+          unique_identifier: [createUniqueIds(ids)]
+        }
       },
       {
         headers: { Authorization: `Bearer ${betterUptime!.apiKey}` },
@@ -196,9 +228,25 @@ export const alertViaBetterUptime = async (
     );
     return response;
   } catch (e) {
-    logger.error(`Error sending betterUptime alert`, requestContext, methodContext, jsonifyError(e as Error), {
-      report: loggableReport,
-    });
+    const error = e as any;
+    // Enhanced error handling for v3 API responses
+    if (error.response?.status === 422) {
+      logger.error(`BetterUptime v3 validation error`, requestContext, methodContext, jsonifyError(e as Error), {
+        status: error.response.status,
+        data: error.response.data,
+        report: loggableReport,
+      });
+    } else if (error.response?.status === 429) {
+      logger.error(`BetterUptime v3 rate limit exceeded`, requestContext, methodContext, jsonifyError(e as Error), {
+        status: error.response.status,
+        retryAfter: error.response.headers?.['retry-after'],
+        report: loggableReport,
+      });
+    } else {
+      logger.error(`Error sending betterUptime alert`, requestContext, methodContext, jsonifyError(e as Error), {
+        report: loggableReport,
+      });
+    }
     return;
   }
 };
@@ -245,27 +293,51 @@ export const resolveAlertViaBetterUptime = async (
 
   // Get matching alerts
   // TODO: should ideally pull _all_ incidents, not only the latest 50 in last 24h
-  const matching = await getMatchingIncidents(report, betterUptime, byName, requestContext, methodContext);
+  const matching = await getMatchingIncidents(report, betterUptime, requestContext, methodContext);
   if (!matching.length) {
     logger.info('No matching incidents found to resolve', requestContext, methodContext, { report: loggableReport });
     return;
   }
 
   // Resolve all matched incidents
-  await Promise.allSettled(
+  const resolveResults = await Promise.allSettled(
     matching.map(async (incident) => {
-      const response = await axiosPost(
-        `${BETTERUPTIME_INCIDENTS_URL}/${incident.id}/resolve`,
-        {
-          resolved_by: betterUptime!.requesterEmail,
-        },
-        {
-          headers: { Authorization: `Bearer ${betterUptime!.apiKey}`, ['Content-Type']: `application/json` },
-        },
-      );
-      return response;
+      try {
+        const response = await axiosPost(
+          `${BETTERUPTIME_INCIDENTS_URL}/${incident.id}/resolve`,
+          {
+            resolved_by: betterUptime!.requesterEmail,
+          },
+          {
+            headers: { Authorization: `Bearer ${betterUptime!.apiKey}`, ['Content-Type']: `application/json` },
+          },
+        );
+        return { incidentId: incident.id, status: 'resolved', response };
+      } catch (e) {
+        const error = e as any;
+        // Handle v3 specific responses
+        if (error.response?.status === 409) {
+          logger.info(`Incident ${incident.id} was already resolved`, requestContext, methodContext);
+          return { incidentId: incident.id, status: 'already_resolved' };
+        } else if (error.response?.status === 404) {
+          logger.warn(`Incident ${incident.id} not found`, requestContext, methodContext);
+          return { incidentId: incident.id, status: 'not_found' };
+        } else {
+          logger.error(`Error resolving incident ${incident.id}`, requestContext, methodContext, jsonifyError(error));
+          return { incidentId: incident.id, status: 'error', error: jsonifyError(error) };
+        }
+      }
     }),
   );
 
-  logger.info('Resolved all incidents', requestContext, methodContext, { report: loggableReport, matching });
+  // Log resolution results
+  const successfulResolutions = resolveResults.filter(
+    (result) => result.status === 'fulfilled' &&
+      ['resolved', 'already_resolved'].includes(result.value.status)
+  );
+
+  logger.info(`Resolved ${successfulResolutions.length}/${matching.length} incidents`, requestContext, methodContext, {
+    report: loggableReport,
+    results: resolveResults.map(r => r.status === 'fulfilled' ? r.value : r.reason)
+  });
 };
