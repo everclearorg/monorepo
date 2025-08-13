@@ -1,4 +1,5 @@
-// yarn ts-node tron/scripts/signTxMultisig.ts  tron/pendingTransactions/tx.json
+// yarn ts-node tron/scripts/signTxMultisig.ts tron/pendingTransactions/tx.json [hot|cold]
+
 
 import TronWeb from 'tronweb';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
@@ -51,10 +52,6 @@ async function checkAccountResources(address: string, tx?: any) {
 }
 
 async function loadTx(source: string) {
-  if (source.endsWith('.txt')) {
-    const [id, b64] = (await fs.readFile(source, 'utf8')).trim().split('\n');
-    return JSON.parse(Buffer.from(b64, 'base64').toString());
-  }
   if (source.endsWith('.json')) return JSON.parse(await fs.readFile(source, 'utf8'));
 
   // assume it's a txID
@@ -63,9 +60,120 @@ async function loadTx(source: string) {
   return tx;
 }
 
+async function saveTransaction(tx: any, originalPath: string) {
+  // Only save if the original path is a JSON file
+  if (!originalPath.endsWith('.json')) {
+    console.log('⚠️  Cannot save transaction - original input was a transaction ID, not a JSON file');
+    console.log('   Transaction data:', JSON.stringify(tx, null, 2));
+    return;
+  }
+
+  try {
+    // Create backup of original file
+    const backupPath = `${originalPath}.backup.${Date.now()}`;
+    try {
+      await fs.copyFile(originalPath, backupPath);
+      console.log(`📁 Backup created: ${backupPath}`);
+    } catch (err) {
+      console.log('⚠️  Could not create backup (file may not exist yet)');
+    }
+
+    // Write updated transaction
+    await fs.writeFile(originalPath, JSON.stringify(tx, null, 2));
+    console.log(`💾 Transaction saved to: ${originalPath}`);
+  } catch (err: any) {
+    console.log('❌ Error saving transaction:', err.message);
+    console.log('   Transaction data:', JSON.stringify(tx, null, 2));
+  }
+}
+
+async function signWithLedger(tx: any): Promise<string> {
+  console.log('🔐 Using Ledger for signing...');
+  
+  const paths = await TransportNodeHid.list();
+  if (paths.length === 0) {
+    throw new Error('No Ledger device found. Please connect your Ledger and open the Tron app.');
+  }
+  
+  const transport = await TransportNodeHid.open(paths[0]);
+  const ledger = new Trx(transport);
+
+  console.log(`📱 Using Ledger at path: ${paths[0]}`);
+  
+  try {
+    const sig = await ledger.signTransaction(LEDGER_PATH, tx.raw_data_hex, []);
+    console.log('✅ Ledger signature obtained successfully');
+    return sig;
+  } finally {
+    await transport.close();
+  }
+}
+
+async function signWithPrivateKey(tx: any): Promise<string> {
+  console.log('🔑 Using private key for signing...');
+  
+  const privateKey = process.env.TRON_KEY;
+  if (!privateKey) {
+    throw new Error('TRON_KEY environment variable not set. Please set it for hot wallet signing.');
+  }
+  
+  // Remove '0x' prefix if present
+  const cleanPrivateKey = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey;
+  
+  if (cleanPrivateKey.length !== 64) {
+    throw new Error('Invalid private key length. Expected 64 hex characters (32 bytes).');
+  }
+  
+  try {
+    // Create TronWeb instance with private key
+    const tronWeb = new TronWeb.TronWeb({
+      fullHost: 'https://api.trongrid.io',
+      headers: { 'TRON-PRO-API-KEY': process.env.TRONGRID_API_KEY },
+      privateKey: cleanPrivateKey
+    });
+    
+    // Try approach 1: Create a completely clean transaction object
+    try {
+      const cleanTx = {
+        txID: tx.txID,
+        raw_data: tx.raw_data,
+        raw_data_hex: tx.raw_data_hex,
+        visible: tx.visible
+        // No signature field at all
+      };
+      
+      const signedTx = await tronWeb.trx.sign(cleanTx);
+      const signature = signedTx.signature[0];
+      
+      console.log('✅ Private key signature obtained successfully');
+      return signature;
+    } catch (err: any) {
+      console.log('⚠️  First approach failed, trying alternative method...');
+      
+      // Try approach 2: Sign using raw hex data directly
+      const rawDataHex = tx.raw_data_hex;
+      const signature = await tronWeb.trx.signMessage(rawDataHex);
+      
+      console.log('✅ Private key signature obtained successfully (alternative method)');
+      return signature;
+    }
+  } catch (err: any) {
+    throw new Error(`Failed to sign with private key: ${err.message}`);
+  }
+}
+
 (async () => {
   const src = process.argv[2];
-  if (!src) throw new Error('Usage: add-signature.ts <txID | tx.json | txtoken.txt>');
+  const signingMode = process.argv[3]; // 'hot' or 'cold'
+  
+  if (!src) throw new Error('Usage: add-signature.ts <txID | tx.json> [hot|cold]');
+  if (signingMode && !['hot', 'cold'].includes(signingMode)) {
+    throw new Error('Signing mode must be either "hot" (private key) or "cold" (Ledger)');
+  }
+  
+  // Default to cold (Ledger) if no mode specified
+  const isHotWallet = signingMode === 'hot';
+  console.log(`🔐 Signing mode: ${isHotWallet ? 'HOT WALLET (private key)' : 'COLD WALLET (Ledger)'}`);
 
   const tx: any = await loadTx(src);
   console.log('loaded tx', tx.txID, '  signatures so far:', tx.signature?.length ?? 0);
@@ -120,23 +228,32 @@ async function loadTx(source: string) {
     }
   }
 
-  // Setting up ledger
-  const paths = await TransportNodeHid.list();
-  const transport = await TransportNodeHid.open(paths[0]);
-  const ledger = new Trx(transport);
-
-  // Logging 
-  console.log(`Using Ledger at path: ${paths[0]}`);
-  console.log('Transport:', transport);
-  console.log('Ledger App:', ledger);
-
-  const sig = await ledger.signTransaction(LEDGER_PATH, tx.raw_data_hex, []);
-
-  if (tx.signature?.includes(sig)) {
-    console.log('⚠️  This key has already signed.  Exiting.');
+  // Sign the transaction using the selected method
+  let sig: string;
+  try {
+    if (isHotWallet) {
+      sig = await signWithPrivateKey(tx);
+    } else {
+      sig = await signWithLedger(tx);
+    }
+  } catch (err: any) {
+    console.log('❌ Signing failed:', err.message);
+    if (isHotWallet) {
+      console.log('💡 For hot wallet signing, make sure TRON_KEY is set in your environment');
+    } else {
+      console.log('💡 For cold wallet signing, make sure your Ledger is connected and Tron app is open');
+    }
     return;
   }
+
+  if (tx.signature?.includes(sig)) {
+    console.log('⚠️  This key has already signed. Exiting.');
+    return;
+  }
+  
+  // Add the new signature
   tx.signature = [...(tx.signature || []), sig];
+  console.log(`✅ Signature added. Total signatures: ${tx.signature.length}`);
 
   const weight = await tronGrid.trx.getSignWeight(tx);
   const cur = (weight.result as any).current_weight;
@@ -152,16 +269,13 @@ async function loadTx(source: string) {
         console.log('✅ Transaction broadcast successful!');
       } else {
         console.log('⚠️  Broadcast failed, but transaction has enough signatures');
-        await fs.writeFile('tron/pendingTransactions/tx.json', JSON.stringify(tx, null, 2));
-        console.log('tx.json written – transaction ready for manual broadcast');
+        await saveTransaction(tx, src);
       }
     } catch (err: any) {
       console.log('⚠️  Broadcast error:', err.message);
-      await fs.writeFile('tron/pendingTransactions/tx.json', JSON.stringify(tx, null, 2));
-      console.log('tx.json written – transaction ready for manual broadcast');
+      await saveTransaction(tx, src);
     }
   } else {
-    await fs.writeFile('tron/pendingTransactions/tx.json', JSON.stringify(tx, null, 2));
-    console.log('tx.json written – send it to the next co‑signer.');
+    await saveTransaction(tx, src);
   }
 })();

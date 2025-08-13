@@ -5,7 +5,7 @@ import Trx from '@ledgerhq/hw-app-trx';
 import fs from "fs/promises";
 
 import dotenv from 'dotenv';
-import { FEE_ADAPTER_PROD, SPOKE_STAGING } from './constants';
+import { FEE_ADAPTER_PROD, SPOKE_PROD, SPOKE_STAGING } from './constants';
 dotenv.config();
 
 const tronWeb = new TronWeb.TronWeb({
@@ -22,7 +22,7 @@ const tronGrid = new TronWeb.TronWeb({
 
 (async () => {
   // 1. build
-  const contract = SPOKE_STAGING;
+  const contract = SPOKE_PROD;
   const multiSigHex = tronWeb.address.toHex(MULTI_SIG_ADDRESS); // convert Base58 → hex
   const transactionName = 'updateFeeAdapterProd'
 
