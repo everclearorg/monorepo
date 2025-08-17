@@ -1,4 +1,4 @@
-import { createLoggingContext, delay } from '@chimera-monorepo/utils';
+import { createLoggingContext, delay, jsonifyError } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { ChainStatusResponse, Severity } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
@@ -18,8 +18,26 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
     ...Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm'),
     config.hub.domain,
   ];
+  const subgraphStart = Date.now();
   const subgraphBlockNumbers = await Promise.race([
-    subgraph.getLatestBlockNumber(domains),
+    subgraph
+      .getLatestBlockNumber(domains)
+      .then((ret) => {
+        logger.info('Getting block from subgraphs complete', requestContext, methodContext, {
+          chains: domains,
+          elapsed: Date.now() - subgraphStart,
+          ret,
+        });
+        return ret;
+      })
+      .catch((e) => {
+        logger.warn('Failed to get block number from subgraph', requestContext, methodContext, {
+          chains: domains,
+          elapsed: Date.now() - subgraphStart,
+          error: jsonifyError(e),
+        });
+        throw e;
+      }),
     (async () => {
       await delay(CALL_DELAY);
       logger.warn('Subgraph took longer than tolerated to resolve latest block', requestContext, methodContext, {
@@ -36,8 +54,26 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
     const threshold = chainConfig.maxDelayedSubgraphBlock ?? config.thresholds.maxDelayedSubgraphBlock ?? 0;
 
     const subgraphBlockNumber = subgraphBlockNumbers.has(domainId) ? subgraphBlockNumbers.get(domainId)! : 0;
+    const rpcStart = Date.now();
     const rpcBlock = await Promise.race([
-      chainreader.getBlock(+domainId, 'latest'),
+      chainreader
+        .getBlock(+domainId, 'latest')
+        .then((ret) => {
+          logger.info('Getting block from chain complete', requestContext, methodContext, {
+            chain: +domainId,
+            elapsed: Date.now() - rpcStart,
+            ret,
+          });
+          return ret;
+        })
+        .catch((e) => {
+          logger.warn('Failed to get block from chain', requestContext, methodContext, {
+            chain: +domainId,
+            elapsed: Date.now() - rpcStart,
+            error: jsonifyError(e),
+          });
+          throw e;
+        }),
       (async () => {
         await delay(CALL_DELAY);
         logger.warn('Chain took longer than tolerated to resolve latest block', requestContext, methodContext, {
