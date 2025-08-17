@@ -105,15 +105,18 @@ export const makeMonitor = async (service: MonitorService) => {
       await bindServer();
       await bindConfig();
     } else if (service == MonitorService.POLLER) {
+      const timeout = 300_000;
       const ret = await Promise.race([
         runChecks(),
         (async () => {
-          await delay(90_000);
+          await delay(timeout);
           return 'timeout';
         })(),
       ]);
       if (ret === 'timeout') {
-        context.logger.warn('Running checks timed out after 90s');
+        context.logger.warn('Running checks timed out', requestContext, methodContext, {
+          timeout,
+        });
       }
       if (context.config.healthUrls[service]) {
         const url = context.config.healthUrls[service]!;
