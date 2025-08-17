@@ -27,29 +27,31 @@ export const checkRpcs = async () => {
 
   const { requestContext, methodContext } = createLoggingContext(checkRpcs.name);
   const badRpcs: RpcError[] = [];
-  const goodRpcs = [];
-  for (const domainId of Object.keys(config.chains)) {
-    const chainConfig = config.chains[domainId];
-    const rpcUrls = chainConfig.providers;
-    for (const rpcUrl of rpcUrls) {
-      const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
-      try {
-        let blockNumber: number;
-        if (chainConfig.network === 'svm') {
-          const connection = new Connection(rpcUrl);
-          blockNumber = await connection.getBlockHeight();
-        } else {
-          const provider = new providers.JsonRpcProvider(rpcUrl);
-          blockNumber = await provider.getBlockNumber();
+  const goodRpcs: { blockNumber: number; domain: string; rpcOrigin: string }[] = [];
+  await Promise.all(
+    Object.keys(config.chains).map(async (domainId) => {
+      const chainConfig = config.chains[domainId];
+      const rpcUrls = chainConfig.providers;
+      for (const rpcUrl of rpcUrls) {
+        const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
+        try {
+          let blockNumber: number;
+          if (chainConfig.network === 'svm') {
+            const connection = new Connection(rpcUrl);
+            blockNumber = await connection.getBlockHeight();
+          } else {
+            const provider = new providers.JsonRpcProvider(rpcUrl);
+            blockNumber = await provider.getBlockNumber();
+          }
+          goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
+        } catch (error: unknown) {
+          (error as Error).message = (error as Error).message.replace(rpcUrl, rpcOrigin);
+          badRpcs.push({ rpcOrigin, error: (error as Error).message, domain: domainId });
+          logger.debug(`Error connecting to provider at ${rpcOrigin}: ${error}`, requestContext, methodContext);
         }
-        goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
-      } catch (error: unknown) {
-        (error as Error).message = (error as Error).message.replace(rpcUrl, rpcOrigin);
-        badRpcs.push({ rpcOrigin, error: (error as Error).message, domain: domainId });
-        logger.debug(`Error connecting to provider at ${rpcOrigin}: ${error}`, requestContext, methodContext);
       }
-    }
-  }
+    }),
+  );
 
   for (const badRpc of badRpcs) {
     // Skip alerts for Solana 429 errors
