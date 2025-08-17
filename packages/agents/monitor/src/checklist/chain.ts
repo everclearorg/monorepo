@@ -130,10 +130,14 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
           },
         );
 
+        const alertStart = Date.now();
         await sendAlerts(report, logger, config, requestContext);
+        logger.debug('Sent all alerts', requestContext, methodContext, { elapsed: Date.now() - alertStart });
       } else {
         // Resolve any alerts
+        const alertStart = Date.now();
         await resolveAlerts(report, logger, config, requestContext);
+        logger.debug('Resolved all alerts', requestContext, methodContext, { elapsed: Date.now() - alertStart });
       }
     }),
   );
