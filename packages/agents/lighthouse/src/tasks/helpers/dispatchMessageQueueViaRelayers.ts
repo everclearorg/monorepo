@@ -297,7 +297,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          messageGasLimit(queue.domain, toDequeue),
+          messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, toDequeue),
         ]);
         const digest = keccak256(payload);
 
@@ -364,7 +364,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          messageGasLimit(queue.domain, actualIntentCount),
+          messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
         ]);
         const correctedDigest = keccak256(correctedPayload);
 
@@ -402,7 +402,7 @@ export const dispatchMessageQueueViaRelayers = async (
             relayerAddress,
             ttl,
             nonce,
-            messageGasLimit(queue.domain, actualIntentCount),
+            messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
             correctedSignature, // Use corrected signature
           ]),
           to: everclear,
