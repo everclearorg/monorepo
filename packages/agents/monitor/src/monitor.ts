@@ -106,6 +106,7 @@ export const makeMonitor = async (service: MonitorService) => {
       await bindConfig();
     } else if (service == MonitorService.POLLER) {
       const timeout = 700_000;
+      const start = Date.now();
       const ret = await Promise.race([
         runChecks(),
         (async () => {
@@ -116,6 +117,11 @@ export const makeMonitor = async (service: MonitorService) => {
       if (ret === 'timeout') {
         context.logger.warn('Running checks timed out', requestContext, methodContext, {
           timeout,
+        });
+      } else {
+        context.logger.info('Completed all checks within time', requestContext, methodContext, {
+          timeout,
+          elapsed: Date.now() - start,
         });
       }
       if (context.config.healthUrls[service]) {
