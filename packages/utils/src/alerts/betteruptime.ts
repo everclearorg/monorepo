@@ -2,6 +2,7 @@ import { Logger, MethodContext, RequestContext, createMethodContext } from '../l
 import { jsonifyError } from '../types';
 import { BetterUptimeConfig, Severity, Report } from '../helpers';
 import { axiosPost, axiosGet } from './mockable';
+import { AxiosError } from 'axios';
 
 // Create a uniquely serialized and searchable ids for matching reports.
 export const createUniqueIds = (ids: string[]): string => {
@@ -10,10 +11,53 @@ export const createUniqueIds = (ids: string[]): string => {
 
 export const BETTERUPTIME_INCIDENTS_URL = 'https://uptime.betterstack.com/api/v3/incidents';
 
+type BetteruptimeIncidentAttributes = {
+  name: string;
+  http_method?: string;
+  cause: string;
+  url?: string;
+  incident_group_id?: string;
+  started_at: string;
+  acknowledged_at?: string;
+  acknowledged_by?: string;
+  resolved_at?: string;
+  resolved_by?: string;
+  status: 'Started' | 'Acknowledged' | 'Resolved';
+  team_name: string;
+  response_content?: string;
+  response_options?: string;
+  regions?: string;
+  response_url?: string;
+  screenshot_url?: string;
+  origin_url?: string;
+  escalation_policy_id?: string;
+  call: boolean;
+  sms: boolean;
+  email: boolean;
+  push: boolean;
+  critical_alert: boolean;
+  metadata: BetteruptimeHeartbeatMetadata | BetteruptimeTypedMetadata;
+};
+
+type Metadata = { type: string; value: string };
+type BetteruptimeHeartbeatMetadata = { Group: Metadata[] };
+type BetteruptimeTypedMetadata = {
+  affected_ids: Metadata[];
+  everclear_env: Metadata[];
+  report_type: Metadata[];
+  severity_level: Metadata[];
+  timestamp: Metadata[];
+  unique_identifier: Metadata[];
+};
+
+type BetteruptimeIncidentRelationships = {
+  heartbeat: { data: { id: string; type: 'heartbeat ' } };
+};
 type BetteruptimeIncident = {
   id: string;
   type: string;
-  attributes: { status: string; name: string; cause: string; started_at: string };
+  attributes: BetteruptimeIncidentAttributes;
+  relationships: Partial<BetteruptimeIncidentRelationships>;
 };
 
 const createAlertName = (report: Report): string => {
@@ -41,7 +85,7 @@ const validateBetterUptimeConfig = (
   return true;
 };
 
-const getMatchingIncidents = async (
+export const getMatchingIncidents = async (
   report: Report,
   betterUptime: BetterUptimeConfig,
   requestContext: RequestContext,
@@ -71,45 +115,44 @@ const getMatchingIncidents = async (
   // Also filter by environment and report type for more precise matching
   const queryParams = new URLSearchParams({
     resolved: 'false',
-    per_page: '50'
+    per_page: '50',
   });
 
   // Add metadata filtering for better incident matching in v3
   if (report.ids.length > 0) {
     // Filter by unique identifier metadata for exact matching
-    queryParams.append(`metadata[unique_identifier][][value]`, createUniqueIds(report.ids))
+    queryParams.append(`metadata[unique_identifier][][value]`, createUniqueIds(report.ids));
   }
   queryParams.append(`metadata[everclear_env][][value]`, report.env);
   queryParams.append(`metadata[report_type][][value]`, report.type);
 
   const {
-    data: { data: incidents },
+    data: { data: _incidents },
   } = await axiosGet(`${BETTERUPTIME_INCIDENTS_URL}?${queryParams.toString()}`, {
     headers: {
       Authorization: `Bearer ${betterUptime!.apiKey}`,
     },
   });
-
+  const incidents = _incidents as BetteruptimeIncident[];
   const uniqueIds = createUniqueIds(report.ids);
 
   // Enhanced filtering with v3 API - metadata filtering is already applied in the query
   // but we still need client-side filtering for additional safety
-  return incidents.filter(
-    (i: BetteruptimeIncident) => {
-      if (!['Started', 'Acknowledged'].includes(i.attributes.status)) {
-        return false;
-      }
-      if (i.attributes.name !== name) {
-        return false;
-      }
-      // incident active, shares a name
-      const uids: { type: string, value: string }[] = (i.attributes as any).metadata?.unique_identifier ?? [];
-      const values = uids.map(i => i.value);
-      if (!values.includes(uniqueIds)) {
-        return false;
-      }
-      return true;
-    });
+  return incidents.filter((i: BetteruptimeIncident) => {
+    if (!['Started', 'Acknowledged'].includes(i.attributes.status)) {
+      return false;
+    }
+    if (i.attributes.name !== name) {
+      return false;
+    }
+    // incident active, shares a name
+    const uids = (i.attributes.metadata as BetteruptimeTypedMetadata)?.unique_identifier ?? [];
+    const values = uids.map((i) => i.value);
+    if (!values.includes(uniqueIds)) {
+      return false;
+    }
+    return true;
+  });
 };
 
 /**
@@ -125,7 +168,7 @@ const getMatchingIncidents = async (
 export const alertViaBetterUptimeIfNeeded = async (
   report: Report,
   betterUptime: BetterUptimeConfig,
-  requestContext: RequestContext
+  requestContext: RequestContext,
 ) => {
   // Create method context for the logger
   const methodContext = createMethodContext(alertViaBetterUptime.name);
@@ -219,8 +262,8 @@ export const alertViaBetterUptime = async (
           severity_level: [severity.toString()],
           affected_ids: ids.length > 0 ? ids : ['none'],
           timestamp: [timestamp.toString()],
-          unique_identifier: [createUniqueIds(ids)]
-        }
+          unique_identifier: [createUniqueIds(ids)],
+        },
       },
       {
         headers: { Authorization: `Bearer ${betterUptime!.apiKey}` },
@@ -228,7 +271,7 @@ export const alertViaBetterUptime = async (
     );
     return response;
   } catch (e) {
-    const error = e as any;
+    const error = e as unknown as AxiosError;
     // Enhanced error handling for v3 API responses
     if (error.response?.status === 422) {
       logger.error(`BetterUptime v3 validation error`, requestContext, methodContext, jsonifyError(e as Error), {
@@ -314,7 +357,7 @@ export const resolveAlertViaBetterUptime = async (
         );
         return { incidentId: incident.id, status: 'resolved', response };
       } catch (e) {
-        const error = e as any;
+        const error = e as unknown as AxiosError;
         // Handle v3 specific responses
         if (error.response?.status === 409) {
           logger.info(`Incident ${incident.id} was already resolved`, requestContext, methodContext);
@@ -332,12 +375,11 @@ export const resolveAlertViaBetterUptime = async (
 
   // Log resolution results
   const successfulResolutions = resolveResults.filter(
-    (result) => result.status === 'fulfilled' &&
-      ['resolved', 'already_resolved'].includes(result.value.status)
+    (result) => result.status === 'fulfilled' && ['resolved', 'already_resolved'].includes(result.value.status),
   );
 
   logger.info(`Resolved ${successfulResolutions.length}/${matching.length} incidents`, requestContext, methodContext, {
     report: loggableReport,
-    results: resolveResults.map(r => r.status === 'fulfilled' ? r.value : r.reason)
+    results: resolveResults.map((r) => (r.status === 'fulfilled' ? r.value : r.reason)),
   });
 };

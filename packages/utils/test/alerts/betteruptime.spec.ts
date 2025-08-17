@@ -67,7 +67,7 @@ describe('betteruptime', () => {
               everclear_env: [TEST_REPORT.env],
               report_type: [type],
               severity_level: [severity.toString()],
-              affected_ids: ids,
+              affected_ids: ids.length ? ids : ['none'],
               timestamp: [timestamp.toString()],
               unique_identifier: [`<ids: ${ids.join(',')}>`]
             }
@@ -109,7 +109,7 @@ describe('betteruptime', () => {
         }
       };
       postStub.rejects(error);
-      
+
       await alertViaBetterUptime(TEST_REPORT, betterUptimeConfig, requestContext);
       expect(logger.error.callCount).to.be.eq(1);
       expect(logger.error.getCall(0).args[0]).to.include('v3 validation error');
@@ -123,7 +123,7 @@ describe('betteruptime', () => {
         }
       };
       postStub.rejects(error);
-      
+
       await alertViaBetterUptime(TEST_REPORT, betterUptimeConfig, requestContext);
       expect(logger.error.callCount).to.be.eq(1);
       expect(logger.error.getCall(0).args[0]).to.include('rate limit exceeded');
@@ -136,7 +136,7 @@ describe('betteruptime', () => {
         }
       };
       postStub.rejects(error);
-      
+
       await alertViaBetterUptime(TEST_REPORT, betterUptimeConfig, requestContext);
       expect(logger.error.callCount).to.be.eq(1);
       expect(logger.error.getCall(0).args[0]).to.include('Error sending betterUptime alert');
@@ -147,7 +147,7 @@ describe('betteruptime', () => {
       const criticalReport = { ...TEST_REPORT, severity: Severity.Critical };
 
       await alertViaBetterUptime(criticalReport, betterUptimeConfig, requestContext);
-      
+
       const callArgs = postStub.getCall(0).args[1];
       expect(callArgs.call).to.be.true;
       expect(callArgs.critical_alert).to.be.true;
@@ -158,7 +158,7 @@ describe('betteruptime', () => {
       const warningReport = { ...TEST_REPORT, severity: Severity.Warning };
 
       await alertViaBetterUptime(warningReport, betterUptimeConfig, requestContext);
-      
+
       const callArgs = postStub.getCall(0).args[1];
       expect(callArgs.call).to.be.false;
       expect(callArgs.critical_alert).to.be.false;
@@ -169,7 +169,7 @@ describe('betteruptime', () => {
       const reportWithoutIds = { ...TEST_REPORT, ids: [] };
 
       await alertViaBetterUptime(reportWithoutIds, betterUptimeConfig, requestContext);
-      
+
       const callArgs = postStub.getCall(0).args[1];
       expect(callArgs.metadata.affected_ids).to.deep.equal(['none']);
     });
@@ -179,7 +179,7 @@ describe('betteruptime', () => {
       const reportWithIds = { ...TEST_REPORT, ids: ['id1', 'id2'] };
 
       await alertViaBetterUptime(reportWithIds, betterUptimeConfig, requestContext);
-      
+
       const callArgs = postStub.getCall(0).args[1];
       expect(callArgs.metadata.affected_ids).to.deep.equal(['id1', 'id2']);
     });
@@ -218,12 +218,12 @@ describe('betteruptime', () => {
                 email: true,
                 push: true,
                 metadata: {
-                  everclear_env: ['staging'],
-                  report_type: ['test'],
-                  severity_level: ['info'],
-                  affected_ids: ['test'],
+                  everclear_env: [{ value: 'staging' }],
+                  report_type: [{ value: 'test' }],
+                  severity_level: [{ value: 'info' }],
+                  affected_ids: [{ value: 'test' }],
                   timestamp: ['1234567890000'],
-                  unique_identifier: ['<ids: test>']
+                  unique_identifier: [{ value: '<ids: test>' }]
                 },
               },
               relationships: {},
@@ -235,16 +235,17 @@ describe('betteruptime', () => {
     });
 
     it('should skip creating an incident if similar incident exists', async () => {
-      await expect(alertViaBetterUptimeIfNeeded(TEST_REPORT, betterUptimeConfig, requestContext)).to.not.rejected;
+      await expect(alertViaBetterUptimeIfNeeded(TEST_REPORT, betterUptimeConfig, requestContext)).to.not.be.rejected;
+      expect(getStub.callCount).to.be.eq(1);
       expect(postStub.callCount).to.be.eq(0);
     });
 
     it('should call alertViaBetterUptime directly when report has no IDs', async () => {
       const reportWithoutIds = { ...TEST_REPORT, ids: [] };
       postStub.resolves();
-      
+
       await alertViaBetterUptimeIfNeeded(reportWithoutIds, betterUptimeConfig, requestContext);
-      
+
       // Should call alertViaBetterUptime directly, not check for existing incidents
       expect(getStub.callCount).to.be.eq(0);
       expect(postStub.callCount).to.be.eq(1);
@@ -259,16 +260,16 @@ describe('betteruptime', () => {
         },
       });
       postStub.resolves();
-      
+
       await alertViaBetterUptimeIfNeeded(TEST_REPORT, betterUptimeConfig, requestContext);
-      
+
       expect(getStub.callCount).to.be.eq(1);
       expect(postStub.callCount).to.be.eq(1);
     });
 
     it('should use byName parameter when searching for incidents', async () => {
-      await alertViaBetterUptimeIfNeeded(TEST_REPORT, betterUptimeConfig, requestContext, true);
-      
+      await alertViaBetterUptimeIfNeeded(TEST_REPORT, betterUptimeConfig, requestContext);
+
       expect(getStub.callCount).to.be.eq(1);
       expect(postStub.callCount).to.be.eq(0); // Should find matching incident by name
     });
@@ -286,7 +287,7 @@ describe('betteruptime', () => {
                 cause: 'content#<ids: test>',
                 status: 'Resolved', // This should be filtered out
                 metadata: {
-                  unique_identifier: ['<ids: test>']
+                  unique_identifier: [{ value: '<ids: test>' }]
                 },
               },
             },
@@ -294,9 +295,9 @@ describe('betteruptime', () => {
         },
       });
       postStub.resolves();
-      
+
       await alertViaBetterUptimeIfNeeded(TEST_REPORT, betterUptimeConfig, requestContext);
-      
+
       // Should create new incident because existing one is resolved
       expect(postStub.callCount).to.be.eq(1);
     });
@@ -314,16 +315,16 @@ describe('betteruptime', () => {
                 cause: 'different cause', // No uniqueIds here
                 status: 'Started',
                 metadata: {
-                  unique_identifier: ['<ids: test>'] // But has it in metadata
+                  unique_identifier: [{ value: '<ids: test>' }] // But has it in metadata
                 },
               },
             },
           ],
         },
       });
-      
+
       await alertViaBetterUptimeIfNeeded(TEST_REPORT, betterUptimeConfig, requestContext);
-      
+
       // Should not create new incident because it found match via metadata
       expect(postStub.callCount).to.be.eq(0);
     });
@@ -362,12 +363,12 @@ describe('betteruptime', () => {
                 email: true,
                 push: true,
                 metadata: {
-                  everclear_env: ['staging'],
-                  report_type: ['test'],
+                  everclear_env: [{ value: 'staging' }],
+                  report_type: [{ value: 'test' }],
                   severity_level: ['info'],
-                  affected_ids: ['test'],
+                  affected_ids: [{ value: 'test' }],
                   timestamp: ['1234567890000'],
-                  unique_identifier: ['<ids: test>']
+                  unique_identifier: [{ value: '<ids: test>' }]
                 },
               },
               relationships: {},
@@ -390,7 +391,7 @@ describe('betteruptime', () => {
         response: { status: 409 }
       };
       postStub.rejects(error);
-      
+
       await resolveAlertViaBetterUptime(TEST_REPORT, betterUptimeConfig, requestContext);
       expect(logger.info.callCount).to.be.greaterThan(0);
     });
@@ -400,7 +401,7 @@ describe('betteruptime', () => {
         response: { status: 404 }
       };
       postStub.rejects(error);
-      
+
       await resolveAlertViaBetterUptime(TEST_REPORT, betterUptimeConfig, requestContext);
       expect(logger.warn.callCount).to.be.greaterThan(0);
     });
@@ -410,16 +411,16 @@ describe('betteruptime', () => {
         response: { status: 500 }
       };
       postStub.rejects(error);
-      
+
       await resolveAlertViaBetterUptime(TEST_REPORT, betterUptimeConfig, requestContext);
       expect(logger.error.callCount).to.be.greaterThan(0);
     });
 
     it('should return early if no IDs and byName is false', async () => {
       const reportWithoutIds = { ...TEST_REPORT, ids: [] };
-      
+
       await resolveAlertViaBetterUptime(reportWithoutIds, betterUptimeConfig, requestContext);
-      
+
       expect(getStub.callCount).to.be.eq(0);
       expect(postStub.callCount).to.be.eq(0);
       expect(logger.warn.callCount).to.be.eq(1);
@@ -427,9 +428,9 @@ describe('betteruptime', () => {
 
     it('should proceed if no IDs but byName is true', async () => {
       const reportWithoutIds = { ...TEST_REPORT, ids: [] };
-      
+
       await resolveAlertViaBetterUptime(reportWithoutIds, betterUptimeConfig, requestContext, true);
-      
+
       expect(getStub.callCount).to.be.eq(1);
     });
 
@@ -441,9 +442,9 @@ describe('betteruptime', () => {
           pagination: {},
         },
       });
-      
+
       await resolveAlertViaBetterUptime(TEST_REPORT, betterUptimeConfig, requestContext);
-      
+
       expect(getStub.callCount).to.be.eq(1);
       expect(postStub.callCount).to.be.eq(0);
       expect(logger.info.callCount).to.be.greaterThan(0);
