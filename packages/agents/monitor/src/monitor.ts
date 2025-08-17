@@ -1,4 +1,4 @@
-import { Logger, RelayerType, createLoggingContext, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
+import { Logger, RelayerType, createLoggingContext, delay, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
 import { setupCache, setupSubgraphReader } from './setup';
@@ -78,6 +78,7 @@ export const makeMonitor = async (service: MonitorService) => {
     );
 
     context.adapters.database = await getDatabase(context.config.database.url, context.logger);
+    context.logger.debug('Database setup', requestContext, methodContext);
 
     // Adapters - relayers
     context.adapters.relayers = [];
@@ -99,13 +100,51 @@ export const makeMonitor = async (service: MonitorService) => {
         type: relayerConfig.type as RelayerType,
       });
     }
+    context.logger.debug('Relayers setup', requestContext, methodContext);
 
     /// MARK - Bindings
     if (service == MonitorService.SERVER) {
       await bindServer();
       await bindConfig();
     } else if (service == MonitorService.POLLER) {
-      await runChecks();
+      const timeout = 700_000;
+      const start = Date.now();
+      context.logger.info('Beginning checks', requestContext, methodContext, {
+        start,
+        timeout,
+      });
+      const ret = await Promise.race([
+        runChecks(requestContext)
+          .then(() => {
+            context.logger.info('Running checks completed', requestContext, methodContext, {
+              elapsed: Date.now() - start,
+              start,
+              timeout,
+            });
+          })
+          .catch((e) => {
+            context.logger.error('Failed to run checks', requestContext, methodContext, jsonifyError(e), {
+              start,
+              timeout,
+              elapsed: Date.now() - start,
+            });
+            throw e;
+          }),
+        (async () => {
+          await delay(timeout);
+          return 'timeout';
+        })(),
+      ]);
+      if (ret === 'timeout') {
+        context.logger.warn('Running checks timed out', requestContext, methodContext, {
+          timeout,
+        });
+      } else {
+        context.logger.info('Completed all checks within time', requestContext, methodContext, {
+          timeout,
+          elapsed: Date.now() - start,
+        });
+      }
       if (context.config.healthUrls[service]) {
         const url = context.config.healthUrls[service]!;
         await sendHeartbeat(url, context.logger);
