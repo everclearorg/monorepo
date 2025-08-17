@@ -78,6 +78,7 @@ export const makeMonitor = async (service: MonitorService) => {
     );
 
     context.adapters.database = await getDatabase(context.config.database.url, context.logger);
+    context.logger.debug('Database setup', requestContext, methodContext);
 
     // Adapters - relayers
     context.adapters.relayers = [];
@@ -99,6 +100,7 @@ export const makeMonitor = async (service: MonitorService) => {
         type: relayerConfig.type as RelayerType,
       });
     }
+    context.logger.debug('Relayers setup', requestContext, methodContext);
 
     /// MARK - Bindings
     if (service == MonitorService.SERVER) {
@@ -107,6 +109,10 @@ export const makeMonitor = async (service: MonitorService) => {
     } else if (service == MonitorService.POLLER) {
       const timeout = 700_000;
       const start = Date.now();
+      context.logger.info('Beginning checks', requestContext, methodContext, {
+        start,
+        timeout,
+      });
       const ret = await Promise.race([
         runChecks()
           .then(() => {
