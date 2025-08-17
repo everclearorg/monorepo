@@ -13,7 +13,7 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkChains.name);
 
-  const chainStatus = [];
+  const chainStatus: ChainStatusResponse = [];
   const domains = [
     ...Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm'),
     config.hub.domain,
@@ -39,7 +39,7 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
     const rpcBlock = await Promise.race([
       chainreader.getBlock(+domainId, 'latest'),
       (async () => {
-        await delay(5_000);
+        await delay(CALL_DELAY);
         logger.warn('Chain took longer than tolerated to resolve latest block', requestContext, methodContext, {
           chain: +domainId,
           delay: CALL_DELAY,
@@ -48,7 +48,9 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
       })(),
     ]);
 
-    const diff = rpcBlock.number - subgraphBlockNumber;
+    // Automatically increase the diff to size of threshold + 10
+    const diff =
+      rpcBlock.number === 0 && subgraphBlockNumber === 0 ? threshold + 10 : rpcBlock.number - subgraphBlockNumber;
 
     logger.debug(`Checking chain status: ${domainId}`, requestContext, methodContext, {
       rpc: rpcBlock.number,
@@ -71,7 +73,7 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
       severity: Severity.Warning,
       type: 'ChainDelayed',
       ids: [domainId],
-      reason: `${requestContext.origin}, The subgraph or chain of ${domainId} is behind by ${diff} blocks (threshold: ${threshold}). Check rpcs and subgraph.`,
+      reason: `${requestContext.origin}, The subgraph or chain of ${domainId} is behind by ${rpcBlock.number - subgraphBlockNumber} blocks (threshold: ${threshold}). Check rpcs and subgraph.`,
       timestamp: Date.now(),
       logger: logger,
       env: config.environment,
@@ -84,7 +86,7 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
         requestContext,
         methodContext,
         {
-          diff,
+          diff: rpcBlock.number - subgraphBlockNumber,
           threshold,
           rpcBlock,
           subgraphBlockNumber,
