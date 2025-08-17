@@ -108,7 +108,22 @@ export const makeMonitor = async (service: MonitorService) => {
       const timeout = 700_000;
       const start = Date.now();
       const ret = await Promise.race([
-        runChecks(),
+        runChecks()
+          .then(() => {
+            context.logger.info('Running checks completed', requestContext, methodContext, {
+              elapsed: Date.now() - start,
+              start,
+              timeout,
+            });
+          })
+          .catch((e) => {
+            context.logger.error('Failed to run checks', requestContext, methodContext, jsonifyError(e), {
+              start,
+              timeout,
+              elapsed: Date.now() - start,
+            });
+            throw e;
+          }),
         (async () => {
           await delay(timeout);
           return 'timeout';
