@@ -61,7 +61,7 @@ export const runChecks = async () => {
     const endTime = Date.now();
     const elapsed = endTime - startTime;
     if (elapsed > 90_000) {
-      logger.warn(`Check took took more than 90s`, requestContext, methodContext, {
+      logger.warn(`Check took more than 90s`, requestContext, methodContext, {
         elapsedSec: elapsed / 1000,
         check: checkFn.name,
       });
