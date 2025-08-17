@@ -164,6 +164,6 @@ export const checkInvoiceAmount = async () => {
       filteredInvoiceIds,
     });
 
-    return sendAlerts(report, logger, config, requestContext, true);
+    return sendAlerts(report, logger, config, requestContext);
   }
 };

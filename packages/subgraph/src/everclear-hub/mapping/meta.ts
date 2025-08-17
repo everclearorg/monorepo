@@ -10,6 +10,8 @@ import {
   MinSolverSupportedDomainsUpdated,
   ExpiryTimeBufferUpdated,
   EpochLengthUpdated,
+  Paused as PausedEvent,
+  Unpaused as UnpausedEvent,
 } from '../../../generated/EverclearHub/EverclearHub';
 import { getChainId } from '../../common';
 
@@ -72,9 +74,8 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
  *
  * @param event - The contract event used to create the subgraph record
  */
-export function handlePaused(): void {
+export function handlePaused(event: PausedEvent): void {
   const meta = getOrCreateMeta();
-
   meta.paused = true;
   meta.save();
 }
@@ -84,9 +85,8 @@ export function handlePaused(): void {
  *
  * @param event - The contract event used to create the subgraph record
  */
-export function handleUnpaused(): void {
+export function handleUnpaused(event: UnpausedEvent): void {
   const meta = getOrCreateMeta();
-
   meta.paused = false;
   meta.save();
 }
