@@ -105,7 +105,7 @@ export const makeMonitor = async (service: MonitorService) => {
       await bindServer();
       await bindConfig();
     } else if (service == MonitorService.POLLER) {
-      const timeout = 300_000;
+      const timeout = 700_000;
       const ret = await Promise.race([
         runChecks(),
         (async () => {
