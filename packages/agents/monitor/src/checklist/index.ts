@@ -1,4 +1,4 @@
-import { createLoggingContext } from '@chimera-monorepo/utils';
+import { createLoggingContext, RequestContext } from '@chimera-monorepo/utils';
 import { checkAgents } from './agent';
 import { checkChains } from './chain';
 import { checkGas } from './gas';
@@ -22,8 +22,8 @@ import { checkSpokeBalance } from './spoke';
 import { checkTokenomicsExportLatency, checkTokenomicsExportStatus } from './tokenomics';
 import { checkSolanaPipelineStatus } from './solana';
 
-export const runChecks = async () => {
-  const { requestContext, methodContext } = createLoggingContext(runChecks.name);
+export const runChecks = async (_requestContext?: RequestContext) => {
+  const { methodContext, requestContext } = createLoggingContext(runChecks.name, _requestContext);
   const checklist = [
     checkChains,
     checkAgents,

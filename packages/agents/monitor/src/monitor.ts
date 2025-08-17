@@ -114,7 +114,7 @@ export const makeMonitor = async (service: MonitorService) => {
         timeout,
       });
       const ret = await Promise.race([
-        runChecks()
+        runChecks(requestContext)
           .then(() => {
             context.logger.info('Running checks completed', requestContext, methodContext, {
               elapsed: Date.now() - start,
