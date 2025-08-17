@@ -53,6 +53,10 @@ export const runChecks = async () => {
   logger.info(`Running checks... fns: ${checklist.map((it) => it.name).join(',')}`, requestContext, methodContext);
   for (const checkFn of checklist) {
     const startTime = Date.now();
+    logger.debug(`Starting check`, requestContext, methodContext, {
+      startTime,
+      check: checkFn.name,
+    });
     await checkFn();
     const endTime = Date.now();
     const elapsed = endTime - startTime;
@@ -62,7 +66,7 @@ export const runChecks = async () => {
         check: checkFn.name,
       });
     } else {
-      logger.debug(`Elapsed time for checks`, requestContext, methodContext, {
+      logger.debug(`Elapsed time for check`, requestContext, methodContext, {
         elapsedSec: elapsed / 1000,
         check: checkFn.name,
       });

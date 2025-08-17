@@ -1,4 +1,4 @@
-import { createLoggingContext } from '@chimera-monorepo/utils';
+import { createLoggingContext, delay } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { ChainStatusResponse, Severity } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
@@ -16,7 +16,16 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
     ...Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm'),
     config.hub.domain,
   ];
-  const subgraphBlockNumbers = await subgraph.getLatestBlockNumber(domains);
+  const subgraphBlockNumbers = await Promise.race([
+    subgraph.getLatestBlockNumber(domains),
+    (async () => {
+      await delay(5_000);
+      logger.warn('Subgraph took longer than 5s to resolve latest block', requestContext, methodContext, {
+        chains: domains,
+      });
+      return new Map();
+    })(),
+  ]);
 
   for (const domainId of domains) {
     // Get chain-specific threshold or fall back to global default
@@ -24,7 +33,16 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
     const threshold = chainConfig.maxDelayedSubgraphBlock ?? config.thresholds.maxDelayedSubgraphBlock ?? 0;
 
     const subgraphBlockNumber = subgraphBlockNumbers.has(domainId) ? subgraphBlockNumbers.get(domainId)! : 0;
-    const rpcBlock = await chainreader.getBlock(+domainId, 'latest');
+    const rpcBlock = await Promise.race([
+      chainreader.getBlock(+domainId, 'latest'),
+      (async () => {
+        await delay(5_000);
+        logger.warn('Chain took longer than 5s to resolve latest block', requestContext, methodContext, {
+          chain: +domainId,
+        });
+        return { number: 0, timestamp: Math.floor(Date.now() / 1000) };
+      })(),
+    ]);
 
     const diff = rpcBlock.number - subgraphBlockNumber;
 
@@ -47,9 +65,9 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
     // Create report
     const report = {
       severity: Severity.Warning,
-      type: 'SubgraphDelayed',
+      type: 'ChainDelayed',
       ids: [domainId],
-      reason: `${requestContext.origin}, The subgraph of ${domainId} is behind by ${diff} blocks (threshold: ${threshold})`,
+      reason: `${requestContext.origin}, The subgraph or chain of ${domainId} is behind by ${diff} blocks (threshold: ${threshold}). Check rpcs and subgraph.`,
       timestamp: Date.now(),
       logger: logger,
       env: config.environment,
@@ -57,10 +75,17 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
 
     if (shouldAlert && threshold > 0 && diff > threshold) {
       // Send alerts
-      logger.warn(`The subgraph of ${domainId} is behind by a threshold of blocks`, requestContext, methodContext, {
-        diff,
-        threshold,
-      });
+      logger.warn(
+        `The subgraph or chain of ${domainId} is behind by a threshold of blocks`,
+        requestContext,
+        methodContext,
+        {
+          diff,
+          threshold,
+          rpcBlock,
+          subgraphBlockNumber,
+        },
+      );
 
       await sendAlerts(report, logger, config, requestContext);
     } else {
