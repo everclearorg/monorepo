@@ -55,6 +55,17 @@ export const runChecks = async () => {
     const startTime = Date.now();
     await checkFn();
     const endTime = Date.now();
-    logger.debug(`Elapsed time: ${(endTime - startTime) / 1000}s`, requestContext, methodContext);
+    const elapsed = endTime - startTime;
+    if (elapsed > 90_000) {
+      logger.warn(`Check took took more than 90s`, requestContext, methodContext, {
+        elapsedSec: elapsed / 1000,
+        check: checkFn.name,
+      });
+    } else {
+      logger.debug(`Elapsed time for checks`, requestContext, methodContext, {
+        elapsedSec: elapsed / 1000,
+        check: checkFn.name,
+      });
+    }
   }
 };

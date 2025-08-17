@@ -1,4 +1,4 @@
-import { Logger, RelayerType, createLoggingContext, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
+import { Logger, RelayerType, createLoggingContext, delay, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
 import { setupCache, setupSubgraphReader } from './setup';
@@ -105,7 +105,16 @@ export const makeMonitor = async (service: MonitorService) => {
       await bindServer();
       await bindConfig();
     } else if (service == MonitorService.POLLER) {
-      await runChecks();
+      const ret = await Promise.race([
+        runChecks(),
+        (async () => {
+          await delay(90_000);
+          return 'timeout';
+        })(),
+      ]);
+      if (ret === 'timeout') {
+        context.logger.warn('Running checks timed out after 90s');
+      }
       if (context.config.healthUrls[service]) {
         const url = context.config.healthUrls[service]!;
         await sendHeartbeat(url, context.logger);
