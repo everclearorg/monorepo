@@ -379,8 +379,8 @@ module "monitor_poller_cron" {
     MONITOR_SERVICE = "poller"
     CONFIG_PARAMETER_NAME = local.monitor_poller_config_param_name
   })
-  schedule_expression    = "rate(10 minutes)"
-  timeout                = 300
+  schedule_expression    = "rate(20 minutes)"
+  timeout                = 750
   memory_size            = 2048
   lambda_in_vpc          = true
   subnet_ids             = module.network.private_subnets
