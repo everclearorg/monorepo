@@ -30,7 +30,6 @@ export async function sendAlerts(
   logger: Logger,
   config: AlertConfig,
   requestContext: RequestContext,
-  byName: boolean = false,
 ): Promise<void> {
   const methodContext = createMethodContext(sendAlerts.name);
 
@@ -45,7 +44,7 @@ export async function sendAlerts(
     alertPromises.push(alertTelegram(alertReport, config.telegram, requestContext));
   }
   if (config.betterUptime) {
-    alertPromises.push(alertViaBetterUptimeIfNeeded(alertReport, config.betterUptime, requestContext, byName));
+    alertPromises.push(alertViaBetterUptimeIfNeeded(alertReport, config.betterUptime, requestContext));
   }
 
   await Promise.allSettled(alertPromises);
