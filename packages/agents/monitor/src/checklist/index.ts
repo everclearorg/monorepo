@@ -44,9 +44,9 @@ export const runChecks = async (_requestContext?: RequestContext) => {
     checkInvoices,
     checkMessageStatus,
     checkChains,
-    checkRpcs,
     checkGas,
     checkSpokeBalance,
+    checkRpcs,
   ];
 
   const { logger } = getContext();
