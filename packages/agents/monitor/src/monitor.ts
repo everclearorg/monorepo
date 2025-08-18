@@ -61,10 +61,16 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
             if (!blockMap.has(domain)) blockMap.set(domain, []);
 
             // Replace idx for provider if more recent
-            const idx = blockMap
-              .get(domain)!
-              .findIndex((a) => a.rpcOrigin.toLowerCase() === origin.toLowerCase() && a.number < block.number);
-            idx === -1 ? blockMap.get(domain)!.push(entry) : (blockMap.get(domain)![idx] = entry);
+            const idx = blockMap.get(domain)!.findIndex((a) => a.rpcOrigin.toLowerCase() === origin.toLowerCase());
+            if (idx === -1) {
+              // no entry for origin, push
+              return;
+            }
+            // Replace the entry IFF it is more recent
+            if (blockMap.get(domain)![idx].number >= blockNumber) {
+              return;
+            }
+            blockMap.get(domain)![idx] = entry;
           });
         }),
       );
