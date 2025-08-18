@@ -24,6 +24,7 @@ export const TExtendedChainConfig = Type.Intersect([
     minEnergyOnRelayer: Type.Optional(Type.Number()),
     minBandwidthOnGateway: Type.Optional(Type.Number()),
     minEnergyOnGateway: Type.Optional(Type.Number()),
+    network: Type.Optional(Type.String()),
   }),
 ]);
 

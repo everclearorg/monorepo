@@ -13,187 +13,177 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkGas.name);
 
-  const chainGas = [];
+  const chainGas: CheckGasResponse = [];
   const chains = [
     ...Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm'),
     config.hub.domain,
   ];
-  let native;
-  for (const domainId of chains) {
-    // If the domain is hub, get the native asset from hub assets
-    if (domainId === config.hub.domain) {
-      native = Object.entries(config.hub.assets!).find(([, asset]) => asset.isNative)?.[1];
-    } else {
-      native = Object.entries(config.chains[domainId].assets!).find(([, asset]) => asset.isNative)?.[1];
-    }
 
-    // Get chain-specific thresholds or fall back to global defaults
-    const chainConfig = domainId === config.hub.domain ? config.hub : config.chains[domainId];
+  await Promise.all(
+    chains.map(async (domainId) => {
+      // If the domain is hub, get the native asset from hub assets
+      const native =
+        domainId === config.hub.domain
+          ? Object.entries(config.hub.assets!).find(([, asset]) => asset.isNative)?.[1]
+          : Object.entries(config.chains[domainId].assets!).find(([, asset]) => asset.isNative)?.[1];
 
-    // Use chain-specific values if available, otherwise fall back to global thresholds
-    const relayerThresholdValue = chainConfig.minGasOnRelayer ?? config.thresholds.minGasOnRelayer ?? 0;
-    const gatewayThresholdValue = chainConfig.minGasOnGateway ?? config.thresholds.minGasOnGateway ?? 0;
+      // Get chain-specific thresholds or fall back to global defaults
+      const chainConfig = domainId === config.hub.domain ? config.hub : config.chains[domainId];
 
-    // Parse threshold values with appropriate decimal places
-    const relayerThreshold = utils.parseUnits(relayerThresholdValue.toString(), native?.decimals ?? 18);
-    const gatewayThreshold = utils.parseUnits(gatewayThresholdValue.toString(), native?.decimals ?? 18);
+      // Use chain-specific values if available, otherwise fall back to global thresholds
+      const relayerThresholdValue = chainConfig.minGasOnRelayer ?? config.thresholds.minGasOnRelayer ?? 0;
+      const gatewayThresholdValue = chainConfig.minGasOnGateway ?? config.thresholds.minGasOnGateway ?? 0;
 
-    const relayerUrl = config.relayers.find((relayer) => relayer.type === 'Everclear')?.url;
+      // Parse threshold values with appropriate decimal places
+      const relayerThreshold = utils.parseUnits(relayerThresholdValue.toString(), native?.decimals ?? 18);
+      const gatewayThreshold = utils.parseUnits(gatewayThresholdValue.toString(), native?.decimals ?? 18);
 
-    const relayerAddress = relayerUrl ? await fetchRelayerData(relayerUrl) : undefined;
-    const relayerGas = relayerAddress
-      ? await chainreader.getBalance(+domainId, relayerAddress, native?.address)
-      : undefined;
+      const relayerUrl = config.relayers.find((relayer) => relayer.type === 'Everclear')?.url;
 
-    let gatewayAddress;
-    let tokenonmicsGatewayAddress;
-    if (domainId === config.hub.domain) {
-      gatewayAddress = config.hub.deployments?.gateway;
-      tokenonmicsGatewayAddress = config.hub.deployments?.tokenomicsHubGateway;
-    } else {
-      gatewayAddress = config.chains[domainId].deployments?.gateway;
-    }
+      const relayerAddress = relayerUrl ? await fetchRelayerData(relayerUrl) : undefined;
+      const relayerGas = relayerAddress
+        ? await chainreader.getBalance(+domainId, relayerAddress, native?.address)
+        : undefined;
 
-    const gatewayGas = gatewayAddress
-      ? await chainreader.getBalance(+domainId, gatewayAddress, native?.address)
-      : undefined;
+      let gatewayAddress;
+      let tokenonmicsGatewayAddress;
+      if (domainId === config.hub.domain) {
+        gatewayAddress = config.hub.deployments?.gateway;
+        tokenonmicsGatewayAddress = config.hub.deployments?.tokenomicsHubGateway;
+      } else {
+        gatewayAddress = config.chains[domainId].deployments?.gateway;
+      }
 
-    const tokenomicsGatewayGas = tokenonmicsGatewayAddress
-      ? await chainreader.getBalance(+domainId, tokenonmicsGatewayAddress, native?.address)
-      : undefined;
+      const gatewayGas = gatewayAddress
+        ? await chainreader.getBalance(+domainId, gatewayAddress, native?.address)
+        : undefined;
 
-    logger.debug(`Checking chain gas: ${domainId}`, requestContext, methodContext, {
-      domainId,
-      relayerAddress,
-      relayerGas,
-      gatewayAddress,
-      gatewayGas,
-      tokenomicsGatewayGas,
-      relayerThresholdValue,
-      gatewayThresholdValue,
-    });
+      const tokenomicsGatewayGas = tokenonmicsGatewayAddress
+        ? await chainreader.getBalance(+domainId, tokenonmicsGatewayAddress, native?.address)
+        : undefined;
 
-    chainGas.push({
-      domain: domainId,
-      gasType: GasType.Gas,
-      relayerAddress,
-      belowRelayerThreshold: relayerGas ? BigNumber.from(relayerGas).lt(relayerThreshold) : false,
-      relayerGas,
-      gatewayAddress,
-      gatewayGas,
-      belowGatewayThreshold: gatewayGas ? BigNumber.from(gatewayGas).lt(gatewayThreshold) : false,
-      tokenomicsGatewayGas,
-      belowTokenomicsGatewayThreshold: tokenomicsGatewayGas ? BigNumber.from(gatewayGas).lt(gatewayThreshold) : false,
-    });
-
-    const relayerReport = {
-      severity: Severity.Warning,
-      type: 'LowGasRelayer',
-      ids: [domainId],
-      reason: `${requestContext.origin}, The relayer ${relayerAddress} of ${domainId} has low gas balance`,
-      timestamp: Date.now(),
-      logger: logger,
-      env: config.environment,
-    };
-    const relayerViolated = relayerAddress && BigNumber.from(relayerGas ?? '0').lt(relayerThreshold);
-    if (shouldAlert && relayerViolated) {
-      // Send relayer gas alerts
-      logger.warn(`The relayer ${relayerAddress} of ${domainId} has low gas balance`, requestContext, methodContext, {
-        relayerGas,
-        relayerThreshold,
+      chainGas.push({
+        domain: domainId,
+        gasType: GasType.Gas,
         relayerAddress,
-      });
-
-      await sendAlerts(relayerReport, logger, config, requestContext);
-    } else if (shouldAlert && !relayerViolated) {
-      // Send relayer gas alerts
-      logger.info(
-        `The relayer ${relayerAddress} of ${domainId} has sufficient gas balance`,
-        requestContext,
-        methodContext,
-        {
-          relayerGas,
-          relayerThreshold,
-          relayerAddress,
-        },
-      );
-      await resolveAlerts(relayerReport, logger, config, requestContext);
-    }
-
-    const gatewayGasViolated = gatewayAddress && BigNumber.from(gatewayGas ?? '0').lt(gatewayThreshold);
-    const gatewayReport = {
-      severity: Severity.Warning,
-      type: 'LowGasGateway',
-      ids: [domainId],
-      reason: `${requestContext.origin}, The gateway ${gatewayAddress} of ${domainId} has low gas balance`,
-      timestamp: Date.now(),
-      logger: logger,
-      env: config.environment,
-    };
-    if (shouldAlert && gatewayGasViolated) {
-      // Resolve gateway gas alerts
-      logger.warn(`The gateway ${gatewayAddress} of ${domainId} has low gas balance`, requestContext, methodContext, {
-        gatewayGas,
-        gatewayThreshold,
+        belowRelayerThreshold: relayerGas ? BigNumber.from(relayerGas).lt(relayerThreshold) : false,
+        relayerGas,
         gatewayAddress,
+        gatewayGas,
+        belowGatewayThreshold: gatewayGas ? BigNumber.from(gatewayGas).lt(gatewayThreshold) : false,
+        tokenomicsGatewayGas,
+        belowTokenomicsGatewayThreshold: tokenomicsGatewayGas ? BigNumber.from(gatewayGas).lt(gatewayThreshold) : false,
       });
 
-      await sendAlerts(gatewayReport, logger, config, requestContext);
-    } else if (shouldAlert && !gatewayGasViolated) {
-      // Resolve relayer gas alerts
-      logger.info(
-        `The gateway ${gatewayAddress} of ${domainId} has sufficient gas balance`,
-        requestContext,
-        methodContext,
-        {
+      const relayerReport = {
+        severity: Severity.Warning,
+        type: 'LowGasRelayer',
+        ids: [domainId],
+        reason: `${requestContext.origin}, The relayer ${relayerAddress} of ${domainId} has low gas balance`,
+        timestamp: Date.now(),
+        logger: logger,
+        env: config.environment,
+      };
+      const relayerViolated = relayerAddress && BigNumber.from(relayerGas ?? '0').lt(relayerThreshold);
+      if (shouldAlert && relayerViolated) {
+        // Send relayer gas alerts
+        logger.warn(`The relayer ${relayerAddress} of ${domainId} has low gas balance`, requestContext, methodContext, {
           relayerGas,
           relayerThreshold,
           relayerAddress,
-        },
-      );
-      await resolveAlerts(gatewayReport, logger, config, requestContext);
-    }
+        });
 
-    const tokenomicsGatewayGasViolated =
-      tokenonmicsGatewayAddress && BigNumber.from(tokenomicsGatewayGas ?? '0').lt(gatewayThreshold);
-    const tokenomicsGatewayReport = {
-      severity: Severity.Warning,
-      type: 'LowGasTokenomicsGateway',
-      ids: [domainId],
-      reason: `${requestContext.origin}, The tokenomics gateway ${tokenonmicsGatewayAddress} of ${domainId} has low gas balance`,
-      timestamp: Date.now(),
-      logger: logger,
-      env: config.environment,
-    };
-    if (shouldAlert && tokenomicsGatewayGasViolated) {
-      // Send tokenomics gateway gas alerts
-      logger.warn(
-        `The tokenomics gateway ${tokenonmicsGatewayAddress} of ${domainId} has low gas balance`,
-        requestContext,
-        methodContext,
-        {
-          tokenomicsGatewayGas,
-          gatewayThreshold,
-          tokenonmicsGatewayAddress,
-        },
-      );
+        await sendAlerts(relayerReport, logger, config, requestContext);
+      } else if (shouldAlert && !relayerViolated) {
+        // Send relayer gas alerts
+        logger.info(
+          `The relayer ${relayerAddress} of ${domainId} has sufficient gas balance`,
+          requestContext,
+          methodContext,
+          {
+            relayerGas,
+            relayerThreshold,
+            relayerAddress,
+          },
+        );
+        await resolveAlerts(relayerReport, logger, config, requestContext);
+      }
 
-      await sendAlerts(tokenomicsGatewayReport, logger, config, requestContext);
-    } else if (shouldAlert && !tokenomicsGatewayGasViolated) {
-      // Resolve tokenomics gateway gas alerts
-      logger.info(
-        `The tokenomics gateway ${tokenonmicsGatewayAddress} of ${domainId} has sufficient gas balance`,
-        requestContext,
-        methodContext,
-        {
-          tokenomicsGatewayGas,
+      const gatewayGasViolated = gatewayAddress && BigNumber.from(gatewayGas ?? '0').lt(gatewayThreshold);
+      const gatewayReport = {
+        severity: Severity.Warning,
+        type: 'LowGasGateway',
+        ids: [domainId],
+        reason: `${requestContext.origin}, The gateway ${gatewayAddress} of ${domainId} has low gas balance`,
+        timestamp: Date.now(),
+        logger: logger,
+        env: config.environment,
+      };
+      if (shouldAlert && gatewayGasViolated) {
+        // Resolve gateway gas alerts
+        logger.warn(`The gateway ${gatewayAddress} of ${domainId} has low gas balance`, requestContext, methodContext, {
+          gatewayGas,
           gatewayThreshold,
-          tokenonmicsGatewayAddress,
-        },
-      );
-      await resolveAlerts(tokenomicsGatewayReport, logger, config, requestContext);
-    }
-  }
+          gatewayAddress,
+        });
+
+        await sendAlerts(gatewayReport, logger, config, requestContext);
+      } else if (shouldAlert && !gatewayGasViolated) {
+        // Resolve relayer gas alerts
+        logger.info(
+          `The gateway ${gatewayAddress} of ${domainId} has sufficient gas balance`,
+          requestContext,
+          methodContext,
+          {
+            relayerGas,
+            relayerThreshold,
+            relayerAddress,
+          },
+        );
+        await resolveAlerts(gatewayReport, logger, config, requestContext);
+      }
+
+      const tokenomicsGatewayGasViolated =
+        tokenonmicsGatewayAddress && BigNumber.from(tokenomicsGatewayGas ?? '0').lt(gatewayThreshold);
+      const tokenomicsGatewayReport = {
+        severity: Severity.Warning,
+        type: 'LowGasTokenomicsGateway',
+        ids: [domainId],
+        reason: `${requestContext.origin}, The tokenomics gateway ${tokenonmicsGatewayAddress} of ${domainId} has low gas balance`,
+        timestamp: Date.now(),
+        logger: logger,
+        env: config.environment,
+      };
+      if (shouldAlert && tokenomicsGatewayGasViolated) {
+        // Send tokenomics gateway gas alerts
+        logger.warn(
+          `The tokenomics gateway ${tokenonmicsGatewayAddress} of ${domainId} has low gas balance`,
+          requestContext,
+          methodContext,
+          {
+            tokenomicsGatewayGas,
+            gatewayThreshold,
+            tokenonmicsGatewayAddress,
+          },
+        );
+
+        await sendAlerts(tokenomicsGatewayReport, logger, config, requestContext);
+      } else if (shouldAlert && !tokenomicsGatewayGasViolated) {
+        // Resolve tokenomics gateway gas alerts
+        logger.info(
+          `The tokenomics gateway ${tokenonmicsGatewayAddress} of ${domainId} has sufficient gas balance`,
+          requestContext,
+          methodContext,
+          {
+            tokenomicsGatewayGas,
+            gatewayThreshold,
+            tokenonmicsGatewayAddress,
+          },
+        );
+        await resolveAlerts(tokenomicsGatewayReport, logger, config, requestContext);
+      }
+    }),
+  );
 
   logger.info('Overall chain gas', requestContext, methodContext, chainGas);
 

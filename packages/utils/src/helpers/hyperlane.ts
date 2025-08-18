@@ -200,7 +200,7 @@ export const getHyperlaneMessageStatusViaRestApi = async (
       data: {
         result: [result],
       },
-    } = await axiosGet<{ result: HyperlaneMessageResponse[] }>(url);
+    } = await axiosGet<{ result: HyperlaneMessageResponse[] }>(url, undefined, 2);
     return result;
   } catch (err: unknown) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

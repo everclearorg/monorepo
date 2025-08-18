@@ -102,6 +102,8 @@ export const CheckGasResponseSchema = Type.Array(
     gatewayGas: Type.Optional(Type.String()),
     belowGatewayThreshold: Type.Optional(Type.Boolean()),
     gasType: Type.Enum(GasType),
+    tokenomicsGatewayGas: Type.Optional(TIntegerString),
+    belowTokenomicsGatewayThreshold: Type.Optional(Type.Boolean()),
   }),
 );
 export type CheckGasResponse = Static<typeof CheckGasResponseSchema>;

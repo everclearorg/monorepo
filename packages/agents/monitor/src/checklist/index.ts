@@ -1,4 +1,4 @@
-import { createLoggingContext } from '@chimera-monorepo/utils';
+import { createLoggingContext, RequestContext } from '@chimera-monorepo/utils';
 import { checkAgents } from './agent';
 import { checkChains } from './chain';
 import { checkGas } from './gas';
@@ -23,16 +23,10 @@ import { checkTokenomicsExportLatency, checkTokenomicsExportStatus } from './tok
 import { checkSolanaPipelineStatus } from './solana';
 import { checkTronGas, checkTronPipelineStatus } from './tron';
 
-export const runChecks = async () => {
-  const { requestContext, methodContext } = createLoggingContext(runChecks.name);
+export const runChecks = async (_requestContext?: RequestContext) => {
+  const { methodContext, requestContext } = createLoggingContext(runChecks.name, _requestContext);
   const checklist = [
-    // EVM monitoring checks
-    checkChains,
     checkAgents,
-    checkMessageStatus,
-    checkRpcs,
-    checkGas,
-    checkSpokeBalance,
     checkIntentQueueCount,
     checkIntentQueueLatency,
     checkFillQueueCount,
@@ -44,21 +38,41 @@ export const runChecks = async () => {
     checkDepositQueueCount,
     checkDepositQueueLatency,
     checkElapsedEpochsByTickerHash,
-    checkInvoices,
     checkInvoiceAmount,
     checkTokenomicsExportStatus,
     checkTokenomicsExportLatency,
     checkSolanaPipelineStatus,
     checkTronGas,
     checkTronPipelineStatus,
+    checkInvoices,
+    checkMessageStatus,
+    checkGas,
+    checkSpokeBalance,
+    checkChains,
+    checkRpcs,
   ];
 
   const { logger } = getContext();
   logger.info(`Running checks... fns: ${checklist.map((it) => it.name).join(',')}`, requestContext, methodContext);
   for (const checkFn of checklist) {
     const startTime = Date.now();
+    logger.debug(`Starting check`, requestContext, methodContext, {
+      startTime,
+      check: checkFn.name,
+    });
     await checkFn();
     const endTime = Date.now();
-    logger.debug(`Elapsed time: ${(endTime - startTime) / 1000}s`, requestContext, methodContext);
+    const elapsed = endTime - startTime;
+    if (elapsed > 90_000) {
+      logger.warn(`Check took more than 90s`, requestContext, methodContext, {
+        elapsedSec: elapsed / 1000,
+        check: checkFn.name,
+      });
+    } else {
+      logger.debug(`Elapsed time for check`, requestContext, methodContext, {
+        elapsedSec: elapsed / 1000,
+        check: checkFn.name,
+      });
+    }
   }
 };
