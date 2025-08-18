@@ -25,12 +25,7 @@ import { checkSolanaPipelineStatus } from './solana';
 export const runChecks = async (_requestContext?: RequestContext) => {
   const { methodContext, requestContext } = createLoggingContext(runChecks.name, _requestContext);
   const checklist = [
-    checkChains,
     checkAgents,
-    checkMessageStatus,
-    checkRpcs,
-    checkGas,
-    checkSpokeBalance,
     checkIntentQueueCount,
     checkIntentQueueLatency,
     checkFillQueueCount,
@@ -42,11 +37,16 @@ export const runChecks = async (_requestContext?: RequestContext) => {
     checkDepositQueueCount,
     checkDepositQueueLatency,
     checkElapsedEpochsByTickerHash,
-    checkInvoices,
     checkInvoiceAmount,
     checkTokenomicsExportStatus,
     checkTokenomicsExportLatency,
     checkSolanaPipelineStatus,
+    checkInvoices,
+    checkMessageStatus,
+    checkChains,
+    checkRpcs,
+    checkGas,
+    checkSpokeBalance,
   ];
 
   const { logger } = getContext();
