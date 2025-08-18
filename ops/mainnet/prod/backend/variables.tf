@@ -110,6 +110,10 @@ variable "alchemy_key" {
   default   = "neverclear"
 }
 
+variable "helius_key" {
+  type      = string
+  sensitive = true
+}
 
 variable "trongrid_api_key" {
   type      = string
