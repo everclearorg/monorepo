@@ -129,7 +129,7 @@ locals {
       },
       "2020" = {
         providers = [
-          "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+          "https://ronin-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://api.roninchain.com/rpc"
         ]
       },
