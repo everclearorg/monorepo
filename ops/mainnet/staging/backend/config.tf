@@ -47,26 +47,22 @@ locals {
     chains = {
       "1" = {
         providers = [
-          "https://eth-mainnet.blastapi.io/${var.blast_key}",
           "https://eth-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "10" = {
         providers = [
-          "https://optimism-mainnet.blastapi.io/${var.blast_key}",
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       # "42161" = {
       #   providers = [
-      #     "https://arbitrum-one.blastapi.io/${var.blast_key}",
       #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
       #   ]
       # }
       "8453" = {
         providers = [
-          "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://base-mainnet.blastapi.io/${var.blast_key}"
+          "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
       "1399811149" = {
