@@ -4,6 +4,7 @@ import { getContext } from '../context';
 import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
 import { Connection } from '@solana/web3.js';
+import { getLatestBlockFromBlockMap } from '../helpers/chain';
 
 interface RpcError {
   rpcOrigin: string;
@@ -40,6 +41,11 @@ export const checkRpcs = async () => {
           const start = Date.now();
           await Promise.race([
             (async () => {
+              const cached = getLatestBlockFromBlockMap(domainId, rpcOrigin);
+              if (cached) {
+                blockNumber = cached.number;
+                return;
+              }
               if (chainConfig.network === 'svm') {
                 const connection = new Connection(rpcUrl);
                 blockNumber = await connection.getBlockHeight();
