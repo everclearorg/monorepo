@@ -194,7 +194,7 @@ locals {
       },
       "1399811149" = {
         providers = [
-          "https://virulent-still-needle.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}",
           "https://api.mainnet-beta.solana.com"
         ]
       },
@@ -360,8 +360,7 @@ locals {
       },
       "1399811149" = {
         providers = [
-          "https://virulent-still-needle.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
-          "https://api.mainnet-beta.solana.com"
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}"
         ]
       },
       "728126428" = {
@@ -511,8 +510,7 @@ locals {
       },
       "1399811149" = {
         providers = [
-          "https://virulent-still-needle.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
-          "https://api.mainnet-beta.solana.com"
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}"
         ]
       },
       "80094" = {
@@ -758,8 +756,7 @@ locals {
       },
       "1399811149" = {
         providers = [
-          "https://virulent-still-needle.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
-          "https://api.mainnet-beta.solana.com"
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}"
         ]
       },
       "80094" = {

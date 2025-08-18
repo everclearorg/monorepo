@@ -71,6 +71,7 @@ locals {
       }
       "1399811149" = {
         providers = [
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}",
           "https://api.mainnet-beta.solana.com"
         ],
         network = "solana"

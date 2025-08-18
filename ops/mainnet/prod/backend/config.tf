@@ -146,7 +146,7 @@ locals {
       },
       "1399811149" = {
         providers = [
-          "https://virulent-still-needle.solana-mainnet.quiknode.pro/${var.quicknode_api_key}/",
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}",
           "https://api.mainnet-beta.solana.com"
         ],
         network = "solana"

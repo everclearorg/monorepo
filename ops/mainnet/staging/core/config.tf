@@ -125,6 +125,7 @@ locals {
       }
       "1399811149" = {
         providers = [
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}",
           "https://api.mainnet-beta.solana.com"
         ]
       }
@@ -191,7 +192,7 @@ locals {
       }
       "1399811149" = {
         providers = [
-          "https://api.mainnet-beta.solana.com"
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}"
         ]
       }
       "728126428" = {
@@ -263,7 +264,7 @@ locals {
       }
       "1399811149" = {
         providers = [
-          "https://api.mainnet-beta.solana.com"
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}"
         ]
       }
       "728126428" = {
@@ -390,7 +391,7 @@ locals {
       }
       "1399811149" = {
         providers = [
-          "https://api.mainnet-beta.solana.com"
+          "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}"
         ]
       }
       "728126428" = {
