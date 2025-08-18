@@ -17,6 +17,9 @@ export const getLatestBlockFromBlockMap = (domain: string, rpcOrigin?: string) =
 
   // Find latest
   const [latest] = entry.sort((a, b) => b.number - a.number);
+  if (!latest) {
+    return undefined;
+  }
   const now = Math.floor(Date.now() / 1_000);
   if (now - latest.timestamp > TTL) {
     return undefined;
