@@ -4,6 +4,7 @@ import { getContext } from '../context';
 import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
 import { Connection } from '@solana/web3.js';
+import { getLatestBlockFromBlockMap } from '../helpers/chain';
 
 interface RpcError {
   rpcOrigin: string;
@@ -32,46 +33,53 @@ export const checkRpcs = async () => {
     Object.keys(config.chains).map(async (domainId) => {
       const chainConfig = config.chains[domainId];
       const rpcUrls = chainConfig.providers;
-      for (const rpcUrl of rpcUrls) {
-        const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
-        try {
-          let blockNumber: number;
-          const delay = 5_000;
-          const start = Date.now();
-          await Promise.race([
-            (async () => {
-              if (chainConfig.network === 'svm') {
-                const connection = new Connection(rpcUrl);
-                blockNumber = await connection.getBlockHeight();
-              } else {
-                const provider = new providers.JsonRpcProvider(rpcUrl);
-                blockNumber = await provider.getBlockNumber();
-              }
-              goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
-            })().then((ret) => {
-              logger.debug('Retrieved block number for rpc', requestContext, methodContext, {
-                number: ret,
-                rpcOrigin,
-                chain: domainId,
-                elapsed: Date.now() - start,
-              });
-              return ret;
-            }),
-            (async () => {
-              logger.warn('Getting block number timed out for rpc', requestContext, methodContext, {
-                rpcOrigin,
-                chain: domainId,
-                delay,
-              });
-              throw new Error('Request timed out');
-            })(),
-          ]);
-        } catch (error: unknown) {
-          (error as Error).message = (error as Error).message.replace(rpcUrl, rpcOrigin);
-          badRpcs.push({ rpcOrigin, error: (error as Error).message, domain: domainId });
-          logger.debug(`Error connecting to provider at ${rpcOrigin}: ${error}`, requestContext, methodContext);
-        }
-      }
+      await Promise.all(
+        rpcUrls.map(async (rpcUrl) => {
+          const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
+          try {
+            let blockNumber: number;
+            const delay = 5_000;
+            const start = Date.now();
+            await Promise.race([
+              (async () => {
+                const cached = getLatestBlockFromBlockMap(domainId, rpcOrigin);
+                if (cached) {
+                  blockNumber = cached.number;
+                  return;
+                }
+                if (chainConfig.network === 'svm') {
+                  const connection = new Connection(rpcUrl);
+                  blockNumber = await connection.getBlockHeight();
+                } else {
+                  const provider = new providers.JsonRpcProvider(rpcUrl);
+                  blockNumber = await provider.getBlockNumber();
+                }
+                goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
+              })().then((ret) => {
+                logger.debug('Retrieved block number for rpc', requestContext, methodContext, {
+                  number: ret,
+                  rpcOrigin,
+                  chain: domainId,
+                  elapsed: Date.now() - start,
+                });
+                return ret;
+              }),
+              (async () => {
+                logger.warn('Getting block number timed out for rpc', requestContext, methodContext, {
+                  rpcOrigin,
+                  chain: domainId,
+                  delay,
+                });
+                throw new Error('Request timed out');
+              })(),
+            ]);
+          } catch (error: unknown) {
+            (error as Error).message = (error as Error).message.replace(rpcUrl, rpcOrigin);
+            badRpcs.push({ rpcOrigin, error: (error as Error).message, domain: domainId });
+            logger.debug(`Error connecting to provider at ${rpcOrigin}: ${error}`, requestContext, methodContext);
+          }
+        }),
+      );
     }),
   );
 

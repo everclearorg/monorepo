@@ -2,13 +2,14 @@ import { Logger, RelayerType, createLoggingContext, delay, jsonifyError, sendHea
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
 import { setupCache, setupSubgraphReader } from './setup';
+import { providers } from 'ethers';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { SubgraphConfig } from '@chimera-monorepo/adapters-subgraph';
 import { setupEverclearRelayer, setupGelatoRelayer } from '@chimera-monorepo/adapters-relayer';
 import { runChecks } from './checklist';
 import interval from 'interval-promise';
 import { MonitorConfig } from './types';
-import { getContext } from './context';
+import { AppContext, getContext } from './context';
 import { getDatabase } from '@chimera-monorepo/database';
 
 export const MonitorService = {
@@ -29,6 +30,52 @@ export const getSubgraphReaderConfig = (chains: MonitorConfig['chains']): Subgra
     subgraphs[domainId] = { endpoints: chains[domainId].subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   });
   return { subgraphs };
+};
+
+export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppContext['adapters']['blockMap']) => {
+  const domains = [...new Set([config.hub.domain, ...Object.keys(config.chains)])];
+  await Promise.all(
+    domains.map(async (domain) => {
+      const chainConfig = domain === config.hub.domain ? config.hub : config.chains[domain];
+      const providerUrls = chainConfig.providers ?? [];
+      const type = domain === config.hub.domain ? 'evm' : (chainConfig as { network?: string })?.network ?? 'evm';
+      await Promise.all(
+        providerUrls.map(async (provider) => {
+          const origin = URL.canParse(provider) ? new URL(provider).origin : provider;
+          if (type !== 'evm') {
+            return;
+          }
+          const ethProvider = new providers.JsonRpcProvider(provider);
+          ethProvider.on('block', (blockNumber) => {
+            if (!blockNumber) {
+              return;
+            }
+
+            // Create the entry
+            const entry = {
+              rpcOrigin: origin,
+              number: blockNumber,
+              timestamp: Math.floor(Date.now() / 1_000),
+            };
+            // Add domain array if it exists
+            if (!blockMap.has(domain)) blockMap.set(domain, []);
+
+            // Replace idx for provider if more recent
+            const idx = blockMap.get(domain)!.findIndex((a) => a.rpcOrigin.toLowerCase() === origin.toLowerCase());
+            if (idx === -1) {
+              // no entry for origin, push
+              return;
+            }
+            // Replace the entry IFF it is more recent
+            if (blockMap.get(domain)![idx].number >= blockNumber) {
+              return;
+            }
+            blockMap.get(domain)![idx] = entry;
+          });
+        }),
+      );
+    }),
+  );
 };
 
 export const makeMonitor = async (service: MonitorService) => {
@@ -69,6 +116,9 @@ export const makeMonitor = async (service: MonitorService) => {
       ...context.config.chains,
       [context.config.hub.domain]: context.config.hub,
     });
+
+    context.adapters.blockMap = new Map();
+    await startBlockMapPoller(context.config, context.adapters.blockMap);
 
     const { domain: hubDomain, ...remainder } = context.config.hub;
     context.adapters.subgraph = await setupSubgraphReader(
