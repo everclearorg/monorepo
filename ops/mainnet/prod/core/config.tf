@@ -514,6 +514,11 @@ locals {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
+      },
+      "100" = {
+        providers = [
+          "https://gnosis-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
       }
     }
     betterUptime = {
