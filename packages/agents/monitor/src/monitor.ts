@@ -64,6 +64,7 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
             const idx = blockMap.get(domain)!.findIndex((a) => a.rpcOrigin.toLowerCase() === origin.toLowerCase());
             if (idx === -1) {
               // no entry for origin, push
+              blockMap.get(domain)!.push(entry);
               return;
             }
             // Replace the entry IFF it is more recent

@@ -1,5 +1,5 @@
 import { providers } from 'ethers';
-import { createLoggingContext, Logger, Severity, SOLANA_CHAINID } from '@chimera-monorepo/utils';
+import { createLoggingContext, delay, Logger, Severity, SOLANA_CHAINID } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
@@ -38,7 +38,7 @@ export const checkRpcs = async () => {
           const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
           try {
             let blockNumber: number | undefined = undefined;
-            const delay = 5_000;
+            const delayMs = 5_000;
             const start = Date.now();
             await Promise.race([
               (async () => {
@@ -64,10 +64,11 @@ export const checkRpcs = async () => {
                 return ret;
               }),
               (async () => {
+                await delay(delayMs);
                 logger.warn('Getting block number timed out for rpc', requestContext, methodContext, {
                   rpcOrigin,
                   chain: domainId,
-                  delay,
+                  delay: delayMs,
                 });
                 throw new Error('Request timed out');
               })(),
