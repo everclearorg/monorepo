@@ -379,7 +379,7 @@ module "monitor_poller_cron" {
     MONITOR_SERVICE = "poller"
     CONFIG_PARAMETER_NAME = local.monitor_poller_config_param_name
   })
-  schedule_expression    = "rate(20 minutes)"
+  schedule_expression    = "rate(15 minutes)"
   timeout                = 750
   memory_size            = 2048
   lambda_in_vpc          = true
