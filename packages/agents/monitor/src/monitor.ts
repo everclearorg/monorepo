@@ -46,17 +46,20 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
             return;
           }
           const ethProvider = new providers.JsonRpcProvider(provider);
-          ethProvider.on('block', (block) => {
-            if (!block || !block.number || !block.timestamp) {
+          ethProvider.on('block', (blockNumber) => {
+            if (!blockNumber) {
               return;
             }
-            // Add domain array if it exists
-            if (!blockMap.has(domain)) blockMap.set(domain, []);
+
+            // Create the entry
             const entry = {
               rpcOrigin: origin,
-              number: block.number,
-              timestamp: block.timestamp ?? Math.floor(Date.now() / 1_000),
+              number: blockNumber,
+              timestamp: Math.floor(Date.now() / 1_000),
             };
+            // Add domain array if it exists
+            if (!blockMap.has(domain)) blockMap.set(domain, []);
+
             // Replace idx for provider if more recent
             const idx = blockMap
               .get(domain)!
