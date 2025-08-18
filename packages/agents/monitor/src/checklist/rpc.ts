@@ -37,7 +37,7 @@ export const checkRpcs = async () => {
         rpcUrls.map(async (rpcUrl) => {
           const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
           try {
-            let blockNumber: number;
+            let blockNumber: number | undefined = undefined;
             const delay = 5_000;
             const start = Date.now();
             await Promise.race([
@@ -54,7 +54,6 @@ export const checkRpcs = async () => {
                   const provider = new providers.JsonRpcProvider(rpcUrl);
                   blockNumber = await provider.getBlockNumber();
                 }
-                goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
               })().then((ret) => {
                 logger.debug('Retrieved block number for rpc', requestContext, methodContext, {
                   number: ret,
@@ -73,6 +72,10 @@ export const checkRpcs = async () => {
                 throw new Error('Request timed out');
               })(),
             ]);
+            if (!blockNumber) {
+              throw new Error(`Could not get block number for ${domainId} using ${rpcOrigin}`);
+            }
+            goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
           } catch (error: unknown) {
             (error as Error).message = (error as Error).message.replace(rpcUrl, rpcOrigin);
             badRpcs.push({ rpcOrigin, error: (error as Error).message, domain: domainId });
