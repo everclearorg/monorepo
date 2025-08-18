@@ -12,6 +12,7 @@ describe('checkDepositQueueState', () => {
   let chainreader: SinonStubbedInstance<ChainReader>;
   let logger: SinonStubbedInstance<Logger>;
   let sendAlertsStub: SinonStub;
+  let resolveAlertsStub: SinonStub;
   let database: SinonStubbedInstance<Database>;
 
   beforeEach(() => {
@@ -29,7 +30,7 @@ describe('checkDepositQueueState', () => {
     const enqueuedDeposit = mock.depositQueue();
     database.getAllEnqueuedDeposits.resolves([enqueuedDeposit]);
     sendAlertsStub = stub(Mockable, 'sendAlerts');
-    stub(Mockable, 'resolveAlerts').resolves();
+    resolveAlertsStub = stub(Mockable, 'resolveAlerts').resolves();
   });
 
   afterEach(() => {
@@ -63,8 +64,9 @@ describe('checkDepositQueueState', () => {
 
   describe('#checkDepositQueueLatency', () => {
     it('should work with no pending deposits', async () => {
+      database.getAllEnqueuedDeposits.resolves([]);
       const result = await checkDepositQueueLatency();
-      expect(Object.keys(result.keys()).length).to.eq(0);
+      expect(result.size).to.eq(0);
     });
 
     it('should work with pending deposits', async () => {
@@ -80,6 +82,107 @@ describe('checkDepositQueueState', () => {
 
     it('should fail', async () => {
       expect(checkDepositQueueLatency()).to.be.rejected;
+    });
+
+    it('should handle multiple deposits with same key', async () => {
+      const epoch = 100;
+      const domain = '1337';
+      const tickerHash = mkHash('0x1234');
+      const deposit1 = mock.depositQueue({ epoch, domain, tickerHash, enqueuedTimestamp: 100 });
+      const deposit2 = mock.depositQueue({ epoch, domain, tickerHash, enqueuedTimestamp: 50 });
+      const deposit3 = mock.depositQueue({ epoch, domain, tickerHash, enqueuedTimestamp: 150 });
+      
+      database.getAllEnqueuedDeposits.resolves([deposit1, deposit2, deposit3]);
+      
+      const result = await checkDepositQueueLatency();
+      // Should use the oldest timestamp (50)
+      expect(result.get(`${domain}-${tickerHash}`)).to.eq(50);
+    });
+
+    it('should not send alert if latency is within threshold', async () => {
+      const config = mock.config();
+      config.thresholds.maxDepositQueueLatency = 3600; // Set threshold to 1 hour
+      
+      getContextStub.returns({
+        ...mock.context(),
+        config,
+      });
+      
+      const epoch = 100;
+      const domain = '1337';
+      const tickerHash = mkHash('0x1234');
+      const currentTime = Math.floor(Date.now() / 1000);
+      // Set timestamp to be within threshold (100 seconds ago, well under 3600 seconds)
+      const enqueuedDeposit = mock.depositQueue({ 
+        epoch, 
+        domain, 
+        tickerHash, 
+        enqueuedTimestamp: currentTime - 100
+      });
+      
+      database.getAllEnqueuedDeposits.resolves([enqueuedDeposit]);
+      
+      await checkDepositQueueLatency();
+      expect(sendAlertsStub.called).to.be.false;
+      expect(resolveAlertsStub.called).to.be.true;
+    });
+
+    it('should handle deposits across different domains and ticker hashes', async () => {
+      const epoch = 100;
+      const deposits = [
+        mock.depositQueue({ epoch, domain: '1337', tickerHash: mkHash('0x1234'), enqueuedTimestamp: 100 }),
+        mock.depositQueue({ epoch, domain: '1338', tickerHash: mkHash('0x1234'), enqueuedTimestamp: 200 }),
+        mock.depositQueue({ epoch, domain: '1337', tickerHash: mkHash('0x5678'), enqueuedTimestamp: 150 }),
+      ];
+      
+      database.getAllEnqueuedDeposits.resolves(deposits);
+      
+      const result = await checkDepositQueueLatency();
+      expect(result.size).to.eq(3);
+      expect(result.get('1337-' + mkHash('0x1234'))).to.eq(100);
+      expect(result.get('1338-' + mkHash('0x1234'))).to.eq(200);
+      expect(result.get('1337-' + mkHash('0x5678'))).to.eq(150);
+    });
+  });
+
+  describe('#checkDepositQueueCount', () => {
+    it('should handle multiple deposits increasing count', async () => {
+      const epoch = 100;
+      const domain = '1337';
+      const tickerHash = mkHash('0x1234');
+      const deposits = [
+        mock.depositQueue({ epoch, domain, tickerHash }),
+        mock.depositQueue({ epoch, domain, tickerHash }),
+        mock.depositQueue({ epoch, domain, tickerHash }),
+      ];
+      
+      database.getAllEnqueuedDeposits.resolves(deposits);
+      
+      const result = await checkDepositQueueCount();
+      expect(result.get(`${epoch}-${domain}-${tickerHash}`)).to.eq(3);
+    });
+
+    it('should not send alert when below threshold', async () => {
+      const config = mock.config();
+      config.thresholds.maxDepositQueueCount = 10; // Set high threshold
+      
+      getContextStub.returns({
+        ...mock.context(),
+        config,
+      });
+      
+      const epoch = 100;
+      const domain = '1337';
+      const tickerHash = mkHash('0x1234');
+      const deposits = [
+        mock.depositQueue({ epoch, domain, tickerHash }),
+        mock.depositQueue({ epoch, domain, tickerHash }),
+      ];
+      
+      database.getAllEnqueuedDeposits.resolves(deposits);
+      
+      await checkDepositQueueCount();
+      expect(sendAlertsStub.called).to.be.false;
     });
   });
 });
