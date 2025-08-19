@@ -13,6 +13,7 @@ import {IGatewayV2} from 'interfaces/common/IGatewayV2.sol';
 import {IHubGatewayV2} from 'interfaces/hub/IHubGatewayV2.sol';
 
 import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
+import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
 
 import {OwnableUpgradeable} from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import {Initializable} from '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
@@ -82,47 +83,89 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
   }
 
   ////////////////////////////////////// Public Functions //////////////////////////////////////
-  // TODO:
   function test_hubGatewayUpgrade_sendMessageWithoutFee() public {
     // Setting up and updating the gateway
     _setupTest();
     _upgradeGateway();
 
-    // Mocking the message expected to send to the activeMailbox
+    // Constructing the inputs
     address activeMailbox = address(hubGatewayProxy.activeMailbox(1));
     bytes32 _expectedMessageId = keccak256(abi.encodePacked('Expected Message'));
-    uint256 _expectedFee = 2e16;
+    uint256 _expectedFee = 0;
+    bytes32 _destinationGateway = hubGatewayProxy.chainGateways(1);
+    bytes memory _message = abi.encodePacked('Hello, World!');
+    bytes memory _metadata = _formatMetadata(0, 500_000, address(hubGatewayProxy), '');
+
+    // Mock and expect the call
+    vm.startPrank(RECEIVER);
+    uint32 _chainId = 1;
+    bytes memory _calldata = abi.encodeWithSignature(
+      'dispatch(uint32,bytes32,bytes,bytes)', _chainId, _destinationGateway, _message, _metadata
+    );
+    vm.mockCall(activeMailbox, _calldata, abi.encode(_expectedMessageId, _expectedFee));
+    vm.expectCall(activeMailbox, _calldata);
 
     // Sending a message without the fee
-    vm.prank(RECEIVER);
     (bytes32 messageId, uint256 feeSpent) = hubGatewayProxy.sendMessage(1, 'Hello, World!', 500_000);
+    vm.stopPrank();
+
     assertEq(messageId, _expectedMessageId);
     assertEq(feeSpent, _expectedFee);
   }
 
-  // TODO:
   function test_hubGatewayUpgrade_sendMessageWithFee() public {
     // Setting up and updating the gateway
     _setupTest();
     _upgradeGateway();
 
     // Sending the fee amount to the wallet
-    vm.deal(address(hubGatewayProxy), 1001);
+    vm.deal(address(hubGatewayProxy), 1e18);
 
-    // Mocking the message expected to send to the activeMailbox
+    // Constructing the inputs
     address activeMailbox = address(hubGatewayProxy.activeMailbox(1));
     bytes32 _expectedMessageId = keccak256(abi.encodePacked('Expected Message'));
-    uint256 _expectedFee = 2e16;
+    uint256 _expectedFee = 1e16;
+    bytes32 _destinationGateway = hubGatewayProxy.chainGateways(1);
+    bytes memory _message = abi.encodePacked('Hello, World!');
+    bytes memory _metadata = _formatMetadata(0, 500_000, address(hubGatewayProxy), '');
 
-    // Sending a message with the fee
-    vm.prank(RECEIVER);
-    (bytes32 messageId, uint256 feeSpent) = hubGatewayProxy.sendMessage(1, 'Hello, World!', 1000, 500_000);
+    // Mock and expect the call
+    vm.startPrank(RECEIVER);
+    uint32 _chainId = 1;
+    bytes memory _calldata = abi.encodeWithSignature(
+      'dispatch(uint32,bytes32,bytes,bytes)', _chainId, _destinationGateway, _message, _metadata
+    );
+    vm.mockCall(activeMailbox, _expectedFee, _calldata, abi.encode(_expectedMessageId, _expectedFee));
+    vm.expectCall(activeMailbox, _expectedFee, _calldata);
+
+    // Sending a message without the fee
+    (bytes32 messageId,) = hubGatewayProxy.sendMessage(1, 'Hello, World!', _expectedFee, 500_000);
+    vm.stopPrank();
+
+    // asserting messageId matches and not checking fee due to mocking (i.e. no fees sent)
     assertEq(messageId, _expectedMessageId);
-    assertEq(feeSpent, _expectedFee);
   }
 
-  // TODO:
-  function test_hubGatewayUpgrade_handle() public {}
+  function test_hubGatewayUpgrade_handle() public {
+    // Setting up and updating the gateway
+    _setupTest();
+    _upgradeGateway();
+
+    // Constructing the inputs
+    address activeMailbox = address(hubGatewayProxy.activeMailbox(1));
+    bytes memory _message = abi.encodePacked('Hello, World!');
+    address _receiver = address(hubGatewayProxy.receiver());
+    bytes32 _sender = GATEWAY_2;
+    bytes memory _calldata = abi.encodeWithSelector(IMessageReceiver.receiveMessage.selector, _message);
+
+    // Mocking the call to receiver
+    vm.startPrank(activeMailbox);
+    vm.mockCall(_receiver, _calldata, abi.encode(bytes32(0)));
+    vm.expectCall(_receiver, _calldata);
+
+    // Sending the handle message
+    hubGatewayProxy.handle(uint32(1), _sender, _message);
+  }
 
   function test_hubGatewayUpgrade_setChainGateway() public {
     // Setting up and updating the gateway
@@ -199,8 +242,29 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
     assertEq(address(hubGatewayProxy.interchainSecurityModule()), address(0x123));
   }
 
-  // TODO:
-  function test_hubGatewayUpgrade_quoteMessage() public {}
+  function test_hubGatewayUpgrade_quoteMessage() public {
+    // Setting up and updating the gateway
+    _setupTest();
+    _upgradeGateway();
+
+    // configuring the inputs
+    address _activeMailbox = address(hubGatewayProxy.activeMailbox(1));
+    bytes32 _gateway = hubGatewayProxy.getGateway(1);
+    bytes memory _message = abi.encodePacked('Hello, World!');
+    uint256 _gasLimit = 100_000;
+    uint256 _expectedFee = 2000;
+    bytes memory _metadata = _formatMetadata(0, _gasLimit, address(hubGatewayProxy), '');
+    bytes memory _calldata =
+      abi.encodeWithSignature('quoteDispatch(uint32,bytes32,bytes,bytes)', uint32(1), _gateway, _message, _metadata);
+
+    // mocking the call
+    vm.mockCall(_activeMailbox, _calldata, abi.encode(_expectedFee));
+    vm.expectCall(_activeMailbox, _calldata);
+
+    // calling quote message
+    uint256 _fee = hubGatewayProxy.quoteMessage(uint32(1), _message, _gasLimit);
+    assertEq(_expectedFee, _fee);
+  }
 
   ////////////////////////////// Internal Functions /////////////////////////
   function test_hubGatewayUpgrade_checkValidSender() public {
@@ -322,7 +386,7 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
 
     // setting the mailbox to zero
     vm.prank(OWNER);
-    hubGatewayProxy.updateActiveMailbox(1, address(0));
+    hubGatewayProxy.disableActiveMailbox(1);
 
     // Trying to send a message with a zeroed mailbox
     vm.startPrank(address(hubGatewayProxy.receiver()));
@@ -388,6 +452,9 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
     // Setting up and updating the gateway
     _setupTest();
 
+    // Deploying implementation
+    address _hubGatewayV2 = address(new TestHubGatewayV2());
+
     // Trying to initialize again
     IMailbox[] memory _mailboxes = new IMailbox[](2);
     uint32[] memory _chainIds = new uint32[](2);
@@ -398,7 +465,9 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
 
     // should revert on initialize
     vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(this)));
-    hubGatewayProxy.initialize(_mailboxes, _chainIds);
+    hubGatewayProxy.upgradeToAndCall(
+      _hubGatewayV2, abi.encodeWithSelector(HubGatewayV2.initialize.selector, _mailboxes, _chainIds)
+    );
   }
 
   function testRevert_hubGatewayUpgrade_setChainGateway_UnauthorizedCaller() public {
@@ -473,6 +542,16 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
     hubGatewayProxy.updateActiveMailbox(1, address(0x123));
   }
 
+  function testRevert_hubGatewayUpgrade_disableActiveMailbox_NotOwner() public {
+    // Setting up and updating the gateway
+    _setupTest();
+    _upgradeGateway();
+
+    // Trying to update the active mailbox as a non-owner
+    vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(this)));
+    hubGatewayProxy.disableActiveMailbox(1);
+  }
+
   function testRevert_hubGatewayUpgrade_updateSecurityModule_UnauthorizedCaller() public {
     // Setting up and updating the gateway
     _setupTest();
@@ -535,5 +614,15 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
 
     // Asserting same owner
     assertEq(hubGatewayProxy.owner(), OWNER);
+  }
+
+  function _formatMetadata(
+    uint256 _msgValue,
+    uint256 _gasLimit,
+    address _refundAddress,
+    bytes memory _customMetadata
+  ) internal pure returns (bytes memory) {
+    uint16 _variant = 1;
+    return abi.encodePacked(_variant, _msgValue, _gasLimit, _refundAddress, _customMetadata);
   }
 }

@@ -123,6 +123,15 @@ abstract contract GatewayV2 is GasTank, IGatewayV2, IMessageRecipient, ISpecifie
   }
 
   /// @inheritdoc IGatewayV2
+  function updateMailbox(
+    address _newMailbox
+  ) external onlyReceiver validAddress(_newMailbox.toBytes32()) {
+    address _oldMailbox = address(mailbox);
+    mailbox = IMailbox(_newMailbox);
+    emit MailboxUpdated(_oldMailbox, _newMailbox);
+  }
+
+  /// @inheritdoc IGatewayV2
   function updateSecurityModule(
     address _newSecurityModule
   ) external onlyReceiver validAddress(_newSecurityModule.toBytes32()) {
