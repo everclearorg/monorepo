@@ -108,6 +108,15 @@ interface IGatewayV2 {
   ) external payable returns (bytes32 _messageId, uint256 _feeSpent);
 
   /**
+   * @notice Updates the mailbox
+   * @param _mailbox The new mailbox address
+   * @dev only called by the `receiver`
+   */
+  function updateMailbox(
+    address _mailbox
+  ) external;
+
+  /**
    * @notice Updates the gateway security module
    * @param _securityModule The address of the new security module
    * @dev only called by the `receiver`
