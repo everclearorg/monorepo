@@ -246,7 +246,7 @@ export const DEFAULT_CHAIN_CONFIG: CoreChainConfig = {
   // of 10 gwei was used, the replacement should be 15.000000001 gwei.
   gasPriceReplacementBumpPercent: 20,
   gasPriceMaximum: parseUnits('1500', 'gwei').toString(),
-  gasPriceMinimum: parseUnits('5', 'gwei').toString(),
+  gasPriceMinimum: '0',
   gasPriceMaxIncreaseScalar: 200,
   confirmations: 10,
   // NOTE: This should be the amount of time we are willing to wait for a transaction
