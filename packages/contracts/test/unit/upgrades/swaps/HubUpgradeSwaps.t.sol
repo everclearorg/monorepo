@@ -2992,6 +2992,8 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(_maxDiscountDbps, _maxDiscount);
   }
 
+  function test_hubUpgradeSwaps_setMaxDiscountDBPS() public {}
+
   // ============ Upgrades Functions ============ //
   function test_hubUpgradeSwaps_updateModuleAddress_Settlement() public {
     _upgradeHub();
