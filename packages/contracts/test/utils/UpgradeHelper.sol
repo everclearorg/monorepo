@@ -22,6 +22,8 @@ import {HubMessageReceiverV2, IHubMessageReceiverV2} from 'contracts/hub/modules
 import {IManagerV2, ManagerV2} from 'contracts/hub/modules/ManagerV2.sol';
 import {ISettlerV2, SettlerV2} from 'contracts/hub/modules/SettlerV2.sol';
 
+import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
+
 interface ICREATE3 {
   function deploy(bytes32 _salt, bytes calldata _creationCode) external payable returns (address _deployed);
 }
@@ -41,6 +43,7 @@ contract TestEverclearSpokeV5 is EverclearSpokeV5 {
 }
 
 contract UpgradeHelper is SafeTxBuilder {
+  using stdStorage for StdStorage;
   using TypeCasts for address;
   using TypeCasts for bytes32;
 
@@ -176,6 +179,7 @@ contract UpgradeHelper is SafeTxBuilder {
   address public constant HUB_PROXY_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
   address public constant HUB_PROXY_OWNER = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
   uint256 internal constant FIXED_EVERCLEAR_BLOCK = 1_667_352;
+  uint256 internal constant LAST_BLOCK_NUMBER_CARRY = 1_000_000;
   address internal constant USDC_ARBITRUM = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
   address public immutable MANAGER = makeAddr('Manager');
 
@@ -309,6 +313,9 @@ contract UpgradeHelper is SafeTxBuilder {
     // Checking the implementation address has updated
     address newImplementation = (vm.load(HUB_PROXY, IMPLEMENTATION_SLOT)).toAddress();
     assertEq(newImplementation, address(everclearHubV2));
+
+    // Storing value for lastBlockNumberCarryEpoch to prevent underflows in getCurrentEpoch
+    vm.store(address(hubProxy), bytes32(uint256(6)), bytes32(LAST_BLOCK_NUMBER_CARRY));
 
     // Checking the cached state
     assertEq(state.owner, hubProxy.owner());
