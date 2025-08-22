@@ -597,6 +597,11 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(hubProxy.modules(_MESSAGE_RECEIVER_MODULE), newModuleAddress, 'Module address should be updated');
   }
 
+  // ============ Same-chain Swap ============ //
+  function test_hubUpgradeSwaps_processIntent_sameChainSwap() public {}
+
+  function test_hubUpgradeSwaps_processFill_sameChainSwap() public {}
+
   // ============ View Functions ============ //
   function test_hubUpgradeSwaps_supportedDomains() public {}
 
