@@ -9,7 +9,7 @@ import {HubQueueLibV2} from 'contracts/hub/lib/HubQueueLibV2.sol';
 import {InvoiceListLibV2} from 'contracts/hub/lib/InvoiceListLibV2.sol';
 import {Uint32Set} from 'contracts/hub/lib/Uint32Set.sol';
 
-import 'forge-std/console.sol';
+import {console2} from 'forge-std/console2.sol';
 import {IHubGateway} from 'interfaces/hub/IHubGateway.sol';
 import {IHubStorageV2} from 'interfaces/hub/IHubStorageV2.sol';
 
@@ -300,10 +300,11 @@ abstract contract HubStorageV2 is NoncesUpgradeable, IHubStorageV2 {
 
   /// @inheritdoc IHubStorageV2
   function getCurrentEpoch() public view returns (uint48 _currentEpoch) {
-    console.logUint(_carryEpoch);
-    console.logUint(block.number);
-    console.logUint(_lastBlockNumberCarryEpochUpdated);
-    console.logUint(epochLength);
+    console2.log('Logs');
+    console2.log(_carryEpoch);
+    console2.log(block.number);
+    console2.log(_lastBlockNumberCarryEpochUpdated);
+    console2.log(epochLength);
 
     _currentEpoch = _carryEpoch + uint48((block.number - _lastBlockNumberCarryEpochUpdated) / epochLength);
   }
