@@ -32,6 +32,7 @@ import {IUsersManager} from 'interfaces/hub/IUsersManager.sol';
 import {Uint32Set} from 'contracts/hub/lib/Uint32Set.sol';
 
 import {HubStorageV2} from 'contracts/hub/HubStorageV2.sol';
+import {console2} from 'forge-std/console2.sol';
 
 /**
  * @title EverclearHubV2
