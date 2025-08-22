@@ -206,8 +206,16 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
       uint32 _destination = _intent.destinations[0];
       bytes32 _outputAssetHash = AssetUtils.getAssetHash(_intent.outputAsset, _destination);
 
-      if (!_adoptedForAssets[_outputAssetHash].approval) {
-        return (false, _tickerHash, _inputAssetHash, IEverclearV2.Strategy.DEFAULT);
+      // Checking the output asset when netting
+      if (_intent.ttl == 0) {
+        bytes32 _expectedOutputHash = _tokenConfigs[_tickerHash].assetHashes[_destination];
+        if (!_adoptedForAssets[_outputAssetHash].approval || _outputAssetHash != _expectedOutputHash) {
+          return (false, _tickerHash, _inputAssetHash, IEverclearV2.Strategy.DEFAULT);
+        }
+      } else {
+        if (!_adoptedForAssets[_outputAssetHash].approval) {
+          return (false, _tickerHash, _inputAssetHash, IEverclearV2.Strategy.DEFAULT);
+        }
       }
     }
 

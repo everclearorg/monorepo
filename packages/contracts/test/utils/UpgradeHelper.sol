@@ -26,6 +26,20 @@ interface ICREATE3 {
   function deploy(bytes32 _salt, bytes calldata _creationCode) external payable returns (address _deployed);
 }
 
+contract TestEverclearSpokeV5 is EverclearSpokeV5 {
+  function processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) external {
+    return _processQueueChecks(_domain, _relayer, _ttl);
+  }
+
+  function executeCalldata(bytes32 _intentId, bytes memory _data) external {
+    return _executeCalldata(_intentId, _data);
+  }
+
+  function verifySignature(address _signer, bytes memory _data, uint256 _noncer, bytes calldata _signature) external {
+    return _verifySignature(_signer, _data, _noncer, _signature);
+  }
+}
+
 contract UpgradeHelper is SafeTxBuilder {
   using TypeCasts for address;
   using TypeCasts for bytes32;
@@ -104,6 +118,7 @@ contract UpgradeHelper is SafeTxBuilder {
   address public SPOKE_GATEWAY_MAINNET = 0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7;
   uint256 public MESSAGE_GAS_LIMIT = 2_000_000;
   address public USDC_MAINNET = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+  address public CLEAR_MAINNET = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
   address public MAILBOX_MAINNET = 0xc005dc82818d67AF737725bD4bf75435d065D239;
   uint256 public FIXED_MAIN_BLOCK = 21_244_576;
   uint32 constant HUB_ID = 25_327;
@@ -136,12 +151,43 @@ contract UpgradeHelper is SafeTxBuilder {
   mapping(uint256 _chainId => DeploymentParamsV4 _params) internal _deploymentParamsV4;
 
   /**
-   * **********************  FeeAdapter Upgrade  **********************
+   * **********************  Swap Upgrade  **********************
    */
-  address public SPOKE_IMPL_MAINNET_V4 = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
-  uint256 public FIXED_MAIN_BLOCK_UP5 = 22_716_806;
+  struct CachedHubState {
+    address owner;
+    address lighthouse;
+    address watchtower;
+    address hubGateway;
+    uint48 epochLength;
+    uint48 expiryTimeBuffer;
+    address settlementModule;
+    address managerModule;
+    address handlerModule;
+    address messageReceiverModule;
+  }
+
+  address public constant SPOKE_IMPL_MAINNET_V4 = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  uint256 public constant FIXED_MAIN_BLOCK_UP5 = 22_716_806;
+  bytes32 internal constant _SETTLEMENT_MODULE = keccak256('settlement_module');
+  bytes32 internal constant _HANDLER_MODULE = keccak256('handler_module');
+  bytes32 internal constant _MESSAGE_RECEIVER_MODULE = keccak256('message_receiver_module');
+  bytes32 internal constant _MANAGER_MODULE = keccak256('manager_module');
+  address public constant HUB_PROXY = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+  address public constant HUB_PROXY_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant HUB_PROXY_OWNER = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
+  uint256 internal constant FIXED_EVERCLEAR_BLOCK = 1_667_352;
+  address internal constant USDC_ARBITRUM = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
+  address public immutable MANAGER = makeAddr('Manager');
 
   EverclearSpokeV5 public spokeProxyV5;
+  TestEverclearSpokeV5 public testSpokeProxyV5;
+  IEverclearHubV2 public hubProxy;
+  IHubMessageReceiverV2 public hubMessageReceiverV2;
+  IHandlerV2 public handlerV2;
+  ISettlerV2 public settlerV2;
+  IManagerV2 public managerV2;
+  IEverclearHubV2 public everclearHubV2;
+  uint64 public testNonce;
 
   /**
    * **********************  Helpers  **********************
@@ -187,41 +233,6 @@ contract UpgradeHelper is SafeTxBuilder {
     state.nonce = spokeProxyV4.nonce();
     state.messageGasLimit = spokeProxyV4.messageGasLimit();
   }
-
-  /**
-   * **********************  Swap Upgrade  **********************
-   */
-  struct CachedHubState {
-    address owner;
-    address lighthouse;
-    address watchtower;
-    address hubGateway;
-    uint48 epochLength;
-    uint48 expiryTimeBuffer;
-    address settlementModule;
-    address managerModule;
-    address handlerModule;
-    address messageReceiverModule;
-  }
-
-  bytes32 internal constant _SETTLEMENT_MODULE = keccak256('settlement_module');
-  bytes32 internal constant _HANDLER_MODULE = keccak256('handler_module');
-  bytes32 internal constant _MESSAGE_RECEIVER_MODULE = keccak256('message_receiver_module');
-  bytes32 internal constant _MANAGER_MODULE = keccak256('manager_module');
-  address public constant HUB_PROXY = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
-  address public constant HUB_PROXY_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
-  address public constant HUB_PROXY_OWNER = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
-  uint256 internal constant FIXED_EVERCLEAR_BLOCK = 1_667_352;
-  address internal constant USDC_ARBITRUM = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
-  address public immutable MANAGER = makeAddr('Manager');
-
-  IEverclearHubV2 public hubProxy;
-  IHubMessageReceiverV2 public hubMessageReceiverV2;
-  IHandlerV2 public handlerV2;
-  ISettlerV2 public settlerV2;
-  IManagerV2 public managerV2;
-  IEverclearHubV2 public everclearHubV2;
-  uint64 public testNonce;
 
   function _getDestinations(IEverclearV2.Intent memory _intent, uint32 _destination) internal {
     uint32[] memory _destinations = new uint32[](1);
