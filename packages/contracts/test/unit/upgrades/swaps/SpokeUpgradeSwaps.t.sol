@@ -188,6 +188,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
    * @notice Tests the deposit function of the spoke proxy
    * @dev This function is used to deposit tokens into the spoke proxy
    */
+
   function test_spokeUpgradeSwaps_deposit() public {
     _upgradeSpoke();
 
@@ -967,6 +968,98 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // filling the user intent
     spokeProxyV5.fillIntentWithPull(_intent, _amountOut, _solverDestinations);
+    bytes32 _intentId = keccak256(abi.encode(_intent));
+    vm.stopPrank();
+
+    // asserting changes in state
+    assertTrue(spokeProxyV5.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
+    assertEq(IERC20(USDC_MAINNET).balanceOf(_solver), _startingBalanceSolver - _amountOut);
+    assertEq(IERC20(USDC_MAINNET).balanceOf(_receiver), _startingBalanceReceiver + _amountOut);
+  }
+
+  function test_spokeUpgradeSwaps_fillIntentWithPull(address _solver, uint256 _amountOut) public {
+    vm.assume(_solver != address(0));
+    address _receiver = address(0x456);
+
+    // upgrading the spoke
+    _upgradeSpoke();
+
+    // Constructing the user intent
+    IEverclearV2.Intent memory _intent = IEverclearV2.Intent({
+      initiator: address(0x123).toBytes32(),
+      receiver: _receiver.toBytes32(),
+      inputAsset: address(0x987).toBytes32(),
+      outputAsset: USDC_MAINNET.toBytes32(),
+      destinations: _getDestinations(1),
+      origin: 10,
+      nonce: 1,
+      timestamp: uint48(block.timestamp - 10 minutes),
+      ttl: 4 hours,
+      amount: 1e18,
+      amountOutMin: 0,
+      data: ''
+    });
+    _intent.amountOutMin = bound(_intent.amountOutMin, 1, type(uint128).max);
+    _amountOut = bound(_amountOut, _intent.amountOutMin, type(uint128).max);
+
+    // storing balances of participants
+    deal(USDC_MAINNET, _solver, _amountOut);
+    uint256 _startingBalanceSolver = IERC20(USDC_MAINNET).balanceOf(_solver);
+    uint256 _startingBalanceReceiver = IERC20(USDC_MAINNET).balanceOf(_receiver);
+
+    vm.startPrank(_solver);
+    // approving the amount and depositing to spoke
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
+
+    // filling the user intent
+    spokeProxyV5.fillIntentWithPull(_intent, _amountOut);
+    bytes32 _intentId = keccak256(abi.encode(_intent));
+    vm.stopPrank();
+
+    // asserting changes in state
+    assertTrue(spokeProxyV5.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
+    assertEq(IERC20(USDC_MAINNET).balanceOf(_solver), _startingBalanceSolver - _amountOut);
+    assertEq(IERC20(USDC_MAINNET).balanceOf(_receiver), _startingBalanceReceiver + _amountOut);
+  }
+
+  function test_spokeUpgradeSwaps_fillIntentWithPull_amountOutEqualsAmountOutMin(
+    uint256 _amountOut
+  ) public {
+    address _solver = address(0x999);
+    address _receiver = address(0x456);
+
+    // upgrading the spoke
+    _upgradeSpoke();
+
+    // Constructing the user intent
+    IEverclearV2.Intent memory _intent = IEverclearV2.Intent({
+      initiator: address(0x123).toBytes32(),
+      receiver: _receiver.toBytes32(),
+      inputAsset: address(0x987).toBytes32(),
+      outputAsset: USDC_MAINNET.toBytes32(),
+      destinations: _getDestinations(1),
+      origin: 10,
+      nonce: 1,
+      timestamp: uint48(block.timestamp - 10 minutes),
+      ttl: 4 hours,
+      amount: 1e18,
+      amountOutMin: 0,
+      data: ''
+    });
+    _intent.amountOutMin = bound(_intent.amountOutMin, 1, type(uint128).max);
+    _amountOut = _intent.amountOutMin;
+
+    // storing balances of participants
+    deal(USDC_MAINNET, _solver, _amountOut);
+    uint256 _startingBalanceSolver = IERC20(USDC_MAINNET).balanceOf(_solver);
+    uint256 _startingBalanceReceiver = IERC20(USDC_MAINNET).balanceOf(_receiver);
+
+    vm.startPrank(_solver);
+    // approving the amount and depositing to spoke
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
+
+    // filling the user intent
+    spokeProxyV5.fillIntentWithPull(_intent, _amountOut);
     bytes32 _intentId = keccak256(abi.encode(_intent));
     vm.stopPrank();
 

@@ -44,6 +44,7 @@ import {IEverclearSpokeV5} from 'interfaces/intent/IEverclearSpokeV5.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
 import {SpokeStorageV5} from 'contracts/intent/SpokeStorageV5.sol';
+
 /**
  * @title EverclearSpoke
  * @notice Spoke contract for Everclear
@@ -208,7 +209,15 @@ contract EverclearSpokeV5 is
     Intent calldata _intent,
     uint256 _amountOut
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut);
+    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, false);
+  }
+
+  /// @inheritdoc IEverclearSpokeV5
+  function fillIntentWithPull(
+    Intent calldata _intent,
+    uint256 _amountOut
+  ) external whenNotPaused returns (FillMessage memory _fillMessage) {
+    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, true);
   }
 
   /// @inheritdoc IEverclearSpokeV5
