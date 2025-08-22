@@ -100,6 +100,20 @@ contract TestEverclearSpokeV5 is EverclearSpokeV5 {
   }
 }
 
+contract TestEverclearSpokeV5 is EverclearSpokeV5 {
+  function processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) external {
+    return _processQueueChecks(_domain, _relayer, _ttl);
+  }
+
+  function executeCalldata(bytes32 _intentId, bytes memory _data) external {
+    return _executeCalldata(_intentId, _data);
+  }
+
+  function verifySignature(address _signer, bytes memory _data, uint256 _noncer, bytes calldata _signature) external {
+    return _verifySignature(_signer, _data, _noncer, _signature);
+  }
+}
+
 contract UpgradeHelper is SafeTxBuilder {
   using stdStorage for StdStorage;
   using TypeCasts for address;
