@@ -18,17 +18,17 @@ import {ISpokeStorageV5} from 'interfaces/intent/ISpokeStorageV5.sol';
 abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant FILL_INTENT_FOR_SOLVER_TYPEHASH = keccak256(
-    'function fillIntentForSolver(address _solver, Intent calldata _intent, uint256 _nonce, uint256 _amountOut, bytes memory _signature)'
+    'function fillIntentForSolver(bytes32 _domain, address _solver, Intent calldata _intent, uint256 _nonce, uint256 _amountOut)'
   );
 
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
-    'function processIntentQueueViaRelayer(uint32 _domain, Intent[] memory _intents, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes memory _signature)'
+    'function processIntentQueueViaRelayer(uint32 _domain, Intent[] memory _intents, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS)'
   );
 
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
-    'function processFillQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes memory _signature)'
+    'function processFillQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS)'
   );
 
   /// @inheritdoc ISpokeStorageV5
@@ -76,13 +76,10 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   /// @inheritdoc ISpokeStorageV5
   mapping(Strategy _strategy => ISettlementModule _module) public modules;
 
-  /**
-   * @notice The intent queue
-   */
-  QueueLibV2.IntentQueue public intentQueue;
-  /**
-   * @notice The deprecated fill queue with previous FillMessage struct
-   */
+  /// @notice The deprecated intent queue with previous Intent struct
+  QueueLib.IntentQueue public deprecated_intentQueue;
+
+  /// @notice The deprecated fill queue with previous FillMessage struct
   QueueLib.FillQueue public deprecated_fillQueue;
 
   /**
@@ -93,6 +90,10 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   /**
    * **********************  Swap Upgrade  **********************
    */
+  /**
+   * @notice The intent queue
+   */
+  QueueLibV2.IntentQueue public intentQueue;
   /**
    * @notice The fill queue
    */
