@@ -29,6 +29,7 @@ import {IHubGateway} from 'interfaces/hub/IHubGateway.sol';
 import {IHubStorageV2} from 'interfaces/hub/IHubStorageV2.sol';
 
 import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
+import {console2} from 'forge-std/console2.sol';
 
 contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   using TypeCasts for address;
@@ -95,55 +96,59 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   }
 
   // NOTE: Epoch issue prevents from working ============ Settler Module ============ //
-  // function test_hubUpgradeSwaps_processDepositsAndInvoices_NettingDepositsOnly() public {
-  //   _upgradeHub();
+  function test_hubUpgradeSwaps_processDepositsAndInvoices_NettingDepositsOnly() public {
+    _upgradeHub();
 
-  //   // constructing the intent messages
-  //   uint32[] memory _destinations = _getDestinations(42_161);
-  //   (IEverclearV2.Intent[] memory _intentsToProcess, bytes memory _intentMessage) =
-  //     _configureIntentMessages(1, USDC_MAINNET, USDC_ARBITRUM, ETHEREUM, _destinations, true);
+    // constructing the intent messages
+    // vm.rollFork(2_070_819);
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToProcess, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, USDC_ARBITRUM, ETHEREUM, _destinations, true);
 
-  //   // TODO: This isn't working due to the block.number being returned being incorrect
-  //   // sending message as gateway to the Hub
-  //   IEverclearV2.Intent[] memory _intents = new IEverclearV2.Intent[](1);
-  //   bytes memory _message = MessageLibV2.formatIntentMessageBatch(_intents);
-  //   vm.prank(address(hubProxy.hubGateway()));
-  //   hubProxy.receiveMessage(_message);
-  //   // _assertIntentsReceived(_intentsToProcess);
+    // TODO: This isn't working due to the block.number being returned being incorrect
+    // sending message as gateway to the Hub
+    IEverclearV2.Intent[] memory _intents = new IEverclearV2.Intent[](1);
+    bytes memory _message = MessageLibV2.formatIntentMessageBatch(_intents);
+    console2.log(block.number);
+    // lastCarryEpochUpdated: 22829519
+    assertEq(block.number, 2_070_819);
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_message);
+    // _assertIntentsReceived(_intentsToProcess);
 
-  //   // processing the deposits and invoices
-  // }
+    // processing the deposits and invoices
+  }
 
-  // function _configureIntentMessages(
-  //   uint256 _total,
-  //   address _inputAsset,
-  //   address _outputAsset,
-  //   uint32 _origin,
-  //   uint32[] memory _destinations,
-  //   bool _netting
-  // ) internal returns (IEverclearV2.Intent[] memory _intents, bytes memory _message) {
-  //   _intents = new IEverclearV2.Intent[](_total);
-  //   for (uint256 i; i < _total; i++) {
-  //     address _initiator = address(uint160(uint256(keccak256(abi.encodePacked(i, 'initiator')))));
-  //     address _receiver = address(uint160(uint256(keccak256(abi.encodePacked(i, 'receiver')))));
+  function _configureIntentMessages(
+    uint256 _total,
+    address _inputAsset,
+    address _outputAsset,
+    uint32 _origin,
+    uint32[] memory _destinations,
+    bool _netting
+  ) internal returns (IEverclearV2.Intent[] memory _intents, bytes memory _message) {
+    _intents = new IEverclearV2.Intent[](_total);
+    for (uint256 i; i < _total; i++) {
+      address _initiator = address(uint160(uint256(keccak256(abi.encodePacked(i, 'initiator')))));
+      address _receiver = address(uint160(uint256(keccak256(abi.encodePacked(i, 'receiver')))));
 
-  //     _intents[i] = IEverclearV2.Intent({
-  //       initiator: _initiator.toBytes32(),
-  //       receiver: _receiver.toBytes32(),
-  //       inputAsset: _inputAsset.toBytes32(),
-  //       outputAsset: _outputAsset.toBytes32(),
-  //       origin: _origin,
-  //       nonce: testNonce++,
-  //       timestamp: uint48(block.timestamp),
-  //       ttl: _netting ? 0 : 2 hours,
-  //       amount: 1000e18,
-  //       amountOutMin: _netting ? 0 : 990e18,
-  //       destinations: _destinations,
-  //       data: ''
-  //     });
-  //   }
-  //   _message = MessageLibV2.formatIntentMessageBatch(_intents);
-  // }
+      _intents[i] = IEverclearV2.Intent({
+        initiator: _initiator.toBytes32(),
+        receiver: _receiver.toBytes32(),
+        inputAsset: _inputAsset.toBytes32(),
+        outputAsset: _outputAsset.toBytes32(),
+        origin: _origin,
+        nonce: testNonce++,
+        timestamp: uint48(block.timestamp),
+        ttl: _netting ? 0 : 2 hours,
+        amount: 1000e18,
+        amountOutMin: _netting ? 0 : 990e18,
+        destinations: _destinations,
+        data: ''
+      });
+    }
+    _message = MessageLibV2.formatIntentMessageBatch(_intents);
+  }
 
   // function _assertIntentsReceived(
   //   IEverclearV2.Intent[] memory _intents
@@ -261,23 +266,23 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
       assertEq(_fees.length, _feesNumber, 'fees length not set correctly');
 
-      // for (uint8 _j; _j < _feesNumber; _j++) {
-      //   assertEq(_fees[_j].recipient, _configs[_i].fees[_j].recipient, 'recipient not set correctly');
-      //   assertEq(_fees[_j].fee, _configs[_i].fees[_j].fee, 'fee not set correctly');
-      // }
+      for (uint8 _j; _j < _feesNumber; _j++) {
+        assertEq(_fees[_j].recipient, _configs[_i].fees[_j].recipient, 'recipient not set correctly');
+        assertEq(_fees[_j].fee, _configs[_i].fees[_j].fee, 'fee not set correctly');
+      }
 
-      // IHubStorage.AssetConfig[] memory _adoptedForAssets = _configs[_i].adoptedForAssets;
-      // for (uint8 _j; _j < _adoptedForAssets.length; _j++) {
-      //   bytes32 _assetHash =
-      //     keccak256(abi.encode(_configs[_i].adoptedForAssets[_j].adopted, _configs[_i].adoptedForAssets[_j].domain));
-      //   IHubStorage.AssetConfig memory _assetConfig = assetManager.adoptedForAssets(_assetHash);
+      IHubStorageV2.AssetConfig[] memory _adoptedForAssets = _configs[_i].adoptedForAssets;
+      for (uint8 _j; _j < _adoptedForAssets.length; _j++) {
+        bytes32 _assetHash =
+          keccak256(abi.encode(_configs[_i].adoptedForAssets[_j].adopted, _configs[_i].adoptedForAssets[_j].domain));
+        IHubStorageV2.AssetConfig memory _assetConfig = hubProxy.adoptedForAssets(_assetHash);
 
-      //   assertEq(_assetConfig.tickerHash, _tickerHash, 'ticker hash not set correctly');
-      //   assertEq(_assetConfig.adopted, _adoptedForAssets[_j].adopted, 'adopted not set correctly');
-      //   assertEq(_assetConfig.domain, _adoptedForAssets[_j].domain, 'domain not set correctly');
-      //   assertEq(_assetConfig.approval, _adoptedForAssets[_j].approval, 'approval not set correctly');
-      //   assertEq(uint256(_assetConfig.strategy), uint256(_adoptedForAssets[_j].strategy), 'strategy not set correctly');
-      // }
+        assertEq(_assetConfig.tickerHash, _tickerHash, 'ticker hash not set correctly');
+        assertEq(_assetConfig.adopted, _adoptedForAssets[_j].adopted, 'adopted not set correctly');
+        assertEq(_assetConfig.domain, _adoptedForAssets[_j].domain, 'domain not set correctly');
+        assertEq(_assetConfig.approval, _adoptedForAssets[_j].approval, 'approval not set correctly');
+        assertEq(uint256(_assetConfig.strategy), uint256(_adoptedForAssets[_j].strategy), 'strategy not set correctly');
+      }
     }
   }
 
@@ -292,11 +297,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(uint8(_prioritizedStrategy), uint8(_strategy), 'prioritized strategy not set correctly');
   }
 
+  function test_hubUpgradeSwaps_setLastClosedEpochProcessed() public {}
+
   function test_hubUpgradeSwaps_setDiscountPerEpoch() public {
     _upgradeHub();
 
     bytes32 tickerHash = USDC_MAINNET.toBytes32();
-    uint24 newDiscountPerEpoch = 1000; // Example value
+    uint24 newDiscountPerEpoch = 0; // Example value
 
     vm.prank(hubProxy.owner());
     hubProxy.setDiscountPerEpoch(tickerHash, newDiscountPerEpoch);
@@ -322,6 +329,19 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(userSupportedDomains.length, 2, 'User should have two supported domains');
     assertEq(userSupportedDomains[0], ETHEREUM, 'First supported domain should be Ethereum');
     assertEq(userSupportedDomains[1], ARBITRUM, 'Second supported domain should be Arbitrum');
+  }
+
+  function test_hubUpgradeSwaps_setUpdateVirtualBalance() public {
+    _upgradeHub();
+
+    vm.prank(address(0x123));
+    hubProxy.setUpdateVirtualBalance(true);
+
+    assertEq(
+      EverclearHubV2(address(hubProxy)).updateVirtualBalance(address(0x123).toBytes32()),
+      true,
+      'Virtual balance should be updated'
+    );
   }
 
   // ============ Protocol Manager Functions ============ //
@@ -421,9 +441,14 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   error DomainUnsupported();
 
   function test_hubUpgradeSwaps_removeSupportedDomains() public {
+    _upgradeHub();
+
     uint32[] memory _domains = new uint32[](2);
     _domains[0] = 1;
     _domains[1] = 42_161;
+
+    // removing supported domains
+    vm.startPrank(hubProxy.owner());
     hubProxy.removeSupportedDomains(_domains);
 
     uint32[] memory _supportedDomains = hubProxy.supportedDomains();
@@ -551,6 +576,8 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(averageGasUnitsPerSettlement, config.averageGasUnitsPerSettlement);
     assertEq(bufferDBPS, config.bufferDBPS);
   }
+
+  function test_hubUpgradeSwaps_setMaxDiscountDBPS() public {}
 
   // ============ Upgrades Functions ============ //
   function test_hubUpgradeSwaps_updateModuleAddress_Settlement() public {
