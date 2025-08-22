@@ -119,6 +119,16 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   error EverclearSpoke_NewIntent_InvalidIntent();
 
   /**
+   * @notice Thrown when the ttl is non-zero and outputAsset is null
+   */
+  error EverclearSpoke_NewIntent_OutputAssetNull();
+
+  /**
+   * @notice Thrown when the destination array > 1 and outputAsset is not null
+   */
+  error EverclearSpoke_NewIntent_OutputAssetNotNull();
+
+  /**
    * @notice Thrown when the maxFee is exceeded
    * @param _amountOut The amount sent by the solver
    * @param _amountOutMin The min amount out
@@ -136,13 +146,6 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _available The amount of tokens the solver has deposited in the `EverclearSpoke`
    */
   error EverclearSpoke_FillIntent_InsufficientFunds(uint256 _requested, uint256 _available);
-
-  /**
-   * @notice Thrown when the fee exceeds the maximum fee
-   * @param _fee The fee chosen by the solver
-   * @param _maxFee The actual fee the intent solver set for his intent
-   */
-  error EverclearSpoke_FillIntent_MaxFeeExceeded(uint256 _fee, uint24 _maxFee);
 
   /**
    * @notice Thrown when the intent calldata exceeds the limit
@@ -186,6 +189,16 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @notice Thrown when the external call failed on executeIntentCalldata
    */
   error EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed();
+
+  /**
+   * @notice Thrown when the queues are non-empty
+   */
+  error EverclearSpoke_Initialize_IntentQueueNotEmpty();
+
+  /**
+   * @notice Thrown when the queues are non-empty
+   */
+  error EverclearSpoke_Initialize_FillQueueNotEmpty();
 
   /*///////////////////////////////////////////////////////////////
                               LOGIC
@@ -235,11 +248,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
 
   /**
    * @notice Initialize the EverclearSpoke contract
-   * @param _feeAdapter The fee adapter
    */
-  function initialize(
-    address _feeAdapter
-  ) external;
+  function initialize(address _feeAdapter, address _messageReceiver) external;
 
   /**
    * @notice Creates a new intent
@@ -263,7 +273,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     uint256 _amountOutMin,
     uint48 _ttl,
     bytes calldata _data
-  ) external returns (bytes32 _intentId, Intent calldata _intent);
+  ) external returns (bytes32 _intentId, Intent memory _intent);
 
   /**
    * @notice Creates a new intent
@@ -287,7 +297,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     uint256 _amountOutMin,
     uint48 _ttl,
     bytes calldata _data
-  ) external returns (bytes32 _intentId, Intent calldata _intent);
+  ) external returns (bytes32 _intentId, Intent memory _intent);
 
   /**
    * @notice Creates a new intent with permit2
@@ -313,7 +323,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     uint48 _ttl,
     bytes calldata _data,
     Permit2Params calldata _permit2Params
-  ) external returns (bytes32 _intentId, Intent calldata _intent);
+  ) external returns (bytes32 _intentId, Intent memory _intent);
 
   /**
    * @notice fills an intent
@@ -321,7 +331,18 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _amountOut The amount of the asset the solver is sending to the user
    * @return _fillMessage The enqueued fill message
    */
-  function fillIntent(Intent calldata _intent, uint256 _amountOut) external returns (FillMessage calldata _fillMessage);
+  function fillIntent(Intent calldata _intent, uint256 _amountOut) external returns (FillMessage memory _fillMessage);
+
+  /**
+   * @notice fills an intent pulling funds from callers wallet
+   * @param _intent The intent structure
+   * @param _amountOut The amount of the asset the solver is sending to the user
+   * @return _fillMessage The enqueued fill message
+   */
+  function fillIntentWithPull(
+    Intent calldata _intent,
+    uint256 _amountOut
+  ) external returns (FillMessage memory _fillMessage);
 
   /**
    * @notice Allows a relayer to fill an intent for a solver
