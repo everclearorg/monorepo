@@ -176,7 +176,7 @@ contract Settler is SettlerLogic, ISettler, IEverclear {
     // check if deposit was an xcall
     Intent memory _intent = _intentContext.intent;
 
-    // Emit edeposit processed before invoice or settlement enqueued events
+    // Emit deposit processed before invoice or settlement enqueued events
     emit DepositProcessed(
       _epoch, _domain, _tickerHash, _deposit.intentId, _intentContext.amountAfterFees + _intentContext.pendingRewards
     );
