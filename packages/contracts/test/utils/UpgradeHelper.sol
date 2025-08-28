@@ -122,16 +122,23 @@ contract UpgradeHelper is SafeTxBuilder {
   uint256 public MESSAGE_GAS_LIMIT = 2_000_000;
   address public USDC_MAINNET = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
   address public USDC_OPTIMISM = 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85;
+  address public USDT_MAINNET = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+  address public USDT_ARBITRUM = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
+  address public USDT_OPTIMISM = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58;
   address public WETH_MAINNET = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
   address public WETH_ARBITRUM = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
   address public CLEAR_MAINNET = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
   address public MAILBOX_MAINNET = 0xc005dc82818d67AF737725bD4bf75435d065D239;
+  address public AAVE_ARBITRUM = 0xba5DdD1f9d7F570dc94a51479a000E3BCE967196;
   uint256 public FIXED_MAIN_BLOCK = 21_244_576;
   uint32 constant HUB_ID = 25_327;
   address public HUB_GATEWAY_PROD = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
   bytes32 public USDC_MAINNET_ASSET_HASH = keccak256(abi.encode(USDC_MAINNET, 1));
   bytes32 public USDC_OPTIMISM_ASSET_HASH = keccak256(abi.encode(USDC_OPTIMISM, 10));
   bytes32 public USDC_ARBITRUM_ASSET_HASH = keccak256(abi.encode(USDC_ARBITRUM, 42_161));
+  bytes32 public USDT_ETHEREUM_ASSET_HASH = keccak256(abi.encode(USDT_MAINNET, 1));
+  bytes32 public USDT_ARBITRUM_ASSET_HASH = keccak256(abi.encode(USDT_ARBITRUM, 42_161));
+  bytes32 public USDT_OPTIMISM_ASSET_HASH = keccak256(abi.encode(USDT_OPTIMISM, 10));
 
   EverclearSpoke public spokeProxy;
   DeploymentParams public _params;

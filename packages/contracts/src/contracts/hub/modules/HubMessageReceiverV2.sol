@@ -13,7 +13,6 @@ import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
 import {IHubMessageReceiverV2, IMessageReceiver} from 'interfaces/hub/IHubMessageReceiverV2.sol';
 
 import {SettlerLogicV2} from 'contracts/hub/modules/SettlerLogicV2.sol';
-import 'forge-std/console2.sol';
 
 /**
  * @title HubMessageReceiverV2
@@ -134,8 +133,6 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
         continue;
       }
 
-      console2.log('Filling solver');
-      console2.logBytes32(_fillMessage.solver);
       _intentContext.solver = _fillMessage.solver;
       _intentContext.amountOut = _fillMessage.amountOut;
       _intentContext.fillTimestamp = _fillMessage.executionTimestamp;

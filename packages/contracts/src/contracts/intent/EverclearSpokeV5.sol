@@ -506,7 +506,7 @@ contract EverclearSpokeV5 is
       revert EverclearSpoke_FillIntent_AmountOutInvalid(_amountOut, _intent.amountOutMin);
     }
 
-    if (_destinations.length == 0) {
+    if (_destinations.length == 0 || _destinations.length > 10) {
       revert EverclearSpoke_FillIntent_InvalidDestinationArray();
     }
 
