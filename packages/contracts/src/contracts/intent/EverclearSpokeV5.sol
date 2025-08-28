@@ -207,17 +207,19 @@ contract EverclearSpokeV5 is
   /// @inheritdoc IEverclearSpokeV5
   function fillIntent(
     Intent calldata _intent,
-    uint256 _amountOut
+    uint256 _amountOut,
+    uint32[] memory _destinations
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, false);
+    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, false);
   }
 
   /// @inheritdoc IEverclearSpokeV5
   function fillIntentWithPull(
     Intent calldata _intent,
-    uint256 _amountOut
+    uint256 _amountOut,
+    uint32[] memory _destinations
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, true);
+    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, true);
   }
 
   /// @inheritdoc IEverclearSpokeV5
