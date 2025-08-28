@@ -87,7 +87,7 @@ contract TestEverclearSpokeV5 is EverclearSpokeV5 {
 }
 
 contract TestEverclearSpokeV5 is EverclearSpokeV5 {
-  function processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) external {
+  function processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) external view {
     return _processQueueChecks(_domain, _relayer, _ttl);
   }
 

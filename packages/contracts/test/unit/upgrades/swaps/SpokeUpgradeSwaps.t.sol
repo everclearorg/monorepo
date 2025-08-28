@@ -1198,6 +1198,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     });
     _intent.amountOutMin = bound(_intent.amountOutMin, 1, type(uint128).max);
     _amountOut = bound(_amountOut, _intent.amountOutMin, type(uint128).max);
+    uint32[] memory _solverDestinations = _getDestinations(1);
 
     // storing balances of participants
     deal(USDC_MAINNET, _solver, _amountOut);
@@ -1209,7 +1210,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
 
     // filling the user intent
-    spokeProxyV5.fillIntentWithPull(_intent, _amountOut);
+    spokeProxyV5.fillIntentWithPull(_intent, _amountOut, _solverDestinations);
     bytes32 _intentId = keccak256(abi.encode(_intent));
     vm.stopPrank();
 
@@ -1245,6 +1246,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     });
     _intent.amountOutMin = bound(_intent.amountOutMin, 1, type(uint128).max);
     _amountOut = _intent.amountOutMin;
+    uint32[] memory _solverDestinations = _getDestinations(1);
 
     // storing balances of participants
     deal(USDC_MAINNET, _solver, _amountOut);
@@ -1256,7 +1258,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
 
     // filling the user intent
-    spokeProxyV5.fillIntentWithPull(_intent, _amountOut);
+    spokeProxyV5.fillIntentWithPull(_intent, _amountOut, _solverDestinations);
     bytes32 _intentId = keccak256(abi.encode(_intent));
     vm.stopPrank();
 
