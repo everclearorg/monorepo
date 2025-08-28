@@ -1459,15 +1459,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     spokeProxyV5.fillIntent(_intent, _amountOut, _solverDestinations);
   }
 
-  function testRevert_spokeSwapUpgrade_fillIntent_InvalidDestinationArray() public {
+  function testRevert_spokeSwapUpgrade_fillIntent_InvalidDestinationArray_ZeroLength() public {
     _upgradeSpoke();
 
     // configuring the inputs
     uint256 _amountOut = 999e6;
     uint32[] memory _solverDestinations;
     IEverclearV2.Intent memory _intent;
-    _intent.destinations = new uint32[](1);
-    _intent.destinations[0] = 1;
     _intent.timestamp = uint48(block.timestamp);
     _intent.ttl = 1 days;
     _intent.amountOutMin = 1000e6;
@@ -1475,7 +1473,28 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // calling
     vm.expectRevert(
       abi.encodeWithSelector(
-        IEverclearSpokeV5.EverclearSpoke_FillIntent_AmountOutInvalid.selector, _amountOut, _intent.amountOutMin
+        IEverclearSpokeV5.EverclearSpoke_FillIntent_InvalidDestinationArray.selector, _amountOut, _intent.amountOutMin
+      )
+    );
+    spokeProxyV5.fillIntent(_intent, _amountOut, _solverDestinations);
+  }
+
+    function testRevert_spokeSwapUpgrade_fillIntent_InvalidDestinationArray_MaxLength() public {
+    _upgradeSpoke();
+
+    // configuring the inputs
+    uint256 _amountOut = 999e6;
+    uint32[] memory _solverDestinations;
+    IEverclearV2.Intent memory _intent;
+    _intent.destinations = new uint32[](11);
+    _intent.timestamp = uint48(block.timestamp);
+    _intent.ttl = 1 days;
+    _intent.amountOutMin = 1000e6;
+
+    // calling
+    vm.expectRevert(
+      abi.encodeWithSelector(
+        IEverclearSpokeV5.EverclearSpoke_FillIntent_InvalidDestinationArray.selector, _amountOut, _intent.amountOutMin
       )
     );
     spokeProxyV5.fillIntent(_intent, _amountOut, _solverDestinations);
@@ -1614,6 +1633,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     spokeProxyV5.processIntentQueue(_intents);
   }
 
+  // TODO: Fix this
   function testRevert_spokeSwapUpgrade_executeCalldata_ExternalCallFailed() public {
     _upgradeSpoke();
 
@@ -1629,7 +1649,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // calling and expecting revert
     vm.expectRevert(
-      abi.encodeWithSelector(IEverclearSpokeV5.EverclearSpoke_ExecuteIntentCalldata_InvalidStatus.selector, _intentId)
+      abi.encodeWithSelector(IEverclearSpokeV5.EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed.selector, _intentId)
     );
     spokeProxyV5.executeIntentCalldata(_intent);
   }
