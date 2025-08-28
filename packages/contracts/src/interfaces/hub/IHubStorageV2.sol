@@ -189,6 +189,7 @@ interface IHubStorageV2 {
     uint256 amountAfterFees;
     uint256 pendingRewards;
     uint256 amountOut;
+    uint32[] solverDestinations;
     IEverclearV2.IntentStatus status;
     IEverclearV2.Intent intent;
   }

@@ -148,6 +148,11 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   error EverclearSpoke_FillIntent_InsufficientFunds(uint256 _requested, uint256 _available);
 
   /**
+   * @notice Thrown when the destination array is empty
+   */
+  error EverclearSpoke_FillIntent_InvalidDestinationArray();
+
+  /**
    * @notice Thrown when the intent calldata exceeds the limit
    */
   error EverclearSpoke_NewIntent_CalldataExceedsLimit();
@@ -331,7 +336,11 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _amountOut The amount of the asset the solver is sending to the user
    * @return _fillMessage The enqueued fill message
    */
-  function fillIntent(Intent calldata _intent, uint256 _amountOut) external returns (FillMessage memory _fillMessage);
+  function fillIntent(
+    Intent calldata _intent,
+    uint256 _amountOut,
+    uint32[] memory _destinations
+  ) external returns (FillMessage memory _fillMessage);
 
   /**
    * @notice fills an intent pulling funds from callers wallet
@@ -341,7 +350,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   function fillIntentWithPull(
     Intent calldata _intent,
-    uint256 _amountOut
+    uint256 _amountOut,
+    uint32[] memory _destinations
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -358,6 +368,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     Intent calldata _intent,
     uint256 _nonce,
     uint256 _amountOut,
+    uint32[] memory _destinations,
     bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 

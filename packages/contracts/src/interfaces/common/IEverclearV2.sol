@@ -89,14 +89,20 @@ interface IEverclearV2 {
    * @param intentId The ID of the intent
    * @param solver The address of the intent solver in bytes32 format
    * @param initiator The address of the intent initiator
+   * @param intentInputAsset The input asset of the intent (i.e. asset the solver will be repaid in)
+   * @param intentOrigin The origin chain of the intent
    * @param amountOut The amount being sent to the user by the solver
+   * @param destinations The settlement destinations for the fill
    * @param executionTimestamp The execution timestamp of the intent
    */
   struct FillMessage {
     bytes32 intentId;
     bytes32 solver;
     bytes32 initiator;
+    bytes32 intentInputAsset;
+    uint32 intentOrigin;
     uint256 amountOut;
+    uint32[] destinations;
     uint48 executionTimestamp;
   }
 
