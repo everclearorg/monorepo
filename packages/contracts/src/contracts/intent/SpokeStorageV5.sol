@@ -18,7 +18,7 @@ import {ISpokeStorageV5} from 'interfaces/intent/ISpokeStorageV5.sol';
 abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant FILL_INTENT_FOR_SOLVER_TYPEHASH = keccak256(
-    'function fillIntentForSolver(bytes32 _domain, address _solver, Intent calldata _intent, uint256 _nonce, uint256 _amountOut)'
+    'function fillIntentForSolver(bytes32 _domain, address _solver, Intent calldata _intent, uint256 _nonce, uint256 _amountOut, uint32[] memory _destinations)'
   );
 
   /// @inheritdoc ISpokeStorageV5

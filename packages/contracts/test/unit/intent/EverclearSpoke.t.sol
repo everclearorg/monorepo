@@ -73,13 +73,13 @@ contract TestEverclearSpoke is EverclearSpoke {
 
   function getBalance(
     bytes32 _asset
-  ) public returns (uint256 _amount) {
+  ) public view returns (uint256 _amount) {
     _amount = IERC20(_asset.toAddress()).balanceOf(address(this));
   }
 
   function getBalance(
     address _asset
-  ) public returns (uint256 _amount) {
+  ) public view returns (uint256 _amount) {
     _amount = IERC20(_asset).balanceOf(address(this));
   }
 
@@ -276,7 +276,7 @@ contract BaseTest is TestExtended {
 
   function _getDestinations(
     uint32 _destination
-  ) internal view returns (uint32[] memory _destinations) {
+  ) internal pure returns (uint32[] memory _destinations) {
     uint32[] memory _destinations = new uint32[](1);
     _destinations[0] = _destination;
     return _destinations;
@@ -289,7 +289,7 @@ contract BaseTest is TestExtended {
     _;
   }
 
-  function _getDestinations(IEverclear.Intent memory _intent, uint32 _destination) internal {
+  function _getDestinations(IEverclear.Intent memory _intent, uint32 _destination) internal pure {
     uint32[] memory _destinations = new uint32[](1);
     _destinations[0] = _destination;
     _intent.destinations = _destinations;
@@ -390,13 +390,13 @@ contract BaseTest is TestExtended {
     vm.mockCall(_token, abi.encodeWithSignature('decimals()'), abi.encode(_decimals));
   }
 
-  function _assertIntentQueueIndexes(uint256 _first, uint256 _last) internal {
+  function _assertIntentQueueIndexes(uint256 _first, uint256 _last) internal view {
     (uint256 _firstIdx, uint256 _lastIdx) = everclearSpoke.getIntentQueueIndexes();
     assertEq(_firstIdx, _first);
     assertEq(_lastIdx, _last);
   }
 
-  function _assertFillQueueIndexes(uint256 _first, uint256 _last) internal {
+  function _assertFillQueueIndexes(uint256 _first, uint256 _last) internal view {
     (uint256 _firstIdx, uint256 _lastIdx) = everclearSpoke.getFillQueueIndexes();
     assertEq(_firstIdx, _first);
     assertEq(_lastIdx, _last);
