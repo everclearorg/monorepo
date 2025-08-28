@@ -13,7 +13,6 @@ import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
 import {IHubMessageReceiverV2, IMessageReceiver} from 'interfaces/hub/IHubMessageReceiverV2.sol';
 
 import {SettlerLogicV2} from 'contracts/hub/modules/SettlerLogicV2.sol';
-import 'forge-std/console2.sol';
 
 /**
  * @title HubMessageReceiverV2
