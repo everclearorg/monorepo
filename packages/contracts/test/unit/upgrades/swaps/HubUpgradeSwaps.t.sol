@@ -2373,6 +2373,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
   }
 
+  // ============ Discount Maths ============ //
+  function test_hubUpgradeSwaps_invoiceNotDiscounted() public {}
+  
+  function test_hubUpgradeSwaps_invoiceDiscountedFiveTimes() public {}
+
+  // ============ Fee Maths ============ //
+
   // ============ Asset Manager Functions ============ //
   function test_hubUpgradeSwaps_setAdoptedForAssets(
     bytes32 _tickerHash,
