@@ -29,7 +29,7 @@ interface ICREATE3 {
 }
 
 contract TestEverclearSpokeV5 is EverclearSpokeV5 {
-  function processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) external {
+  function processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) external view {
     return _processQueueChecks(_domain, _relayer, _ttl);
   }
 
@@ -121,11 +121,17 @@ contract UpgradeHelper is SafeTxBuilder {
   address public SPOKE_GATEWAY_MAINNET = 0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7;
   uint256 public MESSAGE_GAS_LIMIT = 2_000_000;
   address public USDC_MAINNET = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+  address public USDC_OPTIMISM = 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85;
+  address public WETH_MAINNET = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+  address public WETH_ARBITRUM = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
   address public CLEAR_MAINNET = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
   address public MAILBOX_MAINNET = 0xc005dc82818d67AF737725bD4bf75435d065D239;
   uint256 public FIXED_MAIN_BLOCK = 21_244_576;
   uint32 constant HUB_ID = 25_327;
   address public HUB_GATEWAY_PROD = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
+  bytes32 public USDC_MAINNET_ASSET_HASH = keccak256(abi.encode(USDC_MAINNET, 1));
+  bytes32 public USDC_OPTIMISM_ASSET_HASH = keccak256(abi.encode(USDC_OPTIMISM, 10));
+  bytes32 public USDC_ARBITRUM_ASSET_HASH = keccak256(abi.encode(USDC_ARBITRUM, 42_161));
 
   EverclearSpoke public spokeProxy;
   DeploymentParams public _params;
@@ -178,9 +184,11 @@ contract UpgradeHelper is SafeTxBuilder {
   address public constant HUB_PROXY = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
   address public constant HUB_PROXY_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
   address public constant HUB_PROXY_OWNER = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
+
+  // Epoch as of 26th Aug - 235177 //
   uint256 internal constant FIXED_EVERCLEAR_BLOCK = 1_667_352;
-  uint256 internal constant LAST_BLOCK_NUMBER_CARRY = 1_000_000;
-  address internal constant USDC_ARBITRUM = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
+  uint256 internal constant LAST_BLOCK_NUMBER_CARRY = 250_000; // CurrentEpoch of 213078 with 250_000
+  address internal constant USDC_ARBITRUM = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831;
   address public immutable MANAGER = makeAddr('Manager');
 
   EverclearSpokeV5 public spokeProxyV5;
@@ -238,7 +246,7 @@ contract UpgradeHelper is SafeTxBuilder {
     state.messageGasLimit = spokeProxyV4.messageGasLimit();
   }
 
-  function _getDestinations(IEverclearV2.Intent memory _intent, uint32 _destination) internal {
+  function _getDestinations(IEverclearV2.Intent memory _intent, uint32 _destination) internal pure {
     uint32[] memory _destinations = new uint32[](1);
     _destinations[0] = _destination;
     _intent.destinations = _destinations;
@@ -334,7 +342,7 @@ contract UpgradeHelper is SafeTxBuilder {
     IHubStorageV2.TokenSetup[] memory _configs,
     uint8 _adoptedForAssetsNumber,
     uint8 _feesNumber
-  ) internal {
+  ) internal pure {
     for (uint8 _i; _i < _configs.length; _i++) {
       _configs[_i].tickerHash = keccak256(abi.encode(1));
       _configs[_i].fees = new IHubStorageV2.Fee[](_feesNumber);
