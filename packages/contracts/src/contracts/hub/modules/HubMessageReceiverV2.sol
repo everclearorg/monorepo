@@ -13,7 +13,7 @@ import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
 import {IHubMessageReceiverV2, IMessageReceiver} from 'interfaces/hub/IHubMessageReceiverV2.sol';
 
 import {SettlerLogicV2} from 'contracts/hub/modules/SettlerLogicV2.sol';
-import {console2} from 'forge-std/console2.sol';
+import 'forge-std/console2.sol';
 
 /**
  * @title HubMessageReceiverV2
@@ -134,9 +134,21 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
         continue;
       }
 
+      console2.log('Filling solver');
+      console2.logBytes32(_fillMessage.solver);
       _intentContext.solver = _fillMessage.solver;
       _intentContext.amountOut = _fillMessage.amountOut;
       _intentContext.fillTimestamp = _fillMessage.executionTimestamp;
+
+      // checking destinations for the repayment asset - setting to provided array if valid or origin if invalid
+      bool supportedDestinations =
+        _checkSupportedDestinations(_fillMessage.intentInputAsset, _fillMessage.intentOrigin, _fillMessage.destinations);
+      if (supportedDestinations) {
+        _intentContext.solverDestinations = _fillMessage.destinations;
+      } else {
+        _intentContext.solverDestinations = new uint32[](1);
+        _intentContext.solverDestinations[0] = _fillMessage.intentOrigin;
+      }
 
       if (_previousStatus == IntentStatus.DEPOSIT_PROCESSED) {
         Intent memory _intent = _contexts[_intentId].intent;
@@ -221,5 +233,29 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
     }
 
     return (true, _tickerHash, _inputAssetHash, _adoptedForAssets[_inputAssetHash].strategy);
+  }
+
+  function _checkSupportedDestinations(
+    bytes32 _intentInputAsset,
+    uint32 _origin,
+    uint32[] memory _destinations
+  ) internal view returns (bool) {
+    // checking the provided domain is supported
+    for (uint256 i; i < _destinations.length; i++) {
+      if (!_supportedDomains.contains(_destinations[i])) {
+        return false;
+      }
+    }
+
+    // checking input asset is approved on provided destinations to enable repayment on a diff chain
+    bytes32 _inputAssetHash = AssetUtils.getAssetHash(_intentInputAsset, _origin);
+    bytes32 _tickerHash = _adoptedForAssets[_inputAssetHash].tickerHash;
+    for (uint256 i; i < _destinations.length; i++) {
+      bytes32 _outputAssetHash = _tokenConfigs[_tickerHash].assetHashes[_destinations[i]];
+      if (!_adoptedForAssets[_outputAssetHash].approval) {
+        return false;
+      }
+    }
+    return true;
   }
 }
