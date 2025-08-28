@@ -207,17 +207,19 @@ contract EverclearSpokeV5 is
   /// @inheritdoc IEverclearSpokeV5
   function fillIntent(
     Intent calldata _intent,
-    uint256 _amountOut
+    uint256 _amountOut,
+    uint32[] memory _destinations
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, false);
+    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, false);
   }
 
   /// @inheritdoc IEverclearSpokeV5
   function fillIntentWithPull(
     Intent calldata _intent,
-    uint256 _amountOut
+    uint256 _amountOut,
+    uint32[] memory _destinations
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, true);
+    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, true);
   }
 
   /// @inheritdoc IEverclearSpokeV5
@@ -226,13 +228,15 @@ contract EverclearSpokeV5 is
     Intent calldata _intent,
     uint256 _nonce,
     uint256 _amountOut,
+    uint32[] memory _destinations,
     bytes calldata _signature
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
     bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data = abi.encode(FILL_INTENT_FOR_SOLVER_TYPEHASH, _domain, _solver, _intent, _nonce, _amountOut);
+    bytes memory _data =
+      abi.encode(FILL_INTENT_FOR_SOLVER_TYPEHASH, _domain, _solver, _intent, _nonce, _amountOut, _destinations);
     _verifySignature(_solver, _data, _nonce, _signature);
 
-    _fillMessage = _fillIntent(_intent, _solver, _amountOut, false);
+    _fillMessage = _fillIntent(_intent, _solver, _amountOut, _destinations, false);
   }
 
   /// @inheritdoc IEverclearSpokeV5
@@ -490,6 +494,7 @@ contract EverclearSpokeV5 is
     Intent calldata _intent,
     address _solver,
     uint256 _amountOut,
+    uint32[] memory _destinations,
     bool _pull
   ) internal validDestination(_intent) returns (FillMessage memory _fillMessage) {
     bytes32 _intentId = keccak256(abi.encode(_intent));
@@ -499,6 +504,10 @@ contract EverclearSpokeV5 is
 
     if (_amountOut < _intent.amountOutMin) {
       revert EverclearSpoke_FillIntent_AmountOutInvalid(_amountOut, _intent.amountOutMin);
+    }
+
+    if (_destinations.length == 0) {
+      revert EverclearSpoke_FillIntent_InvalidDestinationArray();
     }
 
     // TODO: Review consequences of this second check change
@@ -532,7 +541,10 @@ contract EverclearSpokeV5 is
       intentId: _intentId,
       initiator: _intent.initiator,
       solver: _solver.toBytes32(),
+      intentInputAsset: _intent.inputAsset,
+      intentOrigin: _intent.origin,
       amountOut: _amountOut,
+      destinations: _destinations,
       executionTimestamp: uint48(block.timestamp)
     });
 
