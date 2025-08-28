@@ -177,7 +177,7 @@ contract SettlerV2 is SettlerLogicV2, ISettlerV2, IEverclearV2 {
     // check if deposit was an xcall
     Intent memory _intent = _intentContext.intent;
 
-    // Emit edeposit processed before invoice or settlement enqueued events
+    // Emit deposit processed before invoice or settlement enqueued events
     emit DepositProcessed(
       _epoch, _domain, _tickerHash, _deposit.intentId, _intentContext.amountAfterFees + _intentContext.pendingRewards
     );
@@ -242,19 +242,9 @@ contract SettlerV2 is SettlerLogicV2, ISettlerV2, IEverclearV2 {
 
     for (uint32 _i; _i < _amount; _i++) {
       _settlementMessages[_i] = HubQueueLibV2.dequeueSettlement(settlements[_domain]);
-      console2.log('Settlement info output');
-      console2.logBytes32(_settlementMessages[_i].intentId);
-      console2.log(_settlementMessages[_i].amount);
-      console2.logBytes32(_settlementMessages[_i].asset);
-      console2.logBytes32(_settlementMessages[_i].recipient);
-      console2.log(_settlementMessages[_i].updateVirtualBalance);
     }
 
     _message = MessageLibV2.formatSettlementBatch(_settlementMessages);
-    console2.log('Message output');
-    console2.logBytes(_message);
-    console2.log(_gasLimit);
-    console2.log(_domain);
   }
 
   /**
