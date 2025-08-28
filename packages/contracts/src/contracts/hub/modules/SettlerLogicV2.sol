@@ -114,8 +114,11 @@ abstract contract SettlerLogicV2 is HubStorageV2 {
     uint32[] memory _userSupportedDomains = _usersSupportedDomains[_user].memValues();
 
     // Prioritize creator supported domains over intent destinations
+    // If filled by solver use solver provided destinations
     if (_userSupportedDomains.length == 0) {
-      _destinations = _contexts[_intentId].intent.destinations;
+      _destinations = _contexts[_intentId].solver == 0
+        ? _contexts[_intentId].intent.destinations
+        : _contexts[_intentId].solverDestinations;
       _destinations = _destinations.length == 0 ? _tokenConfigs[_tickerHash].domains.memValues() : _destinations;
     } else {
       _destinations = _userSupportedDomains;
