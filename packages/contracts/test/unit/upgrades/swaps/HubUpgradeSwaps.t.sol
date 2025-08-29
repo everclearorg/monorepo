@@ -3017,7 +3017,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
   // ============ Discount Maths ============ //
   function test_hubUpgradeSwaps_invoiceNotDiscounted() public {}
-  
+
   function test_hubUpgradeSwaps_invoiceDiscountedFiveTimes() public {}
 
   // ============ Fee Maths ============ //
