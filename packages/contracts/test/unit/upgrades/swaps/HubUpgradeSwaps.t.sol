@@ -1724,7 +1724,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
   // ============ Discount Maths ============ //
   function test_hubUpgradeSwaps_invoiceNotDiscounted() public {}
-  
+
   function test_hubUpgradeSwaps_invoiceDiscountedFiveTimes() public {}
 
   // ============ Fee Maths ============ //
@@ -1803,7 +1803,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
   function test_hubUpgradeSwaps_setPrioritizedStrategy(bytes32 _tickerHash, uint8 _strategySeed) public {
     _upgradeHub();
-    
+
     IEverclearV2.Strategy _strategy =
       IEverclearV2.Strategy(bound(_strategySeed, 0, uint256(type(IEverclearV2.Strategy).max)));
 
