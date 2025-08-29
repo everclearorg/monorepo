@@ -1479,7 +1479,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     spokeProxyV5.fillIntent(_intent, _amountOut, _solverDestinations);
   }
 
-    function testRevert_spokeSwapUpgrade_fillIntent_InvalidDestinationArray_MaxLength() public {
+  function testRevert_spokeSwapUpgrade_fillIntent_InvalidDestinationArray_MaxLength() public {
     _upgradeSpoke();
 
     // configuring the inputs
@@ -1649,7 +1649,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // calling and expecting revert
     vm.expectRevert(
-      abi.encodeWithSelector(IEverclearSpokeV5.EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed.selector, _intentId)
+      abi.encodeWithSelector(
+        IEverclearSpokeV5.EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed.selector, _intentId
+      )
     );
     spokeProxyV5.executeIntentCalldata(_intent);
   }
