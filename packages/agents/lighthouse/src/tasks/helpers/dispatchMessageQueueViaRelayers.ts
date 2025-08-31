@@ -38,7 +38,9 @@ const MAX_SETTLEMENT_DEQUEUE = 900;
 const MAX_SETTLEMENT_DEQUEUE_SOLANA = 1;
 
 // NOTE: We are now capping intents because of hyperlane gas calculations
-const MAX_INTENT_DEQUEUE = 6;
+// NOTE: This is reduced from 6 to 5 because of "default" gas limit on spoke is currently at 2M < 605_000 + 300_000 * 5
+// TODO: increase this while increase messageGasLimit on spoke
+const MAX_INTENT_DEQUEUE = 5;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
