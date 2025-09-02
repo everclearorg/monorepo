@@ -99,7 +99,6 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   }
 
   // ============ Settler Module ============ //
-
   function test_hubUpgradeSwaps_processDepositsAndInvoices_NettingDepositsOnly() public {
     _upgradeHub();
 
@@ -134,6 +133,52 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
     _intentIds[1] = keccak256(abi.encode(_intentsToMainnet[0]));
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+  }
+
+  function test_hubUpradeSwaps_processSettlementQueue_ZeroGasLimit() public {
+    _upgradeHub();
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToArbitrum, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, address(0), ETHEREUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToArbitrum);
+
+    // Arbitrum to mainnet intents //
+    IEverclearV2.Intent[] memory _intentsToMainnet;
+    _destinations = _getDestinations(1);
+    (_intentsToMainnet, _intentMessage) =
+      _configureIntentMessages(1, USDC_ARBITRUM, address(0), ARBITRUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToMainnet);
+
+    // processing the deposits and invoices for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    vm.warp(block.timestamp + 3600);
+    vm.roll(block.number + 50);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // asserting the intents status are SETTLED
+    bytes32[] memory _intentIds = new bytes32[](2);
+    _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
+    _intentIds[1] = keccak256(abi.encode(_intentsToMainnet[0]));
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing the settlement queue
+    bytes memory _calldata =
+      _constructSettlementInfo(_intentsToArbitrum[0].receiver, USDC_ARBITRUM.toBytes32(), _intentsToArbitrum);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, 0)
+    );
+    hubProxy.processSettlementQueue(ARBITRUM, 1, 0);
   }
 
   // ============ Handler Module ============ //
@@ -277,14 +322,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // checking the settlement
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_intents[0].receiver, USDC_ARBITRUM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ARBITRUM, 1);
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_IntentNettingPath_Settled_Multiple() public {
@@ -325,23 +369,22 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // checking the settlement
     // processing settlement queue to ARBITRUM
-    uint256 _gasLimit = 319_000;
     bytes memory _calldata = _constructSettlementInfoArray(USDC_ARBITRUM.toBytes32(), _intentsToArb);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ARBITRUM, 5);
+    hubProxy.processSettlementQueue(ARBITRUM, 5, DEFAULT_GAS_LIMIT);
 
     // processing the settlement queue to ETHEREUM
     _calldata = _constructSettlementInfoArray(USDC_MAINNET.toBytes32(), _intentsToMain);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 5);
+    hubProxy.processSettlementQueue(ETHEREUM, 5, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Solver Path - Bridging ============ //
@@ -392,14 +435,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_FilledThenAdded_SingleSolverDestination() public {
@@ -451,14 +493,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_FilledThenAdded_MultipleSolverDestinations() public {
@@ -513,14 +554,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Solver Path - Swaps ============ //
@@ -575,14 +615,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSwapPath_FilledThenAdded() public {
@@ -636,14 +675,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Solver Path - Destination Adjustment Cases ============ //
@@ -700,14 +738,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_FillUnsupportedAsset() public {
@@ -763,14 +800,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_DifferentSettlementDestination() public {
@@ -779,7 +815,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     // processing the deposits and invoices for USDC //
     bytes32 _tickerHash = keccak256('USDC');
     hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
-    hubProxy.processSettlementQueue(OPTIMISM, 1);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
 
     // Mainnet to Arbitrum intents //
     // constructing the intent messages
@@ -830,14 +866,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_OPTIMISM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(OPTIMISM, 1);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_MemValues_ToSettlement() public {}
@@ -848,7 +883,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     // processing the deposits and invoices for USDC //
     bytes32 _tickerHash = keccak256('USDC');
     hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
-    hubProxy.processSettlementQueue(OPTIMISM, 1);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
 
     // Mainnet to Arbitrum intents //
     // constructing the intent messages
@@ -899,14 +934,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_OPTIMISM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(OPTIMISM, 1);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Solver Path - Deposit Processing Cases ============ //
@@ -960,14 +994,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertFillInfo(_intentIds[0], _fill);
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDT_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSwapPath_DepositProcessedState_FillProcessedIntoInvoice() public {
@@ -1022,14 +1055,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDT_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Solver Path - Fill Invoicing Cases ============ //
@@ -1083,14 +1115,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDT_OPTIMISM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(OPTIMISM, 1);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_FilledThenAdded_IntentSettled() public {
@@ -1138,14 +1169,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDT_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_InvoicedFill() public {
@@ -1199,14 +1229,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_ARBITRUM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ARBITRUM, 1);
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSwapPath_InvoicedFill() public {
@@ -1260,14 +1289,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_ARBITRUM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ARBITRUM, 1);
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Solver Path - Expired Cases ============ //
@@ -1307,14 +1335,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_intents[0].receiver, USDC_ARBITRUM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ARBITRUM, 1);
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSwapPath_ExpiredIntoInvoice() public {
@@ -1353,14 +1380,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_intents[0].receiver, USDC_ARBITRUM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ARBITRUM, 1);
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_ExpiredIntoSettlement() public {
@@ -1395,14 +1421,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_intents[0].receiver, USDC_ARBITRUM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ARBITRUM, 1);
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSwapPath_ExpiredIntoSettlement() public {
@@ -1437,14 +1462,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_intents[0].receiver, USDC_ARBITRUM.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ARBITRUM, 1);
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Swap Path - Same Chain ============ //
@@ -1498,14 +1522,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSameChainSwapPath_FilledThenAdded() public {
@@ -1558,14 +1581,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing settlement queue
-    uint256 _gasLimit = 99_000;
     bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_MAINNET.toBytes32(), _intents);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 1);
+    hubProxy.processSettlementQueue(ETHEREUM, 1, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Solver Path - Multiple Cases ============ //
@@ -1610,14 +1632,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing the settlements
-    uint256 _gasLimit = 319_000;
     bytes memory _calldata = _constructSettlementInfoArrayWithSolvers(USDC_MAINNET.toBytes32(), _intents, _solvers);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 5);
+    hubProxy.processSettlementQueue(ETHEREUM, 5, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSwapPath_MultipleIntentsAndFills() public {
@@ -1661,14 +1682,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing the settlements
-    uint256 _gasLimit = 319_000;
     bytes memory _calldata = _constructSettlementInfoArrayWithSolvers(USDC_MAINNET.toBytes32(), _intents, _solvers);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 5);
+    hubProxy.processSettlementQueue(ETHEREUM, 5, DEFAULT_GAS_LIMIT);
   }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSameChainSwapPath_MultipleIntentsAndFills() public {
@@ -1712,14 +1732,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
 
     // processing the settlements
-    uint256 _gasLimit = 319_000;
     bytes memory _calldata = _constructSettlementInfoArrayWithSolvers(USDC_MAINNET.toBytes32(), _intents, _solvers);
     vm.expectCall(
       address(hubProxy.hubGateway()),
       0,
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, _gasLimit)
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ETHEREUM, _calldata, DEFAULT_GAS_LIMIT)
     );
-    hubProxy.processSettlementQueue(ETHEREUM, 5);
+    hubProxy.processSettlementQueue(ETHEREUM, 5, DEFAULT_GAS_LIMIT);
   }
 
   // ============ Discount Maths ============ //
@@ -2141,11 +2160,61 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(hubProxy.modules(_MESSAGE_RECEIVER_MODULE), newModuleAddress, 'Module address should be updated');
   }
 
-  // ============ View Functions ============ //
-  function test_hubUpgradeSwaps_supportedDomains() public {}
-
   // ============ Revert Checks ============ //
   function test_hubUpgradeSwaps_checkUnsupported_DoesNotRevert() public {}
+
+  function testRevert_hubUpgradeSwaps_processSettlementQueue_DomainNotsupported() public {
+    _upgradeHub();
+
+    // configuring the params
+    uint32 unsupportedDomain = 9_999_999;
+
+    // expecting revert
+    vm.expectRevert(ISettlerV2.Settler_DomainNotSupported.selector);
+    hubProxy.processSettlementQueue(unsupportedDomain, 1, 0);
+  }
+
+  function testRevert_hubUpgradeSwaps_processSettlementQueue_BlockGasLimitReached() public {
+    _upgradeHub();
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToArbitrum, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, address(0), ETHEREUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToArbitrum);
+
+    // Arbitrum to mainnet intents //
+    IEverclearV2.Intent[] memory _intentsToMainnet;
+    _destinations = _getDestinations(1);
+    (_intentsToMainnet, _intentMessage) =
+      _configureIntentMessages(1, USDC_ARBITRUM, address(0), ARBITRUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToMainnet);
+
+    // processing the deposits and invoices for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    vm.warp(block.timestamp + 3600);
+    vm.roll(block.number + 50);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // asserting the intents status are SETTLED
+    bytes32[] memory _intentIds = new bytes32[](2);
+    _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
+    _intentIds[1] = keccak256(abi.encode(_intentsToMainnet[0]));
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing the settlement queue
+    vm.expectRevert(
+      abi.encodeWithSelector(ISettlerV2.Settler_DomainBlockGasLimitReached.selector, 30_000_000, type(uint256).max)
+    );
+    hubProxy.processSettlementQueue(ARBITRUM, 1, type(uint256).max);
+  }
 
   // ============== Helpers ================= //
   function _configureIntentMessages(

@@ -45,7 +45,7 @@ abstract contract HubStorageV2 is NoncesUpgradeable, IHubStorageV2 {
 
   /// @inheritdoc IHubStorageV2
   bytes32 public constant PROCESS_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
-    'function processQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS, bytes calldata _signature)'
+    'function processQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _gasLimit, bytes calldata _signature)'
   );
 
   /// @inheritdoc IHubStorageV2
