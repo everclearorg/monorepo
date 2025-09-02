@@ -1795,6 +1795,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOut = 1000e6;
     uint32[] memory _solverDestinations = new uint32[](0);
     IEverclearV2.Intent memory _intent;
+    _intent.destinations = new uint32[](1);
+    _intent.destinations[0] = 1;
     _intent.timestamp = uint48(block.timestamp);
     _intent.ttl = 1 days;
     _intent.amountOutMin = 999e6;
