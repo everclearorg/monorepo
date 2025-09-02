@@ -16,7 +16,6 @@ import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
 import {ISettlerV2} from 'interfaces/hub/ISettlerV2.sol';
 
 import {SettlerLogicV2} from 'contracts/hub/modules/SettlerLogicV2.sol';
-import {console2} from 'forge-std/console2.sol';
 
 /**
  * @title SettlerV2
@@ -210,8 +209,6 @@ contract SettlerV2 is SettlerLogicV2, ISettlerV2, IEverclearV2 {
       } else {
         // intent filled, settle and rewards goes to solver
         // settle solver
-        console2.log('Solver stored');
-        console2.logBytes32(_solver);
         _createSettlementOrInvoice({_intentId: _deposit.intentId, _tickerHash: _tickerHash, _recipient: _solver});
       }
     }
