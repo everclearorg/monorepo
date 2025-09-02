@@ -16,7 +16,6 @@ import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
 import {ISettlerV2} from 'interfaces/hub/ISettlerV2.sol';
 
 import {SettlerLogicV2} from 'contracts/hub/modules/SettlerLogicV2.sol';
-import {console2} from 'forge-std/console2.sol';
 
 /**
  * @title SettlerV2
@@ -58,8 +57,8 @@ contract SettlerV2 is SettlerLogicV2, ISettlerV2, IEverclearV2 {
   }
 
   /// @inheritdoc ISettlerV2
-  function processSettlementQueue(uint32 _domain, uint32 _amount) external payable {
-    (bytes memory _message, uint256 _gasLimit) = _processSettlementQueue(_domain, _amount);
+  function processSettlementQueue(uint32 _domain, uint32 _amount, uint256 _gasLimit) external payable {
+    bytes memory _message = _processSettlementQueue(_domain, _amount, _gasLimit);
 
     (bytes32 _messageId, uint256 _feeSpent) = hubGateway.sendMessage{value: msg.value}(_domain, _message, _gasLimit);
 
@@ -73,19 +72,18 @@ contract SettlerV2 is SettlerLogicV2, ISettlerV2, IEverclearV2 {
     address _relayer,
     uint256 _ttl,
     uint256 _nonce,
-    uint256 _bufferDBPS,
+    uint256 _gasLimit,
     bytes calldata _signature
   ) external {
     bytes memory _data =
-      abi.encode(PROCESS_QUEUE_VIA_RELAYER_TYPEHASH, _domain, _amount, _relayer, _ttl, _nonce, _bufferDBPS);
+      abi.encode(PROCESS_QUEUE_VIA_RELAYER_TYPEHASH, _domain, _amount, _relayer, _ttl, _nonce, _gasLimit);
     _verifySignature(lighthouse, _data, _nonce, _signature);
 
-    (bytes memory _message, uint256 _gasLimit) = _processSettlementQueue(_domain, _amount);
+    bytes memory _message = _processSettlementQueue(_domain, _amount, _gasLimit);
 
     uint256 _fee = hubGateway.quoteMessage(_domain, _message, _gasLimit);
 
-    (bytes32 _messageId, uint256 _feeSpent) =
-      hubGateway.sendMessage(_domain, _message, _fee + ((_fee * _bufferDBPS) / Common.DBPS_DENOMINATOR), _gasLimit);
+    (bytes32 _messageId, uint256 _feeSpent) = hubGateway.sendMessage(_domain, _message, _fee, _gasLimit);
 
     emit SettlementQueueProcessed(_messageId, _domain, _amount, _feeSpent);
   }
@@ -206,8 +204,6 @@ contract SettlerV2 is SettlerLogicV2, ISettlerV2, IEverclearV2 {
       } else {
         // intent filled, settle and rewards goes to solver
         // settle solver
-        console2.log('Solver stored');
-        console2.logBytes32(_solver);
         _createSettlementOrInvoice({_intentId: _deposit.intentId, _tickerHash: _tickerHash, _recipient: _solver});
       }
     }
@@ -218,12 +214,12 @@ contract SettlerV2 is SettlerLogicV2, ISettlerV2, IEverclearV2 {
    * @param _domain The domain of the settlement
    * @param _amount The amount of the settlement
    * @return _message The message to be sent
-   * @return _gasLimit The gas limit for the message
    */
   function _processSettlementQueue(
     uint32 _domain,
-    uint32 _amount
-  ) internal returns (bytes memory _message, uint256 _gasLimit) {
+    uint32 _amount,
+    uint256 _gasLimit
+  ) internal returns (bytes memory _message) {
     if (!_supportedDomains.contains(_domain)) {
       revert Settler_DomainNotSupported();
     }
@@ -232,9 +228,6 @@ contract SettlerV2 is SettlerLogicV2, ISettlerV2, IEverclearV2 {
     }
 
     IEverclearV2.Settlement[] memory _settlementMessages = new IEverclearV2.Settlement[](_amount);
-
-    uint256 _baseGasLimit = gasConfig.settlementBaseGasUnits + (gasConfig.averageGasUnitsPerSettlement * _amount);
-    _gasLimit = _baseGasLimit + ((_baseGasLimit * gasConfig.bufferDBPS) / Common.DBPS_DENOMINATOR);
 
     if (_gasLimit > domainGasLimit[_domain]) {
       revert Settler_DomainBlockGasLimitReached(domainGasLimit[_domain], _gasLimit);
