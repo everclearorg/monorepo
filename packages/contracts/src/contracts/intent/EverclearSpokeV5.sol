@@ -510,7 +510,6 @@ contract EverclearSpokeV5 is
       revert EverclearSpoke_FillIntent_InvalidDestinationArray();
     }
 
-    // TODO: Review consequences of this second check change
     if (status[_intentId] != IntentStatus.NONE && status[_intentId] != IntentStatus.ADDED) {
       revert EverclearSpoke_FillIntent_InvalidStatus(_intentId);
     }
