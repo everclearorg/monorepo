@@ -122,8 +122,9 @@ interface ISettlerV2 {
    * @notice Dispatches batch settlements to the transport layer for a domain and amount
    * @param _domain The domain which settlements queue is going to be processed
    * @param _amount The amount of settlements to be batched
+   * @param _gasLimit The gas limit for the settlement batch
    */
-  function processSettlementQueue(uint32 _domain, uint32 _amount) external payable;
+  function processSettlementQueue(uint32 _domain, uint32 _amount, uint256 _gasLimit) external payable;
 
   /**
    * @notice Dispatches batch settlements to the transport layer for a domain and amount via a relayer
@@ -132,7 +133,7 @@ interface ISettlerV2 {
    * @param _relayer The address of the relayer
    * @param _ttl The time to live of the signature
    * @param _nonce The nonce of the signature
-   * @param _bufferDBPS The buffer to be applied to the fee
+   * @param _gasLimit The gas limit for the message
    * @param _signature The signature of the message
    */
   function processSettlementQueueViaRelayer(
@@ -141,7 +142,7 @@ interface ISettlerV2 {
     address _relayer,
     uint256 _ttl,
     uint256 _nonce,
-    uint256 _bufferDBPS,
+    uint256 _gasLimit,
     bytes calldata _signature
   ) external;
 }

@@ -55,7 +55,7 @@ contract EverclearHubV2 is HubStorageV2, UUPSUpgradeable, IEverclearHubV2 {
   }
 
   /// @inheritdoc ISettlerV2
-  function processSettlementQueue(uint32, uint32) external payable whenNotPaused {
+  function processSettlementQueue(uint32, uint32, uint256) external payable whenNotPaused {
     _delegate(_SETTLEMENT_MODULE);
   }
 
