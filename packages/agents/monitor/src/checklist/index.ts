@@ -81,9 +81,9 @@ export const runChecks = async (_requestContext?: RequestContext) => {
         check: checkFn.name,
       });
     }
-    if (error.length !== 0) {
-      throw error;
-    }
+  }
+  if (error.length !== 0) {
+    throw error;
   }
   if (error.length !== 0) {
     throw error;
