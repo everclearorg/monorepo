@@ -29,7 +29,6 @@
     "@chimera-monorepo/relayer": "workspace:*",
     "@chimera-monorepo/utils": "workspace:*",
     "@gelatonetwork/relay-sdk": "3.1.0",
-    "ethers": "5.7.2",
     "interval-promise": "1.4.0"
   },
   "devDependencies": {
@@ -40,7 +39,7 @@
     "ts-mocha": "10.0.0",
     "ts-node": "10.9.1",
     "tslib": "2.5.0",
-    "typescript": "5.3.3"
+    "typescript": "5.9.2"
   },
   "gitHead": "937a7cde93e6ac1e151c6374f48adf83d3fa4ec6",
   "stableVersion": "0.0.1"

@@ -1,7 +1,7 @@
 import { Type, Static } from '@sinclair/typebox';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { parseUnits } from 'ethers/lib/utils';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 import { ConfigurationError } from './shared';
 import { TSafeConfig } from '@chimera-monorepo/utils';
@@ -245,7 +245,7 @@ export const DEFAULT_CHAIN_CONFIG: CoreChainConfig = {
   // Generally, the new gas price should be about 50% + 1 wei more, so if a gas price
   // of 10 gwei was used, the replacement should be 15.000000001 gwei.
   gasPriceReplacementBumpPercent: 20,
-  gasPriceMaximum: parseUnits('1500', 'gwei').toString(),
+  gasPriceMaximum: chainWrapper.parseGwei('1500').toString(),
   gasPriceMinimum: '0',
   gasPriceMaxIncreaseScalar: 200,
   confirmations: 10,

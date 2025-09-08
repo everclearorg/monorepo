@@ -1,4 +1,3 @@
-import { Signer, providers } from 'ethers';
 import {
   ReadTransaction,
   WriteTransaction,
@@ -6,6 +5,7 @@ import {
   ISigner,
   ITransactionResponse,
   ITransactionReceipt,
+  ITransactionRequest,
 } from '../types';
 import { getEthRpcProvider } from './eth';
 import { getTronRpcProvider } from './tron';
@@ -26,20 +26,20 @@ export type SupportedVm = (typeof SupportedVms)[keyof typeof SupportedVms];
 export const MAX_CONFIRMATION = 10000;
 
 export interface SignerTypeMaps {
-  [SupportedVms.evm]: Signer;
+  [SupportedVms.evm]: ISigner;
 }
 export interface BlockTypeMap {
-  [SupportedVms.evm]: providers.Block;
+  [SupportedVms.evm]: IBlock;
 }
 
 export interface TransactionRequestTypeMap {
-  [SupportedVms.evm]: providers.TransactionRequest;
+  [SupportedVms.evm]: ITransactionRequest;
 }
 export interface TransactionResponseTypeMap {
-  [SupportedVms.evm]: providers.TransactionResponse;
+  [SupportedVms.evm]: ITransactionResponse;
 }
 export interface TransactionReceiptTypeMap {
-  [SupportedVms.evm]: providers.TransactionReceipt;
+  [SupportedVms.evm]: ITransactionReceipt;
 }
 
 /**
@@ -66,7 +66,6 @@ export type RpcProvider = {
   send: (method: string, params: unknown[]) => Promise<unknown>;
   // Tx methods
   getTransaction: (hash: string) => Promise<ITransactionResponse | undefined>;
-  prepareRequest: (method: string, params: unknown) => [string, unknown[]];
   estimateGas: (tx: ReadTransaction | WriteTransaction) => Promise<string>;
   getTransactionReceipt: (hash: string) => Promise<ITransactionReceipt>;
   // Env methods

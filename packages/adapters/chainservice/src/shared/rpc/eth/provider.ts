@@ -1,23 +1,31 @@
-import { EverclearError, delay, domainToChainId, parseHostname } from '@chimera-monorepo/utils';
-import { constants, providers, utils } from 'ethers';
+import { EverclearError, delay, domainToChainId, parseHostname, ERC20Abi } from '@chimera-monorepo/utils';
+import { chainWrapper, type PublicClient, type Block } from '@chimera-monorepo/utils';
 
 import { parseError, RpcError, ServerError, StallTimeout } from '../../errors';
-import { ISigner, ReadTransaction, WriteTransaction } from '../../types';
+import { ISigner, ReadTransaction, WriteTransaction, ITransactionReceipt, ITransactionResponse, IBlock } from '../../types';
 import { RpcProvider, SignerTypeMaps } from '..';
-import { Interface } from 'ethers/lib/utils';
 import { EthWallet } from './wallet';
-
-export const { StaticJsonRpcProvider } = providers;
 
 // TODO: Wrap metrics in a type, and add a getter for it for logging purposes (after sync() calls, for example)
 // TODO: Should be a multiton mapped by URL (such that no duplicate instances are created).
 /**
- * @classdesc An extension of StaticJsonRpcProvider that manages a providers chain synchronization status
+ * @classdesc A provider that manages chain synchronization status
  * and intercepts all RPC send() calls to ensure that the provider is in sync.
  */
-class BaseSyncProvider extends StaticJsonRpcProvider {
-  private readonly connectionInfo: utils.ConnectionInfo;
+class BaseSyncProvider {
+  private readonly connectionInfo: { url: string };
   public readonly name: string;
+  public readonly domain: number;
+  public readonly stallTimeout: number;
+  public readonly client: PublicClient;
+
+  public get url(): string {
+    return this.connectionInfo.url;
+  }
+
+  public set url(value: string) {
+    this.connectionInfo.url = value;
+  }
 
   public synced = true;
   public lag = 0;
@@ -58,18 +66,33 @@ class BaseSyncProvider extends StaticJsonRpcProvider {
   }
 
   constructor(
-    _connectionInfo: utils.ConnectionInfo | string,
-    public readonly domain: number,
-    public readonly stallTimeout = 10_000,
+    _connectionInfo: { url: string } | string,
+    domain: number,
+    stallTimeout = 10_000,
     private readonly debugLogging = false,
   ) {
-    // NOTE: super (StaticJsonRpc) uses the hard-coded chainId when instantiated for all future
-    // .getNetwork() requests, so it is important to use the chainId here, not the domain
-    super(_connectionInfo, domainToChainId(domain));
+    this.domain = domain;
+    this.stallTimeout = stallTimeout;
     this.connectionInfo = typeof _connectionInfo === 'string' ? { url: _connectionInfo } : _connectionInfo;
     this.name = parseHostname(this.connectionInfo.url)
       ? parseHostname(this.connectionInfo.url)!.split('.').slice(0, -1).join('.')
       : this.connectionInfo.url;
+
+    this.client = chainWrapper.createPublicClient({
+      chain: { 
+        id: domainToChainId(domain),
+        name: `Chain ${domain}`,
+        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+        rpcUrls: { 
+          default: { http: [this.connectionInfo.url] },
+          public: { http: [this.connectionInfo.url] }
+        },
+        blockExplorers: {
+          default: { name: 'Explorer', url: 'https://etherscan.io' }
+        }
+      },
+      transport: chainWrapper.http(this.connectionInfo.url),
+    }) as PublicClient;
   }
 
   /**
@@ -93,18 +116,15 @@ class BaseSyncProvider extends StaticJsonRpcProvider {
    * @throws RpcError - If the provider is currently out of sync.
    */
   public async send(method: string, params: Array<unknown>): Promise<unknown> {
-    // provider.ready returns a Promise which will stall until the network has been established, ignoring
-    // errors due to the target node not being active yet. This will ensure we wait until the node is up
-    // and running smoothly.
-    const ready = await this.ready;
-    if (!ready) {
+    // Check if provider is ready (synced)
+    if (!this.synced) {
       throw new RpcError(RpcError.reasons.OutOfSync, {
         provider: this.name,
         domain: this.domain,
         lastSyncedBlockNumber: this.syncedBlockNumber,
         synced: this.synced,
         lag: this.lag,
-        ready,
+        ready: false,
       });
     }
 
@@ -118,17 +138,18 @@ class BaseSyncProvider extends StaticJsonRpcProvider {
         console.log(`=== ETH PROVIDER SEND called with method: ${method}, domain: ${this.domain}, params:`, params);
         return await Promise.race(
           [
-            new Promise((resolve, reject) => {
-              super
-                .send(method, params)
-                .then((res) => {
-                  this.updateMetrics(true, sendTimestamp, i, method, params);
-                  resolve(res);
-                })
-                .catch((e) => {
-                  const error = parseError(e);
-                  reject(error);
+            new Promise(async (resolve, reject) => {
+              try {
+                const res = await this.client.request({
+                  method: method as any,
+                  params: params as any,
                 });
+                this.updateMetrics(true, sendTimestamp, i, method, params);
+                resolve(res);
+              } catch (e) {
+                const error = parseError(e);
+                reject(error);
+              }
             }),
           ].concat(
             this.stallTimeout
@@ -222,12 +243,113 @@ class BaseSyncProvider extends StaticJsonRpcProvider {
       console.log(`[${Date.now()}]`, `(${this.name})`, message, ...args);
     }
   }
+
+  // Core RPC Methods
+  public async getGasPrice(): Promise<string> {
+    const gasPrice = await this.client.getGasPrice();
+    return gasPrice.toString();
+  }
+
+  public async getBlock(blockTag: number | string): Promise<IBlock> {
+    const block = await this.client.getBlock({
+      blockHash: typeof blockTag === 'string' && blockTag.startsWith('0x') ? blockTag as any : undefined,
+      blockNumber: typeof blockTag === 'number' ? BigInt(blockTag) : undefined,
+    });
+    
+    // Convert viem Block to IBlock
+    return {
+      hash: block.hash || '',
+      parentHash: block.parentHash,
+      number: Number(block.number),
+      timestamp: Number(block.timestamp),
+    };
+  }
+
+  public async getBlockNumber(): Promise<number> {
+    const blockNumber = await this.client.getBlockNumber();
+    return Number(blockNumber);
+  }
+
+  public async getCode(address: string): Promise<string> {
+    const code = await this.client.getCode({ address: address as `0x${string}` });
+    return code || '0x';
+  }
+
+  public async getTransaction(hash: string): Promise<ITransactionResponse | undefined> {
+    try {
+      const tx = await this.client.getTransaction({ hash: hash as any });
+      if (!tx) return undefined;
+
+      return {
+        hash: tx.hash,
+        nonce: Number(tx.nonce),
+        gasLimit: tx.gas,
+        gasPrice: tx.gasPrice,
+        confirmations: 0, // Will be set by caller
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  public async getTransactionReceipt(hash: string): Promise<ITransactionReceipt> {
+    const receipt = await this.client.getTransactionReceipt({ hash: hash as any });
+
+    return {
+      transactionHash: receipt.transactionHash,
+      blockNumber: Number(receipt.blockNumber),
+      status: receipt.status === 'success' ? 1 : 0,
+      confirmations: 0, // Will be set by caller
+      logs: receipt.logs.map(log => ({
+        address: log.address,
+        topics: log.topics,
+        data: log.data,
+        blockNumber: Number(log.blockNumber),
+        transactionHash: log.transactionHash,
+        transactionIndex: Number(log.transactionIndex),
+        logIndex: Number(log.logIndex),
+        blockHash: log.blockHash,
+        removed: log.removed,
+      })),
+    };
+  }
+
+  public async estimateGas(tx: any): Promise<string> {
+    const gas = await this.client.estimateGas({
+      account: tx.from,
+      to: tx.to,
+      value: tx.value ? BigInt(tx.value) : undefined,
+      data: tx.data,
+    });
+    return gas.toString();
+  }
+
+  public async call(tx: any, block: string): Promise<string> {
+    const result = await this.client.call({
+      account: tx.from,
+      to: tx.to,
+      value: tx.value ? BigInt(tx.value) : undefined,
+      data: tx.data,
+      blockTag: block as any,
+    });
+    return (result as unknown as string) || '0x';
+  }
+
+  public async getBalance(address: string): Promise<string> {
+    const balance = await this.client.getBalance({ address: address as `0x${string}` });
+    return balance.toString();
+  }
+
+  public async getTransactionCount(address: string, block: string): Promise<number> {
+    const count = await this.client.getTransactionCount({ address: address as `0x${string}`, blockTag: block as any });
+    return Number(count);
+  }
 }
 
 export class SyncProvider implements RpcProvider {
   private readonly provider: BaseSyncProvider;
   constructor(
-    connectionInfo: utils.ConnectionInfo | string,
+    connectionInfo: { url: string } | string,
     domain: number,
     stallTimeout = 10_000,
     debugLogging = false,
@@ -297,7 +419,7 @@ export class SyncProvider implements RpcProvider {
   }
 
   public async getGasPrice(): Promise<string> {
-    return (await this.provider.getGasPrice()).toString();
+    return await this.provider.getGasPrice();
   }
 
   public async getBlock(block: number | string) {
@@ -317,10 +439,6 @@ export class SyncProvider implements RpcProvider {
     return this.provider.getTransaction(hash);
   }
 
-  public prepareRequest(method: string, params: unknown): [string, unknown[]] {
-    return this.provider.prepareRequest(method, params);
-  }
-
   public async getTransactionReceipt(hash: string) {
     return this.provider.getTransactionReceipt(hash);
   }
@@ -333,7 +451,7 @@ export class SyncProvider implements RpcProvider {
       ...toCall,
       chainId: domainToChainId(domain),
     };
-    return (await this.provider.estimateGas(formatted)).toString();
+    return await this.provider.estimateGas(formatted);
   }
 
   public send(method: string, params: unknown[]): Promise<unknown> {
@@ -348,62 +466,74 @@ export class SyncProvider implements RpcProvider {
       ...toCall,
       chainId: domainToChainId(domain),
     };
-    return this.provider.call(formatted, block);
+    return this.provider.call(formatted, block.toString());
   }
 
   // Token / Balance Methods
   public async getBalance(address: string, assetId: string): Promise<string> {
-    if (assetId === constants.AddressZero) {
-      return (await this.provider.getBalance(address)).toString();
+    if (assetId === chainWrapper.zeroAddress) {
+      return await this.provider.getBalance(address);
     }
-    const iface = new Interface(['function balanceOf(address owner) view returns (uint256)']);
-    const encoded = await this.provider.call({
-      to: assetId,
-      data: iface.encodeFunctionData('balanceOf', [address]),
-      chainId: domainToChainId(this.provider.domain),
-    });
-    const [balance] = iface.decodeFunctionResult('balanceOf', encoded);
-    return balance.toString();
+
+    try {
+      const balance = await this.provider.client.readContract({
+        address: assetId as `0x${string}`,
+        abi: ERC20Abi,
+        functionName: 'balanceOf',
+        args: [address as `0x${string}`],
+      }) as bigint;
+      return balance.toString();
+    } catch (error) {
+      // Fallback to direct RPC call if readContract fails
+      const result = await this.provider.send('eth_call', [{
+        to: assetId,
+        data: '0x70a08231000000000000000000000000' + address.slice(2).padStart(64, '0'),
+      }, 'latest']);
+      return result as string;
+    }
   }
 
   public async getDecimals(assetId: string): Promise<number> {
-    const iface = new Interface([
-      {
-        type: 'function',
-        name: 'decimals',
-        inputs: [],
-        outputs: [
-          {
-            name: '',
-            type: 'uint8',
-            internalType: 'uint8',
-          },
-        ],
-        stateMutability: 'view',
-      },
-    ]);
-    const encoded = await this.provider.call({
-      to: assetId,
-      data: iface.encodeFunctionData('decimals'),
-      chainId: domainToChainId(this.provider.domain),
-    });
-    const [decimals] = iface.decodeFunctionResult('decimals', encoded);
-    return decimals;
+    try {
+      const decimals = await this.provider.client.readContract({
+        address: assetId as `0x${string}`,
+        abi: ERC20Abi,
+        functionName: 'decimals',
+      }) as number;
+      return Number(decimals);
+    } catch (error) {
+      // Fallback to direct RPC call if readContract fails
+      const result = await this.provider.send('eth_call', [{
+        to: assetId,
+        data: '0x313ce567',
+      }, 'latest']);
+      return parseInt(result as string, 16);
+    }
   }
 
   // Signer Methods
   public async getTransactionCount(address: string, block: number | string) {
-    return this.provider.getTransactionCount(address, block);
+    return this.provider.getTransactionCount(address, block.toString());
+  }
+
+  public get url(): string {
+    return this.provider?.url || '';
+  }
+
+  public set url(value: string) {
+    if (this.provider) {
+      this.provider.url = value;
+    }
   }
 
   public async getSigner(signer: ISigner | string): Promise<ISigner> {
     if (typeof signer === 'string') {
-      return new EthWallet(signer, this.provider);
+      return new EthWallet(signer, { rpcUrl: this.url });
     }
     return signer;
   }
 
   public async connect(signer: ISigner | string): Promise<ISigner> {
-    return (signer as SignerTypeMaps['evm']).connect(this.provider);
+    return this.getSigner(signer);
   }
 }

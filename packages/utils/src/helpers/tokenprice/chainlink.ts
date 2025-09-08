@@ -1,5 +1,5 @@
-import { Interface, formatUnits } from 'ethers/lib/utils';
-import { providers } from 'ethers';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { chainWrapper, type PublicClient } from '../chain';
 
 export const aggregatorV3InterfaceABI = [
   {
@@ -55,25 +55,34 @@ export const aggregatorV3InterfaceABI = [
  * Get the token price from the chainlink price feed.
  * @param domain - The domain id.
  * @param priceFeed - The data feed contract address.
- * @param provider - The json rpc provider for a given domain.
+ * @param client - The viem public client instance.
  */
 export const getTokenPriceFromChainlink = async (
   domain: string,
   priceFeed: string,
-  provider: providers.JsonRpcProvider,
+  client: PublicClient,
 ): Promise<number> => {
-  const feedIface = new Interface(aggregatorV3InterfaceABI);
-  const encodedData = feedIface.encodeFunctionData('latestRoundData');
+  const encodedData = chainWrapper.encodeFunctionData({
+    abi: aggregatorV3InterfaceABI,
+    functionName: 'latestRoundData',
+  });
 
-  const encodedPriceResult = await provider.call(
-    {
-      to: priceFeed,
-      chainId: +domain,
-      data: encodedData,
-    },
-    'latest',
-  );
+  const encodedPriceResult = await client.request({
+    method: 'eth_call',
+    params: [
+      {
+        to: priceFeed as `0x${string}`,
+        data: encodedData,
+      },
+      'latest',
+    ],
+  });
 
-  const [, answer, , ,] = feedIface.decodeFunctionResult('latestRoundData', encodedPriceResult);
-  return +formatUnits(answer, 8);
+  const result = chainWrapper.decodeFunctionResult({
+    abi: aggregatorV3InterfaceABI,
+    functionName: 'latestRoundData',
+    data: encodedPriceResult as `0x${string}`,
+  }) as any[];
+  const answer = result[1];
+  return +chainWrapper.formatUnits(answer, 8);
 };

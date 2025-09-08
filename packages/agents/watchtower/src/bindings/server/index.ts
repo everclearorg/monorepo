@@ -17,7 +17,7 @@ import {
   createRequestContext,
   jsonifyError,
 } from '@chimera-monorepo/utils';
-import { formatEther } from 'ethers/lib/utils';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { pauseProtocol } from '../../helpers';
 import { Severity } from '../../lib/entities';
 import { getFastifyInstance } from '../../mockable';
@@ -55,7 +55,7 @@ export const bindServer = async (): Promise<void> => {
         );
         const balances: Record<string, string> = {};
         nativeBalances.forEach((balance, index) => {
-          balances[allChains[index]] = formatEther(balance);
+          balances[allChains[index]] = chainWrapper.formatEther(BigInt(balance));
         });
         return res.status(200).send({ address, balances });
       } catch (err: unknown) {

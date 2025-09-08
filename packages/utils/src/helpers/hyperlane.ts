@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { axiosGet } from './axios';
-import { Client, cacheExchange, fetchExchange } from '@urql/core';
-import { Interface } from 'ethers/lib/utils';
-import { ethers } from 'ethers';
+import { cacheExchange, Client, fetchExchange } from '@urql/core';
+import { chainWrapper } from './chain';
 import { getBestProvider } from './provider';
 
 export const HyperlaneStatus = {
@@ -65,9 +65,9 @@ query ($id: bytea!) {
   }
 }`;
 
-export const getMailboxInterface = (): Interface => {
+export const getMailboxInterface = () => {
   // Only need the `process` and `delivered` functions.
-  return new Interface([
+  return [
     {
       type: 'function',
       name: 'process',
@@ -136,11 +136,11 @@ export const getMailboxInterface = (): Interface => {
       name: 'Dispatch',
       type: 'event',
     },
-  ]);
+  ];
 };
 
-export const getGatewayInterface = (): Interface => {
-  return new Interface([
+export const getGatewayInterface = () => {
+  return [
     {
       inputs: [],
       name: 'mailbox',
@@ -154,7 +154,7 @@ export const getGatewayInterface = (): Interface => {
       stateMutability: 'view',
       type: 'function',
     },
-  ]);
+  ];
 };
 
 export const getHyperlaneMessageStatusViaGraphql = async (
@@ -235,18 +235,56 @@ export const getHyperlaneMsgDelivered = async (
   // If there's no working rpc url, returns `delivered` false.
   if (!bestProvider) return false;
 
-  const gatewayContract = new ethers.Contract(
-    gateway,
-    getGatewayInterface(),
-    new ethers.providers.JsonRpcProvider(bestProvider),
-  );
-  const mailbox = await gatewayContract.mailbox();
+  const client = chainWrapper.createPublicClient({
+    transport: chainWrapper.http(bestProvider),
+  });
 
-  const mailboxContract = new ethers.Contract(
-    mailbox,
-    getMailboxInterface(),
-    new ethers.providers.JsonRpcProvider(bestProvider),
-  );
+  const mailboxData = chainWrapper.encodeFunctionData({
+    abi: getGatewayInterface(),
+    functionName: 'mailbox',
+    args: [],
+  });
 
-  return await mailboxContract.delivered(messageId);
+  const mailboxResult = await client.request({
+    method: 'eth_call',
+    params: [
+      {
+        to: gateway as `0x${string}`,
+        data: mailboxData,
+      },
+      'latest',
+    ],
+  });
+
+  const mailbox = chainWrapper.decodeFunctionResult({
+    abi: getGatewayInterface(),
+    functionName: 'mailbox',
+    data: mailboxResult as `0x${string}`,
+  });
+
+  const deliveredData = chainWrapper.encodeFunctionData({
+    abi: getMailboxInterface(),
+    functionName: 'delivered',
+    args: [messageId],
+  });
+
+  const deliveredResult = await client.request({
+    method: 'eth_call',
+    params: [
+      {
+        to: mailbox as `0x${string}`,
+        data: deliveredData,
+      },
+      'latest',
+    ],
+  });
+
+  const result = chainWrapper.decodeFunctionResult({
+    abi: getMailboxInterface(),
+    functionName: 'delivered',
+    data: deliveredResult as `0x${string}`,
+  }) as any[];
+  const delivered = result[0];
+
+  return delivered as boolean;
 };

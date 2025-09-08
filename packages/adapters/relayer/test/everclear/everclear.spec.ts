@@ -10,7 +10,7 @@ import {
   RelayerTaskStatus,
 } from '@chimera-monorepo/utils';
 import { ChainReader, WriteTransaction } from '@chimera-monorepo/chainservice';
-import { constants } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 import {
   everclearRelayerSend,
@@ -54,7 +54,7 @@ describe('Everclear Relayer', () => {
         fee: {
           amount: '0',
           chain: mockChainId,
-          token: constants.AddressZero,
+          token: chainWrapper.zeroAddress,
         },
         apiKey: 'foo',
         funcSig: 'bar()',

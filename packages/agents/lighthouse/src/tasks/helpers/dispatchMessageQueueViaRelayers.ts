@@ -10,13 +10,11 @@ import {
   SOLANA_CHAINID,
   TRON_CHAINID,
 } from '@chimera-monorepo/utils';
-import { Interface, keccak256, defaultAbiCoder } from 'ethers/lib/utils';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 import { getContext } from '../../context';
 import { getQueueMethodName, getTypeHash } from './getMessageQueueConstants';
 import { RelayerSendFailed } from '../../errors';
-import { BigNumber } from 'ethers';
-import { ethers } from 'ethers';
 import { TronWeb } from 'tronweb';
 
 const DEFAULT_SIGNATURE_TTL = 60 * 60; // 60 minutes
@@ -140,7 +138,7 @@ export const dispatchMessageQueueViaRelayers = async (
     });
     return [];
   }
-  const everclearIface = new Interface(transactionDomain === hub.domain ? abis.hub.everclear : abis.spoke.everclear);
+  const everclearAbi = transactionDomain === hub.domain ? abis.hub.everclear : abis.spoke.everclear;
 
   // Get the number of elements to dequeue
   // Maxes are defined by the lowest block gas limit on the message route.
@@ -149,13 +147,11 @@ export const dispatchMessageQueueViaRelayers = async (
 
   // Get the destination. If transacting on hub, destination is the spoke and vice versa.
   const destinationDomain = transactionDomain === hub.domain ? queue.domain : hub.domain;
-  const blockLimit = BigNumber.from(chains[destinationDomain].gasLimit!);
-  const bufferMultiple = BigNumber.from(BPS_DENOMINATOR + DEFAULT_GAS_BUFFER).div(BPS_DENOMINATOR);
-  const gasAvailable = blockLimit
-    .mul(BPS_DENOMINATOR)
-    .div(BPS_DENOMINATOR + DEFAULT_GAS_BUFFER)
-    .sub(BASE_GAS);
-  const calculatedMax = gasAvailable.div(DESTINATION_GAS_CONSUMPTION[type]).toNumber();
+  const blockLimit = BigInt(chains[destinationDomain].gasLimit!);
+  const bufferMultiple = BigInt(BPS_DENOMINATOR + DEFAULT_GAS_BUFFER) / BigInt(BPS_DENOMINATOR);
+  const gasAvailable =
+    (blockLimit * BigInt(BPS_DENOMINATOR)) / BigInt(BPS_DENOMINATOR + DEFAULT_GAS_BUFFER) - BigInt(BASE_GAS);
+  const calculatedMax = Number(gasAvailable / BigInt(DESTINATION_GAS_CONSUMPTION[type]));
   let maxDequeue = calculatedMax;
   switch (type) {
     case QueueType.Settlement:
@@ -195,13 +191,13 @@ export const dispatchMessageQueueViaRelayers = async (
   const walletAddr = await wallet.getAddress();
 
   // Get the nonce for the signer from the contract
-  let nonce: BigNumber;
+  let nonce: bigint;
   if (transactionDomain === SOLANA_CHAINID) {
     // Solana doesn't have EVM-style contracts, use default nonce
     logger.info('Using default nonce for Solana chain', requestContext, methodContext, {
       transactionDomain,
     });
-    nonce = BigNumber.from(0);
+    nonce = BigInt(0);
   } else {
     // For EVM-compatible chains (including Tron), read nonce from contract
     logger.info('Reading nonce from contract', requestContext, methodContext, {
@@ -215,13 +211,22 @@ export const dispatchMessageQueueViaRelayers = async (
       const encodedNonce = await chainservice.readTx(
         {
           to: everclear,
-          data: everclearIface.encodeFunctionData('nonces', [walletAddr]),
+          data: chainWrapper.encodeFunctionData({
+            abi: everclearAbi,
+            functionName: 'nonces',
+            args: [walletAddr],
+          }),
           domain: +transactionDomain,
-          funcSig: everclearIface.getFunction('nonces').format(),
+          funcSig: 'nonces(address)',
         },
         blockTag,
       );
-      [nonce] = everclearIface.decodeFunctionResult('nonces', encodedNonce) as [BigNumber];
+      const nonceResult = chainWrapper.decodeFunctionResult({
+        abi: everclearAbi,
+        functionName: 'nonces',
+        data: encodedNonce as `0x${string}`,
+      }) as unknown as bigint;
+      nonce = BigInt(nonceResult);
 
       logger.info('Successfully read nonce from contract', requestContext, methodContext, {
         transactionDomain,
@@ -289,17 +294,27 @@ export const dispatchMessageQueueViaRelayers = async (
         });
 
         // NOTE: Settlement queue encodes buffer after the nonce. Spoke queues do not.
-        const types = ['bytes32', 'uint32', 'uint32', 'address', 'uint256', 'uint256', 'uint256'];
-        const payload = defaultAbiCoder.encode(types, [
-          getTypeHash(type),
-          +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
-          toDequeue,
-          relayerAddress,
-          ttl,
-          nonce,
-          messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, toDequeue),
-        ]);
-        const digest = keccak256(payload);
+        const payload = chainWrapper.encodeAbiParameters(
+          [
+            { type: 'bytes32', name: 'typeHash' },
+            { type: 'uint32', name: 'domain' },
+            { type: 'uint32', name: 'toDequeue' },
+            { type: 'address', name: 'relayerAddress' },
+            { type: 'uint256', name: 'ttl' },
+            { type: 'uint256', name: 'nonce' },
+            { type: 'uint256', name: 'messageGasLimit' },
+          ],
+          [
+            getTypeHash(type) as `0x${string}`,
+            +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
+            toDequeue,
+            relayerAddress as `0x${string}`,
+            BigInt(ttl),
+            nonce,
+            BigInt(messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, toDequeue)),
+          ],
+        );
+        const digest = chainWrapper.keccak256(payload) as string;
 
         // Use different signing methods for different chains
         let signature: string;
@@ -314,15 +329,15 @@ export const dispatchMessageQueueViaRelayers = async (
 
           // For Tron, use the lighthouse's web3signer (which has the correct lighthouse private key)
           // This ensures the signature comes from the lighthouse address expected by the contract
-          signature = await wallet.signMessage(ethers.utils.arrayify(digest));
+          signature = await wallet.signMessage(digest);
 
           // Calculate prefixed hash for logging
           const prefix = '\x19Ethereum Signed Message:\n32';
-          const prefixedMessage = ethers.utils.concat([
-            ethers.utils.toUtf8Bytes(prefix),
-            ethers.utils.arrayify(digest),
+          const prefixedMessage = chainWrapper.concat([
+            chainWrapper.stringToBytes(prefix),
+            chainWrapper.toBytes(digest),
           ]);
-          const prefixedHash = ethers.utils.keccak256(prefixedMessage);
+          const prefixedHash = chainWrapper.keccak256(prefixedMessage) as string;
 
           logger.info('Generated Tron signature with Ethereum message prefix', requestContext, methodContext, {
             signature,
@@ -333,7 +348,7 @@ export const dispatchMessageQueueViaRelayers = async (
           // For Ethereum and other EVM chains, use standard Ethereum message signing
           // The contract will apply MessageHashUtils.toEthSignedMessageHash to the payload hash,
           // so we need to sign the raw digest bytes using signMessage which applies the same prefix
-          signature = await wallet.signMessage(ethers.utils.arrayify(digest));
+          signature = await wallet.signMessage(digest);
         }
         logger.info('Generated signature', requestContext, methodContext, {
           typeHash: getTypeHash(type),
@@ -357,16 +372,27 @@ export const dispatchMessageQueueViaRelayers = async (
         const actualIntentCount = type === 'INTENT' ? (intentStructs as unknown[]).length : (intentStructs as number);
 
         // Re-generate payload with the correct intent count
-        const correctedPayload = defaultAbiCoder.encode(types, [
-          getTypeHash(type),
-          +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
-          actualIntentCount, // Use actual intent count instead of toDequeue
-          relayerAddress,
-          ttl,
-          nonce,
-          messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
-        ]);
-        const correctedDigest = keccak256(correctedPayload);
+        const correctedPayload = chainWrapper.encodeAbiParameters(
+          [
+            { type: 'bytes32', name: 'typeHash' },
+            { type: 'uint32', name: 'domain' },
+            { type: 'uint32', name: 'actualIntentCount' },
+            { type: 'address', name: 'relayerAddress' },
+            { type: 'uint256', name: 'ttl' },
+            { type: 'uint256', name: 'nonce' },
+            { type: 'uint256', name: 'messageGasLimit' },
+          ],
+          [
+            getTypeHash(type) as `0x${string}`,
+            +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
+            actualIntentCount, // Use actual intent count instead of toDequeue
+            relayerAddress as `0x${string}`,
+            BigInt(ttl),
+            nonce,
+            BigInt(messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount)),
+          ],
+        );
+        const correctedDigest = chainWrapper.keccak256(correctedPayload) as string;
 
         // Re-generate signature with corrected payload
         let correctedSignature: string;
@@ -377,9 +403,9 @@ export const dispatchMessageQueueViaRelayers = async (
             correctedDigest,
             transactionDomain,
           });
-          correctedSignature = await wallet.signMessage(ethers.utils.arrayify(correctedDigest));
+          correctedSignature = await wallet.signMessage(correctedDigest);
         } else {
-          correctedSignature = await wallet.signMessage(ethers.utils.arrayify(correctedDigest));
+          correctedSignature = await wallet.signMessage(correctedDigest);
         }
 
         logger.info('Generated corrected signature', requestContext, methodContext, {
@@ -396,19 +422,23 @@ export const dispatchMessageQueueViaRelayers = async (
         });
 
         const tx: WriteTransaction = {
-          data: everclearIface.encodeFunctionData(queueMethodName, [
-            +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
-            intentStructs,
-            relayerAddress,
-            ttl,
-            nonce,
-            messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
-            correctedSignature, // Use corrected signature
-          ]),
+          data: chainWrapper.encodeFunctionData({
+            abi: everclearAbi,
+            functionName: queueMethodName,
+            args: [
+              +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
+              intentStructs,
+              relayerAddress,
+              ttl,
+              nonce,
+              messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
+              correctedSignature, // Use corrected signature
+            ],
+          }),
           to: everclear,
           value: '0',
           domain: +transactionDomain,
-          funcSig: everclearIface.getFunction(queueMethodName).format(),
+          funcSig: `${queueMethodName}(uint32,${type === 'INTENT' ? 'tuple[]' : 'uint256'},address,uint32,uint256,uint256,bytes)`,
         };
 
         logger.debug(
@@ -478,7 +508,7 @@ export const dispatchMessageQueueViaRelayers = async (
     }
 
     // Increment the nonce for the next batch
-    nonce = nonce.add(1);
+    nonce = nonce + BigInt(1);
     // FIXME: Should process the full batch
     break;
   }

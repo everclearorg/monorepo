@@ -1,7 +1,5 @@
-import { canonizeId, createLoggingContext, getMaxTxNonce } from '@chimera-monorepo/utils';
-
+import { canonizeId, createLoggingContext, getMaxTxNonce, chainWrapper } from '@chimera-monorepo/utils';
 import { getContext } from '../../shared';
-import { hexlify, solidityKeccak256 } from 'ethers/lib/utils';
 
 export const updateDepositors = async () => {
   const {
@@ -38,14 +36,19 @@ export const updateDepositors = async () => {
 
   // Save the depositors
   const flat = depositors.flat();
-  const ids = Array.from(new Set(flat.map((f) => hexlify(canonizeId(f.depositor)))));
+  const ids = Array.from(new Set(flat.map((f) => chainWrapper.toHex(canonizeId(f.depositor)))));
   logger.debug('Saving depositors', requestContext, methodContext, { ids });
   await database.saveDepositors(ids.map((id) => ({ id })));
 
   // Get the asset hash for each of the entries
   const withAssetHash = flat.map((f) => ({
     ...f,
-    assetHash: solidityKeccak256(['address', 'uint32'], [f.asset, f.domain]),
+    assetHash: chainWrapper.keccak256(
+      chainWrapper.encodeAbiParameters(
+        [{ type: 'address' }, { type: 'uint32' }],
+        [f.asset as `0x${string}`, f.domain]
+      )
+    ) as string,
   }));
 
   // Only take the latest event for each asset hash
@@ -58,8 +61,8 @@ export const updateDepositors = async () => {
     return {
       ...f,
       id: f.assetHash,
-      asset: hexlify(canonizeId(f.asset)),
-      account: hexlify(canonizeId(f.depositor)),
+      asset: chainWrapper.toHex(canonizeId(f.asset)),
+      account: chainWrapper.toHex(canonizeId(f.depositor)),
     };
   });
   logger.debug('Saving balances', requestContext, methodContext, { balances });

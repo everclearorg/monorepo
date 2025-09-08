@@ -2,7 +2,6 @@ import { createLoggingContext, getNtpTimeSeconds, Invoice } from '@chimera-monor
 import { getContext } from '../../context';
 import { Severity, Report } from '../../types';
 import { getCurrentEpoch, getCustodiedAssetsFromHubContract } from '../../helpers';
-import { BigNumber } from 'ethers';
 import { resolveAlerts, sendAlerts } from '../../mockable';
 
 export const checkInvoices = async () => {
@@ -119,10 +118,10 @@ export const checkInvoiceAmount = async () => {
   ).then((results) =>
     results.reduce(
       (map, { key, custodied }) => {
-        map[key] = BigNumber.from(custodied);
+        map[key] = BigInt(custodied);
         return map;
       },
-      {} as Record<string, BigNumber>,
+      {} as Record<string, bigint>,
     ),
   );
 
@@ -135,8 +134,7 @@ export const checkInvoiceAmount = async () => {
     const custodiedAmount = custodiedAssets[key];
     if (custodiedAmount !== undefined) {
       const filtered = invoices.filter(
-        (invoice) =>
-          BigNumber.from(invoice.hubInvoiceAmount).lt(custodiedAmount) && invoice.hubInvoiceEntryEpoch < currentEpoch, // Not in the current epoch
+        (invoice) => BigInt(invoice.hubInvoiceAmount) < custodiedAmount && invoice.hubInvoiceEntryEpoch < currentEpoch, // Not in the current epoch
       );
       acc.push(...filtered);
     }

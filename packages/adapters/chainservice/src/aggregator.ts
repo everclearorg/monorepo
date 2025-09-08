@@ -7,7 +7,7 @@ import {
   EverclearError,
   RequestContext,
 } from '@chimera-monorepo/utils';
-import { BigNumber, constants, utils, BigNumberish, providers } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 import { validateProviderConfig, ChainConfig } from './config';
 import {
@@ -40,7 +40,7 @@ const PROVIDER_MAX_LAG = 30;
 // Default value for block period time (in ms) if we're unable to attain that info from the providers for some reason.
 const DEFAULT_BLOCK_PERIOD = 2_000;
 
-type ChainRpcProviderCache = { gasPrice: BigNumber; transactionCount: number };
+type ChainRpcProviderCache = { gasPrice: bigint; transactionCount: number };
 
 // TODO: Multiton?
 /**
@@ -55,7 +55,7 @@ export class RpcProviderAggregator {
 
   private signer?: ISigner;
 
-  private lastUsedGasPrice: BigNumber | undefined = undefined;
+  private lastUsedGasPrice: bigint | undefined = undefined;
 
   // Cached decimal values per asset. Saved separately from main cache as decimals obviously don't expire.
   private cachedDecimals: Record<string, number> = {};
@@ -66,7 +66,7 @@ export class RpcProviderAggregator {
   private cache: ProviderCache<ChainRpcProviderCache>;
 
   /**
-   * A class for managing the usage of an ethers FallbackProvider, and for wrapping calls in
+   * A class for managing the usage of a FallbackProvider, and for wrapping calls in
    * retries. Will ensure provider(s) are ready before any use case.
    *
    * @param logger - Logger used for logging.
@@ -161,7 +161,7 @@ export class RpcProviderAggregator {
    *
    * @param tx The transaction used for the request.
    *
-   * @returns The ethers TransactionResponse.
+   * @returns The TransactionResponse.
    */
   protected async sendTransaction(transaction: OnchainTransaction) {
     console.log(`=== sendTransaction called with domain ${this.domain} ===`);
@@ -173,9 +173,9 @@ export class RpcProviderAggregator {
     // making fallback provider obsolete (and making this class the real fallback provider).
     const toSend = {
       ...transaction.params,
-      gasLimit: transaction.params.gasLimit ? BigNumber.from(transaction.params.gasLimit) : undefined,
-      gasPrice: transaction.params.gasPrice ? BigNumber.from(transaction.params.gasPrice) : undefined,
-      value: BigNumber.from(transaction.params.value || 0),
+      gasLimit: transaction.params.gasLimit ? BigInt(transaction.params.gasLimit) : undefined,
+      gasPrice: transaction.params.gasPrice ? BigInt(transaction.params.gasPrice) : undefined,
+      value: BigInt(transaction.params.value || 0),
     };
     const provider = await this.leadProvider!.connect(this.signer!);
     return provider.sendTransaction(toSend as unknown as ITransactionRequest);
@@ -190,7 +190,7 @@ export class RpcProviderAggregator {
    * required to validate the receipt.
    * @param timeout - Optional timeout parameter in ms to override the configured parameter.
    *
-   * @returns The ethers TransactionReceipt, if mined, otherwise null.
+   * @returns The ITransactionReceipt, if mined, otherwise null.
    */
   public async confirmTransaction(
     transaction: OnchainTransaction,
@@ -220,7 +220,7 @@ export class RpcProviderAggregator {
       // Wait until all the 'receipts' (or errors) have been pushed to the list.
       const receipts = (await Promise.all(_receipts)).filter(
         (r) => r !== null && r !== undefined,
-      ) as providers.TransactionReceipt[];
+      ) as ITransactionReceipt[];
 
       for (const receipt of receipts) {
         if (receipt!.status === 1) {
@@ -329,7 +329,7 @@ export class RpcProviderAggregator {
    * revert error code when it fails through its typical API, we had to implement our own
    * estimateGas call through RPC directly.
    *
-   * @param transaction - The ethers TransactionRequest data in question.
+   * @param transaction - The transaction data in question.
    *
    * @returns A BigNumber representing the estimated gas value.
    */
@@ -339,9 +339,7 @@ export class RpcProviderAggregator {
     return this.execute(false, async (provider: RpcProvider) => {
       const result = await provider.estimateGas(transaction);
       try {
-        return BigNumber.from(result)
-          .add(gasLimitInflation ? BigNumber.from(gasLimitInflation) : 0)
-          .toString();
+        return (BigInt(result) + (gasLimitInflation ? BigInt(gasLimitInflation) : BigInt(0))).toString();
       } catch (error: unknown) {
         throw new GasEstimateInvalid(result.toString(), {
           error: (error as Error).message,
@@ -379,7 +377,7 @@ export class RpcProviderAggregator {
     }
 
     const { gasPriceInitialBoostPercent, gasPriceMinimum, gasPriceMaximum, gasPriceMaxIncreaseScalar } = this.config;
-    let gasPrice: BigNumber | undefined = undefined;
+    let gasPrice: bigint | undefined = undefined;
 
     // Use gas station APIs, if available.
     const gasStations = this.config.gasStations ?? [];
@@ -390,9 +388,9 @@ export class RpcProviderAggregator {
       try {
         response = await axiosGet(uri);
         if (response && response.data) {
-          const { fast } = response.data as unknown as { fast: BigNumberish };
+          const { fast } = response.data as unknown as { fast: string | number };
           if (fast) {
-            gasPrice = utils.parseUnits(fast.toString(), 'gwei');
+            gasPrice = chainWrapper.parseGwei(fast.toString());
             break;
           }
         }
@@ -411,13 +409,13 @@ export class RpcProviderAggregator {
 
     if (!gasPrice) {
       // If we did not have a gas station API to use, or the gas station failed, use the provider's getGasPrice method.
-      gasPrice = BigNumber.from(
+      gasPrice = BigInt(
         await this.execute<string>(false, async (provider: RpcProvider) => {
           return await provider.getGasPrice();
         }),
       );
       if (useInitialBoost) {
-        gasPrice = gasPrice.add(gasPrice.mul(gasPriceInitialBoostPercent).div(100));
+        gasPrice = gasPrice + (gasPrice * BigInt(gasPriceInitialBoostPercent)) / BigInt(100);
       }
     }
 
@@ -429,14 +427,14 @@ export class RpcProviderAggregator {
       this.lastUsedGasPrice !== undefined
     ) {
       // If we have a configured cap scalar, and the gas price is greater than that cap, set it to the cap.
-      const curbedPrice = this.lastUsedGasPrice.mul(gasPriceMaxIncreaseScalar).div(100);
-      if (gasPrice.gt(curbedPrice)) {
+      const curbedPrice = (this.lastUsedGasPrice * BigInt(gasPriceMaxIncreaseScalar)) / BigInt(100);
+      if (gasPrice > curbedPrice) {
         this.logger.debug('Hit the gas price curbed maximum.', requestContext, methodContext, {
           domain: this.domain,
-          gasPrice: utils.formatUnits(gasPrice, 'gwei'),
-          curbedPrice: utils.formatUnits(curbedPrice, 'gwei'),
+          gasPrice: chainWrapper.formatGwei(gasPrice),
+          curbedPrice: chainWrapper.formatGwei(curbedPrice),
           gasPriceMaxIncreaseScalar,
-          lastUsedGasPrice: utils.formatUnits(this.lastUsedGasPrice, 'gwei'),
+          lastUsedGasPrice: chainWrapper.formatGwei(this.lastUsedGasPrice),
         });
         gasPrice = curbedPrice;
         hitMaximum = true;
@@ -446,17 +444,17 @@ export class RpcProviderAggregator {
     // Final step to ensure we remain within reasonable, configured bounds for gas price.
     // If the gas price is less than absolute gas minimum, bump it up to minimum.
     // If it's greater than (or equal to) the absolute maximum, set it to that maximum (and log).
-    const min = BigNumber.from(gasPriceMinimum);
-    const max = BigNumber.from(gasPriceMaximum);
+    const min = BigInt(gasPriceMinimum);
+    const max = BigInt(gasPriceMaximum);
     // TODO: Could use a more sustainable method of separating out gas price abs min for certain
     // chains (such as arbitrum or zksync here) in particular:
-    if (gasPrice.lt(min) && ![1634886255, 1734439522, 2053862243, 2053862260, 728126428].includes(this.domain)) {
+    if (gasPrice < min && ![1634886255, 1734439522, 2053862243, 2053862260, 728126428].includes(this.domain)) {
       gasPrice = min;
-    } else if (gasPrice.gte(max)) {
+    } else if (gasPrice >= max) {
       this.logger.warn('Hit the gas price absolute maximum.', requestContext, methodContext, {
         domain: this.domain,
-        gasPrice: utils.formatUnits(gasPrice, 'gwei'),
-        absoluteMax: utils.formatUnits(max, 'gwei'),
+        gasPrice: chainWrapper.formatGwei(gasPrice),
+        absoluteMax: chainWrapper.formatGwei(max),
       });
       gasPrice = max;
       hitMaximum = true;
@@ -502,7 +500,7 @@ export class RpcProviderAggregator {
         return this.cachedDecimals[assetId];
       }
 
-      if (assetId === constants.AddressZero) {
+      if (assetId === chainWrapper.zeroAddress) {
         this.cachedDecimals[assetId] = 18;
         return 18;
       }

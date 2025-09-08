@@ -44,10 +44,8 @@ const wallet = EthWallet.createRandom();
 describe('ChainService', () => {
   beforeEach(() => {
     dispatch = createStubInstance(TransactionDispatch);
-    const wallet = EthWallet.createRandom();
     signer = stub(EthWallet.prototype);
     signer.sendTransaction.resolves(TEST_TX_RESPONSE);
-    signer.getTransactionCount.resolves(TEST_TX_RESPONSE.nonce);
     signer.connect.returns(signer);
     (signer as any)._signingKey = () => wallet.privateKey;
     (signer as any).address = wallet.address;

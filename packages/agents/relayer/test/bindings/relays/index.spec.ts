@@ -1,7 +1,6 @@
 import { ChainService, EthWallet } from '@chimera-monorepo/chainservice';
 import { TasksCache } from '@chimera-monorepo/adapters-cache';
-import { RelayerTaskStatus, delay, expect, mkAddress, mkBytes32, mock } from '@chimera-monorepo/utils';
-import { BigNumber } from 'ethers';
+import { RelayerTaskStatus, delay, expect, mkAddress, mkBytes32, mock, chainWrapper, type PublicClient } from '@chimera-monorepo/utils';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { FastifyInstance } from 'fastify';
 
@@ -10,28 +9,36 @@ import * as Relays from '../../../src/bindings/relays';
 
 import { createTask } from '../../mock';
 import { mockAppContext } from '../../globalTestHook';
-import { JsonRpcProvider } from '@ethersproject/providers';
 
 describe('Relayer:Relays', () => {
   describe('#pollCache', () => {
     let cache: { tasks: SinonStubbedInstance<TasksCache> };
     let wallet: SinonStubbedInstance<EthWallet>;
     let chainservice: SinonStubbedInstance<ChainService>;
-    let provider: SinonStubbedInstance<JsonRpcProvider>;
+    let provider: any;
 
     const task = createTask();
     const id = mkBytes32('0x1234');
-    const gasPrice = BigNumber.from('100000');
+    const gasPrice = BigInt('100000');
     const gasLimit = 3000000;
     const walletAddr = mkAddress('0x121212');
 
-    const receipt = mock.ethers.receipt();
+    const receipt = {
+      transactionHash: mkBytes32('0xdef'),
+      blockNumber: 123,
+      status: 1,
+      confirmations: 1,
+      logs: [],
+    };
 
     beforeEach(() => {
       cache = mockAppContext.adapters.cache as unknown as { tasks: SinonStubbedInstance<TasksCache> };
       wallet = mockAppContext.adapters.wallet as SinonStubbedInstance<EthWallet>;
       chainservice = mockAppContext.adapters.chainservice as SinonStubbedInstance<ChainService>;
-      provider = createStubInstance(JsonRpcProvider);
+      provider = {
+        getGasPrice: stub().resolves(gasPrice),
+        getTransactionCount: stub().resolves(1),
+      };
 
       // wallet.address = '0x1234';
       wallet.getAddress.resolves(walletAddr);
@@ -42,11 +49,8 @@ describe('Relayer:Relays', () => {
 
       chainservice.getProvider.returns({ leadProvider: provider } as any);
       chainservice.sendTx.resolves(receipt);
-      chainservice.getGasPrice.resolves("10");
-      chainservice.getGasEstimate.resolves("100000");
-
-      provider.getGasPrice.resolves(gasPrice);
-      provider.getTransactionCount.resolves(1);
+      chainservice.getGasPrice.resolves('10');
+      chainservice.getGasEstimate.resolves('100000');
     });
 
     it('should handle when no pending tasks retrieved', async () => {
@@ -109,9 +113,9 @@ describe('Relayer:Relays', () => {
         to: task.to,
         from: walletAddr,
         value: task.fee.amount,
-        gasLimit: BigNumber.from(gasLimit).mul(120).div(100).toString(),
-        gasPrice: gasPrice.mul(130).div(100).toString(),
-      }),
+        gasLimit: ((BigInt(gasLimit) * BigInt(120)) / BigInt(100)).toString(),
+        gasPrice: ((gasPrice * BigInt(130)) / BigInt(100)).toString(),
+      });
       cache.tasks.setError.calledOnceWithExactly(id, JSON.stringify(error));
     });
 
@@ -131,9 +135,9 @@ describe('Relayer:Relays', () => {
         to: task.to,
         from: walletAddr,
         value: task.fee.amount,
-        gasLimit: BigNumber.from(gasLimit).mul(120).div(100).toString(),
-        gasPrice: gasPrice.mul(130).div(100).toString(),
-      }),
+        gasLimit: ((BigInt(gasLimit) * BigInt(120)) / BigInt(100)).toString(),
+        gasPrice: ((gasPrice * BigInt(130)) / BigInt(100)).toString(),
+      });
       expect(cache.tasks.setHash.calledOnceWithExactly(id, receipt.transactionHash)).to.be.true;
       expect(cache.tasks.setError.callCount).to.equal(0);
     });

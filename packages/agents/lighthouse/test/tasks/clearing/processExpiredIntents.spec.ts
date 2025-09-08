@@ -2,8 +2,7 @@ import { Database } from '@chimera-monorepo/database/src';
 import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { mock } from '../../globalTestHook';
 import { createHubIntents } from '@chimera-monorepo/database/test/mock';
-import { RelayerType, getNtpTimeSeconds, expect, mkBytes32, Logger } from '@chimera-monorepo/utils';
-import { Interface } from 'ethers/lib/utils';
+import { RelayerType, getNtpTimeSeconds, expect, mkBytes32, Logger, chainWrapper } from '@chimera-monorepo/utils';
 import { ChainService } from '@chimera-monorepo/chainservice';
 import * as Relayer from '@chimera-monorepo/adapters-relayer';
 
@@ -16,7 +15,6 @@ describe('#processExpiredIntents', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   let sendWithRelayerWithBackup: SinonStub;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   const TTL = 1_000;
 
@@ -44,10 +42,8 @@ describe('#processExpiredIntents', () => {
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     database.getExpiredIntents.resolves(intents);
 
-    encodeFunctionData = stub(Interface.prototype, 'encodeFunctionData').returns('0xencoded');
-    decodeFunctionResult = stub(Interface.prototype, 'decodeFunctionResult').returns([{ status: 2 }]);
-    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
-    decodeFunctionResult.onCall(0).returns([TTL.toString()]);
+    encodeFunctionData = stub(chainWrapper, 'encodeFunctionData').returns('0xencoded');
+    decodeFunctionResult = stub(chainWrapper, 'decodeFunctionResult').returns(BigInt(TTL));
 
     sendWithRelayerWithBackup = stub(Relayer, 'sendWithRelayerWithBackup').resolves({
       taskId: '123',
@@ -83,9 +79,17 @@ describe('#processExpiredIntents', () => {
     expect(sendWithRelayerWithBackup.calledWith(+hub.domain, hub.domain, hub.deployments.everclear, '0xencoded', '0'))
       .to.be.true;
     // verify call to encoding
-    const [name, [params]] = encodeFunctionData.lastCall.args;
-    expect(name).to.be.eq('handleExpiredIntents');
-    console.log(params);
+    expect(encodeFunctionData.called).to.be.true;
+    const lastCall = encodeFunctionData.lastCall;
+    expect(lastCall).to.not.be.undefined;
+    expect(lastCall!.args).to.not.be.undefined;
+    const args = lastCall!.args;
+    expect(args).to.not.be.undefined;
+    expect(args.length).to.be.greaterThan(0);
+    const callObject = args[0];
+    expect(callObject).to.not.be.undefined;
+    expect(callObject.functionName).to.be.eq('handleExpiredIntents');
+    const params = callObject.args[0];
     expect(params.length).to.be.eq(2);
     expect(params).to.be.deep.eq([...new Set(intents.map((i) => i.id))]);
   });

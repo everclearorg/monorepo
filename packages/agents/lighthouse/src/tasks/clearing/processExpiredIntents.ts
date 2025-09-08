@@ -1,7 +1,7 @@
-import { Interface } from 'ethers/lib/utils';
 import { getContext } from '../../context';
 import { createLoggingContext, domainToChainId } from '@chimera-monorepo/utils';
 import { sendWithRelayerWithBackup } from '@chimera-monorepo/adapters-relayer';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 /**
  * @notice Inserts any intents that have expired inot the queue. These are
@@ -22,18 +22,24 @@ export const processExpiredIntents = async () => {
   logger.info('Method started', requestContext, methodContext, { chains, hub });
 
   // Get the intent buffer from the hub
-  const iface = new Interface(abis.hub.everclear);
   const encodedExpiry = await chainservice.readTx(
     {
-      data: iface.encodeFunctionData('expiryTimeBuffer', []),
+      data: chainWrapper.encodeFunctionData({
+        abi: abis.hub.everclear,
+        functionName: 'expiryTimeBuffer',
+        args: [],
+      }),
       domain: +hub.domain,
       to: hub.deployments.everclear,
-      funcSig: iface.getFunction('expiryTimeBuffer').format(),
+      funcSig: 'expiryTimeBuffer()',
     },
     'latest',
   );
-  const [expiry] = iface.decodeFunctionResult('expiryTimeBuffer', encodedExpiry);
-  logger.debug('Retrieved expiryTimeBuffer', requestContext, methodContext, { expiryTimeBuffer: expiry.toString() });
+  const expiry = chainWrapper.decodeFunctionResult({
+    abi: abis.hub.everclear,
+    functionName: 'expiryTimeBuffer',
+    data: encodedExpiry as `0x${string}`,
+  }) as unknown as bigint;
 
   // Get the expired intents from the database (keyed by destination domain);
   const expired = await database.getExpiredIntents(hub.domain, Object.keys(chains), expiry.toString());
@@ -55,7 +61,11 @@ export const processExpiredIntents = async () => {
 
   if (expired.length == 0) return;
 
-  const data = iface.encodeFunctionData('handleExpiredIntents', [expired.map((e) => e.id)]);
+  const data = chainWrapper.encodeFunctionData({
+    abi: abis.hub.everclear,
+    functionName: 'handleExpiredIntents',
+    args: [expired.map((e) => e.id)],
+  });
   logger.info('Submitting expired intents to relayer', requestContext, methodContext, {
     intents: logCtx.filter((i) => !!expired.find((f) => f!.id === i.id)),
     transaction: {
@@ -72,7 +82,7 @@ export const processExpiredIntents = async () => {
     hub.deployments.everclear,
     data,
     '0',
-    iface.getFunction('handleExpiredIntents').format(),
+    'handleExpiredIntents(uint256[])',
     relayers,
     chainservice,
     logger,

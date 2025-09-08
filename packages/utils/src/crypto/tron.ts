@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TronWeb } from 'tronweb';
 
 export interface TronKeyPair {
@@ -55,10 +56,10 @@ export function ethereumToTronAddress(ethAddress: string): string {
   if (!ethAddress.startsWith('0x')) {
     throw new Error('Invalid Ethereum address format');
   }
-  
+
   const ethHex = ethAddress.slice(2); // Remove '0x'
   const tronHex = '41' + ethHex; // Add Tron prefix
-  
+
   return TronWeb.address.fromHex(tronHex);
 }
 
@@ -73,18 +74,18 @@ export async function signTransactionHash(privateKey: string, txHash: string): P
       'TRON-PRO-API-KEY': process.env.TRON_PRO_API_KEY || '',
     },
   });
-  
+
   // Ensure txHash has 0x prefix for TronWeb
   const hashWithPrefix = txHash.startsWith('0x') ? txHash : `0x${txHash}`;
-  
+
   // Use TronWeb's internal signing
   const signature = await tronWeb.trx.sign(hashWithPrefix);
-  
+
   // Extract r, s, v from the signature
   const r = signature.slice(0, 64);
   const s = signature.slice(64, 128);
   const v = parseInt(signature.slice(128, 130), 16);
-  
+
   return {
     r,
     s,
@@ -104,8 +105,8 @@ export async function signMessage(privateKey: string, message: string): Promise<
       'TRON-PRO-API-KEY': process.env.TRON_PRO_API_KEY || '',
     },
   });
-  
-  return await tronWeb.trx.signMessageV2(message);
+
+  return tronWeb.trx.signMessageV2(message);
 }
 
 /**
@@ -118,7 +119,7 @@ export async function verifyMessage(message: string, signature: string): Promise
       'TRON-PRO-API-KEY': process.env.TRON_PRO_API_KEY || '',
     },
   });
-  
+
   return await tronWeb.trx.verifyMessageV2(message, signature);
 }
 
@@ -126,12 +127,15 @@ export async function verifyMessage(message: string, signature: string): Promise
  * Create a TronWeb instance with private key
  */
 export function createTronWeb(privateKey: string, fullHost: string = 'https://api.trongrid.io'): any {
-  const tronWeb = new TronWeb({
+  return new TronWeb({
     fullHost,
     privateKey,
     headers: {
-      'TRON-PRO-API-KEY': process.env.TRON_PRO_API_KEY || (() => { throw new Error('TRON_PRO_API_KEY is not set'); })(),
+      'TRON-PRO-API-KEY':
+        process.env.TRON_PRO_API_KEY ||
+        (() => {
+          throw new Error('TRON_PRO_API_KEY is not set');
+        })(),
     },
   });
-  return tronWeb;
-} 
+}

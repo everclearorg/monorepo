@@ -33,13 +33,12 @@
   "dependencies": {
     "@chimera-monorepo/chainservice": "workspace:*",
     "@chimera-monorepo/utils": "workspace:*",
-    "@typescript-eslint/eslint-plugin": "5.52.0",
-    "ethers": "5.7.2"
+    "@typescript-eslint/eslint-plugin": "5.52.0"
   },
   "devDependencies": {
     "eslint": "8.34.0",
     "ts-node": "10.9.1",
     "tslib": "2.5.0",
-    "typescript": "5.3.3"
+    "typescript": "5.9.2"
   }
 }

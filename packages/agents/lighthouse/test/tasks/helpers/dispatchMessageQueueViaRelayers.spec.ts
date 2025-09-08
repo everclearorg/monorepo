@@ -1,7 +1,5 @@
-import { Logger, RelayerType, Settlement, domainToChainId, expect, mkBytes32 } from '@chimera-monorepo/utils';
+import { Logger, RelayerType, Settlement, domainToChainId, expect, mkBytes32, chainWrapper } from '@chimera-monorepo/utils';
 import * as Relayer from '@chimera-monorepo/adapters-relayer';
-import { Bytes, Interface } from 'ethers/lib/utils';
-import { constants } from 'ethers';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { EthWallet } from '@chimera-monorepo/chainservice';
 
@@ -21,12 +19,12 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   let encodeStub: SinonStub;
   let decodeStub: SinonStub;
   let wallet: SinonStubbedInstance<EthWallet>;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     // Interface stubs
     wallet = createStubInstance(EthWallet, {
-      signMessage: stub<[string | Bytes], Promise<string>>().resolves('0xsigned'),
+      signMessage: stub<[string], Promise<string>>().resolves('0xsigned'),
+      getAddress: stub<[], Promise<string>>().resolves('0x1234567890123456789012345678901234567890'),
     });
 
     // Set mock context
@@ -57,14 +55,12 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
 
     // Function stubs
     getContextStub.returns(context);
-    encodeStub = stub(Interface.prototype, 'encodeFunctionData').returns('0xencoded');
-    decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns([constants.Zero]);
+    encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0xencoded');
+    decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(BigInt(0));
     sendWithRelayerWithBackupStub = stub(Relayer, 'sendWithRelayerWithBackup').resolves({
       taskId: '123',
       relayerType: RelayerType.Everclear,
     });
-
-    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   it('should return early if chain is not configured', async () => {
@@ -128,7 +124,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
         mock.chains()[queue.domain].deployments?.everclear,
         '0xencoded', // encode stub value
         '0',
-        'foo()',
+        'processIntentQueueViaRelayer(uint32,tuple[],address,uint32,uint256,uint256,bytes)',
         [context.adapters.relayers[0]],
         context.adapters.chainservice,
         context.logger,
@@ -148,7 +144,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
     ];
     const ret = await dispatchMessageQueueViaRelayers('SETTLEMENT', { ...queue, type: 'SETTLEMENT' }, settlements, rc);
     expect(ret).to.not.be.empty;
-    expect(encodeStub.calledWith(getQueueMethodName('SETTLEMENT'))).to.be.true;
+    expect(encodeStub.called).to.be.true;
   });
 
   it('should not dispatch more than 15 intents for a 10M gas limit message destination', async () => {

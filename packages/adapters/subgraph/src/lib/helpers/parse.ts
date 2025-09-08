@@ -41,10 +41,9 @@ import {
   IntentStatus,
   OrderEntity,
 } from '../operations/entities';
-import { BigNumber } from 'ethers';
 
 export const StringToNumber = (num: number | string): number => {
-  return BigNumber.from(num).toNumber();
+  return Number(BigInt(num));
 };
 
 export const originIntent = (entity: SpokeAddIntentEventEntity): OriginIntent => {

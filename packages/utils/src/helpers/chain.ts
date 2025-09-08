@@ -1,0 +1,71 @@
+import * as viem from 'viem';
+import {
+  privateKeyToAccount as viemPrivateKeyToAccount,
+  generatePrivateKey as viemGeneratePrivateKey,
+  mnemonicToAccount as viemMnemonicToAccount,
+} from 'viem/accounts';
+
+// Create a wrapper object that can be easily stubbed in tests
+export const chainWrapper = {
+  encodeFunctionData: (...args: Parameters<typeof viem.encodeFunctionData>) => viem.encodeFunctionData(...args),
+  encodeFunctionResult: (...args: Parameters<typeof viem.encodeFunctionResult>) => viem.encodeFunctionResult(...args),
+  decodeFunctionResult: (...args: Parameters<typeof viem.decodeFunctionResult>) => viem.decodeFunctionResult(...args),
+  decodeFunctionData: (...args: Parameters<typeof viem.decodeFunctionData>) => viem.decodeFunctionData(...args),
+  decodeEventLog: (...args: Parameters<typeof viem.decodeEventLog>) => viem.decodeEventLog(...args),
+  encodeAbiParameters: (...args: Parameters<typeof viem.encodeAbiParameters>) => viem.encodeAbiParameters(...args),
+  encodePacked: (...args: Parameters<typeof viem.encodePacked>) => viem.encodePacked(...args),
+  toHex: (...args: Parameters<typeof viem.toHex>) => viem.toHex(...args),
+  toBytes: (...args: Parameters<typeof viem.toBytes>) => viem.toBytes(...args),
+  fromHex: (...args: Parameters<typeof viem.fromHex>) => viem.fromHex(...args),
+  fromBytes: (...args: Parameters<typeof viem.fromBytes>) => viem.fromBytes(...args),
+  stringToHex: (...args: Parameters<typeof viem.stringToHex>) => viem.stringToHex(...args),
+  hexToBytes: (...args: Parameters<typeof viem.hexToBytes>) => viem.hexToBytes(...args),
+  getAddress: (...args: Parameters<typeof viem.getAddress>) => viem.getAddress(...args),
+  zeroAddress: viem.zeroAddress,
+  parseEther: (...args: Parameters<typeof viem.parseEther>) => viem.parseEther(...args),
+  formatEther: (...args: Parameters<typeof viem.formatEther>) => viem.formatEther(...args),
+  parseUnits: (...args: Parameters<typeof viem.parseUnits>) => viem.parseUnits(...args),
+  formatUnits: (...args: Parameters<typeof viem.formatUnits>) => viem.formatUnits(...args),
+  parseGwei: (...args: Parameters<typeof viem.parseGwei>) => viem.parseGwei(...args),
+  formatGwei: (...args: Parameters<typeof viem.formatGwei>) => viem.formatGwei(...args),
+  keccak256: (...args: Parameters<typeof viem.keccak256>) => viem.keccak256(...args),
+  hashMessage: (...args: Parameters<typeof viem.hashMessage>) => viem.hashMessage(...args),
+  recoverMessageAddress: (...args: Parameters<typeof viem.recoverMessageAddress>) =>
+    viem.recoverMessageAddress(...args),
+  recoverPublicKey: (...args: Parameters<typeof viem.recoverPublicKey>) => viem.recoverPublicKey(...args),
+  concat: (...args: Parameters<typeof viem.concat>) => viem.concat(...args),
+  stringToBytes: (...args: Parameters<typeof viem.stringToBytes>) => viem.stringToBytes(...args),
+  serializeTransaction: (...args: Parameters<typeof viem.serializeTransaction>) => viem.serializeTransaction(...args),
+  parseTransaction: (...args: Parameters<typeof viem.parseTransaction>) => viem.parseTransaction(...args),
+  createWalletClient: (...args: Parameters<typeof viem.createWalletClient>) => viem.createWalletClient(...args),
+  createPublicClient: (...args: Parameters<typeof viem.createPublicClient>) => viem.createPublicClient(...args),
+  http: viem.http,
+  pad: (...args: Parameters<typeof viem.pad>) => viem.pad(...args),
+  isAddress: (...args: Parameters<typeof viem.isAddress>) => viem.isAddress(...args),
+  isAddressEqual: (...args: Parameters<typeof viem.isAddressEqual>) => viem.isAddressEqual(...args),
+  zeroHash: viem.zeroHash,
+  // Account management functions
+  privateKeyToAccount: (...args: Parameters<typeof viemPrivateKeyToAccount>) => viemPrivateKeyToAccount(...args),
+  generatePrivateKey: (...args: Parameters<typeof viemGeneratePrivateKey>) => viemGeneratePrivateKey(...args),
+  mnemonicToAccount: (...args: Parameters<typeof viemMnemonicToAccount>) => viemMnemonicToAccount(...args),
+};
+
+// Re-export types
+export type {
+  Address as ViemAddress,
+  Hex,
+  Hash,
+  TransactionRequest,
+  TransactionReceipt,
+  Block,
+  Log,
+  WalletClient,
+  PublicClient,
+  Account,
+  PrivateKeyAccount,
+  Abi,
+  AbiParameter,
+  AbiStateMutability,
+  AbiFunction,
+  AbiEvent,
+} from 'viem';

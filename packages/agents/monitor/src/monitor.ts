@@ -1,8 +1,15 @@
-import { Logger, RelayerType, createLoggingContext, delay, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
+import {
+  Logger,
+  RelayerType,
+  createLoggingContext,
+  delay,
+  jsonifyError,
+  sendHeartbeat,
+  chainWrapper,
+} from '@chimera-monorepo/utils';
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
 import { setupCache, setupSubgraphReader } from './setup';
-import { providers } from 'ethers';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { SubgraphConfig } from '@chimera-monorepo/adapters-subgraph';
 import { setupEverclearRelayer, setupGelatoRelayer } from '@chimera-monorepo/adapters-relayer';
@@ -45,8 +52,11 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
           if (type !== 'evm') {
             return;
           }
-          const ethProvider = new providers.JsonRpcProvider(provider);
-          ethProvider.on('block', (blockNumber) => {
+          const client = chainWrapper.createPublicClient({
+            transport: chainWrapper.http(provider),
+          });
+
+          const handleBlockNumber = (blockNumber: bigint) => {
             if (!blockNumber) {
               return;
             }
@@ -54,7 +64,7 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
             // Create the entry
             const entry = {
               rpcOrigin: origin,
-              number: blockNumber,
+              number: Number(blockNumber),
               timestamp: Math.floor(Date.now() / 1_000),
             };
             // Add domain array if it exists
@@ -68,10 +78,14 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
               return;
             }
             // Replace the entry IFF it is more recent
-            if (blockMap.get(domain)![idx].number >= blockNumber) {
+            if (blockMap.get(domain)![idx].number >= Number(blockNumber)) {
               return;
             }
             blockMap.get(domain)![idx] = entry;
+          };
+
+          client.watchBlockNumber({
+            onBlockNumber: handleBlockNumber,
           });
         }),
       );

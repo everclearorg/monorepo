@@ -1,4 +1,3 @@
-import { providers } from 'ethers';
 import { createLoggingContext, Logger, EverclearError, RequestContext } from '@chimera-monorepo/utils';
 
 import { ChainConfig } from './config';
@@ -134,7 +133,7 @@ export class ChainService extends ChainReader {
             {
               parameter: 'providers',
               error: 'No valid providers were supplied in configuration for this chain.',
-              value: providers,
+              value: chain.providers,
             },
           ],
           {
@@ -143,7 +142,7 @@ export class ChainService extends ChainReader {
         );
         this.logger.error('Failed to create transaction service', context, methodContext, error.toJson(), {
           domain,
-          providers,
+          providers: chain.providers,
         });
         throw error;
       }

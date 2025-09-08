@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber, utils } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { reset, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { mkBytes32, Logger, mkAddress, mock, expect } from '@chimera-monorepo/utils';
 
@@ -29,7 +29,6 @@ import {
   TEST_TX_RECEIPT,
   TEST_TX_RESPONSE,
   getMockOnchainTransaction,
-  TEST_SENDER_CHAIN_ID,
 } from '../utils';
 
 const logger = new Logger({
@@ -88,7 +87,6 @@ describe('TransactionDispatch', () => {
     const wallet = EthWallet.createRandom();
     signer = stub(EthWallet.prototype);
     signer.sendTransaction.resolves(TEST_TX_RESPONSE);
-    signer.getTransactionCount.resolves(TEST_TX_RESPONSE.nonce);
     signer.connect.returns(signer);
     (signer as any)._signingKey = () => wallet.privateKey;
     (signer as any).address = wallet.address;
@@ -109,7 +107,7 @@ describe('TransactionDispatch', () => {
     stub(RpcProviderAggregator.prototype as any, 'setBlockPeriod').resolves();
 
     // NOTE: This will start dispatch with NO loops running. We will start the loops manually in unit tests below.
-    txDispatch = new TransactionDispatch(logger, TEST_SENDER_DOMAIN, chainConfig, signer.privateKey, false);
+    txDispatch = new TransactionDispatch(logger, TEST_SENDER_DOMAIN, chainConfig, false);
 
     // This will stub all dispatch methods. Methods below should be restored manually as needed.
     stubAllDispatchMethods();
@@ -132,7 +130,7 @@ describe('TransactionDispatch', () => {
         TEST_TX_RESPONSE.nonce,
         {
           limit: '24007',
-          price: utils.parseUnits('5', 'gwei').toString(),
+          price: chainWrapper.parseGwei('5').toString(),
         },
         {
           confirmationTimeout: 1,
@@ -769,7 +767,7 @@ describe('TransactionDispatch', () => {
 
     it("shouldn't bump if we've reached maximum gas price", async () => {
       const max = (txDispatch as any).config.gasPriceMaximum;
-      transaction.gas.price = BigNumber.from(max).toString();
+      transaction.gas.price = BigInt(max).toString();
       // Valid state: we've sent off 2 transactions and bumped once.
       (transaction as any).responses = [TEST_TX_RESPONSE, TEST_TX_RESPONSE];
       transaction.bumps = 1;
@@ -790,7 +788,7 @@ describe('TransactionDispatch', () => {
       // (there should be a second hash present in the transaction if the "resubmit" was successful).
       (transaction as any).responses = [TEST_TX_RESPONSE];
       transaction.bumps = 1;
-      const testCurrentGasPrice = BigNumber.from(1234567).toString();
+      const testCurrentGasPrice = BigInt(1234567).toString();
       transaction.gas.price = testCurrentGasPrice;
       // Should return without bumping.
       await txDispatch.bump(transaction);
@@ -800,17 +798,17 @@ describe('TransactionDispatch', () => {
     });
 
     it('happy: should bump updated price', async () => {
-      const initial = BigNumber.from(10);
-      (transaction as any).gas.price = BigNumber.from(5).toString();
+      const initial = BigInt(10);
+      (transaction as any).gas.price = BigInt(5).toString();
       getGasPriceStub.resolves(initial);
       await txDispatch.bump(transaction);
       expect(+transaction.gas.price!).to.be.eq(13);
     });
 
     it('happy: should bump previous price if previous price > updated price', async () => {
-      const initial = BigNumber.from(10);
+      const initial = BigInt(10);
       (transaction as any).gas.price = initial;
-      getGasPriceStub.resolves(BigNumber.from(5)).toString();
+      getGasPriceStub.resolves(BigInt(5));
       await txDispatch.bump(transaction);
       expect(+transaction.gas.price!).to.be.eq(13);
     });

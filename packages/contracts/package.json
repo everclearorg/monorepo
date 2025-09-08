@@ -86,7 +86,7 @@
     "isolmate": "github:defi-wonderland/isolmate#59e18043c2450fef550f1744b3705ce9ebcaf1c8",
     "ts-node": "^10.9.2",
     "tweetnacl": "^1.0.3",
-    "viem": "^2.19.8"
+    "viem": "^2.36.0"
   },
   "devDependencies": {
     "@commitlint/cli": "17.0.3",
@@ -99,6 +99,6 @@
     "solhint": "github:solhint-community/solhint-community#v4.0.0-rc01",
     "sort-package-json": "1.53.1",
     "ts-mocha": "^10.0.0",
-    "typescript": "^5.5.4"
+    "typescript": "5.9.2"
   }
 }

@@ -1,5 +1,5 @@
 import { RequestContext } from '@chimera-monorepo/utils';
-import { utils } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 import { Gas, ITransactionReceipt, ITransactionRequest, ITransactionResponse, WriteTransaction } from './types';
 
@@ -150,10 +150,10 @@ export class OnchainTransaction {
   } {
     const gasFee = this.gasFee;
     return {
-      gasPrice: gasFee.gasPrice ? `${utils.formatUnits(gasFee.gasPrice, 'gwei')} gwei` : undefined,
-      maxFeePerGas: gasFee.maxFeePerGas ? `${utils.formatUnits(gasFee.maxFeePerGas, 'gwei')} gwei` : undefined,
+      gasPrice: gasFee.gasPrice ? `${chainWrapper.formatGwei(BigInt(gasFee.gasPrice))} gwei` : undefined,
+      maxFeePerGas: gasFee.maxFeePerGas ? `${chainWrapper.formatGwei(BigInt(gasFee.maxFeePerGas))} gwei` : undefined,
       maxPriorityFeePerGas: gasFee.maxPriorityFeePerGas
-        ? `${utils.formatUnits(gasFee.maxPriorityFeePerGas, 'gwei')} gwei`
+        ? `${chainWrapper.formatGwei(BigInt(gasFee.maxPriorityFeePerGas))} gwei`
         : undefined,
     };
   }

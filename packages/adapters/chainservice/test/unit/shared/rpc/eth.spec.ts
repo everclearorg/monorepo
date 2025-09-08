@@ -2,7 +2,6 @@
 import { randomInt } from 'crypto';
 import { reset, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { expect } from '@chimera-monorepo/utils';
-import { providers } from 'ethers';
 
 import { RpcError, TransactionReverted, SyncProvider } from '../../../../src/shared';
 import { TEST_ERROR, TEST_SENDER_DOMAIN } from '../../../utils';
@@ -10,18 +9,20 @@ import { TEST_ERROR, TEST_SENDER_DOMAIN } from '../../../utils';
 describe('Eth RpcProvider', () => {
   const testStallTimeout = 100;
   let provider: SyncProvider;
-  let providerStub: SinonStubbedInstance<providers.StaticJsonRpcProvider>;
 
   beforeEach(() => {
-    providerStub = stub(providers.StaticJsonRpcProvider.prototype);
     provider = new SyncProvider(
       {
-        url: 'http://------------------',
+        url: 'http://localhost:8545', // Use a valid URL format
       },
       TEST_SENDER_DOMAIN,
       testStallTimeout,
       process.env.LOG_LEVEL === 'debug',
     );
+    
+    // Stub the underlying client methods to prevent real HTTP calls
+    stub(provider.internalProvider.client, 'getBlockNumber').resolves(BigInt(12345));
+    stub(provider.internalProvider.client, 'request').resolves('stubbed result');
   });
 
   afterEach(() => {
@@ -44,14 +45,15 @@ describe('Eth RpcProvider', () => {
     const testBlockNumber = randomInt(999999999999);
 
     it('should retrieve current block number', async () => {
-      providerStub.getBlockNumber.resolves(testBlockNumber);
       await provider.sync();
-      expect(providerStub.getBlockNumber.calledOnce).to.be.true;
-      expect(provider.syncedBlockNumber).to.be.equal(testBlockNumber);
+      expect(provider.internalProvider.client.getBlockNumber).to.have.been.calledOnce;
+      expect(provider.syncedBlockNumber).to.be.eq(12345);
     });
 
     it('should throw if getBlockNumber throws', async () => {
-      providerStub.getBlockNumber.rejects(TEST_ERROR);
+      // Restore the original stub and create a new one that throws
+      restore();
+      stub(provider.internalProvider.client, 'getBlockNumber').rejects(TEST_ERROR);
       await expect(provider.sync()).to.be.rejectedWith(TEST_ERROR);
     });
   });
@@ -61,10 +63,9 @@ describe('Eth RpcProvider', () => {
     const testParams = ['testParam1', 'testParam2'];
     const expectedSendResult = 'test send result';
 
-    let superSendStub: SinonStub;
+    let requestStub: SinonStub;
     beforeEach(() => {
-      // This will stub StaticJsonRpcProvider (super class) send method. Only needs to be done once.
-      superSendStub = stub((provider as any).__proto__, 'send').resolves(expectedSendResult);
+      requestStub = provider.internalProvider.client.request as SinonStub;
     });
 
     afterEach(() => {
@@ -74,24 +75,25 @@ describe('Eth RpcProvider', () => {
 
     it('should intercept rpc send call', async () => {
       const result = await provider.send(testMethod, testParams);
-      expect(superSendStub.calledOnce).to.be.true;
-      expect(superSendStub.calledWith(testMethod, testParams)).to.be.true;
-      // TODO: For some reason this stub is not being called.
-      // expect(updateMetricsStub.calledOnce).to.be.true;
-      expect(result).to.be.eq(expectedSendResult);
+      expect(requestStub.calledOnce).to.be.true;
+      expect(requestStub.calledWith({
+        method: testMethod,
+        params: testParams,
+      })).to.be.true;
+      expect(result).to.be.eq('stubbed result');
     });
 
     it('if attempt fails due to non-RpcError, throws', async () => {
-      superSendStub.rejects(TEST_ERROR);
+      TEST_ERROR.type = 'test_type';
+      requestStub.rejects(TEST_ERROR);
       await expect(provider.send(testMethod, testParams)).to.be.rejectedWith(TEST_ERROR);
       // expect(updateMetricsStub.calledOnce).to.be.true;
     });
 
     it('if every attempt fails due to RpcError, throws RpcError', async () => {
       const rpcError = new RpcError(RpcError.reasons.ConnectionReset);
-      superSendStub.rejects(rpcError);
+      requestStub.rejects(rpcError);
       await expect(provider.send(testMethod, testParams)).to.be.rejectedWith(RpcError);
-      // expect(updateMetricsStub.callCount).to.be.eq(5);
     });
   });
 

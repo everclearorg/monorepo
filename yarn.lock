@@ -943,14 +943,13 @@ __metadata:
     "@types/mocha": 10.0.1
     "@typescript-eslint/eslint-plugin": 5.52.0
     eslint: 8.34.0
-    ethers: 5.7.2
     ioredis: 5.3.1
     ioredis-mock: 8.2.6
     nyc: 15.1.0
     rimraf: 5.0.1
     ts-mocha: 10.0.0
     tslib: 2.5.0
-    typescript: 5.3.3
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -964,14 +963,13 @@ __metadata:
     "@gelatonetwork/relay-sdk": 3.1.0
     "@types/mocha": 10.0.1
     eslint: 8.34.0
-    ethers: 5.7.2
     interval-promise: 1.4.0
     mocha: 10.2.0
     nyc: 15.1.0
     ts-mocha: 10.0.0
     ts-node: 10.9.1
     tslib: 2.5.0
-    typescript: 5.3.3
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -983,7 +981,6 @@ __metadata:
     "@sinclair/typebox": 0.25.21
     "@typescript-eslint/eslint-plugin": 5.52.0
     eslint: 8.34.0
-    ethers: 5.7.2
     graphql: 16.8.1
     graphql-request: 6.1.0
     nyc: 15.1.0
@@ -991,7 +988,7 @@ __metadata:
     ts-mocha: 10.0.0
     ts-node: 10.9.1
     tslib: 2.5.0
-    typescript: 5.3.3
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -1003,10 +1000,9 @@ __metadata:
     "@chimera-monorepo/utils": "workspace:*"
     "@typescript-eslint/eslint-plugin": 5.52.0
     eslint: 8.34.0
-    ethers: 5.7.2
     ts-node: 10.9.1
     tslib: 2.5.0
-    typescript: 5.3.3
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -1025,7 +1021,6 @@ __metadata:
     dd-trace: 3.13.2
     dotenv: 16.0.3
     eslint: 8.34.0
-    ethers: 5.7.2
     interval-promise: 1.4.0
     nodemon: 2.0.20
     nyc: 15.1.0
@@ -1037,7 +1032,7 @@ __metadata:
     ts-mocha: 10.0.0
     ts-node: 10.9.1
     tslib: 2.5.0
-    typescript: 4.9.5
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -1056,7 +1051,6 @@ __metadata:
     "@types/node-fetch": ^2.6.12
     ajv: 8.17.1
     eslint: 9.17.0
-    ethers: 5.7.2
     interval-promise: 1.4.0
     mocha: 8.2.0
     nyc: 15.1.0
@@ -1065,7 +1059,7 @@ __metadata:
     sinon: 17.0.1
     tronweb: ^6.0.3
     ts-mocha: 10.0.0
-    typescript: 5.7.2
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -1093,8 +1087,8 @@ __metadata:
     ts-mocha: ^10.0.0
     ts-node: ^10.9.2
     tweetnacl: ^1.0.3
-    typescript: ^5.5.4
-    viem: ^2.19.8
+    typescript: 5.9.2
+    viem: ^2.36.0
   languageName: unknown
   linkType: soft
 
@@ -1109,7 +1103,7 @@ __metadata:
     pg: 8.9.0
     rimraf: 5.0.1
     ts-mocha: 10.0.0
-    typescript: 5.3.3
+    typescript: 5.9.2
     zapatos: 6.5.0
   languageName: unknown
   linkType: soft
@@ -1132,13 +1126,12 @@ __metadata:
     dd-trace: 3.13.2
     dotenv: 16.0.3
     eslint: 8.34.0
-    ethers: 5.7.2
     nyc: 15.1.0
     rimraf: 5.0.1
     sinon: 15.0.1
     ts-mocha: 10.0.0
     ts-node: 10.9.1
-    typescript: 5.3.3
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -1165,7 +1158,7 @@ __metadata:
     nyc: 15.1.0
     rimraf: 5.0.1
     ts-mocha: 10.0.0
-    typescript: 5.3.3
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -1180,7 +1173,6 @@ __metadata:
     "@sinclair/typebox": 0.25.21
     concurrently: 7.6.0
     eslint: 8.34.0
-    ethers: 5.7.2
     fastify: 4.13.0
     interval-promise: 1.4.0
     mocha: 10.2.0
@@ -1190,7 +1182,7 @@ __metadata:
     sinon: 17.0.1
     ts-mocha: 10.0.0
     tsc: 2.0.4
-    typescript: 5.3.3
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -1226,6 +1218,7 @@ __metadata:
     "@types/chai-as-promised": 7.1.5
     "@types/chai-subset": 1.3.3
     "@types/mocha": 10.0.1
+    "@types/proxyquire": ^1.3.31
     "@types/secp256k1": 4.0.3
     "@types/sinon-chai": 3.2.9
     "@urql/core": 5.0.4
@@ -1239,13 +1232,15 @@ __metadata:
     eslint: 8.34.0
     hyperid: 3.2.0
     nyc: 15.1.0
+    proxyquire: ^2.1.3
     rimraf: 5.0.1
     secp256k1: 4.0.3
     sinon: 17.0.1
     sinon-chai: 3.7.0
     tronweb: ^6.0.3
     ts-mocha: 10.0.0
-    typescript: 5.3.3
+    typescript: 5.9.2
+    viem: ^2.36.0
   languageName: unknown
   linkType: soft
 
@@ -1264,7 +1259,6 @@ __metadata:
     concurrently: 7.6.0
     dotenv: 16.0.3
     eslint: 8.34.0
-    ethers: 5.7.2
     fastify: 4.13.0
     interval-promise: 1.4.0
     mocha: 10.2.0
@@ -1277,7 +1271,7 @@ __metadata:
     ts-node: 10.9.1
     tsc: 2.0.4
     twilio: 3.83.4
-    typescript: 5.3.3
+    typescript: 5.9.2
   languageName: unknown
   linkType: soft
 
@@ -3670,6 +3664,15 @@ __metadata:
   dependencies:
     "@noble/hashes": 1.8.0
   checksum: bac582aefe951032cb04ed7627f139c3351ddfefd2625a25fe7f7a8043e7d781be4fad320d4ae75e31fa5d7e05ba643f16139877375130fd3cff86d81512e0f2
+  languageName: node
+  linkType: hard
+
+"@noble/curves@npm:1.9.6":
+  version: 1.9.6
+  resolution: "@noble/curves@npm:1.9.6"
+  dependencies:
+    "@noble/hashes": 1.8.0
+  checksum: 0944cb0fd0f521ee2004df22013e997c85d3a10b529e98cb2d5b552343fd62cd3edb65a3373dcb255bda18cb7651b0399e58a3f50b5307db2b3ef0c2bdb35248
   languageName: node
   linkType: hard
 
@@ -6080,6 +6083,13 @@ __metadata:
     pg-protocol: "*"
     pg-types: ^2.2.0
   checksum: ac145553a8ad2f357feacad1bceaf5d6ce904eb9d66233b84c469a2b4fa3738d4ebdf29b7ea45387be2d07f915fd873a229f90a2f766d7c377afa7c41fbcf8d1
+  languageName: node
+  linkType: hard
+
+"@types/proxyquire@npm:^1.3.31":
+  version: 1.3.31
+  resolution: "@types/proxyquire@npm:1.3.31"
+  checksum: 945024495fc991f6152686795ac6f2f2d0f571834e67fa41c1e84877eeb1a321a24ab8ff67fc5152d9227f5b39f6254213dced15deaf80ed7443059c2257e072
   languageName: node
   linkType: hard
 
@@ -10726,6 +10736,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fill-keys@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "fill-keys@npm:1.0.2"
+  dependencies:
+    is-object: ~1.0.1
+    merge-descriptors: ~1.0.0
+  checksum: 6ac5ff60ff08f2f44d19e919c9ca579f4efaaa8c88232b4aab5a5b5522aeb8ec91501956e780cb2b44574fe4a4a337e9b43187829267d0b66a6bfedbafae893f
+  languageName: node
+  linkType: hard
+
 "fill-range@npm:^7.1.1":
   version: 7.1.1
   resolution: "fill-range@npm:7.1.1"
@@ -12665,6 +12685,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-object@npm:~1.0.1":
+  version: 1.0.2
+  resolution: "is-object@npm:1.0.2"
+  checksum: 971219c4b1985b9751f65e4c8296d3104f0457b0e8a70849e848a4a2208bc47317d73b3b85d4a369619cb2df8284dc22584cb2695a7d99aca5e8d0aa64fc075a
+  languageName: node
+  linkType: hard
+
 "is-path-inside@npm:^3.0.3":
   version: 3.0.3
   resolution: "is-path-inside@npm:3.0.3"
@@ -14021,7 +14048,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"merge-descriptors@npm:1.0.3":
+"merge-descriptors@npm:1.0.3, merge-descriptors@npm:~1.0.0":
   version: 1.0.3
   resolution: "merge-descriptors@npm:1.0.3"
   checksum: 52117adbe0313d5defa771c9993fe081e2d2df9b840597e966aadafde04ae8d0e3da46bac7ca4efc37d4d2b839436582659cd49c6a43eacb3fe3050896a105d1
@@ -14484,6 +14511,13 @@ __metadata:
   version: 1.0.4
   resolution: "module-details-from-path@npm:1.0.4"
   checksum: 2ebfada5358492f6ab496b70f70a1042f2ee7a4c79d29467f59ed6704f741fb4461d7cecb5082144ed39a05fec4d19e9ff38b731c76228151be97227240a05b2
+  languageName: node
+  linkType: hard
+
+"module-not-found-error@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "module-not-found-error@npm:1.0.1"
+  checksum: ebd65339d4d5980dd55cd32dbf112ec02b8e33f30866312b94caeee4783322259f18cf2270e9d2e600df3bd1876c35612b87f5c2525c21885fb1f83e85a9b9b0
   languageName: node
   linkType: hard
 
@@ -15174,6 +15208,27 @@ __metadata:
     typescript:
       optional: true
   checksum: cefabd1b2f615e2e0600589a1d46e4f15b3f494d7347bcf96e7d3e388dcba36dd6e9b572650a4e7c0aeae1fd6796c02fb02f09db6c34f2f73606c8f174fef787
+  languageName: node
+  linkType: hard
+
+"ox@npm:0.9.1":
+  version: 0.9.1
+  resolution: "ox@npm:0.9.1"
+  dependencies:
+    "@adraffy/ens-normalize": ^1.11.0
+    "@noble/ciphers": ^1.3.0
+    "@noble/curves": ^1.9.1
+    "@noble/hashes": ^1.8.0
+    "@scure/bip32": ^1.7.0
+    "@scure/bip39": ^1.6.0
+    abitype: ^1.0.8
+    eventemitter3: 5.0.1
+  peerDependencies:
+    typescript: ">=5.4.0"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 577946f69fb8fa2b80fad359ae6e315e459209392109e43313b6bb59a127bdef8eb1844bdd924b87751cc0613d4fe4b64ac08c6e9514d9b7c53367e3f7394a44
   languageName: node
   linkType: hard
 
@@ -15941,6 +15996,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"proxyquire@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "proxyquire@npm:2.1.3"
+  dependencies:
+    fill-keys: ^1.0.2
+    module-not-found-error: ^1.0.1
+    resolve: ^1.11.1
+  checksum: a320f1a04d65aeb41625bfd6bbf848492523b730b07926b6c1ed48f9342f2a30c4a4c0b399e07391e76691b65f604773327767c33a8578e5e4ab19299ba46a02
+  languageName: node
+  linkType: hard
+
 "psl@npm:^1.1.28":
   version: 1.15.0
   resolution: "psl@npm:1.15.0"
@@ -16483,7 +16549,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@npm:^1.10.0, resolve@npm:^1.10.1, resolve@npm:^1.22.1, resolve@npm:^1.22.4":
+"resolve@npm:^1.10.0, resolve@npm:^1.10.1, resolve@npm:^1.11.1, resolve@npm:^1.22.1, resolve@npm:^1.22.4":
   version: 1.22.10
   resolution: "resolve@npm:1.22.10"
   dependencies:
@@ -16505,7 +16571,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@patch:resolve@^1.10.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.10.1#~builtin<compat/resolve>, resolve@patch:resolve@^1.22.1#~builtin<compat/resolve>, resolve@patch:resolve@^1.22.4#~builtin<compat/resolve>":
+"resolve@patch:resolve@^1.10.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.10.1#~builtin<compat/resolve>, resolve@patch:resolve@^1.11.1#~builtin<compat/resolve>, resolve@patch:resolve@^1.22.1#~builtin<compat/resolve>, resolve@patch:resolve@^1.22.4#~builtin<compat/resolve>":
   version: 1.22.10
   resolution: "resolve@patch:resolve@npm%3A1.22.10#~builtin<compat/resolve>::version=1.22.10&hash=c3c19d"
   dependencies:
@@ -18724,37 +18790,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.9.5":
-  version: 4.9.5
-  resolution: "typescript@npm:4.9.5"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: ee000bc26848147ad423b581bd250075662a354d84f0e06eb76d3b892328d8d4440b7487b5a83e851b12b255f55d71835b008a66cbf8f255a11e4400159237db
-  languageName: node
-  linkType: hard
-
-"typescript@npm:5.3.3":
-  version: 5.3.3
-  resolution: "typescript@npm:5.3.3"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 2007ccb6e51bbbf6fde0a78099efe04dc1c3dfbdff04ca3b6a8bc717991862b39fd6126c0c3ebf2d2d98ac5e960bcaa873826bb2bb241f14277034148f41f6a2
-  languageName: node
-  linkType: hard
-
-"typescript@npm:5.7.2":
-  version: 5.7.2
-  resolution: "typescript@npm:5.7.2"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: b55300c4cefee8ee380d14fa9359ccb41ff8b54c719f6bc49b424899d662a5ce62ece390ce769568c7f4d14af844085255e63788740084444eb12ef423b13433
-  languageName: node
-  linkType: hard
-
-"typescript@npm:^4.6.4 || ^5.2.2, typescript@npm:^5.5.4":
+"typescript@npm:5.9.2, typescript@npm:^4.6.4 || ^5.2.2":
   version: 5.9.2
   resolution: "typescript@npm:5.9.2"
   bin:
@@ -18764,37 +18800,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.9.5#~builtin<compat/typescript>":
-  version: 4.9.5
-  resolution: "typescript@patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=ad5954"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 8f6260acc86b56bfdda6004bc53f32ea548f543e8baef7071c8e34d29d292f3e375c8416556c8de10b24deef6933cd1c16a8233dc84a3dd43a13a13265d0faab
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@5.3.3#~builtin<compat/typescript>":
-  version: 5.3.3
-  resolution: "typescript@patch:typescript@npm%3A5.3.3#~builtin<compat/typescript>::version=5.3.3&hash=ad5954"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: f61375590b3162599f0f0d5b8737877ac0a7bc52761dbb585d67e7b8753a3a4c42d9a554c4cc929f591ffcf3a2b0602f65ae3ce74714fd5652623a816862b610
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@5.7.2#~builtin<compat/typescript>":
-  version: 5.7.2
-  resolution: "typescript@patch:typescript@npm%3A5.7.2#~builtin<compat/typescript>::version=5.7.2&hash=ad5954"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 803430c6da2ba73c25a21880d8d4f08a56d9d2444e6db2ea949ac4abceeece8e4a442b7b9b585db7d8a0b47ebda2060e45fe8ee8b8aca23e27ec1d4844987ee6
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@^4.6.4 || ^5.2.2#~builtin<compat/typescript>, typescript@patch:typescript@^5.5.4#~builtin<compat/typescript>":
+"typescript@patch:typescript@5.9.2#~builtin<compat/typescript>, typescript@patch:typescript@^4.6.4 || ^5.2.2#~builtin<compat/typescript>":
   version: 5.9.2
   resolution: "typescript@patch:typescript@npm%3A5.9.2#~builtin<compat/typescript>::version=5.9.2&hash=ad5954"
   bin:
@@ -19138,7 +19144,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^2.19.8, viem@npm:^2.21.8":
+"viem@npm:^2.21.8":
   version: 2.33.3
   resolution: "viem@npm:2.33.3"
   dependencies:
@@ -19156,6 +19162,27 @@ __metadata:
     typescript:
       optional: true
   checksum: 1053dd69197f23773d1a57d0c652938e4bc53458b1c58409a0f955514b678e207740b8fa54dcf4a0621b6d5ade5e1b8f024b809bfd94488163e4d761bc7725e7
+  languageName: node
+  linkType: hard
+
+"viem@npm:^2.36.0":
+  version: 2.36.0
+  resolution: "viem@npm:2.36.0"
+  dependencies:
+    "@noble/curves": 1.9.6
+    "@noble/hashes": 1.8.0
+    "@scure/bip32": 1.7.0
+    "@scure/bip39": 1.6.0
+    abitype: 1.0.8
+    isows: 1.0.7
+    ox: 0.9.1
+    ws: 8.18.3
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 9dc94f729b1035a91469976dd7ed3d4b4d54844e73eaacb5e518d1c4ab7dac84942358c676f19718f4637692a66d9fd0b5571ddcfa128566c1d369b891a1ddcc
   languageName: node
   linkType: hard
 
@@ -19891,6 +19918,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ws@npm:8.18.3, ws@npm:^8.5.0":
+  version: 8.18.3
+  resolution: "ws@npm:8.18.3"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: d64ef1631227bd0c5fe21b3eb3646c9c91229402fb963d12d87b49af0a1ef757277083af23a5f85742bae1e520feddfb434cb882ea59249b15673c16dc3f36e0
+  languageName: node
+  linkType: hard
+
 "ws@npm:^3.0.0":
   version: 3.3.3
   resolution: "ws@npm:3.3.3"
@@ -19914,21 +19956,6 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: f9bb062abf54cc8f02d94ca86dcd349c3945d63851f5d07a3a61c2fcb755b15a88e943a63cf580cbdb5b74436d67ef6b67f745b8f7c0814e411379138e1863cb
-  languageName: node
-  linkType: hard
-
-"ws@npm:^8.5.0":
-  version: 8.18.3
-  resolution: "ws@npm:8.18.3"
-  peerDependencies:
-    bufferutil: ^4.0.1
-    utf-8-validate: ">=5.0.2"
-  peerDependenciesMeta:
-    bufferutil:
-      optional: true
-    utf-8-validate:
-      optional: true
-  checksum: d64ef1631227bd0c5fe21b3eb3646c9c91229402fb963d12d87b49af0a1ef757277083af23a5f85742bae1e520feddfb434cb882ea59249b15673c16dc3f36e0
   languageName: node
   linkType: hard
 

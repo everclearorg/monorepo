@@ -1,4 +1,3 @@
-import { BigNumber, providers, utils } from 'ethers';
 import PriorityQueue from 'p-queue';
 import {
   createLoggingContext,
@@ -9,6 +8,7 @@ import {
   EverclearError,
   RequestContext,
 } from '@chimera-monorepo/utils';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import interval from 'interval-promise';
 
 import {
@@ -572,7 +572,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
         response: {
           hash: response.hash,
           nonce: response.nonce,
-          gasPrice: response.gasPrice ? utils.formatUnits(response.gasPrice, 'gwei') : undefined,
+          gasPrice: response.gasPrice ? chainWrapper.formatGwei(BigInt(response.gasPrice)) : undefined,
           gasLimit: response.gasLimit.toString(),
         },
         transaction: transaction.loggable,
@@ -735,7 +735,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
     // Here we wait for the target confirmations.
     // TODO: Ensure we are comfortable with how this timeout period is calculated.
     const timeout = this.config.confirmationTimeout * this.config.confirmations * 2;
-    let receipt: providers.TransactionReceipt;
+    let receipt: ITransactionReceipt;
     try {
       receipt = await this.confirmTransaction(transaction, this.config.confirmations, timeout);
     } catch (error: unknown) {
@@ -801,45 +801,39 @@ export class TransactionDispatch extends RpcProviderAggregator {
     const currentGasPrice = (transaction.gas.price ?? transaction.gas.maxPriorityFeePerGas)!;
     if (
       transaction.bumps >= transaction.hashes.length ||
-      BigNumber.from(currentGasPrice).gte(BigNumber.from(this.config.gasPriceMaximum))
+      BigInt(currentGasPrice) >= BigInt(this.config.gasPriceMaximum)
     ) {
       // If we've already bumped this tx but it's failed to resubmit, we should return here without bumping.
       // The number of gas bumps we've done should always be less than the number of txs we've submitted.
       this.logger.warn('Bump skipped.', requestContext, methodContext, {
         domain: this.domain,
         bumps: transaction.bumps,
-        gasPrice: utils.formatUnits(currentGasPrice, 'gwei'),
-        gasMaximum: utils.formatUnits(this.config.gasPriceMaximum, 'gwei'),
+        gasPrice: chainWrapper.formatGwei(BigInt(currentGasPrice)),
+        gasMaximum: chainWrapper.formatGwei(BigInt(this.config.gasPriceMaximum)),
       });
       return;
     }
     transaction.bumps++;
     // TODO: EIP-1559 support.
     // Get the current gas baseline price, in case it has changed drastically in the last block.
-    let updatedGasPrice: BigNumber;
+    let updatedGasPrice: bigint;
     try {
-      updatedGasPrice = BigNumber.from(await this.getGasPrice(requestContext, false));
+      updatedGasPrice = BigInt(await this.getGasPrice(requestContext, false));
     } catch {
-      updatedGasPrice = BigNumber.from(this.config.gasPriceMinimum);
+      updatedGasPrice = BigInt(this.config.gasPriceMinimum);
     }
-    const determinedBaseline = updatedGasPrice.gt(currentGasPrice) ? updatedGasPrice : BigNumber.from(currentGasPrice);
+    const determinedBaseline = updatedGasPrice > BigInt(currentGasPrice) ? updatedGasPrice : BigInt(currentGasPrice);
     // Scale up gas by percentage as specified by config.
     if (transaction.type === 0) {
-      transaction.gas.price = determinedBaseline
-        .add(determinedBaseline.mul(this.config.gasPriceReplacementBumpPercent).div(100))
-        .add(1)
-        .toString();
+      transaction.gas.price = (determinedBaseline + (determinedBaseline * BigInt(this.config.gasPriceReplacementBumpPercent)) / BigInt(100) + BigInt(1)).toString();
     } else {
-      transaction.gas.maxPriorityFeePerGas = determinedBaseline
-        .add(determinedBaseline.mul(this.config.gasPriceReplacementBumpPercent).div(100))
-        .add(1)
-        .toString();
+      transaction.gas.maxPriorityFeePerGas = (determinedBaseline + (determinedBaseline * BigInt(this.config.gasPriceReplacementBumpPercent)) / BigInt(100) + BigInt(1)).toString();
     }
 
     this.logger.info(`Tx bumped.`, requestContext, methodContext, {
       domain: this.domain,
-      updatedGasPrice: utils.formatUnits(updatedGasPrice, 'gwei'),
-      previousGasPrice: utils.formatUnits(currentGasPrice, 'gwei'),
+      updatedGasPrice: chainWrapper.formatGwei(updatedGasPrice),
+      previousGasPrice: chainWrapper.formatGwei(BigInt(currentGasPrice)),
       transaction: transaction.loggable,
     });
   }
