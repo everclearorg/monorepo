@@ -62,6 +62,7 @@ abstract contract Everclear {
 
   IEverclearHub public constant HUB = IEverclearHub(0x372396818F125b8f3AA5a73e70C30F54c6195331);
   IHubGateway public constant HUB_GATEWAY = IHubGateway(0xe5F2F4afAd6211cfBD6a882D5a6a435530Ee3909);
+  address public constant HUB_IMPL = 0xEa7fBf043eAbE43ACe71d5c3B24E26A76DB329a1;
 
   address public HUB_MANAGER = address(0x53c91cFc48a3B9e30C3E73a6eDCb584917C19Ab4);
   address public SETTLER = address(0xcebcc29F32C5f23251Dd218e28485e3a02e83bED);
