@@ -3016,11 +3016,220 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   }
 
   // ============ Discount Maths ============ //
-  function test_hubUpgradeSwaps_invoiceNotDiscounted() public {}
+  function test_hubUpgradeSwaps_invoiceNotDiscounted() public {
+    _upgradeHub();
 
-  function test_hubUpgradeSwaps_invoiceDiscountedFiveTimes() public {}
+    // configuring the discount per epoch to xyz
+    bytes32 _tickerHash = keccak256('USDC');
+    _configureToken(_tickerHash);
 
-  // ============ Fee Maths ============ //
+    // processing the deposits, invoices, and settlements for USDC //
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intents, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, WETH_ARBITRUM, ETHEREUM, _destinations, false);
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intents[0]));
+
+    // sending intent message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.ADDED));
+
+    // Sending the fill before the intent arrives
+    // constructing the fill message
+    uint32[] memory _solverDestinations = _getDestinations(42_161);
+    uint256 _amountOut = _intents[0].amountOutMin;
+    address _solver = address(0x123);
+    (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
+      _intentIds[0],
+      _solver,
+      _amountOut,
+      _solverDestinations,
+      USDC_MAINNET.toBytes32(),
+      ETHEREUM,
+      uint48(block.timestamp)
+    );
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_fillMessage);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.ADDED_AND_FILLED));
+    _assertFillInfo(_intentIds[0], _fill);
+
+    // processing the deposits - skipping one epoch ahead (i.e. zero discount)
+    vm.roll(block.number + hubProxy.epochLength());
+    hubProxy.processDepositsAndInvoices(_tickerHash, 5, 5, 5);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.INVOICED));
+
+    // processing the invoice
+    _updateCustodiedAssets(USDC_ARBITRUM_ASSET_HASH, _intents[0].amount);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 5, 5, 5);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing settlement queue
+    bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_ARBITRUM.toBytes32(), _intents);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
+    );
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
+  }
+
+  function test_hubUpgradeSwaps_invoiceDiscountedFiveTimes_Swap() public {
+    _upgradeHub();
+
+    // configuring the discount per epoch to 10 BPS
+    bytes32 _tickerHash = keccak256('USDC');
+    _configureToken(_tickerHash);
+
+    // processing the deposits, invoices, and settlements for USDC //
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intents, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, WETH_ARBITRUM, ETHEREUM, _destinations, false);
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intents[0]));
+
+    // sending intent message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.ADDED));
+
+    // Sending the fill before the intent arrives
+    // constructing the fill message
+    uint32[] memory _solverDestinations = _getDestinations(42_161);
+    uint256 _amountOut = _intents[0].amountOutMin;
+    address _solver = address(0x123);
+    (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
+      _intentIds[0],
+      _solver,
+      _amountOut,
+      _solverDestinations,
+      USDC_MAINNET.toBytes32(),
+      ETHEREUM,
+      uint48(block.timestamp)
+    );
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_fillMessage);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.ADDED_AND_FILLED));
+    _assertFillInfo(_intentIds[0], _fill);
+
+    // processing the deposits - skipping one epoch ahead (i.e. zero discount)
+    vm.roll(block.number + 20);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 5, 5, 5);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.INVOICED));
+
+    // Creating an intent to match liquidity and rolling to create a discount
+    // Arbitrum to Mainnet intents //
+    // constructing the intent messages
+    vm.roll(block.number + (hubProxy.epochLength() * 5));
+    _destinations = _getDestinations(1);
+    (IEverclearV2.Intent[] memory _matchIntent, bytes memory _matchIntentMessage) =
+      _configureIntentMessages(1, USDC_ARBITRUM, USDC_MAINNET, ARBITRUM, _destinations, true);
+
+    // sending intent message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_matchIntentMessage);
+
+    // processing the invoice
+    hubProxy.processDepositsAndInvoices(_tickerHash, 2, 2, 2);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing settlement queue
+    _intents[0].amount = _intents[0].amount - (_intents[0].amount * (100 * 5)) / 100_000;
+    bytes memory _calldata =
+      _constructSettlementInfoArrayWithCustomId(_solver.toBytes32(), USDC_ARBITRUM.toBytes32(), _intentIds, _intents);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
+    );
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
+  }
+
+  function test_hubUpgradeSwaps_invoiceDiscountedTenTimes_Bridge() public {
+    _upgradeHub();
+
+    // configuring the discount per epoch to xyz
+    bytes32 _tickerHash = keccak256('USDC');
+    _configureToken(_tickerHash);
+
+    // processing the deposits, invoices, and settlements for USDC //
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intents, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, USDC_ARBITRUM, ETHEREUM, _destinations, false);
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intents[0]));
+
+    // sending intent message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.ADDED));
+
+    // Sending the fill before the intent arrives
+    // constructing the fill message
+    uint32[] memory _solverDestinations = _getDestinations(42_161);
+    uint256 _amountOut = _intents[0].amountOutMin;
+    address _solver = address(0x123);
+    (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
+      _intentIds[0],
+      _solver,
+      _amountOut,
+      _solverDestinations,
+      USDC_MAINNET.toBytes32(),
+      ETHEREUM,
+      uint48(block.timestamp)
+    );
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_fillMessage);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.ADDED_AND_FILLED));
+    _assertFillInfo(_intentIds[0], _fill);
+
+    // processing the deposits - skipping one epoch ahead (i.e. zero discount)
+    vm.roll(block.number + 20);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 5, 5, 5);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.INVOICED));
+
+    // Creating an intent to lead to a discount - 10 epochs
+    // Arbitrum to Mainnet intents //
+    // constructing the intent messages
+    vm.roll(block.number + (hubProxy.epochLength() * 10));
+    _destinations = _getDestinations(1);
+    (IEverclearV2.Intent[] memory _matchIntent, bytes memory _matchIntentMessage) =
+      _configureIntentMessages(1, USDC_ARBITRUM, USDC_MAINNET, ARBITRUM, _destinations, true);
+
+    // sending intent message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_matchIntentMessage);
+
+    // processing the invoice
+    hubProxy.processDepositsAndInvoices(_tickerHash, 2, 2, 2);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing settlement queue
+    _intents[0].amount = _intents[0].amount - (_intents[0].amount * (100 * 10)) / 100_000;
+    bytes memory _calldata =
+      _constructSettlementInfoArrayWithCustomId(_solver.toBytes32(), USDC_ARBITRUM.toBytes32(), _intentIds, _intents);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', ARBITRUM, _calldata, DEFAULT_GAS_LIMIT)
+    );
+    hubProxy.processSettlementQueue(ARBITRUM, 1, DEFAULT_GAS_LIMIT);
+  }
 
   // ============ Asset Manager Functions ============ //
   function test_hubUpgradeSwaps_setAdoptedForAssets(
