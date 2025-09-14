@@ -324,8 +324,6 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.UNSUPPORTED_RETURNED));
   }
 
-  function test_hubUpgradeSwaps_withdrawFees() public {}
-
   // ============ Receive Message ============ //
   // ============ Netting Path ============ //
   function test_hubUpgradeSwaps_receiveMessage_IntentNettingPath_Added() public {
@@ -874,6 +872,8 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     // processing the deposits and invoices for USDC //
     bytes32 _tickerHash = keccak256('USDC');
     hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // processing the settlement queue from the fork //
     hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
 
     // Mainnet to Arbitrum intents //
@@ -934,7 +934,73 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
   }
 
-  function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_MemValues_ToSettlement() public {}
+  function test_hubUpgradeSwaps_receiveMessage_SolverBridgePath_MemValues_ToSettlement() public {
+    _upgradeHub();
+
+    // processing the deposits, invoices, and settlements for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intents, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, USDC_ARBITRUM, ETHEREUM, _destinations, false);
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intents[0]));
+
+    // sending intent message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intents);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.ADDED));
+
+    // Setting the memvalues for the solver //
+    address _solver = address(0x123);
+    uint32[] memory _domains = new uint32[](2);
+    _domains[0] = ARBITRUM;
+    _domains[1] = OPTIMISM;
+    vm.prank(_solver);
+    hubProxy.setUserSupportedDomains(_domains);
+
+    // Configuring liquidity to be 0
+    _updateCustodiedAssets(USDC_ARBITRUM_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_OPTIMISM_ASSET_HASH, _intents[0].amount);
+
+    // Sending the fill before the intent arrives
+    // constructing the fill message
+    uint32[] memory _solverDestinations = _getDestinations(1);
+    uint256 _amountOut = _intents[0].amountOutMin;
+    (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
+      _intentIds[0],
+      _solver,
+      _amountOut,
+      _solverDestinations,
+      USDC_MAINNET.toBytes32(),
+      ETHEREUM,
+      uint48(block.timestamp)
+    );
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_fillMessage);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.ADDED_AND_FILLED));
+    _assertFillInfo(_intentIds[0], _fill);
+
+    // processing the deposits
+    vm.roll(block.number + 20);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 5, 5, 5);
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing settlement queue
+    bytes memory _calldata = _constructSettlementInfo(_solver.toBytes32(), USDC_OPTIMISM.toBytes32(), _intents);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, DEFAULT_GAS_LIMIT)
+    );
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
+  }
 
   function test_hubUpgradeSwaps_receiveMessage_SolverSwapPath_DifferentSettlementDestination() public {
     _upgradeHub();
@@ -2155,7 +2221,24 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(uint8(_prioritizedStrategy), uint8(_strategy), 'prioritized strategy not set correctly');
   }
 
-  function test_hubUpgradeSwaps_setLastClosedEpochProcessed() public {}
+  function test_hubUpgradeSwaps_setLastClosedEpochProcessed() public {
+    _upgradeHub();
+
+    // configuring the params
+    uint48 _lastEpochProcessed = uint48(block.number);
+    IAssetManagerV2.SetLastClosedEpochProcessedParams memory _params;
+    _params.lastEpochProcessed = _lastEpochProcessed;
+    _params.tickerHashes = new bytes32[](1);
+    _params.tickerHashes[0] = keccak256('USDC');
+
+    // setting the state
+    vm.prank(hubProxy.owner());
+    hubProxy.setLastClosedEpochProcessed(_params);
+
+    // asserting the state change
+    EverclearHubV2 _hub = EverclearHubV2(address(hubProxy));
+    assertEq(_hub.lastClosedEpochsProcessed(keccak256('USDC')), _lastEpochProcessed);
+  }
 
   function test_hubUpgradeSwaps_setDiscountPerEpoch() public {
     _upgradeHub();
@@ -2414,7 +2497,13 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   }
 
   function test_hubUpgradeSwaps_updateEpochLength() public {
-    // TODO: This does not work due to block number issue
+    _upgradeHub();
+
+    uint48 _epochLength = 55;
+    vm.prank(hubProxy.owner());
+    hubProxy.updateEpochLength(_epochLength);
+
+    assertEq(hubProxy.epochLength(), _epochLength);
   }
 
   function test_hubUpgradeSwaps_updateGasConfig() public {
@@ -2435,7 +2524,20 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(bufferDBPS, config.bufferDBPS);
   }
 
-  function test_hubUpgradeSwaps_setMaxDiscountDBPS() public {}
+  function test_hubUpgradeSwaps_setMaxDiscountDBPS() public {
+    _upgradeHub();
+
+    // configuring the inputs
+    bytes32 _tickerHash = keccak256('USDC');
+    uint24 _maxDiscount = 20_000; // 2000 BPS
+
+    vm.prank(hubProxy.owner());
+    hubProxy.setMaxDiscountDbps(_tickerHash, _maxDiscount);
+
+    // EverclearHubV2 _hub = EverclearHubV2(address(hubProxy));
+    (uint24 _maxDiscountDbps,,) = hubProxy.tokenConfigs(_tickerHash);
+    assertEq(_maxDiscountDbps, _maxDiscount);
+  }
 
   // ============ Upgrades Functions ============ //
   function test_hubUpgradeSwaps_updateModuleAddress_Settlement() public {
@@ -2483,7 +2585,16 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   }
 
   // ============ Revert Checks ============ //
-  function test_hubUpgradeSwaps_checkUnsupported_DoesNotRevert() public {}
+  function testRevert_hubUpgradeSwaps_receiveMessage_Unauthorized() public {
+    _upgradeHub();
+
+    // configuring the params
+    bytes memory _data = abi.encodePacked(uint256(1), uint256(2), uint256(3));
+
+    // expecting revert
+    vm.expectRevert(IHubStorageV2.HubStorage_Unauthorized.selector);
+    hubProxy.receiveMessage(_data);
+  }
 
   function testRevert_hubUpgradeSwaps_processSettlementQueue_DomainNotsupported() public {
     _upgradeHub();
@@ -2539,37 +2650,6 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   }
 
   // ============== Helpers ================= //
-  function _configureIntentMessages(
-    uint256 _total,
-    address _inputAsset,
-    address _outputAsset,
-    uint32 _origin,
-    uint32[] memory _destinations,
-    bool _netting
-  ) internal returns (IEverclearV2.Intent[] memory _intents, bytes memory _message) {
-    _intents = new IEverclearV2.Intent[](_total);
-    for (uint256 i; i < _total; i++) {
-      address _initiator = address(uint160(uint256(keccak256(abi.encodePacked(i, 'initiator')))));
-      address _receiver = address(uint160(uint256(keccak256(abi.encodePacked(i, 'receiver')))));
-
-      _intents[i] = IEverclearV2.Intent({
-        initiator: _initiator.toBytes32(),
-        receiver: _receiver.toBytes32(),
-        inputAsset: _inputAsset.toBytes32(),
-        outputAsset: _outputAsset.toBytes32(),
-        origin: _origin,
-        nonce: testNonce++,
-        timestamp: uint48(block.timestamp),
-        ttl: _netting ? 0 : 2 hours,
-        amount: 1000e18,
-        amountOutMin: _netting ? 0 : 990e18,
-        destinations: _destinations,
-        data: ''
-      });
-    }
-    _message = MessageLibV2.formatIntentMessageBatch(_intents);
-  }
-
   function _assertIntentsReceived(
     IEverclearV2.Intent[] memory _intents
   ) internal view {
