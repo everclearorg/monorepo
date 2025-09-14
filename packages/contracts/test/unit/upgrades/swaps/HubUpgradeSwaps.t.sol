@@ -2977,7 +2977,20 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(_maxDiscountDbps, _maxDiscount);
   }
 
-  function test_hubUpgradeSwaps_setMaxDiscountDBPS() public {}
+  function test_hubUpgradeSwaps_setMaxDiscountDBPS() public {
+    _upgradeHub();
+
+    // configuring the inputs
+    bytes32 _tickerHash = keccak256('USDC');
+    uint24 _maxDiscount = 20_000; // 2000 BPS
+
+    vm.prank(hubProxy.owner());
+    hubProxy.setMaxDiscountDbps(_tickerHash, _maxDiscount);
+
+    // EverclearHubV2 _hub = EverclearHubV2(address(hubProxy));
+    (uint24 _maxDiscountDbps,,) = hubProxy.tokenConfigs(_tickerHash);
+    assertEq(_maxDiscountDbps, _maxDiscount);
+  }
 
   // ============ Upgrades Functions ============ //
   function test_hubUpgradeSwaps_updateModuleAddress_Settlement() public {
