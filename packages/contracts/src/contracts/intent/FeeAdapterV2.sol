@@ -398,7 +398,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
     bytes calldata _sig
   ) internal {
     // Verify the signature on the fee
-    _verifySignature(abi.encode(_tokenFee, _nativeFee, _inputAsset, _deadline), _sig);
+    _verifySignature(abi.encode(_tokenFee, _nativeFee, _inputAsset, _deadline, msg.sender, block.chainid), _sig);
 
     // Verify the ttl is valid
     if (block.timestamp > _deadline) {

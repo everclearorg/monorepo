@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
+import {MessageLibV2} from 'contracts/common/MessageLibV2.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
 import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
@@ -370,5 +371,36 @@ contract UpgradeHelper is SafeTxBuilder {
         });
       }
     }
+  }
+
+  function _configureIntentMessages(
+    uint256 _total,
+    address _inputAsset,
+    address _outputAsset,
+    uint32 _origin,
+    uint32[] memory _destinations,
+    bool _netting
+  ) internal returns (IEverclearV2.Intent[] memory _intents, bytes memory _message) {
+    _intents = new IEverclearV2.Intent[](_total);
+    for (uint256 i; i < _total; i++) {
+      address _initiator = address(uint160(uint256(keccak256(abi.encodePacked(i, 'initiator')))));
+      address _receiver = address(uint160(uint256(keccak256(abi.encodePacked(i, 'receiver')))));
+
+      _intents[i] = IEverclearV2.Intent({
+        initiator: _initiator.toBytes32(),
+        receiver: _receiver.toBytes32(),
+        inputAsset: _inputAsset.toBytes32(),
+        outputAsset: _outputAsset.toBytes32(),
+        origin: _origin,
+        nonce: testNonce++,
+        timestamp: uint48(block.timestamp),
+        ttl: _netting ? 0 : 2 hours,
+        amount: 1000e18,
+        amountOutMin: _netting ? 0 : 990e18,
+        destinations: _destinations,
+        data: ''
+      });
+    }
+    _message = MessageLibV2.formatIntentMessageBatch(_intents);
   }
 }
