@@ -205,6 +205,11 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   error EverclearSpoke_Initialize_FillQueueNotEmpty();
 
+  /**
+   * @notice Thrown when the array length invalid in a batch fill
+   */
+  error EverclearSpoke_FillIntent_InvalidArrayLengths();
+
   /*///////////////////////////////////////////////////////////////
                               LOGIC
   //////////////////////////////////////////////////////////////*/
@@ -329,6 +334,30 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     bytes calldata _data,
     Permit2Params calldata _permit2Params
   ) external returns (bytes32 _intentId, Intent memory _intent);
+
+  /**
+   * @notice Fills a batch of intents
+   * @param _intents The intents to fill
+   * @param _amountOut The amounts of the assets the solver is sending to the users
+   * @param _destinations The destinations for the repayment
+   */
+  function batchFillIntent(
+    Intent[] calldata _intents,
+    uint256[] calldata _amountOut,
+    uint32[][] calldata _destinations
+  ) external returns (FillMessage[] memory _fillMessages);
+
+  /**
+   * @notice Fills a batch of intents
+   * @param _intents The intents to fill
+   * @param _amountOut The amounts of the assets the solver is sending to the users
+   * @param _destinations The destinations for the repayment
+   */
+  function batchFillIntentWithPull(
+    Intent[] calldata _intents,
+    uint256[] calldata _amountOut,
+    uint32[][] calldata _destinations
+  ) external returns (FillMessage[] memory _fillMessages);
 
   /**
    * @notice fills an intent
