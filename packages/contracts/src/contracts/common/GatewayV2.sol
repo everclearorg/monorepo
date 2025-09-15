@@ -126,9 +126,7 @@ abstract contract GatewayV2 is GasTank, IGatewayV2, IMessageRecipient, ISpecifie
   function updateMailbox(
     address _newMailbox
   ) external onlyReceiver validAddress(_newMailbox.toBytes32()) {
-    address _oldMailbox = address(mailbox);
-    mailbox = IMailbox(_newMailbox);
-    emit MailboxUpdated(_oldMailbox, _newMailbox);
+    revert Gateway_Deprecated_SingletonMailbox();
   }
 
   /// @inheritdoc IGatewayV2
