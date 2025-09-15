@@ -89,9 +89,12 @@ class BaseSyncProvider {
         },
         blockExplorers: {
           default: { name: 'Explorer', url: 'https://etherscan.io' }
-        }
+        },
       },
       transport: chainWrapper.http(this.connectionInfo.url),
+      batch: {
+        multicall: true,
+      },
     }) as PublicClient;
   }
 
