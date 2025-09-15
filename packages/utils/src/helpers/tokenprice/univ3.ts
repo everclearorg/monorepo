@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AssetConfig } from '../../types';
-import { chainWrapper, type PublicClient } from '../chain';
+import { type PublicClient } from '../chain';
 
 export const univ3PoolABI = [
   {
@@ -71,27 +71,12 @@ export const getTokenPriceFromUniV3 = async (
    *
    * For more info, refer to the uniswap docs: https://docs.uniswap.org/concepts/protocol/oracle#deriving-price-from-a-tick
    **/
-  const encodedDataForSlot0 = chainWrapper.encodeFunctionData({
+  const result = (await client.readContract({
+    address: pool as `0x${string}`,
     abi: univ3PoolABI,
     functionName: 'slot0',
-  });
+  })) as [bigint, number, number, number, number, number, boolean];
 
-  const encodedResultData = await client.request({
-    method: 'eth_call',
-    params: [
-      {
-        to: pool as `0x${string}`,
-        data: encodedDataForSlot0,
-      },
-      'latest',
-    ],
-  });
-
-  const result = chainWrapper.decodeFunctionResult({
-    abi: univ3PoolABI,
-    functionName: 'slot0',
-    data: encodedResultData as `0x${string}`,
-  }) as any[];
   const tick = result[1];
 
   const P = 1.0001;

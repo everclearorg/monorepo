@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { reset, restore, stub } from 'sinon';
 import { getTokenPriceFromUniV2, univ2PairABI } from "../../../src";
-import { PublicClient, encodeFunctionResult } from 'viem';
+import { PublicClient } from 'viem';
 
 describe('univ2', () => {
   let mockClient: PublicClient;
@@ -10,7 +10,7 @@ describe('univ2', () => {
     reset();
     restore();
     mockClient = {
-      request: stub().resolves(''),
+      readContract: stub().resolves(['100', '200', '100']),
     } as any;
   });
   
@@ -21,14 +21,6 @@ describe('univ2', () => {
   
   describe('#getTokenPriceFromUniV2', () => {
     it('happy: should return price', async () => {
-      const mockEncodedResult = encodeFunctionResult({
-        abi: univ2PairABI,
-        functionName: 'getReserves',
-        result: ['100', '200', '100'],
-      });
-      
-      (mockClient.request as any).resolves(mockEncodedResult);
-
       const token0Price = await getTokenPriceFromUniV2(
         '1111',
         '0x',
@@ -38,11 +30,16 @@ describe('univ2', () => {
       );
       
       expect(token0Price).to.be.eq(2);
-      expect(mockClient.request).to.have.been.calledOnce;
+      expect(mockClient.readContract).to.have.been.calledOnce;
+      expect(mockClient.readContract).to.have.been.calledWith({
+        address: '0x',
+        abi: univ2PairABI,
+        functionName: 'getReserves',
+      });
     });
 
     it('should handle client request errors', async () => {
-      (mockClient.request as any).rejects(new Error('RPC Error'));
+      (mockClient.readContract as any).rejects(new Error('RPC Error'));
 
       await expect(getTokenPriceFromUniV2(
         '1111',

@@ -239,52 +239,18 @@ export const getHyperlaneMsgDelivered = async (
     transport: chainWrapper.http(bestProvider),
   });
 
-  const mailboxData = chainWrapper.encodeFunctionData({
+  const mailbox = await client.readContract({
+    address: gateway as `0x${string}`,
     abi: getGatewayInterface(),
     functionName: 'mailbox',
-    args: [],
   });
 
-  const mailboxResult = await client.request({
-    method: 'eth_call',
-    params: [
-      {
-        to: gateway as `0x${string}`,
-        data: mailboxData,
-      },
-      'latest',
-    ],
-  });
-
-  const mailbox = chainWrapper.decodeFunctionResult({
-    abi: getGatewayInterface(),
-    functionName: 'mailbox',
-    data: mailboxResult as `0x${string}`,
-  });
-
-  const deliveredData = chainWrapper.encodeFunctionData({
+  const delivered = await client.readContract({
+    address: mailbox as `0x${string}`,
     abi: getMailboxInterface(),
     functionName: 'delivered',
     args: [messageId],
   });
-
-  const deliveredResult = await client.request({
-    method: 'eth_call',
-    params: [
-      {
-        to: mailbox as `0x${string}`,
-        data: deliveredData,
-      },
-      'latest',
-    ],
-  });
-
-  const result = chainWrapper.decodeFunctionResult({
-    abi: getMailboxInterface(),
-    functionName: 'delivered',
-    data: deliveredResult as `0x${string}`,
-  }) as any[];
-  const delivered = result[0];
 
   return delivered as boolean;
 };

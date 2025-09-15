@@ -62,27 +62,12 @@ export const getTokenPriceFromChainlink = async (
   priceFeed: string,
   client: PublicClient,
 ): Promise<number> => {
-  const encodedData = chainWrapper.encodeFunctionData({
+  const result = (await client.readContract({
+    address: priceFeed as `0x${string}`,
     abi: aggregatorV3InterfaceABI,
     functionName: 'latestRoundData',
-  });
+  })) as [bigint, bigint, bigint, bigint, bigint];
 
-  const encodedPriceResult = await client.request({
-    method: 'eth_call',
-    params: [
-      {
-        to: priceFeed as `0x${string}`,
-        data: encodedData,
-      },
-      'latest',
-    ],
-  });
-
-  const result = chainWrapper.decodeFunctionResult({
-    abi: aggregatorV3InterfaceABI,
-    functionName: 'latestRoundData',
-    data: encodedPriceResult as `0x${string}`,
-  }) as any[];
   const answer = result[1];
   return +chainWrapper.formatUnits(answer, 8);
 };

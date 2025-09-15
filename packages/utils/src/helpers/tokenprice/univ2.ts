@@ -51,27 +51,12 @@ export const getTokenPriceFromUniV2 = async (
   token1: AssetConfig,
   client: PublicClient,
 ): Promise<number> => {
-  const encodedDataForGetReserves = chainWrapper.encodeFunctionData({
+  const result = (await client.readContract({
+    address: pair as `0x${string}`,
     abi: univ2PairABI,
     functionName: 'getReserves',
-  });
+  })) as [bigint, bigint, number];
 
-  const encodedResultData = await client.request({
-    method: 'eth_call',
-    params: [
-      {
-        to: pair as `0x${string}`,
-        data: encodedDataForGetReserves,
-      },
-      'latest',
-    ],
-  });
-
-  const result = chainWrapper.decodeFunctionResult({
-    abi: univ2PairABI,
-    functionName: 'getReserves',
-    data: encodedResultData as `0x${string}`,
-  }) as any[];
   const reserve0 = result[0];
   const reserve1 = result[1];
 

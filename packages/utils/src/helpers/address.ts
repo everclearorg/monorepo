@@ -9,7 +9,6 @@ import { publicKeyConvert } from 'secp256k1';
  * @returns the address
  */
 export const getAddressFromPublicKey = (publicKey: string): Address => {
-  // Remove 0x prefix if present
   let key = publicKey.replace(/^0x/, '');
 
   // Validate that the key contains only valid hex characters
@@ -19,7 +18,6 @@ export const getAddressFromPublicKey = (publicKey: string): Address => {
 
   // Ensure we have the uncompressed format (04 prefix (optional) + 64 bytes)
   if (key.length === 130 && key.startsWith('04')) {
-    // Already has 04 prefix, use as is
     key = key.slice(2);
   } else if (key.length !== 128) {
     throw new Error('Invalid public key format');

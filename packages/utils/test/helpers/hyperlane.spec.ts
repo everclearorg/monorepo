@@ -11,8 +11,7 @@ import {
   getHyperlaneMsgDelivered,
   HyperlaneStatus,
   HYPERLANE_GRAPHQL_URL
-} from '../../src/helpers/hyperlane';
-import { axiosGet } from '../../src/helpers/axios';
+} from '../../src';
 
 describe('Hyperlane Helper Functions', () => {
   afterEach(() => {
@@ -375,13 +374,13 @@ describe('Hyperlane Helper Functions', () => {
       
       // Mock chainWrapper functions
       const createPublicClientStub = stub().returns({
-        request: stub().resolves('0x1234567890123456789012345678901234567890'),
+        readContract: stub()
+          .onFirstCall().resolves('0x1234567890123456789012345678901234567890') // mailbox call
+          .onSecondCall().resolves(true), // delivered call
       });
       stub(require('../../src/helpers/chain'), 'chainWrapper').value({
         ...require('../../src/helpers/chain').chainWrapper,
         createPublicClient: createPublicClientStub,
-        encodeFunctionData: stub().returns('0xencoded'),
-        decodeFunctionResult: stub().returns([true]),
         http: stub().returns({}),
       });
       
@@ -416,13 +415,13 @@ describe('Hyperlane Helper Functions', () => {
       
       // Mock chainWrapper functions
       const createPublicClientStub = stub().returns({
-        request: stub().resolves('0x1234567890123456789012345678901234567890'),
+        readContract: stub()
+          .onFirstCall().resolves('0x1234567890123456789012345678901234567890') // mailbox call
+          .onSecondCall().resolves(false), // delivered call
       });
       stub(require('../../src/helpers/chain'), 'chainWrapper').value({
         ...require('../../src/helpers/chain').chainWrapper,
         createPublicClient: createPublicClientStub,
-        encodeFunctionData: stub().returns('0xencoded'),
-        decodeFunctionResult: stub().returns([false]),
         http: stub().returns({}),
       });
       
@@ -455,13 +454,13 @@ describe('Hyperlane Helper Functions', () => {
       
       // Mock chainWrapper functions
       const createPublicClientStub = stub().returns({
-        request: stub().resolves('0x1234567890123456789012345678901234567890'),
+        readContract: stub()
+          .onFirstCall().resolves('0x1234567890123456789012345678901234567890') // mailbox call
+          .onSecondCall().resolves(false), // delivered call
       });
       stub(require('../../src/helpers/chain'), 'chainWrapper').value({
         ...require('../../src/helpers/chain').chainWrapper,
         createPublicClient: createPublicClientStub,
-        encodeFunctionData: stub().returns('0xencoded'),
-        decodeFunctionResult: stub().returns([false]),
         http: stub().returns({}),
       });
       
