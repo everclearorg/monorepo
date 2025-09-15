@@ -71,6 +71,11 @@ interface IGatewayV2 {
    */
   error Gateway_ZeroAddress();
 
+  /**
+   * @notice Thrown when trying to set a singleton mailbox on a GatewayV2
+   */
+  error Gateway_Deprecated_SingletonMailbox();
+
   /*///////////////////////////////////////////////////////////////
                               LOGIC
   //////////////////////////////////////////////////////////////*/

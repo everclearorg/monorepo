@@ -407,8 +407,17 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
     vm.stopPrank();
   }
 
-  // TODO:
-  function testRevert_hubGatewayUpgrade_SendMessage_UnsuccessfulRebate() public {}
+  function testRevert_hubGatewayUpgrade_updateMailbox_DeprecatedFunction() public {
+    // Setting up and updating the gateway
+    _setupTest();
+    _upgradeGateway();
+
+    // Trying to update the mailbox
+    vm.startPrank(address(hubGatewayProxy.receiver()));
+    vm.expectRevert(IGatewayV2.Gateway_Deprecated_SingletonMailbox.selector);
+    hubGatewayProxy.updateMailbox(address(0x123));
+    vm.stopPrank();
+  }
 
   ////////////////////////////// Revert Cases - Address Input //////////////////////////////
   function testRevert_hubGatewayUpgrade_setChainGateway_InvalidAddress() public {
