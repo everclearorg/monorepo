@@ -774,20 +774,18 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       _fillsToProcess[_i] = _fillIntentAndAssert(_solver, _intents[_i], _solverDestinations);
     }
 
-    bytes memory _batchFillmessage = MessageLibV2.formatFillMessageBatch(_fillsToProcess);
-    metadata = StandardHookMetadata.formatMetadata(0, MESSAGE_GAS_LIMIT, SPOKE_GATEWAY_MAINNET, '');
+    bytes memory _batchFillMessage = MessageLibV2.formatFillMessageBatch(_fillsToProcess);
 
-    // TODO: The fill event is failing
-    // // processing the fillQueue
-    // vm.expectCall(
-    //   address(MAILBOX_MAINNET),
-    //   abi.encodeWithSignature(
-    //     'dispatch(uint32,bytes32,bytes,bytes)', HUB_ID, HUB_GATEWAY_PROD, _batchFillmessage, metadata
-    //   )
-    // );
+    // processing the fillQueue
+    vm.expectCall(
+      address(spokeProxyV5.gateway()),
+      abi.encodeWithSignature(
+        'sendMessage(uint32,bytes,uint256)', HUB_ID, _batchFillMessage, MESSAGE_GAS_LIMIT
+      )
+    );    
 
     vm.startPrank(lightHouse);
-    spokeProxyV5.processFillQueue{value: _messageFee}(uint32(_intents.length));
+    spokeProxyV5.processFillQueue{value: _messageFee}(uint32(_fillsToProcess.length));
   }
 
   function test_spokeUpgradeSwaps_processIntentQueueViaRelayer(
@@ -865,8 +863,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       _fillsToProcess[_i] = _fillIntentAndAssert(_solver, _intents[_i], _solverDestinations);
     }
 
-    bytes memory _batchFillmessage = MessageLibV2.formatFillMessageBatch(_fillsToProcess);
-    metadata = StandardHookMetadata.formatMetadata(0, MESSAGE_GAS_LIMIT, SPOKE_GATEWAY_MAINNET, '');
+    bytes memory _batchFillMessage = MessageLibV2.formatFillMessageBatch(_fillsToProcess);
 
     // constructing the signature and inputs
     uint256 _ttl = block.timestamp + 1 hours;
@@ -880,7 +877,14 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       )
     );
 
-    // TODO: Checking event emissions
+    // processing the fillQueue
+    uint256 _fee = ISpokeGateway(spokeProxy.gateway()).quoteMessage(HUB_ID, _batchFillMessage,MESSAGE_GAS_LIMIT);
+    vm.expectCall(
+      address(spokeProxyV5.gateway()),
+      abi.encodeWithSignature(
+        'sendMessage(uint32,bytes,uint256,uint256)', HUB_ID, _batchFillMessage, _fee, MESSAGE_GAS_LIMIT
+      )
+    ); 
 
     vm.startPrank(_relayer);
     spokeProxyV5.processFillQueueViaRelayer(uint32(block.chainid), _amount, _relayer, _ttl, _nonce, 0, _sig);
