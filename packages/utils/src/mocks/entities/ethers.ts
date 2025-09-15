@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { chainWrapper } from '../../helpers';
 import { mkAddress, mkHash } from '../mk';
 
 // Define viem-compatible types
@@ -55,7 +54,7 @@ const transactionRequest = (overrides: Partial<TransactionRequest> = {}): Transa
   to: mkAddress('0xbbbb'),
   from: mkAddress('0xaaa'),
   data: mkHash('0xdef'),
-  value: chainWrapper.parseUnits('1', 18),
+  value: 1n,
   ...overrides,
 });
 
@@ -66,11 +65,11 @@ const transactionResponse = (overrides: Partial<TransactionResponse> = {}): Tran
     data: '0x',
     to: mkAddress('0xbbbb'),
     from: mkAddress('0xaaa'),
-    gasLimit: chainWrapper.parseUnits('21000000', 0),
-    gasPrice: chainWrapper.parseUnits('1', 0),
+    gasLimit: 21000000n,
+    gasPrice: 1n,
     hash: mkHash('0xdef'),
     nonce: 1,
-    value: chainWrapper.parseUnits('0', 18),
+    value: 0n,
     type: 1,
     ...overrides,
   };
@@ -92,15 +91,15 @@ const transactionReceipt = (overrides: Partial<TransactionReceipt> = {}): Transa
   from: mkAddress('0xbbb'),
   contractAddress: mkAddress('0xa'),
   transactionIndex: 1,
-  gasUsed: chainWrapper.parseUnits('21000', 0),
+  gasUsed: 21000n,
   logsBloom: '0x',
   blockHash: mkHash('0xabc'),
   transactionHash: mkHash('0xdef'),
   logs: [],
   blockNumber: 123,
   confirmations: 1,
-  cumulativeGasUsed: chainWrapper.parseUnits('21000', 0),
-  effectiveGasPrice: chainWrapper.parseUnits('1', 0),
+  cumulativeGasUsed: 21000n,
+  effectiveGasPrice: 1n,
   byzantium: true,
   type: 1,
   status: 1,
@@ -122,10 +121,10 @@ const getAssociatedTransactions = (
     from,
     type,
     nonce: nonce ?? 1,
-    gasLimit: gasLimit ?? chainWrapper.parseUnits('800000', 0),
-    gasPrice: gasPrice ?? chainWrapper.parseUnits('1', 0),
+    gasLimit: gasLimit ?? 800_000n,
+    gasPrice: gasPrice ?? 1n,
     data: data?.toString() ?? '0x',
-    value: value ?? chainWrapper.parseUnits('0', 18),
+    value: value ?? 0n,
   });
   const { hash } = response;
   const receipt = transactionReceipt({
