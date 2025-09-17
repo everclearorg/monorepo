@@ -33,6 +33,7 @@ import {Deploy} from 'utils/Deploy.sol';
 
 contract DeploySpokeBase is Script, ScriptUtils {
   using TypeCasts for address;
+  using TypeCasts for bytes32;
 
   struct DeploymentParams {
     ISpokeGateway gateway;
@@ -48,6 +49,7 @@ contract DeploySpokeBase is Script, ScriptUtils {
     uint24 maxSolversFee;
   }
 
+  bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
 
   EverclearSpoke internal _spoke;
@@ -61,6 +63,7 @@ contract DeploySpokeBase is Script, ScriptUtils {
   error ExecutorAddressMismatch();
   error MessageReceiverAddressMismatch();
   error MailboxMismatch();
+  error SpokeUpgradeFailed();
 
   function run(
     string memory _account
@@ -118,6 +121,12 @@ contract DeploySpokeBase is Script, ScriptUtils {
     _messageReceiver = new SpokeMessageReceiver();
     if (address(_messageReceiver) != address(_params.messageReceiver)) {
       revert MessageReceiverAddressMismatch();
+    }
+
+    // deploying the SpokeUpgrade to newest version
+    address _spokeImpl = Deploy.EverclearSpokeUpgrade(address(_spoke));
+    if ((vm.load(address(_spoke), IMPLEMENTATION_SLOT)).toAddress() != _spokeImpl) {
+      revert SpokeUpgradeFailed();
     }
 
     vm.stopBroadcast();
