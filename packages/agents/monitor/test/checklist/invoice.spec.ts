@@ -1,4 +1,4 @@
-import { Logger, expect, getNtpTimeSeconds, mkBytes32 } from '@chimera-monorepo/utils';
+import { Logger, expect, getNtpTimeSeconds } from '@chimera-monorepo/utils';
 import { restore, reset, stub, SinonStub, SinonStubbedInstance } from 'sinon';
 import { checkInvoices, checkInvoiceAmount } from '../../src/checklist/queue';
 import { getContextStub, mock } from '../globalTestHook';
@@ -77,6 +77,7 @@ describe('checkInvoiceAmount', () => {
   let subgraph: SinonStubbedInstance<SubgraphReader>;
   let chainreader: SinonStubbedInstance<ChainReader>;
   let sendAlertsStub: SinonStub;
+  let resolveAlertsStub: SinonStub;
   let getCurrentEpochStub: SinonStub;
   let logger: SinonStubbedInstance<Logger>;
   let database: SinonStubbedInstance<Database>;
@@ -92,6 +93,7 @@ describe('checkInvoiceAmount', () => {
     logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     sendAlertsStub = stub(Mockable, 'sendAlerts');
+    resolveAlertsStub = stub(Mockable, 'resolveAlerts');
     getCurrentEpochStub = stub(intents, 'getCurrentEpoch');
     getCustodiedAssetsFromHubContractStub = stub(asset, 'getCustodiedAssetsFromHubContract');
   });
@@ -150,6 +152,7 @@ describe('checkInvoiceAmount', () => {
     // Stubbing other methods
     getCurrentEpochStub.resolves(1234567890);
     sendAlertsStub.resolves();
+    resolveAlertsStub.resolves();
 
     // Call the function
     await checkInvoiceAmount();

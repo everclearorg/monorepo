@@ -1,14 +1,15 @@
-import { Logger, RelayerType, createLoggingContext, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
+import { Logger, RelayerType, createLoggingContext, delay, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
 import { setupCache, setupSubgraphReader } from './setup';
+import { providers } from 'ethers';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { SubgraphConfig } from '@chimera-monorepo/adapters-subgraph';
 import { setupEverclearRelayer, setupGelatoRelayer } from '@chimera-monorepo/adapters-relayer';
 import { runChecks } from './checklist';
 import interval from 'interval-promise';
 import { MonitorConfig } from './types';
-import { getContext } from './context';
+import { AppContext, getContext } from './context';
 import { getDatabase } from '@chimera-monorepo/database';
 
 export const MonitorService = {
@@ -29,6 +30,53 @@ export const getSubgraphReaderConfig = (chains: MonitorConfig['chains']): Subgra
     subgraphs[domainId] = { endpoints: chains[domainId].subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   });
   return { subgraphs };
+};
+
+export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppContext['adapters']['blockMap']) => {
+  const domains = [...new Set([config.hub.domain, ...Object.keys(config.chains)])];
+  await Promise.all(
+    domains.map(async (domain) => {
+      const chainConfig = domain === config.hub.domain ? config.hub : config.chains[domain];
+      const providerUrls = chainConfig.providers ?? [];
+      const type = domain === config.hub.domain ? 'evm' : (chainConfig as { network?: string })?.network ?? 'evm';
+      await Promise.all(
+        providerUrls.map(async (provider) => {
+          const origin = URL.canParse(provider) ? new URL(provider).origin : provider;
+          if (type !== 'evm') {
+            return;
+          }
+          const ethProvider = new providers.JsonRpcProvider(provider);
+          ethProvider.on('block', (blockNumber) => {
+            if (!blockNumber) {
+              return;
+            }
+
+            // Create the entry
+            const entry = {
+              rpcOrigin: origin,
+              number: blockNumber,
+              timestamp: Math.floor(Date.now() / 1_000),
+            };
+            // Add domain array if it exists
+            if (!blockMap.has(domain)) blockMap.set(domain, []);
+
+            // Replace idx for provider if more recent
+            const idx = blockMap.get(domain)!.findIndex((a) => a.rpcOrigin.toLowerCase() === origin.toLowerCase());
+            if (idx === -1) {
+              // no entry for origin, push
+              blockMap.get(domain)!.push(entry);
+              return;
+            }
+            // Replace the entry IFF it is more recent
+            if (blockMap.get(domain)![idx].number >= blockNumber) {
+              return;
+            }
+            blockMap.get(domain)![idx] = entry;
+          });
+        }),
+      );
+    }),
+  );
 };
 
 export const makeMonitor = async (service: MonitorService) => {
@@ -70,6 +118,9 @@ export const makeMonitor = async (service: MonitorService) => {
       [context.config.hub.domain]: context.config.hub,
     });
 
+    context.adapters.blockMap = new Map();
+    await startBlockMapPoller(context.config, context.adapters.blockMap);
+
     const { domain: hubDomain, ...remainder } = context.config.hub;
     context.adapters.subgraph = await setupSubgraphReader(
       getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }),
@@ -78,6 +129,7 @@ export const makeMonitor = async (service: MonitorService) => {
     );
 
     context.adapters.database = await getDatabase(context.config.database.url, context.logger);
+    context.logger.debug('Database setup', requestContext, methodContext);
 
     // Adapters - relayers
     context.adapters.relayers = [];
@@ -99,13 +151,51 @@ export const makeMonitor = async (service: MonitorService) => {
         type: relayerConfig.type as RelayerType,
       });
     }
+    context.logger.debug('Relayers setup', requestContext, methodContext);
 
     /// MARK - Bindings
     if (service == MonitorService.SERVER) {
       await bindServer();
       await bindConfig();
     } else if (service == MonitorService.POLLER) {
-      await runChecks();
+      const timeout = 700_000;
+      const start = Date.now();
+      context.logger.info('Beginning checks', requestContext, methodContext, {
+        start,
+        timeout,
+      });
+      const ret = await Promise.race([
+        runChecks(requestContext)
+          .then(() => {
+            context.logger.info('Running checks completed', requestContext, methodContext, {
+              elapsed: Date.now() - start,
+              start,
+              timeout,
+            });
+          })
+          .catch((e) => {
+            context.logger.error('Failed to run checks', requestContext, methodContext, jsonifyError(e), {
+              start,
+              timeout,
+              elapsed: Date.now() - start,
+            });
+            throw e;
+          }),
+        (async () => {
+          await delay(timeout);
+          return 'timeout';
+        })(),
+      ]);
+      if (ret === 'timeout') {
+        context.logger.warn('Running checks timed out', requestContext, methodContext, {
+          timeout,
+        });
+      } else {
+        context.logger.info('Completed all checks within time', requestContext, methodContext, {
+          timeout,
+          elapsed: Date.now() - start,
+        });
+      }
       if (context.config.healthUrls[service]) {
         const url = context.config.healthUrls[service]!;
         await sendHeartbeat(url, context.logger);
