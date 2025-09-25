@@ -592,7 +592,7 @@ export class TronSyncProvider extends SyncProvider {
   public async getGasPrice(): Promise<string> {
     try {
       const energyPrices = await this.tronWeb.trx.getEnergyPrices();
-      if (energyPrices && energyPrices) {
+      if (energyPrices) {
         // Format: "timestamp:price,timestamp:price,..."
         const priceEntries = energyPrices.split(',');
         if (priceEntries.length) {
