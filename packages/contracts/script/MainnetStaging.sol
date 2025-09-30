@@ -89,7 +89,7 @@ abstract contract Ethereum {
   IMailbox public ETHEREUM_MAILBOX = IMailbox(0xc005dc82818d67AF737725bD4bf75435d065D239); // https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/cfb890dc6bf66c62e7d3176cc01197f334ba96cf/rust/config/mainnet_config.json#L632C19-L632C61
 
   IEverclearSpoke public ETHEREUM_SPOKE = IEverclearSpoke(0xD95Ff203bAAd65A8Fafd5C3dB695FC0a77A809a3);
-  ISpokeGateway public ETHEREUM_SPOKE_GATEWAY = ISpokeGateway(0xF712520F89d295dFdcC4d71B7E8787c060f44e39);
+  ISpokeGateway public ETHEREUM_SPOKE_GATEWAY = ISpokeGateway(0xfB1792b0992B9685be041A69a082241CE991F231);
   ICallExecutor public ETHEREUM_EXECUTOR = ICallExecutor(0xcA48aCE7387574a6120392722eB6f2018C60eF3B);
   address public ETHEREUM_SPOKE_IMPL = 0x24a26B463a59EBB88FDe49363C6c8f44351E8524;
   address public ETHEREUM_XERC20_MODULE = 0xDEe6fD45a585fa890BA12262AFc2312adE23e41e;
