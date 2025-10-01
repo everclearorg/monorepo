@@ -17,6 +17,7 @@ import { setModuleForStrategy } from './tasks/setModuleForStrategy';
 import { deployXERC20 } from './tasks/deployXERC20';
 import { assetDashboard } from './tasks/assetDashboard';
 import { logOwners } from './tasks/logOwners';
+import { createNewIntent } from './tasks/createNewIntent';
 
 async function main() {
   const mainTask = await select({
@@ -58,6 +59,10 @@ async function main() {
       {
         name: 'Process Settlement queue',
         value: 'process_settlement_queue',
+      },
+      {
+        name: 'Create New Intent',
+        value: 'create_new_intent',
       },
       {
         name: 'Handle expired intents',
@@ -142,6 +147,9 @@ async function main() {
       break;
     case 'log_owners':
       logOwners();
+      break;
+    case 'create_new_intent':
+      createNewIntent();
       break;
     case 'cancel':
       return;
