@@ -25,22 +25,22 @@ export async function createNewIntent(): Promise<void> {
   }
   const inputAsset = inputAssetToken.addresses[originDomain!.id.toString()];
 
+  // Get fee adapter address for ORIGIN domain (where we're sending FROM)
+  const spokeConfig = require('../config/spoke.json');
+  const originSpoke = spokeConfig.find((spoke: any) => spoke.environment === environment && spoke.domainName === originDomain!.name);
+  if (!originSpoke) {
+    throw new Error('No matching origin spoke configuration found.');
+  }
+
+  const { feeAdapterAddress } = originSpoke;
+  if (!feeAdapterAddress) {
+    throw new Error('Fee Adapter Address is missing for the origin domain.');
+  }
+
+  console.log('Fee Adapter address:', feeAdapterAddress);
+
   // Select destination chain
   const destinationDomain = await c.chooseDomain(environment, Realm.SPOKE);
-  const spokeConfig = require('../config/spoke.json');
-  const filteredSpoke = spokeConfig.find((spoke: any) => spoke.environment === environment && spoke.domainName === destinationDomain!.name);
-  if (!filteredSpoke) {
-    throw new Error('No matching spoke configuration found.');
-  }
-
-  const { address: feeAdapterAddress } = filteredSpoke;
-  if (!feeAdapterAddress) {
-    throw new Error('Fee Adapter Address is missing for the selected domain.');
-  }
-
-  // using the fee adapter address as the destination contract address
-  const destinationContractAddress = feeAdapterAddress;
-  if (!destinationContractAddress) return;
 
   // Select destination asset
   const destinationAssetConfigPath = `../config/assets/${environment.toLowerCase()}.json`;
@@ -120,11 +120,6 @@ export async function createNewIntent(): Promise<void> {
     amount,
     callData: '', // Add appropriate callData
     maxFee: fee.toString(), // Convert fee to string
-    permit2Params: {
-      nonce: '0', // Example nonce
-      deadline: '0', // Example deadline
-      signature: '0x', // Example signature
-    },
   };
 
   console.log('\nPayload being sent to API:');
