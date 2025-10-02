@@ -3046,7 +3046,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -3109,7 +3109,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -3185,7 +3185,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),

@@ -42,12 +42,18 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @notice emitted when an intent is filled on destination
    * @param _intentId The ID of the intent
    * @param _solver The address of the intent solver
+   * @param _receiver The address of the intent receiver
    * @param _amountOut The total amount the user has been transferred
    * @param _queueIdx The index of the FillMessage in the FillQueue
    * @param _intent The full intent object
    */
   event IntentFilled(
-    bytes32 indexed _intentId, address indexed _solver, uint256 _amountOut, uint256 _queueIdx, Intent _intent
+    bytes32 indexed _intentId,
+    address indexed _solver,
+    bytes32 indexed _receiver,
+    uint256 _amountOut,
+    uint256 _queueIdx,
+    Intent _intent
   );
 
   /**
@@ -413,6 +419,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     Intent calldata _intent,
     uint256 _nonce,
     uint256 _amountOut,
+    bytes32 _receiver,
     uint32[] memory _destinations,
     bytes calldata _signature,
     bytes calldata _fillSignature
