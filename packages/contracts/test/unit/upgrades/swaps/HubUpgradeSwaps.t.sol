@@ -41,6 +41,8 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   uint32 internal constant ETHEREUM = 1;
   uint32 internal constant ARBITRUM = 42_161;
   uint32 internal constant OPTIMISM = 10;
+  uint32 internal constant BASE = 8453;
+  uint32 internal constant TAIKO = 167_000;
 
   // ============ Upgrade ============ //
   function test_hubUpgradeSwaps_upgrade() public {
@@ -238,6 +240,240 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encodeWithSignature('sendMessage(uint32,bytes,uint256,uint256)', ARBITRUM, _calldata, _fee, 0)
     );
     hubProxy.processSettlementQueueViaRelayer(ARBITRUM, 1, _relayer, block.timestamp, _nonce, 0, _sig);
+  }
+
+  function _configureUSDCTokenSetup() internal {
+    IHubStorageV2.Fee[] memory _feesConfig = new IHubStorageV2.Fee[](1);
+    _feesConfig[0] = IHubStorageV2.Fee({recipient: OWNER, fee: 0});
+
+    // Asset config
+    IHubStorageV2.AssetConfig[] memory _assetConfigs = new IHubStorageV2.AssetConfig[](4);
+    // Ethereum
+    _assetConfigs[0] = IHubStorageV2.AssetConfig({
+      tickerHash: keccak256('USDC'),
+      adopted: USDC_MAINNET.toBytes32(),
+      domain: 1,
+      approval: true,
+      strategy: IEverclearV2.Strategy.DEFAULT
+    });
+    // Optimism
+    _assetConfigs[1] = IHubStorageV2.AssetConfig({
+      tickerHash: keccak256('USDC'),
+      adopted: USDC_OPTIMISM.toBytes32(),
+      domain: 10,
+      approval: true,
+      strategy: IEverclearV2.Strategy.DEFAULT
+    });
+    // Arbitrum
+    _assetConfigs[2] = IHubStorageV2.AssetConfig({
+      tickerHash: keccak256('USDC'),
+      adopted: USDC_ARBITRUM.toBytes32(),
+      domain: 42_161,
+      approval: true,
+      strategy: IEverclearV2.Strategy.DEFAULT
+    });
+    // Base
+    _assetConfigs[3] = IHubStorageV2.AssetConfig({
+      tickerHash: keccak256('USDC'),
+      adopted: USDC_BASE.toBytes32(),
+      domain: 8453,
+      approval: true,
+      strategy: IEverclearV2.Strategy.DEFAULT
+    });
+
+    IHubStorageV2.TokenSetup[] memory _setup = new IHubStorageV2.TokenSetup[](4);
+    _setup[0] = IHubStorageV2.TokenSetup({
+      tickerHash: keccak256('USDC'),
+      initLastClosedEpochProcessed: false,
+      prioritizedStrategy: IEverclearV2.Strategy.DEFAULT,
+      maxDiscountDbps: 5000,
+      discountPerEpoch: 0,
+      fees: _feesConfig,
+      adoptedForAssets: _assetConfigs
+    });
+
+    vm.prank(hubProxy.owner());
+    hubProxy.setTokenConfigs(_setup);
+  }
+
+  function test_hubUpgradeSwaps_createSettlement_allUserSupportedDomainsValid() public {
+    _upgradeHub();
+
+    // processing the deposits, invoices, and settlements for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
+    hubProxy.processSettlementQueue(BASE, 1, DEFAULT_GAS_LIMIT);
+
+    // configuring the token setup //
+    _configureUSDCTokenSetup();
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToArbitrum, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, address(0), ETHEREUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToArbitrum);
+
+    // configuring the memValues for the solver - includes Optimism and Base //
+    uint32[] memory _supportedDomains = new uint32[](2);
+    _supportedDomains[0] = 10;
+    _supportedDomains[1] = 8453;
+    vm.prank(_intentsToArbitrum[0].receiver.toAddress());
+    hubProxy.setUserSupportedDomains(_supportedDomains);
+
+    // configuring the state of custodiedAssets to 0 for Optimism and Base //
+    _updateCustodiedAssets(USDC_OPTIMISM_ASSET_HASH, _intentsToArbitrum[0].amount);
+    _updateCustodiedAssets(USDC_BASE_ASSET_HASH, 0);
+
+    // processing the deposits and invoices for USDC //
+    vm.warp(block.timestamp + 3600);
+    vm.roll(block.number + 50);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // asserting the intents status are SETTLED
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing the settlement queue
+    bytes memory _calldata =
+      _constructSettlementInfo(_intentsToArbitrum[0].receiver, USDC_OPTIMISM.toBytes32(), _intentsToArbitrum);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, 0)
+    );
+    hubProxy.processSettlementQueue(OPTIMISM, 1, 0);
+  }
+
+  function test_hubUpgradeSwaps_createSettlement_threeUserSupportedDomainsValid() public {
+    _upgradeHub();
+
+    // processing the deposits, invoices, and settlements for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
+    hubProxy.processSettlementQueue(BASE, 1, DEFAULT_GAS_LIMIT);
+
+    // configuring the token setup //
+    _configureUSDCTokenSetup();
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToArbitrum, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, address(0), ETHEREUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToArbitrum);
+
+    // configuring the memValues for the solver - includes Optimism, Base, and Invalid //
+    uint32[] memory _supportedDomains = new uint32[](3);
+    _supportedDomains[0] = 10;
+    _supportedDomains[1] = 8453;
+    _supportedDomains[2] = 33_139;
+    vm.prank(_intentsToArbitrum[0].receiver.toAddress());
+    hubProxy.setUserSupportedDomains(_supportedDomains);
+
+    // configuring the state of custodiedAssets to 0 for Optimism and Base //
+    _updateCustodiedAssets(USDC_OPTIMISM_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_BASE_ASSET_HASH, _intentsToArbitrum[0].amount);
+
+    // processing the deposits and invoices for USDC //
+    vm.warp(block.timestamp + 3600);
+    vm.roll(block.number + 50);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // asserting the intents status are SETTLED
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing the settlement queue
+    bytes memory _calldata =
+      _constructSettlementInfo(_intentsToArbitrum[0].receiver, USDC_BASE.toBytes32(), _intentsToArbitrum);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', BASE, _calldata, 0)
+    );
+    hubProxy.processSettlementQueue(BASE, 1, 0);
+  }
+
+  function test_hubUpgradeSwaps_createSettlement_zeroUserSupportedDomainsValid() public {
+    _upgradeHub();
+
+    // processing the deposits, invoices, and settlements for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
+    hubProxy.processSettlementQueue(BASE, 1, DEFAULT_GAS_LIMIT);
+
+    // configuring the token setup //
+    _configureUSDCTokenSetup();
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToArbitrum, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, address(0), ETHEREUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToArbitrum);
+
+    // configuring the memValues for the solver - includes Optimism, Base, and Invalid //
+    uint32[] memory _supportedDomains = new uint32[](2);
+    _supportedDomains[0] = 81_457;
+    _supportedDomains[1] = 33_139;
+    vm.prank(_intentsToArbitrum[0].receiver.toAddress());
+    hubProxy.setUserSupportedDomains(_supportedDomains);
+
+    // configuring the state of custodiedAssets to 0 for Optimism and Base //
+    _updateCustodiedAssets(USDC_OPTIMISM_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_BASE_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_MAINNET_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_MANTLE_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_ARBITRUM_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_BNB_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_LINEA_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_POLYGON_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_AVALANCHE_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_SCROLL_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_TAIKO_ASSET_HASH, _intentsToArbitrum[0].amount);
+    _updateCustodiedAssets(USDC_MODE_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_UNICHAIN_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_ZKSYNC_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_RONIN_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_BERACHAIN_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_SONIC_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_INK_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_SOLANA_ASSET_HASH, 0);
+
+    // processing the deposits and invoices for USDC //
+    vm.warp(block.timestamp + 3600);
+    vm.roll(block.number + 50);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // asserting the intents status are SETTLED
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing the settlement queue
+    bytes memory _calldata =
+      _constructSettlementInfo(_intentsToArbitrum[0].receiver, USDC_TAIKO.toBytes32(), _intentsToArbitrum);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', TAIKO, _calldata, 0)
+    );
+    hubProxy.processSettlementQueue(TAIKO, 1, 0);
   }
 
   // ============ Handler Module ============ //
