@@ -121,7 +121,41 @@ abstract contract SettlerLogicV2 is HubStorageV2 {
         : _contexts[_intentId].solverDestinations;
       _destinations = _destinations.length == 0 ? _tokenConfigs[_tickerHash].domains.memValues() : _destinations;
     } else {
-      _destinations = _userSupportedDomains;
+      // Setting destinations to the reduced valid destinations
+      _destinations = _getValidDestinations(_tickerHash, _userSupportedDomains);
+      if (_destinations.length == 0) {
+        _destinations = _tokenConfigs[_tickerHash].domains.memValues();
+      }
+    }
+  }
+
+  /**
+   * @notice Get the valid destinations from user supported domains for the ticker hahs
+   * @param _tickerHash The hash of the ticker symbol
+   * @param _userSupportedDomains The user supported domains
+   * @return _validDestinations The valid destinations that are approved for the asset
+   */
+  function _getValidDestinations(
+    bytes32 _tickerHash,
+    uint32[] memory _userSupportedDomains
+  ) internal view returns (uint32[] memory _validDestinations) {
+    // Setting up temporary array for valid destinations
+    uint32[] memory _tempDestinations = new uint32[](_userSupportedDomains.length);
+    uint256 validCount = 0;
+
+    // Collect valid destinations and count
+    for (uint256 i; i < _userSupportedDomains.length; i++) {
+      bytes32 _outputAssetHash = _tokenConfigs[_tickerHash].assetHashes[_userSupportedDomains[i]];
+      if (_adoptedForAssets[_outputAssetHash].approval) {
+        _tempDestinations[validCount] = _userSupportedDomains[i];
+        validCount++;
+      }
+    }
+
+    // Create the result array with the exact size
+    _validDestinations = new uint32[](validCount);
+    for (uint256 j; j < validCount; j++) {
+      _validDestinations[j] = _tempDestinations[j];
     }
   }
 

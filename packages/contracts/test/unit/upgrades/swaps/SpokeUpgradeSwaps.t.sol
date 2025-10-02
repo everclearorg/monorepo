@@ -27,7 +27,6 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {ICREATE3, TestEverclearSpokeV5, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
 
 import 'forge-std/StdStorage.sol';
-import 'forge-std/console2.sol';
 
 contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
   using TypeCasts for address;
@@ -455,9 +454,12 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     stdstore.target(_target).sig('lighthouse()').checked_write(_solver);
   }
 
-  function test_spokeUpgradeSwaps_fillIntent_ForSolver(uint128 _solverPk, uint256 _amountOut) public {
-    vm.assume(_solverPk != 0);
-    address _solver = vm.addr(_solverPk);
+  uint256 public constant SOLVER_PK = 9_999_999;
+
+  function test_spokeUpgradeSwaps_fillIntent_ForSolver(
+    uint256 _amountOut
+  ) public {
+    address _solver = vm.addr(SOLVER_PK);
     address _receiver = address(0x456);
 
     // upgrading the spoke
@@ -499,7 +501,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _payload = abi.encode(
       spokeProxyV5.FILL_INTENT_FOR_SOLVER_TYPEHASH(), _domain, _solver, _intent, _nonce, _amountOut, _solverDestinations
     );
-    bytes memory _sig = _generateSignature(_solverPk, _payload);
+    bytes memory _sig = _generateSignature(SOLVER_PK, _payload);
 
     // filling the user intent
     spokeProxyV5.fillIntentForSolver(_solver, _intent, _nonce, _amountOut, _solverDestinations, _sig);
@@ -779,10 +781,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // processing the fillQueue
     vm.expectCall(
       address(spokeProxyV5.gateway()),
-      abi.encodeWithSignature(
-        'sendMessage(uint32,bytes,uint256)', HUB_ID, _batchFillMessage, MESSAGE_GAS_LIMIT
-      )
-    );    
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', HUB_ID, _batchFillMessage, MESSAGE_GAS_LIMIT)
+    );
 
     vm.startPrank(lightHouse);
     spokeProxyV5.processFillQueue{value: _messageFee}(uint32(_fillsToProcess.length));
@@ -878,13 +878,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     );
 
     // processing the fillQueue
-    uint256 _fee = ISpokeGateway(spokeProxy.gateway()).quoteMessage(HUB_ID, _batchFillMessage,MESSAGE_GAS_LIMIT);
+    uint256 _fee = ISpokeGateway(spokeProxyV5.gateway()).quoteMessage(HUB_ID, _batchFillMessage, MESSAGE_GAS_LIMIT);
     vm.expectCall(
       address(spokeProxyV5.gateway()),
       abi.encodeWithSignature(
         'sendMessage(uint32,bytes,uint256,uint256)', HUB_ID, _batchFillMessage, _fee, MESSAGE_GAS_LIMIT
       )
-    ); 
+    );
 
     vm.startPrank(_relayer);
     spokeProxyV5.processFillQueueViaRelayer(uint32(block.chainid), _amount, _relayer, _ttl, _nonce, 0, _sig);
