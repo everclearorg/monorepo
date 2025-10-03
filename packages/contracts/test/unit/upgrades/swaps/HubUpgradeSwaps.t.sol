@@ -20,6 +20,7 @@ import {AssetManagerV2} from 'contracts/hub/modules/managers/AssetManagerV2.sol'
 
 import {IManagerV2, ManagerV2} from 'contracts/hub/modules/ManagerV2.sol';
 import {ISettlerV2, SettlerV2} from 'contracts/hub/modules/SettlerV2.sol';
+import {IProtocolManagerV2} from 'interfaces/hub/IProtocolManagerV2.sol';
 
 import {IAssetManagerV2} from 'interfaces/hub/IAssetManagerV2.sol';
 
@@ -2506,24 +2507,6 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(hubProxy.epochLength(), _epochLength);
   }
 
-  function test_hubUpgradeSwaps_updateGasConfig() public {
-    _upgradeHub();
-
-    IHubStorageV2.GasConfig memory config = IHubStorageV2.GasConfig({
-      settlementBaseGasUnits: 100_000,
-      averageGasUnitsPerSettlement: 50_000,
-      bufferDBPS: 10_000
-    });
-
-    vm.prank(hubProxy.owner());
-    hubProxy.updateGasConfig(config);
-
-    (uint256 settlementBaseGasUnits, uint256 averageGasUnitsPerSettlement, uint256 bufferDBPS) = hubProxy.gasConfig();
-    assertEq(settlementBaseGasUnits, config.settlementBaseGasUnits);
-    assertEq(averageGasUnitsPerSettlement, config.averageGasUnitsPerSettlement);
-    assertEq(bufferDBPS, config.bufferDBPS);
-  }
-
   function test_hubUpgradeSwaps_setMaxDiscountDBPS() public {
     _upgradeHub();
 
@@ -2647,6 +2630,14 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encodeWithSelector(ISettlerV2.Settler_DomainBlockGasLimitReached.selector, 30_000_000, type(uint256).max)
     );
     hubProxy.processSettlementQueue(ARBITRUM, 1, type(uint256).max);
+  }
+
+  function testRevert_hubUpgradeSwaps_updateGasConfig() public {
+    _upgradeHub();
+    IHubStorageV2.GasConfig memory _gasConfig;
+
+    vm.expectRevert(IProtocolManagerV2.ProtocolManager_UpdateGasConfig_Deprecated.selector);
+    hubProxy.updateGasConfig(_gasConfig);
   }
 
   // ============== Helpers ================= //

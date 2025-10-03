@@ -388,7 +388,7 @@ interface IHubStorageV2 {
    * @return _averageGasUnitsPerSettlement The average amount of gas units per settlement message processed
    * @return _bufferDBPS The gas buffer for relay on destination (in DBPS)
    */
-  function gasConfig()
+  function deprecated_gasConfig()
     external
     view
     returns (uint256 _settlementBaseGasUnits, uint256 _averageGasUnitsPerSettlement, uint256 _bufferDBPS);
