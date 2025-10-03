@@ -190,6 +190,11 @@ interface IProtocolManagerV2 {
    */
   error ProtocolManager_UpdateEpochLength_InvalidEpochLength();
 
+  /**
+   * @notice Thrown when trying to update the gas configuration
+   */
+  error ProtocolManager_UpdateGasConfig_Deprecated();
+
   /*//////////////////////////////////////////////////////////////
                             LOGIC
     //////////////////////////////////////////////////////////////*/
@@ -362,8 +367,7 @@ interface IProtocolManagerV2 {
   ) external;
 
   /**
-   * @notice Updates the messaging gas config
-   * @param _newGasConfig The new gas config
+   * @notice Deprecated: Updates the gas configuration
    */
   function updateGasConfig(
     IHubStorageV2.GasConfig calldata _newGasConfig
