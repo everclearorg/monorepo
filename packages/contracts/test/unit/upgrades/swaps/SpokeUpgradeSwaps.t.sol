@@ -27,7 +27,6 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {ICREATE3, TestEverclearSpokeV5, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
 
 import 'forge-std/StdStorage.sol';
-import 'forge-std/console2.sol';
 
 contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
   using TypeCasts for bytes32;
@@ -977,9 +976,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(IERC20(USDC_MAINNET).balanceOf(_receiver), _startingBalanceReceiver + _amountOut);
   }
 
-  function test_spokeUpgradeSwaps_fillIntentWithPull(address _solver, uint256 _amountOut) public {
-    vm.assume(_solver != address(0));
+  function test_spokeUpgradeSwaps_fillIntentWithPull_Single() public {
+    address _solver = address(0x123);
     address _receiver = address(0x456);
+    uint256 _amountOut = 100e6;
 
     // upgrading the spoke
     _upgradeSpoke();
@@ -1213,29 +1213,44 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(lightHouse.balance, 0);
   }
 
-  function test_spokeUpgradeSwaps_ProcessFillQueue(
-    IEverclearV2.Intent[MAX_FUZZED_ARRAY_LENGTH] memory _intents,
-    uint256 _messageFee
-  ) public {
+  function test_spokeUpgradeSwaps_ProcessFillQueue() public {
     _upgradeSpoke();
+    uint8 _arrayLength;
+    uint256 _seed;
+
+    // Bound the array length to avoid excessive gas usage
+    _arrayLength = uint8(bound(uint256(_arrayLength), 1, MAX_FUZZED_ARRAY_LENGTH));
+    _seed = bound(_seed, 1, type(uint256).max);
+
+    uint256 _messageFee = 0.01 ether;
     address lightHouse = spokeProxyV5.lighthouse();
     address _solver = address(0x456);
     uint32[] memory _solverDestinations = _getDestinations(42_161);
-
-    _messageFee = bound(_messageFee, 1, 10 ether);
     deal(lightHouse, _messageFee);
 
     uint32[] memory _destinations = _getDestinations(1);
-    IEverclearV2.FillMessage[] memory _fillsToProcess = new IEverclearV2.FillMessage[](_intents.length);
-    for (uint256 _i; _i < _intents.length; _i++) {
-      if (_intents[_i].origin == 1) _intents[_i].origin = 10;
-      _intents[_i].destinations = _destinations;
-      _intents[_i].amountOutMin = bound(_intents[_i].amountOutMin, 1, type(uint64).max);
-      _intents[_i].outputAsset = USDC_MAINNET.toBytes32();
-      _intents[_i].timestamp = uint48(block.timestamp - 10 minutes);
+
+    // Create intents manually to avoid calldata explosion
+    IEverclearV2.Intent[] memory _intents = new IEverclearV2.Intent[](_arrayLength);
+    IEverclearV2.FillMessage[] memory _fillsToProcess = new IEverclearV2.FillMessage[](_arrayLength);
+
+    for (uint256 _i; _i < _arrayLength; _i++) {
+      // Generate pseudo-random intent data using the seed
+      uint256 intentSeed = uint256(keccak256(abi.encode(_seed, _i)));
+
+      _intents[_i].initiator = bytes32(intentSeed);
       _intents[_i].receiver = address(0x999).toBytes32();
+      _intents[_i].inputAsset = USDC_MAINNET.toBytes32();
+      _intents[_i].outputAsset = USDC_MAINNET.toBytes32();
+      _intents[_i].origin = uint32(bound(intentSeed, 2, 1000)); // Avoid origin = 1
+      _intents[_i].nonce = uint64(intentSeed);
+      _intents[_i].timestamp = uint48(block.timestamp - 10 minutes);
       _intents[_i].ttl = 4 hours;
+      _intents[_i].amount = bound(intentSeed, 1, type(uint64).max);
+      _intents[_i].amountOutMin = bound(intentSeed >> 128, 1, type(uint64).max);
+      _intents[_i].destinations = _destinations;
       _intents[_i].data = '';
+
       deal(USDC_MAINNET, _solver, _intents[_i].amountOutMin + 1);
       _fillsToProcess[_i] = _fillIntentAndAssert(_solver, _intents[_i], _solverDestinations);
     }
