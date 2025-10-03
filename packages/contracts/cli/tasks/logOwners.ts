@@ -1,6 +1,6 @@
 import * as c from '../common';
 import { Deployments } from '../../deployments';
-import { Contract, providers } from 'ethers';
+import { Contract, JsonRpcProvider } from 'ethers';
 import { fetchJson } from '@ethersproject/web';
 
 // define the relevant abi
@@ -61,7 +61,7 @@ export async function logOwners() {
     }
     const isHub = domain === hubDomain;
     const providerUri = isHub ? chaindata.hub.providers[0] : chaindata.chains[domain].providers[0];
-    const provider = new providers.JsonRpcProvider(providerUri);
+    const provider = new JsonRpcProvider(providerUri);
     try {
       const everclear = new Contract(deployments.everclear.address, OwnableAbi, provider);
       const owner = await everclear.owner();
