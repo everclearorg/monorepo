@@ -55,5 +55,8 @@
     "fastify": "4.26.2",
     "zapatos": "6.5.0"
   },
+  "resolutions": {
+    "tronweb/ethers": "5.7.2"
+  },
   "packageManager": "yarn@3.3.1"
 }
