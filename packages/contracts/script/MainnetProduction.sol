@@ -93,7 +93,7 @@ abstract contract MainnetAssets {
   address public constant BERACHAIN_USDC = 0x549943e04f40284185054145c6E4e9568C1D3241;
   address public constant MANTLE_USDC = 0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9;
   address public constant SONIC_USDC = 0x29219dd400f2Bf60E5a23d13Be72B486D4038894;
-  address public constant INK_USDC = 0xF1815bd50389c46847f0Bda824eC8da914045D14;
+  address public constant INK_USDC = 0x2D270e6886d130D724215A266106e6832161EAEd;
   bytes32 public constant SOLANA_USDC = 0xc6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d61;
 
   ///////////////////// xPufETH
@@ -120,6 +120,10 @@ abstract contract MainnetAssets {
   address public constant BASE_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
   address public constant BERACHAIN_WBTC = 0x0555E30da8f98308EdB960aa94C0Db47230d2B9c;
   address public constant MANTLE_WBTC = 0xCAbAE6f6Ea1ecaB08Ad02fE02ce9A44F09aebfA2;
+
+  //////////////////// EURC
+  address public constant ETHEREUM_EURC = 0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c;
+  address public constant BASE_EURC = 0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42;
 
   ///////////////////// FEE RECIPIENTS
   address public constant FEE_RECIPIENT = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;

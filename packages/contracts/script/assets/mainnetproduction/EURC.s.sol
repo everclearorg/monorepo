@@ -10,7 +10,7 @@ import {AddAssetBase} from '../AddAsset.s.sol';
 
 import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 
-contract WBTC is AddAssetBase, MainnetProductionEnvironment {
+contract EURC is AddAssetBase, MainnetProductionEnvironment {
   using TypeCasts for address;
 
   function _fetchTokenSetup()
@@ -22,7 +22,7 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
                              TICKER HASH
     //////////////////////////////////////////////////////////////*/
 
-    _symbol = 'WBTC';
+    _symbol = 'EURC';
     bytes32 _tickerHash = keccak256(bytes(_symbol));
 
     /*///////////////////////////////////////////////////////////////
@@ -36,49 +36,22 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](5);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](2);
 
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ETHEREUM_WBTC.toBytes32(),
+      adopted: ETHEREUM_EURC.toBytes32(),
       domain: ETHEREUM,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Arbitrum
+    ///// Base
     _assetConfigs[1] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ARBITRUM_WBTC.toBytes32(),
-      domain: ARBITRUM_ONE,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Berachain
-    _assetConfigs[2] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: BERACHAIN_WBTC.toBytes32(),
-      domain: BERACHAIN,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Base
-    _assetConfigs[3] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: BASE_WBTC.toBytes32(),
+      adopted: BASE_EURC.toBytes32(),
       domain: BASE,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Mantle
-    _assetConfigs[4] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: MANTLE_WBTC.toBytes32(),
-      domain: MANTLE,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
@@ -99,7 +72,7 @@ contract WBTC is AddAssetBase, MainnetProductionEnvironment {
   }
 }
 
-contract WBTCDashboard is WBTC {
+contract EURCDashboard is EURC {
   function run(
     address _hub
   ) public {
