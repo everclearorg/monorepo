@@ -93,8 +93,6 @@ abstract contract ArbitrumOne {
   IXERC20Module public ARBITRUM_ONE_XERC20_MODULE = IXERC20Module(0x315bCf956e887378836f6E57bC735F0cf7022352);
   address public ARBITRUM_SPOKE_IMPL = 0x172A786fA844A3fa0aEE2031D7955F82f7a8a984;
   address public constant ARBITRUM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
-
-  address public ARBITRUM_FEE_ADAPTER;
 }
 
 abstract contract Optimism {

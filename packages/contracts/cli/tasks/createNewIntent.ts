@@ -1,7 +1,7 @@
 import * as c from '../common';
 import { Realm } from '../types';
 import fetch from 'node-fetch';
-import { select } from '@inquirer/prompts';
+import { select, confirm } from '@inquirer/prompts';
 
 export async function createNewIntent(): Promise<void> {
   const environment = await c.chooseEnvironment();
@@ -58,22 +58,39 @@ export async function createNewIntent(): Promise<void> {
   // Input amount
   const amount = await c.inputNumber('Amount to deposit');
 
-  // Input ttl in minutes
-  let ttlInput = await c.inputNumber('Time to live in minutes (minimum 120 minutes)');
-  let ttl = parseInt(ttlInput) * 60; // Convert minutes to seconds
-  const minTTL = 2 * 60 * 60; // 2 hours in seconds
-  if (ttl < minTTL) {
-    console.log(`TTL must be at least ${minTTL / 60} minutes (2 hours).`);
-    ttl = minTTL;
-  }
+  // Ask if user wants to use fast path
+  const useFastPath = await confirm({ 
+    message: 'Use fast path? (If no, TTL and Max Fee will be set to 0)', 
+    default: true 
+  });
 
-  // Input fee in BPS
-  let feeInput = await c.inputNumber('Fee in BPS (minimum 500)');
-  let fee = parseInt(feeInput);
-  const minFee = 500; // Minimum fee in BPS
-  if (fee < minFee) {
-    console.log(`Fee must be at least ${minFee} BPS.`);
-    fee = minFee;
+  let ttl: number;
+  let fee: number;
+
+  if (useFastPath) {
+    // Fast path: ask for TTL and fee
+    // Input ttl in minutes
+    let ttlInput = await c.inputNumber('Time to live in minutes (minimum 120 minutes)');
+    ttl = parseInt(ttlInput) * 60; // Convert minutes to seconds
+    const minTTL = 2 * 60 * 60; // 2 hours in seconds
+    if (ttl < minTTL) {
+      console.log(`TTL must be at least ${minTTL / 60} minutes (2 hours).`);
+      ttl = minTTL;
+    }
+
+    // Input fee in BPS
+    let feeInput = await c.inputNumber('Fee in BPS (minimum 500)');
+    fee = parseInt(feeInput);
+    const minFee = 500; // Minimum fee in BPS
+    if (fee < minFee) {
+      console.log(`Fee must be at least ${minFee} BPS.`);
+      fee = minFee;
+    }
+  } else {
+    // Non-fast path: set TTL and fee to 0
+    ttl = 0;
+    fee = 0;
+    console.log('Fast path disabled: TTL = 0, Max Fee = 0');
   }
 
   console.log('Selected Environment:', environment);
@@ -82,6 +99,7 @@ export async function createNewIntent(): Promise<void> {
   console.log('Input Asset:', inputAssetSymbol, '-', inputAsset);
   console.log('Output Asset:', outputAssetSymbol, '-', outputAsset);
   console.log('Amount:', amount);
+  console.log('Fast Path:', useFastPath);
   console.log('TTL:', ttl, 'seconds');
   console.log('Fee:', fee, 'BPS');
 
@@ -118,6 +136,7 @@ export async function createNewIntent(): Promise<void> {
     to: senderAddress,
     inputAsset,
     amount,
+    isFastPath: useFastPath, // Fast path boolean
     callData: '', // Add appropriate callData
     maxFee: fee.toString(), // Convert fee to string
   };

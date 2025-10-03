@@ -120,10 +120,8 @@ contract MainnetProduction is NewIntentBase, MainnetProductionEnvironment {
 contract MainnetStaging is NewIntentBase, MainnetStagingEnvironment {
   function setUp() public {
     spokes[OPTIMISM] = OPTIMISM_SPOKE;
-    spokes[ARBITRUM_ONE] = ARBITRUM_ONE_SPOKE;
     spokes[BASE] = BASE_SPOKE;
     feeAdapter[OPTIMISM] = IFeeAdapter(OPTIMISM_FEE_ADAPTER);
-    feeAdapter[ARBITRUM_ONE] = IFeeAdapter(ARBITRUM_FEE_ADAPTER);
     feeAdapter[BASE] = IFeeAdapter(BASE_FEE_ADAPTER);
   }
 }

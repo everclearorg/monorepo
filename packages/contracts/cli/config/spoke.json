@@ -1,14 +1,12 @@
 [
   {
     "address": "0x3650432cB5331e6dc95be8C1d8168b7c37f677e2",
-    "feeAdapterAddress": "",
     "domainName": "Ethereum Sepolia",
     "domainId": 11155111,
     "environment": "TestnetProduction"
   },
   {
     "address": "0x97f24e4eeD4d05D48cb8a45ADfE5e6aF2de14F71",
-    "feeAdapterAddress": "",
     "domainName": "Arbitrum Sepolia",
     "domainId": 421614,
     "environment": "TestnetProduction"
@@ -22,14 +20,12 @@
   },
   {
     "address": "0xFeaaF6291E40252413aA6cb5214F486c8088207e",
-    "feeAdapterAddress": "",
     "domainName": "BNB Testnet",
     "domainId": 97,
     "environment": "TestnetProduction"
   },
   {
     "address": "0x54dFa8c1964ccCEcdA7206773de910D54E7E4c6C",
-    "feeAdapterAddress": "",
     "domainName": "Ethereum",
     "domainId": 1,
     "environment": "TestnetStaging"
@@ -43,21 +39,18 @@
   },
   {
     "address": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
-    "feeAdapterAddress": "",
     "domainName": "Arbitrum One",
     "domainId": 42161,
     "environment": "MainnetStaging"
   },
   {
     "address": "0x9d3DE64eC0491251306a3B30d0a385C3a005B9F4",
-    "feeAdapterAddress": "",
     "domainName": "Zircuit",
     "domainId": 48900,
     "environment": "MainnetStaging"
   },
   {
     "address": "0xf1D5d2D7C6c3D125eBbf137BE5093c0C5D7Fa032",
-    "feeAdapterAddress": "",
     "domainName": "Blast",
     "domainId": 81457,
     "environment": "MainnetStaging"
