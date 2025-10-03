@@ -6,7 +6,7 @@
     "composite": true,
     "tsBuildInfoFile": "./tsconfig.tsBuildInfo"
   },
-  "exclude": ["./test", "./src", "./script", "./node_modules/**", "./cache", "./out", "./cli"],
-  "include": ["deployments/**/*.json", "deployments/**/*.ts"],
+  "exclude": ["./test", "./src", "./script", "./node_modules/**", "./cache", "./out"],
+  "include": ["deployments/**/*.json", "deployments/**/*.ts", "cli/**/*.ts"],
   "references": []
 }
