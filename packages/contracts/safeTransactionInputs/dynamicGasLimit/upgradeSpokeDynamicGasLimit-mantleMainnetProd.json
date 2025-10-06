@@ -1,0 +1,19 @@
+{
+  "chainId": "5000",
+  "createdAt": "1754575156000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Dynamic Gas Limit | Mantle | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xe0F010e465f15dcD42098dF9b99F1038c11B3056",
+      "value": "0",
+      "data": "0x4f1ef28600000000000000000000000027508d1c61fcc99b4b6e608ef5305aaf5dc1f0a000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

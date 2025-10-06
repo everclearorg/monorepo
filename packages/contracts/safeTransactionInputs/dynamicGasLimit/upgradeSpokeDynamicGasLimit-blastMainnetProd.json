@@ -1,0 +1,19 @@
+{
+  "chainId": "81457",
+  "createdAt": "1754574857000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Dynamic Gas Limit | Blast | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7",
+      "value": "0",
+      "data": "0x4f1ef28600000000000000000000000052fda30b2d5c391c69fad37322e9e3629d830b0f00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

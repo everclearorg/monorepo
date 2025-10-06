@@ -1,0 +1,19 @@
+{
+  "chainId": "57073",
+  "createdAt": "1754575285000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Dynamic Gas Limit | Ink | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000c715486b1048996fb2f707ce50c0c84cd114358300000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

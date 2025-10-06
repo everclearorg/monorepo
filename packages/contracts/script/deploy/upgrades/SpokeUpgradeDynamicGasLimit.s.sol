@@ -5,15 +5,15 @@ import {ScriptUtils} from '../../utils/Utils.sol';
 
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {Script} from 'forge-std/Script.sol';
-import {console} from 'forge-std/console.sol';
+import {console2} from 'forge-std/console2.sol';
 
-import {EverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
+import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
 
 import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 import {MainnetStagingEnvironment} from '../../MainnetStaging.sol';
 import {ICREATE3} from './ICREATE3.sol';
 
-contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
+contract DeployDynamicGasLimitUpgrade is Script, ScriptUtils {
   using TypeCasts for bytes32;
 
   struct DeploymentParams {
@@ -28,6 +28,8 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
   // CREATE3 addresses
   address public constant LIFI_CREATE3 = 0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1;
   address public constant LIFI_LONDON_CREATE3 = 0x8437A5fE47A4Df14700c96DF1870824e72FA8499;
+  address public constant LIFI_INK_CREATE3 = 0xeBbbaC35500713C4AD49929e1bE4225c7efF6510;
+  address public constant LIFI_BERACHAIN_CREATE3 = 0x5f63A2d7850776465b84Bc0fe6284BBC8188dbC7;
 
   mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
 
@@ -42,27 +44,31 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
     address newEverclearSpoke;
 
     // Generating the inputs for CREATE3
-    uint8 version = 6;
+    uint8 version = 1;
     bytes32 _salt = keccak256(abi.encodePacked(_params.spokeProxy, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
-    bytes memory _creation = type(EverclearSpokeV4).creationCode;
+    bytes memory _creation = type(EverclearSpokeV5).creationCode;
 
     // Deploying the new implementation via CREATE3
-    bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
-    (bool success, bytes memory returnData) = _params.create3.call(create3Calldata);
-    if (!success) revert Create3DeploymentFailed();
-    newEverclearSpoke = abi.decode(returnData, (address));
+    if (_params.create3 == address(0)) {
+      newEverclearSpoke = address(new EverclearSpokeV5{salt: _implementationSalt}());
+    } else {
+      bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
+      (bool success, bytes memory returnData) = _params.create3.call(create3Calldata);
+      if (!success) revert Create3DeploymentFailed();
+      newEverclearSpoke = abi.decode(returnData, (address));
+    }
 
     vm.stopBroadcast();
 
-    console.log('------------------------------------------------');
-    console.log('Deployed spoke impl to:', newEverclearSpoke, ' for chainId:', block.chainid);
-    console.log('Chain ID:', block.chainid);
-    console.log('------------------------------------------------');
+    console2.log('------------------------------------------------');
+    console2.log('Deployed spoke impl to:', newEverclearSpoke, ' for chainId:', block.chainid);
+    console2.log('Chain ID:', block.chainid);
+    console2.log('------------------------------------------------');
   }
 }
 
-contract MainnetStaging is DeployFeeAdapterUpgrade, MainnetStagingEnvironment {
+contract MainnetStaging is DeployDynamicGasLimitUpgrade, MainnetStagingEnvironment {
   function setUp() public {
     //// Ethereum
     _deploymentParams[ETHEREUM] =
@@ -81,7 +87,7 @@ contract MainnetStaging is DeployFeeAdapterUpgrade, MainnetStagingEnvironment {
   }
 }
 
-contract MainnetProduction is DeployFeeAdapterUpgrade, MainnetProductionEnvironment {
+contract MainnetProduction is DeployDynamicGasLimitUpgrade, MainnetProductionEnvironment {
   function setUp() public {
     //// Arbitrum One
     _deploymentParams[ARBITRUM_ONE] =
@@ -143,5 +149,19 @@ contract MainnetProduction is DeployFeeAdapterUpgrade, MainnetProductionEnvironm
 
     // Gnosis
     _deploymentParams[GNOSIS] = DeploymentParams({owner: OWNER, spokeProxy: address(GNOSIS_SPOKE), create3: CREATE_3}); // set domain id as mapping key
+
+    // Berachain
+    _deploymentParams[BERACHAIN] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(BERACHAIN_SPOKE), create3: LIFI_BERACHAIN_CREATE3}); // set domain id as mapping key
+
+    // Mantle
+    _deploymentParams[MANTLE] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(MANTLE_SPOKE), create3: LIFI_CREATE3}); // set domain id as mapping key
+
+    // Sonic
+    _deploymentParams[SONIC] = DeploymentParams({owner: OWNER, spokeProxy: address(SONIC_SPOKE), create3: LIFI_CREATE3}); // set domain id as mapping key
+
+    // Ink
+    _deploymentParams[INK] = DeploymentParams({owner: OWNER, spokeProxy: address(INK_SPOKE), create3: LIFI_INK_CREATE3}); // set domain id as mapping key
   }
 }

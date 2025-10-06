@@ -14,6 +14,7 @@ import {HubGateway, IHubGateway} from 'contracts/hub/HubGateway.sol';
 
 import {HubGateway} from 'contracts/hub/HubGateway.sol';
 import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
+import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
 import {ISpokeGateway, SpokeGateway} from 'contracts/intent/SpokeGateway.sol';
 import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
 
@@ -45,6 +46,13 @@ library Deploy {
         )
       )
     );
+  }
+
+  function EverclearSpokeUpgrade(
+    address _spokeProxy
+  ) internal returns (address _impl) {
+    _impl = address(new EverclearSpokeV5());
+    UnsafeUpgrades.upgradeProxy(_spokeProxy, _impl, '');
   }
 
   // hub contracts

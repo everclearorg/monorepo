@@ -1,0 +1,19 @@
+{
+  "chainId": "167000",
+  "createdAt": "1754639639000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Dynamic Gas Limit | Taiko | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7",
+      "value": "0",
+      "data": "0x4f1ef2860000000000000000000000004a170968bfb67822e422358a1263c906b257990700000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}
