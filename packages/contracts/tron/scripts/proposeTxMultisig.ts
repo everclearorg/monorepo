@@ -5,7 +5,7 @@ import Trx from '@ledgerhq/hw-app-trx';
 import fs from "fs/promises";
 
 import dotenv from 'dotenv';
-import { FEE_ADAPTER_PROD, SPOKE_PROD, SPOKE_STAGING } from './constants';
+import { FEE_ADAPTER_PROD, POLYMER_PROD_ISM, SPOKE_PROD, SPOKE_STAGING } from './constants';
 dotenv.config();
 
 const tronWeb = new TronWeb.TronWeb({
@@ -24,13 +24,13 @@ const tronGrid = new TronWeb.TronWeb({
   // 1. build
   const contract = SPOKE_PROD;
   const multiSigHex = tronWeb.address.toHex(MULTI_SIG_ADDRESS); // convert Base58 → hex
-  const transactionName = 'updateFeeAdapterProd'
+  const transactionName = 'updateSecurityModule'
 
   const { transaction: tx0 } = await tronWeb.transactionBuilder.triggerSmartContract(
     contract,
     'updateFeeAdapter(address)',
     { permissionId: 0, feeLimit: 5_000_000 },
-    [{ type: 'address', value: FEE_ADAPTER_PROD }, { type: 'bytes', value: '0x' }],
+    [{ type: 'address', value: POLYMER_PROD_ISM }],
     multiSigHex,
   );
   const tx = await tronWeb.transactionBuilder.extendExpiration(tx0, 86400); // extend expiration by 24 hours

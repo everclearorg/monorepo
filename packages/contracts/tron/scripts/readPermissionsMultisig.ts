@@ -1,4 +1,4 @@
-// Run with: yarn ts-node --files --project tsconfig.json tron/scripts/readMultisig.ts
+// Run with: yarn ts-node --files --project tsconfig.json tron/scripts/readPermissionMultisig.ts
 import axios from 'axios';
 
 async function readMultisig(address: string) {

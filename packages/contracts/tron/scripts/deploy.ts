@@ -17,6 +17,7 @@ import {
   SPOKE_STAGING,
   SPOKE_IMPL,
   HUB_GATEWAY_PROD,
+  HUB_GATEWAY_STAGING,
   GATEWAY_IMPL,
   CALL_EXECUTOR,
   MESSAGE_RECEIVER,
@@ -166,7 +167,7 @@ async function deployGatewayProxy(
     toEthHex(receiver),
     toEthHex(params.ism),
     params.hubDomain,
-    HUB_GATEWAY_PROD,
+    HUB_GATEWAY_STAGING,
   ]);
 
   const contractInstance = await tronWeb.contract().new({
@@ -231,17 +232,19 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     // );
     // console.log('Everclear Spoke (proxy) at:', spokeAddress);
 
-    // // Deploy Gateway (UUPS style)
-    // // const spokeAddress = SPOKE_PROD;
-    // const gatewayAddress = await deployGatewayProxy(
-    //   SpokeGatewayArtifact.abi,
-    //   SpokeGatewayArtifact.bytecode,
-    //   ERC1967ProxyArtifact.abi,
-    //   ERC1967ProxyArtifact.bytecode.object,
-    //   params,
-    //   spokeAddress,
-    // );
-    // console.log('Spoke Gateway (proxy) at:', gatewayAddress);
+    // Deploy Gateway (UUPS style)
+    // const spokeAddress = SPOKE_PROD;
+    // NOTE: Re-deploying
+    const spokeAddress = SPOKE_STAGING;
+    const gatewayAddress = await deployGatewayProxy(
+      SpokeGatewayArtifact.abi,
+      SpokeGatewayArtifact.bytecode,
+      ERC1967ProxyArtifact.abi,
+      ERC1967ProxyArtifact.bytecode.object,
+      params,
+      spokeAddress,
+    );
+    console.log('Spoke Gateway (proxy) at:', gatewayAddress);
 
     // // Deploying the XERC20Module
     // const xerc20ConstructorArgs = [spokeAddress];
@@ -252,11 +255,11 @@ async function calculateResourceUsage(deployerAddress: string, raw_bytes: string
     // );
     // console.log('XERC20Module at:', xerc20ModuleAddr);
 
-    // Deploy the FeeAdapter
-    const spokeAddress = SPOKE_PROD;
-    const constructorArgs = [spokeAddress, tronOwner, FEE_SIGNER_PROD, XERC20_MODULE_PROD, tronOwner];
-    const feeAdapterAddr = await deployContract(FeeAdapterArtifact.abi, FeeAdapterArtifact.bytecode, constructorArgs);
-    console.log('FeeAdapter at:', feeAdapterAddr);
+    // // Deploy the FeeAdapter
+    // const spokeAddress = SPOKE_PROD;
+    // const constructorArgs = [spokeAddress, tronOwner, FEE_SIGNER_PROD, XERC20_MODULE_PROD, tronOwner];
+    // const feeAdapterAddr = await deployContract(FeeAdapterArtifact.abi, FeeAdapterArtifact.bytecode, constructorArgs);
+    // console.log('FeeAdapter at:', feeAdapterAddr);
 
     console.log('DONE!');
   } catch (err) {

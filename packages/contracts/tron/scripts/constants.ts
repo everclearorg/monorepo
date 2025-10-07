@@ -1,6 +1,9 @@
 // Global //
-export const POLYMER_ISM: string = '41cbcbc532cf88bacf1c8a6359604c784d042bb692';
+export const POLYMER_PROD_ISM: string = 'TVxZzZEK9dKj1Y5ZK4HhEFZPWGQEwDuz47'; // Prod ISM: TVxZzZEK9dKj1Y5ZK4HhEFZPWGQEwDuz47
 export const POLYMER_MAILBOX: string = '415b34081e9d453fc2ba925d893583d89d1b7175dd';
+export const POLYMER_STAGING_MAILBOX: string = 'TGWEpW7aytCrJhryWZ73M8G22Q4cKh5LUa';
+export const POLYMER_STAGING_ISM: string = 'TAX5oSJURLpgf4C1GAjuSAdxNt6P6WWX41';
+
 export const MESSAGE_RECEIVER: string = '4147120c330314b3929b3efa22234a069f84e2c80d';
 export const CALL_EXECUTOR: string = '41902fdfc8e489100aadfc982d7c5144253b5dfb81';
 export const GATEWAY_IMPL: string = '417039676630aba9606afa13bfb4b822d67c05282a';
@@ -12,8 +15,8 @@ export const tronWatchtower: string = 'TJx4rVn6Nf2P1ZL9m5G737EYLD3BQdF7rj';
 export const tronOwner: string = 'TATCzhQqxq9DRppGHiEFvFuoDW6tHaESqg'; // NOTE: Using EOA to enable the update of the gateway
 export const tronMaxSolversFee: number = 5000;
 export const hubDomain: number = 25327;
-export const tronIsm: string = POLYMER_ISM;
-export const tronMailbox: string = POLYMER_MAILBOX;
+export const tronIsm: string = POLYMER_STAGING_ISM;
+export const tronMailbox: string = POLYMER_STAGING_MAILBOX;
 
 // Implementations //
 export const EVERCLEAR_SPOKE_IMPL = 'TRooMrhE5VP2JFRyBf74fqMijMGx8usXuX';
