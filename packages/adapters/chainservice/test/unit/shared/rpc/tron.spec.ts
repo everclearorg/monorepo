@@ -1065,7 +1065,7 @@ describe('TronSyncProvider', () => {
         'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
         'transfer(address,uint256)',
         {
-          feeLimit: 42000000, // 100000 energy * 420 SUN per energy
+          feeLimit: 10000000, // 100000 energy * 420 SUN per energy
           callValue: 1000000,
           rawParameter: '000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         },
@@ -1139,7 +1139,7 @@ describe('TronSyncProvider', () => {
         'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
         'transfer(address,uint256)',
         {
-          feeLimit: 42000000, // 100000 energy * 420 SUN per energy
+          feeLimit: 10000000, // 100000 energy * 420 SUN per energy
           callValue: 1000000,
           rawParameter: '000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         },
