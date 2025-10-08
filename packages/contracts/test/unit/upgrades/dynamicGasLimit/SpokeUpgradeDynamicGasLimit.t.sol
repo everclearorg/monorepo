@@ -22,7 +22,6 @@ import {Constants} from 'test/utils/Constants.sol';
 import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-import 'forge-std/Console.sol';
 import {ICREATE3, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
 
 contract SpokeUpgradeDynamicGasLimitTest is BaseTest, UpgradeHelper {
