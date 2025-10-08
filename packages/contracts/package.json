@@ -89,7 +89,7 @@
     "tronweb": "beta",
     "ts-node": "^10.9.2",
     "tweetnacl": "^1.0.3",
-    "viem": "^2.19.8"
+    "viem": "2.19.8"
   },
   "devDependencies": {
     "@commitlint/cli": "17.0.3",

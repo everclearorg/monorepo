@@ -1,13 +1,23 @@
 {
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "module": "CommonJS",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2022"],
+    "noEmit": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "strictNullChecks": false
   },
   "include": ["src/**/*", "tron/build/contracts/**/*", "tron/deploy/**/*.ts", "tron/types/**/*.d.ts", "tron/scripts/spoke.ts", "tron/scripts/readSpokeState.ts"],
+  "exclude": ["node_modules/**", "dist/**", "build/**", "cache/**", "out/**"],
   "references": []
 }

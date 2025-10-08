@@ -4,9 +4,11 @@
     "rootDir": ".",
     "outDir": "dist",
     "composite": true,
-    "tsBuildInfoFile": "./tsconfig.tsBuildInfo"
+    "tsBuildInfoFile": "./tsconfig.tsBuildInfo",
+    "skipLibCheck": true,
+    "moduleResolution": "node"
   },
-  "exclude": ["./test", "./src", "./script", "./node_modules/**", "./cache", "./out"],
+  "exclude": ["./test", "./src", "./script", "./tron", "./node_modules/**", "./cache", "./out"],
   "include": ["deployments/**/*.json", "deployments/**/*.ts", "cli/**/*.ts"],
   "references": []
 }
