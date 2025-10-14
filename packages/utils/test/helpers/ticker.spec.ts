@@ -5,6 +5,7 @@ import {
   getTickerHashes,
   NoTickerFoundForAsset,
   NoTickersConfigured,
+  MultipleTickersFoundForAsset,
   ChainConfig,
   expect,
   mkAddress,
@@ -65,12 +66,21 @@ describe('Helpers:assets', () => {
 
     it('should fail if multiple tickers found', async () => {
       config['1'].assets!['USDC2'] = { ...config['1'].assets!['USDC'] };
-      expect(() => getTickerFromAssetContext('1', mkAddress('0x55'), config)).to.throw(NoTickerFoundForAsset);
+      expect(() => getTickerFromAssetContext('1', config['1'].assets!['USDC'].address, config)).to.throw(MultipleTickersFoundForAsset);
     });
 
-    it('should work', async () => {
+    it('should work with exact address match', async () => {
       const ret = getTickerFromAssetContext('1', config['1'].assets![ticker].address, config);
       expect(ret).to.be.eq(ticker);
+    });
+
+    it('should work with case-insensitive address match', async () => {
+      const ret = getTickerFromAssetContext('1', config['1'].assets![ticker].address.toUpperCase(), config);
+      expect(ret).to.be.eq(ticker);
+    });
+
+    it('should fail if domain does not exist', async () => {
+      expect(() => getTickerFromAssetContext('999', mkAddress('0x55'), config)).to.throw(NoTickersConfigured);
     });
   });
 
@@ -79,8 +89,68 @@ describe('Helpers:assets', () => {
       expect(() => getConfiguredTickers(MOCK_CHAINS)).to.throw(NoTickersConfigured);
     });
 
-    it('should work', async () => {
+    it('should work with all assets', async () => {
       expect(getConfiguredTickers(config)).to.be.deep.eq([ticker]);
+    });
+
+    it('should work with skipNativeAssets=false', async () => {
+      expect(getConfiguredTickers(config, false)).to.be.deep.eq([ticker]);
+    });
+
+    it('should skip native assets when skipNativeAssets=true', async () => {
+      // Add a native asset
+      config['1'].assets!['ETH'] = {
+        address: mkAddress('0xeth'),
+        symbol: 'ETH',
+        decimals: 18,
+        isNative: true,
+        price: { isStable: false },
+      };
+
+      const result = getConfiguredTickers(config, true);
+      expect(result).to.not.include('ETH');
+      expect(result).to.include('USDC');
+    });
+
+    it('should include native assets when skipNativeAssets=false', async () => {
+      // Add a native asset
+      config['1'].assets!['ETH'] = {
+        address: mkAddress('0xeth'),
+        symbol: 'ETH',
+        decimals: 18,
+        isNative: true,
+        price: { isStable: false },
+      };
+
+      const result = getConfiguredTickers(config, false);
+      expect(result).to.include('ETH');
+      expect(result).to.include('USDC');
+    });
+
+    it('should handle multiple domains with different assets', async () => {
+      config['2'] = {
+        ...MOCK_CHAINS[1337],
+        assets: {
+          'USDT': {
+            address: mkAddress('0xusdt'),
+            symbol: 'USDT',
+            decimals: 6,
+            isNative: false,
+            price: { isStable: true },
+          },
+        },
+      };
+
+      const result = getConfiguredTickers(config);
+      expect(result).to.include('USDC');
+      expect(result).to.include('USDT');
+    });
+
+    it('should handle assets with undefined values', async () => {
+      config['1'].assets!['INVALID'] = undefined as any;
+      
+      const result = getConfiguredTickers(config);
+      expect(result).to.be.deep.eq([ticker]);
     });
   });
 

@@ -114,6 +114,42 @@ const MOCK_CHAINS = {
       },
     },
   },
+  '1339': {
+    providers: ['http://rpc-1339:8545'],
+    subgraphUrls: ['http://1339.mocksubgraph.com'],
+    deployments: {
+      everclear: mkAddress('0x1339ccc'),
+      gateway: mkAddress('0x1339fff'),
+    },
+    confirmations: 3,
+    network: 'tvm',
+    assets: {
+      TRX: {
+        symbol: 'TRX',
+        address: 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb',
+        decimals: 6,
+        isNative: true,
+        price: {
+          isStable: false,
+          priceFeed: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
+          coingeckoId: 'tron',
+        },
+        tickerHash: "0xbbbeebeb3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4",
+      },
+      USDT: {
+        symbol: 'USDT',
+        address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
+        decimals: 6,
+        isNative: false,
+        price: {
+          isStable: true,
+          priceFeed: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
+          coingeckoId: 'tether',
+        },
+        tickerHash: "0xccceeee3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4",
+      },
+    },
+  },
 };
 
 const MOCK_THRESHOLDS = {
@@ -231,7 +267,8 @@ export const mock = {
     return { ...MOCK_THRESHOLDS, ...overrides };
   },
   config: (overrides: Partial<MonitorConfig> = {}): MonitorConfig => {
-    return {
+    // Deep clone to prevent test interference
+    return JSON.parse(JSON.stringify({
       environment: 'staging',
       network: 'staging',
       logLevel: MOCK_ENV.MONITOR_LOG_LEVEL as LogLevel,
@@ -260,7 +297,7 @@ export const mock = {
       tokenomicsTables: MOCK_TOKENOMICS_TABLES,
       solana: MOCK_SOLANA,
       ...overrides,
-    };
+    }));
   },
   context: (overrides: Partial<AppContext> = {}): AppContext => {
     const { config, ...remainder } = overrides;
@@ -421,9 +458,19 @@ export const mock = {
 
 export const mochaHooks = {
   beforeEach() {
+    // Always restore and reset first to ensure clean state
+    restore();
+    reset();
+    
     // Create stubbed instance
     mockChainReader = createStubInstance(ChainReader, {
       readTx: stub<[ReadTransaction, number | string]>().resolves('0x'),
+      getBlock: stub().resolves({
+        number: 1000,
+        timestamp: Math.floor(Date.now() / 1000),
+        hash: '0x1234567890abcdef',
+      }),
+      getBalance: stub().resolves('1000000000000000000'), // 1 ETH in wei
     });
     mockLogger = createStubInstance(Logger);
     mockDatabase = createMockDatabase();
@@ -432,6 +479,8 @@ export const mochaHooks = {
     // Stub call to get database
     stub(ChimeraDatabase, 'getDatabase').resolves(mockDatabase);
 
+    // Note: Individual tests handle their own Interface and asset helper stubs to avoid conflicts
+
     // Stub call to logger
     mockLogger.child = stub(Logger.prototype, 'child').returns(mockLogger);
     mockLogger.debug = stub(Logger.prototype, 'debug').returns();
@@ -439,7 +488,7 @@ export const mochaHooks = {
     mockLogger.warn = stub(Logger.prototype, 'warn').returns();
     mockLogger.error = stub(Logger.prototype, 'error').returns();
 
-    // Stub call to get context
+    // Stub call to get context (reset to default for each test)
     getContextStub = stub(AppContextFunctions, 'getContext').returns(mock.context());
   },
 

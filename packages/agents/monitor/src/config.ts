@@ -175,6 +175,11 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     const minGasOnRelayer = localChainConfig?.minGasOnRelayer || localThresholds?.minGasOnRelayer;
     const minGasOnGateway = localChainConfig?.minGasOnGateway || localThresholds?.minGasOnGateway;
 
+    const minBandwidthOnRelayer = localChainConfig?.minBandwidthOnRelayer;
+    const minEnergyOnRelayer = localChainConfig?.minEnergyOnRelayer;
+    const minBandwidthOnGateway = localChainConfig?.minBandwidthOnGateway;
+    const minEnergyOnGateway = localChainConfig?.minEnergyOnGateway;
+
     chainsForMonitorConfig[domainId] = {
       providers,
       subgraphUrls,
@@ -185,6 +190,10 @@ export const getConfig = async (): Promise<MonitorConfig> => {
       // Only include these properties if they were specified
       ...(minGasOnRelayer !== undefined && { minGasOnRelayer }),
       ...(minGasOnGateway !== undefined && { minGasOnGateway }),
+      ...(minBandwidthOnRelayer !== undefined && { minBandwidthOnRelayer }),
+      ...(minEnergyOnRelayer !== undefined && { minEnergyOnRelayer }),
+      ...(minBandwidthOnGateway !== undefined && { minBandwidthOnGateway }),
+      ...(minEnergyOnGateway !== undefined && { minEnergyOnGateway }),
     };
 
     if (localChainConfig?.privateKey) {

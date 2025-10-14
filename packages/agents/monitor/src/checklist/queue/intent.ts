@@ -2,6 +2,7 @@ import { QueueType, createLoggingContext, getNtpTimeSeconds } from '@chimera-mon
 import { getContext } from '../../context';
 import { Severity } from '../../types';
 import { resolveAlerts, sendAlerts } from '../../mockable';
+import { getSupportedDomains } from '../../helpers';
 
 export const checkFillQueueCount = async (): Promise<Map<string, number>> => {
   const {
@@ -11,7 +12,7 @@ export const checkFillQueueCount = async (): Promise<Map<string, number>> => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkFillQueueCount.name);
 
-  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
+  const domains = getSupportedDomains(config.chains);
   const intentsByDomain = await database.getMessageQueueContents(QueueType.Fill, domains);
   const countsByDomain = new Map<string, number>(
     domains.map((domain) => [domain, intentsByDomain.get(domain)?.length ?? 0]),
@@ -62,7 +63,7 @@ export const checkFillQueueLatency = async (): Promise<Map<string, number>> => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkFillQueueLatency.name);
 
-  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
+  const domains = getSupportedDomains(config.chains);
   const intentsByDomain = await database.getMessageQueueContents(QueueType.Fill, domains);
 
   const latencyByDomain = new Map<string, number>();
@@ -133,7 +134,7 @@ export const checkIntentQueueCount = async (): Promise<Map<string, number>> => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkIntentQueueCount.name);
 
-  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
+  const domains = getSupportedDomains(config.chains);
   const intentsByDomain = await database.getMessageQueueContents(QueueType.Intent, domains);
   const countsByDomain = new Map<string, number>(
     domains.map((domain) => [domain, intentsByDomain.get(domain)?.length ?? 0]),
@@ -184,7 +185,7 @@ export const checkIntentQueueLatency = async (): Promise<Map<string, number>> =>
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkIntentQueueLatency.name);
 
-  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
+  const domains = getSupportedDomains(config.chains);
   const intentsByDomain = await database.getMessageQueueContents(QueueType.Intent, domains);
 
   const latencyByDomain = new Map<string, number>();

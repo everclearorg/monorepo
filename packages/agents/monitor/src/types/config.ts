@@ -19,6 +19,11 @@ export const TExtendedChainConfig = Type.Intersect([
     minGasOnRelayer: Type.Optional(Type.Number()),
     minGasOnGateway: Type.Optional(Type.Number()),
     maxDelayedSubgraphBlock: Type.Optional(Type.Number()),
+    // Tron-specific resource limits
+    minBandwidthOnRelayer: Type.Optional(Type.Number()),
+    minEnergyOnRelayer: Type.Optional(Type.Number()),
+    minBandwidthOnGateway: Type.Optional(Type.Number()),
+    minEnergyOnGateway: Type.Optional(Type.Number()),
     network: Type.Optional(Type.String()),
   }),
 ]);

@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { stub, SinonStub, restore } from 'sinon';
-import { TronSyncProvider, TronWebFactory } from '../../../../src/shared/rpc/tron/provider';
+import { TronSyncProvider } from '../../../../src/shared/rpc/tron';
+import { TronWebFactory } from '@chimera-monorepo/utils';
 import { TronWeb } from 'tronweb';
 import { BigNumber, Bytes } from 'ethers';
 import { ISigner, ISignerApi } from '../../../../src';
@@ -125,7 +126,7 @@ describe('TronSyncProvider', () => {
 
     // Create a mock factory that returns our mock TronWeb
     mockTronWebFactory = {
-      create: (config: { fullHost: string; apiKey?: string }) => mockTronWeb as unknown as InstanceType<typeof TronWeb>
+      create: (url: string) => mockTronWeb as unknown as InstanceType<typeof TronWeb>
     };
 
     // Create provider with mock factory
@@ -186,10 +187,7 @@ describe('TronSyncProvider', () => {
       );
       
       expect(createStub.calledOnce).to.be.true;
-      expect(createStub.firstCall.args[0]).to.deep.equal({
-        fullHost: 'http://tron.test/',
-        apiKey: testApiKey
-      });
+      expect(createStub.firstCall.args[0]).to.deep.equal('http://tron.test?apiKey=test-api-key-123');
     });
 
     it('should work without API key in URL', () => {
@@ -204,10 +202,7 @@ describe('TronSyncProvider', () => {
       );
       
       expect(createStub.calledOnce).to.be.true;
-      expect(createStub.firstCall.args[0]).to.deep.equal({
-        fullHost: 'http://tron.test/',
-        apiKey: undefined
-      });
+      expect(createStub.firstCall.args[0]).to.deep.equal('http://tron.test');
     });
   });
 

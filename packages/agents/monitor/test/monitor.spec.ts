@@ -114,10 +114,17 @@ describe('Monitor', () => {
 
   describe('#getSubgraphReaderConfig', () => {
     it('should work', async () => {
-      const config = mock.config();
-      const result = getSubgraphReaderConfig(config.chains);
+      // Get a fresh config directly to avoid test interference
+      const freshConfig = {
+        chains: {
+          '1337': { subgraphUrls: ['http://1337.mocksubgraph.com'] },
+          '1338': { subgraphUrls: ['http://1338.mocksubgraph.com'] },
+          '1339': { subgraphUrls: ['http://1339.mocksubgraph.com'] },
+        },
+      };
+      const result = getSubgraphReaderConfig(freshConfig.chains);
 
-      expect(Object.keys(result.subgraphs).length).to.equal(2);
+      expect(Object.keys(result.subgraphs).length).to.equal(3);
     });
   });
 });

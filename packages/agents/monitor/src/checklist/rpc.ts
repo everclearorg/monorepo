@@ -4,6 +4,7 @@ import { getContext } from '../context';
 import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
 import { Connection } from '@solana/web3.js';
+import { DefaultTronWebFactory } from '@chimera-monorepo/utils';
 import { getLatestBlockFromBlockMap } from '../helpers/chain';
 
 interface RpcError {
@@ -27,6 +28,7 @@ export const checkRpcs = async () => {
   const { config, logger } = getContext();
 
   const { requestContext, methodContext } = createLoggingContext(checkRpcs.name);
+  const tronWebFactory = new DefaultTronWebFactory();
   const badRpcs: RpcError[] = [];
   const goodRpcs: { blockNumber: number; domain: string; rpcOrigin: string }[] = [];
   await Promise.all(
@@ -47,12 +49,23 @@ export const checkRpcs = async () => {
                   blockNumber = cached.number;
                   return;
                 }
-                if (chainConfig.network === 'svm') {
-                  const connection = new Connection(rpcUrl);
-                  blockNumber = await connection.getBlockHeight();
-                } else {
-                  const provider = new providers.JsonRpcProvider(rpcUrl);
-                  blockNumber = await provider.getBlockNumber();
+                switch (chainConfig.network) {
+                  case 'svm': {
+                    const connection = new Connection(rpcUrl);
+                    blockNumber = await connection.getBlockHeight();
+                    break;
+                  }
+                  case 'tvm': {
+                    const tronWeb = tronWebFactory.create(rpcUrl);
+                    const block = await tronWeb.trx.getCurrentBlock();
+                    blockNumber = block.block_header.raw_data.number;
+                    break;
+                  }
+                  default: {
+                    const provider = new providers.JsonRpcProvider(rpcUrl);
+                    blockNumber = await provider.getBlockNumber();
+                    break;
+                  }
                 }
               })().then((ret) => {
                 logger.debug('Retrieved block number for rpc', requestContext, methodContext, {

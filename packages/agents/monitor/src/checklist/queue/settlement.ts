@@ -3,6 +3,7 @@ import { BigNumber, utils } from 'ethers';
 import { getContext } from '../../context';
 import { Severity } from '../../types';
 import { resolveAlerts, sendAlerts } from '../../mockable';
+import { getSupportedDomains } from '../../helpers';
 
 export const checkSettlementQueueStatusCount = async (): Promise<Map<string, Map<string, number>>> => {
   const {
@@ -12,11 +13,10 @@ export const checkSettlementQueueStatusCount = async (): Promise<Map<string, Map
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkSettlementQueueStatusCount.name);
 
-  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
+  const domains = getSupportedDomains(config.chains);
   logger.debug('Method start', requestContext, methodContext, {
     domains,
     hubDomain: config.hub.domain,
-    assets: config.chains.assets,
   });
 
   // Get all of the queued settlements
@@ -25,6 +25,9 @@ export const checkSettlementQueueStatusCount = async (): Promise<Map<string, Map
   await Promise.all(
     [...queuedSettlements].map(async (_record) => {
       const [settlementDomain, settlements] = _record;
+      if (!domains.includes(settlementDomain)) {
+        return;
+      }
       const statusCounts = statusCountByTicker.get(settlementDomain) || new Map<string, number>();
       settlements.forEach((settlement) => {
         // Increment the status count
@@ -151,7 +154,7 @@ export const checkSettlementQueueLatency = async (): Promise<Map<string, number>
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkSettlementQueueLatency.name);
 
-  const domains = Object.keys(config.chains).filter((domain) => config.chains[domain].network === 'evm');
+  const domains = getSupportedDomains(config.chains);
   logger.debug('Method start', requestContext, methodContext, {
     domains,
     hubDomain: config.hub.domain,
@@ -187,6 +190,9 @@ export const checkSettlementQueueLatency = async (): Promise<Map<string, number>
   await Promise.all(
     [...queuedSettlements].map(async (_record) => {
       const [settlementDomain, settlements] = _record;
+      if (!domains.includes(settlementDomain)) {
+        return;
+      }
       settlements.forEach((settlement) => {
         // Identify latency by tickerhash
         if (settlement.status == 'DISPATCHED') return; // Only check latency for unsettled settlements

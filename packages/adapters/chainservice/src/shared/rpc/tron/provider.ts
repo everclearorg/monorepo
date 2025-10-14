@@ -11,9 +11,9 @@ import {
 } from '../../types';
 import { SyncProvider } from '../eth';
 import { UnpredictableGasLimit, TransactionReadError } from '../../errors';
-import { TronWeb } from '../../../mockable';
 import { Interface } from 'ethers/lib/utils';
 import fetch from 'node-fetch';
+import { DefaultTronWebFactory, TronWebFactory, TronWebInstance } from '@chimera-monorepo/utils';
 
 interface ContractFunctionParameter {
   type: string;
@@ -26,23 +26,7 @@ interface TronLog {
   data: string;
 }
 
-type TronWebInstance = InstanceType<typeof TronWeb>;
-
 const DEFAULT_ADDRESS = '410000000000000000000000000000000000000000';
-
-export interface TronWebFactory {
-  create(config: { fullHost: string; apiKey?: string }): TronWebInstance;
-}
-
-class DefaultTronWebFactory implements TronWebFactory {
-  create(config: { fullHost: string; apiKey?: string }): TronWebInstance {
-    const tronWebConfig: any = { fullHost: config.fullHost };
-    if (config.apiKey) {
-      tronWebConfig.headers = { "TRON-PRO-API-KEY": config.apiKey };
-    }
-    return new TronWeb(tronWebConfig);
-  }
-}
 
 // For simple parameters, decode and convert to TronWeb format
 function decodeSimpleParameters(data: string, funcSig: string, value?: string): ContractFunctionParameter[] {
@@ -74,6 +58,7 @@ function decodeSimpleParameters(data: string, funcSig: string, value?: string): 
     return [];
   }
 }
+
 class TronWeb3Signer implements ISigner {
   public readonly tronWeb: TronWebInstance;
 
@@ -328,16 +313,13 @@ export class TronSyncProvider extends SyncProvider {
     debugLogging = false,
     private readonly tronWebFactory: TronWebFactory = new DefaultTronWebFactory(),
   ) {
-    // Extract API key from URL if present
-    const urlObj = new URL(url);
-    const apiKey = urlObj.searchParams.get('apiKey');
-    
     // Remove API key from URL to get clean fullHost
+    const urlObj = new URL(url);
     urlObj.searchParams.delete('apiKey');
     const cleanUrl = urlObj.toString();
     
     super(cleanUrl, domain, stallTimeout, debugLogging);
-    this.tronWeb = this.tronWebFactory.create({ fullHost: cleanUrl, apiKey: apiKey || undefined });
+    this.tronWeb = this.tronWebFactory.create(url);
   }
 
   public async sync(): Promise<void> {

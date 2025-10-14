@@ -41,8 +41,73 @@ describe('helpers:alerts', () => {
     });
   
     describe('#sendAlerts', () => {
-      it('should work', async () => {
-        expect(sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'))).to.be.not.throw;
+      it('should send alerts to all configured channels', async () => {
+        await sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'));
+        
+        expect(telegramStub.calledOnce).to.be.true;
+        expect(discordStub.calledOnce).to.be.true;
+        expect(betterUptimeStub.calledOnce).to.be.true;
+        expect(logger.warn.calledOnce).to.be.true;
+      });
+
+      it('should send alerts only to discord when other channels are disabled', async () => {
+        const discordOnlyConfig = {
+          ...config,
+          telegram: undefined,
+          betterUptime: undefined,
+        };
+
+        await sendAlerts(TEST_REPORT, logger, discordOnlyConfig, createRequestContext('test'));
+        
+        expect(discordStub.calledOnce).to.be.true;
+        expect(telegramStub.called).to.be.false;
+        expect(betterUptimeStub.called).to.be.false;
+      });
+
+      it('should send alerts only to telegram when other channels are disabled', async () => {
+        const telegramOnlyConfig = {
+          ...config,
+          discord: undefined,
+          betterUptime: undefined,
+        };
+
+        await sendAlerts(TEST_REPORT, logger, telegramOnlyConfig, createRequestContext('test'));
+        
+        expect(telegramStub.calledOnce).to.be.true;
+        expect(discordStub.called).to.be.false;
+        expect(betterUptimeStub.called).to.be.false;
+      });
+
+      it('should send alerts only to betteruptime when other channels are disabled', async () => {
+        const betterUptimeOnlyConfig = {
+          ...config,
+          discord: undefined,
+          telegram: undefined,
+        };
+
+        await sendAlerts(TEST_REPORT, logger, betterUptimeOnlyConfig, createRequestContext('test'));
+        
+        expect(betterUptimeStub.calledOnce).to.be.true;
+        expect(telegramStub.called).to.be.false;
+        expect(discordStub.called).to.be.false;
+      });
+
+      it('should handle alert failures gracefully', async () => {
+        telegramStub.rejects(new Error('Telegram API Error'));
+        discordStub.rejects(new Error('Discord API Error'));
+        betterUptimeStub.rejects(new Error('BetterUptime API Error'));
+
+        // Should not throw even if all alerts fail
+        await expect(sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'))).to.not.be.rejected;
+        expect(logger.warn.calledOnce).to.be.true;
+      });
+
+      it('should preprocess report with network and unique ids', async () => {
+        await sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'));
+        
+        const alertReport = telegramStub.getCall(0).args[0];
+        expect(alertReport.env).to.include('staging');
+        expect(alertReport.reason).to.include('#');
       });
     });
 
@@ -62,6 +127,34 @@ describe('helpers:alerts', () => {
         expect(alertReport.ids).to.be.eq(resolveReport.ids);
         expect(alertReport.timestamp).to.be.eq(resolveReport.timestamp);
         expect(alertReport.type).to.be.eq(resolveReport.type);
-      })
+      });
+
+      it('should resolve alerts with byName parameter', async () => {
+        await resolveAlerts(TEST_REPORT, logger, config, createRequestContext('test'), true);
+        
+        expect(resolveBetterUptimeStub.calledOnce).to.be.true;
+        expect(resolveBetterUptimeStub.getCall(0).args[3]).to.be.true; // byName parameter
+        expect(logger.info.calledOnce).to.be.true;
+      });
+
+      it('should not resolve alerts when betterUptime is disabled', async () => {
+        const noBetterUptimeConfig = {
+          ...config,
+          betterUptime: undefined,
+        };
+
+        await resolveAlerts(TEST_REPORT, logger, noBetterUptimeConfig, createRequestContext('test'));
+        
+        expect(resolveBetterUptimeStub.called).to.be.false;
+        expect(logger.info.calledOnce).to.be.true;
+      });
+
+      it('should handle resolve failures gracefully', async () => {
+        resolveBetterUptimeStub.rejects(new Error('BetterUptime API Error'));
+
+        // Should not throw even if resolve fails
+        await expect(resolveAlerts(TEST_REPORT, logger, config, createRequestContext('test'))).to.not.be.rejected;
+        expect(logger.info.calledOnce).to.be.true;
+      });
     });
   });

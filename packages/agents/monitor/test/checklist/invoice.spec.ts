@@ -135,8 +135,8 @@ describe('checkInvoiceAmount', () => {
   it('should not send alerts if no invoices meet the conditions', async () => {
     // Mock data
     const mockInvoices = [
-      mock.invoice({ id: '1', originIntent: mock.originIntent({ outputAsset: 'asset1' }), hubInvoiceAmount: '150' }),
-      mock.invoice({ id: '2', originIntent: mock.originIntent({ outputAsset: 'asset2' }), hubInvoiceAmount: '250' }),
+      mock.invoice({ id: '1', originIntent: mock.originIntent({ outputAsset: 'asset1' }), hubInvoiceAmount: '150', hubInvoiceEntryEpoch: 1234567890 }),
+      mock.invoice({ id: '2', originIntent: mock.originIntent({ outputAsset: 'asset2' }), hubInvoiceAmount: '250', hubInvoiceEntryEpoch: 1234567890 }),
     ];
     const mockCustodiedAssets = {
       asset1: '150',

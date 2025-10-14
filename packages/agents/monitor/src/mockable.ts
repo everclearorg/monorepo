@@ -15,8 +15,11 @@ import {
   resolveAlerts as _resolveAlerts,
   getSsmParameter as _getSsmParameter,
   getMailboxInterface as _getMailboxInterface,
+  getAccountResources as _getAccountResources,
   AssetConfig,
 } from '@chimera-monorepo/utils';
+import { fetchRelayerData as _fetchRelayerData } from './helpers/relayer';
+import { getTronLastIntentNonce as _getTronLastIntentNonce } from './helpers/tron';
 
 export const getContract = (address: string, abi: ContractInterface, provider?: providers.JsonRpcProvider) =>
   new Contract(address, abi, provider);
@@ -52,3 +55,6 @@ export const sendAlerts = _sendAlerts;
 export const resolveAlerts = _resolveAlerts;
 export const getSsmParameter = _getSsmParameter;
 export const getMailboxInterface = _getMailboxInterface;
+export const getAccountResources = _getAccountResources;
+export const fetchRelayerData = _fetchRelayerData;
+export const getTronLastIntentNonce = _getTronLastIntentNonce;

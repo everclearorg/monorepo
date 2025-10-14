@@ -11,12 +11,15 @@ export const getIntentStatus = async (
 ): Promise<IntentMessageSummary> => {
   const {
     config,
-    adapters: { subgraph },
+    adapters: { subgraph, database },
   } = getContext();
 
-  // Retrieve intent records from subgraph.
+  // Check if originDomain is Tron - if so, query from database instead of subgraph
+  const isTronOrigin = config.chains[originDomain]?.network === 'tvm';
+
+  // Retrieve intent records from subgraph and db.
   const [originIntent, hubIntent, ...destinationIntents] = await Promise.all([
-    subgraph.getOriginIntentById(originDomain, intentId),
+    isTronOrigin ? database.getOriginIntentsById(intentId) : subgraph.getOriginIntentById(originDomain, intentId),
     subgraph.getHubIntentById(config.hub.domain, intentId),
     ...destinationDomains.map((domain) => subgraph.getDestinationIntentById(domain, intentId)),
   ]);

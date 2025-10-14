@@ -21,6 +21,7 @@ import { getContext } from '../context';
 import { checkSpokeBalance } from './spoke';
 import { checkTokenomicsExportLatency, checkTokenomicsExportStatus } from './tokenomics';
 import { checkSolanaPipelineStatus } from './solana';
+import { checkTronGas, checkTronPipelineStatus } from './tron';
 
 export const runChecks = async (_requestContext?: RequestContext) => {
   const { methodContext, requestContext } = createLoggingContext(runChecks.name, _requestContext);
@@ -41,11 +42,13 @@ export const runChecks = async (_requestContext?: RequestContext) => {
     checkTokenomicsExportStatus,
     checkTokenomicsExportLatency,
     checkSolanaPipelineStatus,
+    checkTronGas,
+    checkTronPipelineStatus,
     checkInvoices,
     checkMessageStatus,
-    checkChains,
     checkGas,
     checkSpokeBalance,
+    checkChains,
     checkRpcs,
   ];
 

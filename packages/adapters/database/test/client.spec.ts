@@ -801,6 +801,7 @@ describe('Database Adapter:Client', () => {
 
       await sleep(100);
       const from = new Date();
+      await sleep(100);
 
       event.transactionHash = mkBytes32('0x3');
       await saveRewardClaimedEvent(event);

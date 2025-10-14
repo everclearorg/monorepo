@@ -6,12 +6,14 @@ import { ChainReader } from '@chimera-monorepo/chainservice';
 import { createProcessEnv } from '../../mock';
 import { Database } from '@chimera-monorepo/database';
 import * as Mockable from '../../../src/mockable';
+import * as ChainHelpers from '../../../src/helpers/chain';
 
 describe('Queue Checklist - intent', () => {
   let chainreader: SinonStubbedInstance<ChainReader>;
   let logger: SinonStubbedInstance<Logger>;
   let sendAlertsStub: SinonStub;
   let database: SinonStubbedInstance<Database>;
+  let getSupportedDomainsStub: SinonStub;
 
   beforeEach(() => {
     stub(process, 'env').value({
@@ -31,6 +33,7 @@ describe('Queue Checklist - intent', () => {
     database.getMessageQueueContents.resolves(contents);
     sendAlertsStub = stub(Mockable, 'sendAlerts');
     stub(Mockable, 'resolveAlerts').resolves();
+    getSupportedDomainsStub = stub(ChainHelpers, 'getSupportedDomains').returns(['1337', '1338']);
   });
 
   afterEach(() => {

@@ -59,3 +59,22 @@ export class UnableToGetSpokeState extends EverclearError {
     super(`Unable to get spoke state`, { ...context });
   }
 }
+
+// Tron-specific error types
+export class TronChainNotConfigured extends EverclearError {
+  constructor(context: object = {}) {
+    super('Tron chain is not configured', { ...context }, TronChainNotConfigured.name);
+  }
+}
+
+export class TronSpokeAddressNotConfigured extends EverclearError {
+  constructor(context: object = {}) {
+    super('No Tron spoke address configured', { ...context }, TronSpokeAddressNotConfigured.name);
+  }
+}
+
+export class TronNonceReadFailed extends EverclearError {
+  constructor(context: object = {}) {
+    super('Failed to read Tron last intent nonce', { ...context }, TronNonceReadFailed.name);
+  }
+}

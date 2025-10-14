@@ -14,6 +14,7 @@ import * as invoice from './../../src/checklist/queue/invoice';
 import * as message from './../../src/checklist/queue/message';
 import * as tokenomics from "./../../src/checklist/tokenomics";
 import * as solana from "./../../src/checklist/solana";
+import * as tron from "./../../src/checklist/tron";
 
 describe('runChecks', () => {
   let sandbox: sinon.SinonSandbox;
@@ -60,6 +61,9 @@ describe('runChecks', () => {
     const checkTokenomicsExportLatencyStub = sandbox.stub(tokenomics, 'checkTokenomicsExportLatency').resolves();
     const checkSolanaPipelineStatusStub = sandbox.stub(solana, 'checkSolanaPipelineStatus').resolves();
     
+    // Add Tron stubs
+    const checkTronGasStub = sandbox.stub(tron, 'checkTronGas').resolves();
+    const checkTronPipelineStatusStub = sandbox.stub(tron, 'checkTronPipelineStatus').resolves();
 
     await runChecks();
 
@@ -79,10 +83,12 @@ describe('runChecks', () => {
     expect(checkDepositQueueCountStub.calledOnce).to.be.true;
     expect(checkDepositQueueLatencyStub.calledOnce).to.be.true;
     expect(checkElapsedEpochsByTickerHashStub.calledOnce).to.be.true;
-    expect(checkInvoiceAmountStub.calledOnce).to.be.true;
     expect(checkInvoicesStub.calledOnce).to.be.true;
+    expect(checkInvoiceAmountStub.calledOnce).to.be.true;
     expect(checkTokenomicsExportStatusStub.calledOnce).to.be.true;
     expect(checkTokenomicsExportLatencyStub.calledOnce).to.be.true;
     expect(checkSolanaPipelineStatusStub.calledOnce).to.be.true;
+    expect(checkTronGasStub.calledOnce).to.be.true;
+    expect(checkTronPipelineStatusStub.calledOnce).to.be.true;
   });
 });
