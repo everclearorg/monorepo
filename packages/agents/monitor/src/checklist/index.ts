@@ -1,4 +1,4 @@
-import { createLoggingContext, RequestContext } from '@chimera-monorepo/utils';
+import { createLoggingContext, jsonifyError, RequestContext } from '@chimera-monorepo/utils';
 import { checkAgents } from './agent';
 import { checkChains } from './chain';
 import { checkGas } from './gas';
@@ -51,13 +51,23 @@ export const runChecks = async (_requestContext?: RequestContext) => {
 
   const { logger } = getContext();
   logger.info(`Running checks... fns: ${checklist.map((it) => it.name).join(',')}`, requestContext, methodContext);
+  const error = [];
   for (const checkFn of checklist) {
     const startTime = Date.now();
     logger.debug(`Starting check`, requestContext, methodContext, {
       startTime,
       check: checkFn.name,
     });
-    await checkFn();
+    try {
+      await checkFn();
+    } catch (e) {
+      logger.error('Failed to run checks', _requestContext, methodContext, jsonifyError(e as Error), {
+        startTime,
+        elapsed: Date.now() - startTime,
+        check: checkFn.name,
+      });
+      error.push(e);
+    }
     const endTime = Date.now();
     const elapsed = endTime - startTime;
     if (elapsed > 90_000) {
@@ -71,5 +81,8 @@ export const runChecks = async (_requestContext?: RequestContext) => {
         check: checkFn.name,
       });
     }
+  }
+  if (error.length !== 0) {
+    throw error;
   }
 };
