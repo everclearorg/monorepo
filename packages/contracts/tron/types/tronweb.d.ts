@@ -25,6 +25,16 @@ declare module 'tronweb' {
   }
 
   /**
+   * Broadcast return type for TronWeb transactions
+   */
+  interface BroadcastReturn {
+    result: boolean;
+    code?: string;
+    message?: string;
+    txid?: string;
+  }
+
+  /**
    * Main TronWeb class definition
    */
   export class TronWeb {
@@ -63,6 +73,18 @@ declare module 'tronweb' {
        * Equivalent to `tronWeb.trx.getTransactionInfo(txId)`
        */
       getTransactionInfo(txId: string): Promise<any>;
+      /**
+       * Broadcast a signed transaction to the network
+       */
+      broadcast(transaction: any): Promise<BroadcastReturn>;
+      /**
+       * Sign a transaction
+       */
+      sign(transaction: any): Promise<any>;
+      /**
+       * Send a raw transaction to the network
+       */
+      sendRawTransaction(signedTransaction: any): Promise<BroadcastReturn>;
       // …extend with more methods as required
     };
 
@@ -86,6 +108,31 @@ declare module 'tronweb' {
         result: { result: boolean; code?: string; message?: string };
         constant_result: string[];
       }>;
+
+      triggerSmartContract(
+        contractAddress: string,
+        functionSelector: string,
+        options: {
+          feeLimit?: number;
+          callValue?: number;
+          permissionId?: number;
+        },
+        parameters?: any[],
+        issuerAddress?: string,
+      ): Promise<{
+        result: { result: boolean; code?: string; message?: string };
+        transaction: any;
+      }>;
+
+      sendTrx(
+        to: string,
+        amount: number,
+      ): Promise<any>;
+
+      extendExpiration(
+        transaction: any,
+        expiration: number,
+      ): Promise<any>;
     };
 
     defaultAddress: {
