@@ -210,6 +210,11 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   error EverclearSpoke_FillIntent_InvalidArrayLengths();
 
+  /**
+   * @notice Thrown when the fill signature is invalid
+   */
+  error EverclearSpoke_InvalidFillSignature();
+
   /*///////////////////////////////////////////////////////////////
                               LOGIC
   //////////////////////////////////////////////////////////////*/
@@ -344,7 +349,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   function batchFillIntent(
     Intent[] calldata _intents,
     uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations
+    uint32[][] calldata _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage[] memory _fillMessages);
 
   /**
@@ -356,7 +362,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   function batchFillIntentWithPull(
     Intent[] calldata _intents,
     uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations
+    uint32[][] calldata _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage[] memory _fillMessages);
 
   /**
@@ -368,7 +375,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   function fillIntent(
     Intent calldata _intent,
     uint256 _amountOut,
-    uint32[] memory _destinations
+    uint32[] memory _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -380,7 +388,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   function fillIntentWithPull(
     Intent calldata _intent,
     uint256 _amountOut,
-    uint32[] memory _destinations
+    uint32[] memory _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -398,7 +407,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     uint256 _nonce,
     uint256 _amountOut,
     uint32[] memory _destinations,
-    bytes calldata _signature
+    bytes calldata _signature,
+    bytes calldata _fillSignature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
