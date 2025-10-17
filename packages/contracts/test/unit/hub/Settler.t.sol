@@ -204,7 +204,8 @@ contract SettlerForTest is Settler {
     uint256 _amount
   ) public {
     for (uint256 _i; _i < _amount; _i++) {
-      settlements[_domain].enqueueSettlement(
+      settlements[_domain]
+      .enqueueSettlement(
         IEverclear.Settlement({
           intentId: keccak256(abi.encode(_i)),
           amount: 1,
@@ -1828,8 +1829,9 @@ contract Unit_ProcessInvoice is BaseTest {
       _params.tickerHash, uint24(_discountDbps), _params.destination, _params.epoch, _params.amount
     );
 
-    uint256 _expectedReward = (_depositAvailable > _params.amount ? _params.amount : _depositAvailable)
-      * _rewardsForDepositors / _amountAfterDiscount;
+    uint256 _expectedReward =
+      (_depositAvailable > _params.amount ? _params.amount : _depositAvailable) * _rewardsForDepositors
+      / _amountAfterDiscount;
 
     _expectEmit(address(settler));
     emit SettlementEnqueued(

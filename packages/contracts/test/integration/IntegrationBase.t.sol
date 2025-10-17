@@ -892,7 +892,10 @@ contract IntegrationBase is TestExtended {
     // create new intent
     vm.prank(_user);
 
-    (_intentId, _intent) = spokeChainValues[_origin].feeAdapter.newIntent{value: _ethFee}(
+    (_intentId, _intent) = spokeChainValues[_origin].feeAdapter
+    .newIntent{
+      value: _ethFee
+    }(
       _destinations,
       _user,
       address(_assetOrigin),
