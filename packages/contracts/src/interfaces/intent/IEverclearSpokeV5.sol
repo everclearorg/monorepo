@@ -97,6 +97,13 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   event FeeAdapterUpdated(address _newFeeAdapter);
 
+  /**
+   * @notice Emitted when fill signer is updated
+   * @param _oldFillSigner The old fill signer
+   * @param _newFillSigner The new fill signer
+   */
+  event FillSignerUpdated(address _oldFillSigner, address _newFillSigner);
+
   /*///////////////////////////////////////////////////////////////
                               ERRORS
   //////////////////////////////////////////////////////////////*/
@@ -264,7 +271,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   /**
    * @notice Initialize the EverclearSpoke contract
    */
-  function initialize(address _feeAdapter, address _messageReceiver) external;
+  function initialize(address _feeAdapter, address _messageReceiver, address _fillSigner) external;
 
   /**
    * @notice Creates a new intent
@@ -505,6 +512,14 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   function updateMessageGasLimit(
     uint256 _newGasLimit
+  ) external;
+
+  /**
+   * @notice Updates the fill signer
+   * @param _fillSigner The address of the new fill signer
+   */
+  function updateFillSigner(
+    address _fillSigner
   ) external;
 
   /**
