@@ -110,6 +110,11 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   QueueLibV2.FillQueue public fillQueue;
 
   /**
+   * @notice Address for the fillSigner
+   */
+  address public fillSigner;
+
+  /**
    * @notice Checks that the address is valid
    */
   modifier validAddress(

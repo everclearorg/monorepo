@@ -187,7 +187,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
    * @notice Tests the deposit function of the spoke proxy
    * @dev This function is used to deposit tokens into the spoke proxy
    */
-
   function test_spokeUpgradeSwaps_deposit() public {
     _upgradeSpoke();
 
@@ -1012,7 +1011,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // approving the amount and depositing to spoke
     IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
 
-    _updateLighthouse(fillSigner);
     _payload =
       abi.encode(spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, _solverDestinations);
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
@@ -1214,7 +1212,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // approving the amount and depositing to spoke
     IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
 
-    _updateLighthouse(fillSigner);
     bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
     bytes memory _payload =
       abi.encode(spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, _solver, _intent, _amountOut, _solverDestinations);
@@ -1253,8 +1250,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _totalAmount);
     spokeProxyV5.deposit(USDC_MAINNET, _totalAmount);
     vm.stopPrank();
-
-    _updateLighthouse(fillSigner);
 
     // filling the user intent
     vm.startPrank(_solver);
@@ -1317,8 +1312,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     vm.prank(_solver);
     // approving the amount and depositing to spoke
     IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _totalAmount);
-
-    _updateLighthouse(fillSigner);
 
     // filling the user intent
     vm.startPrank(_solver);
@@ -1397,7 +1390,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // approving the amount and depositing to spoke
     IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
 
-    _updateLighthouse(fillSigner);
     bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
     bytes memory _payload =
       abi.encode(spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, _solver, _intent, _amountOut, _solverDestinations);
@@ -2277,7 +2269,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _solverDestinations[0] = 1;
     address _solver = address(0x456);
 
-    _updateLighthouse(fillSigner);
     bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
     bytes memory _payload =
       abi.encode(spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, _solver, _intent, 0, _solverDestinations);
@@ -2618,7 +2609,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     spokeProxyV5.batchFillIntentWithPull(_intents, _amountOut, _destinations);
   }
 
-  function testRevert_spokeSwapUpgrade_batchFillIntent_InvalidArrayLength() public {
+  function test_revert_spokeSwapUpgrade_batchFillIntent_InvalidArrayLength() public {
     _upgradeSpoke();
 
     // configuring the invalid inputs
@@ -2641,7 +2632,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     spokeProxyV5.batchFillIntent(_intents, _amountOut, _destinations, _fillSignature);
   }
 
-  function testRevert_spokeSwapUpgrade_batchFillIntentWithPull_InvalidArrayLength() public {
+  function test_revert_spokeSwapUpgrade_batchFillIntentWithPull_InvalidArrayLength() public {
     _upgradeSpoke();
 
     // configuring the invalid inputs
@@ -2664,7 +2655,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     spokeProxyV5.batchFillIntentWithPull(_intents, _amountOut, _destinations, _fillSignature);
   }
 
-  function testRevert_spokeSwapUpgrade_verifySignature_InvalidSignature() public {
+  function test_revert_spokeSwapUpgrade_verifySignature_InvalidSignature() public {
     _upgradeSpoke();
     address _relayer = address(0x123);
 
