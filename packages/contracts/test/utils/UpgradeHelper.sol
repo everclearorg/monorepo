@@ -232,6 +232,8 @@ contract UpgradeHelper is SafeTxBuilder {
   address public constant HUB_PROXY_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
   address public constant HUB_PROXY_OWNER = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
   uint256 public constant DEFAULT_GAS_LIMIT = 500_000;
+  uint256 public constant FILL_SIGNER_PK = 99_900_999;
+  address public FILL_SIGNER = vm.addr(FILL_SIGNER_PK);
 
   // Epoch as of 26th Aug - 235177 //
   uint256 internal constant FIXED_EVERCLEAR_BLOCK = 1_667_352;
