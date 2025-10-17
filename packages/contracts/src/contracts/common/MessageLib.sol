@@ -32,7 +32,10 @@ library MessageLib {
    * @param _data The data to send in the message
    * @return _message The formatted message
    */
-  function formatMessage(MessageType _messageType, bytes memory _data) internal pure returns (bytes memory _message) {
+  function formatMessage(
+    MessageType _messageType,
+    bytes memory _data
+  ) internal pure returns (bytes memory _message) {
     _message = abi.encode(uint8(_messageType), _data);
   }
 

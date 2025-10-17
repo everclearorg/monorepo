@@ -31,16 +31,15 @@ contract CallExecutor is ICallExecutor {
     // we call via assembly to avoid memcopying a very large returndata
     // returned by a malicious contract
     assembly {
-      _success :=
-        call(
-          _gas, // gas
-          _target, // recipient
-          _value, // ether value
-          add(_calldata, 0x20), // inloc
-          mload(_calldata), // inlen
-          0, // outloc
-          0 // outlen
-        )
+      _success := call(
+        _gas, // gas
+        _target, // recipient
+        _value, // ether value
+        add(_calldata, 0x20), // inloc
+        mload(_calldata), // inlen
+        0, // outloc
+        0 // outlen
+      )
       // limit our copy to 256 bytes
       _toCopy := returndatasize()
       if gt(_toCopy, _maxCopy) { _toCopy := _maxCopy }
