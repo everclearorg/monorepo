@@ -101,7 +101,9 @@ contract InvoiceViaFeeAdapter_WithDiscountAndRewardsTTLZeroNonXERC20_Integration
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 10);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
 
     // Check the settlement of the small intents with rewards minus fees
     // We check the settlements of the small intents with rewards
@@ -207,7 +209,9 @@ contract InvoiceViaFeeAdapter_WithDiscountAndRewardsTTLZeroNonXERC20_Integration
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 10);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
 
     // Check the settlement of the small intents with rewards minus fees
     // We check the settlements of the small intents with rewards
@@ -313,7 +317,9 @@ contract InvoiceViaFeeAdapter_WithDiscountAndRewardsTTLZeroNonXERC20_Integration
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 10);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
 
     // Check the settlement of the small intents with rewards minus fees
     // We check the settlements of the small intents with rewards

@@ -123,7 +123,10 @@ interface ISettler {
    * @param _domain The domain which settlements queue is going to be processed
    * @param _amount The amount of settlements to be batched
    */
-  function processSettlementQueue(uint32 _domain, uint32 _amount) external payable;
+  function processSettlementQueue(
+    uint32 _domain,
+    uint32 _amount
+  ) external payable;
 
   /**
    * @notice Dispatches batch settlements to the transport layer for a domain and amount via a relayer

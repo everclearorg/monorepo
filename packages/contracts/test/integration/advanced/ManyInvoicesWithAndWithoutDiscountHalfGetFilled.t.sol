@@ -80,6 +80,8 @@ contract ManyInvoicesWithAndWithoutDiscountHalfGetFilled_Integration is Integrat
 
     // Process settlements for SEPOLIA testnet
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 5);
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
   }
 }

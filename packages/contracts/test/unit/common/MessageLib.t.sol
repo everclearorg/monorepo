@@ -17,7 +17,10 @@ contract Unit_TestMessaging is TestExtended {
    * @param _messageIndex Used to select the message type
    * @param _data The data to be formatted and parsed
    */
-  function test_FormatAndParseMessage(uint256 _messageIndex, bytes memory _data) public pure {
+  function test_FormatAndParseMessage(
+    uint256 _messageIndex,
+    bytes memory _data
+  ) public pure {
     // Bound to available message types
     _messageIndex = bound(_messageIndex, 0, 3);
     MessageLib.MessageType _messageType = MessageLib.MessageType(_messageIndex);
@@ -127,7 +130,10 @@ contract Unit_TestMessaging is TestExtended {
    * @param _newAddress The new address to be formatted and parsed
    * @param _updateVariable The variable to be updated
    */
-  function test_AddressUpdateMessage(bytes32 _newAddress, string calldata _updateVariable) public pure {
+  function test_AddressUpdateMessage(
+    bytes32 _newAddress,
+    string calldata _updateVariable
+  ) public pure {
     bytes32 _updateVariableHash = keccak256(abi.encode(_updateVariable));
     bytes memory _message = MessageLib.formatAddressUpdateMessage(_updateVariableHash, _newAddress);
     (MessageLib.MessageType _parsedMessageType, bytes memory _data) = MessageLib.parseMessage(_message);
@@ -150,7 +156,10 @@ contract Unit_TestMessaging is TestExtended {
    * @param _newUint The new uint to be formatted and parsed
    * @param _updateVariable The variable to be updated
    */
-  function test_UintUpdateMessage(uint256 _newUint, string calldata _updateVariable) public pure {
+  function test_UintUpdateMessage(
+    uint256 _newUint,
+    string calldata _updateVariable
+  ) public pure {
     bytes32 _updateVariableHash = keccak256(abi.encode(_updateVariable));
     bytes memory _message = MessageLib.formatUintUpdateMessage(_updateVariableHash, _newUint);
     (MessageLib.MessageType _parsedMessageType, bytes memory _data) = MessageLib.parseMessage(_message);
