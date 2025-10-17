@@ -20,6 +20,8 @@ const TOKEN_PROGRAM_ID = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
 
 const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL';
 
+// Assume a big enough number of confirmations and treat it as final.
+const SOLANA_MAX_CONFIRMATIONS = 1000;
 
 class SolanaWeb3Signer implements ISigner {
   constructor(
@@ -188,11 +190,12 @@ export class SolanaProvider implements RpcProvider {
     const result = await this.rpc.getTransaction(hash as Signature, {
       // NOTE: this is required to also support v0 transactions
       maxSupportedTransactionVersion: 0,
-      encoding: 'json'
+      encoding: 'json',
+      commitment: 'finalized',
     }).send();
     return {
       hash: hash,
-      confirmations: 0, // this is assume to only obtain finalized transactions
+      confirmations: result ? SOLANA_MAX_CONFIRMATIONS : 0,
       nonce: 0, // this is not used in solana
       gasPrice: '1', // assume 1 lamport per unit
       gasLimit: result?.meta?.fee?.toString() || '0',
@@ -214,13 +217,14 @@ export class SolanaProvider implements RpcProvider {
     const result = await this.rpc.getTransaction(hash as Signature, {
       // NOTE: this is required to also support v0 transactions
       maxSupportedTransactionVersion: 0,
-      encoding: 'json'
+      encoding: 'json',
+      commitment: 'finalized',
     }).send();
     return {
       blockNumber: Number(result?.slot) || 0,
       status: result?.meta?.err ? 0 : 1,
       transactionHash: hash,
-      confirmations: 0,
+      confirmations: result ? SOLANA_MAX_CONFIRMATIONS : 0,
       logs: result?.meta?.logMessages?.map((logLine, index) => {
         return {
           blockNumber: Number(result?.slot) || 0,
