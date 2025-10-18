@@ -38,7 +38,11 @@ contract BaseTest is TestExtended {
     );
   }
 
-  function mockMintable(address _user, address _asset, uint256 _amount) internal {
+  function mockMintable(
+    address _user,
+    address _asset,
+    uint256 _amount
+  ) internal {
     stdstore.target(address(xerc20Module)).sig(xerc20Module.mintable.selector).with_key(_user).with_key(_asset)
       .checked_write(_amount);
   }
@@ -62,7 +66,10 @@ contract Unit_XERC20ModuleMintStrategy is BaseTest {
    * @param _amount The amount to mint
    * @param _limit The current minting limit
    */
-  function test_HandleMintStrategy(uint256 _amount, uint256 _limit) public {
+  function test_HandleMintStrategy(
+    uint256 _amount,
+    uint256 _limit
+  ) public {
     vm.assume(_amount <= _limit);
     vm.assume(_amount > 0);
 
@@ -81,7 +88,10 @@ contract Unit_XERC20ModuleMintStrategy is BaseTest {
    * @param _amount The amount to mint
    * @param _limit The current minting limit
    */
-  function test_HandleMintStrategy_Fallback(uint256 _amount, uint256 _limit) public {
+  function test_HandleMintStrategy_Fallback(
+    uint256 _amount,
+    uint256 _limit
+  ) public {
     vm.assume(_amount > _limit);
     vm.assume(_limit > 0);
 
@@ -99,7 +109,10 @@ contract Unit_XERC20ModuleMintStrategy is BaseTest {
    * @param caller The address of the caller
    * @param _amount The amount to mint
    */
-  function test_Revert_HandleMintStrategy_NotSpoke(address caller, uint256 _amount) public {
+  function test_Revert_HandleMintStrategy_NotSpoke(
+    address caller,
+    uint256 _amount
+  ) public {
     vm.assume(caller != SPOKE);
 
     vm.expectRevert(IXERC20Module.XERC20Module_HandleStrategy_OnlySpoke.selector);
@@ -115,7 +128,10 @@ contract Unit_XERC20ModuleBurnStrategy is BaseTest {
    * @param _amount The amount to burn
    * @param _limit The current burning limit
    */
-  function test_HandleBurnStrategy(uint256 _amount, uint256 _limit) public {
+  function test_HandleBurnStrategy(
+    uint256 _amount,
+    uint256 _limit
+  ) public {
     vm.assume(_amount <= _limit);
     vm.assume(_amount > 0);
 
@@ -131,7 +147,10 @@ contract Unit_XERC20ModuleBurnStrategy is BaseTest {
    * @param _amount The amount to burn
    * @param _limit The current burning limit
    */
-  function test_Revert_HandleBurnStrategy_InsufficientBurningLimit(uint256 _amount, uint256 _limit) public {
+  function test_Revert_HandleBurnStrategy_InsufficientBurningLimit(
+    uint256 _amount,
+    uint256 _limit
+  ) public {
     vm.assume(_amount > _limit);
     vm.assume(_limit > 0);
 
@@ -152,7 +171,10 @@ contract Unit_XERC20ModuleBurnStrategy is BaseTest {
    * @param caller The address of the caller
    * @param _amount The amount to burn
    */
-  function test_Revert_HandleBurnStrategy_NotSpoke(address caller, uint256 _amount) public {
+  function test_Revert_HandleBurnStrategy_NotSpoke(
+    address caller,
+    uint256 _amount
+  ) public {
     vm.assume(caller != SPOKE);
 
     vm.expectRevert(IXERC20Module.XERC20Module_HandleStrategy_OnlySpoke.selector);
@@ -168,7 +190,10 @@ contract Unit_XERC20ModuleMintDebt is BaseTest {
    * @param _amount The amount to mint
    * @param _limit The current minting limit
    */
-  function test_MintDebt(uint256 _amount, uint256 _limit) public {
+  function test_MintDebt(
+    uint256 _amount,
+    uint256 _limit
+  ) public {
     vm.assume(_amount <= _limit);
     vm.assume(_amount > 0);
 
@@ -190,7 +215,10 @@ contract Unit_XERC20ModuleMintDebt is BaseTest {
    * @param _amount The amount to mint
    * @param _limit The current minting limit
    */
-  function test_Revert_MintDebt_InsufficientMintingLimit(uint256 _amount, uint256 _limit) public {
+  function test_Revert_MintDebt_InsufficientMintingLimit(
+    uint256 _amount,
+    uint256 _limit
+  ) public {
     vm.assume(_amount > _limit);
     vm.assume(_limit > 0);
 

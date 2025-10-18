@@ -11,11 +11,17 @@ contract BaseTest is TestExtended {
   HubQueueLib.DepositQueue depositQueue;
   HubQueueLib.SettlementQueue settlementQueue;
 
-  function _mockDepositData(uint256 _index, IHubStorage.Deposit calldata _deposit) internal {
+  function _mockDepositData(
+    uint256 _index,
+    IHubStorage.Deposit calldata _deposit
+  ) internal {
     depositQueue.queue[_index] = _deposit;
   }
 
-  function _mockSettlmentData(uint256 _index, IEverclear.Settlement calldata _settlement) internal {
+  function _mockSettlmentData(
+    uint256 _index,
+    IEverclear.Settlement calldata _settlement
+  ) internal {
     settlementQueue.queue[_index] = _settlement;
   }
 }
@@ -30,7 +36,11 @@ contract Unit_Enqueue is BaseTest {
    * @param _last The last position in the queue
    * @param _deposit The deposit to enqueue
    */
-  function test_EnqueueDeposit(uint256 _first, uint256 _last, IHubStorage.Deposit calldata _deposit) public {
+  function test_EnqueueDeposit(
+    uint256 _first,
+    uint256 _last,
+    IHubStorage.Deposit calldata _deposit
+  ) public {
     vm.assume(_first < _last && _first >= 1);
     vm.assume(_last < type(uint256).max);
 
@@ -53,7 +63,11 @@ contract Unit_Enqueue is BaseTest {
    * @param _last The last position in the queue
    * @param _settlement The settlement to enqueue
    */
-  function test_EnqueueSettlement(uint256 _first, uint256 _last, IEverclear.Settlement calldata _settlement) public {
+  function test_EnqueueSettlement(
+    uint256 _first,
+    uint256 _last,
+    IEverclear.Settlement calldata _settlement
+  ) public {
     vm.assume(_first < _last && _first >= 1);
     vm.assume(_last < type(uint256).max);
 
@@ -84,7 +98,11 @@ contract Unit_Dequeue is BaseTest {
    * @param _last The last position in the queue
    * @param _deposit The deposit to dequeue
    */
-  function test_DequeueDeposit(uint256 _first, uint256 _last, IHubStorage.Deposit calldata _deposit) public {
+  function test_DequeueDeposit(
+    uint256 _first,
+    uint256 _last,
+    IHubStorage.Deposit calldata _deposit
+  ) public {
     vm.assume(_first < _last && _first >= 1);
     vm.assume(_last < type(uint256).max);
 
@@ -107,7 +125,11 @@ contract Unit_Dequeue is BaseTest {
    * @param _last The last position in the queue
    * @param _settlement The settlement to dequeue
    */
-  function test_DequeueSettlement(uint256 _first, uint256 _last, IEverclear.Settlement calldata _settlement) public {
+  function test_DequeueSettlement(
+    uint256 _first,
+    uint256 _last,
+    IEverclear.Settlement calldata _settlement
+  ) public {
     vm.assume(_first < _last && _first >= 1);
     vm.assume(_last < type(uint256).max);
 

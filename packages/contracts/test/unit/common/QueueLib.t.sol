@@ -10,11 +10,17 @@ contract Unit_TestQueueLib is TestExtended {
   QueueLib.IntentQueue _intentQueue;
   QueueLib.FillQueue _fillQueue;
 
-  function _mockIntentData(uint256 _index, bytes32 _intentId) internal {
+  function _mockIntentData(
+    uint256 _index,
+    bytes32 _intentId
+  ) internal {
     _intentQueue.queue[_index] = _intentId;
   }
 
-  function _mockFillMessage(uint256 _index, IEverclear.FillMessage memory _fillMessage) internal {
+  function _mockFillMessage(
+    uint256 _index,
+    IEverclear.FillMessage memory _fillMessage
+  ) internal {
     _fillQueue.queue[_index] = _fillMessage;
   }
 
@@ -25,7 +31,11 @@ contract Unit_TestQueueLib is TestExtended {
   /**
    * @notice Tests the enqueue function for an intent queue
    */
-  function test_EnqueueIntent(uint256 _first, uint256 _last, bytes32 _intentId) public {
+  function test_EnqueueIntent(
+    uint256 _first,
+    uint256 _last,
+    bytes32 _intentId
+  ) public {
     vm.assume(_first < _last);
     vm.assume(_last < type(uint256).max);
 
@@ -42,7 +52,11 @@ contract Unit_TestQueueLib is TestExtended {
   /**
    * @notice Tests the enqueue function for an fill queue
    */
-  function test_EnqueueFill(uint256 _first, uint256 _last, IEverclear.FillMessage memory _fillMessage) public {
+  function test_EnqueueFill(
+    uint256 _first,
+    uint256 _last,
+    IEverclear.FillMessage memory _fillMessage
+  ) public {
     vm.assume(_first < _last);
     vm.assume(_last < type(uint256).max);
 
@@ -63,7 +77,11 @@ contract Unit_TestQueueLib is TestExtended {
   /**
    * @notice Tests the dequeue function for an intent queue
    */
-  function test_DequeueIntent(uint256 _first, uint256 _last, bytes32 _intentId) public {
+  function test_DequeueIntent(
+    uint256 _first,
+    uint256 _last,
+    bytes32 _intentId
+  ) public {
     vm.assume(_first < _last);
     vm.assume(_last < type(uint256).max);
 
@@ -82,7 +100,11 @@ contract Unit_TestQueueLib is TestExtended {
   /**
    * @notice Tests the dequeue function for an fill queue
    */
-  function test_DequeuFill(uint256 _first, uint256 _last, IEverclear.FillMessage memory _fillMessage) public {
+  function test_DequeuFill(
+    uint256 _first,
+    uint256 _last,
+    IEverclear.FillMessage memory _fillMessage
+  ) public {
     vm.assume(_first < _last);
     vm.assume(_last < type(uint256).max);
 

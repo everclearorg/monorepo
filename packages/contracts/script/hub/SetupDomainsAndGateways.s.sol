@@ -16,7 +16,10 @@ import {TestnetProductionEnvironment} from '../TestnetProduction.sol';
 import {TestnetStagingEnvironment} from '../TestnetStaging.sol';
 
 abstract contract SetupDomainsAndGatewaysBase is Script, ScriptUtils {
-  function run(string memory _account, address _hub) public virtual {
+  function run(
+    string memory _account,
+    address _hub
+  ) public virtual {
     revert NotImplemented();
 
     uint256 _accountPk = vm.envUint(_account);
@@ -25,7 +28,10 @@ abstract contract SetupDomainsAndGatewaysBase is Script, ScriptUtils {
 }
 
 contract SetupDomainsAndGatewaysTestnetProduction is SetupDomainsAndGatewaysBase, TestnetProductionEnvironment {
-  function run(string memory _account, address _hub) public override {
+  function run(
+    string memory _account,
+    address _hub
+  ) public override {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -35,17 +41,15 @@ contract SetupDomainsAndGatewaysTestnetProduction is SetupDomainsAndGatewaysBase
     // add supported domains
     for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
       _domainsSetup[_i] = IHubStorage.DomainSetup({
-        id: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId,
-        blockGasLimit: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit
+        id: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, blockGasLimit: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit
       });
     }
     IEverclearHub(_hub).addSupportedDomains(_domainsSetup);
 
     // set chain gateways
     for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
-      IEverclearHub(_hub).updateChainGateway(
-        SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway
-      );
+      IEverclearHub(_hub)
+        .updateChainGateway(SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway);
     }
 
     uint32[] memory _supportedDomains = IEverclearHub(_hub).supportedDomains();
@@ -71,7 +75,10 @@ contract SetupDomainsAndGatewaysTestnetProduction is SetupDomainsAndGatewaysBase
 }
 
 contract SetupDomainsAndGatewaysTestnetStaging is SetupDomainsAndGatewaysBase, TestnetStagingEnvironment {
-  function run(string memory _account, address _hub) public override {
+  function run(
+    string memory _account,
+    address _hub
+  ) public override {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -81,17 +88,15 @@ contract SetupDomainsAndGatewaysTestnetStaging is SetupDomainsAndGatewaysBase, T
     // add supported domains
     for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
       _domainsSetup[_i] = IHubStorage.DomainSetup({
-        id: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId,
-        blockGasLimit: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit
+        id: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, blockGasLimit: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit
       });
     }
     IEverclearHub(_hub).addSupportedDomains(_domainsSetup);
 
     // set chain gateways
     for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
-      IEverclearHub(_hub).updateChainGateway(
-        SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway
-      );
+      IEverclearHub(_hub)
+        .updateChainGateway(SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway);
     }
 
     uint32[] memory _supportedDomains = IEverclearHub(_hub).supportedDomains();
@@ -117,7 +122,10 @@ contract SetupDomainsAndGatewaysTestnetStaging is SetupDomainsAndGatewaysBase, T
 }
 
 contract SetupDomainsAndGatewaysMainnetStaging is SetupDomainsAndGatewaysBase, MainnetStagingEnvironment {
-  function run(string memory _account, address _hub) public override {
+  function run(
+    string memory _account,
+    address _hub
+  ) public override {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -127,17 +135,15 @@ contract SetupDomainsAndGatewaysMainnetStaging is SetupDomainsAndGatewaysBase, M
     // add supported domains
     for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
       _domainsSetup[_i] = IHubStorage.DomainSetup({
-        id: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId,
-        blockGasLimit: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit
+        id: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, blockGasLimit: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit
       });
     }
     IEverclearHub(_hub).addSupportedDomains(_domainsSetup);
 
     // set chain gateways
     for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
-      IEverclearHub(_hub).updateChainGateway(
-        SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway
-      );
+      IEverclearHub(_hub)
+        .updateChainGateway(SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway);
     }
 
     uint32[] memory _supportedDomains = IEverclearHub(_hub).supportedDomains();
@@ -163,7 +169,10 @@ contract SetupDomainsAndGatewaysMainnetStaging is SetupDomainsAndGatewaysBase, M
 }
 
 contract SetupDomainsAndGatewaysMainnetProduction is SetupDomainsAndGatewaysBase, MainnetProductionEnvironment {
-  function run(string memory _account, address _hub) public override {
+  function run(
+    string memory _account,
+    address _hub
+  ) public override {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -173,17 +182,15 @@ contract SetupDomainsAndGatewaysMainnetProduction is SetupDomainsAndGatewaysBase
     // add supported domains
     for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
       _domainsSetup[_i] = IHubStorage.DomainSetup({
-        id: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId,
-        blockGasLimit: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit
+        id: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, blockGasLimit: SUPPORTED_DOMAINS_AND_GATEWAYS[_i].blockGasLimit
       });
     }
     IEverclearHub(_hub).addSupportedDomains(_domainsSetup);
 
     // set chain gateways
     for (uint256 _i; _i < SUPPORTED_DOMAINS_AND_GATEWAYS.length; _i++) {
-      IEverclearHub(_hub).updateChainGateway(
-        SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway
-      );
+      IEverclearHub(_hub)
+        .updateChainGateway(SUPPORTED_DOMAINS_AND_GATEWAYS[_i].chainId, SUPPORTED_DOMAINS_AND_GATEWAYS[_i].gateway);
     }
 
     uint32[] memory _supportedDomains = IEverclearHub(_hub).supportedDomains();

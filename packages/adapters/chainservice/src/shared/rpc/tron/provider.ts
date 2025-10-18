@@ -180,14 +180,13 @@ class TronWeb3Signer implements ISigner {
         
         // 🎯 ENERGY FIX: Convert energy units to SUN for feeLimit
         // TRON feeLimit is in SUN, not energy units
-        // Energy price ≈ 420 SUN per energy unit on mainnet
         const providedGasLimit = Number.parseInt(transaction.gasLimit || '0');
         const minEnergyUnits = 100000; // 100K energy minimum
         const maxEnergyUnits = 600000; // 600K energy test level
         const energyUnits = Math.max(minEnergyUnits, Math.min(providedGasLimit, maxEnergyUnits));
         
-        // Convert energy units to SUN for feeLimit (420 SUN per energy unit)
-        const energyPriceInSun = 420;
+        // Convert energy units to SUN for feeLimit
+        const energyPriceInSun = Number.parseInt(await this.provider.getGasPrice());
         const feeLimit = energyUnits * energyPriceInSun;
         
         console.log('TRON DEBUG: Building contract transaction with proper function signature');
@@ -591,8 +590,28 @@ export class TronSyncProvider extends SyncProvider {
   }
 
   public async getGasPrice(): Promise<string> {
-    // Currently, the unit price of Energy is 210 sun
-    return '210';
+    try {
+      const energyPrices = await this.tronWeb.trx.getEnergyPrices();
+      if (energyPrices) {
+        // Format: "timestamp:price,timestamp:price,..."
+        const priceEntries = energyPrices.split(',');
+        if (priceEntries.length) {
+          // Get the most recent price (last entry)
+          const latestEntry = priceEntries[priceEntries.length - 1];
+          const [_, priceStr] = latestEntry.split(':');
+          const price = parseInt(priceStr, 10);
+
+          if (!isNaN(price) && price > 0) {
+            return price.toString();
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Failed to get current energy price, falling back to default', error);
+    }
+
+    // Fallback to the current market price (100 SUN based on TronGrid data)
+    return '100';
   }
 
   public async estimateGas(tx: ReadTransaction | WriteTransaction): Promise<string> {

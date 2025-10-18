@@ -32,7 +32,10 @@ contract HubGateway is Gateway, UUPSUpgradeable, IHubGateway {
   //////////////////////////////////////////////////////////////*/
 
   /// @inheritdoc IHubGateway
-  function setChainGateway(uint32 _chainId, bytes32 _gateway) external onlyReceiver validAddress(_gateway) {
+  function setChainGateway(
+    uint32 _chainId,
+    bytes32 _gateway
+  ) external onlyReceiver validAddress(_gateway) {
     chainGateways[_chainId] = _gateway;
     emit ChainGatewayAdded(_chainId, _gateway);
   }
@@ -59,7 +62,10 @@ contract HubGateway is Gateway, UUPSUpgradeable, IHubGateway {
    * @param _origin The origin domain of the message
    * @param _sender The sender of the message
    */
-  function _checkValidSender(uint32 _origin, bytes32 _sender) internal view override(Gateway) {
+  function _checkValidSender(
+    uint32 _origin,
+    bytes32 _sender
+  ) internal view override(Gateway) {
     bytes32 _gateway = chainGateways[_origin];
     if (_sender != _gateway) revert Gateway_Handle_InvalidSender();
   }
