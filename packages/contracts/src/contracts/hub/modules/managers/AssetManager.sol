@@ -85,7 +85,10 @@ abstract contract AssetManager is HubStorage, IAssetManager {
   }
 
   /// @inheritdoc IAssetManager
-  function setDiscountPerEpoch(bytes32 _tickerHash, uint24 _discountPerEpoch) external hasRole(Role.ASSET_MANAGER) {
+  function setDiscountPerEpoch(
+    bytes32 _tickerHash,
+    uint24 _discountPerEpoch
+  ) external hasRole(Role.ASSET_MANAGER) {
     TokenConfig storage _tokenConfig = _tokenConfigs[_tickerHash];
     _validDbpsSetup(_tokenConfig.maxDiscountDbps, _discountPerEpoch);
     uint24 _oldDiscountPerEpoch = _tokenConfig.discountPerEpoch;
@@ -113,7 +116,10 @@ abstract contract AssetManager is HubStorage, IAssetManager {
    * @param _maxDiscountDbps The maximum discount basis points
    * @param _discountPerEpoch The discount basis points per epoch
    */
-  function _validDbpsSetup(uint24 _maxDiscountDbps, uint24 _discountPerEpoch) internal pure {
+  function _validDbpsSetup(
+    uint24 _maxDiscountDbps,
+    uint24 _discountPerEpoch
+  ) internal pure {
     if (_maxDiscountDbps > Constants.DBPS_DENOMINATOR || _discountPerEpoch > _maxDiscountDbps) {
       revert HubStorage_InvalidDbpsValue();
     }

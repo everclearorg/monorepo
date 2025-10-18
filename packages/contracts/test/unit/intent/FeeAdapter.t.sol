@@ -46,11 +46,17 @@ contract BaseTest is TestExtended {
     balance = _asset == address(0) ? FEE_RECIPIENT.balance : IERC20(_asset).balanceOf(FEE_RECIPIENT);
   }
 
-  function mockNewIntentCall(bytes32 _intentId, IEverclearSpoke.Intent memory _intent) internal {
+  function mockNewIntentCall(
+    bytes32 _intentId,
+    IEverclearSpoke.Intent memory _intent
+  ) internal {
     vm.mockCall(SPOKE, abi.encodeWithSelector(hex'4a943d21'), abi.encode(_intentId, _intent));
   }
 
-  function mockStrategyCall(address _asset, uint8 _strategy) internal {
+  function mockStrategyCall(
+    address _asset,
+    uint8 _strategy
+  ) internal {
     vm.mockCall(SPOKE, abi.encodeWithSelector(ISpokeStorage.strategies.selector, _asset), abi.encode(_strategy));
     vm.expectCall(SPOKE, abi.encodeWithSelector(ISpokeStorage.strategies.selector, _asset));
   }
@@ -59,17 +65,27 @@ contract BaseTest is TestExtended {
     // vm.mockCallRevert(SPOKE, abi.encodeWithSelector(hex'4a943d21'), keccak256('fail'));
   }
 
-  function mockReturnUnsupportedIntent(address _asset, uint256 _amount) internal {
+  function mockReturnUnsupportedIntent(
+    address _asset,
+    uint256 _amount
+  ) internal {
     vm.mockCall(SPOKE, abi.encodeWithSelector(IEverclearSpoke.withdraw.selector, _asset, _amount), abi.encode(''));
     vm.expectCall(SPOKE, abi.encodeWithSelector(IEverclearSpoke.withdraw.selector, _asset, _amount));
   }
 
-  function mockTransferCall(address _asset, address _recipient, uint256 _amount) internal {
+  function mockTransferCall(
+    address _asset,
+    address _recipient,
+    uint256 _amount
+  ) internal {
     vm.mockCall(_asset, abi.encodeWithSelector(IERC20.transfer.selector, _recipient, _amount), abi.encode(true));
     vm.expectCall(_asset, abi.encodeWithSelector(IERC20.transfer.selector, _recipient, _amount));
   }
 
-  function expectFeeTransferCall(address _feeAsset, uint256 _fee) internal {
+  function expectFeeTransferCall(
+    address _feeAsset,
+    uint256 _fee
+  ) internal {
     if (_feeAsset == address(0)) {
       vm.expectCall(FEE_RECIPIENT, _fee, hex'', 1);
     } else {
@@ -169,7 +185,11 @@ contract Unit_ReturnUnsupportedIntent is BaseTest {
     adapter.returnUnsupportedIntent(_asset, _amount, _receiver);
   }
 
-  function test_ReturnUnsupportedIntent_FeeAdapter(address _asset, uint256 _amount, address _receiver) public {
+  function test_ReturnUnsupportedIntent_FeeAdapter(
+    address _asset,
+    uint256 _amount,
+    address _receiver
+  ) public {
     vm.assume(_asset != address(0));
     vm.assume(_asset != address(vm));
 
@@ -232,7 +252,11 @@ contract Unit_NewIntent is BaseTest {
     adapter.newIntent(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
   }
 
-  function test_NewIntent_FeeInNative_ERC20(uint256 _amount, uint256 _fee, uint32 _destination) public {
+  function test_NewIntent_FeeInNative_ERC20(
+    uint256 _amount,
+    uint256 _fee,
+    uint32 _destination
+  ) public {
     vm.assume(_amount > 0);
     vm.assume(_fee > 0);
 
@@ -273,7 +297,10 @@ contract Unit_NewIntent is BaseTest {
     assertEq(address(adapter).balance, 0, 'adapter balance nonzero');
   }
 
-  function test_NewIntent_FeeInTransacting_ERC20(uint256 _amountWithFee, uint32 _destination) public {
+  function test_NewIntent_FeeInTransacting_ERC20(
+    uint256 _amountWithFee,
+    uint32 _destination
+  ) public {
     vm.assume(_amountWithFee > 0);
     uint256 _fee = _amountWithFee / 2;
     uint256 _amount = _amountWithFee - _fee;
@@ -353,9 +380,9 @@ contract Unit_NewIntent is BaseTest {
       emit IFeeAdapter.IntentWithFeesAdded(bytes32(uint256(1)), USER.toBytes32(), _fee, _nativeFee);
 
       vm.prank(USER);
-      (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{value: _nativeFee}(
-        _destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams
-      );
+      (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{
+        value: _nativeFee
+      }(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
       assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
       assertEq(_returnedId, bytes32(uint256(1)), 'returned id != id');
     }
@@ -367,7 +394,11 @@ contract Unit_NewIntent is BaseTest {
     );
   }
 
-  function test_NewIntent_SufficientSpokeAllowance_ERC20(uint256 _amount, uint256 _fee, uint32 _destination) public {
+  function test_NewIntent_SufficientSpokeAllowance_ERC20(
+    uint256 _amount,
+    uint256 _fee,
+    uint32 _destination
+  ) public {
     vm.assume(_amount > 0);
     vm.assume(_amount < UINT256_MAX / 2);
     vm.assume(_fee > 0);
@@ -416,7 +447,11 @@ contract Unit_NewIntent is BaseTest {
     assertEq(address(adapter).balance, 0, 'adapter balance nonzero');
   }
 
-  function test_NewIntent_Permit2_ERC20(uint256 _amount, uint256 _fee, uint32 _destination) public {
+  function test_NewIntent_Permit2_ERC20(
+    uint256 _amount,
+    uint256 _fee,
+    uint32 _destination
+  ) public {
     vm.assume(_amount > 0);
     vm.assume(_fee > 0);
 
@@ -465,12 +500,15 @@ contract Unit_NewIntent is BaseTest {
     uint256 _fee
   ) internal returns (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) {
     IEverclearSpoke.Permit2Params memory _permit2Params;
-    (_returnedId, _returnedIntent) = adapter.newIntent{value: _fee}(
-      _destinations, USER, _inputAsset, address(0), _amount, 0, 0, hex'', _permit2Params, _feeParams
-    );
+    (_returnedId, _returnedIntent) = adapter.newIntent{
+      value: _fee
+    }(_destinations, USER, _inputAsset, address(0), _amount, 0, 0, hex'', _permit2Params, _feeParams);
   }
 
-  function test_NewIntent_FeeInTransacting_XERC20(uint256 _amountWithFee, uint32 _destination) public {
+  function test_NewIntent_FeeInTransacting_XERC20(
+    uint256 _amountWithFee,
+    uint32 _destination
+  ) public {
     vm.assume(_amountWithFee > 0);
     uint256 _fee = _amountWithFee / 2;
     uint256 _amount = _amountWithFee - _fee;
@@ -510,7 +548,11 @@ contract Unit_NewIntent is BaseTest {
     assertEq(IERC20(inputAsset).balanceOf(address(adapter)), _amount, 'adapter token balance != amount');
   }
 
-  function test_NewIntent_SufficientSpokeAllowance_XERC20(uint256 _amount, uint256 _fee, uint32 _destination) public {
+  function test_NewIntent_SufficientSpokeAllowance_XERC20(
+    uint256 _amount,
+    uint256 _fee,
+    uint32 _destination
+  ) public {
     vm.assume(_amount > 0);
     vm.assume(_amount < UINT256_MAX / 2);
     vm.assume(_fee > 0);
@@ -747,7 +789,11 @@ contract Unit_NewOrder is BaseTest {
   using TypeCasts for bytes32;
   using MessageHashUtils for bytes32;
 
-  function test_Revert_NewOrder_MultipleOrderAsset(uint256 _fee, address _assetOne, address _assetTwo) public {
+  function test_Revert_NewOrder_MultipleOrderAsset(
+    uint256 _fee,
+    address _assetOne,
+    address _assetTwo
+  ) public {
     vm.assume(_fee > 0);
     vm.assume(_assetOne != _assetTwo);
 
@@ -765,7 +811,11 @@ contract Unit_NewOrder is BaseTest {
     adapter.newOrder(_fee, _deadline, _sig, _params);
   }
 
-  function test_NewOrder_FeeWithTransacting(uint256 _amountWithFee, uint32 _destination, uint256 _numOfIntents) public {
+  function test_NewOrder_FeeWithTransacting(
+    uint256 _amountWithFee,
+    uint32 _destination,
+    uint256 _numOfIntents
+  ) public {
     vm.assume(_amountWithFee > 0);
     vm.assume(_numOfIntents < 10);
     if (_numOfIntents < 2) _numOfIntents = 2;
@@ -824,7 +874,12 @@ contract Unit_NewOrder is BaseTest {
     assertEq(IERC20(inputAsset).balanceOf(address(adapter)), _amount, 'adapter token balance != amount');
   }
 
-  function test_NewOrder_FeeWithEth(uint256 _amount, uint256 _fee, uint32 _destination, uint256 _numOfIntents) public {
+  function test_NewOrder_FeeWithEth(
+    uint256 _amount,
+    uint256 _fee,
+    uint32 _destination,
+    uint256 _numOfIntents
+  ) public {
     vm.assume(_amount > 0);
     vm.assume(_numOfIntents < 10);
     if (_numOfIntents < 2) _numOfIntents = 2;

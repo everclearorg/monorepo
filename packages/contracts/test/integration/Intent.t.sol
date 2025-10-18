@@ -44,8 +44,8 @@ contract Intent_Integration is IntegrationBase {
 
   function test_Intent_HappyPath_Default() public {
     /*///////////////////////////////////////////////////////////////
-                         ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                           ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // select origin fork
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
@@ -108,8 +108,8 @@ contract Intent_Integration is IntegrationBase {
     sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intents);
 
     /*///////////////////////////////////////////////////////////////
-                         EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                           EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -143,8 +143,8 @@ contract Intent_Integration is IntegrationBase {
     hubMailbox.process(bytes(''), _intentMessage);
 
     /*///////////////////////////////////////////////////////////////
-                        DESTINATION DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                          DESTINATION DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     {
       // switch to destination fork
@@ -203,7 +203,7 @@ contract Intent_Integration is IntegrationBase {
     }
 
     /*///////////////////////////////////////////////////////////////
-                         EVERCLEAR DOMAIN 
+                         EVERCLEAR DOMAIN
     //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
@@ -255,7 +255,7 @@ contract Intent_Integration is IntegrationBase {
     bytes memory _settlementMessageBody = abi.decode(entries[0].data, (bytes));
 
     /*///////////////////////////////////////////////////////////////
-                         SETTLEMENT DOMAIN 
+                         SETTLEMENT DOMAIN
     //////////////////////////////////////////////////////////////*/
 
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
@@ -291,8 +291,8 @@ contract Intent_Integration is IntegrationBase {
 
   function test_Intent_HappyPath_XERC20() public {
     /*///////////////////////////////////////////////////////////////
-                         ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                           ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // select origin fork
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
@@ -351,8 +351,8 @@ contract Intent_Integration is IntegrationBase {
     sepoliaEverclearSpoke.processIntentQueue{value: 1 ether}(_intents);
 
     /*///////////////////////////////////////////////////////////////
-                         EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                           EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -386,8 +386,8 @@ contract Intent_Integration is IntegrationBase {
     hubMailbox.process(bytes(''), _intentMessage);
 
     /*///////////////////////////////////////////////////////////////
-                        DESTINATION DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                          DESTINATION DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to destination fork
     vm.selectFork(BSC_TESTNET_FORK);
@@ -434,7 +434,7 @@ contract Intent_Integration is IntegrationBase {
     bscEverclearSpoke.processFillQueue{value: 1 ether}(1);
 
     /*///////////////////////////////////////////////////////////////
-                         EVERCLEAR DOMAIN 
+                         EVERCLEAR DOMAIN
     //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
@@ -486,7 +486,7 @@ contract Intent_Integration is IntegrationBase {
     bytes memory _settlementMessageBody = abi.decode(entries[0].data, (bytes));
 
     /*///////////////////////////////////////////////////////////////
-                         SETTLEMENT DOMAIN 
+                         SETTLEMENT DOMAIN
     //////////////////////////////////////////////////////////////*/
 
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);

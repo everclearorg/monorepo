@@ -36,5 +36,10 @@ interface ISettlementModule {
    * @param _data Extra data needed by some modules
    * @dev In case of failure, the `newIntent` flow will revert
    */
-  function handleBurnStrategy(address _asset, address _user, uint256 _amount, bytes calldata _data) external;
+  function handleBurnStrategy(
+    address _asset,
+    address _user,
+    uint256 _amount,
+    bytes calldata _data
+  ) external;
 }
