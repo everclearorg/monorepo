@@ -17,7 +17,7 @@ contract Mocker is Test {
     bytes memory _message,
     bytes memory _metadata
   ) internal returns (bytes32 _messageId) {
-    /* 
+    /*
       A Message in HL has the following structre:
       VERSION,
       nonce,
@@ -65,7 +65,7 @@ contract Mocker is Test {
     bytes memory _message,
     bytes memory _metadata
   ) internal returns (bytes32 _messageId) {
-    /* 
+    /*
       A Message in HL has the following structre:
       VERSION,
       nonce,
@@ -97,7 +97,10 @@ contract Mocker is Test {
     );
   }
 
-  function _mockReceiveMessage(address _contract, bytes calldata _message) internal {
+  function _mockReceiveMessage(
+    address _contract,
+    bytes calldata _message
+  ) internal {
     vm.mockCall(
       address(_contract), abi.encodeWithSelector(IMessageReceiver.receiveMessage.selector, _message), abi.encode(0)
     );

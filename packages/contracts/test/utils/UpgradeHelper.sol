@@ -8,7 +8,10 @@ import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {SafeTxBuilder} from 'test/utils/SafeTxBuilder.sol';
 
 interface ICREATE3 {
-  function deploy(bytes32 _salt, bytes calldata _creationCode) external payable returns (address _deployed);
+  function deploy(
+    bytes32 _salt,
+    bytes calldata _creationCode
+  ) external payable returns (address _deployed);
 }
 
 contract UpgradeHelper is SafeTxBuilder {

@@ -26,10 +26,7 @@ contract BaseTest is TestExtended {
     vm.assume(_previousNodes > 0 && _previousNodes < type(uint8).max);
     for (uint8 _i = 1; _i <= _previousNodes; _i++) {
       IHubStorage.Invoice memory _invoice = IHubStorage.Invoice({
-        intentId: keccak256(abi.encode(_i)),
-        owner: vm.addr(_i).toBytes32(),
-        entryEpoch: _i,
-        amount: 10
+        intentId: keccak256(abi.encode(_i)), owner: vm.addr(_i).toBytes32(), entryEpoch: _i, amount: 10
       });
       list.append(_invoice);
     }
@@ -170,7 +167,10 @@ contract Unit_Remove is BaseTest {
    * @param _previousNodes the number of previous nodes
    * @param _removedNodeUint the node to be removed
    */
-  function test_Middle(uint8 _previousNodes, uint8 _removedNodeUint) public setPreviousNodes(_previousNodes) {
+  function test_Middle(
+    uint8 _previousNodes,
+    uint8 _removedNodeUint
+  ) public setPreviousNodes(_previousNodes) {
     vm.assume(_previousNodes > 2);
     vm.assume(_removedNodeUint > 1 && _removedNodeUint < _previousNodes);
 
@@ -288,15 +288,15 @@ contract Unit_At is BaseTest {
    * @param _previousNodes the number of previous nodes
    * @param _nodeAtUint the node to get
    */
-  function test_At(uint8 _previousNodes, uint8 _nodeAtUint) public setPreviousNodes(_previousNodes) {
+  function test_At(
+    uint8 _previousNodes,
+    uint8 _nodeAtUint
+  ) public setPreviousNodes(_previousNodes) {
     vm.assume(_nodeAtUint > 0 && _nodeAtUint <= _previousNodes);
 
     bytes32 _intentId = keccak256(abi.encode(_nodeAtUint));
     IHubStorage.Invoice memory _invoice = IHubStorage.Invoice({
-      intentId: _intentId,
-      owner: vm.addr(_nodeAtUint).toBytes32(),
-      entryEpoch: uint48(_nodeAtUint),
-      amount: 10
+      intentId: _intentId, owner: vm.addr(_nodeAtUint).toBytes32(), entryEpoch: uint48(_nodeAtUint), amount: 10
     });
     bytes32 _nodeId = keccak256(abi.encode(_invoice, _nodeAtUint));
 

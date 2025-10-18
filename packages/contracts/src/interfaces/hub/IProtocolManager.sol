@@ -242,7 +242,10 @@ interface IProtocolManager {
    * @param _account Address of the account receiving the role
    * @param _role Role being assigned
    */
-  function assignRole(address _account, IHubStorage.Role _role) external;
+  function assignRole(
+    address _account,
+    IHubStorage.Role _role
+  ) external;
 
   /**
    * @notice Adds a list of supported domains
@@ -298,7 +301,10 @@ interface IProtocolManager {
    * @param _mailbox Address of the new mailbox
    * @param _domains The domains being updated
    */
-  function updateMailbox(bytes32 _mailbox, uint32[] calldata _domains) external payable;
+  function updateMailbox(
+    bytes32 _mailbox,
+    uint32[] calldata _domains
+  ) external payable;
 
   /**
    * @notice Updates the security module address
@@ -324,7 +330,10 @@ interface IProtocolManager {
    * @param _newGateway Address of the new gateway
    * @param _domains The domains being updated
    */
-  function updateGateway(bytes32 _newGateway, uint32[] calldata _domains) external payable;
+  function updateGateway(
+    bytes32 _newGateway,
+    uint32[] calldata _domains
+  ) external payable;
 
   /**
    * @notice Updates the gateway address for a chainId
@@ -332,7 +341,10 @@ interface IProtocolManager {
    * @param _chainId The chain ID
    * @param _gateway Address of the new gateway
    */
-  function updateChainGateway(uint32 _chainId, bytes32 _gateway) external;
+  function updateChainGateway(
+    uint32 _chainId,
+    bytes32 _gateway
+  ) external;
 
   /**
    * @notice Removes the gateway address for a chainId
@@ -375,7 +387,10 @@ interface IProtocolManager {
    * @param _tickerHash The asset ticker hash
    * @param _maxDiscountDbps The new maximum discount dbps
    */
-  function setMaxDiscountDbps(bytes32 _tickerHash, uint24 _maxDiscountDbps) external;
+  function setMaxDiscountDbps(
+    bytes32 _tickerHash,
+    uint24 _maxDiscountDbps
+  ) external;
 
   /*//////////////////////////////////////////////////////////////
                             VIEW FUNCTIONS

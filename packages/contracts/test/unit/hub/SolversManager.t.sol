@@ -17,7 +17,10 @@ import {IEverclear} from 'interfaces/common/IEverclear.sol';
 contract TestUsersManager is UsersManager, ProtocolManager {
   using Uint32Set for Uint32Set.Set;
 
-  constructor(address _owner, uint8 __minSupportedDomains) {
+  constructor(
+    address _owner,
+    uint8 __minSupportedDomains
+  ) {
     minSolverSupportedDomains = __minSupportedDomains;
     owner = _owner;
   }
@@ -58,8 +61,7 @@ contract BaseTest is TestExtended {
 
     for (uint256 _i; _i < _supportedDomains.length; _i++) {
       _domains[_i] = IHubStorage.DomainSetup({
-        id: uint32(uint256(keccak256(abi.encodePacked(_supportedDomains[_i], _i)))),
-        blockGasLimit: 1
+        id: uint32(uint256(keccak256(abi.encodePacked(_supportedDomains[_i], _i)))), blockGasLimit: 1
       });
     }
 
@@ -71,10 +73,12 @@ contract BaseTest is TestExtended {
     solversManager = new TestUsersManager(owner, MIN_SUPPORTED_DOMAINS);
   }
 
-  function _mockRole(address _account, IHubStorage.Role _role) internal {
-    stdstore.target(address(solversManager)).sig(IHubStorage.roles.selector).with_key(_account).checked_write(
-      uint8(_role)
-    );
+  function _mockRole(
+    address _account,
+    IHubStorage.Role _role
+  ) internal {
+    stdstore.target(address(solversManager)).sig(IHubStorage.roles.selector).with_key(_account)
+      .checked_write(uint8(_role));
   }
 
   function _setSupportedDomains(
@@ -84,7 +88,10 @@ contract BaseTest is TestExtended {
     IProtocolManager(address(solversManager)).addSupportedDomains(_domains);
   }
 
-  function _setUserSupportedDomainsConfig(address _account, uint32[] memory _supportedDomains) internal {
+  function _setUserSupportedDomainsConfig(
+    address _account,
+    uint32[] memory _supportedDomains
+  ) internal {
     vm.prank(_account);
     solversManager.setUserSupportedDomains(_supportedDomains);
   }
