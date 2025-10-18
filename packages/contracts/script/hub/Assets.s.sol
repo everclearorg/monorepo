@@ -12,7 +12,12 @@ import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
 import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';
 
 contract UpdateMaxDiscountBPS is Script, ScriptUtils {
-  function run(string memory _account, address _hub, bytes32 _tickerHash, uint24 _maxDiscountBps) public {
+  function run(
+    string memory _account,
+    address _hub,
+    bytes32 _tickerHash,
+    uint24 _maxDiscountBps
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -23,7 +28,11 @@ contract UpdateMaxDiscountBPS is Script, ScriptUtils {
 }
 
 contract SetAdopted is Script, ScriptUtils {
-  function run(string memory _account, address _hub, IHubStorage.AssetConfig calldata _config) public {
+  function run(
+    string memory _account,
+    address _hub,
+    IHubStorage.AssetConfig calldata _config
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -34,7 +43,12 @@ contract SetAdopted is Script, ScriptUtils {
 }
 
 contract UpdateDiscountPerEpoch is Script, ScriptUtils {
-  function run(string memory _account, address _hub, bytes32 _tickerHash, uint24 _discountPerEpoch) public {
+  function run(
+    string memory _account,
+    address _hub,
+    bytes32 _tickerHash,
+    uint24 _discountPerEpoch
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -45,7 +59,12 @@ contract UpdateDiscountPerEpoch is Script, ScriptUtils {
 }
 
 contract UpdatePrioritizedStrategy is Script, ScriptUtils {
-  function run(string memory _account, address _hub, bytes32 _tickerHash, IEverclear.Strategy _strategy) public {
+  function run(
+    string memory _account,
+    address _hub,
+    bytes32 _tickerHash,
+    IEverclear.Strategy _strategy
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 

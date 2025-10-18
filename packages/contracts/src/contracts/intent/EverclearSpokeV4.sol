@@ -84,13 +84,19 @@ contract EverclearSpokeV4 is
   }
 
   /// @inheritdoc IEverclearSpokeV4
-  function setStrategyForAsset(address _asset, IEverclear.Strategy _strategy) external onlyOwner {
+  function setStrategyForAsset(
+    address _asset,
+    IEverclear.Strategy _strategy
+  ) external onlyOwner {
     strategies[_asset] = _strategy;
     emit StrategySetForAsset(_asset, _strategy);
   }
 
   /// @inheritdoc IEverclearSpokeV4
-  function setModuleForStrategy(IEverclear.Strategy _strategy, ISettlementModule _module) external onlyOwner {
+  function setModuleForStrategy(
+    IEverclear.Strategy _strategy,
+    ISettlementModule _module
+  ) external onlyOwner {
     modules[_strategy] = _module;
     emit ModuleSetForStrategy(_strategy, _module);
   }
@@ -304,7 +310,10 @@ contract EverclearSpokeV4 is
   }
 
   /// @inheritdoc IEverclearSpokeV4
-  function deposit(address _asset, uint256 _amount) external whenNotPaused {
+  function deposit(
+    address _asset,
+    uint256 _amount
+  ) external whenNotPaused {
     _pullTokens(msg.sender, _asset, _amount);
     balances[_asset.toBytes32()][msg.sender.toBytes32()] += _amount;
 
@@ -312,7 +321,10 @@ contract EverclearSpokeV4 is
   }
 
   /// @inheritdoc IEverclearSpokeV4
-  function withdraw(address _asset, uint256 _amount) external whenNotPaused {
+  function withdraw(
+    address _asset,
+    uint256 _amount
+  ) external whenNotPaused {
     balances[_asset.toBytes32()][msg.sender.toBytes32()] -= _amount;
 
     _pushTokens(msg.sender, _asset, _amount);
@@ -531,7 +543,12 @@ contract EverclearSpokeV4 is
    * @param _nonce The nonce of the message
    * @param _signature The signature of the message
    */
-  function _verifySignature(address _signer, bytes memory _data, uint256 _nonce, bytes calldata _signature) internal {
+  function _verifySignature(
+    address _signer,
+    bytes memory _data,
+    uint256 _nonce,
+    bytes calldata _signature
+  ) internal {
     bytes32 _hash = keccak256(_data);
     address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
     if (_recoveredSigner != _signer) {
@@ -596,7 +613,10 @@ contract EverclearSpokeV4 is
    * @param _intentId The intent ID
    * @param _data The calldata of the intent
    */
-  function _executeCalldata(bytes32 _intentId, bytes memory _data) internal {
+  function _executeCalldata(
+    bytes32 _intentId,
+    bytes memory _data
+  ) internal {
     (address _target, bytes memory _calldata) = abi.decode(_data, (address, bytes));
 
     (bool _success, bytes memory _returnData) = callExecutor.excessivelySafeCall(
@@ -616,7 +636,11 @@ contract EverclearSpokeV4 is
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function _pullTokens(address _sender, address _asset, uint256 _amount) internal {
+  function _pullTokens(
+    address _sender,
+    address _asset,
+    uint256 _amount
+  ) internal {
     IERC20(_asset).safeTransferFrom(_sender, address(this), _amount);
   }
 
@@ -626,7 +650,11 @@ contract EverclearSpokeV4 is
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function _pushTokens(address _recipient, address _asset, uint256 _amount) internal {
+  function _pushTokens(
+    address _recipient,
+    address _asset,
+    uint256 _amount
+  ) internal {
     IERC20(_asset).safeTransfer(_recipient, _amount);
   }
 
@@ -670,7 +698,11 @@ contract EverclearSpokeV4 is
    * @param _relayer The relayer address
    * @param _ttl The time to live of the message
    */
-  function _processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) internal view {
+  function _processQueueChecks(
+    uint32 _domain,
+    address _relayer,
+    uint256 _ttl
+  ) internal view {
     if (_domain != DOMAIN) {
       revert EverclearSpoke_ProcessFillViaRelayer_WrongDomain();
     }

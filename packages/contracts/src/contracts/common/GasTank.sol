@@ -54,7 +54,10 @@ contract GasTank is Initializable, OwnableUpgradeable, IGasTank {
   /**
    * @inheritdoc IGasTank
    */
-  function authorizeGasReceiver(address _receiver, bool _authorized) external onlyOwner {
+  function authorizeGasReceiver(
+    address _receiver,
+    bool _authorized
+  ) external onlyOwner {
     _authorizedGasReceiver[_receiver] = _authorized;
     emit GasReceiverAuthorized(_receiver, _authorized);
   }

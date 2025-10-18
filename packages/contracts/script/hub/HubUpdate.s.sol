@@ -13,7 +13,11 @@ import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
 import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';
 
 contract UpdateEpochLength is Script, ScriptUtils {
-  function run(string memory _account, address _hub, uint48 _epochLength) public {
+  function run(
+    string memory _account,
+    address _hub,
+    uint48 _epochLength
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -24,7 +28,11 @@ contract UpdateEpochLength is Script, ScriptUtils {
 }
 
 contract UpdateExpiryTimeBuffer is Script, ScriptUtils {
-  function run(string memory _account, address _hub, uint48 _expiryTimeBuffer) public {
+  function run(
+    string memory _account,
+    address _hub,
+    uint48 _expiryTimeBuffer
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -35,7 +43,11 @@ contract UpdateExpiryTimeBuffer is Script, ScriptUtils {
 }
 
 contract UpdateLighthouse is Script, ScriptUtils {
-  function run(string memory _account, address _hub, address _lighthouse) public {
+  function run(
+    string memory _account,
+    address _hub,
+    address _lighthouse
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -46,7 +58,11 @@ contract UpdateLighthouse is Script, ScriptUtils {
 }
 
 contract UpdateWatchtower is Script, ScriptUtils {
-  function run(string memory _account, address _hub, address _watchtower) public {
+  function run(
+    string memory _account,
+    address _hub,
+    address _watchtower
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -57,7 +73,11 @@ contract UpdateWatchtower is Script, ScriptUtils {
 }
 
 contract UpdateMinSupportedDomains is Script, ScriptUtils {
-  function run(string memory _account, address _hub, uint8 _minSolverSupportedDomains) public {
+  function run(
+    string memory _account,
+    address _hub,
+    uint8 _minSolverSupportedDomains
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -68,7 +88,11 @@ contract UpdateMinSupportedDomains is Script, ScriptUtils {
 }
 
 contract UpdateSecurityModule is Script, ScriptUtils {
-  function run(string memory _account, address _hub, address _ism) public {
+  function run(
+    string memory _account,
+    address _hub,
+    address _ism
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -79,7 +103,11 @@ contract UpdateSecurityModule is Script, ScriptUtils {
 }
 
 contract UpdateGasConfig is Script, ScriptUtils {
-  function run(string memory _account, address _hub, IHubStorage.GasConfig calldata _gasConfig) public {
+  function run(
+    string memory _account,
+    address _hub,
+    IHubStorage.GasConfig calldata _gasConfig
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -92,7 +120,12 @@ contract UpdateGasConfig is Script, ScriptUtils {
 contract AddChainGateway is Script, ScriptUtils {
   using TypeCasts for address;
 
-  function run(string memory _account, address _hub, uint32 _chainId, address _gateway) public {
+  function run(
+    string memory _account,
+    address _hub,
+    uint32 _chainId,
+    address _gateway
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     bytes32 _padded = _gateway.toBytes32();
     vm.startBroadcast(_accountPk);
@@ -104,7 +137,12 @@ contract AddChainGateway is Script, ScriptUtils {
 }
 
 contract AssignRole is Script, ScriptUtils {
-  function run(string memory _account, address _hub, address _user, uint8 _role) public {
+  function run(
+    string memory _account,
+    address _hub,
+    address _user,
+    uint8 _role
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -117,7 +155,11 @@ contract AssignRole is Script, ScriptUtils {
 contract ProposeNewOwner is Script, ScriptUtils {
   error IncorrectlySetOwner(address _actual, address _intended);
 
-  function run(string memory _account, address _hub, address _owner) public {
+  function run(
+    string memory _account,
+    address _hub,
+    address _owner
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -132,7 +174,10 @@ contract ProposeNewOwner is Script, ScriptUtils {
 }
 
 contract Pause is Script, ScriptUtils {
-  function run(string memory _account, address _hub) public {
+  function run(
+    string memory _account,
+    address _hub
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -143,7 +188,10 @@ contract Pause is Script, ScriptUtils {
 }
 
 contract Unpause is Script, ScriptUtils {
-  function run(string memory _account, address _hub) public {
+  function run(
+    string memory _account,
+    address _hub
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -154,7 +202,11 @@ contract Unpause is Script, ScriptUtils {
 }
 
 contract TransferOwnership is Script, ScriptUtils {
-  function run(string memory _account, address _hub, address _newOwner) public {
+  function run(
+    string memory _account,
+    address _hub,
+    address _newOwner
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -167,7 +219,11 @@ contract TransferOwnership is Script, ScriptUtils {
 contract TransferGatewayOwnership is Script, ScriptUtils {
   error FailedToTransferOwnership();
 
-  function run(string memory _account, address _hub, address _newOwner) public {
+  function run(
+    string memory _account,
+    address _hub,
+    address _newOwner
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 

@@ -24,7 +24,12 @@ import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';
 import {Deploy} from 'utils/Deploy.sol';
 
 contract TestProtocolManager is ProtocolManager {
-  constructor(address __owner, address __admin, address __hubGateway, address __lighthouse) {
+  constructor(
+    address __owner,
+    address __admin,
+    address __hubGateway,
+    address __lighthouse
+  ) {
     // Set the internal state vars for tests, these are set in the constructor of the HubStorage originally
     owner = __owner;
     roles[__admin] = IHubStorage.Role.ADMIN;
@@ -133,7 +138,10 @@ contract Unit_OwnershipFunctions is BaseTest {
    * @param _caller The address of the caller
    * @param _newOwner The address of the new owner
    */
-  function test_Revert_ProposeOwnerNotOwner(address _caller, address _newOwner) public {
+  function test_Revert_ProposeOwnerNotOwner(
+    address _caller,
+    address _newOwner
+  ) public {
     vm.assume(_newOwner != address(0) && _newOwner != OWNER);
     vm.assume(_caller != OWNER);
     vm.prank(_caller);
@@ -147,7 +155,11 @@ contract Unit_OwnershipFunctions is BaseTest {
    * @param _delay The acceptance delay
    * @param _newOwner The address of the new owner
    */
-  function test_AcceptOwnership(uint256 _timestamp, uint256 _delay, address _newOwner) public {
+  function test_AcceptOwnership(
+    uint256 _timestamp,
+    uint256 _delay,
+    address _newOwner
+  ) public {
     vm.assume(_newOwner != address(0) && _newOwner != OWNER);
     vm.assume(type(uint256).max - _timestamp > _delay);
     _mockAcceptanceDelay(_delay);
@@ -176,7 +188,10 @@ contract Unit_OwnershipFunctions is BaseTest {
    * @param _caller The address of the caller
    * @param _newOwner The address of the new owner
    */
-  function test_Revert_AcceptOwnershipNotProposedOwner(address _caller, address _newOwner) public {
+  function test_Revert_AcceptOwnershipNotProposedOwner(
+    address _caller,
+    address _newOwner
+  ) public {
     vm.assume(_newOwner != address(0) && _newOwner != OWNER);
     vm.assume(_caller != _newOwner);
     vm.prank(OWNER);
@@ -227,7 +242,10 @@ contract Unit_RoleManagementFunctions is BaseTest {
    * @param _account The address of the account
    * @param _roleIndex The index of the role
    */
-  function test_AssignRole(address _account, uint256 _roleIndex) public {
+  function test_AssignRole(
+    address _account,
+    uint256 _roleIndex
+  ) public {
     vm.assume(_account != address(0) && _account != ADMIN);
     IHubStorage.Role _role = IHubStorage.Role(bound(_roleIndex, 0, 1));
 
@@ -357,7 +375,10 @@ contract Unit_FeeAndDomainFunctions is BaseTest {
    * @param _caller The address of the caller
    * @param _newDelay The new acceptance delay
    */
-  function test_Revert_UpdateAcceptanceDelayNotOwnerOrAdmin(address _caller, uint256 _newDelay) public {
+  function test_Revert_UpdateAcceptanceDelayNotOwnerOrAdmin(
+    address _caller,
+    uint256 _newDelay
+  ) public {
     vm.assume(_caller != OWNER && _caller != ADMIN && _caller != address(0));
 
     vm.prank(_caller);
@@ -386,7 +407,10 @@ contract Unit_FeeAndDomainFunctions is BaseTest {
    * @param _caller The address of the caller
    * @param _newMinDomains The new minimum number of supported domains
    */
-  function test_Revert_UpdateMinSolverSupportedDomainsNotOwnerOrAdmin(address _caller, uint8 _newMinDomains) public {
+  function test_Revert_UpdateMinSolverSupportedDomainsNotOwnerOrAdmin(
+    address _caller,
+    uint8 _newMinDomains
+  ) public {
     vm.assume(_caller != OWNER && _caller != ADMIN);
 
     vm.prank(_caller);
@@ -520,7 +544,10 @@ contract Unit_FeeAndDomainFunctions is BaseTest {
    * @param _caller The address of the caller
    * @param _domains The domains to remove
    */
-  function test_Revert_RemoveSupportedDomains_NotOwnerOrAdmin(address _caller, uint32[] memory _domains) public {
+  function test_Revert_RemoveSupportedDomains_NotOwnerOrAdmin(
+    address _caller,
+    uint32[] memory _domains
+  ) public {
     vm.assume(_caller != OWNER && _caller != ADMIN);
 
     for (uint256 _i; _i < _domains.length; _i++) {
@@ -576,7 +603,10 @@ contract Unit_FeeAndDomainFunctions is BaseTest {
    * @param _caller The address of the caller
    * @param _newBuffer The new expiry time buffer
    */
-  function test_Revert_UpdateExpiryTimeBufferNotOwnerOrAdmin(address _caller, uint48 _newBuffer) public {
+  function test_Revert_UpdateExpiryTimeBufferNotOwnerOrAdmin(
+    address _caller,
+    uint48 _newBuffer
+  ) public {
     vm.assume(_caller != OWNER && _caller != ADMIN);
 
     vm.prank(_caller);
@@ -589,7 +619,10 @@ contract Unit_FeeAndDomainFunctions is BaseTest {
    * @param _previousEpochLength The previous epoch length
    * @param _newEpochLength The new epoch length
    */
-  function test_UpdateEpochLength(uint48 _previousEpochLength, uint48 _newEpochLength) public {
+  function test_UpdateEpochLength(
+    uint48 _previousEpochLength,
+    uint48 _newEpochLength
+  ) public {
     vm.assume(_newEpochLength != 0 && _previousEpochLength != 0 && _newEpochLength != _previousEpochLength);
     protocolManager.mockEpochLength(_previousEpochLength);
     _expectEmit(address(protocolManager));
@@ -764,7 +797,10 @@ contract Unit_FeeAndDomainFunctions is BaseTest {
    * @param _caller The address of the caller
    * @param _newEpochLength The new epoch length
    */
-  function test_Revert_UpdateEpochLengthNotOwnerOrAdmin(address _caller, uint48 _newEpochLength) public {
+  function test_Revert_UpdateEpochLengthNotOwnerOrAdmin(
+    address _caller,
+    uint48 _newEpochLength
+  ) public {
     vm.assume(_caller != OWNER && _caller != ADMIN);
 
     vm.prank(_caller);
@@ -787,7 +823,10 @@ contract Unit_FeeAndDomainFunctions is BaseTest {
    * @param _tickerHash The hash of the ticker
    * @param _newMaxDiscountDbps The new max discount dbps
    */
-  function test_SetMaxDiscountDbps(bytes32 _tickerHash, uint24 _newMaxDiscountDbps) public {
+  function test_SetMaxDiscountDbps(
+    bytes32 _tickerHash,
+    uint24 _newMaxDiscountDbps
+  ) public {
     _newMaxDiscountDbps = _newMaxDiscountDbps % Constants.DBPS_DENOMINATOR;
 
     _expectEmit(address(protocolManager));
@@ -822,7 +861,10 @@ contract Unit_FeeAndDomainFunctions is BaseTest {
    * @param _tickerHash The hash of the ticker
    * @param _newMaxDiscountDbps The new max discount dbps
    */
-  function test_Revert_SetMaxDiscountDbps_InvalidDiscount(bytes32 _tickerHash, uint24 _newMaxDiscountDbps) public {
+  function test_Revert_SetMaxDiscountDbps_InvalidDiscount(
+    bytes32 _tickerHash,
+    uint24 _newMaxDiscountDbps
+  ) public {
     vm.assume(_newMaxDiscountDbps > Constants.DBPS_DENOMINATOR);
 
     vm.expectRevert(IProtocolManager.ProtocolManager_SetMaxDiscountDbps_InvalidDiscount.selector);
@@ -853,7 +895,10 @@ contract Unit_UpdateGatewayStorage is BaseTest {
    * @param _caller The address of the caller
    * @param _newMailbox The new mailbox address
    */
-  function test_Revert_UpdateMailboxNonOwner(address _caller, address _newMailbox) public validAddress(_newMailbox) {
+  function test_Revert_UpdateMailboxNonOwner(
+    address _caller,
+    address _newMailbox
+  ) public validAddress(_newMailbox) {
     vm.assume(_caller != OWNER);
     vm.prank(_caller);
 
@@ -915,7 +960,10 @@ contract Unit_UpdateGatewayStorage is BaseTest {
    * @param _chainId The chain ID
    * @param _gateway The gateway address
    */
-  function test_UpdateChainGateway(uint32 _chainId, bytes32 _gateway) public validAddress(_gateway.toAddress()) {
+  function test_UpdateChainGateway(
+    uint32 _chainId,
+    bytes32 _gateway
+  ) public validAddress(_gateway.toAddress()) {
     vm.prank(OWNER);
 
     vm.expectCall(address(hubGateway), abi.encodeWithSignature('setChainGateway(uint32,bytes32)', _chainId, _gateway));
@@ -958,7 +1006,10 @@ contract Unit_UpdateGatewayStorage is BaseTest {
    * @param _chainId The chain ID
    * @param _gateway The gateway address
    */
-  function test_RemoveChainGateway(uint32 _chainId, bytes32 _gateway) public validAddress(_gateway.toAddress()) {
+  function test_RemoveChainGateway(
+    uint32 _chainId,
+    bytes32 _gateway
+  ) public validAddress(_gateway.toAddress()) {
     vm.startPrank(OWNER);
     vm.expectCall(address(hubGateway), abi.encodeWithSignature('setChainGateway(uint32,bytes32)', _chainId, _gateway));
     protocolManager.updateChainGateway(_chainId, _gateway);
@@ -973,7 +1024,10 @@ contract Unit_UpdateGatewayStorage is BaseTest {
    * @param _caller The address of the caller
    * @param _chainId The chain ID
    */
-  function test_Revert_RemoveChainGatewayNonOwner(address _caller, uint32 _chainId) public {
+  function test_Revert_RemoveChainGatewayNonOwner(
+    address _caller,
+    uint32 _chainId
+  ) public {
     vm.assume(_caller != OWNER);
     vm.prank(_caller);
 
@@ -1053,7 +1107,10 @@ contract Unit_CrossChainUpdates is BaseTest {
    * @param _caller The address of the caller
    * @param _lighthouse The lighthouse address
    */
-  function test_Revert_UpdateLighthouse_NotOwner(address _caller, address _lighthouse) public {
+  function test_Revert_UpdateLighthouse_NotOwner(
+    address _caller,
+    address _lighthouse
+  ) public {
     vm.assume(_caller != OWNER && _caller != address(0));
     vm.expectRevert(IHubStorage.HubStorage_OnlyOwner.selector);
     protocolManager.updateLighthouse(_lighthouse);
@@ -1114,7 +1171,10 @@ contract Unit_CrossChainUpdates is BaseTest {
    * @param _caller The address of the caller
    * @param _watchtower The watchtower address
    */
-  function test_Revert_UpdateWatchtower_NotOwner(address _caller, address _watchtower) public {
+  function test_Revert_UpdateWatchtower_NotOwner(
+    address _caller,
+    address _watchtower
+  ) public {
     vm.assume(_caller != OWNER && _caller != address(0));
     vm.expectRevert(IHubStorage.HubStorage_OnlyOwner.selector);
     protocolManager.updateWatchtower(_watchtower);
@@ -1296,7 +1356,10 @@ contract Unit_UpdateGateway is BaseTest {
    * @param _nonOwner The address of the caller
    * @param _newGateway The new mailbox address
    */
-  function test_Revert_UpdateGateway_OnlyOwner(address _nonOwner, address _newGateway) public {
+  function test_Revert_UpdateGateway_OnlyOwner(
+    address _nonOwner,
+    address _newGateway
+  ) public {
     vm.assume(_nonOwner != OWNER);
 
     vm.expectRevert(IHubStorage.HubStorage_OnlyOwner.selector);
@@ -1351,7 +1414,10 @@ contract Unit_UpdateGasConfig is BaseTest {
    * @param _nonOwner The address of the caller
    * @param _newGasConfig The new gas config
    */
-  function test_Revert_Unauthorized(address _nonOwner, IHubStorage.GasConfig calldata _newGasConfig) public {
+  function test_Revert_Unauthorized(
+    address _nonOwner,
+    IHubStorage.GasConfig calldata _newGasConfig
+  ) public {
     vm.assume(_nonOwner != OWNER && _nonOwner != ADMIN);
 
     vm.expectRevert(IHubStorage.HubStorage_Unauthorized.selector);
