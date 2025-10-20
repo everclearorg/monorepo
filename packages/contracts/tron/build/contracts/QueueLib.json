@@ -1,0 +1,3735 @@
+{
+  "contractName": "QueueLib",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Queue_EmptyQueue",
+      "type": "error"
+    }
+  ],
+  "bytecode": "0x60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea26474726f6e58221220cdfd9ca1e30a17d0bff603c6bc19313ad7ab7c8836236b59415eb907c572169c64736f6c63430008170033",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea26474726f6e58221220cdfd9ca1e30a17d0bff603c6bc19313ad7ab7c8836236b59415eb907c572169c64736f6c63430008170033",
+  "sourceMap": "185:2422:2:-:0;;;;;;;;;;;;;;;-1:-1:-1;;;185:2422:2;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "185:2422:2:-:0;;;;;;;;",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\nimport {IEverclear} from 'interfaces/common/IEverclear.sol';\n\n/**\n * @title QueueLib\n * @notice Library for managing queues\n */\nlibrary QueueLib {\n  /**\n   * @notice Structure for the IntentQueue\n   * @dev first should always be initialized to 1\n   * @param first The first position in the queue\n   * @param last The last position in the queue\n   * @param queue The queue of intent ids\n   */\n  struct IntentQueue {\n    uint256 first;\n    uint256 last;\n    mapping(uint256 _position => bytes32 _intentId) queue;\n  }\n\n  /**\n   * @notice Structure for the FillQueue\n   * @dev Member first should always be initialized to 1\n   * @param first The first position in the queue\n   * @param last The last position in the queue\n   * @param queue The queue of fill messages\n   */\n  struct FillQueue {\n    uint256 first;\n    uint256 last;\n    mapping(uint256 _position => IEverclear.FillMessage _fillMessage) queue;\n  }\n\n  /**\n   * @notice Thrown when the queue is empty\n   */\n  error Queue_EmptyQueue();\n\n  /**\n   * @notice Enqueue an intent id to the IntentQueue\n   * @param _queue The IntentQueue\n   * @param _intentId The intent id to enqueue\n   */\n  function enqueueIntent(IntentQueue storage _queue, bytes32 _intentId) internal {\n    _queue.last += 1;\n    _queue.queue[_queue.last] = _intentId;\n  }\n\n  /**\n   * @notice Enqueue a fill message to the FillQueue\n   * @param _queue The FillQueue\n   * @param _fillMessage The fill message to enqueue\n   */\n  function enqueueFill(FillQueue storage _queue, IEverclear.FillMessage memory _fillMessage) internal {\n    _queue.last += 1;\n    _queue.queue[_queue.last] = _fillMessage;\n  }\n\n  /**\n   * @notice Dequeue an intent id from the IntentQueue\n   * @param _queue The IntentQueue\n   * @return _intentId The dequeued intent id\n   */\n  function dequeueIntent(\n    IntentQueue storage _queue\n  ) internal returns (bytes32 _intentId) {\n    // non-empty queue check\n    if (_queue.last < _queue.first) revert Queue_EmptyQueue();\n\n    _intentId = _queue.queue[_queue.first];\n\n    delete _queue.queue[_queue.first];\n    _queue.first += 1;\n  }\n\n  /**\n   * @notice Dequeue a fill message from the FillQueue\n   * @param _queue The FillQueue\n   * @return _fillMessage The dequeued fill message\n   */\n  function dequeueFill(\n    FillQueue storage _queue\n  ) internal returns (IEverclear.FillMessage memory _fillMessage) {\n    // non-empty queue\n    if (_queue.last < _queue.first) revert Queue_EmptyQueue();\n\n    _fillMessage = _queue.queue[_queue.first];\n\n    delete _queue.queue[_queue.first];\n    _queue.first += 1;\n  }\n}\n",
+  "sourcePath": "/Users/jamesharbridge/Code/Proxima/everclear-monorepo/packages/contracts/tron/contracts/common/QueueLib.sol",
+  "ast": {
+    "absolutePath": "/Users/jamesharbridge/Code/Proxima/everclear-monorepo/packages/contracts/tron/contracts/common/QueueLib.sol",
+    "exportedSymbols": {
+      "IEverclear": [
+        981
+      ],
+      "QueueLib": [
+        371
+      ]
+    },
+    "id": 372,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 211,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:2"
+      },
+      {
+        "absolutePath": "interfaces/common/IEverclear.sol",
+        "file": "interfaces/common/IEverclear.sol",
+        "id": 213,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 372,
+        "sourceUnit": 982,
+        "src": "57:60:2",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 212,
+              "name": "IEverclear",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 981,
+              "src": "65:10:2",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "QueueLib",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": {
+          "id": 214,
+          "nodeType": "StructuredDocumentation",
+          "src": "119:65:2",
+          "text": " @title QueueLib\n @notice Library for managing queues"
+        },
+        "fullyImplemented": true,
+        "id": 371,
+        "linearizedBaseContracts": [
+          371
+        ],
+        "name": "QueueLib",
+        "nameLocation": "193:8:2",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "QueueLib.IntentQueue",
+            "documentation": {
+              "id": 215,
+              "nodeType": "StructuredDocumentation",
+              "src": "206:242:2",
+              "text": " @notice Structure for the IntentQueue\n @dev first should always be initialized to 1\n @param first The first position in the queue\n @param last The last position in the queue\n @param queue The queue of intent ids"
+            },
+            "id": 224,
+            "members": [
+              {
+                "constant": false,
+                "id": 217,
+                "mutability": "mutable",
+                "name": "first",
+                "nameLocation": "484:5:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 224,
+                "src": "476:13:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 216,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "476:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 219,
+                "mutability": "mutable",
+                "name": "last",
+                "nameLocation": "503:4:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 224,
+                "src": "495:12:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 218,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "495:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 223,
+                "mutability": "mutable",
+                "name": "queue",
+                "nameLocation": "561:5:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 224,
+                "src": "513:53:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                  "typeString": "mapping(uint256 => bytes32)"
+                },
+                "typeName": {
+                  "id": 222,
+                  "keyName": "_position",
+                  "keyNameLocation": "529:9:2",
+                  "keyType": {
+                    "id": 220,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "521:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "513:47:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                    "typeString": "mapping(uint256 => bytes32)"
+                  },
+                  "valueName": "_intentId",
+                  "valueNameLocation": "550:9:2",
+                  "valueType": {
+                    "id": 221,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "542:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "IntentQueue",
+            "nameLocation": "458:11:2",
+            "nodeType": "StructDefinition",
+            "scope": 371,
+            "src": "451:120:2",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "QueueLib.FillQueue",
+            "documentation": {
+              "id": 225,
+              "nodeType": "StructuredDocumentation",
+              "src": "575:250:2",
+              "text": " @notice Structure for the FillQueue\n @dev Member first should always be initialized to 1\n @param first The first position in the queue\n @param last The last position in the queue\n @param queue The queue of fill messages"
+            },
+            "id": 235,
+            "members": [
+              {
+                "constant": false,
+                "id": 227,
+                "mutability": "mutable",
+                "name": "first",
+                "nameLocation": "859:5:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 235,
+                "src": "851:13:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 226,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "851:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 229,
+                "mutability": "mutable",
+                "name": "last",
+                "nameLocation": "878:4:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 235,
+                "src": "870:12:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 228,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "870:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 234,
+                "mutability": "mutable",
+                "name": "queue",
+                "nameLocation": "954:5:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 235,
+                "src": "888:71:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                  "typeString": "mapping(uint256 => struct IEverclear.FillMessage)"
+                },
+                "typeName": {
+                  "id": 233,
+                  "keyName": "_position",
+                  "keyNameLocation": "904:9:2",
+                  "keyType": {
+                    "id": 230,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "896:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "888:65:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                    "typeString": "mapping(uint256 => struct IEverclear.FillMessage)"
+                  },
+                  "valueName": "_fillMessage",
+                  "valueNameLocation": "940:12:2",
+                  "valueType": {
+                    "id": 232,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 231,
+                      "name": "IEverclear.FillMessage",
+                      "nameLocations": [
+                        "917:10:2",
+                        "928:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 968,
+                      "src": "917:22:2"
+                    },
+                    "referencedDeclaration": 968,
+                    "src": "917:22:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_storage_ptr",
+                      "typeString": "struct IEverclear.FillMessage"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "FillQueue",
+            "nameLocation": "835:9:2",
+            "nodeType": "StructDefinition",
+            "scope": 371,
+            "src": "828:136:2",
+            "visibility": "public"
+          },
+          {
+            "documentation": {
+              "id": 236,
+              "nodeType": "StructuredDocumentation",
+              "src": "968:53:2",
+              "text": " @notice Thrown when the queue is empty"
+            },
+            "errorSelector": "950f1c15",
+            "id": 238,
+            "name": "Queue_EmptyQueue",
+            "nameLocation": "1030:16:2",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 237,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1046:2:2"
+            },
+            "src": "1024:25:2"
+          },
+          {
+            "body": {
+              "id": 262,
+              "nodeType": "Block",
+              "src": "1279:70:2",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 251,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 247,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 242,
+                        "src": "1285:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                          "typeString": "struct QueueLib.IntentQueue storage pointer"
+                        }
+                      },
+                      "id": 249,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1292:4:2",
+                      "memberName": "last",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 219,
+                      "src": "1285:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 250,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1300:1:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "1285:16:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 252,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1285:16:2"
+                },
+                {
+                  "expression": {
+                    "id": 260,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 253,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 242,
+                          "src": "1307:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 257,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1314:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 223,
+                        "src": "1307:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                          "typeString": "mapping(uint256 => bytes32)"
+                        }
+                      },
+                      "id": 258,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 255,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 242,
+                          "src": "1320:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 256,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1327:4:2",
+                        "memberName": "last",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 219,
+                        "src": "1320:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "1307:25:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 259,
+                      "name": "_intentId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 244,
+                      "src": "1335:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "1307:37:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 261,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1307:37:2"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 239,
+              "nodeType": "StructuredDocumentation",
+              "src": "1053:144:2",
+              "text": " @notice Enqueue an intent id to the IntentQueue\n @param _queue The IntentQueue\n @param _intentId The intent id to enqueue"
+            },
+            "id": 263,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "enqueueIntent",
+            "nameLocation": "1209:13:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 245,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 242,
+                  "mutability": "mutable",
+                  "name": "_queue",
+                  "nameLocation": "1243:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 263,
+                  "src": "1223:26:2",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                    "typeString": "struct QueueLib.IntentQueue"
+                  },
+                  "typeName": {
+                    "id": 241,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 240,
+                      "name": "IntentQueue",
+                      "nameLocations": [
+                        "1223:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 224,
+                      "src": "1223:11:2"
+                    },
+                    "referencedDeclaration": 224,
+                    "src": "1223:11:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                      "typeString": "struct QueueLib.IntentQueue"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 244,
+                  "mutability": "mutable",
+                  "name": "_intentId",
+                  "nameLocation": "1259:9:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 263,
+                  "src": "1251:17:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 243,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1251:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1222:47:2"
+            },
+            "returnParameters": {
+              "id": 246,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1279:0:2"
+            },
+            "scope": 371,
+            "src": "1200:149:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 288,
+              "nodeType": "Block",
+              "src": "1604:73:2",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 277,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 273,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 267,
+                        "src": "1610:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                          "typeString": "struct QueueLib.FillQueue storage pointer"
+                        }
+                      },
+                      "id": 275,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1617:4:2",
+                      "memberName": "last",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 229,
+                      "src": "1610:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 276,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1625:1:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "1610:16:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 278,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1610:16:2"
+                },
+                {
+                  "expression": {
+                    "id": 286,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 279,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 267,
+                          "src": "1632:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 283,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1639:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 234,
+                        "src": "1632:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                          "typeString": "mapping(uint256 => struct IEverclear.FillMessage storage ref)"
+                        }
+                      },
+                      "id": 284,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 281,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 267,
+                          "src": "1645:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 282,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1652:4:2",
+                        "memberName": "last",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 229,
+                        "src": "1645:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "1632:25:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_storage",
+                        "typeString": "struct IEverclear.FillMessage storage ref"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 285,
+                      "name": "_fillMessage",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 270,
+                      "src": "1660:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                        "typeString": "struct IEverclear.FillMessage memory"
+                      }
+                    },
+                    "src": "1632:40:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_storage",
+                      "typeString": "struct IEverclear.FillMessage storage ref"
+                    }
+                  },
+                  "id": 287,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1632:40:2"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 264,
+              "nodeType": "StructuredDocumentation",
+              "src": "1353:148:2",
+              "text": " @notice Enqueue a fill message to the FillQueue\n @param _queue The FillQueue\n @param _fillMessage The fill message to enqueue"
+            },
+            "id": 289,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "enqueueFill",
+            "nameLocation": "1513:11:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 271,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 267,
+                  "mutability": "mutable",
+                  "name": "_queue",
+                  "nameLocation": "1543:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 289,
+                  "src": "1525:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                    "typeString": "struct QueueLib.FillQueue"
+                  },
+                  "typeName": {
+                    "id": 266,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 265,
+                      "name": "FillQueue",
+                      "nameLocations": [
+                        "1525:9:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 235,
+                      "src": "1525:9:2"
+                    },
+                    "referencedDeclaration": 235,
+                    "src": "1525:9:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                      "typeString": "struct QueueLib.FillQueue"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 270,
+                  "mutability": "mutable",
+                  "name": "_fillMessage",
+                  "nameLocation": "1581:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 289,
+                  "src": "1551:42:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                    "typeString": "struct IEverclear.FillMessage"
+                  },
+                  "typeName": {
+                    "id": 269,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 268,
+                      "name": "IEverclear.FillMessage",
+                      "nameLocations": [
+                        "1551:10:2",
+                        "1562:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 968,
+                      "src": "1551:22:2"
+                    },
+                    "referencedDeclaration": 968,
+                    "src": "1551:22:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_storage_ptr",
+                      "typeString": "struct IEverclear.FillMessage"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1524:70:2"
+            },
+            "returnParameters": {
+              "id": 272,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1604:0:2"
+            },
+            "scope": 371,
+            "src": "1504:173:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 328,
+              "nodeType": "Block",
+              "src": "1925:205:2",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 302,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "id": 298,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 293,
+                        "src": "1964:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                          "typeString": "struct QueueLib.IntentQueue storage pointer"
+                        }
+                      },
+                      "id": 299,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1971:4:2",
+                      "memberName": "last",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 219,
+                      "src": "1964:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "expression": {
+                        "id": 300,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 293,
+                        "src": "1978:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                          "typeString": "struct QueueLib.IntentQueue storage pointer"
+                        }
+                      },
+                      "id": 301,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1985:5:2",
+                      "memberName": "first",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 217,
+                      "src": "1978:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1964:26:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 306,
+                  "nodeType": "IfStatement",
+                  "src": "1960:57:2",
+                  "trueBody": {
+                    "errorCall": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "id": 303,
+                        "name": "Queue_EmptyQueue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 238,
+                        "src": "1999:16:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                          "typeString": "function () pure"
+                        }
+                      },
+                      "id": 304,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1999:18:2",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$__$",
+                        "typeString": "tuple()"
+                      }
+                    },
+                    "id": 305,
+                    "nodeType": "RevertStatement",
+                    "src": "1992:25:2"
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 313,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 307,
+                      "name": "_intentId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 296,
+                      "src": "2024:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 308,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 293,
+                          "src": "2036:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 309,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2043:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 223,
+                        "src": "2036:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                          "typeString": "mapping(uint256 => bytes32)"
+                        }
+                      },
+                      "id": 312,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 310,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 293,
+                          "src": "2049:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 311,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2056:5:2",
+                        "memberName": "first",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 217,
+                        "src": "2049:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "IndexAccess",
+                      "src": "2036:26:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "2024:38:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 314,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2024:38:2"
+                },
+                {
+                  "expression": {
+                    "id": 320,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "delete",
+                    "prefix": true,
+                    "src": "2069:33:2",
+                    "subExpression": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 315,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 293,
+                          "src": "2076:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 316,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2083:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 223,
+                        "src": "2076:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                          "typeString": "mapping(uint256 => bytes32)"
+                        }
+                      },
+                      "id": 319,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 317,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 293,
+                          "src": "2089:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 318,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2096:5:2",
+                        "memberName": "first",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 217,
+                        "src": "2089:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "2076:26:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 321,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2069:33:2"
+                },
+                {
+                  "expression": {
+                    "id": 326,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 322,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 293,
+                        "src": "2108:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                          "typeString": "struct QueueLib.IntentQueue storage pointer"
+                        }
+                      },
+                      "id": 324,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "2115:5:2",
+                      "memberName": "first",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 217,
+                      "src": "2108:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 325,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "2124:1:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "2108:17:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 327,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2108:17:2"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 290,
+              "nodeType": "StructuredDocumentation",
+              "src": "1681:145:2",
+              "text": " @notice Dequeue an intent id from the IntentQueue\n @param _queue The IntentQueue\n @return _intentId The dequeued intent id"
+            },
+            "id": 329,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "dequeueIntent",
+            "nameLocation": "1838:13:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 294,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 293,
+                  "mutability": "mutable",
+                  "name": "_queue",
+                  "nameLocation": "1877:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 329,
+                  "src": "1857:26:2",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                    "typeString": "struct QueueLib.IntentQueue"
+                  },
+                  "typeName": {
+                    "id": 292,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 291,
+                      "name": "IntentQueue",
+                      "nameLocations": [
+                        "1857:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 224,
+                      "src": "1857:11:2"
+                    },
+                    "referencedDeclaration": 224,
+                    "src": "1857:11:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                      "typeString": "struct QueueLib.IntentQueue"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1851:36:2"
+            },
+            "returnParameters": {
+              "id": 297,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 296,
+                  "mutability": "mutable",
+                  "name": "_intentId",
+                  "nameLocation": "1914:9:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 329,
+                  "src": "1906:17:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 295,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1906:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1905:19:2"
+            },
+            "scope": 371,
+            "src": "1829:301:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 369,
+              "nodeType": "Block",
+              "src": "2403:202:2",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 343,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "id": 339,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 333,
+                        "src": "2436:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                          "typeString": "struct QueueLib.FillQueue storage pointer"
+                        }
+                      },
+                      "id": 340,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "2443:4:2",
+                      "memberName": "last",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 229,
+                      "src": "2436:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "expression": {
+                        "id": 341,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 333,
+                        "src": "2450:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                          "typeString": "struct QueueLib.FillQueue storage pointer"
+                        }
+                      },
+                      "id": 342,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "2457:5:2",
+                      "memberName": "first",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 227,
+                      "src": "2450:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "2436:26:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 347,
+                  "nodeType": "IfStatement",
+                  "src": "2432:57:2",
+                  "trueBody": {
+                    "errorCall": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "id": 344,
+                        "name": "Queue_EmptyQueue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 238,
+                        "src": "2471:16:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                          "typeString": "function () pure"
+                        }
+                      },
+                      "id": 345,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2471:18:2",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$__$",
+                        "typeString": "tuple()"
+                      }
+                    },
+                    "id": 346,
+                    "nodeType": "RevertStatement",
+                    "src": "2464:25:2"
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 354,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 348,
+                      "name": "_fillMessage",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 337,
+                      "src": "2496:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                        "typeString": "struct IEverclear.FillMessage memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 349,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 333,
+                          "src": "2511:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 350,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2518:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 234,
+                        "src": "2511:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                          "typeString": "mapping(uint256 => struct IEverclear.FillMessage storage ref)"
+                        }
+                      },
+                      "id": 353,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 351,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 333,
+                          "src": "2524:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 352,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2531:5:2",
+                        "memberName": "first",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 227,
+                        "src": "2524:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "IndexAccess",
+                      "src": "2511:26:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_storage",
+                        "typeString": "struct IEverclear.FillMessage storage ref"
+                      }
+                    },
+                    "src": "2496:41:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                      "typeString": "struct IEverclear.FillMessage memory"
+                    }
+                  },
+                  "id": 355,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2496:41:2"
+                },
+                {
+                  "expression": {
+                    "id": 361,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "delete",
+                    "prefix": true,
+                    "src": "2544:33:2",
+                    "subExpression": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 356,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 333,
+                          "src": "2551:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 357,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2558:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 234,
+                        "src": "2551:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                          "typeString": "mapping(uint256 => struct IEverclear.FillMessage storage ref)"
+                        }
+                      },
+                      "id": 360,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 358,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 333,
+                          "src": "2564:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 359,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2571:5:2",
+                        "memberName": "first",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 227,
+                        "src": "2564:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "2551:26:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_storage",
+                        "typeString": "struct IEverclear.FillMessage storage ref"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 362,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2544:33:2"
+                },
+                {
+                  "expression": {
+                    "id": 367,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 363,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 333,
+                        "src": "2583:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                          "typeString": "struct QueueLib.FillQueue storage pointer"
+                        }
+                      },
+                      "id": 365,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "2590:5:2",
+                      "memberName": "first",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 227,
+                      "src": "2583:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 366,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "2599:1:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "2583:17:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 368,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2583:17:2"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 330,
+              "nodeType": "StructuredDocumentation",
+              "src": "2134:149:2",
+              "text": " @notice Dequeue a fill message from the FillQueue\n @param _queue The FillQueue\n @return _fillMessage The dequeued fill message"
+            },
+            "id": 370,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "dequeueFill",
+            "nameLocation": "2295:11:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 334,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 333,
+                  "mutability": "mutable",
+                  "name": "_queue",
+                  "nameLocation": "2330:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 370,
+                  "src": "2312:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                    "typeString": "struct QueueLib.FillQueue"
+                  },
+                  "typeName": {
+                    "id": 332,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 331,
+                      "name": "FillQueue",
+                      "nameLocations": [
+                        "2312:9:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 235,
+                      "src": "2312:9:2"
+                    },
+                    "referencedDeclaration": 235,
+                    "src": "2312:9:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                      "typeString": "struct QueueLib.FillQueue"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2306:34:2"
+            },
+            "returnParameters": {
+              "id": 338,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 337,
+                  "mutability": "mutable",
+                  "name": "_fillMessage",
+                  "nameLocation": "2389:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 370,
+                  "src": "2359:42:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                    "typeString": "struct IEverclear.FillMessage"
+                  },
+                  "typeName": {
+                    "id": 336,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 335,
+                      "name": "IEverclear.FillMessage",
+                      "nameLocations": [
+                        "2359:10:2",
+                        "2370:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 968,
+                      "src": "2359:22:2"
+                    },
+                    "referencedDeclaration": 968,
+                    "src": "2359:22:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_storage_ptr",
+                      "typeString": "struct IEverclear.FillMessage"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2358:44:2"
+            },
+            "scope": 371,
+            "src": "2286:319:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 372,
+        "src": "185:2422:2",
+        "usedErrors": [
+          238
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:2576:2"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/jamesharbridge/Code/Proxima/everclear-monorepo/packages/contracts/tron/contracts/common/QueueLib.sol",
+    "exportedSymbols": {
+      "IEverclear": [
+        981
+      ],
+      "QueueLib": [
+        371
+      ]
+    },
+    "id": 372,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 211,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:2"
+      },
+      {
+        "absolutePath": "interfaces/common/IEverclear.sol",
+        "file": "interfaces/common/IEverclear.sol",
+        "id": 213,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 372,
+        "sourceUnit": 982,
+        "src": "57:60:2",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 212,
+              "name": "IEverclear",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 981,
+              "src": "65:10:2",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "QueueLib",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": {
+          "id": 214,
+          "nodeType": "StructuredDocumentation",
+          "src": "119:65:2",
+          "text": " @title QueueLib\n @notice Library for managing queues"
+        },
+        "fullyImplemented": true,
+        "id": 371,
+        "linearizedBaseContracts": [
+          371
+        ],
+        "name": "QueueLib",
+        "nameLocation": "193:8:2",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "QueueLib.IntentQueue",
+            "documentation": {
+              "id": 215,
+              "nodeType": "StructuredDocumentation",
+              "src": "206:242:2",
+              "text": " @notice Structure for the IntentQueue\n @dev first should always be initialized to 1\n @param first The first position in the queue\n @param last The last position in the queue\n @param queue The queue of intent ids"
+            },
+            "id": 224,
+            "members": [
+              {
+                "constant": false,
+                "id": 217,
+                "mutability": "mutable",
+                "name": "first",
+                "nameLocation": "484:5:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 224,
+                "src": "476:13:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 216,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "476:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 219,
+                "mutability": "mutable",
+                "name": "last",
+                "nameLocation": "503:4:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 224,
+                "src": "495:12:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 218,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "495:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 223,
+                "mutability": "mutable",
+                "name": "queue",
+                "nameLocation": "561:5:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 224,
+                "src": "513:53:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                  "typeString": "mapping(uint256 => bytes32)"
+                },
+                "typeName": {
+                  "id": 222,
+                  "keyName": "_position",
+                  "keyNameLocation": "529:9:2",
+                  "keyType": {
+                    "id": 220,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "521:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "513:47:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                    "typeString": "mapping(uint256 => bytes32)"
+                  },
+                  "valueName": "_intentId",
+                  "valueNameLocation": "550:9:2",
+                  "valueType": {
+                    "id": 221,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "542:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "IntentQueue",
+            "nameLocation": "458:11:2",
+            "nodeType": "StructDefinition",
+            "scope": 371,
+            "src": "451:120:2",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "QueueLib.FillQueue",
+            "documentation": {
+              "id": 225,
+              "nodeType": "StructuredDocumentation",
+              "src": "575:250:2",
+              "text": " @notice Structure for the FillQueue\n @dev Member first should always be initialized to 1\n @param first The first position in the queue\n @param last The last position in the queue\n @param queue The queue of fill messages"
+            },
+            "id": 235,
+            "members": [
+              {
+                "constant": false,
+                "id": 227,
+                "mutability": "mutable",
+                "name": "first",
+                "nameLocation": "859:5:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 235,
+                "src": "851:13:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 226,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "851:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 229,
+                "mutability": "mutable",
+                "name": "last",
+                "nameLocation": "878:4:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 235,
+                "src": "870:12:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 228,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "870:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 234,
+                "mutability": "mutable",
+                "name": "queue",
+                "nameLocation": "954:5:2",
+                "nodeType": "VariableDeclaration",
+                "scope": 235,
+                "src": "888:71:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                  "typeString": "mapping(uint256 => struct IEverclear.FillMessage)"
+                },
+                "typeName": {
+                  "id": 233,
+                  "keyName": "_position",
+                  "keyNameLocation": "904:9:2",
+                  "keyType": {
+                    "id": 230,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "896:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "888:65:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                    "typeString": "mapping(uint256 => struct IEverclear.FillMessage)"
+                  },
+                  "valueName": "_fillMessage",
+                  "valueNameLocation": "940:12:2",
+                  "valueType": {
+                    "id": 232,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 231,
+                      "name": "IEverclear.FillMessage",
+                      "nameLocations": [
+                        "917:10:2",
+                        "928:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 968,
+                      "src": "917:22:2"
+                    },
+                    "referencedDeclaration": 968,
+                    "src": "917:22:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_storage_ptr",
+                      "typeString": "struct IEverclear.FillMessage"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "FillQueue",
+            "nameLocation": "835:9:2",
+            "nodeType": "StructDefinition",
+            "scope": 371,
+            "src": "828:136:2",
+            "visibility": "public"
+          },
+          {
+            "documentation": {
+              "id": 236,
+              "nodeType": "StructuredDocumentation",
+              "src": "968:53:2",
+              "text": " @notice Thrown when the queue is empty"
+            },
+            "errorSelector": "950f1c15",
+            "id": 238,
+            "name": "Queue_EmptyQueue",
+            "nameLocation": "1030:16:2",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 237,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1046:2:2"
+            },
+            "src": "1024:25:2"
+          },
+          {
+            "body": {
+              "id": 262,
+              "nodeType": "Block",
+              "src": "1279:70:2",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 251,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 247,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 242,
+                        "src": "1285:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                          "typeString": "struct QueueLib.IntentQueue storage pointer"
+                        }
+                      },
+                      "id": 249,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1292:4:2",
+                      "memberName": "last",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 219,
+                      "src": "1285:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 250,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1300:1:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "1285:16:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 252,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1285:16:2"
+                },
+                {
+                  "expression": {
+                    "id": 260,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 253,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 242,
+                          "src": "1307:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 257,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1314:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 223,
+                        "src": "1307:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                          "typeString": "mapping(uint256 => bytes32)"
+                        }
+                      },
+                      "id": 258,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 255,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 242,
+                          "src": "1320:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 256,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1327:4:2",
+                        "memberName": "last",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 219,
+                        "src": "1320:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "1307:25:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 259,
+                      "name": "_intentId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 244,
+                      "src": "1335:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "1307:37:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 261,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1307:37:2"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 239,
+              "nodeType": "StructuredDocumentation",
+              "src": "1053:144:2",
+              "text": " @notice Enqueue an intent id to the IntentQueue\n @param _queue The IntentQueue\n @param _intentId The intent id to enqueue"
+            },
+            "id": 263,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "enqueueIntent",
+            "nameLocation": "1209:13:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 245,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 242,
+                  "mutability": "mutable",
+                  "name": "_queue",
+                  "nameLocation": "1243:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 263,
+                  "src": "1223:26:2",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                    "typeString": "struct QueueLib.IntentQueue"
+                  },
+                  "typeName": {
+                    "id": 241,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 240,
+                      "name": "IntentQueue",
+                      "nameLocations": [
+                        "1223:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 224,
+                      "src": "1223:11:2"
+                    },
+                    "referencedDeclaration": 224,
+                    "src": "1223:11:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                      "typeString": "struct QueueLib.IntentQueue"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 244,
+                  "mutability": "mutable",
+                  "name": "_intentId",
+                  "nameLocation": "1259:9:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 263,
+                  "src": "1251:17:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 243,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1251:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1222:47:2"
+            },
+            "returnParameters": {
+              "id": 246,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1279:0:2"
+            },
+            "scope": 371,
+            "src": "1200:149:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 288,
+              "nodeType": "Block",
+              "src": "1604:73:2",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 277,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 273,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 267,
+                        "src": "1610:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                          "typeString": "struct QueueLib.FillQueue storage pointer"
+                        }
+                      },
+                      "id": 275,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1617:4:2",
+                      "memberName": "last",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 229,
+                      "src": "1610:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 276,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1625:1:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "1610:16:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 278,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1610:16:2"
+                },
+                {
+                  "expression": {
+                    "id": 286,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 279,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 267,
+                          "src": "1632:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 283,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1639:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 234,
+                        "src": "1632:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                          "typeString": "mapping(uint256 => struct IEverclear.FillMessage storage ref)"
+                        }
+                      },
+                      "id": 284,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 281,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 267,
+                          "src": "1645:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 282,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1652:4:2",
+                        "memberName": "last",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 229,
+                        "src": "1645:11:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "1632:25:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_storage",
+                        "typeString": "struct IEverclear.FillMessage storage ref"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 285,
+                      "name": "_fillMessage",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 270,
+                      "src": "1660:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                        "typeString": "struct IEverclear.FillMessage memory"
+                      }
+                    },
+                    "src": "1632:40:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_storage",
+                      "typeString": "struct IEverclear.FillMessage storage ref"
+                    }
+                  },
+                  "id": 287,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1632:40:2"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 264,
+              "nodeType": "StructuredDocumentation",
+              "src": "1353:148:2",
+              "text": " @notice Enqueue a fill message to the FillQueue\n @param _queue The FillQueue\n @param _fillMessage The fill message to enqueue"
+            },
+            "id": 289,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "enqueueFill",
+            "nameLocation": "1513:11:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 271,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 267,
+                  "mutability": "mutable",
+                  "name": "_queue",
+                  "nameLocation": "1543:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 289,
+                  "src": "1525:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                    "typeString": "struct QueueLib.FillQueue"
+                  },
+                  "typeName": {
+                    "id": 266,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 265,
+                      "name": "FillQueue",
+                      "nameLocations": [
+                        "1525:9:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 235,
+                      "src": "1525:9:2"
+                    },
+                    "referencedDeclaration": 235,
+                    "src": "1525:9:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                      "typeString": "struct QueueLib.FillQueue"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 270,
+                  "mutability": "mutable",
+                  "name": "_fillMessage",
+                  "nameLocation": "1581:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 289,
+                  "src": "1551:42:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                    "typeString": "struct IEverclear.FillMessage"
+                  },
+                  "typeName": {
+                    "id": 269,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 268,
+                      "name": "IEverclear.FillMessage",
+                      "nameLocations": [
+                        "1551:10:2",
+                        "1562:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 968,
+                      "src": "1551:22:2"
+                    },
+                    "referencedDeclaration": 968,
+                    "src": "1551:22:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_storage_ptr",
+                      "typeString": "struct IEverclear.FillMessage"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1524:70:2"
+            },
+            "returnParameters": {
+              "id": 272,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1604:0:2"
+            },
+            "scope": 371,
+            "src": "1504:173:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 328,
+              "nodeType": "Block",
+              "src": "1925:205:2",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 302,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "id": 298,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 293,
+                        "src": "1964:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                          "typeString": "struct QueueLib.IntentQueue storage pointer"
+                        }
+                      },
+                      "id": 299,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1971:4:2",
+                      "memberName": "last",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 219,
+                      "src": "1964:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "expression": {
+                        "id": 300,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 293,
+                        "src": "1978:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                          "typeString": "struct QueueLib.IntentQueue storage pointer"
+                        }
+                      },
+                      "id": 301,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1985:5:2",
+                      "memberName": "first",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 217,
+                      "src": "1978:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1964:26:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 306,
+                  "nodeType": "IfStatement",
+                  "src": "1960:57:2",
+                  "trueBody": {
+                    "errorCall": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "id": 303,
+                        "name": "Queue_EmptyQueue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 238,
+                        "src": "1999:16:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                          "typeString": "function () pure"
+                        }
+                      },
+                      "id": 304,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1999:18:2",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$__$",
+                        "typeString": "tuple()"
+                      }
+                    },
+                    "id": 305,
+                    "nodeType": "RevertStatement",
+                    "src": "1992:25:2"
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 313,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 307,
+                      "name": "_intentId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 296,
+                      "src": "2024:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 308,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 293,
+                          "src": "2036:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 309,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2043:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 223,
+                        "src": "2036:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                          "typeString": "mapping(uint256 => bytes32)"
+                        }
+                      },
+                      "id": 312,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 310,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 293,
+                          "src": "2049:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 311,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2056:5:2",
+                        "memberName": "first",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 217,
+                        "src": "2049:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "IndexAccess",
+                      "src": "2036:26:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "2024:38:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 314,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2024:38:2"
+                },
+                {
+                  "expression": {
+                    "id": 320,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "delete",
+                    "prefix": true,
+                    "src": "2069:33:2",
+                    "subExpression": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 315,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 293,
+                          "src": "2076:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 316,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2083:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 223,
+                        "src": "2076:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                          "typeString": "mapping(uint256 => bytes32)"
+                        }
+                      },
+                      "id": 319,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 317,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 293,
+                          "src": "2089:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                            "typeString": "struct QueueLib.IntentQueue storage pointer"
+                          }
+                        },
+                        "id": 318,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2096:5:2",
+                        "memberName": "first",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 217,
+                        "src": "2089:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "2076:26:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 321,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2069:33:2"
+                },
+                {
+                  "expression": {
+                    "id": 326,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 322,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 293,
+                        "src": "2108:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                          "typeString": "struct QueueLib.IntentQueue storage pointer"
+                        }
+                      },
+                      "id": 324,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "2115:5:2",
+                      "memberName": "first",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 217,
+                      "src": "2108:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 325,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "2124:1:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "2108:17:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 327,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2108:17:2"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 290,
+              "nodeType": "StructuredDocumentation",
+              "src": "1681:145:2",
+              "text": " @notice Dequeue an intent id from the IntentQueue\n @param _queue The IntentQueue\n @return _intentId The dequeued intent id"
+            },
+            "id": 329,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "dequeueIntent",
+            "nameLocation": "1838:13:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 294,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 293,
+                  "mutability": "mutable",
+                  "name": "_queue",
+                  "nameLocation": "1877:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 329,
+                  "src": "1857:26:2",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                    "typeString": "struct QueueLib.IntentQueue"
+                  },
+                  "typeName": {
+                    "id": 292,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 291,
+                      "name": "IntentQueue",
+                      "nameLocations": [
+                        "1857:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 224,
+                      "src": "1857:11:2"
+                    },
+                    "referencedDeclaration": 224,
+                    "src": "1857:11:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_IntentQueue_$224_storage_ptr",
+                      "typeString": "struct QueueLib.IntentQueue"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1851:36:2"
+            },
+            "returnParameters": {
+              "id": 297,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 296,
+                  "mutability": "mutable",
+                  "name": "_intentId",
+                  "nameLocation": "1914:9:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 329,
+                  "src": "1906:17:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 295,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1906:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1905:19:2"
+            },
+            "scope": 371,
+            "src": "1829:301:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 369,
+              "nodeType": "Block",
+              "src": "2403:202:2",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 343,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "id": 339,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 333,
+                        "src": "2436:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                          "typeString": "struct QueueLib.FillQueue storage pointer"
+                        }
+                      },
+                      "id": 340,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "2443:4:2",
+                      "memberName": "last",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 229,
+                      "src": "2436:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "expression": {
+                        "id": 341,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 333,
+                        "src": "2450:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                          "typeString": "struct QueueLib.FillQueue storage pointer"
+                        }
+                      },
+                      "id": 342,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "2457:5:2",
+                      "memberName": "first",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 227,
+                      "src": "2450:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "2436:26:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 347,
+                  "nodeType": "IfStatement",
+                  "src": "2432:57:2",
+                  "trueBody": {
+                    "errorCall": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "id": 344,
+                        "name": "Queue_EmptyQueue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 238,
+                        "src": "2471:16:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                          "typeString": "function () pure"
+                        }
+                      },
+                      "id": 345,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2471:18:2",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$__$",
+                        "typeString": "tuple()"
+                      }
+                    },
+                    "id": 346,
+                    "nodeType": "RevertStatement",
+                    "src": "2464:25:2"
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 354,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 348,
+                      "name": "_fillMessage",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 337,
+                      "src": "2496:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                        "typeString": "struct IEverclear.FillMessage memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 349,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 333,
+                          "src": "2511:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 350,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2518:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 234,
+                        "src": "2511:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                          "typeString": "mapping(uint256 => struct IEverclear.FillMessage storage ref)"
+                        }
+                      },
+                      "id": 353,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 351,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 333,
+                          "src": "2524:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 352,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2531:5:2",
+                        "memberName": "first",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 227,
+                        "src": "2524:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "IndexAccess",
+                      "src": "2511:26:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_storage",
+                        "typeString": "struct IEverclear.FillMessage storage ref"
+                      }
+                    },
+                    "src": "2496:41:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                      "typeString": "struct IEverclear.FillMessage memory"
+                    }
+                  },
+                  "id": 355,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2496:41:2"
+                },
+                {
+                  "expression": {
+                    "id": 361,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "delete",
+                    "prefix": true,
+                    "src": "2544:33:2",
+                    "subExpression": {
+                      "baseExpression": {
+                        "expression": {
+                          "id": 356,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 333,
+                          "src": "2551:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 357,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2558:5:2",
+                        "memberName": "queue",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 234,
+                        "src": "2551:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_FillMessage_$968_storage_$",
+                          "typeString": "mapping(uint256 => struct IEverclear.FillMessage storage ref)"
+                        }
+                      },
+                      "id": 360,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 358,
+                          "name": "_queue",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 333,
+                          "src": "2564:6:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                            "typeString": "struct QueueLib.FillQueue storage pointer"
+                          }
+                        },
+                        "id": 359,
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "2571:5:2",
+                        "memberName": "first",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 227,
+                        "src": "2564:12:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "2551:26:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_FillMessage_$968_storage",
+                        "typeString": "struct IEverclear.FillMessage storage ref"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 362,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2544:33:2"
+                },
+                {
+                  "expression": {
+                    "id": 367,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 363,
+                        "name": "_queue",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 333,
+                        "src": "2583:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                          "typeString": "struct QueueLib.FillQueue storage pointer"
+                        }
+                      },
+                      "id": 365,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "2590:5:2",
+                      "memberName": "first",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 227,
+                      "src": "2583:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "hexValue": "31",
+                      "id": 366,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "2599:1:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_1_by_1",
+                        "typeString": "int_const 1"
+                      },
+                      "value": "1"
+                    },
+                    "src": "2583:17:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 368,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2583:17:2"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 330,
+              "nodeType": "StructuredDocumentation",
+              "src": "2134:149:2",
+              "text": " @notice Dequeue a fill message from the FillQueue\n @param _queue The FillQueue\n @return _fillMessage The dequeued fill message"
+            },
+            "id": 370,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "dequeueFill",
+            "nameLocation": "2295:11:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 334,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 333,
+                  "mutability": "mutable",
+                  "name": "_queue",
+                  "nameLocation": "2330:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 370,
+                  "src": "2312:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                    "typeString": "struct QueueLib.FillQueue"
+                  },
+                  "typeName": {
+                    "id": 332,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 331,
+                      "name": "FillQueue",
+                      "nameLocations": [
+                        "2312:9:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 235,
+                      "src": "2312:9:2"
+                    },
+                    "referencedDeclaration": 235,
+                    "src": "2312:9:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillQueue_$235_storage_ptr",
+                      "typeString": "struct QueueLib.FillQueue"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2306:34:2"
+            },
+            "returnParameters": {
+              "id": 338,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 337,
+                  "mutability": "mutable",
+                  "name": "_fillMessage",
+                  "nameLocation": "2389:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 370,
+                  "src": "2359:42:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_FillMessage_$968_memory_ptr",
+                    "typeString": "struct IEverclear.FillMessage"
+                  },
+                  "typeName": {
+                    "id": 336,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 335,
+                      "name": "IEverclear.FillMessage",
+                      "nameLocations": [
+                        "2359:10:2",
+                        "2370:11:2"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 968,
+                      "src": "2359:22:2"
+                    },
+                    "referencedDeclaration": 968,
+                    "src": "2359:22:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_FillMessage_$968_storage_ptr",
+                      "typeString": "struct IEverclear.FillMessage"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2358:44:2"
+            },
+            "scope": 371,
+            "src": "2286:319:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 372,
+        "src": "185:2422:2",
+        "usedErrors": [
+          238
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:2576:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-21T10:04:43.961Z"
+}

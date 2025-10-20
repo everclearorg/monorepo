@@ -79,14 +79,17 @@
     "@coral-xyz/anchor": "^0.30.1",
     "@hyperlane-xyz/core": "3.8.1",
     "@inquirer/prompts": "^5.3.8",
+    "@ledgerhq/hw-app-trx": "^6.31.4",
+    "@ledgerhq/hw-transport-node-hid": "^6.29.9",
     "@openzeppelin/contracts": "5.0.2",
     "@openzeppelin/contracts-upgradeable": "5.0.2",
     "@solana-developers/helpers": "^2.8.1",
     "dotenv": "^16.4.5",
     "isolmate": "github:defi-wonderland/isolmate#59e18043c2450fef550f1744b3705ce9ebcaf1c8",
+    "tronweb": "beta",
     "ts-node": "^10.9.2",
     "tweetnacl": "^1.0.3",
-    "viem": "^2.19.8"
+    "viem": "2.19.8"
   },
   "devDependencies": {
     "@commitlint/cli": "17.0.3",

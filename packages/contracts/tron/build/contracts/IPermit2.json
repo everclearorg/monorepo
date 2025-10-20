@@ -1,0 +1,1099 @@
+{
+  "contractName": "IPermit2",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct IPermit2.TokenPermissions",
+              "name": "permitted",
+              "type": "tuple"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "deadline",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IPermit2.PermitTransferFrom",
+          "name": "permit",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "requestedAmount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IPermit2.SignatureTransferDetails",
+          "name": "transferDetails",
+          "type": "tuple"
+        },
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "signature",
+          "type": "bytes"
+        }
+      ],
+      "name": "permitTransferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\nimport {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';\n\n/**\n * @title IPermit2\n * @notice Interface for permit2\n */\ninterface IPermit2 {\n  /*///////////////////////////////////////////////////////////////\n                                STRUCTS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Struct for token and amount in a permit message\n   * @param token The token to transfer\n   * @param amount The amount to transfer\n   */\n  struct TokenPermissions {\n    IERC20 token;\n    uint256 amount;\n  }\n\n  /**\n   * @notice Struct for the permit2 message\n   * @param permitted The permitted token and amount\n   * @param nonce The unique identifier for this permit\n   * @param deadline The expiration for this permit\n   */\n  struct PermitTransferFrom {\n    TokenPermissions permitted;\n    uint256 nonce;\n    uint256 deadline;\n  }\n\n  /**\n   * @notice Struct for the transfer details for permitTransferFrom()\n   * @param to The recipient of the tokens\n   * @param requestedAmount The amount to transfer\n   */\n  struct SignatureTransferDetails {\n    address to;\n    uint256 requestedAmount;\n  }\n\n  /*///////////////////////////////////////////////////////////////\n                                LOGIC\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Consume a permit2 message and transfer tokens\n   * @param permit The permit message\n   * @param transferDetails The transfer details\n   * @param owner The owner of the tokens\n   * @param signature The signature of the permit\n   */\n  function permitTransferFrom(\n    PermitTransferFrom calldata permit,\n    SignatureTransferDetails calldata transferDetails,\n    address owner,\n    bytes calldata signature\n  ) external;\n}\n",
+  "sourcePath": "interfaces/common/IPermit2.sol",
+  "ast": {
+    "absolutePath": "interfaces/common/IPermit2.sol",
+    "exportedSymbols": {
+      "IERC20": [
+        2603
+      ],
+      "IPermit2": [
+        3250
+      ]
+    },
+    "id": 3251,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3210,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:25"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "id": 3212,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 3251,
+        "sourceUnit": 2604,
+        "src": "57:70:25",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 3211,
+              "name": "IERC20",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 2603,
+              "src": "65:6:25",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IPermit2",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 3213,
+          "nodeType": "StructuredDocumentation",
+          "src": "129:59:25",
+          "text": " @title IPermit2\n @notice Interface for permit2"
+        },
+        "fullyImplemented": false,
+        "id": 3250,
+        "linearizedBaseContracts": [
+          3250
+        ],
+        "name": "IPermit2",
+        "nameLocation": "199:8:25",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IPermit2.TokenPermissions",
+            "documentation": {
+              "id": 3214,
+              "nodeType": "StructuredDocumentation",
+              "src": "388:152:25",
+              "text": " @notice Struct for token and amount in a permit message\n @param token The token to transfer\n @param amount The amount to transfer"
+            },
+            "id": 3220,
+            "members": [
+              {
+                "constant": false,
+                "id": 3217,
+                "mutability": "mutable",
+                "name": "token",
+                "nameLocation": "580:5:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3220,
+                "src": "573:12:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_contract$_IERC20_$2603",
+                  "typeString": "contract IERC20"
+                },
+                "typeName": {
+                  "id": 3216,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 3215,
+                    "name": "IERC20",
+                    "nameLocations": [
+                      "573:6:25"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 2603,
+                    "src": "573:6:25"
+                  },
+                  "referencedDeclaration": 2603,
+                  "src": "573:6:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$2603",
+                    "typeString": "contract IERC20"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 3219,
+                "mutability": "mutable",
+                "name": "amount",
+                "nameLocation": "599:6:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3220,
+                "src": "591:14:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 3218,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "591:7:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "TokenPermissions",
+            "nameLocation": "550:16:25",
+            "nodeType": "StructDefinition",
+            "scope": 3250,
+            "src": "543:67:25",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IPermit2.PermitTransferFrom",
+            "documentation": {
+              "id": 3221,
+              "nodeType": "StructuredDocumentation",
+              "src": "614:214:25",
+              "text": " @notice Struct for the permit2 message\n @param permitted The permitted token and amount\n @param nonce The unique identifier for this permit\n @param deadline The expiration for this permit"
+            },
+            "id": 3229,
+            "members": [
+              {
+                "constant": false,
+                "id": 3224,
+                "mutability": "mutable",
+                "name": "permitted",
+                "nameLocation": "880:9:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3229,
+                "src": "863:26:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_TokenPermissions_$3220_storage_ptr",
+                  "typeString": "struct IPermit2.TokenPermissions"
+                },
+                "typeName": {
+                  "id": 3223,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 3222,
+                    "name": "TokenPermissions",
+                    "nameLocations": [
+                      "863:16:25"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 3220,
+                    "src": "863:16:25"
+                  },
+                  "referencedDeclaration": 3220,
+                  "src": "863:16:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_TokenPermissions_$3220_storage_ptr",
+                    "typeString": "struct IPermit2.TokenPermissions"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 3226,
+                "mutability": "mutable",
+                "name": "nonce",
+                "nameLocation": "903:5:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3229,
+                "src": "895:13:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 3225,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "895:7:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 3228,
+                "mutability": "mutable",
+                "name": "deadline",
+                "nameLocation": "922:8:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3229,
+                "src": "914:16:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 3227,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "914:7:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "PermitTransferFrom",
+            "nameLocation": "838:18:25",
+            "nodeType": "StructDefinition",
+            "scope": 3250,
+            "src": "831:104:25",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IPermit2.SignatureTransferDetails",
+            "documentation": {
+              "id": 3230,
+              "nodeType": "StructuredDocumentation",
+              "src": "939:173:25",
+              "text": " @notice Struct for the transfer details for permitTransferFrom()\n @param to The recipient of the tokens\n @param requestedAmount The amount to transfer"
+            },
+            "id": 3235,
+            "members": [
+              {
+                "constant": false,
+                "id": 3232,
+                "mutability": "mutable",
+                "name": "to",
+                "nameLocation": "1161:2:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3235,
+                "src": "1153:10:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 3231,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1153:7:25",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 3234,
+                "mutability": "mutable",
+                "name": "requestedAmount",
+                "nameLocation": "1177:15:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3235,
+                "src": "1169:23:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 3233,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1169:7:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "SignatureTransferDetails",
+            "nameLocation": "1122:24:25",
+            "nodeType": "StructDefinition",
+            "scope": 3250,
+            "src": "1115:82:25",
+            "visibility": "public"
+          },
+          {
+            "documentation": {
+              "id": 3236,
+              "nodeType": "StructuredDocumentation",
+              "src": "1375:247:25",
+              "text": " @notice Consume a permit2 message and transfer tokens\n @param permit The permit message\n @param transferDetails The transfer details\n @param owner The owner of the tokens\n @param signature The signature of the permit"
+            },
+            "functionSelector": "30f28b7a",
+            "id": 3249,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "permitTransferFrom",
+            "nameLocation": "1634:18:25",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3247,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3239,
+                  "mutability": "mutable",
+                  "name": "permit",
+                  "nameLocation": "1686:6:25",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3249,
+                  "src": "1658:34:25",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_PermitTransferFrom_$3229_calldata_ptr",
+                    "typeString": "struct IPermit2.PermitTransferFrom"
+                  },
+                  "typeName": {
+                    "id": 3238,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 3237,
+                      "name": "PermitTransferFrom",
+                      "nameLocations": [
+                        "1658:18:25"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 3229,
+                      "src": "1658:18:25"
+                    },
+                    "referencedDeclaration": 3229,
+                    "src": "1658:18:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_PermitTransferFrom_$3229_storage_ptr",
+                      "typeString": "struct IPermit2.PermitTransferFrom"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3242,
+                  "mutability": "mutable",
+                  "name": "transferDetails",
+                  "nameLocation": "1732:15:25",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3249,
+                  "src": "1698:49:25",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_SignatureTransferDetails_$3235_calldata_ptr",
+                    "typeString": "struct IPermit2.SignatureTransferDetails"
+                  },
+                  "typeName": {
+                    "id": 3241,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 3240,
+                      "name": "SignatureTransferDetails",
+                      "nameLocations": [
+                        "1698:24:25"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 3235,
+                      "src": "1698:24:25"
+                    },
+                    "referencedDeclaration": 3235,
+                    "src": "1698:24:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_SignatureTransferDetails_$3235_storage_ptr",
+                      "typeString": "struct IPermit2.SignatureTransferDetails"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3244,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "1761:5:25",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3249,
+                  "src": "1753:13:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3243,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1753:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3246,
+                  "mutability": "mutable",
+                  "name": "signature",
+                  "nameLocation": "1787:9:25",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3249,
+                  "src": "1772:24:25",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3245,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1772:5:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1652:148:25"
+            },
+            "returnParameters": {
+              "id": 3248,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1809:0:25"
+            },
+            "scope": 3250,
+            "src": "1625:185:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3251,
+        "src": "189:1623:25",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:1781:25"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/common/IPermit2.sol",
+    "exportedSymbols": {
+      "IERC20": [
+        2603
+      ],
+      "IPermit2": [
+        3250
+      ]
+    },
+    "id": 3251,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3210,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:25"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "id": 3212,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 3251,
+        "sourceUnit": 2604,
+        "src": "57:70:25",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 3211,
+              "name": "IERC20",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 2603,
+              "src": "65:6:25",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IPermit2",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 3213,
+          "nodeType": "StructuredDocumentation",
+          "src": "129:59:25",
+          "text": " @title IPermit2\n @notice Interface for permit2"
+        },
+        "fullyImplemented": false,
+        "id": 3250,
+        "linearizedBaseContracts": [
+          3250
+        ],
+        "name": "IPermit2",
+        "nameLocation": "199:8:25",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IPermit2.TokenPermissions",
+            "documentation": {
+              "id": 3214,
+              "nodeType": "StructuredDocumentation",
+              "src": "388:152:25",
+              "text": " @notice Struct for token and amount in a permit message\n @param token The token to transfer\n @param amount The amount to transfer"
+            },
+            "id": 3220,
+            "members": [
+              {
+                "constant": false,
+                "id": 3217,
+                "mutability": "mutable",
+                "name": "token",
+                "nameLocation": "580:5:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3220,
+                "src": "573:12:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_contract$_IERC20_$2603",
+                  "typeString": "contract IERC20"
+                },
+                "typeName": {
+                  "id": 3216,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 3215,
+                    "name": "IERC20",
+                    "nameLocations": [
+                      "573:6:25"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 2603,
+                    "src": "573:6:25"
+                  },
+                  "referencedDeclaration": 2603,
+                  "src": "573:6:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$2603",
+                    "typeString": "contract IERC20"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 3219,
+                "mutability": "mutable",
+                "name": "amount",
+                "nameLocation": "599:6:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3220,
+                "src": "591:14:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 3218,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "591:7:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "TokenPermissions",
+            "nameLocation": "550:16:25",
+            "nodeType": "StructDefinition",
+            "scope": 3250,
+            "src": "543:67:25",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IPermit2.PermitTransferFrom",
+            "documentation": {
+              "id": 3221,
+              "nodeType": "StructuredDocumentation",
+              "src": "614:214:25",
+              "text": " @notice Struct for the permit2 message\n @param permitted The permitted token and amount\n @param nonce The unique identifier for this permit\n @param deadline The expiration for this permit"
+            },
+            "id": 3229,
+            "members": [
+              {
+                "constant": false,
+                "id": 3224,
+                "mutability": "mutable",
+                "name": "permitted",
+                "nameLocation": "880:9:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3229,
+                "src": "863:26:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_TokenPermissions_$3220_storage_ptr",
+                  "typeString": "struct IPermit2.TokenPermissions"
+                },
+                "typeName": {
+                  "id": 3223,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 3222,
+                    "name": "TokenPermissions",
+                    "nameLocations": [
+                      "863:16:25"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 3220,
+                    "src": "863:16:25"
+                  },
+                  "referencedDeclaration": 3220,
+                  "src": "863:16:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_TokenPermissions_$3220_storage_ptr",
+                    "typeString": "struct IPermit2.TokenPermissions"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 3226,
+                "mutability": "mutable",
+                "name": "nonce",
+                "nameLocation": "903:5:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3229,
+                "src": "895:13:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 3225,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "895:7:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 3228,
+                "mutability": "mutable",
+                "name": "deadline",
+                "nameLocation": "922:8:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3229,
+                "src": "914:16:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 3227,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "914:7:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "PermitTransferFrom",
+            "nameLocation": "838:18:25",
+            "nodeType": "StructDefinition",
+            "scope": 3250,
+            "src": "831:104:25",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IPermit2.SignatureTransferDetails",
+            "documentation": {
+              "id": 3230,
+              "nodeType": "StructuredDocumentation",
+              "src": "939:173:25",
+              "text": " @notice Struct for the transfer details for permitTransferFrom()\n @param to The recipient of the tokens\n @param requestedAmount The amount to transfer"
+            },
+            "id": 3235,
+            "members": [
+              {
+                "constant": false,
+                "id": 3232,
+                "mutability": "mutable",
+                "name": "to",
+                "nameLocation": "1161:2:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3235,
+                "src": "1153:10:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 3231,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1153:7:25",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 3234,
+                "mutability": "mutable",
+                "name": "requestedAmount",
+                "nameLocation": "1177:15:25",
+                "nodeType": "VariableDeclaration",
+                "scope": 3235,
+                "src": "1169:23:25",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 3233,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1169:7:25",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "SignatureTransferDetails",
+            "nameLocation": "1122:24:25",
+            "nodeType": "StructDefinition",
+            "scope": 3250,
+            "src": "1115:82:25",
+            "visibility": "public"
+          },
+          {
+            "documentation": {
+              "id": 3236,
+              "nodeType": "StructuredDocumentation",
+              "src": "1375:247:25",
+              "text": " @notice Consume a permit2 message and transfer tokens\n @param permit The permit message\n @param transferDetails The transfer details\n @param owner The owner of the tokens\n @param signature The signature of the permit"
+            },
+            "functionSelector": "30f28b7a",
+            "id": 3249,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "permitTransferFrom",
+            "nameLocation": "1634:18:25",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3247,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3239,
+                  "mutability": "mutable",
+                  "name": "permit",
+                  "nameLocation": "1686:6:25",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3249,
+                  "src": "1658:34:25",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_PermitTransferFrom_$3229_calldata_ptr",
+                    "typeString": "struct IPermit2.PermitTransferFrom"
+                  },
+                  "typeName": {
+                    "id": 3238,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 3237,
+                      "name": "PermitTransferFrom",
+                      "nameLocations": [
+                        "1658:18:25"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 3229,
+                      "src": "1658:18:25"
+                    },
+                    "referencedDeclaration": 3229,
+                    "src": "1658:18:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_PermitTransferFrom_$3229_storage_ptr",
+                      "typeString": "struct IPermit2.PermitTransferFrom"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3242,
+                  "mutability": "mutable",
+                  "name": "transferDetails",
+                  "nameLocation": "1732:15:25",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3249,
+                  "src": "1698:49:25",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_SignatureTransferDetails_$3235_calldata_ptr",
+                    "typeString": "struct IPermit2.SignatureTransferDetails"
+                  },
+                  "typeName": {
+                    "id": 3241,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 3240,
+                      "name": "SignatureTransferDetails",
+                      "nameLocations": [
+                        "1698:24:25"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 3235,
+                      "src": "1698:24:25"
+                    },
+                    "referencedDeclaration": 3235,
+                    "src": "1698:24:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_SignatureTransferDetails_$3235_storage_ptr",
+                      "typeString": "struct IPermit2.SignatureTransferDetails"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3244,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "1761:5:25",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3249,
+                  "src": "1753:13:25",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3243,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1753:7:25",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3246,
+                  "mutability": "mutable",
+                  "name": "signature",
+                  "nameLocation": "1787:9:25",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3249,
+                  "src": "1772:24:25",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3245,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1772:5:25",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1652:148:25"
+            },
+            "returnParameters": {
+              "id": 3248,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1809:0:25"
+            },
+            "scope": 3250,
+            "src": "1625:185:25",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3251,
+        "src": "189:1623:25",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:1781:25"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-20T14:23:32.536Z"
+}

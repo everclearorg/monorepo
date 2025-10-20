@@ -1,0 +1,255 @@
+{
+  "contractName": "IMessageReceiver",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        }
+      ],
+      "name": "receiveMessage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\n/**\n * @title IMessageReceiver\n * @notice Interface for the transport layer communication with the message receiver\n */\ninterface IMessageReceiver {\n  /*///////////////////////////////////////////////////////////////\n                              LOGIC\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Receive a message from the transport layer\n   * @param _message The message to receive encoded as bytes\n   * @dev This function should be called by the the gateway contract\n   */\n  function receiveMessage(\n    bytes calldata _message\n  ) external;\n}\n",
+  "sourcePath": "interfaces/common/IMessageReceiver.sol",
+  "ast": {
+    "absolutePath": "interfaces/common/IMessageReceiver.sol",
+    "exportedSymbols": {
+      "IMessageReceiver": [
+        3208
+      ]
+    },
+    "id": 3209,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3200,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:24"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IMessageReceiver",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 3201,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:119:24",
+          "text": " @title IMessageReceiver\n @notice Interface for the transport layer communication with the message receiver"
+        },
+        "fullyImplemented": false,
+        "id": 3208,
+        "linearizedBaseContracts": [
+          3208
+        ],
+        "name": "IMessageReceiver",
+        "nameLocation": "187:16:24",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 3202,
+              "nodeType": "StructuredDocumentation",
+              "src": "380:195:24",
+              "text": " @notice Receive a message from the transport layer\n @param _message The message to receive encoded as bytes\n @dev This function should be called by the the gateway contract"
+            },
+            "functionSelector": "f953cec7",
+            "id": 3207,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "receiveMessage",
+            "nameLocation": "587:14:24",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3205,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3204,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "622:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3207,
+                  "src": "607:23:24",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3203,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "607:5:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "601:33:24"
+            },
+            "returnParameters": {
+              "id": 3206,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "643:0:24"
+            },
+            "scope": 3208,
+            "src": "578:66:24",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3209,
+        "src": "177:469:24",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:615:24"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/common/IMessageReceiver.sol",
+    "exportedSymbols": {
+      "IMessageReceiver": [
+        3208
+      ]
+    },
+    "id": 3209,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3200,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:24"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IMessageReceiver",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 3201,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:119:24",
+          "text": " @title IMessageReceiver\n @notice Interface for the transport layer communication with the message receiver"
+        },
+        "fullyImplemented": false,
+        "id": 3208,
+        "linearizedBaseContracts": [
+          3208
+        ],
+        "name": "IMessageReceiver",
+        "nameLocation": "187:16:24",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 3202,
+              "nodeType": "StructuredDocumentation",
+              "src": "380:195:24",
+              "text": " @notice Receive a message from the transport layer\n @param _message The message to receive encoded as bytes\n @dev This function should be called by the the gateway contract"
+            },
+            "functionSelector": "f953cec7",
+            "id": 3207,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "receiveMessage",
+            "nameLocation": "587:14:24",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3205,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3204,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "622:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3207,
+                  "src": "607:23:24",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3203,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "607:5:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "601:33:24"
+            },
+            "returnParameters": {
+              "id": 3206,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "643:0:24"
+            },
+            "scope": 3208,
+            "src": "578:66:24",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3209,
+        "src": "177:469:24",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:615:24"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-20T14:23:32.536Z"
+}

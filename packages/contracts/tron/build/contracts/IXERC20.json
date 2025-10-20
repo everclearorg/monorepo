@@ -1,0 +1,2635 @@
+{
+  "contractName": "IXERC20",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "IXERC20_LimitsTooHigh",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "IXERC20_NotFactory",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "IXERC20_NotHighEnoughLimits",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_mintingLimit",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_burningLimit",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_bridge",
+          "type": "address"
+        }
+      ],
+      "name": "BridgeLimitsSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_lockbox",
+          "type": "address"
+        }
+      ],
+      "name": "LockboxSet",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "burn",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_bridge",
+          "type": "address"
+        }
+      ],
+      "name": "burningCurrentLimitOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_limit",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_bridge",
+          "type": "address"
+        }
+      ],
+      "name": "burningMaxLimitOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_limit",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "mint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_minter",
+          "type": "address"
+        }
+      ],
+      "name": "mintingCurrentLimitOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_limit",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_minter",
+          "type": "address"
+        }
+      ],
+      "name": "mintingMaxLimitOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_limit",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_bridge",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_mintingLimit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_burningLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "setLimits",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_lockbox",
+          "type": "address"
+        }
+      ],
+      "name": "setLockbox",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: UNLICENSED\npragma solidity >=0.8.4 <0.9.0;\n\ninterface IXERC20 {\n  /**\n   * @notice Contains the full minting and burning data for a particular bridge\n   *\n   * @param minterParams The minting parameters for the bridge\n   * @param burnerParams The burning parameters for the bridge\n   */\n  struct Bridge {\n    BridgeParameters minterParams;\n    BridgeParameters burnerParams;\n  }\n\n  /**\n   * @notice Contains the mint or burn parameters for a bridge\n   *\n   * @param timestamp The timestamp of the last mint/burn\n   * @param ratePerSecond The rate per second of the bridge\n   * @param maxLimit The max limit of the bridge\n   * @param currentLimit The current limit of the bridge\n   */\n  struct BridgeParameters {\n    uint256 timestamp;\n    uint256 ratePerSecond;\n    uint256 maxLimit;\n    uint256 currentLimit;\n  }\n\n  /**\n   * @notice Emits when a lockbox is set\n   *\n   * @param _lockbox The address of the lockbox\n   */\n  event LockboxSet(address _lockbox);\n\n  /**\n   * @notice Emits when a limit is set\n   *\n   * @param _mintingLimit The updated minting limit we are setting to the bridge\n   * @param _burningLimit The updated burning limit we are setting to the bridge\n   * @param _bridge The address of the bridge we are setting the limit too\n   */\n  event BridgeLimitsSet(uint256 _mintingLimit, uint256 _burningLimit, address indexed _bridge);\n\n  /**\n   * @notice Reverts when a user with too low of a limit tries to call mint/burn\n   */\n  error IXERC20_NotHighEnoughLimits();\n\n  /**\n   * @notice Reverts when caller is not the factory\n   */\n  error IXERC20_NotFactory();\n\n  /**\n   * @notice Reverts when limits are too high\n   */\n  error IXERC20_LimitsTooHigh();\n\n  /**\n   * @notice Sets the lockbox address\n   *\n   * @param _lockbox The address of the lockbox\n   */\n  function setLockbox(\n    address _lockbox\n  ) external;\n\n  /**\n   * @notice Updates the limits of any bridge\n   * @dev Can only be called by the owner\n   * @param _mintingLimit The updated minting limit we are setting to the bridge\n   * @param _burningLimit The updated burning limit we are setting to the bridge\n   * @param _bridge The address of the bridge we are setting the limits too\n   */\n  function setLimits(address _bridge, uint256 _mintingLimit, uint256 _burningLimit) external;\n\n  /**\n   * @notice Mints tokens for a user\n   * @dev Can only be called by a minter\n   * @param _user The address of the user who needs tokens minted\n   * @param _amount The amount of tokens being minted\n   */\n  function mint(address _user, uint256 _amount) external;\n\n  /**\n   * @notice Burns tokens for a user\n   * @dev Can only be called by a minter\n   * @param _user The address of the user who needs tokens burned\n   * @param _amount The amount of tokens being burned\n   */\n  function burn(address _user, uint256 _amount) external;\n\n  /**\n   * @notice Returns the max limit of a minter\n   *\n   * @param _minter The minter we are viewing the limits of\n   *  @return _limit The limit the minter has\n   */\n  function mintingMaxLimitOf(\n    address _minter\n  ) external view returns (uint256 _limit);\n\n  /**\n   * @notice Returns the max limit of a bridge\n   *\n   * @param _bridge the bridge we are viewing the limits of\n   * @return _limit The limit the bridge has\n   */\n  function burningMaxLimitOf(\n    address _bridge\n  ) external view returns (uint256 _limit);\n\n  /**\n   * @notice Returns the current limit of a minter\n   *\n   * @param _minter The minter we are viewing the limits of\n   * @return _limit The limit the minter has\n   */\n  function mintingCurrentLimitOf(\n    address _minter\n  ) external view returns (uint256 _limit);\n\n  /**\n   * @notice Returns the current limit of a bridge\n   *\n   * @param _bridge the bridge we are viewing the limits of\n   * @return _limit The limit the bridge has\n   */\n  function burningCurrentLimitOf(\n    address _bridge\n  ) external view returns (uint256 _limit);\n}\n",
+  "sourcePath": "interfaces/common/IXERC20.sol",
+  "ast": {
+    "absolutePath": "interfaces/common/IXERC20.sol",
+    "exportedSymbols": {
+      "IXERC20": [
+        11281
+      ]
+    },
+    "id": 11282,
+    "license": "UNLICENSED",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11175,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".4",
+          "<",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:31:57"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IXERC20",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 11281,
+        "linearizedBaseContracts": [
+          11281
+        ],
+        "name": "IXERC20",
+        "nameLocation": "82:7:57",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IXERC20.Bridge",
+            "documentation": {
+              "id": 11176,
+              "nodeType": "StructuredDocumentation",
+              "src": "94:220:57",
+              "text": " @notice Contains the full minting and burning data for a particular bridge\n @param minterParams The minting parameters for the bridge\n @param burnerParams The burning parameters for the bridge"
+            },
+            "id": 11183,
+            "members": [
+              {
+                "constant": false,
+                "id": 11179,
+                "mutability": "mutable",
+                "name": "minterParams",
+                "nameLocation": "354:12:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11183,
+                "src": "337:29:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_BridgeParameters_$11193_storage_ptr",
+                  "typeString": "struct IXERC20.BridgeParameters"
+                },
+                "typeName": {
+                  "id": 11178,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 11177,
+                    "name": "BridgeParameters",
+                    "nameLocations": [
+                      "337:16:57"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 11193,
+                    "src": "337:16:57"
+                  },
+                  "referencedDeclaration": 11193,
+                  "src": "337:16:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_BridgeParameters_$11193_storage_ptr",
+                    "typeString": "struct IXERC20.BridgeParameters"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 11182,
+                "mutability": "mutable",
+                "name": "burnerParams",
+                "nameLocation": "389:12:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11183,
+                "src": "372:29:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_BridgeParameters_$11193_storage_ptr",
+                  "typeString": "struct IXERC20.BridgeParameters"
+                },
+                "typeName": {
+                  "id": 11181,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 11180,
+                    "name": "BridgeParameters",
+                    "nameLocations": [
+                      "372:16:57"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 11193,
+                    "src": "372:16:57"
+                  },
+                  "referencedDeclaration": 11193,
+                  "src": "372:16:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_BridgeParameters_$11193_storage_ptr",
+                    "typeString": "struct IXERC20.BridgeParameters"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Bridge",
+            "nameLocation": "324:6:57",
+            "nodeType": "StructDefinition",
+            "scope": 11281,
+            "src": "317:89:57",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IXERC20.BridgeParameters",
+            "documentation": {
+              "id": 11184,
+              "nodeType": "StructuredDocumentation",
+              "src": "410:301:57",
+              "text": " @notice Contains the mint or burn parameters for a bridge\n @param timestamp The timestamp of the last mint/burn\n @param ratePerSecond The rate per second of the bridge\n @param maxLimit The max limit of the bridge\n @param currentLimit The current limit of the bridge"
+            },
+            "id": 11193,
+            "members": [
+              {
+                "constant": false,
+                "id": 11186,
+                "mutability": "mutable",
+                "name": "timestamp",
+                "nameLocation": "752:9:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11193,
+                "src": "744:17:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 11185,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "744:7:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 11188,
+                "mutability": "mutable",
+                "name": "ratePerSecond",
+                "nameLocation": "775:13:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11193,
+                "src": "767:21:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 11187,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "767:7:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 11190,
+                "mutability": "mutable",
+                "name": "maxLimit",
+                "nameLocation": "802:8:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11193,
+                "src": "794:16:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 11189,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "794:7:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 11192,
+                "mutability": "mutable",
+                "name": "currentLimit",
+                "nameLocation": "824:12:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11193,
+                "src": "816:20:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 11191,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "816:7:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "BridgeParameters",
+            "nameLocation": "721:16:57",
+            "nodeType": "StructDefinition",
+            "scope": 11281,
+            "src": "714:127:57",
+            "visibility": "public"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 11194,
+              "nodeType": "StructuredDocumentation",
+              "src": "845:103:57",
+              "text": " @notice Emits when a lockbox is set\n @param _lockbox The address of the lockbox"
+            },
+            "eventSelector": "fa2e15ea41196e438f0593ecdd6036acd83bdfcd39d627b77c17eab43f376a39",
+            "id": 11198,
+            "name": "LockboxSet",
+            "nameLocation": "957:10:57",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 11197,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11196,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_lockbox",
+                  "nameLocation": "976:8:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11198,
+                  "src": "968:16:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11195,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "968:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "967:18:57"
+            },
+            "src": "951:35:57"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 11199,
+              "nodeType": "StructuredDocumentation",
+              "src": "990:290:57",
+              "text": " @notice Emits when a limit is set\n @param _mintingLimit The updated minting limit we are setting to the bridge\n @param _burningLimit The updated burning limit we are setting to the bridge\n @param _bridge The address of the bridge we are setting the limit too"
+            },
+            "eventSelector": "93f3bbfe8cfb354ec059175107653f49f6eb479a8622a7d83866ea015435c944",
+            "id": 11207,
+            "name": "BridgeLimitsSet",
+            "nameLocation": "1289:15:57",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 11206,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11201,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_mintingLimit",
+                  "nameLocation": "1313:13:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11207,
+                  "src": "1305:21:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11200,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1305:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11203,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_burningLimit",
+                  "nameLocation": "1336:13:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11207,
+                  "src": "1328:21:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11202,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1328:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11205,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_bridge",
+                  "nameLocation": "1367:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11207,
+                  "src": "1351:23:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11204,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1351:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1304:71:57"
+            },
+            "src": "1283:93:57"
+          },
+          {
+            "documentation": {
+              "id": 11208,
+              "nodeType": "StructuredDocumentation",
+              "src": "1380:90:57",
+              "text": " @notice Reverts when a user with too low of a limit tries to call mint/burn"
+            },
+            "errorSelector": "0b6842aa",
+            "id": 11210,
+            "name": "IXERC20_NotHighEnoughLimits",
+            "nameLocation": "1479:27:57",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 11209,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1506:2:57"
+            },
+            "src": "1473:36:57"
+          },
+          {
+            "documentation": {
+              "id": 11211,
+              "nodeType": "StructuredDocumentation",
+              "src": "1513:61:57",
+              "text": " @notice Reverts when caller is not the factory"
+            },
+            "errorSelector": "2029e525",
+            "id": 11213,
+            "name": "IXERC20_NotFactory",
+            "nameLocation": "1583:18:57",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 11212,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1601:2:57"
+            },
+            "src": "1577:27:57"
+          },
+          {
+            "documentation": {
+              "id": 11214,
+              "nodeType": "StructuredDocumentation",
+              "src": "1608:55:57",
+              "text": " @notice Reverts when limits are too high"
+            },
+            "errorSelector": "f5964809",
+            "id": 11216,
+            "name": "IXERC20_LimitsTooHigh",
+            "nameLocation": "1672:21:57",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 11215,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1693:2:57"
+            },
+            "src": "1666:30:57"
+          },
+          {
+            "documentation": {
+              "id": 11217,
+              "nodeType": "StructuredDocumentation",
+              "src": "1700:100:57",
+              "text": " @notice Sets the lockbox address\n @param _lockbox The address of the lockbox"
+            },
+            "functionSelector": "435350b7",
+            "id": 11222,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setLockbox",
+            "nameLocation": "1812:10:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11220,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11219,
+                  "mutability": "mutable",
+                  "name": "_lockbox",
+                  "nameLocation": "1836:8:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11222,
+                  "src": "1828:16:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11218,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1828:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1822:26:57"
+            },
+            "returnParameters": {
+              "id": 11221,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1857:0:57"
+            },
+            "scope": 11281,
+            "src": "1803:55:57",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11223,
+              "nodeType": "StructuredDocumentation",
+              "src": "1862:335:57",
+              "text": " @notice Updates the limits of any bridge\n @dev Can only be called by the owner\n @param _mintingLimit The updated minting limit we are setting to the bridge\n @param _burningLimit The updated burning limit we are setting to the bridge\n @param _bridge The address of the bridge we are setting the limits too"
+            },
+            "functionSelector": "a08d5654",
+            "id": 11232,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setLimits",
+            "nameLocation": "2209:9:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11230,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11225,
+                  "mutability": "mutable",
+                  "name": "_bridge",
+                  "nameLocation": "2227:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11232,
+                  "src": "2219:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11224,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2219:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11227,
+                  "mutability": "mutable",
+                  "name": "_mintingLimit",
+                  "nameLocation": "2244:13:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11232,
+                  "src": "2236:21:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11226,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2236:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11229,
+                  "mutability": "mutable",
+                  "name": "_burningLimit",
+                  "nameLocation": "2267:13:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11232,
+                  "src": "2259:21:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11228,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2259:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2218:63:57"
+            },
+            "returnParameters": {
+              "id": 11231,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2290:0:57"
+            },
+            "scope": 11281,
+            "src": "2200:91:57",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11233,
+              "nodeType": "StructuredDocumentation",
+              "src": "2295:207:57",
+              "text": " @notice Mints tokens for a user\n @dev Can only be called by a minter\n @param _user The address of the user who needs tokens minted\n @param _amount The amount of tokens being minted"
+            },
+            "functionSelector": "40c10f19",
+            "id": 11240,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mint",
+            "nameLocation": "2514:4:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11238,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11235,
+                  "mutability": "mutable",
+                  "name": "_user",
+                  "nameLocation": "2527:5:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11240,
+                  "src": "2519:13:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11234,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2519:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11237,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "2542:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11240,
+                  "src": "2534:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11236,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2534:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2518:32:57"
+            },
+            "returnParameters": {
+              "id": 11239,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2559:0:57"
+            },
+            "scope": 11281,
+            "src": "2505:55:57",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11241,
+              "nodeType": "StructuredDocumentation",
+              "src": "2564:207:57",
+              "text": " @notice Burns tokens for a user\n @dev Can only be called by a minter\n @param _user The address of the user who needs tokens burned\n @param _amount The amount of tokens being burned"
+            },
+            "functionSelector": "9dc29fac",
+            "id": 11248,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burn",
+            "nameLocation": "2783:4:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11246,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11243,
+                  "mutability": "mutable",
+                  "name": "_user",
+                  "nameLocation": "2796:5:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11248,
+                  "src": "2788:13:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11242,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2788:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11245,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "2811:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11248,
+                  "src": "2803:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11244,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2803:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2787:32:57"
+            },
+            "returnParameters": {
+              "id": 11247,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2828:0:57"
+            },
+            "scope": 11281,
+            "src": "2774:55:57",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11249,
+              "nodeType": "StructuredDocumentation",
+              "src": "2833:167:57",
+              "text": " @notice Returns the max limit of a minter\n @param _minter The minter we are viewing the limits of\n  @return _limit The limit the minter has"
+            },
+            "functionSelector": "0c05f82c",
+            "id": 11256,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintingMaxLimitOf",
+            "nameLocation": "3012:17:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11252,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11251,
+                  "mutability": "mutable",
+                  "name": "_minter",
+                  "nameLocation": "3043:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11256,
+                  "src": "3035:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11250,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3035:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3029:25:57"
+            },
+            "returnParameters": {
+              "id": 11255,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11254,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "3086:6:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11256,
+                  "src": "3078:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11253,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3078:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3077:16:57"
+            },
+            "scope": 11281,
+            "src": "3003:91:57",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11257,
+              "nodeType": "StructuredDocumentation",
+              "src": "3098:166:57",
+              "text": " @notice Returns the max limit of a bridge\n @param _bridge the bridge we are viewing the limits of\n @return _limit The limit the bridge has"
+            },
+            "functionSelector": "c1eb7137",
+            "id": 11264,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burningMaxLimitOf",
+            "nameLocation": "3276:17:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11260,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11259,
+                  "mutability": "mutable",
+                  "name": "_bridge",
+                  "nameLocation": "3307:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11264,
+                  "src": "3299:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11258,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3299:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3293:25:57"
+            },
+            "returnParameters": {
+              "id": 11263,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11262,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "3350:6:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11264,
+                  "src": "3342:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11261,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3342:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3341:16:57"
+            },
+            "scope": 11281,
+            "src": "3267:91:57",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11265,
+              "nodeType": "StructuredDocumentation",
+              "src": "3362:170:57",
+              "text": " @notice Returns the current limit of a minter\n @param _minter The minter we are viewing the limits of\n @return _limit The limit the minter has"
+            },
+            "functionSelector": "651fd268",
+            "id": 11272,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintingCurrentLimitOf",
+            "nameLocation": "3544:21:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11268,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11267,
+                  "mutability": "mutable",
+                  "name": "_minter",
+                  "nameLocation": "3579:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11272,
+                  "src": "3571:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11266,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3571:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3565:25:57"
+            },
+            "returnParameters": {
+              "id": 11271,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11270,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "3622:6:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11272,
+                  "src": "3614:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11269,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3614:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3613:16:57"
+            },
+            "scope": 11281,
+            "src": "3535:95:57",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11273,
+              "nodeType": "StructuredDocumentation",
+              "src": "3634:170:57",
+              "text": " @notice Returns the current limit of a bridge\n @param _bridge the bridge we are viewing the limits of\n @return _limit The limit the bridge has"
+            },
+            "functionSelector": "998955d3",
+            "id": 11280,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burningCurrentLimitOf",
+            "nameLocation": "3816:21:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11276,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11275,
+                  "mutability": "mutable",
+                  "name": "_bridge",
+                  "nameLocation": "3851:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11280,
+                  "src": "3843:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11274,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3843:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3837:25:57"
+            },
+            "returnParameters": {
+              "id": 11279,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11278,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "3894:6:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11280,
+                  "src": "3886:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11277,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3886:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3885:16:57"
+            },
+            "scope": 11281,
+            "src": "3807:95:57",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 11282,
+        "src": "72:3832:57",
+        "usedErrors": [
+          11210,
+          11213,
+          11216
+        ],
+        "usedEvents": [
+          11198,
+          11207
+        ]
+      }
+    ],
+    "src": "39:3866:57"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/common/IXERC20.sol",
+    "exportedSymbols": {
+      "IXERC20": [
+        11281
+      ]
+    },
+    "id": 11282,
+    "license": "UNLICENSED",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11175,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".4",
+          "<",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:31:57"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IXERC20",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 11281,
+        "linearizedBaseContracts": [
+          11281
+        ],
+        "name": "IXERC20",
+        "nameLocation": "82:7:57",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IXERC20.Bridge",
+            "documentation": {
+              "id": 11176,
+              "nodeType": "StructuredDocumentation",
+              "src": "94:220:57",
+              "text": " @notice Contains the full minting and burning data for a particular bridge\n @param minterParams The minting parameters for the bridge\n @param burnerParams The burning parameters for the bridge"
+            },
+            "id": 11183,
+            "members": [
+              {
+                "constant": false,
+                "id": 11179,
+                "mutability": "mutable",
+                "name": "minterParams",
+                "nameLocation": "354:12:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11183,
+                "src": "337:29:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_BridgeParameters_$11193_storage_ptr",
+                  "typeString": "struct IXERC20.BridgeParameters"
+                },
+                "typeName": {
+                  "id": 11178,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 11177,
+                    "name": "BridgeParameters",
+                    "nameLocations": [
+                      "337:16:57"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 11193,
+                    "src": "337:16:57"
+                  },
+                  "referencedDeclaration": 11193,
+                  "src": "337:16:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_BridgeParameters_$11193_storage_ptr",
+                    "typeString": "struct IXERC20.BridgeParameters"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 11182,
+                "mutability": "mutable",
+                "name": "burnerParams",
+                "nameLocation": "389:12:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11183,
+                "src": "372:29:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_BridgeParameters_$11193_storage_ptr",
+                  "typeString": "struct IXERC20.BridgeParameters"
+                },
+                "typeName": {
+                  "id": 11181,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 11180,
+                    "name": "BridgeParameters",
+                    "nameLocations": [
+                      "372:16:57"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 11193,
+                    "src": "372:16:57"
+                  },
+                  "referencedDeclaration": 11193,
+                  "src": "372:16:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_BridgeParameters_$11193_storage_ptr",
+                    "typeString": "struct IXERC20.BridgeParameters"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Bridge",
+            "nameLocation": "324:6:57",
+            "nodeType": "StructDefinition",
+            "scope": 11281,
+            "src": "317:89:57",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IXERC20.BridgeParameters",
+            "documentation": {
+              "id": 11184,
+              "nodeType": "StructuredDocumentation",
+              "src": "410:301:57",
+              "text": " @notice Contains the mint or burn parameters for a bridge\n @param timestamp The timestamp of the last mint/burn\n @param ratePerSecond The rate per second of the bridge\n @param maxLimit The max limit of the bridge\n @param currentLimit The current limit of the bridge"
+            },
+            "id": 11193,
+            "members": [
+              {
+                "constant": false,
+                "id": 11186,
+                "mutability": "mutable",
+                "name": "timestamp",
+                "nameLocation": "752:9:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11193,
+                "src": "744:17:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 11185,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "744:7:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 11188,
+                "mutability": "mutable",
+                "name": "ratePerSecond",
+                "nameLocation": "775:13:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11193,
+                "src": "767:21:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 11187,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "767:7:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 11190,
+                "mutability": "mutable",
+                "name": "maxLimit",
+                "nameLocation": "802:8:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11193,
+                "src": "794:16:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 11189,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "794:7:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 11192,
+                "mutability": "mutable",
+                "name": "currentLimit",
+                "nameLocation": "824:12:57",
+                "nodeType": "VariableDeclaration",
+                "scope": 11193,
+                "src": "816:20:57",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 11191,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "816:7:57",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "BridgeParameters",
+            "nameLocation": "721:16:57",
+            "nodeType": "StructDefinition",
+            "scope": 11281,
+            "src": "714:127:57",
+            "visibility": "public"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 11194,
+              "nodeType": "StructuredDocumentation",
+              "src": "845:103:57",
+              "text": " @notice Emits when a lockbox is set\n @param _lockbox The address of the lockbox"
+            },
+            "eventSelector": "fa2e15ea41196e438f0593ecdd6036acd83bdfcd39d627b77c17eab43f376a39",
+            "id": 11198,
+            "name": "LockboxSet",
+            "nameLocation": "957:10:57",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 11197,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11196,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_lockbox",
+                  "nameLocation": "976:8:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11198,
+                  "src": "968:16:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11195,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "968:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "967:18:57"
+            },
+            "src": "951:35:57"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 11199,
+              "nodeType": "StructuredDocumentation",
+              "src": "990:290:57",
+              "text": " @notice Emits when a limit is set\n @param _mintingLimit The updated minting limit we are setting to the bridge\n @param _burningLimit The updated burning limit we are setting to the bridge\n @param _bridge The address of the bridge we are setting the limit too"
+            },
+            "eventSelector": "93f3bbfe8cfb354ec059175107653f49f6eb479a8622a7d83866ea015435c944",
+            "id": 11207,
+            "name": "BridgeLimitsSet",
+            "nameLocation": "1289:15:57",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 11206,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11201,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_mintingLimit",
+                  "nameLocation": "1313:13:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11207,
+                  "src": "1305:21:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11200,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1305:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11203,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_burningLimit",
+                  "nameLocation": "1336:13:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11207,
+                  "src": "1328:21:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11202,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1328:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11205,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_bridge",
+                  "nameLocation": "1367:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11207,
+                  "src": "1351:23:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11204,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1351:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1304:71:57"
+            },
+            "src": "1283:93:57"
+          },
+          {
+            "documentation": {
+              "id": 11208,
+              "nodeType": "StructuredDocumentation",
+              "src": "1380:90:57",
+              "text": " @notice Reverts when a user with too low of a limit tries to call mint/burn"
+            },
+            "errorSelector": "0b6842aa",
+            "id": 11210,
+            "name": "IXERC20_NotHighEnoughLimits",
+            "nameLocation": "1479:27:57",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 11209,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1506:2:57"
+            },
+            "src": "1473:36:57"
+          },
+          {
+            "documentation": {
+              "id": 11211,
+              "nodeType": "StructuredDocumentation",
+              "src": "1513:61:57",
+              "text": " @notice Reverts when caller is not the factory"
+            },
+            "errorSelector": "2029e525",
+            "id": 11213,
+            "name": "IXERC20_NotFactory",
+            "nameLocation": "1583:18:57",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 11212,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1601:2:57"
+            },
+            "src": "1577:27:57"
+          },
+          {
+            "documentation": {
+              "id": 11214,
+              "nodeType": "StructuredDocumentation",
+              "src": "1608:55:57",
+              "text": " @notice Reverts when limits are too high"
+            },
+            "errorSelector": "f5964809",
+            "id": 11216,
+            "name": "IXERC20_LimitsTooHigh",
+            "nameLocation": "1672:21:57",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 11215,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1693:2:57"
+            },
+            "src": "1666:30:57"
+          },
+          {
+            "documentation": {
+              "id": 11217,
+              "nodeType": "StructuredDocumentation",
+              "src": "1700:100:57",
+              "text": " @notice Sets the lockbox address\n @param _lockbox The address of the lockbox"
+            },
+            "functionSelector": "435350b7",
+            "id": 11222,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setLockbox",
+            "nameLocation": "1812:10:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11220,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11219,
+                  "mutability": "mutable",
+                  "name": "_lockbox",
+                  "nameLocation": "1836:8:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11222,
+                  "src": "1828:16:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11218,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1828:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1822:26:57"
+            },
+            "returnParameters": {
+              "id": 11221,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1857:0:57"
+            },
+            "scope": 11281,
+            "src": "1803:55:57",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11223,
+              "nodeType": "StructuredDocumentation",
+              "src": "1862:335:57",
+              "text": " @notice Updates the limits of any bridge\n @dev Can only be called by the owner\n @param _mintingLimit The updated minting limit we are setting to the bridge\n @param _burningLimit The updated burning limit we are setting to the bridge\n @param _bridge The address of the bridge we are setting the limits too"
+            },
+            "functionSelector": "a08d5654",
+            "id": 11232,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setLimits",
+            "nameLocation": "2209:9:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11230,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11225,
+                  "mutability": "mutable",
+                  "name": "_bridge",
+                  "nameLocation": "2227:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11232,
+                  "src": "2219:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11224,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2219:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11227,
+                  "mutability": "mutable",
+                  "name": "_mintingLimit",
+                  "nameLocation": "2244:13:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11232,
+                  "src": "2236:21:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11226,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2236:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11229,
+                  "mutability": "mutable",
+                  "name": "_burningLimit",
+                  "nameLocation": "2267:13:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11232,
+                  "src": "2259:21:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11228,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2259:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2218:63:57"
+            },
+            "returnParameters": {
+              "id": 11231,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2290:0:57"
+            },
+            "scope": 11281,
+            "src": "2200:91:57",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11233,
+              "nodeType": "StructuredDocumentation",
+              "src": "2295:207:57",
+              "text": " @notice Mints tokens for a user\n @dev Can only be called by a minter\n @param _user The address of the user who needs tokens minted\n @param _amount The amount of tokens being minted"
+            },
+            "functionSelector": "40c10f19",
+            "id": 11240,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mint",
+            "nameLocation": "2514:4:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11238,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11235,
+                  "mutability": "mutable",
+                  "name": "_user",
+                  "nameLocation": "2527:5:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11240,
+                  "src": "2519:13:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11234,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2519:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11237,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "2542:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11240,
+                  "src": "2534:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11236,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2534:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2518:32:57"
+            },
+            "returnParameters": {
+              "id": 11239,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2559:0:57"
+            },
+            "scope": 11281,
+            "src": "2505:55:57",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11241,
+              "nodeType": "StructuredDocumentation",
+              "src": "2564:207:57",
+              "text": " @notice Burns tokens for a user\n @dev Can only be called by a minter\n @param _user The address of the user who needs tokens burned\n @param _amount The amount of tokens being burned"
+            },
+            "functionSelector": "9dc29fac",
+            "id": 11248,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burn",
+            "nameLocation": "2783:4:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11246,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11243,
+                  "mutability": "mutable",
+                  "name": "_user",
+                  "nameLocation": "2796:5:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11248,
+                  "src": "2788:13:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11242,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2788:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 11245,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "2811:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11248,
+                  "src": "2803:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11244,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2803:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2787:32:57"
+            },
+            "returnParameters": {
+              "id": 11247,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2828:0:57"
+            },
+            "scope": 11281,
+            "src": "2774:55:57",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11249,
+              "nodeType": "StructuredDocumentation",
+              "src": "2833:167:57",
+              "text": " @notice Returns the max limit of a minter\n @param _minter The minter we are viewing the limits of\n  @return _limit The limit the minter has"
+            },
+            "functionSelector": "0c05f82c",
+            "id": 11256,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintingMaxLimitOf",
+            "nameLocation": "3012:17:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11252,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11251,
+                  "mutability": "mutable",
+                  "name": "_minter",
+                  "nameLocation": "3043:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11256,
+                  "src": "3035:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11250,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3035:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3029:25:57"
+            },
+            "returnParameters": {
+              "id": 11255,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11254,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "3086:6:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11256,
+                  "src": "3078:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11253,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3078:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3077:16:57"
+            },
+            "scope": 11281,
+            "src": "3003:91:57",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11257,
+              "nodeType": "StructuredDocumentation",
+              "src": "3098:166:57",
+              "text": " @notice Returns the max limit of a bridge\n @param _bridge the bridge we are viewing the limits of\n @return _limit The limit the bridge has"
+            },
+            "functionSelector": "c1eb7137",
+            "id": 11264,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burningMaxLimitOf",
+            "nameLocation": "3276:17:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11260,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11259,
+                  "mutability": "mutable",
+                  "name": "_bridge",
+                  "nameLocation": "3307:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11264,
+                  "src": "3299:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11258,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3299:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3293:25:57"
+            },
+            "returnParameters": {
+              "id": 11263,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11262,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "3350:6:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11264,
+                  "src": "3342:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11261,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3342:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3341:16:57"
+            },
+            "scope": 11281,
+            "src": "3267:91:57",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11265,
+              "nodeType": "StructuredDocumentation",
+              "src": "3362:170:57",
+              "text": " @notice Returns the current limit of a minter\n @param _minter The minter we are viewing the limits of\n @return _limit The limit the minter has"
+            },
+            "functionSelector": "651fd268",
+            "id": 11272,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "mintingCurrentLimitOf",
+            "nameLocation": "3544:21:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11268,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11267,
+                  "mutability": "mutable",
+                  "name": "_minter",
+                  "nameLocation": "3579:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11272,
+                  "src": "3571:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11266,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3571:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3565:25:57"
+            },
+            "returnParameters": {
+              "id": 11271,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11270,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "3622:6:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11272,
+                  "src": "3614:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11269,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3614:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3613:16:57"
+            },
+            "scope": 11281,
+            "src": "3535:95:57",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 11273,
+              "nodeType": "StructuredDocumentation",
+              "src": "3634:170:57",
+              "text": " @notice Returns the current limit of a bridge\n @param _bridge the bridge we are viewing the limits of\n @return _limit The limit the bridge has"
+            },
+            "functionSelector": "998955d3",
+            "id": 11280,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burningCurrentLimitOf",
+            "nameLocation": "3816:21:57",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11276,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11275,
+                  "mutability": "mutable",
+                  "name": "_bridge",
+                  "nameLocation": "3851:7:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11280,
+                  "src": "3843:15:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11274,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3843:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3837:25:57"
+            },
+            "returnParameters": {
+              "id": 11279,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11278,
+                  "mutability": "mutable",
+                  "name": "_limit",
+                  "nameLocation": "3894:6:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11280,
+                  "src": "3886:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11277,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3886:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3885:16:57"
+            },
+            "scope": 11281,
+            "src": "3807:95:57",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 11282,
+        "src": "72:3832:57",
+        "usedErrors": [
+          11210,
+          11213,
+          11216
+        ],
+        "usedEvents": [
+          11198,
+          11207
+        ]
+      }
+    ],
+    "src": "39:3866:57"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-20T14:22:53.870Z"
+}

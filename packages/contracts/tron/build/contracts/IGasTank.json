@@ -1,0 +1,1447 @@
+{
+  "contractName": "IGasTank",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "GasTank_CallFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "GasTank_InsufficientFunds",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "GasTank_NotAuthorized",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "_authorized",
+          "type": "bool"
+        }
+      ],
+      "name": "GasReceiverAuthorized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "GasTankDeposited",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "GasTankSpent",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "GasTankWithdrawn",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_authorized",
+          "type": "bool"
+        }
+      ],
+      "name": "authorizeGasReceiver",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "isAuthorizedGasReceiver",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "_authorized",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdrawGas",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\n/**\n * @title IGasTank\n * @notice Interface for contracts that can receive gas\n */\ninterface IGasTank {\n  /*//////////////////////////////////////////////////////////////\n                                EVENTS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Emitted when gas is deposited\n   * @param _sender The sender of the gas\n   * @param _amount The amount of gas deposited\n   */\n  event GasTankDeposited(address indexed _sender, uint256 _amount);\n\n  /**\n   * @notice Emitted when gas is withdrawn\n   * @param _sender The sender of the gas\n   * @param _amount The amount of gas withdrawn\n   */\n  event GasTankWithdrawn(address indexed _sender, uint256 _amount);\n\n  /**\n   * @notice Emitted when gas is spent\n   * @param _amount The amount of gas spent\n   */\n  event GasTankSpent(uint256 indexed _amount);\n\n  /**\n   * @notice Emitted when an address is authorized to receive gas\n   * @param _address The address that was authorized\n   * @param _authorized True if the address was authorized false if unauthorized\n   */\n  event GasReceiverAuthorized(address indexed _address, bool _authorized);\n\n  /*//////////////////////////////////////////////////////////////\n                                ERRORS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Thrown when the contract has insufficient funds\n   */\n  error GasTank_InsufficientFunds();\n\n  /**\n   * @notice Thrown when the caller is not authorized\n   */\n  error GasTank_NotAuthorized();\n\n  /**\n   * @notice Thrown when a call fails\n   */\n  error GasTank_CallFailed();\n\n  /*///////////////////////////////////////////////////////////////\n                              LOGIC\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Withdraws gas from the contract\n   * @param _amount The amount of gas to withdraw\n   */\n  function withdrawGas(\n    uint256 _amount\n  ) external;\n\n  /**\n   * @notice Authorizes a contract to receive gas\n   * @param _address The address to authorize\n   * @param _authorized True if the address is to be authorized\n   */\n  function authorizeGasReceiver(address _address, bool _authorized) external;\n\n  /*//////////////////////////////////////////////////////////////\n                                  VIEWS\n    //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice Checks if an address is authorized to receive gas\n   * @param _address The address to check\n   * @return _authorized True if the address is authorized\n   */\n  function isAuthorizedGasReceiver(\n    address _address\n  ) external view returns (bool _authorized);\n}\n",
+  "sourcePath": "interfaces/common/IGasTank.sol",
+  "ast": {
+    "absolutePath": "interfaces/common/IGasTank.sol",
+    "exportedSymbols": {
+      "IGasTank": [
+        1042
+      ]
+    },
+    "id": 1043,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 983,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:8"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IGasTank",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 984,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:82:8",
+          "text": " @title IGasTank\n @notice Interface for contracts that can receive gas"
+        },
+        "fullyImplemented": false,
+        "id": 1042,
+        "linearizedBaseContracts": [
+          1042
+        ],
+        "name": "IGasTank",
+        "nameLocation": "150:8:8",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 985,
+              "nodeType": "StructuredDocumentation",
+              "src": "337:142:8",
+              "text": " @notice Emitted when gas is deposited\n @param _sender The sender of the gas\n @param _amount The amount of gas deposited"
+            },
+            "eventSelector": "8437e9071307a6ed5c1b1507bf6386fd36cc68f2353e96746596c0faa2b3d2b2",
+            "id": 991,
+            "name": "GasTankDeposited",
+            "nameLocation": "488:16:8",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 990,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 987,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_sender",
+                  "nameLocation": "521:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 991,
+                  "src": "505:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 986,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "505:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 989,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "538:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 991,
+                  "src": "530:15:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 988,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "530:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "504:42:8"
+            },
+            "src": "482:65:8"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 992,
+              "nodeType": "StructuredDocumentation",
+              "src": "551:142:8",
+              "text": " @notice Emitted when gas is withdrawn\n @param _sender The sender of the gas\n @param _amount The amount of gas withdrawn"
+            },
+            "eventSelector": "7bfcd5a30e8ef1d41d21d17f77f4ed8ca27269ce7ead40296c8f0934f4f61b6e",
+            "id": 998,
+            "name": "GasTankWithdrawn",
+            "nameLocation": "702:16:8",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 997,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 994,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_sender",
+                  "nameLocation": "735:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 998,
+                  "src": "719:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 993,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "719:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 996,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "752:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 998,
+                  "src": "744:15:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 995,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "744:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "718:42:8"
+            },
+            "src": "696:65:8"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 999,
+              "nodeType": "StructuredDocumentation",
+              "src": "765:92:8",
+              "text": " @notice Emitted when gas is spent\n @param _amount The amount of gas spent"
+            },
+            "eventSelector": "e50b75e9bedca4a9e31f6eeea1c322891458504a214bc78a388efafa091b53e5",
+            "id": 1003,
+            "name": "GasTankSpent",
+            "nameLocation": "866:12:8",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 1002,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1001,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "895:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1003,
+                  "src": "879:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1000,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "879:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "878:25:8"
+            },
+            "src": "860:44:8"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 1004,
+              "nodeType": "StructuredDocumentation",
+              "src": "908:209:8",
+              "text": " @notice Emitted when an address is authorized to receive gas\n @param _address The address that was authorized\n @param _authorized True if the address was authorized false if unauthorized"
+            },
+            "eventSelector": "1655281a93906ab6c6bc320eaf893bb592ab753f9279358d763c17a7589d46b4",
+            "id": 1010,
+            "name": "GasReceiverAuthorized",
+            "nameLocation": "1126:21:8",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 1009,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1006,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_address",
+                  "nameLocation": "1164:8:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1010,
+                  "src": "1148:24:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1005,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1148:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1008,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_authorized",
+                  "nameLocation": "1179:11:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1010,
+                  "src": "1174:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1007,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1174:4:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1147:44:8"
+            },
+            "src": "1120:72:8"
+          },
+          {
+            "documentation": {
+              "id": 1011,
+              "nodeType": "StructuredDocumentation",
+              "src": "1370:70:8",
+              "text": " @notice Thrown when the contract has insufficient funds"
+            },
+            "errorSelector": "c83517b2",
+            "id": 1013,
+            "name": "GasTank_InsufficientFunds",
+            "nameLocation": "1449:25:8",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 1012,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1474:2:8"
+            },
+            "src": "1443:34:8"
+          },
+          {
+            "documentation": {
+              "id": 1014,
+              "nodeType": "StructuredDocumentation",
+              "src": "1481:63:8",
+              "text": " @notice Thrown when the caller is not authorized"
+            },
+            "errorSelector": "47853761",
+            "id": 1016,
+            "name": "GasTank_NotAuthorized",
+            "nameLocation": "1553:21:8",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 1015,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1574:2:8"
+            },
+            "src": "1547:30:8"
+          },
+          {
+            "documentation": {
+              "id": 1017,
+              "nodeType": "StructuredDocumentation",
+              "src": "1581:47:8",
+              "text": " @notice Thrown when a call fails"
+            },
+            "errorSelector": "ce6c5c39",
+            "id": 1019,
+            "name": "GasTank_CallFailed",
+            "nameLocation": "1637:18:8",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 1018,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1655:2:8"
+            },
+            "src": "1631:27:8"
+          },
+          {
+            "documentation": {
+              "id": 1020,
+              "nodeType": "StructuredDocumentation",
+              "src": "1834:104:8",
+              "text": " @notice Withdraws gas from the contract\n @param _amount The amount of gas to withdraw"
+            },
+            "functionSelector": "91657544",
+            "id": 1025,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "withdrawGas",
+            "nameLocation": "1950:11:8",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1023,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1022,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "1975:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1025,
+                  "src": "1967:15:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1021,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1967:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1961:25:8"
+            },
+            "returnParameters": {
+              "id": 1024,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1995:0:8"
+            },
+            "scope": 1042,
+            "src": "1941:55:8",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1026,
+              "nodeType": "StructuredDocumentation",
+              "src": "2000:169:8",
+              "text": " @notice Authorizes a contract to receive gas\n @param _address The address to authorize\n @param _authorized True if the address is to be authorized"
+            },
+            "functionSelector": "4c213046",
+            "id": 1033,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "authorizeGasReceiver",
+            "nameLocation": "2181:20:8",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1031,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1028,
+                  "mutability": "mutable",
+                  "name": "_address",
+                  "nameLocation": "2210:8:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1033,
+                  "src": "2202:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1027,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2202:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1030,
+                  "mutability": "mutable",
+                  "name": "_authorized",
+                  "nameLocation": "2225:11:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1033,
+                  "src": "2220:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1029,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2220:4:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2201:36:8"
+            },
+            "returnParameters": {
+              "id": 1032,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2246:0:8"
+            },
+            "scope": 1042,
+            "src": "2172:75:8",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1034,
+              "nodeType": "StructuredDocumentation",
+              "src": "2428:173:8",
+              "text": " @notice Checks if an address is authorized to receive gas\n @param _address The address to check\n @return _authorized True if the address is authorized"
+            },
+            "functionSelector": "25ce64d4",
+            "id": 1041,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isAuthorizedGasReceiver",
+            "nameLocation": "2613:23:8",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1037,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1036,
+                  "mutability": "mutable",
+                  "name": "_address",
+                  "nameLocation": "2650:8:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1041,
+                  "src": "2642:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1035,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2642:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2636:26:8"
+            },
+            "returnParameters": {
+              "id": 1040,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1039,
+                  "mutability": "mutable",
+                  "name": "_authorized",
+                  "nameLocation": "2691:11:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1041,
+                  "src": "2686:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1038,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2686:4:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2685:18:8"
+            },
+            "scope": 1042,
+            "src": "2604:100:8",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1043,
+        "src": "140:2566:8",
+        "usedErrors": [
+          1013,
+          1016,
+          1019
+        ],
+        "usedEvents": [
+          991,
+          998,
+          1003,
+          1010
+        ]
+      }
+    ],
+    "src": "32:2675:8"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/common/IGasTank.sol",
+    "exportedSymbols": {
+      "IGasTank": [
+        1042
+      ]
+    },
+    "id": 1043,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 983,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:8"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IGasTank",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 984,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:82:8",
+          "text": " @title IGasTank\n @notice Interface for contracts that can receive gas"
+        },
+        "fullyImplemented": false,
+        "id": 1042,
+        "linearizedBaseContracts": [
+          1042
+        ],
+        "name": "IGasTank",
+        "nameLocation": "150:8:8",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 985,
+              "nodeType": "StructuredDocumentation",
+              "src": "337:142:8",
+              "text": " @notice Emitted when gas is deposited\n @param _sender The sender of the gas\n @param _amount The amount of gas deposited"
+            },
+            "eventSelector": "8437e9071307a6ed5c1b1507bf6386fd36cc68f2353e96746596c0faa2b3d2b2",
+            "id": 991,
+            "name": "GasTankDeposited",
+            "nameLocation": "488:16:8",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 990,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 987,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_sender",
+                  "nameLocation": "521:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 991,
+                  "src": "505:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 986,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "505:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 989,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "538:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 991,
+                  "src": "530:15:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 988,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "530:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "504:42:8"
+            },
+            "src": "482:65:8"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 992,
+              "nodeType": "StructuredDocumentation",
+              "src": "551:142:8",
+              "text": " @notice Emitted when gas is withdrawn\n @param _sender The sender of the gas\n @param _amount The amount of gas withdrawn"
+            },
+            "eventSelector": "7bfcd5a30e8ef1d41d21d17f77f4ed8ca27269ce7ead40296c8f0934f4f61b6e",
+            "id": 998,
+            "name": "GasTankWithdrawn",
+            "nameLocation": "702:16:8",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 997,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 994,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_sender",
+                  "nameLocation": "735:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 998,
+                  "src": "719:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 993,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "719:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 996,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "752:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 998,
+                  "src": "744:15:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 995,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "744:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "718:42:8"
+            },
+            "src": "696:65:8"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 999,
+              "nodeType": "StructuredDocumentation",
+              "src": "765:92:8",
+              "text": " @notice Emitted when gas is spent\n @param _amount The amount of gas spent"
+            },
+            "eventSelector": "e50b75e9bedca4a9e31f6eeea1c322891458504a214bc78a388efafa091b53e5",
+            "id": 1003,
+            "name": "GasTankSpent",
+            "nameLocation": "866:12:8",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 1002,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1001,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "895:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1003,
+                  "src": "879:23:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1000,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "879:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "878:25:8"
+            },
+            "src": "860:44:8"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 1004,
+              "nodeType": "StructuredDocumentation",
+              "src": "908:209:8",
+              "text": " @notice Emitted when an address is authorized to receive gas\n @param _address The address that was authorized\n @param _authorized True if the address was authorized false if unauthorized"
+            },
+            "eventSelector": "1655281a93906ab6c6bc320eaf893bb592ab753f9279358d763c17a7589d46b4",
+            "id": 1010,
+            "name": "GasReceiverAuthorized",
+            "nameLocation": "1126:21:8",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 1009,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1006,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "_address",
+                  "nameLocation": "1164:8:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1010,
+                  "src": "1148:24:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1005,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1148:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1008,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "_authorized",
+                  "nameLocation": "1179:11:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1010,
+                  "src": "1174:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1007,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1174:4:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1147:44:8"
+            },
+            "src": "1120:72:8"
+          },
+          {
+            "documentation": {
+              "id": 1011,
+              "nodeType": "StructuredDocumentation",
+              "src": "1370:70:8",
+              "text": " @notice Thrown when the contract has insufficient funds"
+            },
+            "errorSelector": "c83517b2",
+            "id": 1013,
+            "name": "GasTank_InsufficientFunds",
+            "nameLocation": "1449:25:8",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 1012,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1474:2:8"
+            },
+            "src": "1443:34:8"
+          },
+          {
+            "documentation": {
+              "id": 1014,
+              "nodeType": "StructuredDocumentation",
+              "src": "1481:63:8",
+              "text": " @notice Thrown when the caller is not authorized"
+            },
+            "errorSelector": "47853761",
+            "id": 1016,
+            "name": "GasTank_NotAuthorized",
+            "nameLocation": "1553:21:8",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 1015,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1574:2:8"
+            },
+            "src": "1547:30:8"
+          },
+          {
+            "documentation": {
+              "id": 1017,
+              "nodeType": "StructuredDocumentation",
+              "src": "1581:47:8",
+              "text": " @notice Thrown when a call fails"
+            },
+            "errorSelector": "ce6c5c39",
+            "id": 1019,
+            "name": "GasTank_CallFailed",
+            "nameLocation": "1637:18:8",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 1018,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1655:2:8"
+            },
+            "src": "1631:27:8"
+          },
+          {
+            "documentation": {
+              "id": 1020,
+              "nodeType": "StructuredDocumentation",
+              "src": "1834:104:8",
+              "text": " @notice Withdraws gas from the contract\n @param _amount The amount of gas to withdraw"
+            },
+            "functionSelector": "91657544",
+            "id": 1025,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "withdrawGas",
+            "nameLocation": "1950:11:8",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1023,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1022,
+                  "mutability": "mutable",
+                  "name": "_amount",
+                  "nameLocation": "1975:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1025,
+                  "src": "1967:15:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1021,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1967:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1961:25:8"
+            },
+            "returnParameters": {
+              "id": 1024,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1995:0:8"
+            },
+            "scope": 1042,
+            "src": "1941:55:8",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1026,
+              "nodeType": "StructuredDocumentation",
+              "src": "2000:169:8",
+              "text": " @notice Authorizes a contract to receive gas\n @param _address The address to authorize\n @param _authorized True if the address is to be authorized"
+            },
+            "functionSelector": "4c213046",
+            "id": 1033,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "authorizeGasReceiver",
+            "nameLocation": "2181:20:8",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1031,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1028,
+                  "mutability": "mutable",
+                  "name": "_address",
+                  "nameLocation": "2210:8:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1033,
+                  "src": "2202:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1027,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2202:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1030,
+                  "mutability": "mutable",
+                  "name": "_authorized",
+                  "nameLocation": "2225:11:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1033,
+                  "src": "2220:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1029,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2220:4:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2201:36:8"
+            },
+            "returnParameters": {
+              "id": 1032,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2246:0:8"
+            },
+            "scope": 1042,
+            "src": "2172:75:8",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 1034,
+              "nodeType": "StructuredDocumentation",
+              "src": "2428:173:8",
+              "text": " @notice Checks if an address is authorized to receive gas\n @param _address The address to check\n @return _authorized True if the address is authorized"
+            },
+            "functionSelector": "25ce64d4",
+            "id": 1041,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isAuthorizedGasReceiver",
+            "nameLocation": "2613:23:8",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1037,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1036,
+                  "mutability": "mutable",
+                  "name": "_address",
+                  "nameLocation": "2650:8:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1041,
+                  "src": "2642:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1035,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2642:7:8",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2636:26:8"
+            },
+            "returnParameters": {
+              "id": 1040,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1039,
+                  "mutability": "mutable",
+                  "name": "_authorized",
+                  "nameLocation": "2691:11:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1041,
+                  "src": "2686:16:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1038,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2686:4:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2685:18:8"
+            },
+            "scope": 1042,
+            "src": "2604:100:8",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1043,
+        "src": "140:2566:8",
+        "usedErrors": [
+          1013,
+          1016,
+          1019
+        ],
+        "usedEvents": [
+          991,
+          998,
+          1003,
+          1010
+        ]
+      }
+    ],
+    "src": "32:2675:8"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-21T10:04:43.958Z"
+}

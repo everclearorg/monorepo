@@ -19,6 +19,7 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
   struct DeploymentParams {
     address owner;
     address spokeProxy;
+    address create3;
   }
 
   bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
@@ -48,7 +49,7 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
 
     // Deploying the new implementation via CREATE3
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
-    (bool success, bytes memory returnData) = LIFI_LONDON_CREATE3.call(create3Calldata);
+    (bool success, bytes memory returnData) = _params.create3.call(create3Calldata);
     if (!success) revert Create3DeploymentFailed();
     newEverclearSpoke = abi.decode(returnData, (address));
 
@@ -63,68 +64,84 @@ contract DeployFeeAdapterUpgrade is Script, ScriptUtils {
 
 contract MainnetStaging is DeployFeeAdapterUpgrade, MainnetStagingEnvironment {
   function setUp() public {
+    //// Ethereum
+    _deploymentParams[ETHEREUM] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(ETHEREUM_SPOKE), create3: CREATE_3}); // set domain id as mapping key
+
     //// Arbitrum One
-    _deploymentParams[ARBITRUM_ONE] = DeploymentParams({owner: OWNER, spokeProxy: address(ARBITRUM_ONE_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[ARBITRUM_ONE] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(ARBITRUM_ONE_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     //// Optimism
-    _deploymentParams[OPTIMISM] = DeploymentParams({owner: OWNER, spokeProxy: address(OPTIMISM_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[OPTIMISM] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(OPTIMISM_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     // Base
-    _deploymentParams[BASE] = DeploymentParams({owner: OWNER, spokeProxy: address(BASE_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[BASE] = DeploymentParams({owner: OWNER, spokeProxy: address(BASE_SPOKE), create3: CREATE_3}); // set domain id as mapping key
   }
 }
 
 contract MainnetProduction is DeployFeeAdapterUpgrade, MainnetProductionEnvironment {
   function setUp() public {
     //// Arbitrum One
-    _deploymentParams[ARBITRUM_ONE] = DeploymentParams({owner: OWNER, spokeProxy: address(ARBITRUM_ONE_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[ARBITRUM_ONE] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(ARBITRUM_ONE_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     //// Optimism
-    _deploymentParams[OPTIMISM] = DeploymentParams({owner: OWNER, spokeProxy: address(OPTIMISM_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[OPTIMISM] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(OPTIMISM_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     //// Base
-    _deploymentParams[BASE] = DeploymentParams({owner: OWNER, spokeProxy: address(BASE_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[BASE] = DeploymentParams({owner: OWNER, spokeProxy: address(BASE_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     //// Bnb
-    _deploymentParams[BNB] = DeploymentParams({owner: OWNER, spokeProxy: address(BNB_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[BNB] = DeploymentParams({owner: OWNER, spokeProxy: address(BNB_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     //// Ethereum
-    _deploymentParams[ETHEREUM] = DeploymentParams({owner: OWNER, spokeProxy: address(ETHEREUM_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[ETHEREUM] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(ETHEREUM_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     // Zircuit
-    _deploymentParams[ZIRCUIT] = DeploymentParams({owner: OWNER, spokeProxy: address(ZIRCUIT_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[ZIRCUIT] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(ZIRCUIT_SPOKE), create3: address(0)}); // set domain id as mapping key
 
     // Blast
-    _deploymentParams[BLAST] = DeploymentParams({owner: OWNER, spokeProxy: address(BLAST_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[BLAST] = DeploymentParams({owner: OWNER, spokeProxy: address(BLAST_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     // Linea
-    _deploymentParams[LINEA] = DeploymentParams({owner: OWNER, spokeProxy: address(LINEA_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[LINEA] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(LINEA_SPOKE), create3: LIFI_LONDON_CREATE3}); // set domain id as mapping key
 
     // Polygon
-    _deploymentParams[POLYGON] = DeploymentParams({owner: OWNER, spokeProxy: address(POLYGON_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[POLYGON] = DeploymentParams({owner: OWNER, spokeProxy: address(POLYGON_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     // Avalanche
-    _deploymentParams[AVALANCHE] = DeploymentParams({owner: OWNER, spokeProxy: address(AVALANCHE_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[AVALANCHE] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(AVALANCHE_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     // Taiko
-    _deploymentParams[TAIKO] = DeploymentParams({owner: OWNER, spokeProxy: address(TAIKO_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[TAIKO] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(TAIKO_SPOKE), create3: LIFI_LONDON_CREATE3}); // set domain id as mapping key
 
     // Scroll
-    _deploymentParams[SCROLL] = DeploymentParams({owner: OWNER, spokeProxy: address(SCROLL_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[SCROLL] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(SCROLL_SPOKE), create3: LIFI_CREATE3}); // set domain id as mapping key
 
     // Apechain
-    _deploymentParams[APECHAIN] = DeploymentParams({owner: OWNER, spokeProxy: address(APECHAIN_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[APECHAIN] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(APECHAIN_SPOKE), create3: LIFI_CREATE3}); // set domain id as mapping key
 
     // Mode
-    _deploymentParams[MODE] = DeploymentParams({owner: OWNER, spokeProxy: address(MODE_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[MODE] = DeploymentParams({owner: OWNER, spokeProxy: address(MODE_SPOKE), create3: LIFI_CREATE3}); // set domain id as mapping key
 
     // Unichain
-    _deploymentParams[UNICHAIN] = DeploymentParams({owner: OWNER, spokeProxy: address(UNICHAIN_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[UNICHAIN] =
+      DeploymentParams({owner: OWNER, spokeProxy: address(UNICHAIN_SPOKE), create3: CREATE_3}); // set domain id as mapping key
 
     // Ronin
-    _deploymentParams[RONIN] = DeploymentParams({owner: OWNER, spokeProxy: address(RONIN_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[RONIN] = DeploymentParams({owner: OWNER, spokeProxy: address(RONIN_SPOKE), create3: address(0)}); // set domain id as mapping key
 
     // Gnosis
-    _deploymentParams[GNOSIS] = DeploymentParams({owner: OWNER, spokeProxy: address(GNOSIS_SPOKE)}); // set domain id as mapping key
+    _deploymentParams[GNOSIS] = DeploymentParams({owner: OWNER, spokeProxy: address(GNOSIS_SPOKE), create3: CREATE_3}); // set domain id as mapping key
   }
 }

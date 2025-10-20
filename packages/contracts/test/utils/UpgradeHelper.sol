@@ -4,6 +4,7 @@ pragma solidity 0.8.25;
 import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
 import {EverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
 import {EverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
+import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {SafeTxBuilder} from 'test/utils/SafeTxBuilder.sol';
 
@@ -102,7 +103,7 @@ contract UpgradeHelper is SafeTxBuilder {
   EverclearSpokeV3 public spokeProxyV3;
 
   /**
-   * **********************  FeeAdapter Upgrade  **********************
+   * **********************  FeeAdapter Upgrade  - V4 **********************
    */
   EverclearSpokeV4 public spokeProxyV4;
 
@@ -115,6 +116,19 @@ contract UpgradeHelper is SafeTxBuilder {
   uint256 public FIXED_MAIN_BLOCK_UP2 = 22_146_818;
 
   mapping(uint256 _chainId => DeploymentParamsV4 _params) internal _deploymentParamsV4;
+
+  /**
+   * ********************** Dynamic Gas Limit Upgrade  - V5 **********************
+   */
+  EverclearSpokeV5 public spokeProxyV5;
+  address public constant SPOKE_IMPL_MAINNET_V3 = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
+  address public constant MAINNET_FEE_ADAPTER = 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75;
+
+  uint256 public FIXED_MAIN_BLOCK_UP3 = 23_024_406;
+  uint256 public relayerPk = 1;
+  address public relayer = vm.addr(relayerPk);
+  address public constant WETH_MAINNET = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+  uint256 public constant MAX_GAS_LIMIT = 2_500_000;
 
   function _cacheSpokeState() internal view returns (CachedSpokeState memory state) {
     state.permit = address(spokeProxy.PERMIT2());
@@ -156,5 +170,19 @@ contract UpgradeHelper is SafeTxBuilder {
     state.paused = spokeProxyV4.paused();
     state.nonce = spokeProxyV4.nonce();
     state.messageGasLimit = spokeProxyV4.messageGasLimit();
+  }
+
+  function _cacheSpokeStateV5() internal view returns (CachedSpokeState memory state) {
+    state.permit = address(spokeProxyV5.PERMIT2());
+    state.EVERCLEAR = spokeProxyV5.EVERCLEAR();
+    state.DOMAIN = spokeProxyV5.DOMAIN();
+    state.lighthouse = spokeProxyV5.lighthouse();
+    state.watchtower = spokeProxyV5.watchtower();
+    state.messageReceiver = spokeProxyV5.messageReceiver();
+    state.gateway = address(spokeProxyV5.gateway());
+    state.callExecutor = address(spokeProxyV5.callExecutor());
+    state.paused = spokeProxyV5.paused();
+    state.nonce = spokeProxyV5.nonce();
+    state.messageGasLimit = spokeProxyV5.messageGasLimit();
   }
 }

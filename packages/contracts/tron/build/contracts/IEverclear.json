@@ -1,0 +1,1665 @@
+{
+  "contractName": "IEverclear",
+  "abi": [],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\n/**\n * @title IEverclear\n * @notice Common interface for EverclearHub and EverclearSpoke\n */\ninterface IEverclear {\n  /*//////////////////////////////////////////////////////////////\n                                ENUMS\n    //////////////////////////////////////////////////////////////*/\n  /**\n   * @notice Enum representing statuses of an intent\n   */\n  enum IntentStatus {\n    NONE, // 0\n    ADDED, // 1\n    DEPOSIT_PROCESSED, // 2\n    FILLED, // 3\n    ADDED_AND_FILLED, // 4\n    INVOICED, // 5\n    SETTLED, // 6\n    SETTLED_AND_MANUALLY_EXECUTED, // 7\n    UNSUPPORTED, // 8\n    UNSUPPORTED_RETURNED // 9\n\n  }\n\n  /**\n   * @notice Enum representing asset strategies\n   */\n  enum Strategy {\n    DEFAULT,\n    XERC20\n  }\n\n  /*///////////////////////////////////////////////////////////////\n                            STRUCTS\n  //////////////////////////////////////////////////////////////*/\n\n  /**\n   * @notice The structure of an intent\n   * @param initiator The address of the intent initiator\n   * @param receiver The address of the intent receiver\n   * @param inputAsset The address of the intent asset on origin\n   * @param outputAsset The address of the intent asset on destination\n   * @param maxFee The maximum fee that can be taken by solvers\n   * @param origin The origin chain of the intent\n   * @param destinations The possible destination chains of the intent\n   * @param nonce The nonce of the intent\n   * @param timestamp The timestamp of the intent\n   * @param ttl The time to live of the intent\n   * @param amount The amount of the intent asset normalized to 18 decimals\n   * @param data The data of the intent\n   */\n  struct Intent {\n    bytes32 initiator;\n    bytes32 receiver;\n    bytes32 inputAsset;\n    bytes32 outputAsset;\n    uint24 maxFee;\n    uint32 origin;\n    uint64 nonce;\n    uint48 timestamp;\n    uint48 ttl;\n    uint256 amount;\n    uint32[] destinations;\n    bytes data;\n  }\n\n  /**\n   * @notice The structure of a fill message\n   * @param intentId The ID of the intent\n   * @param solver The address of the intent solver in bytes32 format\n   * @param initiator The address of the intent initiator\n   * @param fee The total fee of the expressed in dbps, represents the solver fee plus the sum of protocol fees for the token\n   * @param executionTimestamp The execution timestamp of the intent\n   */\n  struct FillMessage {\n    bytes32 intentId;\n    bytes32 solver;\n    bytes32 initiator;\n    uint24 fee;\n    uint48 executionTimestamp;\n  }\n\n  /**\n   * @notice The structure of a settlement\n   * @param intentId The ID of the intent\n   * @param amount The amount of the asset\n   * @param asset The address of the asset\n   * @param recipient The address of the recipient\n   * @param updateVirtualBalance If set to true, the settlement will not be transferred to the recipient in spoke domain and the virtual balance will be increased\n   */\n  struct Settlement {\n    bytes32 intentId;\n    uint256 amount;\n    bytes32 asset;\n    bytes32 recipient;\n    bool updateVirtualBalance;\n  }\n}\n",
+  "sourcePath": "interfaces/common/IEverclear.sol",
+  "ast": {
+    "absolutePath": "interfaces/common/IEverclear.sol",
+    "exportedSymbols": {
+      "IEverclear": [
+        981
+      ]
+    },
+    "id": 982,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 912,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:7"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IEverclear",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 913,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:92:7",
+          "text": " @title IEverclear\n @notice Common interface for EverclearHub and EverclearSpoke"
+        },
+        "fullyImplemented": true,
+        "id": 981,
+        "linearizedBaseContracts": [
+          981
+        ],
+        "name": "IEverclear",
+        "nameLocation": "160:10:7",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IEverclear.IntentStatus",
+            "documentation": {
+              "id": 914,
+              "nodeType": "StructuredDocumentation",
+              "src": "349:62:7",
+              "text": " @notice Enum representing statuses of an intent"
+            },
+            "id": 925,
+            "members": [
+              {
+                "id": 915,
+                "name": "NONE",
+                "nameLocation": "438:4:7",
+                "nodeType": "EnumValue",
+                "src": "438:4:7"
+              },
+              {
+                "id": 916,
+                "name": "ADDED",
+                "nameLocation": "453:5:7",
+                "nodeType": "EnumValue",
+                "src": "453:5:7"
+              },
+              {
+                "id": 917,
+                "name": "DEPOSIT_PROCESSED",
+                "nameLocation": "469:17:7",
+                "nodeType": "EnumValue",
+                "src": "469:17:7"
+              },
+              {
+                "id": 918,
+                "name": "FILLED",
+                "nameLocation": "497:6:7",
+                "nodeType": "EnumValue",
+                "src": "497:6:7"
+              },
+              {
+                "id": 919,
+                "name": "ADDED_AND_FILLED",
+                "nameLocation": "514:16:7",
+                "nodeType": "EnumValue",
+                "src": "514:16:7"
+              },
+              {
+                "id": 920,
+                "name": "INVOICED",
+                "nameLocation": "541:8:7",
+                "nodeType": "EnumValue",
+                "src": "541:8:7"
+              },
+              {
+                "id": 921,
+                "name": "SETTLED",
+                "nameLocation": "560:7:7",
+                "nodeType": "EnumValue",
+                "src": "560:7:7"
+              },
+              {
+                "id": 922,
+                "name": "SETTLED_AND_MANUALLY_EXECUTED",
+                "nameLocation": "578:29:7",
+                "nodeType": "EnumValue",
+                "src": "578:29:7"
+              },
+              {
+                "id": 923,
+                "name": "UNSUPPORTED",
+                "nameLocation": "618:11:7",
+                "nodeType": "EnumValue",
+                "src": "618:11:7"
+              },
+              {
+                "id": 924,
+                "name": "UNSUPPORTED_RETURNED",
+                "nameLocation": "640:20:7",
+                "nodeType": "EnumValue",
+                "src": "640:20:7"
+              }
+            ],
+            "name": "IntentStatus",
+            "nameLocation": "419:12:7",
+            "nodeType": "EnumDefinition",
+            "src": "414:256:7"
+          },
+          {
+            "canonicalName": "IEverclear.Strategy",
+            "documentation": {
+              "id": 926,
+              "nodeType": "StructuredDocumentation",
+              "src": "674:57:7",
+              "text": " @notice Enum representing asset strategies"
+            },
+            "id": 929,
+            "members": [
+              {
+                "id": 927,
+                "name": "DEFAULT",
+                "nameLocation": "754:7:7",
+                "nodeType": "EnumValue",
+                "src": "754:7:7"
+              },
+              {
+                "id": 928,
+                "name": "XERC20",
+                "nameLocation": "767:6:7",
+                "nodeType": "EnumValue",
+                "src": "767:6:7"
+              }
+            ],
+            "name": "Strategy",
+            "nameLocation": "739:8:7",
+            "nodeType": "EnumDefinition",
+            "src": "734:43:7"
+          },
+          {
+            "canonicalName": "IEverclear.Intent",
+            "documentation": {
+              "id": 930,
+              "nodeType": "StructuredDocumentation",
+              "src": "953:739:7",
+              "text": " @notice The structure of an intent\n @param initiator The address of the intent initiator\n @param receiver The address of the intent receiver\n @param inputAsset The address of the intent asset on origin\n @param outputAsset The address of the intent asset on destination\n @param maxFee The maximum fee that can be taken by solvers\n @param origin The origin chain of the intent\n @param destinations The possible destination chains of the intent\n @param nonce The nonce of the intent\n @param timestamp The timestamp of the intent\n @param ttl The time to live of the intent\n @param amount The amount of the intent asset normalized to 18 decimals\n @param data The data of the intent"
+            },
+            "id": 956,
+            "members": [
+              {
+                "constant": false,
+                "id": 932,
+                "mutability": "mutable",
+                "name": "initiator",
+                "nameLocation": "1723:9:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1715:17:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 931,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1715:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 934,
+                "mutability": "mutable",
+                "name": "receiver",
+                "nameLocation": "1746:8:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1738:16:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 933,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1738:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 936,
+                "mutability": "mutable",
+                "name": "inputAsset",
+                "nameLocation": "1768:10:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1760:18:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 935,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1760:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 938,
+                "mutability": "mutable",
+                "name": "outputAsset",
+                "nameLocation": "1792:11:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1784:19:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 937,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1784:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 940,
+                "mutability": "mutable",
+                "name": "maxFee",
+                "nameLocation": "1816:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1809:13:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint24",
+                  "typeString": "uint24"
+                },
+                "typeName": {
+                  "id": 939,
+                  "name": "uint24",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1809:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint24",
+                    "typeString": "uint24"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 942,
+                "mutability": "mutable",
+                "name": "origin",
+                "nameLocation": "1835:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1828:13:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint32",
+                  "typeString": "uint32"
+                },
+                "typeName": {
+                  "id": 941,
+                  "name": "uint32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1828:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 944,
+                "mutability": "mutable",
+                "name": "nonce",
+                "nameLocation": "1854:5:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1847:12:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint64",
+                  "typeString": "uint64"
+                },
+                "typeName": {
+                  "id": 943,
+                  "name": "uint64",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1847:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 946,
+                "mutability": "mutable",
+                "name": "timestamp",
+                "nameLocation": "1872:9:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1865:16:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint48",
+                  "typeString": "uint48"
+                },
+                "typeName": {
+                  "id": 945,
+                  "name": "uint48",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1865:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint48",
+                    "typeString": "uint48"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 948,
+                "mutability": "mutable",
+                "name": "ttl",
+                "nameLocation": "1894:3:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1887:10:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint48",
+                  "typeString": "uint48"
+                },
+                "typeName": {
+                  "id": 947,
+                  "name": "uint48",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1887:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint48",
+                    "typeString": "uint48"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 950,
+                "mutability": "mutable",
+                "name": "amount",
+                "nameLocation": "1911:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1903:14:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 949,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1903:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 953,
+                "mutability": "mutable",
+                "name": "destinations",
+                "nameLocation": "1932:12:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1923:21:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_uint32_$dyn_storage_ptr",
+                  "typeString": "uint32[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 951,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1923:6:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "id": 952,
+                  "nodeType": "ArrayTypeName",
+                  "src": "1923:8:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint32_$dyn_storage_ptr",
+                    "typeString": "uint32[]"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 955,
+                "mutability": "mutable",
+                "name": "data",
+                "nameLocation": "1956:4:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1950:10:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes_storage_ptr",
+                  "typeString": "bytes"
+                },
+                "typeName": {
+                  "id": 954,
+                  "name": "bytes",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1950:5:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_storage_ptr",
+                    "typeString": "bytes"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Intent",
+            "nameLocation": "1702:6:7",
+            "nodeType": "StructDefinition",
+            "scope": 981,
+            "src": "1695:270:7",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IEverclear.FillMessage",
+            "documentation": {
+              "id": 957,
+              "nodeType": "StructuredDocumentation",
+              "src": "1969:419:7",
+              "text": " @notice The structure of a fill message\n @param intentId The ID of the intent\n @param solver The address of the intent solver in bytes32 format\n @param initiator The address of the intent initiator\n @param fee The total fee of the expressed in dbps, represents the solver fee plus the sum of protocol fees for the token\n @param executionTimestamp The execution timestamp of the intent"
+            },
+            "id": 968,
+            "members": [
+              {
+                "constant": false,
+                "id": 959,
+                "mutability": "mutable",
+                "name": "intentId",
+                "nameLocation": "2424:8:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2416:16:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 958,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2416:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 961,
+                "mutability": "mutable",
+                "name": "solver",
+                "nameLocation": "2446:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2438:14:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 960,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2438:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 963,
+                "mutability": "mutable",
+                "name": "initiator",
+                "nameLocation": "2466:9:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2458:17:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 962,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2458:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 965,
+                "mutability": "mutable",
+                "name": "fee",
+                "nameLocation": "2488:3:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2481:10:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint24",
+                  "typeString": "uint24"
+                },
+                "typeName": {
+                  "id": 964,
+                  "name": "uint24",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2481:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint24",
+                    "typeString": "uint24"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 967,
+                "mutability": "mutable",
+                "name": "executionTimestamp",
+                "nameLocation": "2504:18:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2497:25:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint48",
+                  "typeString": "uint48"
+                },
+                "typeName": {
+                  "id": 966,
+                  "name": "uint48",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2497:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint48",
+                    "typeString": "uint48"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "FillMessage",
+            "nameLocation": "2398:11:7",
+            "nodeType": "StructDefinition",
+            "scope": 981,
+            "src": "2391:136:7",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IEverclear.Settlement",
+            "documentation": {
+              "id": 969,
+              "nodeType": "StructuredDocumentation",
+              "src": "2531:394:7",
+              "text": " @notice The structure of a settlement\n @param intentId The ID of the intent\n @param amount The amount of the asset\n @param asset The address of the asset\n @param recipient The address of the recipient\n @param updateVirtualBalance If set to true, the settlement will not be transferred to the recipient in spoke domain and the virtual balance will be increased"
+            },
+            "id": 980,
+            "members": [
+              {
+                "constant": false,
+                "id": 971,
+                "mutability": "mutable",
+                "name": "intentId",
+                "nameLocation": "2960:8:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "2952:16:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 970,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2952:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 973,
+                "mutability": "mutable",
+                "name": "amount",
+                "nameLocation": "2982:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "2974:14:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 972,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2974:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 975,
+                "mutability": "mutable",
+                "name": "asset",
+                "nameLocation": "3002:5:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "2994:13:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 974,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2994:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 977,
+                "mutability": "mutable",
+                "name": "recipient",
+                "nameLocation": "3021:9:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "3013:17:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 976,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "3013:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 979,
+                "mutability": "mutable",
+                "name": "updateVirtualBalance",
+                "nameLocation": "3041:20:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "3036:25:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 978,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "3036:4:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Settlement",
+            "nameLocation": "2935:10:7",
+            "nodeType": "StructDefinition",
+            "scope": 981,
+            "src": "2928:138:7",
+            "visibility": "public"
+          }
+        ],
+        "scope": 982,
+        "src": "150:2918:7",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:3037:7"
+  },
+  "legacyAST": {
+    "absolutePath": "interfaces/common/IEverclear.sol",
+    "exportedSymbols": {
+      "IEverclear": [
+        981
+      ]
+    },
+    "id": 982,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 912,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:7"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IEverclear",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 913,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:92:7",
+          "text": " @title IEverclear\n @notice Common interface for EverclearHub and EverclearSpoke"
+        },
+        "fullyImplemented": true,
+        "id": 981,
+        "linearizedBaseContracts": [
+          981
+        ],
+        "name": "IEverclear",
+        "nameLocation": "160:10:7",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IEverclear.IntentStatus",
+            "documentation": {
+              "id": 914,
+              "nodeType": "StructuredDocumentation",
+              "src": "349:62:7",
+              "text": " @notice Enum representing statuses of an intent"
+            },
+            "id": 925,
+            "members": [
+              {
+                "id": 915,
+                "name": "NONE",
+                "nameLocation": "438:4:7",
+                "nodeType": "EnumValue",
+                "src": "438:4:7"
+              },
+              {
+                "id": 916,
+                "name": "ADDED",
+                "nameLocation": "453:5:7",
+                "nodeType": "EnumValue",
+                "src": "453:5:7"
+              },
+              {
+                "id": 917,
+                "name": "DEPOSIT_PROCESSED",
+                "nameLocation": "469:17:7",
+                "nodeType": "EnumValue",
+                "src": "469:17:7"
+              },
+              {
+                "id": 918,
+                "name": "FILLED",
+                "nameLocation": "497:6:7",
+                "nodeType": "EnumValue",
+                "src": "497:6:7"
+              },
+              {
+                "id": 919,
+                "name": "ADDED_AND_FILLED",
+                "nameLocation": "514:16:7",
+                "nodeType": "EnumValue",
+                "src": "514:16:7"
+              },
+              {
+                "id": 920,
+                "name": "INVOICED",
+                "nameLocation": "541:8:7",
+                "nodeType": "EnumValue",
+                "src": "541:8:7"
+              },
+              {
+                "id": 921,
+                "name": "SETTLED",
+                "nameLocation": "560:7:7",
+                "nodeType": "EnumValue",
+                "src": "560:7:7"
+              },
+              {
+                "id": 922,
+                "name": "SETTLED_AND_MANUALLY_EXECUTED",
+                "nameLocation": "578:29:7",
+                "nodeType": "EnumValue",
+                "src": "578:29:7"
+              },
+              {
+                "id": 923,
+                "name": "UNSUPPORTED",
+                "nameLocation": "618:11:7",
+                "nodeType": "EnumValue",
+                "src": "618:11:7"
+              },
+              {
+                "id": 924,
+                "name": "UNSUPPORTED_RETURNED",
+                "nameLocation": "640:20:7",
+                "nodeType": "EnumValue",
+                "src": "640:20:7"
+              }
+            ],
+            "name": "IntentStatus",
+            "nameLocation": "419:12:7",
+            "nodeType": "EnumDefinition",
+            "src": "414:256:7"
+          },
+          {
+            "canonicalName": "IEverclear.Strategy",
+            "documentation": {
+              "id": 926,
+              "nodeType": "StructuredDocumentation",
+              "src": "674:57:7",
+              "text": " @notice Enum representing asset strategies"
+            },
+            "id": 929,
+            "members": [
+              {
+                "id": 927,
+                "name": "DEFAULT",
+                "nameLocation": "754:7:7",
+                "nodeType": "EnumValue",
+                "src": "754:7:7"
+              },
+              {
+                "id": 928,
+                "name": "XERC20",
+                "nameLocation": "767:6:7",
+                "nodeType": "EnumValue",
+                "src": "767:6:7"
+              }
+            ],
+            "name": "Strategy",
+            "nameLocation": "739:8:7",
+            "nodeType": "EnumDefinition",
+            "src": "734:43:7"
+          },
+          {
+            "canonicalName": "IEverclear.Intent",
+            "documentation": {
+              "id": 930,
+              "nodeType": "StructuredDocumentation",
+              "src": "953:739:7",
+              "text": " @notice The structure of an intent\n @param initiator The address of the intent initiator\n @param receiver The address of the intent receiver\n @param inputAsset The address of the intent asset on origin\n @param outputAsset The address of the intent asset on destination\n @param maxFee The maximum fee that can be taken by solvers\n @param origin The origin chain of the intent\n @param destinations The possible destination chains of the intent\n @param nonce The nonce of the intent\n @param timestamp The timestamp of the intent\n @param ttl The time to live of the intent\n @param amount The amount of the intent asset normalized to 18 decimals\n @param data The data of the intent"
+            },
+            "id": 956,
+            "members": [
+              {
+                "constant": false,
+                "id": 932,
+                "mutability": "mutable",
+                "name": "initiator",
+                "nameLocation": "1723:9:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1715:17:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 931,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1715:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 934,
+                "mutability": "mutable",
+                "name": "receiver",
+                "nameLocation": "1746:8:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1738:16:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 933,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1738:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 936,
+                "mutability": "mutable",
+                "name": "inputAsset",
+                "nameLocation": "1768:10:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1760:18:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 935,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1760:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 938,
+                "mutability": "mutable",
+                "name": "outputAsset",
+                "nameLocation": "1792:11:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1784:19:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 937,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1784:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 940,
+                "mutability": "mutable",
+                "name": "maxFee",
+                "nameLocation": "1816:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1809:13:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint24",
+                  "typeString": "uint24"
+                },
+                "typeName": {
+                  "id": 939,
+                  "name": "uint24",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1809:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint24",
+                    "typeString": "uint24"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 942,
+                "mutability": "mutable",
+                "name": "origin",
+                "nameLocation": "1835:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1828:13:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint32",
+                  "typeString": "uint32"
+                },
+                "typeName": {
+                  "id": 941,
+                  "name": "uint32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1828:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 944,
+                "mutability": "mutable",
+                "name": "nonce",
+                "nameLocation": "1854:5:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1847:12:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint64",
+                  "typeString": "uint64"
+                },
+                "typeName": {
+                  "id": 943,
+                  "name": "uint64",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1847:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 946,
+                "mutability": "mutable",
+                "name": "timestamp",
+                "nameLocation": "1872:9:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1865:16:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint48",
+                  "typeString": "uint48"
+                },
+                "typeName": {
+                  "id": 945,
+                  "name": "uint48",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1865:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint48",
+                    "typeString": "uint48"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 948,
+                "mutability": "mutable",
+                "name": "ttl",
+                "nameLocation": "1894:3:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1887:10:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint48",
+                  "typeString": "uint48"
+                },
+                "typeName": {
+                  "id": 947,
+                  "name": "uint48",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1887:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint48",
+                    "typeString": "uint48"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 950,
+                "mutability": "mutable",
+                "name": "amount",
+                "nameLocation": "1911:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1903:14:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 949,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1903:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 953,
+                "mutability": "mutable",
+                "name": "destinations",
+                "nameLocation": "1932:12:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1923:21:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_uint32_$dyn_storage_ptr",
+                  "typeString": "uint32[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 951,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1923:6:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "id": 952,
+                  "nodeType": "ArrayTypeName",
+                  "src": "1923:8:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint32_$dyn_storage_ptr",
+                    "typeString": "uint32[]"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 955,
+                "mutability": "mutable",
+                "name": "data",
+                "nameLocation": "1956:4:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 956,
+                "src": "1950:10:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes_storage_ptr",
+                  "typeString": "bytes"
+                },
+                "typeName": {
+                  "id": 954,
+                  "name": "bytes",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1950:5:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_storage_ptr",
+                    "typeString": "bytes"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Intent",
+            "nameLocation": "1702:6:7",
+            "nodeType": "StructDefinition",
+            "scope": 981,
+            "src": "1695:270:7",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IEverclear.FillMessage",
+            "documentation": {
+              "id": 957,
+              "nodeType": "StructuredDocumentation",
+              "src": "1969:419:7",
+              "text": " @notice The structure of a fill message\n @param intentId The ID of the intent\n @param solver The address of the intent solver in bytes32 format\n @param initiator The address of the intent initiator\n @param fee The total fee of the expressed in dbps, represents the solver fee plus the sum of protocol fees for the token\n @param executionTimestamp The execution timestamp of the intent"
+            },
+            "id": 968,
+            "members": [
+              {
+                "constant": false,
+                "id": 959,
+                "mutability": "mutable",
+                "name": "intentId",
+                "nameLocation": "2424:8:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2416:16:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 958,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2416:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 961,
+                "mutability": "mutable",
+                "name": "solver",
+                "nameLocation": "2446:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2438:14:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 960,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2438:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 963,
+                "mutability": "mutable",
+                "name": "initiator",
+                "nameLocation": "2466:9:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2458:17:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 962,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2458:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 965,
+                "mutability": "mutable",
+                "name": "fee",
+                "nameLocation": "2488:3:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2481:10:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint24",
+                  "typeString": "uint24"
+                },
+                "typeName": {
+                  "id": 964,
+                  "name": "uint24",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2481:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint24",
+                    "typeString": "uint24"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 967,
+                "mutability": "mutable",
+                "name": "executionTimestamp",
+                "nameLocation": "2504:18:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 968,
+                "src": "2497:25:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint48",
+                  "typeString": "uint48"
+                },
+                "typeName": {
+                  "id": 966,
+                  "name": "uint48",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2497:6:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint48",
+                    "typeString": "uint48"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "FillMessage",
+            "nameLocation": "2398:11:7",
+            "nodeType": "StructDefinition",
+            "scope": 981,
+            "src": "2391:136:7",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IEverclear.Settlement",
+            "documentation": {
+              "id": 969,
+              "nodeType": "StructuredDocumentation",
+              "src": "2531:394:7",
+              "text": " @notice The structure of a settlement\n @param intentId The ID of the intent\n @param amount The amount of the asset\n @param asset The address of the asset\n @param recipient The address of the recipient\n @param updateVirtualBalance If set to true, the settlement will not be transferred to the recipient in spoke domain and the virtual balance will be increased"
+            },
+            "id": 980,
+            "members": [
+              {
+                "constant": false,
+                "id": 971,
+                "mutability": "mutable",
+                "name": "intentId",
+                "nameLocation": "2960:8:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "2952:16:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 970,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2952:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 973,
+                "mutability": "mutable",
+                "name": "amount",
+                "nameLocation": "2982:6:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "2974:14:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 972,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2974:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 975,
+                "mutability": "mutable",
+                "name": "asset",
+                "nameLocation": "3002:5:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "2994:13:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 974,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2994:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 977,
+                "mutability": "mutable",
+                "name": "recipient",
+                "nameLocation": "3021:9:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "3013:17:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 976,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "3013:7:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 979,
+                "mutability": "mutable",
+                "name": "updateVirtualBalance",
+                "nameLocation": "3041:20:7",
+                "nodeType": "VariableDeclaration",
+                "scope": 980,
+                "src": "3036:25:7",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 978,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "3036:4:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Settlement",
+            "nameLocation": "2935:10:7",
+            "nodeType": "StructDefinition",
+            "scope": 981,
+            "src": "2928:138:7",
+            "visibility": "public"
+          }
+        ],
+        "scope": 982,
+        "src": "150:2918:7",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:3037:7"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.23+commit.8ed33446.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2025-03-21T10:04:43.960Z"
+}
