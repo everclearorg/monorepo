@@ -4,11 +4,11 @@ High-performance blockchain indexer for Everclear protocol using [Envio](https:/
 
 ## Overview
 
-This indexer monitors EverclearSpoke contracts across multiple chains and provides a unified GraphQL API to query:
+This indexer monitors EverclearSpoke and FeeAdapter contracts across multiple chains and provides a unified GraphQL API to query:
 - **Intents**: Cross-chain intent creation and fulfillment
 - **Fills**: Solver activity and fill details
-- **Statistics**: Global and per-chain metrics
-- **Solver Analytics**: Performance tracking by solver and chain
+- **Fee Information**: Token and native fees paid by initiators
+- **Statistics**: Global metrics for intents and fills
 - **Asset Tracking**: Volume and usage statistics
 
 ## Quick Start
@@ -107,6 +107,10 @@ type Intent {
   receiveBlockNumber: BigInt # Block when intent was filled (null if unfilled)
   isFastPath: Boolean!       # true if ttl != 0 (fillable), false if ttl == 0 (nettable)
   
+  # Fee information (from FeeAdapter)
+  tokenFee: BigInt           # Token fee paid by initiator
+  nativeFee: BigInt          # Native token fee paid by initiator
+  
   # Relations
   fills: [Fill!]!
 }
@@ -143,9 +147,20 @@ type Fill {
 }
 ```
 
-#### Statistics
+#### Statistics & Assets
 - `IntentStatistics` - Global totals (unique intents, nettable vs fillable, total fills)
 - `Asset` - Asset volume tracking per chain
+
+### Indexed Contracts
+
+The indexer tracks events from two contracts on each chain:
+
+1. **EverclearSpoke** - Core intent creation and fulfillment
+   - `IntentAdded` - When a user creates an intent
+   - `IntentFilled` - When a solver fills an intent
+
+2. **FeeAdapter** - Fee collection for intents
+   - `IntentWithFeesAdded` - Tracks token and native fees paid by initiators
 
 ## Example Queries
 
@@ -161,6 +176,8 @@ query RecentIntents {
     originAmount
     isFastPath
     ttl
+    tokenFee
+    nativeFee
     initiator
     receiver
     blockNumber
@@ -180,6 +197,8 @@ query IntentWithFills($intentId: String!) {
     status
     chainId
     originAmount
+    tokenFee
+    nativeFee
     isFastPath
     receiveBlockNumber
     
@@ -265,6 +284,33 @@ query ActiveUnfilledIntents {
 }
 ```
 
+### Get Intents with Fees
+
+```graphql
+query IntentsWithFees {
+  Intent(
+    where: {
+      _or: [
+        { tokenFee: { _gt: "0" } }
+        { nativeFee: { _gt: "0" } }
+      ]
+    }
+    limit: 10
+    order_by: { blockNumber: desc }
+  ) {
+    id
+    intentId
+    originAmount
+    tokenFee
+    nativeFee
+    initiator
+    chainId
+    blockNumber
+    transactionHash
+  }
+}
+```
+
 ### Cross-Chain Intent Flow
 
 ```graphql
@@ -278,6 +324,8 @@ query CrossChainIntents {
     intentId
     chainId
     originAmount
+    tokenFee
+    nativeFee
     isFastPath
     receiveBlockNumber
     fills {
@@ -335,7 +383,7 @@ pnpm codegen
 
 ## Event Handlers
 
-The indexer processes two main events from EverclearSpoke:
+The indexer processes events from two contracts:
 
 ### IntentAdded
 Triggered when a user creates an intent on the origin chain.
@@ -383,6 +431,27 @@ If a fill is sent with wrong information, the intent won't exist. These invalid 
 - `totalFeeDBPS`: 50 (= 0.5% fee)
 - `feeAmount`: (100 * 50) / 10000 = 0.5 tokens
 - `fillAmount`: 100 - 0.5 = 99.5 tokens
+
+### IntentWithFeesAdded (FeeAdapter)
+Triggered when a user creates an intent through the FeeAdapter contract (with fees).
+
+**Handler logic:**
+1. **Check if Intent exists:**
+   - If exists: Update with fee information (`tokenFee`, `nativeFee`)
+   - If not: Create placeholder Intent with fees (will be populated by `IntentAdded`)
+2. This event can occur **before** or **after** `IntentAdded` event
+3. The handler ensures fees are always captured regardless of event order
+
+**Placeholder Handling:**
+When `IntentWithFeesAdded` arrives before `IntentAdded`:
+- Creates a minimal Intent with fee information
+- `IntentAdded` handler detects the placeholder (by `originAmount == 0`)
+- Statistics are only counted once (when real intent data arrives)
+- Fees are preserved when Intent is updated with full data
+
+**Fee Fields:**
+- `tokenFee`: ERC-20 token fees paid to the protocol
+- `nativeFee`: Native token (ETH/MATIC/etc) fees paid to the protocol
 
 ## Development
 

@@ -27,6 +27,10 @@ type Intent @entity {
   receiveBlockNumber: BigInt # Block number when filled (from Fill event)
   isFastPath: Boolean! # true if ttl != 0
   
+  # Fee information (from FeeAdapter IntentWithFeesAdded event)
+  tokenFee: BigInt # Token fee paid by initiator
+  nativeFee: BigInt # Native token fee paid by initiator
+  
   # Relations
   fills: [Fill!]! @derivedFrom(field: "intent")
   
