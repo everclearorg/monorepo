@@ -1,6 +1,7 @@
 import {
   EverclearSpoke_IntentAdded_handler,
   EverclearSpoke_IntentFilled_handler,
+  FeeAdapter_IntentWithFeesAdded_handler,
 } from "../generated/src/Handlers.gen";
 
 // Helper: Convert bytes32 to address (remove leading zeros)
@@ -40,6 +41,9 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     data
   ] = _intent;
 
+  // Check if Intent already exists (could be placeholder from FeeAdapter event)
+  let existingIntent = await context.Intent.get(_intentId);
+
   // Create Intent entity
   const intent = {
     id: _intentId,
@@ -63,61 +67,72 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     transactionHash: txHash,
     receiveBlockNumber: undefined, // Will be set when filled
     isFastPath: ttl !== 0n,
+    // Preserve fee information if it was already set by FeeAdapter
+    tokenFee: existingIntent?.tokenFee,
+    nativeFee: existingIntent?.nativeFee,
     status: "ADDED" as const,
   };
 
   context.Intent.set(intent);
 
-  // Update global statistics
-  let globalStats = await context.IntentStatistics.get("global");
-  if (!globalStats) {
-    globalStats = {
-      id: "global",
-      totalUniqueIntents: 0n,
-      totalNettableIntents: 0n,
-      totalFillableIntents: 0n,
-      totalFills: 0n,
-    };
-  }
-
-  // Determine if intent is nettable (ttl == 0) or fillable (ttl != 0)
-  const isNettable = ttl === 0n;
-
-  context.IntentStatistics.set({
-    id: "global",
-    totalUniqueIntents: globalStats.totalUniqueIntents + 1n,
-    totalNettableIntents: globalStats.totalNettableIntents + (isNettable ? 1n : 0n),
-    totalFillableIntents: globalStats.totalFillableIntents + (isNettable ? 0n : 1n),
-    totalFills: globalStats.totalFills,
-  });
-
-  // Update input asset statistics
-  const inputAssetAddress = bytes32ToAddress(inputAsset);
-  const assetId = `${inputAssetAddress}-${chainId}`;
-  let asset = await context.Asset.get(assetId);
+  // Update global statistics (only if this is a real intent, not updating a placeholder)
+  // Placeholder intents have originAmount of 0
+  const isNewIntent = !existingIntent || existingIntent.originAmount === 0n;
   
-  if (!asset) {
-    asset = {
-      id: assetId,
-      address: inputAssetAddress,
-      chainId,
-      totalIntentVolume: 0n,
-      totalFillVolume: 0n,
-      intentCount: 0n,
-      fillCount: 0n,
-    };
+  if (isNewIntent) {
+    let globalStats = await context.IntentStatistics.get("global");
+    if (!globalStats) {
+      globalStats = {
+        id: "global",
+        totalUniqueIntents: 0n,
+        totalNettableIntents: 0n,
+        totalFillableIntents: 0n,
+        totalFills: 0n,
+      };
+    }
+
+    // Determine if intent is nettable (ttl == 0) or fillable (ttl != 0)
+    const isNettable = ttl === 0n;
+
+    context.IntentStatistics.set({
+      id: "global",
+      totalUniqueIntents: globalStats.totalUniqueIntents + 1n,
+      totalNettableIntents: globalStats.totalNettableIntents + (isNettable ? 1n : 0n),
+      totalFillableIntents: globalStats.totalFillableIntents + (isNettable ? 0n : 1n),
+      totalFills: globalStats.totalFills,
+    });
   }
 
-  context.Asset.set({
-    id: asset.id,
-    address: asset.address,
-    chainId: asset.chainId,
-    totalIntentVolume: asset.totalIntentVolume + amount,
-    totalFillVolume: asset.totalFillVolume,
-    intentCount: asset.intentCount + 1n,
-    fillCount: asset.fillCount,
-  });
+  // Update input asset statistics (only for new intents)
+  if (isNewIntent) {
+    const inputAssetAddress = bytes32ToAddress(inputAsset);
+    const assetId = `${inputAssetAddress}-${chainId}`;
+    let asset = await context.Asset.get(assetId);
+    
+    if (!asset) {
+      asset = {
+        id: assetId,
+        address: inputAssetAddress,
+        chainId,
+        totalIntentVolume: 0n,
+        totalFillVolume: 0n,
+        intentCount: 0n,
+        fillCount: 0n,
+      };
+    }
 
+    context.Asset.set({
+      id: asset.id,
+      address: asset.address,
+      chainId: asset.chainId,
+      totalIntentVolume: asset.totalIntentVolume + amount,
+      totalFillVolume: asset.totalFillVolume,
+      intentCount: asset.intentCount + 1n,
+      fillCount: asset.fillCount,
+    });
+  }
+
+  const isNettable = ttl === 0n;
   context.log.info(`Successfully processed IntentAdded: ${_intentId} (${isNettable ? 'nettable' : 'fillable'})`);
 });
 
@@ -248,5 +263,70 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
 
   context.log.info(
     `Successfully processed IntentFilled: ${_intentId} on chain ${chainId} (valid fill)`
+  );
+});
+
+/**
+ * Handler for IntentWithFeesAdded events from FeeAdapter
+ * Updates Intent entity with fee information
+ * Can be emitted before or after IntentAdded event
+ */
+FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
+  const { _intentId, _initiator, _tokenFee, _nativeFee } = event.params;
+  const chainId = event.chainId;
+
+  context.log.info(
+    `Processing IntentWithFeesAdded: ${_intentId} on chain ${chainId} (tokenFee: ${_tokenFee}, nativeFee: ${_nativeFee})`
+  );
+
+  // Try to load existing Intent
+  let intent = await context.Intent.get(_intentId);
+
+  if (!intent) {
+    // Intent doesn't exist yet - create a placeholder Intent
+    // This can happen when the FeeAdapter event is emitted before IntentAdded
+    context.log.info(
+      `Intent ${_intentId} not found, creating placeholder for fees (will be populated by IntentAdded event)`
+    );
+
+    intent = {
+      id: _intentId,
+      intentId: _intentId,
+      queueIdx: 0n, // Will be updated by IntentAdded
+      initiator: _initiator,
+      receiver: _initiator, // Placeholder, will be updated
+      inputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
+      outputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
+      maxFee: 0, // Placeholder
+      origin: chainId,
+      nonce: 0n, // Placeholder
+      timestamp: BigInt(event.block.timestamp),
+      ttl: 0n, // Placeholder
+      originAmount: 0n, // Placeholder
+      destinations: [],
+      data: "0x",
+      chainId,
+      blockNumber: BigInt(event.block.number),
+      blockTimestamp: BigInt(event.block.timestamp),
+      transactionHash: event.transaction.hash,
+      receiveBlockNumber: undefined,
+      isFastPath: false, // Placeholder
+      tokenFee: _tokenFee,
+      nativeFee: _nativeFee,
+      status: "ADDED" as const,
+    };
+
+    context.Intent.set(intent);
+  } else {
+    // Intent already exists - update it with fee information
+    context.Intent.set({
+      ...intent,
+      tokenFee: _tokenFee,
+      nativeFee: _nativeFee,
+    });
+  }
+
+  context.log.info(
+    `Successfully processed IntentWithFeesAdded: ${_intentId} on chain ${chainId}`
   );
 });

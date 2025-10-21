@@ -6,7 +6,7 @@ field_selection:
   transaction_fields:
     - "hash"
 
-# Define the contract ABI
+# Define the contract ABIs
 contracts:
   - name: EverclearSpoke
     abi_file_path: ./abis/EverclearSpoke.json
@@ -14,6 +14,12 @@ contracts:
     events:
       - event: IntentAdded
       - event: IntentFilled
+  
+  - name: FeeAdapter
+    abi_file_path: ./abis/FeeAdapter.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: IntentWithFeesAdded
 
 # Define all networks
 networks:
@@ -22,53 +28,71 @@ networks:
     contracts:
       - name: EverclearSpoke
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
 
   - id: 42161
     start_block: 0
     contracts:
       - name: EverclearSpoke
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
 
   - id: 10
     start_block: 0
     contracts:
       - name: EverclearSpoke
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
 
   - id: 8453
     start_block: 0
     contracts:
       - name: EverclearSpoke
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
 
   - id: 56
     start_block: 0
     contracts:
       - name: EverclearSpoke
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
 
   - id: 59144
     start_block: 0
     contracts:
       - name: EverclearSpoke
         address: 0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751
+      - name: FeeAdapter
+        address: 0x1B0Dc9CB7EadDa36f4CcFB8130B0Ad967b0A3508
 
   - id: 137
     start_block: 0
     contracts:
       - name: EverclearSpoke
         address: 0x7189C59e245135696bFd2906b56607755F84F3fD
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
 
   - id: 43114
     start_block: 0
     contracts:
       - name: EverclearSpoke
         address: 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
 
   - id: 130
     start_block: 0
     contracts:
       - name: EverclearSpoke
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1
 
 rollback_on_reorg: true
