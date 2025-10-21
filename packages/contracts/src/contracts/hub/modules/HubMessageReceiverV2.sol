@@ -133,7 +133,7 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
         continue;
       }
 
-      _intentContext.solver = _fillMessage.solver;
+      _intentContext.solver = _fillMessage.receiver;
       _intentContext.amountOut = _fillMessage.amountOut;
       _intentContext.fillTimestamp = _fillMessage.executionTimestamp;
 
@@ -151,7 +151,7 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
         Intent memory _intent = _contexts[_intentId].intent;
         bytes32 _tickerHash = _adoptedForAssets[AssetUtils.getAssetHash(_intent.inputAsset, _intent.origin)].tickerHash;
         // settle solver
-        _createSettlementOrInvoice({_intentId: _intentId, _tickerHash: _tickerHash, _recipient: _fillMessage.solver});
+        _createSettlementOrInvoice({_intentId: _intentId, _tickerHash: _tickerHash, _recipient: _fillMessage.receiver});
       } else {
         _intentContext.status =
           _previousStatus == IntentStatus.ADDED ? IntentStatus.ADDED_AND_FILLED : IntentStatus.FILLED;
