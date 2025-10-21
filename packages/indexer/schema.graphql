@@ -1,0 +1,99 @@
+type Intent @entity {
+  id: ID! # intentId
+  intentId: Bytes!
+  queueIdx: BigInt!
+  
+  # Intent struct fields
+  initiator: Bytes!
+  receiver: Bytes!
+  inputAsset: Bytes!
+  outputAsset: Bytes!
+  maxFee: Int!
+  origin: Int!
+  nonce: BigInt!
+  timestamp: BigInt!
+  ttl: BigInt!
+  originAmount: BigInt!
+  destinations: [Int!]!
+  data: Bytes!
+  
+  # Metadata
+  chainId: Int!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  
+  # Fill metadata
+  receiveBlockNumber: BigInt # Block number when filled (from Fill event)
+  isFastPath: Boolean! # true if ttl != 0
+  
+  # Relations
+  fills: [Fill!]! @derivedFrom(field: "intent")
+  
+  # Status tracking
+  status: IntentStatus!
+}
+
+enum IntentStatus {
+  ADDED
+  FILLED
+}
+
+type Fill @entity {
+  id: ID! # intentId-chainId-transactionHash
+  intentId: Bytes!
+  solver: Bytes!
+  totalFeeDBPS: BigInt!
+  queueIdx: BigInt!
+  
+  # Linked intent
+  intent: Intent!
+  
+  # Intent data at fill time (for reference)
+  initiator: Bytes!
+  receiver: Bytes!
+  inputAsset: Bytes!
+  outputAsset: Bytes!
+  maxFee: Int!
+  origin: Int!
+  nonce: BigInt!
+  timestamp: BigInt!
+  ttl: BigInt!
+  originAmount: BigInt!
+  fillAmount: BigInt! # Amount after deducting fee (originAmount - fee)
+  destinations: [Int!]!
+  data: Bytes!
+  
+  # Metadata
+  chainId: Int!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type IntentStatistics @entity {
+  id: ID! # "global"
+  
+  # Intent counts
+  totalUniqueIntents: BigInt!      # All intents (nettable + fillable)
+  totalNettableIntents: BigInt!    # Intents with ttl == 0
+  totalFillableIntents: BigInt!    # Intents with ttl != 0
+  
+  # Fill counts (only valid fills where intent exists)
+  totalFills: BigInt!
+}
+
+type Asset @entity {
+  id: ID! # asset address on chain
+  address: Bytes!
+  chainId: Int!
+  
+  # Volume tracking
+  totalIntentVolume: BigInt!
+  totalFillVolume: BigInt!
+  
+  # Count tracking
+  intentCount: BigInt!
+  fillCount: BigInt!
+}
+
