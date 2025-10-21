@@ -1,0 +1,74 @@
+name: everclear-indexer
+description: Indexes IntentAdded and IntentFilled events from EverclearSpoke contracts across all mainnet chains
+
+# Configure which fields to include from events
+field_selection:
+  transaction_fields:
+    - "hash"
+
+# Define the contract ABI
+contracts:
+  - name: EverclearSpoke
+    abi_file_path: ./abis/EverclearSpoke.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: IntentAdded
+      - event: IntentFilled
+
+# Define all networks
+networks:
+  - id: 1
+    start_block: 20760959
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+
+  - id: 42161
+    start_block: 0
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+
+  - id: 10
+    start_block: 0
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+
+  - id: 8453
+    start_block: 0
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+
+  - id: 56
+    start_block: 0
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+
+  - id: 59144
+    start_block: 0
+    contracts:
+      - name: EverclearSpoke
+        address: 0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751
+
+  - id: 137
+    start_block: 0
+    contracts:
+      - name: EverclearSpoke
+        address: 0x7189C59e245135696bFd2906b56607755F84F3fD
+
+  - id: 43114
+    start_block: 0
+    contracts:
+      - name: EverclearSpoke
+        address: 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460
+
+  - id: 130
+    start_block: 0
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+
+rollback_on_reorg: true
