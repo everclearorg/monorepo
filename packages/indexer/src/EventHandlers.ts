@@ -12,6 +12,16 @@ function bytes32ToAddress(bytes32: string): string {
   return "0x" + hex.slice(-40);
 }
 
+// Helper: Check if an address is a FeeAdapter contract
+function isFeeAdapterAddress(address: string): boolean {
+  const feeAdapterAddresses = [
+    "0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75", // Most chains
+    "0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508", // Linea
+    "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", // Unizen
+  ];
+  return feeAdapterAddresses.includes(address.toLowerCase());
+}
+
 /**
  * Handler for IntentAdded events
  * Creates Intent entity and updates global statistics
@@ -44,12 +54,104 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
   // Check if Intent already exists (could be placeholder from FeeAdapter event)
   let existingIntent = await context.Intent.get(_intentId);
 
+  // Detect if this intent was created via FeeAdapter (initiator is FeeAdapter address)
+  const isViaFeeAdapter = isFeeAdapterAddress(initiator);
+  
+  // If this intent was created via FeeAdapter, we need to wait for IntentWithFeesAdded
+  // to get the correct user address. Create a placeholder if no existing intent.
+  if (isViaFeeAdapter && !existingIntent) {
+    context.log.info(
+      `Intent ${_intentId} created via FeeAdapter, creating placeholder (waiting for IntentWithFeesAdded event)`
+    );
+    
+    // Create placeholder intent with FeeAdapter as initiator temporarily
+    // This will be updated when IntentWithFeesAdded event is processed
+    const placeholderIntent = {
+      id: _intentId,
+      intentId: _intentId,
+      queueIdx: _queueIdx,
+      initiator, // FeeAdapter address temporarily
+      receiver,
+      inputAsset,
+      outputAsset,
+      maxFee: Number(maxFee),
+      origin: Number(origin),
+      nonce,
+      timestamp,
+      ttl,
+      originAmount: amount, // Use actual amount, not 0
+      destinations: destinations.map(d => Number(d)),
+      data,
+      chainId,
+      blockNumber: BigInt(event.block.number),
+      blockTimestamp: BigInt(event.block.timestamp),
+      transactionHash: txHash,
+      receiveBlockNumber: undefined,
+      isFastPath: ttl !== 0n,
+      tokenFee: undefined,
+      nativeFee: undefined,
+      status: "ADDED" as const,
+    };
+    
+    context.Intent.set(placeholderIntent);
+    
+    // Update statistics for this intent
+    let globalStats = await context.IntentStatistics.get("global");
+    if (!globalStats) {
+      globalStats = {
+        id: "global",
+        totalUniqueIntents: 0n,
+        totalNettableIntents: 0n,
+        totalFillableIntents: 0n,
+        totalFills: 0n,
+      };
+    }
+
+    const isNettable = ttl === 0n;
+    context.IntentStatistics.set({
+      id: "global",
+      totalUniqueIntents: globalStats.totalUniqueIntents + 1n,
+      totalNettableIntents: globalStats.totalNettableIntents + (isNettable ? 1n : 0n),
+      totalFillableIntents: globalStats.totalFillableIntents + (isNettable ? 0n : 1n),
+      totalFills: globalStats.totalFills,
+    });
+
+    // Update input asset statistics
+    const inputAssetAddress = bytes32ToAddress(inputAsset);
+    const assetId = `${inputAssetAddress}-${chainId}`;
+    let asset = await context.Asset.get(assetId);
+    
+    if (!asset) {
+      asset = {
+        id: assetId,
+        address: inputAssetAddress,
+        chainId,
+        totalIntentVolume: 0n,
+        totalFillVolume: 0n,
+        intentCount: 0n,
+        fillCount: 0n,
+      };
+    }
+
+    context.Asset.set({
+      id: asset.id,
+      address: asset.address,
+      chainId: asset.chainId,
+      totalIntentVolume: asset.totalIntentVolume + amount,
+      totalFillVolume: asset.totalFillVolume,
+      intentCount: asset.intentCount + 1n,
+      fillCount: asset.fillCount,
+    });
+    
+    return; // Don't process the regular intent creation
+  }
+
   // Create Intent entity
   const intent = {
     id: _intentId,
     intentId: _intentId,
     queueIdx: _queueIdx,
-    initiator,
+    initiator: existingIntent?.initiator || initiator,
     receiver,
     inputAsset,
     outputAsset,
@@ -319,8 +421,17 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
     context.Intent.set(intent);
   } else {
     // Intent already exists - update it with fee information
+    // Also update initiator to ensure we have the correct user address (msg.sender from FeeAdapter)
+    // instead of the FeeAdapter contract address from IntentAdded event
+    
+    context.log.info(
+      `Updating existing intent ${_intentId} with correct initiator and fee information`
+    );
+    
+    // Update intent with correct initiator and fee information
     context.Intent.set({
       ...intent,
+      initiator: _initiator,
       tokenFee: _tokenFee,
       nativeFee: _nativeFee,
     });
