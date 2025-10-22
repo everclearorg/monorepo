@@ -518,7 +518,14 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _nonce = spokeProxyV5.nonces(solverAddr);
     bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_FOR_SOLVER_TYPEHASH(), _domain, solverAddr, solverBytes, _intent, _nonce, _amountOut, _solverDestinations
+      spokeProxyV5.FILL_INTENT_FOR_SOLVER_TYPEHASH(),
+      _domain,
+      solverAddr,
+      solverBytes,
+      _intent,
+      _nonce,
+      _amountOut,
+      _solverDestinations
     );
     bytes memory _sig = _generateSignature(SOLVER_PK, _payload);
 
@@ -527,7 +534,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // filling the user intent
-    spokeProxyV5.fillIntentForSolver(solverAddr, _intent, _nonce, _amountOut, solverBytes, _solverDestinations, _sig, _fillSignature);
+    spokeProxyV5.fillIntentForSolver(
+      solverAddr, _intent, _nonce, _amountOut, solverBytes, _solverDestinations, _sig, _fillSignature
+    );
     bytes32 _intentId = keccak256(abi.encode(_intent));
 
     // asserting changes in state
@@ -690,7 +699,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
     bytes32[] memory _solvers = _constructSolverArray(_solver.toBytes32(), _intents.length);
-    
+
     spokeProxyV5.batchFillIntentWithPull(_intents, _amountOuts, _solvers, _solverDestinations, _fillSignature);
     vm.stopPrank();
 
@@ -1402,7 +1411,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
   function test_revert_spokeSwapUpgrade_initialize_IntentQueueNonEmpty() public {
     uint256 blockWithIntentQueue = 23_182_349;
-    
+
     vm.createSelectFork(vm.envString('MAINNET_RPC'), blockWithIntentQueue);
     feeAdapterV2 = new FeeAdapterV2(
       SPOKE_PROXY_MAINNET, FEE_RECIPIENT_MAINNET, FEE_SIGNER, XERC20_MODULE_MAINNET, SPOKE_PROXY_MAINNET_OWNER
@@ -2135,7 +2144,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     IERC20(_intent.outputAsset.toAddress()).approve(address(spokeProxyV5), _intent.amountOutMin + 1);
     spokeProxyV5.deposit(_intent.outputAsset.toAddress(), _intent.amountOutMin + 1);
     uint256 _balance = spokeProxyV5.balances(_intent.outputAsset, _solver.toBytes32());
-    _fillMessage = spokeProxyV5.fillIntent(_intent, _intent.amountOutMin + 1, _solver.toBytes32(), _destinations, _fillSignature);
+    _fillMessage =
+      spokeProxyV5.fillIntent(_intent, _intent.amountOutMin + 1, _solver.toBytes32(), _destinations, _fillSignature);
     vm.stopPrank();
 
     // asserting the intent status

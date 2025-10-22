@@ -212,12 +212,21 @@ contract EverclearSpokeV5 is
     uint32[][] calldata _destinations,
     bytes calldata _signature
   ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
-    if (_intents.length != _amountOut.length || _intents.length != _receivers.length || _intents.length != _destinations.length) {
+    if (
+      _intents.length != _amountOut.length || _intents.length != _receivers.length
+        || _intents.length != _destinations.length
+    ) {
       revert EverclearSpoke_FillIntent_InvalidArrayLengths();
     }
 
-    bytes memory _data =
-      abi.encode(BATCH_FILL_INTENT_TYPEHASH, keccak256(abi.encode(block.chainid, address(this))), msg.sender, _intents, _amountOut, _destinations);
+    bytes memory _data = abi.encode(
+      BATCH_FILL_INTENT_TYPEHASH,
+      keccak256(abi.encode(block.chainid, address(this))),
+      msg.sender,
+      _intents,
+      _amountOut,
+      _destinations
+    );
     _verifySignature(fillSigner, _data, _signature);
 
     _fillMessages = new FillMessage[](_intents.length);
@@ -234,12 +243,21 @@ contract EverclearSpokeV5 is
     uint32[][] calldata _destinations,
     bytes calldata _signature
   ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
-    if (_intents.length != _amountOut.length || _intents.length != _receivers.length || _intents.length != _destinations.length) {
+    if (
+      _intents.length != _amountOut.length || _intents.length != _receivers.length
+        || _intents.length != _destinations.length
+    ) {
       revert EverclearSpoke_FillIntent_InvalidArrayLengths();
     }
 
-    bytes memory _data =
-      abi.encode(BATCH_FILL_INTENT_TYPEHASH, keccak256(abi.encode(block.chainid, address(this))), msg.sender, _intents, _amountOut, _destinations);
+    bytes memory _data = abi.encode(
+      BATCH_FILL_INTENT_TYPEHASH,
+      keccak256(abi.encode(block.chainid, address(this))),
+      msg.sender,
+      _intents,
+      _amountOut,
+      _destinations
+    );
     _verifySignature(fillSigner, _data, _signature);
 
     _fillMessages = new FillMessage[](_intents.length);
