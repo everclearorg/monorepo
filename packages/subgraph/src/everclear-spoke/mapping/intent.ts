@@ -76,7 +76,7 @@ function createEmptyOriginIntent(intentId: Bytes, initiator: Bytes, timestamp: b
   intent.status = 'ADDED';
   intent.initiator = initiator;
   intent.queueIdx = BigInt.zero();
-  intent.maxFee = BigInt.zero();
+  intent.amountOutMin = BigInt.zero();
   intent.amount = BigInt.zero();
   intent.timestamp = timestamp;
   intent.ttl = BigInt.zero();
@@ -115,7 +115,7 @@ export function handleIntentAdded(event: IntentAdded): void {
   intent.nonce = event.params._intent.nonce;
   intent.data = event.params._intent.data;
   intent.queueIdx = event.params._queueIdx;
-  intent.maxFee = BigInt.fromI32(event.params._intent.maxFee);
+  intent.amountOutMin = event.params._intent.amountOutMin;
   intent.status = 'ADDED';
   intent.timestamp = event.params._intent.timestamp;
   intent.ttl = event.params._intent.ttl;
@@ -175,7 +175,7 @@ export function handleIntentFilled(event: IntentFilled): void {
   intent.receiver = event.params._intent.receiver;
   intent.inputAsset = event.params._intent.inputAsset;
   intent.outputAsset = event.params._intent.outputAsset;
-  intent.maxFee = BigInt.fromI32(event.params._intent.maxFee);
+  intent.amountOutMin = event.params._intent.amountOutMin;
   intent.origin = event.params._intent.origin;
   intent.nonce = event.params._intent.nonce;
   intent.timestamp = event.params._intent.timestamp;
@@ -197,7 +197,8 @@ export function handleIntentFilled(event: IntentFilled): void {
 
   log.intent = intentId;
   log.solver = event.params._solver;
-  log.fee = event.params._totalFeeDBPS;
+  log.receiver = event.params._receiver;
+  log.amountOut = event.params._amountOut;
 
   log.blockNumber = event.block.number;
   log.timestamp = event.block.timestamp;
