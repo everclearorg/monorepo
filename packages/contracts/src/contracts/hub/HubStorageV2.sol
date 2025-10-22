@@ -159,8 +159,8 @@ abstract contract HubStorageV2 is NoncesUpgradeable, IHubStorageV2 {
    */
   Uint32Set.Set internal _supportedDomains;
 
-  /// @inheritdoc IHubStorageV2
-  GasConfig public gasConfig;
+  /// DEPRECATED
+  GasConfig public deprecated_gasConfig;
 
   /// @inheritdoc IHubStorageV2
   mapping(bytes32 _moduleType => address _module) public modules;
