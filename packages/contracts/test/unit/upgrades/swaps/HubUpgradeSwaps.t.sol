@@ -710,7 +710,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -760,7 +760,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -821,7 +821,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -889,7 +889,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -942,7 +942,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1004,7 +1004,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1066,7 +1066,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1142,7 +1142,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1211,7 +1211,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOut = _intents[0].amountOutMin;
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1276,7 +1276,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1341,7 +1341,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1395,7 +1395,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1450,7 +1450,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1509,7 +1509,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1567,7 +1567,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1627,7 +1627,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1864,7 +1864,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1916,7 +1916,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -2188,7 +2188,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -2251,7 +2251,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -2327,7 +2327,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -2910,7 +2910,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
   function _configureFillMessage(
     bytes32 _intentId,
-    address _solver,
+    bytes32 _receiver,
     uint256 _amountOut,
     uint32[] memory _destinations,
     bytes32 _intentInputAsset,
@@ -2919,8 +2919,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   ) internal pure returns (IEverclearV2.FillMessage memory, bytes memory) {
     IEverclearV2.FillMessage memory _fill = IEverclearV2.FillMessage({
       intentId: _intentId,
-      initiator: _solver.toBytes32(),
-      solver: _solver.toBytes32(),
+      receiver: _receiver,
       intentInputAsset: _intentInputAsset,
       intentOrigin: _origin,
       amountOut: _amountOut,
@@ -2936,8 +2935,9 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
   function _assertFillInfo(bytes32 _intentId, IEverclearV2.FillMessage memory _fill) internal view {
     IHubStorageV2.IntentContext memory _context = hubProxy.contexts(_intentId);
-    assertEq(_context.solver, _fill.solver);
+    assertEq(_context.solver, _fill.receiver);
     assertEq(_context.amountOut, _fill.amountOut);
+
     assertEq(_context.solverDestinations.length, _fill.destinations.length);
     for (uint256 i; i < _fill.destinations.length; i++) {
       assertEq(_context.solverDestinations[i], _fill.destinations[i]);
@@ -2947,7 +2947,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   function _assertFillInfo(bytes32[] memory _intentIds, IEverclearV2.FillMessage[] memory _fill) internal view {
     for (uint256 i; i < _intentIds.length; i++) {
       IHubStorageV2.IntentContext memory _context = hubProxy.contexts(_intentIds[i]);
-      assertEq(_context.solver, _fill[i].solver);
+      assertEq(_context.solver, _fill[i].receiver);
       assertEq(_context.amountOut, _fill[i].amountOut);
       assertEq(_context.solverDestinations.length, _fill[i].destinations.length);
       for (uint256 j; j < _fill[i].destinations.length; j++) {
@@ -3073,15 +3073,14 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   function _configureFillMessages(
     IEverclearV2.Intent[] memory _intents,
     uint32[][] memory _destinations,
-    address[] memory _solvers
+    address[] memory _receivers
   ) internal view returns (IEverclearV2.FillMessage[] memory, bytes memory) {
     IEverclearV2.FillMessage[] memory _fills = new IEverclearV2.FillMessage[](_intents.length);
     for (uint256 i; i < _intents.length; i++) {
       bytes32 _intentId = keccak256(abi.encode(_intents[i]));
       _fills[i] = IEverclearV2.FillMessage({
         intentId: _intentId,
-        initiator: _solvers[i].toBytes32(),
-        solver: _solvers[i].toBytes32(),
+        receiver: _receivers[i].toBytes32(),
         intentInputAsset: _intents[i].inputAsset,
         intentOrigin: _intents[i].origin,
         amountOut: _intents[i].amountOutMin,
