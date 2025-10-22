@@ -157,14 +157,9 @@ abstract contract ProtocolManagerV2 is HubStorageV2, IProtocolManagerV2 {
 
   /// @inheritdoc IProtocolManagerV2
   function updateGasConfig(
-    GasConfig calldata _newGasConfig
-  ) external hasRole(Role.ADMIN) {
-    if (_newGasConfig.bufferDBPS > Common.DBPS_DENOMINATOR) {
-      revert HubStorage_InvalidDbpsValue();
-    }
-    GasConfig memory _oldGasConfig = gasConfig;
-    gasConfig = _newGasConfig;
-    emit GasConfigUpdated(_oldGasConfig, _newGasConfig);
+    GasConfig calldata /* _newGasConfig */
+  ) external pure {
+    revert ProtocolManager_UpdateGasConfig_Deprecated();
   }
 
   /*//////////////////////////////////////////////////////////////
