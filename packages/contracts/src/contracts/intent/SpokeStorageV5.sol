@@ -35,6 +35,16 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
 
   /// @inheritdoc ISpokeStorageV5
+  bytes32 public constant FILL_INTENT_TYPEHASH = keccak256(
+    'function fillIntent(bytes32 _domain, address _sender, Intent calldata _intent, uint256 _amountOut, uint32[] memory _destinations)'
+  );
+
+  /// @inheritdoc ISpokeStorageV5
+  bytes32 public constant BATCH_FILL_INTENT_TYPEHASH = keccak256(
+    'function batchFillIntent(bytes32 _domain, address _sender, Intent[] calldata _intents, uint256[] _amountOut, uint32[][] memory _destinations)'
+  );
+
+  /// @inheritdoc ISpokeStorageV5
   uint32 public EVERCLEAR;
 
   /// @inheritdoc ISpokeStorageV5
@@ -98,6 +108,11 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
    * @notice The fill queue
    */
   QueueLibV2.FillQueue public fillQueue;
+
+  /**
+   * @notice Address for the fillSigner
+   */
+  address public fillSigner;
 
   /**
    * @notice Checks that the address is valid
