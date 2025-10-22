@@ -26,6 +26,22 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     uint256 deadline;
     bytes signature;
   }
+
+  /**
+   * @notice Struct for batch filling intents
+   * @param intents The intents to fill
+   * @param amountOut The amounts of the assets the solver is sending to the users
+   * @param receivers The receivers of the intents
+   * @param destinations The destinations for the repayment
+   * @param signature The solver signature
+   */
+  struct BatchFill {
+    Intent[] intents;
+    uint256[] amountOut;
+    bytes32[] receivers;
+    uint32[][] destinations;
+    bytes signature;
+  }
   /*///////////////////////////////////////////////////////////////
                               EVENTS
   //////////////////////////////////////////////////////////////*/
@@ -102,6 +118,13 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _newFeeAdapter The new fee adapter
    */
   event FeeAdapterUpdated(address _newFeeAdapter);
+
+  /**
+   * @notice Emitted when fill signer is updated
+   * @param _oldFillSigner The old fill signer
+   * @param _newFillSigner The new fill signer
+   */
+  event FillSignerUpdated(address _oldFillSigner, address _newFillSigner);
 
   /*///////////////////////////////////////////////////////////////
                               ERRORS
@@ -216,6 +239,11 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   error EverclearSpoke_FillIntent_InvalidArrayLengths();
 
+  /**
+   * @notice Thrown when the fill signature is invalid
+   */
+  error EverclearSpoke_InvalidFillSignature();
+
   /*///////////////////////////////////////////////////////////////
                               LOGIC
   //////////////////////////////////////////////////////////////*/
@@ -265,7 +293,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   /**
    * @notice Initialize the EverclearSpoke contract
    */
-  function initialize(address _feeAdapter, address _messageReceiver) external;
+  function initialize(address _feeAdapter, address _messageReceiver, address _fillSigner) external;
 
   /**
    * @notice Creates a new intent
@@ -343,28 +371,18 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
 
   /**
    * @notice Fills a batch of intents
-   * @param _intents The intents to fill
-   * @param _amountOut The amounts of the assets the solver is sending to the users
-   * @param _destinations The destinations for the repayment
+   * @param _batchFill The batch fill struct
    */
   function batchFillIntent(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    bytes32[] calldata _receivers,
-    uint32[][] calldata _destinations
+    BatchFill calldata _batchFill
   ) external returns (FillMessage[] memory _fillMessages);
 
   /**
    * @notice Fills a batch of intents
-   * @param _intents The intents to fill
-   * @param _amountOut The amounts of the assets the solver is sending to the users
-   * @param _destinations The destinations for the repayment
+   * @param _batchFill The batch fill struct
    */
   function batchFillIntentWithPull(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    bytes32[] calldata _receivers,
-    uint32[][] calldata _destinations
+    BatchFill calldata _batchFill
   ) external returns (FillMessage[] memory _fillMessages);
 
   /**
@@ -377,7 +395,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     Intent calldata _intent,
     uint256 _amountOut,
     bytes32 _receiver,
-    uint32[] memory _destinations
+    uint32[] memory _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -390,7 +409,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     Intent calldata _intent,
     uint256 _amountOut,
     bytes32 _receiver,
-    uint32[] memory _destinations
+    uint32[] memory _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -409,7 +429,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     uint256 _amountOut,
     bytes32 _receiver,
     uint32[] memory _destinations,
-    bytes calldata _signature
+    bytes calldata _signature,
+    bytes calldata _fillSignature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -506,6 +527,14 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   function updateMessageGasLimit(
     uint256 _newGasLimit
+  ) external;
+
+  /**
+   * @notice Updates the fill signer
+   * @param _fillSigner The address of the new fill signer
+   */
+  function updateFillSigner(
+    address _fillSigner
   ) external;
 
   /**

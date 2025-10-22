@@ -123,9 +123,28 @@ contract UpgradeHelper is SafeTxBuilder {
   uint256 public MESSAGE_GAS_LIMIT = 2_000_000;
   address public USDC_MAINNET = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
   address public USDC_OPTIMISM = 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85;
+  address public USDC_BASE = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+  address public USDC_MANTLE = 0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9;
+  address public USDC_BNB = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
+  address public USDC_LINEA = 0x176211869cA2b568f2A7D4EE941E073a821EE1ff;
+  address public USDC_POLYGON = 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359;
+  address public USDC_AVALANCHE = 0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E;
+  address public USDC_SCROLL = 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4;
+  address public USDC_TAIKO = 0x07d83526730c7438048D55A4fc0b850e2aaB6f0b;
+  // address public USDC_ZIRCUIT = ;
+  address public USDC_MODE = 0xd988097fb8612cc24eeC14542bC03424c656005f;
+  address public USDC_UNICHAIN = 0x078D782b760474a361dDA0AF3839290b0EF57AD6;
+  address public USDC_ZKSYNC = 0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4;
+  address public USDC_RONIN = 0x0B7007c13325C48911F73A2daD5FA5dCBf808aDc;
+  address public USDC_BERACHAIN = 0x549943e04f40284185054145c6E4e9568C1D3241;
+  address public USDC_SONIC = 0x29219dd400f2Bf60E5a23d13Be72B486D4038894;
+  address public USDC_INK = 0xF1815bd50389c46847f0Bda824eC8da914045D14;
+  bytes32 public USDC_SOLANA = 0xc6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d61;
+
   address public USDT_MAINNET = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
   address public USDT_ARBITRUM = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
   address public USDT_OPTIMISM = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58;
+
   address public WETH_MAINNET = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
   address public WETH_ARBITRUM = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
   address public CLEAR_MAINNET = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
@@ -133,10 +152,30 @@ contract UpgradeHelper is SafeTxBuilder {
   address public AAVE_ARBITRUM = 0xba5DdD1f9d7F570dc94a51479a000E3BCE967196;
   uint256 public FIXED_MAIN_BLOCK = 21_244_576;
   uint32 constant HUB_ID = 25_327;
+
   address public HUB_GATEWAY_PROD = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
   bytes32 public USDC_MAINNET_ASSET_HASH = keccak256(abi.encode(USDC_MAINNET, 1));
   bytes32 public USDC_OPTIMISM_ASSET_HASH = keccak256(abi.encode(USDC_OPTIMISM, 10));
+  bytes32 public USDC_BASE_ASSET_HASH = keccak256(abi.encode(USDC_BASE, 8453));
+  bytes32 public USDC_MANTLE_ASSET_HASH = keccak256(abi.encode(USDC_MANTLE, 5000));
   bytes32 public USDC_ARBITRUM_ASSET_HASH = keccak256(abi.encode(USDC_ARBITRUM, 42_161));
+  bytes32 public USDC_BNB_ASSET_HASH = keccak256(abi.encode(USDC_BNB, 56));
+
+  bytes32 public USDC_LINEA_ASSET_HASH = keccak256(abi.encode(USDC_LINEA, 59_144));
+  bytes32 public USDC_POLYGON_ASSET_HASH = keccak256(abi.encode(USDC_POLYGON, 137));
+  bytes32 public USDC_AVALANCHE_ASSET_HASH = keccak256(abi.encode(USDC_AVALANCHE, 43_114));
+  bytes32 public USDC_SCROLL_ASSET_HASH = keccak256(abi.encode(USDC_SCROLL, 534_353));
+  bytes32 public USDC_TAIKO_ASSET_HASH = keccak256(abi.encode(USDC_TAIKO, 167_000));
+  // bytes32 public USDC_ZIRCUIT_ASSET_HASH = keccak256(abi.encode(USDC_ZIRCUIT, 0));
+  bytes32 public USDC_MODE_ASSET_HASH = keccak256(abi.encode(USDC_MODE, 34_443));
+  bytes32 public USDC_UNICHAIN_ASSET_HASH = keccak256(abi.encode(USDC_UNICHAIN, 130));
+  bytes32 public USDC_ZKSYNC_ASSET_HASH = keccak256(abi.encode(USDC_ZKSYNC, 324));
+  bytes32 public USDC_RONIN_ASSET_HASH = keccak256(abi.encode(USDC_RONIN, 2020));
+  bytes32 public USDC_BERACHAIN_ASSET_HASH = keccak256(abi.encode(USDC_BERACHAIN, 80_094));
+  bytes32 public USDC_SONIC_ASSET_HASH = keccak256(abi.encode(USDC_SONIC, 146));
+  bytes32 public USDC_INK_ASSET_HASH = keccak256(abi.encode(USDC_INK, 57_073));
+  bytes32 public USDC_SOLANA_ASSET_HASH = keccak256(abi.encode(USDC_SOLANA, 1_399_811_149));
+
   bytes32 public USDT_ETHEREUM_ASSET_HASH = keccak256(abi.encode(USDT_MAINNET, 1));
   bytes32 public USDT_ARBITRUM_ASSET_HASH = keccak256(abi.encode(USDT_ARBITRUM, 42_161));
   bytes32 public USDT_OPTIMISM_ASSET_HASH = keccak256(abi.encode(USDT_OPTIMISM, 10));
@@ -193,6 +232,8 @@ contract UpgradeHelper is SafeTxBuilder {
   address public constant HUB_PROXY_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
   address public constant HUB_PROXY_OWNER = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
   uint256 public constant DEFAULT_GAS_LIMIT = 500_000;
+  uint256 public constant FILL_SIGNER_PK = 99_900_999;
+  address public FILL_SIGNER = vm.addr(FILL_SIGNER_PK);
 
   // Epoch as of 26th Aug - 235177 //
   uint256 internal constant FIXED_EVERCLEAR_BLOCK = 1_667_352;
