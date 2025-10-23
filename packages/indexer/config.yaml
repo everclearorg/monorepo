@@ -29,82 +29,26 @@ networks:
     confirmed_block_threshold: 15
     contracts:
       - name: EverclearSpoke
-        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+        address: 0xD95Ff203bAAd65A8Fafd5C3dB695FC0a77A809a3
       - name: FeeAdapter
-        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
-
-  - id: 42161
-    start_block: 0
-    confirmed_block_threshold: 5
-    contracts:
-      - name: EverclearSpoke
-        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
-      - name: FeeAdapter
-        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+        address: 0x7621D1085559Ab35513E2a41EC948a8524F619D9
 
   - id: 10
     start_block: 0
     confirmed_block_threshold: 10
     contracts:
       - name: EverclearSpoke
-        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+        address: 0x91c40B4135eFea3c5A200388CfE316aa0B172b30
       - name: FeeAdapter
-        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+        address: 0xF4a697B7A48e9c7C1944a68a11d3b8D5E716d169
 
   - id: 8453
     start_block: 0
     confirmed_block_threshold: 10
     contracts:
       - name: EverclearSpoke
-        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+        address: 0x91c40B4135eFea3c5A200388CfE316aa0B172b30
       - name: FeeAdapter
-        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
-
-  - id: 56
-    start_block: 0
-    # using CCTP attestation time: https://developers.circle.com/cctp/required-block-confirmations
-    confirmed_block_threshold: 3
-    contracts:
-      - name: EverclearSpoke
-        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
-      - name: FeeAdapter
-        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
-
-  - id: 59144
-    start_block: 0
-    confirmed_block_threshold: 5
-    contracts:
-      - name: EverclearSpoke
-        address: 0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751
-      - name: FeeAdapter
-        address: 0x1B0Dc9CB7EadDa36f4CcFB8130B0Ad967b0A3508
-
-  - id: 137
-    start_block: 0
-    # using CCTP attestation time: https://developers.circle.com/cctp/required-block-confirmations
-    confirmed_block_threshold: 3
-    contracts:
-      - name: EverclearSpoke
-        address: 0x7189C59e245135696bFd2906b56607755F84F3fD
-      - name: FeeAdapter
-        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
-
-  - id: 43114
-    start_block: 0
-    confirmed_block_threshold: 3
-    contracts:
-      - name: EverclearSpoke
-        address: 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460
-      - name: FeeAdapter
-        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
-
-  - id: 130
-    start_block: 0
-    confirmed_block_threshold: 5
-    contracts:
-      - name: EverclearSpoke
-        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
-      - name: FeeAdapter
-        address: 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1
+        address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89
 
 rollback_on_reorg: true
