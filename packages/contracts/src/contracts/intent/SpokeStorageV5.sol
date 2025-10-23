@@ -36,12 +36,12 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
 
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant FILL_INTENT_TYPEHASH = keccak256(
-    'function fillIntent(bytes32 _domain, address _sender, Intent calldata _intent, uint256 _amountOut, uint32[] memory _destinations)'
+    'function fillIntent(bytes32 _domain, address _sender, Intent calldata _intent, uint256 _amountOut, address _receiver, uint32[] memory _destinations)'
   );
 
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant BATCH_FILL_INTENT_TYPEHASH = keccak256(
-    'function batchFillIntent(bytes32 _domain, address _sender, Intent[] calldata _intents, uint256[] _amountOut, uint32[][] memory _destinations)'
+    'function batchFillIntent(bytes32 _domain, address _sender, Intent[] calldata _intents, uint256[] _amountOut, address[] _receivers, uint32[][] memory _destinations)'
   );
 
   /// @inheritdoc ISpokeStorageV5

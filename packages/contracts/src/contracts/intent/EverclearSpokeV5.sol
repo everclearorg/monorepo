@@ -258,7 +258,8 @@ contract EverclearSpokeV5 is
     bytes calldata _signature
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
     bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data = abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _destinations);
+    bytes memory _data =
+      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
     _verifySignature(fillSigner, _data, _signature);
 
     _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, false);
@@ -272,7 +273,8 @@ contract EverclearSpokeV5 is
     bytes calldata _signature
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
     bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data = abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _destinations);
+    bytes memory _data =
+      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
     _verifySignature(fillSigner, _data, _signature);
 
     _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, true);
@@ -295,7 +297,8 @@ contract EverclearSpokeV5 is
     );
     _verifySignature(_solver, _data, _nonce, _signature);
 
-    bytes memory _fillData = abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _destinations);
+    bytes memory _fillData =
+      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
     _verifySignature(fillSigner, _fillData, _fillSignature);
 
     _fillMessage = _fillIntent(_intent, _solver, _amountOut, _destinations, false);
