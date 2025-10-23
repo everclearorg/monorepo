@@ -1,4 +1,4 @@
-name: everclear-indexer
+name: everclear-indexer-staging
 description: Indexes IntentAdded and IntentFilled events from EverclearSpoke contracts across all mainnet chains
 
 # Configure which fields to include from events
