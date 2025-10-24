@@ -42,12 +42,18 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @notice emitted when an intent is filled on destination
    * @param _intentId The ID of the intent
    * @param _solver The address of the intent solver
+   * @param _receiver The address of the intent receiver
    * @param _amountOut The total amount the user has been transferred
    * @param _queueIdx The index of the FillMessage in the FillQueue
    * @param _intent The full intent object
    */
   event IntentFilled(
-    bytes32 indexed _intentId, address indexed _solver, uint256 _amountOut, uint256 _queueIdx, Intent _intent
+    bytes32 indexed _intentId,
+    address indexed _solver,
+    bytes32 indexed _receiver,
+    uint256 _amountOut,
+    uint256 _queueIdx,
+    Intent _intent
   );
 
   /**
@@ -96,6 +102,13 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _newFeeAdapter The new fee adapter
    */
   event FeeAdapterUpdated(address _newFeeAdapter);
+
+  /**
+   * @notice Emitted when fill signer is updated
+   * @param _oldFillSigner The old fill signer
+   * @param _newFillSigner The new fill signer
+   */
+  event FillSignerUpdated(address _oldFillSigner, address _newFillSigner);
 
   /*///////////////////////////////////////////////////////////////
                               ERRORS
@@ -210,6 +223,11 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   error EverclearSpoke_FillIntent_InvalidArrayLengths();
 
+  /**
+   * @notice Thrown when the fill signature is invalid
+   */
+  error EverclearSpoke_InvalidFillSignature();
+
   /*///////////////////////////////////////////////////////////////
                               LOGIC
   //////////////////////////////////////////////////////////////*/
@@ -259,7 +277,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   /**
    * @notice Initialize the EverclearSpoke contract
    */
-  function initialize(address _feeAdapter, address _messageReceiver) external;
+  function initialize(address _feeAdapter, address _messageReceiver, address _fillSigner) external;
 
   /**
    * @notice Creates a new intent
@@ -344,7 +362,9 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   function batchFillIntent(
     Intent[] calldata _intents,
     uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations
+    bytes32[] calldata _receivers,
+    uint32[][] calldata _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage[] memory _fillMessages);
 
   /**
@@ -356,7 +376,9 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   function batchFillIntentWithPull(
     Intent[] calldata _intents,
     uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations
+    bytes32[] calldata _receivers,
+    uint32[][] calldata _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage[] memory _fillMessages);
 
   /**
@@ -368,7 +390,9 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   function fillIntent(
     Intent calldata _intent,
     uint256 _amountOut,
-    uint32[] memory _destinations
+    bytes32 _receiver,
+    uint32[] memory _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -380,7 +404,9 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   function fillIntentWithPull(
     Intent calldata _intent,
     uint256 _amountOut,
-    uint32[] memory _destinations
+    bytes32 _receiver,
+    uint32[] memory _destinations,
+    bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -397,8 +423,10 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     Intent calldata _intent,
     uint256 _nonce,
     uint256 _amountOut,
+    bytes32 _receiver,
     uint32[] memory _destinations,
-    bytes calldata _signature
+    bytes calldata _signature,
+    bytes calldata _fillSignature
   ) external returns (FillMessage memory _fillMessage);
 
   /**
@@ -495,6 +523,14 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   function updateMessageGasLimit(
     uint256 _newGasLimit
+  ) external;
+
+  /**
+   * @notice Updates the fill signer
+   * @param _fillSigner The address of the new fill signer
+   */
+  function updateFillSigner(
+    address _fillSigner
   ) external;
 
   /**

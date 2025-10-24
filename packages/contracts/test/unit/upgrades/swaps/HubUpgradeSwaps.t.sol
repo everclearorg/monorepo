@@ -20,6 +20,7 @@ import {AssetManagerV2} from 'contracts/hub/modules/managers/AssetManagerV2.sol'
 
 import {IManagerV2, ManagerV2} from 'contracts/hub/modules/ManagerV2.sol';
 import {ISettlerV2, SettlerV2} from 'contracts/hub/modules/SettlerV2.sol';
+import {IProtocolManagerV2} from 'interfaces/hub/IProtocolManagerV2.sol';
 
 import {IAssetManagerV2} from 'interfaces/hub/IAssetManagerV2.sol';
 
@@ -41,6 +42,8 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   uint32 internal constant ETHEREUM = 1;
   uint32 internal constant ARBITRUM = 42_161;
   uint32 internal constant OPTIMISM = 10;
+  uint32 internal constant BASE = 8453;
+  uint32 internal constant TAIKO = 167_000;
 
   // ============ Upgrade ============ //
   function test_hubUpgradeSwaps_upgrade() public {
@@ -238,6 +241,240 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encodeWithSignature('sendMessage(uint32,bytes,uint256,uint256)', ARBITRUM, _calldata, _fee, 0)
     );
     hubProxy.processSettlementQueueViaRelayer(ARBITRUM, 1, _relayer, block.timestamp, _nonce, 0, _sig);
+  }
+
+  function _configureUSDCTokenSetup() internal {
+    IHubStorageV2.Fee[] memory _feesConfig = new IHubStorageV2.Fee[](1);
+    _feesConfig[0] = IHubStorageV2.Fee({recipient: OWNER, fee: 0});
+
+    // Asset config
+    IHubStorageV2.AssetConfig[] memory _assetConfigs = new IHubStorageV2.AssetConfig[](4);
+    // Ethereum
+    _assetConfigs[0] = IHubStorageV2.AssetConfig({
+      tickerHash: keccak256('USDC'),
+      adopted: USDC_MAINNET.toBytes32(),
+      domain: 1,
+      approval: true,
+      strategy: IEverclearV2.Strategy.DEFAULT
+    });
+    // Optimism
+    _assetConfigs[1] = IHubStorageV2.AssetConfig({
+      tickerHash: keccak256('USDC'),
+      adopted: USDC_OPTIMISM.toBytes32(),
+      domain: 10,
+      approval: true,
+      strategy: IEverclearV2.Strategy.DEFAULT
+    });
+    // Arbitrum
+    _assetConfigs[2] = IHubStorageV2.AssetConfig({
+      tickerHash: keccak256('USDC'),
+      adopted: USDC_ARBITRUM.toBytes32(),
+      domain: 42_161,
+      approval: true,
+      strategy: IEverclearV2.Strategy.DEFAULT
+    });
+    // Base
+    _assetConfigs[3] = IHubStorageV2.AssetConfig({
+      tickerHash: keccak256('USDC'),
+      adopted: USDC_BASE.toBytes32(),
+      domain: 8453,
+      approval: true,
+      strategy: IEverclearV2.Strategy.DEFAULT
+    });
+
+    IHubStorageV2.TokenSetup[] memory _setup = new IHubStorageV2.TokenSetup[](4);
+    _setup[0] = IHubStorageV2.TokenSetup({
+      tickerHash: keccak256('USDC'),
+      initLastClosedEpochProcessed: false,
+      prioritizedStrategy: IEverclearV2.Strategy.DEFAULT,
+      maxDiscountDbps: 5000,
+      discountPerEpoch: 0,
+      fees: _feesConfig,
+      adoptedForAssets: _assetConfigs
+    });
+
+    vm.prank(hubProxy.owner());
+    hubProxy.setTokenConfigs(_setup);
+  }
+
+  function test_hubUpgradeSwaps_createSettlement_allUserSupportedDomainsValid() public {
+    _upgradeHub();
+
+    // processing the deposits, invoices, and settlements for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
+    hubProxy.processSettlementQueue(BASE, 1, DEFAULT_GAS_LIMIT);
+
+    // configuring the token setup //
+    _configureUSDCTokenSetup();
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToArbitrum, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, address(0), ETHEREUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToArbitrum);
+
+    // configuring the memValues for the solver - includes Optimism and Base //
+    uint32[] memory _supportedDomains = new uint32[](2);
+    _supportedDomains[0] = 10;
+    _supportedDomains[1] = 8453;
+    vm.prank(_intentsToArbitrum[0].receiver.toAddress());
+    hubProxy.setUserSupportedDomains(_supportedDomains);
+
+    // configuring the state of custodiedAssets to 0 for Optimism and Base //
+    _updateCustodiedAssets(USDC_OPTIMISM_ASSET_HASH, _intentsToArbitrum[0].amount);
+    _updateCustodiedAssets(USDC_BASE_ASSET_HASH, 0);
+
+    // processing the deposits and invoices for USDC //
+    vm.warp(block.timestamp + 3600);
+    vm.roll(block.number + 50);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // asserting the intents status are SETTLED
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing the settlement queue
+    bytes memory _calldata =
+      _constructSettlementInfo(_intentsToArbitrum[0].receiver, USDC_OPTIMISM.toBytes32(), _intentsToArbitrum);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', OPTIMISM, _calldata, 0)
+    );
+    hubProxy.processSettlementQueue(OPTIMISM, 1, 0);
+  }
+
+  function test_hubUpgradeSwaps_createSettlement_threeUserSupportedDomainsValid() public {
+    _upgradeHub();
+
+    // processing the deposits, invoices, and settlements for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
+    hubProxy.processSettlementQueue(BASE, 1, DEFAULT_GAS_LIMIT);
+
+    // configuring the token setup //
+    _configureUSDCTokenSetup();
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToArbitrum, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, address(0), ETHEREUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToArbitrum);
+
+    // configuring the memValues for the solver - includes Optimism, Base, and Invalid //
+    uint32[] memory _supportedDomains = new uint32[](3);
+    _supportedDomains[0] = 10;
+    _supportedDomains[1] = 8453;
+    _supportedDomains[2] = 33_139;
+    vm.prank(_intentsToArbitrum[0].receiver.toAddress());
+    hubProxy.setUserSupportedDomains(_supportedDomains);
+
+    // configuring the state of custodiedAssets to 0 for Optimism and Base //
+    _updateCustodiedAssets(USDC_OPTIMISM_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_BASE_ASSET_HASH, _intentsToArbitrum[0].amount);
+
+    // processing the deposits and invoices for USDC //
+    vm.warp(block.timestamp + 3600);
+    vm.roll(block.number + 50);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // asserting the intents status are SETTLED
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing the settlement queue
+    bytes memory _calldata =
+      _constructSettlementInfo(_intentsToArbitrum[0].receiver, USDC_BASE.toBytes32(), _intentsToArbitrum);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', BASE, _calldata, 0)
+    );
+    hubProxy.processSettlementQueue(BASE, 1, 0);
+  }
+
+  function test_hubUpgradeSwaps_createSettlement_zeroUserSupportedDomainsValid() public {
+    _upgradeHub();
+
+    // processing the deposits, invoices, and settlements for USDC //
+    bytes32 _tickerHash = keccak256('USDC');
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+    hubProxy.processSettlementQueue(OPTIMISM, 1, DEFAULT_GAS_LIMIT);
+    hubProxy.processSettlementQueue(BASE, 1, DEFAULT_GAS_LIMIT);
+
+    // configuring the token setup //
+    _configureUSDCTokenSetup();
+
+    // Mainnet to Arbitrum intents //
+    // constructing the intent messages
+    uint32[] memory _destinations = _getDestinations(42_161);
+    (IEverclearV2.Intent[] memory _intentsToArbitrum, bytes memory _intentMessage) =
+      _configureIntentMessages(1, USDC_MAINNET, address(0), ETHEREUM, _destinations, true);
+    // sending message as gateway to the Hub //
+    vm.prank(address(hubProxy.hubGateway()));
+    hubProxy.receiveMessage(_intentMessage);
+    _assertIntentsReceived(_intentsToArbitrum);
+
+    // configuring the memValues for the solver - includes Optimism, Base, and Invalid //
+    uint32[] memory _supportedDomains = new uint32[](2);
+    _supportedDomains[0] = 81_457;
+    _supportedDomains[1] = 33_139;
+    vm.prank(_intentsToArbitrum[0].receiver.toAddress());
+    hubProxy.setUserSupportedDomains(_supportedDomains);
+
+    // configuring the state of custodiedAssets to 0 for Optimism and Base //
+    _updateCustodiedAssets(USDC_OPTIMISM_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_BASE_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_MAINNET_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_MANTLE_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_ARBITRUM_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_BNB_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_LINEA_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_POLYGON_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_AVALANCHE_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_SCROLL_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_TAIKO_ASSET_HASH, _intentsToArbitrum[0].amount);
+    _updateCustodiedAssets(USDC_MODE_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_UNICHAIN_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_ZKSYNC_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_RONIN_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_BERACHAIN_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_SONIC_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_INK_ASSET_HASH, 0);
+    _updateCustodiedAssets(USDC_SOLANA_ASSET_HASH, 0);
+
+    // processing the deposits and invoices for USDC //
+    vm.warp(block.timestamp + 3600);
+    vm.roll(block.number + 50);
+    hubProxy.processDepositsAndInvoices(_tickerHash, 500, 500, 500);
+
+    // asserting the intents status are SETTLED
+    bytes32[] memory _intentIds = new bytes32[](1);
+    _intentIds[0] = keccak256(abi.encode(_intentsToArbitrum[0]));
+    _assertIntentsState(_intentIds, uint8(IEverclearV2.IntentStatus.SETTLED));
+
+    // processing the settlement queue
+    bytes memory _calldata =
+      _constructSettlementInfo(_intentsToArbitrum[0].receiver, USDC_TAIKO.toBytes32(), _intentsToArbitrum);
+    vm.expectCall(
+      address(hubProxy.hubGateway()),
+      0,
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', TAIKO, _calldata, 0)
+    );
+    hubProxy.processSettlementQueue(TAIKO, 1, 0);
   }
 
   // ============ Handler Module ============ //
@@ -473,7 +710,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -523,7 +760,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -584,7 +821,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -652,7 +889,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -705,7 +942,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -767,7 +1004,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -829,7 +1066,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -905,7 +1142,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -974,7 +1211,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOut = _intents[0].amountOutMin;
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1039,7 +1276,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1104,7 +1341,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1158,7 +1395,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1213,7 +1450,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1272,7 +1509,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1330,7 +1567,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1390,7 +1627,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1627,7 +1864,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1679,7 +1916,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -1951,7 +2188,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -2014,7 +2251,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -2090,7 +2327,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     address _solver = address(0x123);
     (IEverclearV2.FillMessage memory _fill, bytes memory _fillMessage) = _configureFillMessage(
       _intentIds[0],
-      _solver,
+      _solver.toBytes32(),
       _amountOut,
       _solverDestinations,
       USDC_MAINNET.toBytes32(),
@@ -2506,24 +2743,6 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(hubProxy.epochLength(), _epochLength);
   }
 
-  function test_hubUpgradeSwaps_updateGasConfig() public {
-    _upgradeHub();
-
-    IHubStorageV2.GasConfig memory config = IHubStorageV2.GasConfig({
-      settlementBaseGasUnits: 100_000,
-      averageGasUnitsPerSettlement: 50_000,
-      bufferDBPS: 10_000
-    });
-
-    vm.prank(hubProxy.owner());
-    hubProxy.updateGasConfig(config);
-
-    (uint256 settlementBaseGasUnits, uint256 averageGasUnitsPerSettlement, uint256 bufferDBPS) = hubProxy.gasConfig();
-    assertEq(settlementBaseGasUnits, config.settlementBaseGasUnits);
-    assertEq(averageGasUnitsPerSettlement, config.averageGasUnitsPerSettlement);
-    assertEq(bufferDBPS, config.bufferDBPS);
-  }
-
   function test_hubUpgradeSwaps_setMaxDiscountDBPS() public {
     _upgradeHub();
 
@@ -2649,6 +2868,14 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     hubProxy.processSettlementQueue(ARBITRUM, 1, type(uint256).max);
   }
 
+  function testRevert_hubUpgradeSwaps_updateGasConfig() public {
+    _upgradeHub();
+    IHubStorageV2.GasConfig memory _gasConfig;
+
+    vm.expectRevert(IProtocolManagerV2.ProtocolManager_UpdateGasConfig_Deprecated.selector);
+    hubProxy.updateGasConfig(_gasConfig);
+  }
+
   // ============== Helpers ================= //
   function _assertIntentsReceived(
     IEverclearV2.Intent[] memory _intents
@@ -2683,7 +2910,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
   function _configureFillMessage(
     bytes32 _intentId,
-    address _solver,
+    bytes32 _receiver,
     uint256 _amountOut,
     uint32[] memory _destinations,
     bytes32 _intentInputAsset,
@@ -2692,8 +2919,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   ) internal pure returns (IEverclearV2.FillMessage memory, bytes memory) {
     IEverclearV2.FillMessage memory _fill = IEverclearV2.FillMessage({
       intentId: _intentId,
-      initiator: _solver.toBytes32(),
-      solver: _solver.toBytes32(),
+      receiver: _receiver,
       intentInputAsset: _intentInputAsset,
       intentOrigin: _origin,
       amountOut: _amountOut,
@@ -2709,8 +2935,9 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
 
   function _assertFillInfo(bytes32 _intentId, IEverclearV2.FillMessage memory _fill) internal view {
     IHubStorageV2.IntentContext memory _context = hubProxy.contexts(_intentId);
-    assertEq(_context.solver, _fill.solver);
+    assertEq(_context.solver, _fill.receiver);
     assertEq(_context.amountOut, _fill.amountOut);
+
     assertEq(_context.solverDestinations.length, _fill.destinations.length);
     for (uint256 i; i < _fill.destinations.length; i++) {
       assertEq(_context.solverDestinations[i], _fill.destinations[i]);
@@ -2720,7 +2947,7 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   function _assertFillInfo(bytes32[] memory _intentIds, IEverclearV2.FillMessage[] memory _fill) internal view {
     for (uint256 i; i < _intentIds.length; i++) {
       IHubStorageV2.IntentContext memory _context = hubProxy.contexts(_intentIds[i]);
-      assertEq(_context.solver, _fill[i].solver);
+      assertEq(_context.solver, _fill[i].receiver);
       assertEq(_context.amountOut, _fill[i].amountOut);
       assertEq(_context.solverDestinations.length, _fill[i].destinations.length);
       for (uint256 j; j < _fill[i].destinations.length; j++) {
@@ -2846,15 +3073,14 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
   function _configureFillMessages(
     IEverclearV2.Intent[] memory _intents,
     uint32[][] memory _destinations,
-    address[] memory _solvers
+    address[] memory _receivers
   ) internal view returns (IEverclearV2.FillMessage[] memory, bytes memory) {
     IEverclearV2.FillMessage[] memory _fills = new IEverclearV2.FillMessage[](_intents.length);
     for (uint256 i; i < _intents.length; i++) {
       bytes32 _intentId = keccak256(abi.encode(_intents[i]));
       _fills[i] = IEverclearV2.FillMessage({
         intentId: _intentId,
-        initiator: _solvers[i].toBytes32(),
-        solver: _solvers[i].toBytes32(),
+        receiver: _receivers[i].toBytes32(),
         intentInputAsset: _intents[i].inputAsset,
         intentOrigin: _intents[i].origin,
         amountOut: _intents[i].amountOutMin,

@@ -208,16 +208,31 @@ contract EverclearSpokeV5 is
   function batchFillIntent(
     Intent[] calldata _intents,
     uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations
+    bytes32[] calldata _receivers,
+    uint32[][] calldata _destinations,
+    bytes calldata _signature
   ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
-    uint256 length = _intents.length;
-    if (length != _amountOut.length || length != _destinations.length) {
+    if (
+      _intents.length != _amountOut.length || _intents.length != _receivers.length
+        || _intents.length != _destinations.length
+    ) {
       revert EverclearSpoke_FillIntent_InvalidArrayLengths();
     }
 
-    _fillMessages = new FillMessage[](length);
-    for (uint256 i; i < length; i++) {
-      _fillMessages[i] = _fillIntent(_intents[i], msg.sender, _amountOut[i], _destinations[i], false);
+    bytes memory _data = abi.encode(
+      BATCH_FILL_INTENT_TYPEHASH,
+      keccak256(abi.encode(block.chainid, address(this))),
+      msg.sender,
+      _intents,
+      _amountOut,
+      _receivers,
+      _destinations
+    );
+    _verifySignature(fillSigner, _data, _signature);
+
+    _fillMessages = new FillMessage[](_intents.length);
+    for (uint256 i; i < _intents.length; i++) {
+      _fillMessages[i] = _fillIntent(_intents[i], msg.sender, _receivers[i], _amountOut[i], _destinations[i], false);
     }
   }
 
@@ -225,16 +240,31 @@ contract EverclearSpokeV5 is
   function batchFillIntentWithPull(
     Intent[] calldata _intents,
     uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations
+    bytes32[] calldata _receivers,
+    uint32[][] calldata _destinations,
+    bytes calldata _signature
   ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
-    uint256 length = _intents.length;
-    if (length != _amountOut.length || length != _destinations.length) {
+    if (
+      _intents.length != _amountOut.length || _intents.length != _receivers.length
+        || _intents.length != _destinations.length
+    ) {
       revert EverclearSpoke_FillIntent_InvalidArrayLengths();
     }
 
+    bytes memory _data = abi.encode(
+      BATCH_FILL_INTENT_TYPEHASH,
+      keccak256(abi.encode(block.chainid, address(this))),
+      msg.sender,
+      _intents,
+      _amountOut,
+      _receivers,
+      _destinations
+    );
+    _verifySignature(fillSigner, _data, _signature);
+
     _fillMessages = new FillMessage[](_intents.length);
     for (uint256 i; i < _intents.length; i++) {
-      _fillMessages[i] = _fillIntent(_intents[i], msg.sender, _amountOut[i], _destinations[i], true);
+      _fillMessages[i] = _fillIntent(_intents[i], msg.sender, _receivers[i], _amountOut[i], _destinations[i], true);
     }
   }
 
@@ -242,18 +272,32 @@ contract EverclearSpokeV5 is
   function fillIntent(
     Intent calldata _intent,
     uint256 _amountOut,
-    uint32[] memory _destinations
+    bytes32 _receiver,
+    uint32[] memory _destinations,
+    bytes calldata _signature
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, false);
+    bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
+    bytes memory _data =
+      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
+    _verifySignature(fillSigner, _data, _signature);
+
+    _fillMessage = _fillIntent(_intent, msg.sender, _receiver, _amountOut, _destinations, false);
   }
 
   /// @inheritdoc IEverclearSpokeV5
   function fillIntentWithPull(
     Intent calldata _intent,
     uint256 _amountOut,
-    uint32[] memory _destinations
+    bytes32 _receiver,
+    uint32[] memory _destinations,
+    bytes calldata _signature
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    _fillMessage = _fillIntent(_intent, msg.sender, _amountOut, _destinations, true);
+    bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
+    bytes memory _data =
+      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
+    _verifySignature(fillSigner, _data, _signature);
+
+    _fillMessage = _fillIntent(_intent, msg.sender, _receiver, _amountOut, _destinations, true);
   }
 
   /// @inheritdoc IEverclearSpokeV5
@@ -262,15 +306,22 @@ contract EverclearSpokeV5 is
     Intent calldata _intent,
     uint256 _nonce,
     uint256 _amountOut,
+    bytes32 _receiver,
     uint32[] memory _destinations,
-    bytes calldata _signature
+    bytes calldata _signature,
+    bytes calldata _fillSignature
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
     bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data =
-      abi.encode(FILL_INTENT_FOR_SOLVER_TYPEHASH, _domain, _solver, _intent, _nonce, _amountOut, _destinations);
+    bytes memory _data = abi.encode(
+      FILL_INTENT_FOR_SOLVER_TYPEHASH, _domain, _solver, _receiver, _intent, _nonce, _amountOut, _destinations
+    );
     _verifySignature(_solver, _data, _nonce, _signature);
 
-    _fillMessage = _fillIntent(_intent, _solver, _amountOut, _destinations, false);
+    bytes memory _fillData =
+      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
+    _verifySignature(fillSigner, _fillData, _fillSignature);
+
+    _fillMessage = _fillIntent(_intent, _solver, _receiver, _amountOut, _destinations, false);
   }
 
   /// @inheritdoc IEverclearSpokeV5
@@ -393,6 +444,15 @@ contract EverclearSpokeV5 is
     messageGasLimit = _newGasLimit;
     emit MessageGasLimitUpdated(_oldGasLimit, _newGasLimit);
   }
+  /// @inheritdoc IEverclearSpokeV5
+
+  function updateFillSigner(
+    address _feeSigner
+  ) external onlyOwner {
+    address _oldFillSigner = fillSigner;
+    fillSigner = _feeSigner;
+    emit FillSignerUpdated(_oldFillSigner, _feeSigner);
+  }
 
   /// @inheritdoc IEverclearSpokeV5
   function executeIntentCalldata(
@@ -415,7 +475,7 @@ contract EverclearSpokeV5 is
   //////////////////////////////////////////////////////////////*/
 
   /// @inheritdoc IEverclearSpokeV5
-  function initialize(address _feeAdapter, address _messageReceiver) public reinitializer(4) {
+  function initialize(address _feeAdapter, address _messageReceiver, address _fillSigner) public reinitializer(4) {
     if (!_isEmpty(deprecated_intentQueue.first, deprecated_intentQueue.last)) {
       revert EverclearSpoke_Initialize_IntentQueueNotEmpty();
     }
@@ -430,6 +490,7 @@ contract EverclearSpokeV5 is
     // Updating to feeAdapterV2 and messageReceiverV2
     feeAdapter = _feeAdapter;
     messageReceiver = _messageReceiver;
+    fillSigner = _fillSigner;
   }
 
   /*///////////////////////////////////////////////////////////////
@@ -527,6 +588,7 @@ contract EverclearSpokeV5 is
   function _fillIntent(
     Intent calldata _intent,
     address _solver,
+    bytes32 _receiver,
     uint256 _amountOut,
     uint32[] memory _destinations,
     bool _pull
@@ -572,8 +634,7 @@ contract EverclearSpokeV5 is
 
     _fillMessage = FillMessage({
       intentId: _intentId,
-      initiator: _intent.initiator,
-      solver: _solver.toBytes32(),
+      receiver: _receiver,
       intentInputAsset: _intent.inputAsset,
       intentOrigin: _intent.origin,
       amountOut: _amountOut,
@@ -583,7 +644,7 @@ contract EverclearSpokeV5 is
 
     fillQueue.enqueueFill(_fillMessage);
 
-    emit IntentFilled(_intentId, _solver, _amountOut, fillQueue.last, _intent);
+    emit IntentFilled(_intentId, _solver, _receiver, _amountOut, fillQueue.last, _intent);
   }
 
   /**
@@ -601,6 +662,20 @@ contract EverclearSpokeV5 is
     }
 
     _useCheckedNonce(_recoveredSigner, _nonce);
+  }
+
+  /**
+   * @notice Verifies a signature
+   * @param _signer The signer of the message
+   * @param _data The data of the message
+   * @param _signature The signature of the message
+   */
+  function _verifySignature(address _signer, bytes memory _data, bytes calldata _signature) internal {
+    bytes32 _hash = keccak256(_data);
+    address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
+    if (_recoveredSigner != _signer) {
+      revert EverclearSpoke_InvalidFillSignature();
+    }
   }
 
   /**
