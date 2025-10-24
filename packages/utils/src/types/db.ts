@@ -84,7 +84,7 @@ export const IntentSchema = Type.Object({
   nonce: Type.Integer(),
   timestamp: Type.Integer(),
   data: Type.String(),
-  maxFee: Type.Integer(),
+  amountOutMin: TIntegerString,
   ttl: Type.Integer(),
 });
 export type Intent = Static<typeof IntentSchema>;

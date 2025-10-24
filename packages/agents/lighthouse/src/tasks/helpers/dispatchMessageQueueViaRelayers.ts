@@ -76,7 +76,7 @@ function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[
       receiver: convertAddressToBytes32(intent.receiver, intent.origin),
       inputAsset: convertAddressToBytes32(intent.inputAsset, intent.origin),
       outputAsset: convertAddressToBytes32(intent.outputAsset, intent.origin),
-      maxFee: intent.maxFee,
+      amountOutMin: intent.amountOutMin,
       origin: intent.origin,
       nonce: intent.nonce,
       timestamp: intent.timestamp,
