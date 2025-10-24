@@ -18,7 +18,7 @@ export const INTENT_FIELDS = `
     receiver
     inputAsset
     outputAsset
-    maxFee
+    amountOutMin
     origin
     timestamp
     destinations
