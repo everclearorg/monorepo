@@ -13,6 +13,7 @@
   },
   {
     "address": "0xf9A4d8cED1b8c53B39429BB9a8A391b74E85aE5C",
+    "feeAdapterAddress": "",
     "domainName": "Optimism Sepolia",
     "domainId": 11155420,
     "environment": "TestnetProduction"
@@ -31,6 +32,7 @@
   },
   {
     "address": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
+    "feeAdapterAddress": "0xF4a697B7A48e9c7C1944a68a11d3b8D5E716d169",
     "domainName": "Optimism",
     "domainId": 10,
     "environment": "MainnetStaging"
@@ -55,6 +57,7 @@
   },
   {
     "address": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
+    "feeAdapterAddress": "0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89",
     "domainName": "Base",
     "domainId": 8453,
     "environment": "MainnetStaging"
