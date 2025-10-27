@@ -97,10 +97,7 @@ contract Mocker is Test {
     );
   }
 
-  function _mockReceiveMessage(
-    address _contract,
-    bytes calldata _message
-  ) internal {
+  function _mockReceiveMessage(address _contract, bytes calldata _message) internal {
     vm.mockCall(
       address(_contract), abi.encodeWithSelector(IMessageReceiver.receiveMessage.selector, _message), abi.encode(0)
     );

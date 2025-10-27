@@ -783,7 +783,9 @@ contract SpokeArrayUpgradeTestnetStagingSafeInput is TestnetStagingEnvironment, 
   function setUp() public {
     // Ethereum Sepolia
     _deploymentParams[ETHEREUM_SEPOLIA] = DeploymentParams({
-      owner: ETHEREUM_SPOKE_OWNER, spokeProxy: address(ETHEREUM_SEPOLIA_SPOKE), spokeImpl: ETHEREUM_SEPOLIA_SPOKE_IMPL
+      owner: ETHEREUM_SPOKE_OWNER,
+      spokeProxy: address(ETHEREUM_SEPOLIA_SPOKE),
+      spokeImpl: ETHEREUM_SEPOLIA_SPOKE_IMPL
     });
 
     // BSC Testnet
@@ -791,13 +793,14 @@ contract SpokeArrayUpgradeTestnetStagingSafeInput is TestnetStagingEnvironment, 
       DeploymentParams({owner: BSC_SPOKE_OWNER, spokeProxy: address(BSC_SPOKE), spokeImpl: BSC_TESTNET_SPOKE_IMPL});
 
     // Op Sepolia
-    _deploymentParams[OP_SEPOLIA] = DeploymentParams({
-      owner: OP_SPOKE_OWNER, spokeProxy: address(OP_SEPOLIA_SPOKE), spokeImpl: OP_SEPOLIA_SPOKE_IMPL
-    });
+    _deploymentParams[OP_SEPOLIA] =
+      DeploymentParams({owner: OP_SPOKE_OWNER, spokeProxy: address(OP_SEPOLIA_SPOKE), spokeImpl: OP_SEPOLIA_SPOKE_IMPL});
 
     // Arb Sepolia
     _deploymentParams[ARB_SEPOLIA] = DeploymentParams({
-      owner: ARB_SPOKE_OWNER, spokeProxy: address(ARB_SEPOLIA_SPOKE), spokeImpl: ARB_SEPOLIA_SPOKE_IMPL
+      owner: ARB_SPOKE_OWNER,
+      spokeProxy: address(ARB_SEPOLIA_SPOKE),
+      spokeImpl: ARB_SEPOLIA_SPOKE_IMPL
     });
   }
 

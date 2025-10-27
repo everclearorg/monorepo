@@ -187,10 +187,7 @@ library TypedMemView {
    * @param _expected The expected type
    * @return          bool - True if the memview is of the expected type
    */
-  function isType(
-    bytes29 memView,
-    uint40 _expected
-  ) internal pure returns (bool) {
+  function isType(bytes29 memView, uint40 _expected) internal pure returns (bool) {
     return typeOf(memView) == _expected;
   }
 
@@ -201,10 +198,7 @@ library TypedMemView {
    * @param _expected The expected type
    * @return          bytes29 - The view with validated type
    */
-  function assertType(
-    bytes29 memView,
-    uint40 _expected
-  ) internal pure returns (bytes29) {
+  function assertType(bytes29 memView, uint40 _expected) internal pure returns (bytes29) {
     if (!isType(memView, _expected)) {
       revert TypeAssertionFailed(uint256(typeOf(memView)), uint256(_expected));
     }
@@ -217,10 +211,7 @@ library TypedMemView {
    * @param _newType  The new type
    * @return          newView - The new view with the specified type
    */
-  function castTo(
-    bytes29 memView,
-    uint40 _newType
-  ) internal pure returns (bytes29 newView) {
+  function castTo(bytes29 memView, uint40 _newType) internal pure returns (bytes29 newView) {
     // then | in the new type
     assembly {
       // solhint-disable-previous-line no-inline-assembly
@@ -239,11 +230,7 @@ library TypedMemView {
    * @param _len      The length
    * @return          newView - The new view with the specified type, location and length
    */
-  function unsafeBuildUnchecked(
-    uint256 _type,
-    uint256 _loc,
-    uint256 _len
-  ) private pure returns (bytes29 newView) {
+  function unsafeBuildUnchecked(uint256 _type, uint256 _loc, uint256 _len) private pure returns (bytes29 newView) {
     uint256 _uint96Bits = 96;
     uint256 _emptyBits = 24;
 
@@ -272,11 +259,7 @@ library TypedMemView {
    * @param _len      The length
    * @return          newView - The new view with the specified type, location and length
    */
-  function build(
-    uint256 _type,
-    uint256 _loc,
-    uint256 _len
-  ) internal pure returns (bytes29 newView) {
+  function build(uint256 _type, uint256 _loc, uint256 _len) internal pure returns (bytes29 newView) {
     uint256 _end = _loc + _len;
     assembly {
       // solhint-disable-previous-line no-inline-assembly
@@ -296,10 +279,7 @@ library TypedMemView {
    * @param newType   The type
    * @return          bytes29 - The memory view
    */
-  function ref(
-    bytes memory arr,
-    uint40 newType
-  ) internal pure returns (bytes29) {
+  function ref(bytes memory arr, uint40 newType) internal pure returns (bytes29) {
     uint256 _len = arr.length;
 
     uint256 _loc;
@@ -400,12 +380,7 @@ library TypedMemView {
    * @param newType   The new type
    * @return          bytes29 - The new view
    */
-  function slice(
-    bytes29 memView,
-    uint256 _index,
-    uint256 _len,
-    uint40 newType
-  ) internal pure returns (bytes29) {
+  function slice(bytes29 memView, uint256 _index, uint256 _len, uint40 newType) internal pure returns (bytes29) {
     uint256 _loc = loc(memView);
 
     // Ensure it doesn't overrun the view
@@ -424,11 +399,7 @@ library TypedMemView {
    * @param newType   The new type
    * @return          bytes29 - The new view
    */
-  function prefix(
-    bytes29 memView,
-    uint256 _len,
-    uint40 newType
-  ) internal pure returns (bytes29) {
+  function prefix(bytes29 memView, uint256 _len, uint40 newType) internal pure returns (bytes29) {
     return slice(memView, 0, _len, newType);
   }
 
@@ -439,11 +410,7 @@ library TypedMemView {
    * @param newType   The new type
    * @return          bytes29 - The new view
    */
-  function postfix(
-    bytes29 memView,
-    uint256 _len,
-    uint40 newType
-  ) internal pure returns (bytes29) {
+  function postfix(bytes29 memView, uint256 _len, uint40 newType) internal pure returns (bytes29) {
     return slice(memView, uint256(len(memView)) - _len, _len, newType);
   }
 
@@ -457,11 +424,7 @@ library TypedMemView {
    * @param _bytes    The bytes
    * @return          result - The 32 byte result
    */
-  function index(
-    bytes29 memView,
-    uint256 _index,
-    uint8 _bytes
-  ) internal pure returns (bytes32 result) {
+  function index(bytes29 memView, uint256 _index, uint8 _bytes) internal pure returns (bytes32 result) {
     if (_bytes == 0) {
       return bytes32(0);
     }
@@ -491,11 +454,7 @@ library TypedMemView {
    * @param _bytes    The bytes
    * @return          result - The unsigned integer
    */
-  function indexUint(
-    bytes29 memView,
-    uint256 _index,
-    uint8 _bytes
-  ) internal pure returns (uint256 result) {
+  function indexUint(bytes29 memView, uint256 _index, uint8 _bytes) internal pure returns (uint256 result) {
     return uint256(index(memView, _index, _bytes)) >> ((32 - _bytes) * 8);
   }
 
@@ -506,11 +465,7 @@ library TypedMemView {
    * @param _bytes    The bytes
    * @return          result - The unsigned integer
    */
-  function indexLEUint(
-    bytes29 memView,
-    uint256 _index,
-    uint8 _bytes
-  ) internal pure returns (uint256 result) {
+  function indexLEUint(bytes29 memView, uint256 _index, uint8 _bytes) internal pure returns (uint256 result) {
     return reverseUint256(uint256(index(memView, _index, _bytes)));
   }
 
@@ -521,10 +476,7 @@ library TypedMemView {
    * @param _index    The index
    * @return          address - The address
    */
-  function indexAddress(
-    bytes29 memView,
-    uint256 _index
-  ) internal pure returns (address) {
+  function indexAddress(bytes29 memView, uint256 _index) internal pure returns (address) {
     return address(uint160(indexUint(memView, _index, 20)));
   }
 
@@ -550,10 +502,7 @@ library TypedMemView {
    * @param right     The second view
    * @return          bool - True if the underlying memory is equal
    */
-  function untypedEqual(
-    bytes29 left,
-    bytes29 right
-  ) internal pure returns (bool) {
+  function untypedEqual(bytes29 left, bytes29 right) internal pure returns (bool) {
     return (loc(left) == loc(right) && len(left) == len(right)) || keccak(left) == keccak(right);
   }
 
@@ -563,10 +512,7 @@ library TypedMemView {
    * @param right     The second view
    * @return          bool - False if the underlying memory is equal
    */
-  function untypedNotEqual(
-    bytes29 left,
-    bytes29 right
-  ) internal pure returns (bool) {
+  function untypedNotEqual(bytes29 left, bytes29 right) internal pure returns (bool) {
     return !untypedEqual(left, right);
   }
 
@@ -577,10 +523,7 @@ library TypedMemView {
    * @param right     The second view
    * @return          bool - True if the types are the same
    */
-  function equal(
-    bytes29 left,
-    bytes29 right
-  ) internal pure returns (bool) {
+  function equal(bytes29 left, bytes29 right) internal pure returns (bool) {
     return left == right || (typeOf(left) == typeOf(right) && keccak(left) == keccak(right));
   }
 
@@ -591,10 +534,7 @@ library TypedMemView {
    * @param right     The second view
    * @return          bool - True if the types are not the same
    */
-  function notEqual(
-    bytes29 left,
-    bytes29 right
-  ) internal pure returns (bool) {
+  function notEqual(bytes29 left, bytes29 right) internal pure returns (bool) {
     return !equal(left, right);
   }
 
@@ -609,10 +549,7 @@ library TypedMemView {
    * @param _newLoc   The new location
    * @return          written - the unsafe memory reference
    */
-  function unsafeCopyTo(
-    bytes29 memView,
-    uint256 _newLoc
-  ) private view returns (bytes29 written) {
+  function unsafeCopyTo(bytes29 memView, uint256 _newLoc) private view returns (bytes29 written) {
     if (isNull(memView)) revert NullPointer();
     if (isNotValid(memView)) revert InvalidPointer();
 
@@ -672,10 +609,7 @@ library TypedMemView {
    * @param memViews  The views
    * @return          unsafeView - The conjoined view pointing to the new memory
    */
-  function unsafeJoin(
-    bytes29[] memory memViews,
-    uint256 _location
-  ) private view returns (bytes29 unsafeView) {
+  function unsafeJoin(bytes29[] memory memViews, uint256 _location) private view returns (bytes29 unsafeView) {
     assembly {
       // solhint-disable-previous-line no-inline-assembly
       let ptr := mload(0x40)

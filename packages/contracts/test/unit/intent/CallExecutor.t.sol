@@ -53,10 +53,7 @@ contract MockSpoke {
     callExecutor = _callExecutor;
   }
 
-  function executeCall(
-    address _target,
-    bytes calldata _data
-  ) public returns (bool _success, bytes memory _returnData) {
+  function executeCall(address _target, bytes calldata _data) public returns (bool _success, bytes memory _returnData) {
     (_success, _returnData) = callExecutor.excessivelySafeCall(_target, 100_000, 0, 100, _data);
   }
 }

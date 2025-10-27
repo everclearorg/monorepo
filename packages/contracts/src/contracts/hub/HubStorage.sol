@@ -263,10 +263,7 @@ abstract contract HubStorage is NoncesUpgradeable, IHubStorage {
   }
 
   /// @inheritdoc IHubStorage
-  function assetHash(
-    bytes32 _tickerHash,
-    uint32 _domain
-  ) external view returns (bytes32 _assetHash) {
+  function assetHash(bytes32 _tickerHash, uint32 _domain) external view returns (bytes32 _assetHash) {
     return _tokenConfigs[_tickerHash].assetHashes[_domain];
   }
 
@@ -280,11 +277,7 @@ abstract contract HubStorage is NoncesUpgradeable, IHubStorage {
   /// @inheritdoc IHubStorage
   function tokenConfigs(
     bytes32 _tickerHash
-  )
-    external
-    view
-    returns (uint24 _maxDiscountDbps, uint24 _discountPerEpoch, IEverclear.Strategy _prioritizedStrategy)
-  {
+  ) external view returns (uint24 _maxDiscountDbps, uint24 _discountPerEpoch, IEverclear.Strategy _prioritizedStrategy) {
     TokenConfig storage _tokenConfig = _tokenConfigs[_tickerHash];
     return (_tokenConfig.maxDiscountDbps, _tokenConfig.discountPerEpoch, _tokenConfig.prioritizedStrategy);
   }

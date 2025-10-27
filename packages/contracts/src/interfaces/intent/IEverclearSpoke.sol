@@ -208,20 +208,14 @@ interface IEverclearSpoke is ISpokeStorage {
    * @param _asset The asset address
    * @param _strategy The strategy id (see `enum Strategy`)
    */
-  function setStrategyForAsset(
-    address _asset,
-    IEverclear.Strategy _strategy
-  ) external;
+  function setStrategyForAsset(address _asset, IEverclear.Strategy _strategy) external;
 
   /**
    * @notice Sets a module for a strategy
    * @param _strategy The strategy id (see `enum Strategy`)
    * @param _module The module contract
    */
-  function setModuleForStrategy(
-    IEverclear.Strategy _strategy,
-    ISettlementModule _module
-  ) external;
+  function setModuleForStrategy(IEverclear.Strategy _strategy, ISettlementModule _module) external;
 
   /**
    * @notice Updates the security module
@@ -295,10 +289,7 @@ interface IEverclearSpoke is ISpokeStorage {
    * @param _fee The total fee, expressed in dbps, represents the solver fee plus the sum of protocol fees for the token
    * @return _fillMessage The enqueued fill message
    */
-  function fillIntent(
-    Intent calldata _intent,
-    uint24 _fee
-  ) external returns (FillMessage calldata _fillMessage);
+  function fillIntent(Intent calldata _intent, uint24 _fee) external returns (FillMessage calldata _fillMessage);
 
   /**
    * @notice Allows a relayer to fill an intent for a solver
@@ -379,10 +370,7 @@ interface IEverclearSpoke is ISpokeStorage {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function deposit(
-    address _asset,
-    uint256 _amount
-  ) external;
+  function deposit(address _asset, uint256 _amount) external;
 
   /**
    * @notice withdraws an asset from the EverclearSpoke
@@ -390,10 +378,7 @@ interface IEverclearSpoke is ISpokeStorage {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function withdraw(
-    address _asset,
-    uint256 _amount
-  ) external;
+  function withdraw(address _asset, uint256 _amount) external;
 
   /**
    * @notice Updates the gateway

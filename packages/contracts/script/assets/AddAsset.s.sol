@@ -21,10 +21,7 @@ abstract contract AddAssetBase is Script, ScriptUtils {
   error InvalidAdopted();
   error InvalidApproval();
 
-  function run(
-    string memory _account,
-    address _hub
-  ) public {
+  function run(string memory _account, address _hub) public {
     // Get token setup information
     (string memory _symbol, IHubStorage.TokenSetup memory _setup) = _fetchTokenSetup();
     _checkValidSetup(_setup);
@@ -56,10 +53,7 @@ abstract contract AddAssetBase is Script, ScriptUtils {
     }
   }
 
-  function _logConfig(
-    string memory _symbol,
-    IHubStorage.TokenSetup memory _setup
-  ) internal {
+  function _logConfig(string memory _symbol, IHubStorage.TokenSetup memory _setup) internal {
     console.log('------------------------------------------------');
     console.log('Asset:', _symbol);
     console.log('Prioritized strategy: ', uint256(_setup.prioritizedStrategy));

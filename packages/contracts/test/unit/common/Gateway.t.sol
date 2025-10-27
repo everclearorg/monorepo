@@ -12,21 +12,13 @@ import {Gateway, IGateway} from 'contracts/common/Gateway.sol';
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
 
 contract TestGateway is Gateway {
-  function initialize(
-    address _owner,
-    address _mailbox,
-    address _receiver,
-    address _interchainSecurityModule
-  ) external {
+  function initialize(address _owner, address _mailbox, address _receiver, address _interchainSecurityModule) external {
     _initializeGateway(_owner, _mailbox, _receiver, _interchainSecurityModule);
   }
 
   mapping(uint32 _chainId => bytes32 _gateway) public chainGateways;
 
-  function setGateway(
-    uint32 _chainId,
-    bytes32 _gateway
-  ) external {
+  function setGateway(uint32 _chainId, bytes32 _gateway) external {
     chainGateways[_chainId] = _gateway;
   }
 
@@ -36,10 +28,7 @@ contract TestGateway is Gateway {
     return chainGateways[_chainId];
   }
 
-  function _checkValidSender(
-    uint32,
-    bytes32
-  ) internal pure override {}
+  function _checkValidSender(uint32, bytes32) internal pure override {}
 }
 
 contract BaseTest is TestExtended {
@@ -62,16 +51,15 @@ contract BaseTest is TestExtended {
   ) internal returns (TestGateway _gateway) {
     address _impl = address(new TestGateway());
     _gateway = TestGateway(
-      payable(UnsafeUpgrades.deployUUPSProxy(
+      payable(
+        UnsafeUpgrades.deployUUPSProxy(
           _impl, abi.encodeCall(TestGateway.initialize, (_owner, _mailbox, _receiver, _interchainSecurityModule))
-        ))
+        )
+      )
     );
   }
 
-  function _mockGateway(
-    uint32 _chainId,
-    bytes32 _chainGateway
-  ) internal {
+  function _mockGateway(uint32 _chainId, bytes32 _chainGateway) internal {
     gateway.setGateway(_chainId, _chainGateway);
   }
 
@@ -107,9 +95,7 @@ contract BaseTest is TestExtended {
     bytes memory _metadata = StandardHookMetadata.formatMetadata(0, _gasLimit, address(gateway), '');
     vm.mockCall(
       MAILBOX,
-      abi.encodeWithSignature(
-        'quoteDispatch(uint32,bytes32,bytes,bytes)', _chainId, _chainGateway, _message, _metadata
-      ),
+      abi.encodeWithSignature('quoteDispatch(uint32,bytes32,bytes,bytes)', _chainId, _chainGateway, _message, _metadata),
       abi.encode(_fee)
     );
     vm.expectCall(
@@ -125,10 +111,7 @@ contract BaseTest is TestExtended {
     vm.expectCall(RECEIVER, abi.encodeWithSelector(IMessageReceiver.receiveMessage.selector, _message));
   }
 
-  function _mockValidSender(
-    uint32 _origin,
-    bytes32 _sender
-  ) internal {
+  function _mockValidSender(uint32 _origin, bytes32 _sender) internal {
     vm.mockCall(
       address(gateway), abi.encodeWithSignature('_checkValidSender(uint32,bytes32)', _origin, _sender), abi.encode(true)
     );
@@ -272,11 +255,7 @@ contract Unit_HandleMessage is BaseTest {
   /**
    * @notice Test the `handle` function, assert the receiver is called
    */
-  function test_Handle(
-    uint32 _origin,
-    bytes32 _sender,
-    bytes calldata _message
-  ) public {
+  function test_Handle(uint32 _origin, bytes32 _sender, bytes calldata _message) public {
     _mockReceiver(_message);
 
     vm.prank(MAILBOX);

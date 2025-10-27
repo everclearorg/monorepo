@@ -43,12 +43,7 @@ contract SettlerLogicForTest is SettlerLogic {
     return _contexts[_intentId].pendingRewards;
   }
 
-  function createInvoice(
-    bytes32 _tickerHash,
-    bytes32 _intentId,
-    uint256 _amount,
-    bytes32 _owner
-  ) public {
+  function createInvoice(bytes32 _tickerHash, bytes32 _intentId, uint256 _amount, bytes32 _owner) public {
     _createInvoice(_tickerHash, _intentId, _amount, _owner);
   }
 
@@ -77,11 +72,7 @@ contract SettlerLogicForTest is SettlerLogic {
     _createSettlement(_intentId, _tickerHash, _amount, _destination, _recipient);
   }
 
-  function createSettlementOrInvoice(
-    bytes32 _intentId,
-    bytes32 _tickerHash,
-    bytes32 _recipient
-  ) public {
+  function createSettlementOrInvoice(bytes32 _intentId, bytes32 _tickerHash, bytes32 _recipient) public {
     _createSettlementOrInvoice(_intentId, _tickerHash, _recipient);
   }
 
@@ -93,93 +84,56 @@ contract SettlerLogicForTest is SettlerLogic {
     return _findDestinationWithStrategies(_tickerHash, _amountAndRewards, _destinations);
   }
 
-  function getInvoice(
-    bytes32 _tickerHash,
-    bytes32 _id
-  ) public view returns (IEverclearHub.Invoice memory) {
+  function getInvoice(bytes32 _tickerHash, bytes32 _id) public view returns (IEverclearHub.Invoice memory) {
     return invoices[_tickerHash].at(_id).invoice;
   }
 
-  function getSettlement(
-    uint32 _destination,
-    uint256 _position
-  ) public view returns (IEverclearHub.Settlement memory) {
+  function getSettlement(uint32 _destination, uint256 _position) public view returns (IEverclearHub.Settlement memory) {
     return settlements[_destination].queue[_position];
   }
 
-  function mockTokenConfigAssetHash(
-    bytes32 _tickerHash,
-    uint32 _destination,
-    bytes32 _assetHash
-  ) public {
+  function mockTokenConfigAssetHash(bytes32 _tickerHash, uint32 _destination, bytes32 _assetHash) public {
     _tokenConfigs[_tickerHash].assetHashes[_destination] = _assetHash;
     _adoptedForAssets[_assetHash].adopted = _assetHash;
   }
 
-  function mockTokenDomain(
-    bytes32 _tickerHash,
-    uint32 _tokenDomain
-  ) public {
+  function mockTokenDomain(bytes32 _tickerHash, uint32 _tokenDomain) public {
     _tokenConfigs[_tickerHash].domains.add(_tokenDomain);
   }
 
-  function mockCustodiedAssets(
-    bytes32 _assetHash,
-    uint256 _amount
-  ) public {
+  function mockCustodiedAssets(bytes32 _assetHash, uint256 _amount) public {
     custodiedAssets[_assetHash] = _amount;
   }
 
-  function mockUpdateVirtualBalance(
-    bytes32 _user,
-    bool _update
-  ) public {
+  function mockUpdateVirtualBalance(bytes32 _user, bool _update) public {
     updateVirtualBalance[_user] = _update;
   }
 
-  function mockAdoptedForAsset(
-    bytes32 _assetHash,
-    bytes32 _adopted
-  ) public {
+  function mockAdoptedForAsset(bytes32 _assetHash, bytes32 _adopted) public {
     _adoptedForAssets[_assetHash].adopted = _adopted;
   }
 
-  function mockContextDestinations(
-    bytes32 _intentId,
-    uint32[] memory _destinations
-  ) public {
+  function mockContextDestinations(bytes32 _intentId, uint32[] memory _destinations) public {
     _contexts[_intentId].intent.destinations = _destinations;
   }
 
-  function mockTokenSupportedDomains(
-    bytes32 _tickerHash,
-    uint32[] memory _tokenSupportedDomains
-  ) public {
+  function mockTokenSupportedDomains(bytes32 _tickerHash, uint32[] memory _tokenSupportedDomains) public {
     for (uint256 _i; _i < _tokenSupportedDomains.length; _i++) {
       _tokenConfigs[_tickerHash].domains.add(_tokenSupportedDomains[_i]);
     }
   }
 
-  function mockUserSupportedDomains(
-    bytes32 _user,
-    uint32[] memory _userSupportedDomains
-  ) public {
+  function mockUserSupportedDomains(bytes32 _user, uint32[] memory _userSupportedDomains) public {
     for (uint256 _i; _i < _userSupportedDomains.length; _i++) {
       _usersSupportedDomains[_user].add(_userSupportedDomains[_i]);
     }
   }
 
-  function mockAmountAfterFees(
-    bytes32 _intentId,
-    uint256 _amount
-  ) public {
+  function mockAmountAfterFees(bytes32 _intentId, uint256 _amount) public {
     _contexts[_intentId].amountAfterFees = _amount;
   }
 
-  function mockPendingRewards(
-    bytes32 _intentId,
-    uint256 _amount
-  ) public {
+  function mockPendingRewards(bytes32 _intentId, uint256 _amount) public {
     _contexts[_intentId].pendingRewards = _amount;
   }
 
@@ -189,17 +143,11 @@ contract SettlerLogicForTest is SettlerLogic {
     epochLength = _epochLength;
   }
 
-  function mockAssetHashStrategy(
-    bytes32 _assetHash,
-    IEverclear.Strategy _strategy
-  ) public {
+  function mockAssetHashStrategy(bytes32 _assetHash, IEverclear.Strategy _strategy) public {
     _adoptedForAssets[_assetHash].strategy = _strategy;
   }
 
-  function mockAssetPrioritizedStrategy(
-    bytes32 _tickerHash,
-    IEverclear.Strategy _strategy
-  ) public {
+  function mockAssetPrioritizedStrategy(bytes32 _tickerHash, IEverclear.Strategy _strategy) public {
     _tokenConfigs[_tickerHash].prioritizedStrategy = _strategy;
   }
 }
@@ -241,10 +189,7 @@ contract Unit_CurrentEpoch is BaseTest {
    * @param _epochLength The epoch length
    * @param _blocknumber The block number
    */
-  function test_CurrentEpoch(
-    uint48 _epochLength,
-    uint256 _blocknumber
-  ) public {
+  function test_CurrentEpoch(uint48 _epochLength, uint256 _blocknumber) public {
     vm.assume(_epochLength > 0);
     vm.roll(_blocknumber);
     _mockEpockLength(_epochLength);

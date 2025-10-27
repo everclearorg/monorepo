@@ -54,9 +54,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e6 the amount to transfer end up being 0
     assertEq(ERC20(address(sepoliaDAI)).balanceOf(_user2), 0);
@@ -123,9 +121,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(sepoliaWETH)).balanceOf(_user2), 1);
@@ -192,9 +188,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e6 the amount to transfer end up being 0
     assertEq(ERC20(address(sepoliaDAI)).balanceOf(_user2), 0);
@@ -261,9 +255,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(sepoliaWETH)).balanceOf(_user2), 1);
@@ -333,9 +325,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e6 the amount to transfer end up being 0
     assertEq(ERC20(address(sepoliaDAI)).balanceOf(_user2), 0);
@@ -407,9 +397,7 @@ contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is Integratio
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(sepoliaWETH)).balanceOf(_user2), 1);

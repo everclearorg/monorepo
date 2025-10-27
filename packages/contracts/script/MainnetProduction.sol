@@ -548,7 +548,9 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
   constructor() {
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ETHEREUM, blockGasLimit: 30_000_000, gateway: address(ETHEREUM_SPOKE_GATEWAY).toBytes32()
+        chainId: ETHEREUM,
+        blockGasLimit: 30_000_000,
+        gateway: address(ETHEREUM_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -558,13 +560,17 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: OPTIMISM, blockGasLimit: 30_000_000, gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
+        chainId: OPTIMISM,
+        blockGasLimit: 30_000_000,
+        gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ARBITRUM_ONE, blockGasLimit: 30_000_000, gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
+        chainId: ARBITRUM_ONE,
+        blockGasLimit: 30_000_000,
+        gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -574,7 +580,9 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ZIRCUIT, blockGasLimit: 30_000_000, gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
+        chainId: ZIRCUIT,
+        blockGasLimit: 30_000_000,
+        gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -588,13 +596,17 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: POLYGON, blockGasLimit: 30_000_000, gateway: address(POLYGON_SPOKE_GATEWAY).toBytes32()
+        chainId: POLYGON,
+        blockGasLimit: 30_000_000,
+        gateway: address(POLYGON_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: AVALANCHE, blockGasLimit: 15_000_000, gateway: address(AVALANCHE_SPOKE_GATEWAY).toBytes32()
+        chainId: AVALANCHE,
+        blockGasLimit: 15_000_000,
+        gateway: address(AVALANCHE_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -608,7 +620,9 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: APECHAIN, blockGasLimit: 30_000_000, gateway: address(APECHAIN_SPOKE_GATEWAY).toBytes32()
+        chainId: APECHAIN,
+        blockGasLimit: 30_000_000,
+        gateway: address(APECHAIN_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -618,7 +632,9 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: UNICHAIN, blockGasLimit: 30_000_000, gateway: address(UNICHAIN_SPOKE_GATEWAY).toBytes32()
+        chainId: UNICHAIN,
+        blockGasLimit: 30_000_000,
+        gateway: address(UNICHAIN_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -636,20 +652,18 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: BERACHAIN, blockGasLimit: 30_000_000, gateway: address(BERACHAIN_SPOKE_GATEWAY).toBytes32()
+        chainId: BERACHAIN,
+        blockGasLimit: 30_000_000,
+        gateway: address(BERACHAIN_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: MANTLE, blockGasLimit: 250_000_000, gateway: address(MANTLE_SPOKE_GATEWAY).toBytes32()
-      })
+      DomainAndGateway({chainId: MANTLE, blockGasLimit: 250_000_000, gateway: address(MANTLE_SPOKE_GATEWAY).toBytes32()})
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({
-        chainId: SONIC, blockGasLimit: 5_000_000_000, gateway: address(SONIC_SPOKE_GATEWAY).toBytes32()
-      })
+      DomainAndGateway({chainId: SONIC, blockGasLimit: 5_000_000_000, gateway: address(SONIC_SPOKE_GATEWAY).toBytes32()})
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(

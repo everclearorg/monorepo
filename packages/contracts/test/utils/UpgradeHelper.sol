@@ -26,10 +26,7 @@ import {ISettlerV2, SettlerV2} from 'contracts/hub/modules/SettlerV2.sol';
 import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
 
 interface ICREATE3 {
-  function deploy(
-    bytes32 _salt,
-    bytes calldata _creationCode
-  ) external payable returns (address _deployed);
+  function deploy(bytes32 _salt, bytes calldata _creationCode) external payable returns (address _deployed);
 }
 
 contract TestEverclearSpokeV5 is EverclearSpokeV5 {

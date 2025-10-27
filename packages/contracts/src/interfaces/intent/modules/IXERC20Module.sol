@@ -63,11 +63,7 @@ interface IXERC20Module is ISettlementModule {
    * @param _recipient The recipient of the minted assets
    * @param _amount The amount to mint
    */
-  function mintDebt(
-    address _asset,
-    address _recipient,
-    uint256 _amount
-  ) external;
+  function mintDebt(address _asset, address _recipient, uint256 _amount) external;
 
   /*///////////////////////////////////////////////////////////////
                               VIEWS
@@ -85,8 +81,5 @@ interface IXERC20Module is ISettlementModule {
    * @param _asset The address of the mintable asset
    * @return _amount The total mintable amount
    */
-  function mintable(
-    address _account,
-    address _asset
-  ) external view returns (uint256 _amount);
+  function mintable(address _account, address _asset) external view returns (uint256 _amount);
 }
