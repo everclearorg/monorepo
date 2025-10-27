@@ -89,8 +89,7 @@ contract InvoicesWithDifferentDiscountsOneDepositToFillAll_Integration is Integr
       _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
     });
 
-    uint256 _expectedUserBalance =
-      _liquidityNeededToCoverAllInvoices
+    uint256 _expectedUserBalance = _liquidityNeededToCoverAllInvoices
       - (_liquidityNeededToCoverAllInvoices * totalProtocolFees / Common.DBPS_DENOMINATOR) + _accumulatedRewards;
 
     // check arbitrageour user settlement balance should reflect the amount after fees + rewards
