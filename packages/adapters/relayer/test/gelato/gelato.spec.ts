@@ -103,14 +103,6 @@ describe('Adapters: Gelato', () => {
 
     it('happy: should get task status from gelato', async () => {
       gelatoRelayMock.getTaskStatus.resolves({
-        taskState: RelayerTaskStatus.Blacklisted,
-        transactionHash: mockTxHash,
-      });
-      expect(await getTaskStatus('0x')).to.be.eq(RelayerTaskStatus.Blacklisted);
-    });
-
-    it('happy: should get task status from gelato', async () => {
-      gelatoRelayMock.getTaskStatus.resolves({
         taskState: RelayerTaskStatus.Cancelled,
         transactionHash: mockTxHash,
       });

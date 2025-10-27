@@ -17,7 +17,10 @@ contract TestHubGateway is HubGateway {
     return _getGateway(_chainId);
   }
 
-  function checkValidSender(uint32 _origin, bytes32 _sender) external view {
+  function checkValidSender(
+    uint32 _origin,
+    bytes32 _sender
+  ) external view {
     _checkValidSender(_origin, _sender);
   }
 }
@@ -44,18 +47,18 @@ contract BaseTest is TestExtended {
   ) internal returns (TestHubGateway _gateway) {
     address _impl = address(new TestHubGateway());
     _gateway = TestHubGateway(
-      payable(
-        UnsafeUpgrades.deployUUPSProxy(
+      payable(UnsafeUpgrades.deployUUPSProxy(
           _impl, abi.encodeCall(HubGateway.initialize, (_owner, _mailbox, _receiver, _securityModule))
-        )
-      )
+        ))
     );
   }
 
-  function _mockGateway(uint32 _chainId, bytes32 _chainGateway) internal {
-    stdstore.target(address(hubGateway)).sig(IHubGateway.chainGateways.selector).with_key(_chainId).checked_write(
-      _chainGateway
-    );
+  function _mockGateway(
+    uint32 _chainId,
+    bytes32 _chainGateway
+  ) internal {
+    stdstore.target(address(hubGateway)).sig(IHubGateway.chainGateways.selector).with_key(_chainId)
+      .checked_write(_chainGateway);
   }
 }
 
@@ -65,7 +68,10 @@ contract Unit_AddingChainGateways is BaseTest {
    * @param _chainId The chain ID
    * @param _chainGateway The chain gateway
    */
-  function test_SetChainGateway(uint32 _chainId, bytes32 _chainGateway) public {
+  function test_SetChainGateway(
+    uint32 _chainId,
+    bytes32 _chainGateway
+  ) public {
     vm.assume(_chainGateway != bytes32(0));
 
     vm.prank(RECEIVER);
@@ -80,7 +86,11 @@ contract Unit_AddingChainGateways is BaseTest {
    * @param _initialGateway The initial gateway
    * @param _chainGateway The chain gateway to change to
    */
-  function test_ChangeChainGateway(uint32 _chainId, bytes32 _initialGateway, bytes32 _chainGateway) public {
+  function test_ChangeChainGateway(
+    uint32 _chainId,
+    bytes32 _initialGateway,
+    bytes32 _chainGateway
+  ) public {
     vm.assume(_initialGateway != bytes32(0) && _chainGateway != bytes32(0));
     _mockGateway(_chainId, _initialGateway);
 
@@ -113,7 +123,11 @@ contract Unit_AddingChainGateways is BaseTest {
    * @param _chainId The chain ID
    * @param _chainGateway The chain gateway
    */
-  function test_Revert_SetChainGateway_NonReceiver(address _caller, uint32 _chainId, bytes32 _chainGateway) public {
+  function test_Revert_SetChainGateway_NonReceiver(
+    address _caller,
+    uint32 _chainId,
+    bytes32 _chainGateway
+  ) public {
     vm.assume(_caller != RECEIVER);
 
     vm.expectRevert(abi.encodeWithSelector(IGateway.Gateway_SendMessage_UnauthorizedCaller.selector));
@@ -126,7 +140,10 @@ contract Unit_AddingChainGateways is BaseTest {
    * @param _chainId The chain ID
    * @param _chainGateway The chain gateway
    */
-  function test_RemoveChainGateway(uint32 _chainId, bytes32 _chainGateway) public {
+  function test_RemoveChainGateway(
+    uint32 _chainId,
+    bytes32 _chainGateway
+  ) public {
     vm.assume(_chainGateway != bytes32(0));
 
     _mockGateway(_chainId, _chainGateway);
@@ -161,7 +178,10 @@ contract Unit_ValidSender is BaseTest {
    * @param _chainId The chain ID
    * @param _sender The sender
    */
-  function test_ValidSender(uint32 _chainId, bytes32 _sender) public {
+  function test_ValidSender(
+    uint32 _chainId,
+    bytes32 _sender
+  ) public {
     vm.assume(_sender != 0);
     _mockGateway(_chainId, _sender);
 
@@ -175,7 +195,11 @@ contract Unit_ValidSender is BaseTest {
    * @param _incorrectChainId The incorrect chain ID
    * @param _sender The sender
    */
-  function test_Revert_InvalidSender(uint32 _chainId, uint32 _incorrectChainId, bytes32 _sender) public {
+  function test_Revert_InvalidSender(
+    uint32 _chainId,
+    uint32 _incorrectChainId,
+    bytes32 _sender
+  ) public {
     vm.assume(_chainId != _incorrectChainId);
     vm.assume(_sender != 0);
 
