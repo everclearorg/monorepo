@@ -48,12 +48,7 @@ interface IHubGateway is IGateway {
    * @param _interchainSecurityModule The address of the chosen interchain security module
    * @dev Only called once on initialization
    */
-  function initialize(
-    address _owner,
-    address _mailbox,
-    address _receiver,
-    address _interchainSecurityModule
-  ) external;
+  function initialize(address _owner, address _mailbox, address _receiver, address _interchainSecurityModule) external;
 
   /**
    * @notice adds a chain gateway
@@ -61,10 +56,7 @@ interface IHubGateway is IGateway {
    * @param _gateway address of the gateway
    * @dev only called by the hub
    */
-  function setChainGateway(
-    uint32 _chainId,
-    bytes32 _gateway
-  ) external;
+  function setChainGateway(uint32 _chainId, bytes32 _gateway) external;
 
   /**
    * @notice removes a chain gateway

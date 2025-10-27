@@ -108,11 +108,7 @@ abstract contract Gateway is GasTank, IGateway, IMessageRecipient, ISpecifiesInt
    * @param _sender The remote Gateway contract (on the origin domain)
    * @param _message The message payload
    */
-  function handle(
-    uint32 _origin,
-    bytes32 _sender,
-    bytes calldata _message
-  ) external payable {
+  function handle(uint32 _origin, bytes32 _sender, bytes calldata _message) external payable {
     // only called by mailbox
     if (msg.sender != address(mailbox)) {
       revert Gateway_Handle_NotCalledByMailbox();
@@ -177,10 +173,7 @@ abstract contract Gateway is GasTank, IGateway, IMessageRecipient, ISpecifiesInt
    * @param _origin The id for the origin domain of the message
    * @param _sender The remote Gateway contract (on the origin domain)
    */
-  function _checkValidSender(
-    uint32 _origin,
-    bytes32 _sender
-  ) internal view virtual;
+  function _checkValidSender(uint32 _origin, bytes32 _sender) internal view virtual;
 
   /**
    * @notice Returns the appropriate Gateway address on the destination domain for the message

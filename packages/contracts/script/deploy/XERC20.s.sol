@@ -19,10 +19,7 @@ contract DeployXERC20 is Script, ScriptUtils {
   error SpokeNotDeployed();
   error SpokeMismatch();
 
-  function run(
-    string memory _account,
-    address _spoke
-  ) public {
+  function run(string memory _account, address _spoke) public {
     if (_spoke.code.length == 0) {
       revert SpokeNotDeployed();
     }

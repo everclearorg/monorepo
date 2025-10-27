@@ -54,9 +54,7 @@ contract FeeVaultClaims_Integration is IntegrationBase {
 
     // Process settlements for SEPOLIA testnet
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // amount is denormalized to 6 decimals again dividing by 1e12
     assertEq(

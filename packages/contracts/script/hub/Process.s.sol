@@ -11,13 +11,7 @@ import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
 import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';
 
 contract ProcessSettlementQueue is Script, ScriptUtils {
-  function run(
-    string memory _account,
-    address _hub,
-    uint256 _value,
-    uint32 _domain,
-    uint32 _amount
-  ) public {
+  function run(string memory _account, address _hub, uint256 _value, uint32 _domain, uint32 _amount) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -28,11 +22,7 @@ contract ProcessSettlementQueue is Script, ScriptUtils {
 }
 
 contract HandleExpiredIntents is Script, ScriptUtils {
-  function run(
-    string memory _account,
-    address _hub,
-    bytes memory _encodedIntentIds
-  ) public {
+  function run(string memory _account, address _hub, bytes memory _encodedIntentIds) public {
     uint256 _accountPk = vm.envUint(_account);
     bytes32[] memory _intents = abi.decode(_encodedIntentIds, (bytes32[]));
     vm.startBroadcast(_accountPk);
@@ -44,12 +34,7 @@ contract HandleExpiredIntents is Script, ScriptUtils {
 }
 
 contract ReturnUnsupportedIntent is Script, ScriptUtils {
-  function run(
-    string memory _account,
-    address _hub,
-    uint256 _value,
-    bytes32 _intentId
-  ) public {
+  function run(string memory _account, address _hub, uint256 _value, bytes32 _intentId) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 

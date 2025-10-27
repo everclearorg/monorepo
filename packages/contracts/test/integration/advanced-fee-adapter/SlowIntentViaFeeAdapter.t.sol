@@ -946,14 +946,13 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(1 ether, 0, address(oUSDT), _deadline));
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) =
-      sepoliaFeeAdapter.newOrderSplitEvenly(
-        _numOfIntents,
-        1 ether, // token fee
-        _deadline,
-        _sig,
-        _params
-      );
+    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrderSplitEvenly(
+      _numOfIntents,
+      1 ether, // token fee
+      _deadline,
+      _sig,
+      _params
+    );
 
     // create intent message
     IEverclear.Intent[] memory _intents = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
@@ -1177,14 +1176,13 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(0, 1 ether, address(oUSDT), _deadline));
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) =
-      sepoliaFeeAdapter.newOrderSplitEvenly{value: 1 ether}(
-        _numOfIntents,
-        0, // token fee
-        _deadline,
-        _sig,
-        _params
-      );
+    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrderSplitEvenly{value: 1 ether}(
+      _numOfIntents,
+      0, // token fee
+      _deadline,
+      _sig,
+      _params
+    );
 
     // create intent message
     IEverclear.Intent[] memory _intents = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
@@ -1425,13 +1423,12 @@ contract NewOrder_Integration is IntegrationBase {
     bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(1 ether, 0, address(oUSDT), _deadline));
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) =
-      sepoliaFeeAdapter.newOrder(
-        1 ether, // token fee
-        _deadline,
-        _sig,
-        _params
-      );
+    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder(
+      1 ether, // token fee
+      _deadline,
+      _sig,
+      _params
+    );
 
     // create intent message
     IEverclear.Intent[] memory _intents = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
@@ -1684,13 +1681,12 @@ contract NewOrder_Integration is IntegrationBase {
     bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(0, 1 ether, address(oUSDT), _deadline));
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) =
-      sepoliaFeeAdapter.newOrder{value: 1 ether}(
-        0, // token fee
-        _deadline,
-        _sig,
-        _params
-      );
+    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder{value: 1 ether}(
+      0, // token fee
+      _deadline,
+      _sig,
+      _params
+    );
 
     // create intent message
     IEverclear.Intent[] memory _intents = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(

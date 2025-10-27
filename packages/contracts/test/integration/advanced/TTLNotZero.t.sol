@@ -139,9 +139,7 @@ contract TTLNotZero_Integration is IntegrationBase {
 
     // Process settlements for Ethereum Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     uint256 _discount = _amountAfterFees * defaultDiscountPerEpoch / Common.DBPS_DENOMINATOR;
 
@@ -208,9 +206,7 @@ contract TTLNotZero_Integration is IntegrationBase {
 
     // Process settlements for Ethereum Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     uint256 _discount = _amountAfterFees * defaultDiscountPerEpoch / Common.DBPS_DENOMINATOR;
 
@@ -275,9 +271,7 @@ contract TTLNotZero_Integration is IntegrationBase {
 
     // Process settlements for Ethereum Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     uint256 _discount = _amountAfterFees * defaultDiscountPerEpoch / Common.DBPS_DENOMINATOR;
 
@@ -298,7 +292,10 @@ contract TTLNotZero_Integration is IntegrationBase {
     uint256 _amountAfterFees = _intentAmount - (_intentAmount * totalProtocolFees / Common.DBPS_DENOMINATOR);
 
     _mockMintAndApprove({
-      _token: address(sepoliaXToken), _account: _user, _chainId: ETHEREUM_SEPOLIA_ID, _amount: _intentAmount
+      _token: address(sepoliaXToken),
+      _account: _user,
+      _chainId: ETHEREUM_SEPOLIA_ID,
+      _amount: _intentAmount
     });
 
     // User creates intent to be filled by solver, amount is to cover just the first deposit
@@ -325,9 +322,7 @@ contract TTLNotZero_Integration is IntegrationBase {
     });
 
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // check amount of settlement in sepolia for solver
     assertEq(_getTokenBalanceInSepolia(_solver, address(sepoliaXToken)), _amountAfterFees);
@@ -344,7 +339,10 @@ contract TTLNotZero_Integration is IntegrationBase {
     uint256 _amountAfterFees = _intentAmount - (_intentAmount * totalProtocolFees / Common.DBPS_DENOMINATOR);
 
     _mockMintAndApprove({
-      _token: address(sepoliaXToken), _account: _user, _chainId: ETHEREUM_SEPOLIA_ID, _amount: _intentAmount
+      _token: address(sepoliaXToken),
+      _account: _user,
+      _chainId: ETHEREUM_SEPOLIA_ID,
+      _amount: _intentAmount
     });
 
     // User creates intent to be filled by solver, amount is to cover just the first deposit

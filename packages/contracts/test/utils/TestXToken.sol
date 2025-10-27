@@ -62,10 +62,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _user The address of the user who needs tokens minted
    * @param _amount The amount of tokens being minted
    */
-  function mint(
-    address _user,
-    uint256 _amount
-  ) public {
+  function mint(address _user, uint256 _amount) public {
     if (_revertMint) revert IXERC20_MintRevert();
     _mintWithCaller(msg.sender, _user, _amount);
   }
@@ -76,10 +73,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _user The address of the user who needs tokens burned
    * @param _amount The amount of tokens being burned
    */
-  function burn(
-    address _user,
-    uint256 _amount
-  ) public {
+  function burn(address _user, uint256 _amount) public {
     if (msg.sender != _user) {
       _spendAllowance(_user, msg.sender, _amount);
     }
@@ -108,11 +102,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _burningLimit The updated burning limit we are setting to the bridge
    * @param _bridge The address of the bridge we are setting the limits too
    */
-  function setLimits(
-    address _bridge,
-    uint256 _mintingLimit,
-    uint256 _burningLimit
-  ) external onlyOwner {
+  function setLimits(address _bridge, uint256 _mintingLimit, uint256 _burningLimit) external onlyOwner {
     if (_mintingLimit > (type(uint256).max / 2) || _burningLimit > (type(uint256).max / 2)) {
       revert IXERC20_LimitsTooHigh();
     }
@@ -185,10 +175,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _bridge The address of the bridge who is being changed
    * @param _change The change in the limit
    */
-  function _useMinterLimits(
-    address _bridge,
-    uint256 _change
-  ) internal {
+  function _useMinterLimits(address _bridge, uint256 _change) internal {
     uint256 _currentLimit = mintingCurrentLimitOf(_bridge);
     bridges[_bridge].minterParams.timestamp = block.timestamp;
     bridges[_bridge].minterParams.currentLimit = _currentLimit - _change;
@@ -199,10 +186,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _bridge The address of the bridge who is being changed
    * @param _change The change in the limit
    */
-  function _useBurnerLimits(
-    address _bridge,
-    uint256 _change
-  ) internal {
+  function _useBurnerLimits(address _bridge, uint256 _change) internal {
     uint256 _currentLimit = burningCurrentLimitOf(_bridge);
     bridges[_bridge].burnerParams.timestamp = block.timestamp;
     bridges[_bridge].burnerParams.currentLimit = _currentLimit - _change;
@@ -214,10 +198,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _bridge The address of the bridge we are setting the limit too
    * @param _limit The updated limit we are setting to the bridge
    */
-  function _changeMinterLimit(
-    address _bridge,
-    uint256 _limit
-  ) internal {
+  function _changeMinterLimit(address _bridge, uint256 _limit) internal {
     uint256 _oldLimit = bridges[_bridge].minterParams.maxLimit;
     uint256 _currentLimit = mintingCurrentLimitOf(_bridge);
     bridges[_bridge].minterParams.maxLimit = _limit;
@@ -234,10 +215,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _bridge The address of the bridge we are setting the limit too
    * @param _limit The updated limit we are setting to the bridge
    */
-  function _changeBurnerLimit(
-    address _bridge,
-    uint256 _limit
-  ) internal {
+  function _changeBurnerLimit(address _bridge, uint256 _limit) internal {
     uint256 _oldLimit = bridges[_bridge].burnerParams.maxLimit;
     uint256 _currentLimit = burningCurrentLimitOf(_bridge);
     bridges[_bridge].burnerParams.maxLimit = _limit;
@@ -306,11 +284,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _user The user address
    * @param _amount The amount to burn
    */
-  function _burnWithCaller(
-    address _caller,
-    address _user,
-    uint256 _amount
-  ) internal {
+  function _burnWithCaller(address _caller, address _user, uint256 _amount) internal {
     if (_caller != lockbox) {
       uint256 _currentLimit = burningCurrentLimitOf(_caller);
       if (_currentLimit < _amount) revert IXERC20_NotHighEnoughLimits();
@@ -326,11 +300,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _user The user address
    * @param _amount The amount to mint
    */
-  function _mintWithCaller(
-    address _caller,
-    address _user,
-    uint256 _amount
-  ) internal {
+  function _mintWithCaller(address _caller, address _user, uint256 _amount) internal {
     if (_caller != lockbox) {
       uint256 _currentLimit = mintingCurrentLimitOf(_caller);
       if (_currentLimit < _amount) revert IXERC20_NotHighEnoughLimits();
@@ -343,10 +313,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @notice Testing method to mint tokens to a user for testing and avoid errors when using vm.deal
    * @dev Should be use just for TESTING PURPOSES
    */
-  function mockMint(
-    address _user,
-    uint256 _amount
-  ) external {
+  function mockMint(address _user, uint256 _amount) external {
     _mint(_user, _amount);
   }
 

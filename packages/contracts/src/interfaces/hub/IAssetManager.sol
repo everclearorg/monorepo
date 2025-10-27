@@ -102,10 +102,7 @@ interface IAssetManager {
    * @param _tickerHash The hash of the ticker symbol
    * @param _strategy The strategy to be prioritized for the asset
    */
-  function setPrioritizedStrategy(
-    bytes32 _tickerHash,
-    IEverclear.Strategy _strategy
-  ) external;
+  function setPrioritizedStrategy(bytes32 _tickerHash, IEverclear.Strategy _strategy) external;
 
   /**
    * @notice Set the discount per epoch for an asset
@@ -113,10 +110,7 @@ interface IAssetManager {
    * @param _tickerHash The hash of the ticker symbol
    * @param _discountPerEpoch The discount per epoch
    */
-  function setDiscountPerEpoch(
-    bytes32 _tickerHash,
-    uint24 _discountPerEpoch
-  ) external;
+  function setDiscountPerEpoch(bytes32 _tickerHash, uint24 _discountPerEpoch) external;
 
   /**
    * @notice Set the last epoch processed for an array of assets
