@@ -9,19 +9,13 @@ contract TestWETH is ERC20 {
 
   error TestWETH_RevertTransfer();
 
-  constructor(
-    string memory _name,
-    string memory _symbol
-  ) ERC20(_name, _symbol) {}
+  constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) {}
 
   function decimals() public pure override returns (uint8) {
     return 18;
   }
 
-  function transfer(
-    address to,
-    uint256 value
-  ) public virtual override returns (bool) {
+  function transfer(address to, uint256 value) public virtual override returns (bool) {
     if (_failTransfer) {
       return false;
     } else if (_revertTransfer) {

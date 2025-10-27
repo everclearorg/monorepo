@@ -24,17 +24,11 @@ contract TestUsersManager is UsersManager {
     Uint32Set.add(_supportedDomains, _domain);
   }
 
-  function mockUserSupportedDomain(
-    uint32 _domain,
-    address _user
-  ) public {
+  function mockUserSupportedDomain(uint32 _domain, address _user) public {
     Uint32Set.add(_usersSupportedDomains[_user.toBytes32()], _domain);
   }
 
-  function mockExistingDomains(
-    uint32[] memory _existingDomains,
-    address _user
-  ) public {
+  function mockExistingDomains(uint32[] memory _existingDomains, address _user) public {
     Uint32Set.Set storage _userSupportedDomains = _usersSupportedDomains[_user.toBytes32()];
 
     for (uint256 _i; _i < _existingDomains.length; _i++) {
@@ -230,10 +224,7 @@ contract Unit_UpdateVirutalBalance is BaseTest {
    * @param _status The status to set
    * @param _user The user address
    */
-  function test_SetUpdateVirtualBalance(
-    bool _status,
-    address _user
-  ) public {
+  function test_SetUpdateVirtualBalance(bool _status, address _user) public {
     vm.expectEmit(address(usersManager));
     emit IncreaseVirtualBalanceSet(_user.toBytes32(), _status);
 

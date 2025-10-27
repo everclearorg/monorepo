@@ -30,11 +30,7 @@ contract NewIntentBase is Script, ScriptUtils {
   mapping(uint32 _domain => IFeeAdapter) public feeAdapter;
   uint256 _userPk;
 
-  function _sanityChecks(
-    uint256 _amount,
-    address _sender,
-    address _inputAsset
-  ) internal {
+  function _sanityChecks(uint256 _amount, address _sender, address _inputAsset) internal {
     // user has enough balance of input asset
     uint256 balance = IERC20(_inputAsset).balanceOf(_sender);
     if (balance < _amount) {

@@ -170,7 +170,11 @@ contract IntegrationBase is TestExtended {
 
   function setUp() public {
     HubDeploymentParams memory hubParams = HubDeploymentParams({
-      owner: _owner, deployer: HUB_DEPLOYER, domain: 'scroll-sepolia', mailbox: address(hubMailbox), ISM: hubISM
+      owner: _owner,
+      deployer: HUB_DEPLOYER,
+      domain: 'scroll-sepolia',
+      mailbox: address(hubMailbox),
+      ISM: hubISM
     });
 
     // deploy hub contracts
@@ -563,7 +567,7 @@ contract IntegrationBase is TestExtended {
   }
 
   /*///////////////////////////////////////////////////////////////
-                             HELPERS
+                             HELPERS 
   //////////////////////////////////////////////////////////////*/
 
   function _bytes32ToUint32(
@@ -627,10 +631,7 @@ contract IntegrationBase is TestExtended {
                     REUSABLE INTERNAL FUNCTIONS
   //////////////////////////////////////////////////////////////*/
 
-  function _processSettlementMessage(
-    uint32 _destination,
-    bytes memory _settlementMessageBody
-  ) internal {
+  function _processSettlementMessage(uint32 _destination, bytes memory _settlementMessageBody) internal {
     SpokeChainValues memory _chainValues = spokeChainValues[_destination];
 
     vm.selectFork(_chainValues.fork);
@@ -740,8 +741,8 @@ contract IntegrationBase is TestExtended {
     SpokeChainValues memory _chainValues = spokeChainValues[_origin];
 
     /*///////////////////////////////////////////////////////////////
-                              ORIGIN DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN 
+  //////////////////////////////////////////////////////////////*/
 
     // select origin fork
     vm.selectFork(_chainValues.fork);
@@ -760,17 +761,16 @@ contract IntegrationBase is TestExtended {
 
     bytes memory _intentCalldata = abi.encode(makeAddr('target'), abi.encodeWithSignature('doSomething()'));
 
-    (_intentId, _intent) = _chainValues.spoke
-      .newIntent(
-        _destinations,
-        _user,
-        address(_assetOrigin),
-        address(_assetDestination),
-        _intentAmount,
-        Constants.MAX_FEE,
-        _ttl,
-        _intentCalldata
-      );
+    (_intentId, _intent) = _chainValues.spoke.newIntent(
+      _destinations,
+      _user,
+      address(_assetOrigin),
+      address(_assetDestination),
+      _intentAmount,
+      Constants.MAX_FEE,
+      _ttl,
+      _intentCalldata
+    );
 
     // create intent message
     IEverclear.Intent[] memory _intentsA = new IEverclear.Intent[](1);
@@ -781,8 +781,8 @@ contract IntegrationBase is TestExtended {
     _chainValues.spoke.processIntentQueue{value: 1 ether}(_intentsA);
 
     /*///////////////////////////////////////////////////////////////
-                              EVERCLEAR DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN 
+  //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -865,8 +865,8 @@ contract IntegrationBase is TestExtended {
     uint256 _ethFee
   ) internal returns (bytes32 _intentId, IEverclear.Intent memory _intent) {
     /*///////////////////////////////////////////////////////////////
-                              ORIGIN DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN 
+  //////////////////////////////////////////////////////////////*/
 
     // select origin fork
     vm.selectFork(spokeChainValues[_origin].fork);
@@ -892,10 +892,7 @@ contract IntegrationBase is TestExtended {
     // create new intent
     vm.prank(_user);
 
-    (_intentId, _intent) = spokeChainValues[_origin].feeAdapter
-    .newIntent{
-      value: _ethFee
-    }(
+    (_intentId, _intent) = spokeChainValues[_origin].feeAdapter.newIntent{value: _ethFee}(
       _destinations,
       _user,
       address(_assetOrigin),
@@ -916,8 +913,8 @@ contract IntegrationBase is TestExtended {
     spokeChainValues[_origin].spoke.processIntentQueue{value: 1 ether}(_intentsA);
 
     /*///////////////////////////////////////////////////////////////
-                              EVERCLEAR DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN 
+  //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -949,8 +946,8 @@ contract IntegrationBase is TestExtended {
     address _solver
   ) internal {
     /*///////////////////////////////////////////////////////////////
-                          DESTINATION DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                        DESTINATION DOMAIN 
+  //////////////////////////////////////////////////////////////*/
     SpokeChainValues memory _chainValues = spokeChainValues[_destination];
 
     // switch to destination fork
@@ -981,7 +978,7 @@ contract IntegrationBase is TestExtended {
     _chainValues.spoke.processFillQueue{value: 1 ether}(1);
 
     /*///////////////////////////////////////////////////////////////
-                         EVERCLEAR DOMAIN
+                         EVERCLEAR DOMAIN 
     //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
@@ -1040,50 +1037,32 @@ contract IntegrationBase is TestExtended {
     addressGeneratedNonce++;
   }
 
-  function _getTokenBalanceInSepolia(
-    address _account,
-    address _token
-  ) internal returns (uint256) {
+  function _getTokenBalanceInSepolia(address _account, address _token) internal returns (uint256) {
     _switchFork(ETHEREUM_SEPOLIA_FORK);
     return ERC20(_token).balanceOf(_account);
   }
 
-  function _getTokenBalanceInBscTestnet(
-    address _account,
-    address _token
-  ) internal returns (uint256) {
+  function _getTokenBalanceInBscTestnet(address _account, address _token) internal returns (uint256) {
     _switchFork(BSC_TESTNET_FORK);
     return ERC20(_token).balanceOf(_account);
   }
 
-  function _getTokenVirtualBalanceInSepolia(
-    address _account,
-    address _token
-  ) internal returns (uint256) {
+  function _getTokenVirtualBalanceInSepolia(address _account, address _token) internal returns (uint256) {
     _switchFork(ETHEREUM_SEPOLIA_FORK);
     return sepoliaEverclearSpoke.balances(_token.toBytes32(), _account.toBytes32());
   }
 
-  function _getTokenVirtualBalanceInBscTestnet(
-    address _account,
-    address _token
-  ) internal returns (uint256) {
+  function _getTokenVirtualBalanceInBscTestnet(address _account, address _token) internal returns (uint256) {
     _switchFork(BSC_TESTNET_FORK);
     return bscEverclearSpoke.balances(_token.toBytes32(), _account.toBytes32());
   }
 
-  function _getTokenMintableByUserInSepolia(
-    address _account,
-    address _token
-  ) internal returns (uint256) {
+  function _getTokenMintableByUserInSepolia(address _account, address _token) internal returns (uint256) {
     _switchFork(ETHEREUM_SEPOLIA_FORK);
     return sepoliaXERC20Module.mintable(_account, _token);
   }
 
-  function _getTokenMintableByUserInBscTestnet(
-    address _account,
-    address _token
-  ) internal returns (uint256) {
+  function _getTokenMintableByUserInBscTestnet(address _account, address _token) internal returns (uint256) {
     _switchFork(BSC_TESTNET_FORK);
     return bscXERC20Module.mintable(_account, _token);
   }
@@ -1129,21 +1108,13 @@ contract IntegrationBase is TestExtended {
     hub.setAdoptedForAsset(_config);
   }
 
-  function _setUserSupportedDomains(
-    address _account,
-    uint32[] memory _domains
-  ) internal {
+  function _setUserSupportedDomains(address _account, uint32[] memory _domains) internal {
     _switchHubFork();
     vm.prank(_account);
     hub.setUserSupportedDomains(_domains);
   }
 
-  function _mockMintAndApprove(
-    address _token,
-    address _account,
-    uint32 _chainId,
-    uint256 _amount
-  ) internal {
+  function _mockMintAndApprove(address _token, address _account, uint32 _chainId, uint256 _amount) internal {
     _switchFork(spokeChainValues[_chainId].fork);
     XERC20(address(_token)).mockMint(_account, _amount);
 
@@ -1152,10 +1123,7 @@ contract IntegrationBase is TestExtended {
     ERC20(address(_token)).approve(address(spokeChainValues[_chainId].xerc20Module), type(uint256).max);
   }
 
-  function _setPrioritizedStrategy(
-    bytes32 _tickerHash,
-    IEverclear.Strategy _strategy
-  ) internal {
+  function _setPrioritizedStrategy(bytes32 _tickerHash, IEverclear.Strategy _strategy) internal {
     _switchHubFork();
     vm.prank(_assetManager);
     hub.setPrioritizedStrategy(_tickerHash, _strategy);
@@ -1183,9 +1151,8 @@ contract IntegrationBase is TestExtended {
   ) internal view returns (IEverclear.Intent[] memory) {
     // Calculating the normalised amount
     uint256 _toSend = _params.amount / _numOfIntents;
-    uint256 _toSendNormalised = AssetUtils.normalizeDecimals(
-      ERC20(_params.inputAsset).decimals(), Constants.DEFAULT_NORMALIZED_DECIMALS, _toSend
-    );
+    uint256 _toSendNormalised =
+      AssetUtils.normalizeDecimals(ERC20(_params.inputAsset).decimals(), Constants.DEFAULT_NORMALIZED_DECIMALS, _toSend);
 
     // Initialising the intent and updating
     IEverclear.Intent[] memory _intents = new IEverclear.Intent[](_numOfIntents);
@@ -1211,9 +1178,8 @@ contract IntegrationBase is TestExtended {
 
     // Last intent
     _toSend = _params.amount - (_toSend * (_numOfIntents - 1));
-    _toSendNormalised = AssetUtils.normalizeDecimals(
-      ERC20(_params.inputAsset).decimals(), Constants.DEFAULT_NORMALIZED_DECIMALS, _toSend
-    );
+    _toSendNormalised =
+      AssetUtils.normalizeDecimals(ERC20(_params.inputAsset).decimals(), Constants.DEFAULT_NORMALIZED_DECIMALS, _toSend);
     _intents[_numOfIntents - 1] = IEverclear.Intent({
       initiator: _initiator.toBytes32(),
       receiver: _params.receiver.toBytes32(),
@@ -1280,10 +1246,7 @@ contract IntegrationBase is TestExtended {
     return _intents;
   }
 
-  function _normaliseAmount(
-    uint256 _amount,
-    address _asset
-  ) internal view returns (uint256) {
+  function _normaliseAmount(uint256 _amount, address _asset) internal view returns (uint256) {
     return AssetUtils.normalizeDecimals(ERC20(_asset).decimals(), Constants.DEFAULT_NORMALIZED_DECIMALS, _amount);
   }
 
@@ -1313,10 +1276,7 @@ contract IntegrationBase is TestExtended {
     }
   }
 
-  function _calculateFee(
-    uint256 _intentAmount,
-    uint256 _totalProtocolFees
-  ) internal pure returns (uint256) {
+  function _calculateFee(uint256 _intentAmount, uint256 _totalProtocolFees) internal pure returns (uint256) {
     return _intentAmount - ((_totalProtocolFees * _intentAmount) / Constants.DBPS_DENOMINATOR);
   }
 }

@@ -34,8 +34,8 @@ contract Intent_Integration is IntegrationBase {
 
   function test_IntentViaFeeAdapter_Unsupported_FeeInTransacting() public {
     /*///////////////////////////////////////////////////////////////
-                           ORIGIN DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                         ORIGIN DOMAIN 
+  //////////////////////////////////////////////////////////////*/
 
     // select origin fork
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
@@ -86,8 +86,8 @@ contract Intent_Integration is IntegrationBase {
     assertEq(IERC20(_unsupportedToken).balanceOf(address(sepoliaEverclearSpoke)), 100 ether);
 
     /*///////////////////////////////////////////////////////////////
-                           EVERCLEAR DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                         EVERCLEAR DOMAIN 
+  //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -125,7 +125,7 @@ contract Intent_Integration is IntegrationBase {
     bytes memory _settlementMessageBody = abi.decode(entries[0].data, (bytes));
 
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN
+                          ORIGIN DOMAIN 
     //////////////////////////////////////////////////////////////*/
 
     // switch to origin fork
@@ -173,8 +173,8 @@ contract Intent_Integration is IntegrationBase {
 
   function test_Intent_Slow_SingleDomain_XERC20_UnsupportedDestination_FeeInTransacting() public {
     /*///////////////////////////////////////////////////////////////
-                            ORIGIN DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                          ORIGIN DOMAIN 
+  //////////////////////////////////////////////////////////////*/
     uint256 _intentAmount = 100 ether;
     uint256 _feeAmount = 1 ether;
 
@@ -235,8 +235,8 @@ contract Intent_Integration is IntegrationBase {
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(address(sepoliaFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                            EVERCLEAR DOMAIN
-    //////////////////////////////////////////////////////////////*/
+                          EVERCLEAR DOMAIN 
+  //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);

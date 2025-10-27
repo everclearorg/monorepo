@@ -28,10 +28,7 @@ contract FillIntentBase is Script, ScriptUtils {
   mapping(uint32 _domain => IEverclearSpoke) public spokes;
   uint256 _userPk;
 
-  function run(
-    IEverclear.Intent memory _intent,
-    uint24 _fee
-  ) public {
+  function run(IEverclear.Intent memory _intent, uint24 _fee) public {
     vm.startBroadcast(_userPk);
 
     IEverclearSpoke _spoke = spokes[uint32(block.chainid)];
@@ -110,10 +107,7 @@ contract FillIntentBase is Script, ScriptUtils {
    * @param _amount Amount in 18 decimals
    * @param _decimals Destination decimals
    */
-  function _normalizeAmount(
-    uint256 _amount,
-    uint256 _decimals
-  ) internal pure returns (uint256) {
+  function _normalizeAmount(uint256 _amount, uint256 _decimals) internal pure returns (uint256) {
     if (_decimals == 18) {
       return _amount;
     } else if (_decimals < 18) {

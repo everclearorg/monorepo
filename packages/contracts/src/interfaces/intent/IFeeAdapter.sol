@@ -236,9 +236,5 @@ interface IFeeAdapter {
    * @param _amount Amount of the asset to return
    * @param _recipient Address of the recipient
    */
-  function returnUnsupportedIntent(
-    address _asset,
-    uint256 _amount,
-    address _recipient
-  ) external;
+  function returnUnsupportedIntent(address _asset, uint256 _amount, address _recipient) external;
 }

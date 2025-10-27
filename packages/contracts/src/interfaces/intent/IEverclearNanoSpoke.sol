@@ -251,10 +251,7 @@ interface IEverclearNanoSpoke is ISpokeStorage {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function withdraw(
-    address _asset,
-    uint256 _amount
-  ) external;
+  function withdraw(address _asset, uint256 _amount) external;
 
   /**
    * @notice Updates the gateway

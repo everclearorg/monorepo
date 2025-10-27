@@ -45,9 +45,7 @@ export const updateMessages = async () => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateMessages.name);
 
-  const evmDomains = Object.keys(config.chains)
-    .filter((d) => config.chains[d].network === 'evm')
-    .concat(config.hub.domain);
+  const evmDomains = Object.keys(config.chains).filter(d => config.chains[d].network === 'evm').concat(config.hub.domain);
   for (const domain of evmDomains) {
     // Retrieve the most recent timestamp
     const latestNonce = await database.getCheckPoint('message_' + domain);
@@ -127,9 +125,7 @@ export const updateQueues = async () => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateQueues.name);
 
-  const evmDomains = Object.keys(config.chains).filter(
-    (c) => c !== config.hub.domain && config.chains[c].network === 'evm',
-  );
+  const evmDomains = Object.keys(config.chains).filter((c) => c !== config.hub.domain && config.chains[c].network === 'evm');
   logger.debug('Method start', requestContext, methodContext, { spokes: evmDomains, hub: config.hub.domain });
 
   const settlementQueues = await subgraph.getSettlementQueues(config.hub.domain);
@@ -142,7 +138,7 @@ export const updateQueues = async () => {
   const prevBlock = await database.getCheckPoint('hub_queue_deposit');
   const depositQueues = await subgraph.getDepositQueues(config.hub.domain, prevBlock);
   logger.debug('Retrieved deposit queues', requestContext, methodContext, {
-    depositQueues,
+    depositQueues
   });
 
   const spokeSubgraphReturn = await Promise.all(evmDomains.map((s) => subgraph.getSpokeQueues(s)));
@@ -187,7 +183,7 @@ export const updateMessageStatus = async () => {
     });
 
     // Skip messages going to solana, they will be updated by lighthouse
-    const messagesToProcess = uncompletedMessages.filter((message) => message.destinationDomain !== SOLANA_CHAINID);
+    const messagesToProcess = uncompletedMessages.filter(message => message.destinationDomain !== SOLANA_CHAINID);
 
     const statusRes = await Promise.all(
       messagesToProcess.map(async (message) => {

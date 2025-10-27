@@ -35,7 +35,10 @@ contract XERC20TTLNotZeroSolverFillsSettledNonXERC20_Integration is IntegrationB
     });
 
     _mockMintAndApprove({
-      _token: address(sepoliaXToken), _account: _user, _chainId: ETHEREUM_SEPOLIA_ID, _amount: _intentAmount
+      _token: address(sepoliaXToken),
+      _account: _user,
+      _chainId: ETHEREUM_SEPOLIA_ID,
+      _amount: _intentAmount
     });
 
     // User creates intent to be filled by solver, amount is to cover just the first deposit
@@ -75,9 +78,7 @@ contract XERC20TTLNotZeroSolverFillsSettledNonXERC20_Integration is IntegrationB
     });
 
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // check amount of settlement in sepolia for solver, converting to DAI decimals (DAI: 6, TXT: 18)
     assertEq(_getTokenBalanceInSepolia(_solver, address(sepoliaDAI)), _amountAfterFees / 1e12);

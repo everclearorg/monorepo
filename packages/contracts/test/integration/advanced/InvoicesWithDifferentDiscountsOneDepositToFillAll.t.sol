@@ -85,12 +85,9 @@ contract InvoicesWithDifferentDiscountsOneDepositToFillAll_Integration is Integr
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
-    uint256 _expectedUserBalance =
-      _liquidityNeededToCoverAllInvoices
+    uint256 _expectedUserBalance = _liquidityNeededToCoverAllInvoices
       - (_liquidityNeededToCoverAllInvoices * totalProtocolFees / Common.DBPS_DENOMINATOR) + _accumulatedRewards;
 
     // check arbitrageour user settlement balance should reflect the amount after fees + rewards

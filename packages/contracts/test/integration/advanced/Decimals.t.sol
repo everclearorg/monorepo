@@ -65,9 +65,7 @@ contract DecimalsTests_Integration is IntegrationBase {
 
     // Process settlements for Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // check balance of user in sepolia
     assertEq(_getTokenBalanceInSepolia(_user2, address(sepoliaDAI)), _daiAmountAfterFeesSepolia);
@@ -122,9 +120,7 @@ contract DecimalsTests_Integration is IntegrationBase {
 
     // Process settlements for Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // check balance of user in sepolia
     assertEq(_getTokenBalanceInSepolia(_user2, address(sepoliaDAI)), _daiAmountAfterFeesSepolia);
@@ -254,9 +250,7 @@ contract DecimalsTests_Integration is IntegrationBase {
 
     // Process settlements for Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // check balance of settled solver in sepolia
     assertEq(_getTokenBalanceInSepolia(_solver, address(sepoliaDAI)), _daiAmountAfterFeesSepolia);
@@ -308,9 +302,7 @@ contract DecimalsTests_Integration is IntegrationBase {
 
     // Process settlements for Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // check balance of settled solver in sepolia
     assertEq(_getTokenBalanceInSepolia(_solver, address(sepoliaDAI)), _daiAmountAfterFeesSepolia);
@@ -364,9 +356,7 @@ contract DecimalsTests_Integration is IntegrationBase {
 
     // Process settlements for Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // check balance of settled solver in sepolia
     assertEq(_getTokenBalanceInSepolia(_solver, address(sepoliaXToken)), _xAmountAfterFeesSepolia);
@@ -420,9 +410,7 @@ contract DecimalsTests_Integration is IntegrationBase {
 
     // Process settlements for Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // check balance of settled solver in sepolia
     assertEq(_getTokenBalanceInSepolia(_solver, address(sepoliaXToken)), _xAmountAfterFeesSepolia);

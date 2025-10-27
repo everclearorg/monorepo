@@ -26,14 +26,14 @@ contract DTT is AddAssetBase, TestnetStagingEnvironment {
     bytes32 _tickerHash = keccak256(bytes(_symbol));
 
     /*///////////////////////////////////////////////////////////////
-                              TOKEN FEES
+                              TOKEN FEES 
     //////////////////////////////////////////////////////////////*/
 
     IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](1);
     _fees[0] = IHubStorage.Fee({recipient: OWNER, fee: 10});
 
     /*///////////////////////////////////////////////////////////////
-                         ADOPTED CONFIGURATION
+                         ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
     IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](4);
@@ -75,7 +75,7 @@ contract DTT is AddAssetBase, TestnetStagingEnvironment {
     });
 
     /*///////////////////////////////////////////////////////////////
-                          TOKEN SETUP
+                          TOKEN SETUP 
     //////////////////////////////////////////////////////////////*/
 
     _setup = IHubStorage.TokenSetup({

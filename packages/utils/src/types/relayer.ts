@@ -41,7 +41,7 @@ export type MetaTxTask = {
 // Gelato SDK send request.
 export type RelayerRequest = {
   // Chain ID of the chain where the target smart contract is deployed
-  chainId: bigint;
+  chainId: number;
   // Address of the target smart contract
   target: string;
   // Encoded payload data (usually a function selector plus the required arguments) used to call the required target address
@@ -52,7 +52,7 @@ export type RelayerRequest = {
 
 export type RelayerSyncFeeRequest = {
   // Chain ID of the chain where the target smart contract is deployed
-  chainId: bigint;
+  chainId: number;
   // Address of the target smart contract
   target: string;
   // Encoded payload data (usually a function selector plus the required arguments) used to call the required target address
@@ -72,7 +72,7 @@ export type RelayResponse = {
 // Gelato SDK send request options.
 export type RelayRequestOptions = {
   // Gas limit of the relay call. This effectively sets an upper price limit for the relay call.
-  gasLimit?: bigint;
+  gasLimit?: string;
   // Number of retries that Gelato should attempt before discarding this relay call
   retries?: number;
 };

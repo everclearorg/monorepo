@@ -66,9 +66,7 @@ contract ChangeUserPreferredDomainForSettle_Integration is IntegrationBase {
 
     // Process settlements for SEPOLIA testnet
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({
-      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
-    });
+    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
 
     // Check that no discount was applied and only protocol fees were charged, with the decimals of sepolia x tokens
     assertEq(

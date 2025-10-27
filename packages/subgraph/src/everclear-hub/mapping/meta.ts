@@ -74,8 +74,7 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
  *
  * @param event - The contract event used to create the subgraph record
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function handlePaused(_event: PausedEvent): void {
+export function handlePaused(event: PausedEvent): void {
   const meta = getOrCreateMeta();
   meta.paused = true;
   meta.save();
@@ -86,8 +85,7 @@ export function handlePaused(_event: PausedEvent): void {
  *
  * @param event - The contract event used to create the subgraph record
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function handleUnpaused(_event: UnpausedEvent): void {
+export function handleUnpaused(event: UnpausedEvent): void {
   const meta = getOrCreateMeta();
   meta.paused = false;
   meta.save();

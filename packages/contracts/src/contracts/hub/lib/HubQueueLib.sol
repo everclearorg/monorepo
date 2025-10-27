@@ -46,10 +46,7 @@ library HubQueueLib {
    * @param _queue The DepositQueue
    * @param _deposit The deposit to enqueue
    */
-  function enqueueDeposit(
-    DepositQueue storage _queue,
-    IHubStorage.Deposit memory _deposit
-  ) internal {
+  function enqueueDeposit(DepositQueue storage _queue, IHubStorage.Deposit memory _deposit) internal {
     if (_queue.first == 0) {
       _queue.first = 1;
       _queue.firstDepositWithPurchasePower = 1;
@@ -63,10 +60,7 @@ library HubQueueLib {
    * @param _queue The SettlementQueue
    * @param _settlement The settlement to enqueue
    */
-  function enqueueSettlement(
-    SettlementQueue storage _queue,
-    IEverclear.Settlement memory _settlement
-  ) internal {
+  function enqueueSettlement(SettlementQueue storage _queue, IEverclear.Settlement memory _settlement) internal {
     if (_queue.first == 0) {
       _queue.first = 1;
     }
@@ -114,11 +108,7 @@ library HubQueueLib {
    * @param _position The position in the queue
    * @param _decreaseAmount The amount to decrease the purchase power by
    */
-  function updateAt(
-    DepositQueue storage _queue,
-    uint256 _position,
-    uint256 _decreaseAmount
-  ) internal {
+  function updateAt(DepositQueue storage _queue, uint256 _position, uint256 _decreaseAmount) internal {
     IHubStorage.Deposit storage _deposit = _queue.queue[_position];
     _deposit.purchasePower -= _decreaseAmount;
     if (_deposit.purchasePower == 0) {
@@ -143,10 +133,7 @@ library HubQueueLib {
    * @param _position The position in the queue
    * @return _deposit The deposit at the given position
    */
-  function at(
-    DepositQueue storage _queue,
-    uint256 _position
-  ) internal view returns (IHubStorage.Deposit memory) {
+  function at(DepositQueue storage _queue, uint256 _position) internal view returns (IHubStorage.Deposit memory) {
     return _queue.queue[_position];
   }
 

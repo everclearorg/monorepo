@@ -26,14 +26,14 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
     bytes32 _tickerHash = keccak256(bytes(_symbol));
 
     /*///////////////////////////////////////////////////////////////
-                              TOKEN FEES
+                              TOKEN FEES 
     //////////////////////////////////////////////////////////////*/
 
     IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](0);
     // _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 0}); // 0 BPS
 
     /*///////////////////////////////////////////////////////////////
-                         ADOPTED CONFIGURATION
+                         ADOPTED CONFIGURATION  
     //////////////////////////////////////////////////////////////*/
 
     IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](19);
@@ -210,7 +210,7 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
     });
 
     /*///////////////////////////////////////////////////////////////
-                          TOKEN SETUP
+                          TOKEN SETUP 
     //////////////////////////////////////////////////////////////*/
 
     _setup = IHubStorage.TokenSetup({

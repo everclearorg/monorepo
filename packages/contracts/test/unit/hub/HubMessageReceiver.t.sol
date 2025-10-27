@@ -35,40 +35,25 @@ contract TestHubMessageReceiver is HubMessageReceiver {
     return _deductProtocolFees(_tickerHash, _amount);
   }
 
-  function mockAssetFees(
-    bytes32 _tickerHash,
-    IHubStorage.Fee[] memory _fees
-  ) external {
+  function mockAssetFees(bytes32 _tickerHash, IHubStorage.Fee[] memory _fees) external {
     for (uint256 _i; _i < _fees.length; _i++) {
       _tokenConfigs[_tickerHash].fees.push(_fees[_i]);
     }
   }
 
-  function mockIntentStatus(
-    bytes32 _intentId,
-    uint8 _status
-  ) external {
+  function mockIntentStatus(bytes32 _intentId, uint8 _status) external {
     _contexts[_intentId].status = IEverclear.IntentStatus(_status);
   }
 
-  function mockAdoptedForAssetsApproval(
-    bytes32 _inputAssetHash,
-    bool _adopted
-  ) external {
+  function mockAdoptedForAssetsApproval(bytes32 _inputAssetHash, bool _adopted) external {
     _adoptedForAssets[_inputAssetHash].approval = _adopted;
   }
 
-  function mockTickerHash(
-    bytes32 _inputAssetHash,
-    bytes32 _tickerHash
-  ) external {
+  function mockTickerHash(bytes32 _inputAssetHash, bytes32 _tickerHash) external {
     _adoptedForAssets[_inputAssetHash].tickerHash = _tickerHash;
   }
 
-  function mockSupportedDomains(
-    uint32[] memory _domains,
-    bool _supported
-  ) external {
+  function mockSupportedDomains(uint32[] memory _domains, bool _supported) external {
     if (_supported) {
       for (uint256 _i; _i < _domains.length; _i++) {
         Uint32Set.add(_supportedDomains, _domains[_i]);
@@ -80,11 +65,7 @@ contract TestHubMessageReceiver is HubMessageReceiver {
     }
   }
 
-  function mockOutputAssetHash(
-    bytes32 _tickerHash,
-    uint32 _domain,
-    bytes32 _outputAssetHash
-  ) external {
+  function mockOutputAssetHash(bytes32 _tickerHash, uint32 _domain, bytes32 _outputAssetHash) external {
     _tokenConfigs[_tickerHash].assetHashes[_domain] = _outputAssetHash;
   }
 
@@ -134,10 +115,7 @@ contract Unit_ReceiveIntents is BaseTest {
    * @param _intent The intent object
    * @param _status The status of the intent
    */
-  function test_ReceiveIntent_RandomStatus(
-    IEverclear.Intent memory _intent,
-    uint8 _status
-  ) public {
+  function test_ReceiveIntent_RandomStatus(IEverclear.Intent memory _intent, uint8 _status) public {
     vm.assume(
       _status != uint8(IEverclear.IntentStatus.NONE) && _status != uint8(IEverclear.IntentStatus.FILLED)
         && _status <= uint8(type(IEverclear.IntentStatus).max)
@@ -157,10 +135,7 @@ contract Unit_ReceiveIntents is BaseTest {
    * @param _intent The intent object
    * @param _status The status of the intent
    */
-  function test_ReceiveIntent_Unsupported_UnapprovedInputAsset(
-    IEverclear.Intent memory _intent,
-    bool _status
-  ) public {
+  function test_ReceiveIntent_Unsupported_UnapprovedInputAsset(IEverclear.Intent memory _intent, bool _status) public {
     vm.assume(_intent.destinations.length > 0);
     (uint8 __status, bytes32 _intentId, bytes32 _inputAssetHash,) = _processIntent(_intent, _status);
     hubMessageReceiver.mockIntentStatus(_intentId, __status);
@@ -188,10 +163,7 @@ contract Unit_ReceiveIntents is BaseTest {
    * @param _intent The intent object
    * @param _status The status of the intent
    */
-  function test_ReceiveIntent_Unsupported_InvalidDomain(
-    IEverclear.Intent memory _intent,
-    bool _status
-  ) public {
+  function test_ReceiveIntent_Unsupported_InvalidDomain(IEverclear.Intent memory _intent, bool _status) public {
     vm.assume(_intent.destinations.length > 0);
 
     (uint8 __status, bytes32 _intentId, bytes32 _inputAssetHash,) = _processIntent(_intent, _status);
@@ -299,11 +271,7 @@ contract Unit_ReceiveIntents is BaseTest {
    * @param _status The status of the intent
    * @param _tickerHash The ticker hash of the asset of the intent
    */
-  function test_ReceiveIntent_WithInvoices(
-    IEverclear.Intent memory _intent,
-    bool _status,
-    bytes32 _tickerHash
-  ) public {
+  function test_ReceiveIntent_WithInvoices(IEverclear.Intent memory _intent, bool _status, bytes32 _tickerHash) public {
     vm.assume(_intent.ttl != 0);
     vm.assume(_intent.destinations.length > 0);
     (uint8 __status, bytes32 _intentId, bytes32 _inputAssetHash, bytes32 _outputAssetHash) =
@@ -353,10 +321,7 @@ contract Unit_ReceiveFillMessages is BaseTest {
    * @param _fillMessage The fill message object
    * @param _status The status of the fill
    */
-  function test_ReceiveFillMessage_RandomStatus(
-    IEverclear.FillMessage memory _fillMessage,
-    uint8 _status
-  ) public {
+  function test_ReceiveFillMessage_RandomStatus(IEverclear.FillMessage memory _fillMessage, uint8 _status) public {
     vm.assume(
       _status != uint8(IEverclear.IntentStatus.NONE) && _status != uint8(IEverclear.IntentStatus.ADDED)
         && _status != uint8(IEverclear.IntentStatus.DEPOSIT_PROCESSED)
@@ -431,10 +396,7 @@ contract Unit_Reverts is BaseTest {
    * @param _messageType The message type
    * @param _data The data of the message
    */
-  function test_Revert_ReceiveMessage_InvalidMessageType(
-    uint8 _messageType,
-    bytes memory _data
-  ) public {
+  function test_Revert_ReceiveMessage_InvalidMessageType(uint8 _messageType, bytes memory _data) public {
     _messageType = uint8(bound(uint256(_messageType), 2, uint256(type(MessageLib.MessageType).max)));
     bytes memory _message = MessageLib.formatMessage(MessageLib.MessageType(_messageType), _data);
 
@@ -449,10 +411,7 @@ contract Unit_Reverts is BaseTest {
    * @param _caller The caller of the function
    * @param _message The message to be received
    */
-  function test_Revert_ReceiveMessage_NonGateway(
-    address _caller,
-    bytes calldata _message
-  ) public {
+  function test_Revert_ReceiveMessage_NonGateway(address _caller, bytes calldata _message) public {
     vm.assume(_caller != GATEWAY && _caller != address(0));
 
     vm.expectRevert(IHubStorage.HubStorage_Unauthorized.selector);

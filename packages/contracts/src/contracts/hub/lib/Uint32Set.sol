@@ -51,10 +51,7 @@ library Uint32Set {
    * Returns true if the value was added to the set, that is if it was not
    * already present.
    */
-  function add(
-    Set storage _set,
-    uint32 _value
-  ) internal returns (bool) {
+  function add(Set storage _set, uint32 _value) internal returns (bool) {
     return _add(_set, _value);
   }
 
@@ -64,10 +61,7 @@ library Uint32Set {
    * Returns true if the value was removed from the set, that is if it was
    * present.
    */
-  function remove(
-    Set storage _set,
-    uint32 _value
-  ) internal returns (bool) {
+  function remove(Set storage _set, uint32 _value) internal returns (bool) {
     return _remove(_set, _value);
   }
 
@@ -87,10 +81,7 @@ library Uint32Set {
   /**
    * @dev Returns true if the value is in the set. O(1).
    */
-  function contains(
-    Set storage _set,
-    uint32 _value
-  ) internal view returns (bool) {
+  function contains(Set storage _set, uint32 _value) internal view returns (bool) {
     return _contains(_set, _value);
   }
 
@@ -113,10 +104,7 @@ library Uint32Set {
    *
    * - `index` must be strictly less than {length}.
    */
-  function at(
-    Set storage _set,
-    uint256 _index
-  ) internal view returns (uint32) {
+  function at(Set storage _set, uint256 _index) internal view returns (uint32) {
     return _at(_set, _index);
   }
 
@@ -152,10 +140,7 @@ library Uint32Set {
    * Returns true if the value was added to the set, that is if it was not
    * already present.
    */
-  function _add(
-    Set storage _set,
-    uint32 _value
-  ) private returns (bool) {
+  function _add(Set storage _set, uint32 _value) private returns (bool) {
     if (!_contains(_set, _value)) {
       _set.values.push(_value);
       // The value is stored at length-1, but we add 1 to all indexes
@@ -173,10 +158,7 @@ library Uint32Set {
    * Returns true if the value was removed from the set, that is if it was
    * present.
    */
-  function _remove(
-    Set storage _set,
-    uint32 _value
-  ) private returns (bool) {
+  function _remove(Set storage _set, uint32 _value) private returns (bool) {
     // We read and store the value's index to prevent multiple reads from the same storage slot
     uint256 valueIndex = _set.indexes[_value];
 
@@ -213,10 +195,7 @@ library Uint32Set {
   /**
    * @dev Returns true if the value is in the set. O(1).
    */
-  function _contains(
-    Set storage _set,
-    uint32 _value
-  ) private view returns (bool) {
+  function _contains(Set storage _set, uint32 _value) private view returns (bool) {
     return _set.indexes[_value] != 0;
   }
 
@@ -239,10 +218,7 @@ library Uint32Set {
    *
    * - `index` must be strictly less than {length}.
    */
-  function _at(
-    Set storage _set,
-    uint256 _index
-  ) private view returns (uint32) {
+  function _at(Set storage _set, uint256 _index) private view returns (uint32) {
     return _set.values[_index];
   }
 
