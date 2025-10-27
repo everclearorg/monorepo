@@ -15,7 +15,11 @@ library AssetUtils {
    * @param _amount The value to normalize to the `_out` decimals
    * @return _normalized Normalized decimals.
    */
-  function normalizeDecimals(uint8 _in, uint8 _out, uint256 _amount) internal pure returns (uint256 _normalized) {
+  function normalizeDecimals(
+    uint8 _in,
+    uint8 _out,
+    uint256 _amount
+  ) internal pure returns (uint256 _normalized) {
     if (_in == _out) {
       return _amount;
     }
@@ -33,7 +37,10 @@ library AssetUtils {
    * @param _domain The domain of the asset
    * @return _assetHash The hash of the asset
    */
-  function getAssetHash(bytes32 _asset, uint32 _domain) internal pure returns (bytes32 _assetHash) {
+  function getAssetHash(
+    bytes32 _asset,
+    uint32 _domain
+  ) internal pure returns (bytes32 _assetHash) {
     return keccak256(abi.encode(_asset, _domain));
   }
 }
