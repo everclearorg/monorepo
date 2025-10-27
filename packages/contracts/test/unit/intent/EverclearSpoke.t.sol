@@ -63,11 +63,19 @@ contract TestEverclearSpoke is EverclearSpoke {
     return fillQueue.queue[_position];
   }
 
-  function addBalance(bytes32 _account, bytes32 _asset, uint256 _amount) public {
+  function addBalance(
+    bytes32 _account,
+    bytes32 _asset,
+    uint256 _amount
+  ) public {
     balances[_asset][_account] += _amount;
   }
 
-  function addBalance(address _account, bytes32 _asset, uint256 _amount) public {
+  function addBalance(
+    address _account,
+    bytes32 _asset,
+    uint256 _amount
+  ) public {
     balances[_asset][_account.toBytes32()] += _amount;
   }
 
@@ -87,7 +95,10 @@ contract TestEverclearSpoke is EverclearSpoke {
     paused = true;
   }
 
-  function mockIntentStatus(bytes32 _intentId, IEverclear.IntentStatus __status) public {
+  function mockIntentStatus(
+    bytes32 _intentId,
+    IEverclear.IntentStatus __status
+  ) public {
     status[_intentId] = __status;
   }
 
@@ -233,7 +244,10 @@ contract BaseTest is TestExtended {
     _intentId = keccak256(abi.encode(_intentMessage));
   }
 
-  function _newIntent(IEverclear.Intent memory _intent, uint64 _nonce) internal returns (bytes32 _intentId) {
+  function _newIntent(
+    IEverclear.Intent memory _intent,
+    uint64 _nonce
+  ) internal returns (bytes32 _intentId) {
     (IEverclear.Intent memory _intentMessage, bytes32 _intentId) = _createValidIntent(_intent, _nonce);
     uint256 _previousBalance = everclearSpoke.getBalance(_intentMessage.inputAsset);
 
@@ -382,11 +396,17 @@ contract BaseTest is TestExtended {
     vm.expectCall(address(CALL_EXECUTOR), abi.encodeWithSelector(ICallExecutor.excessivelySafeCall.selector));
   }
 
-  function _mockTokenDecimals(bytes32 _token, uint8 _decimals) internal {
+  function _mockTokenDecimals(
+    bytes32 _token,
+    uint8 _decimals
+  ) internal {
     _mockTokenDecimals(_token.toAddress(), _decimals);
   }
 
-  function _mockTokenDecimals(address _token, uint8 _decimals) internal {
+  function _mockTokenDecimals(
+    address _token,
+    uint8 _decimals
+  ) internal {
     vm.mockCall(_token, abi.encodeWithSignature('decimals()'), abi.encode(_decimals));
   }
 
@@ -436,7 +456,10 @@ contract Unit_DepositWithdraw is BaseTest {
    * @param _depositant The address depositing the asset
    * @param _amount The amount to deposit
    */
-  function test_Deposit(address _depositant, uint256 _amount) public validAddress(_depositant) {
+  function test_Deposit(
+    address _depositant,
+    uint256 _amount
+  ) public validAddress(_depositant) {
     vm.assume(_amount > 0 && _depositant != address(everclearSpoke));
     address _token = deployAndDeal(_depositant, _amount).toAddress();
 
@@ -461,7 +484,10 @@ contract Unit_DepositWithdraw is BaseTest {
    * @param _withdrawer The address withdrawing the asset
    * @param _amount The amount to withdraw
    */
-  function test_Withdraw(address _withdrawer, uint256 _amount) public validAddress(_withdrawer) {
+  function test_Withdraw(
+    address _withdrawer,
+    uint256 _amount
+  ) public validAddress(_withdrawer) {
     vm.assume(_amount > 0);
     address _token = deployAndDeal(_withdrawer, _amount).toAddress();
 
@@ -733,7 +759,12 @@ contract Unit_Fill is BaseTest {
    * @param _intent The intent to fill
    * @param _solver The solver to fill the intent
    */
-  function test_FillIntent(IEverclear.Intent calldata _intent, address _solver, uint24 _fee, address _target) public {
+  function test_FillIntent(
+    IEverclear.Intent calldata _intent,
+    address _solver,
+    uint24 _fee,
+    address _target
+  ) public {
     _fillIntent(_intent, 1, _fee, _solver, _target);
   }
 
@@ -1832,7 +1863,10 @@ contract Unit_Settlement is BaseTest {
     address indexed _asset, address indexed _recipient, uint256 _amount, IEverclear.Strategy _strategy
   );
 
-  modifier validSettlement(IEverclear.Settlement memory _settlementMessage, uint256 _balance) {
+  modifier validSettlement(
+    IEverclear.Settlement memory _settlementMessage,
+    uint256 _balance
+  ) {
     vm.assume(_settlementMessage.recipient.toAddress() != address(0));
     _settlementMessage.amount = bound(_settlementMessage.amount, 1, type(uint64).max);
 
@@ -1847,7 +1881,10 @@ contract Unit_Settlement is BaseTest {
    * @param _balance The balance to settle
    */
 
-  function test_SettleSingle_Default_Transfer(IEverclear.Settlement memory _settlementMessage, uint256 _balance) public {
+  function test_SettleSingle_Default_Transfer(
+    IEverclear.Settlement memory _settlementMessage,
+    uint256 _balance
+  ) public {
     // set up a valid settlement for the test case
     vm.assume(_settlementMessage.recipient.toAddress() != address(0));
     vm.assume(_settlementMessage.recipient.toAddress() != address(everclearSpoke));
@@ -2056,7 +2093,10 @@ contract Unit_Settlement is BaseTest {
    * @param _settlementMessage The settlement message to process
    * @param _balance The balance to settle
    */
-  function test_SettleSingle_XERC20_Transfer(IEverclear.Settlement memory _settlementMessage, uint256 _balance) public {
+  function test_SettleSingle_XERC20_Transfer(
+    IEverclear.Settlement memory _settlementMessage,
+    uint256 _balance
+  ) public {
     // set up a valid settlement for the test case
     vm.assume(_settlementMessage.recipient.toAddress() != address(0));
     vm.assume(_settlementMessage.recipient.toAddress() != address(everclearSpoke));
@@ -2103,7 +2143,10 @@ contract Unit_Settlement is BaseTest {
    * @param _settlementMessage The settlement message to process
    * @param _balance The balance to settle
    */
-  function test_SettleSingle_XERC20_Failed(IEverclear.Settlement memory _settlementMessage, uint256 _balance) public {
+  function test_SettleSingle_XERC20_Failed(
+    IEverclear.Settlement memory _settlementMessage,
+    uint256 _balance
+  ) public {
     // set up a valid settlement for the test case
     vm.assume(_settlementMessage.recipient.toAddress() != address(0));
     vm.assume(_settlementMessage.recipient.toAddress() != address(everclearSpoke));
@@ -2227,7 +2270,10 @@ contract Unit_Update_Gateway is BaseTest {
    * @notice Tests the updateGateway function with non owner caller
    * @param _newGateway The new gateway address
    */
-  function test_Revert_UpdateGateway_OnlyOwner(address _newGateway, address _notOwner) public {
+  function test_Revert_UpdateGateway_OnlyOwner(
+    address _newGateway,
+    address _notOwner
+  ) public {
     vm.assume(_notOwner != OWNER);
 
     vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, _notOwner));
@@ -2275,7 +2321,11 @@ contract Unit_Pause_Spoke is BaseTest {
   /**
    * @notice Tests fillIntent function reverts when paused
    */
-  function test_Revert_FillIntent_WhenPaused(address _caller, IEverclear.Intent calldata _intent, uint24 _fee) public {
+  function test_Revert_FillIntent_WhenPaused(
+    address _caller,
+    IEverclear.Intent calldata _intent,
+    uint24 _fee
+  ) public {
     everclearSpoke.mockPaused();
 
     vm.expectRevert(ISpokeStorage.EverclearSpoke_Paused.selector);
@@ -2321,7 +2371,11 @@ contract Unit_Pause_Spoke is BaseTest {
   /**
    * @notice Tests processFillQueue function reverts when paused
    */
-  function test_Revert_ProcessFillQueue_WhenPaused(address _caller, uint32 _amount, uint256 _messageFee) public {
+  function test_Revert_ProcessFillQueue_WhenPaused(
+    address _caller,
+    uint32 _amount,
+    uint256 _messageFee
+  ) public {
     everclearSpoke.mockPaused();
     deal(_caller, _messageFee);
 
@@ -2373,7 +2427,11 @@ contract Unit_Pause_Spoke is BaseTest {
   /**
    * @notice Tests processFillQueueViaRelayer function reverts when paused
    */
-  function test_Revert_Deposit_WhenPaused(address _caller, address _asset, uint256 _amount) public {
+  function test_Revert_Deposit_WhenPaused(
+    address _caller,
+    address _asset,
+    uint256 _amount
+  ) public {
     everclearSpoke.mockPaused();
 
     vm.expectRevert(ISpokeStorage.EverclearSpoke_Paused.selector);
@@ -2385,7 +2443,11 @@ contract Unit_Pause_Spoke is BaseTest {
   /**
    * @notice Tests withdraw function reverts when paused
    */
-  function test_Revert_Withdraw_WhenPaused(address _caller, address _asset, uint256 _amount) public {
+  function test_Revert_Withdraw_WhenPaused(
+    address _caller,
+    address _asset,
+    uint256 _amount
+  ) public {
     everclearSpoke.mockPaused();
 
     vm.expectRevert(ISpokeStorage.EverclearSpoke_Paused.selector);
@@ -2419,7 +2481,10 @@ contract Unit_UpdateMessageReceiver is BaseTest {
    * @notice Tests the updateMessageReceiver function with non owner caller
    * @param _newMessageReceiver The new message receiver address
    */
-  function test_Revert_UpdateMessageReceiver_OnlyOwner(address _newMessageReceiver, address _notOwner) public {
+  function test_Revert_UpdateMessageReceiver_OnlyOwner(
+    address _newMessageReceiver,
+    address _notOwner
+  ) public {
     vm.assume(_notOwner != OWNER);
 
     vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, _notOwner));
@@ -2460,7 +2525,10 @@ contract Unit_ExecuteCalldata is BaseTest {
    * @param _intent The intent to execute
    * @param _status The invalid status
    */
-  function test_Revert_ExecuteCalldata_InvalidStatus(IEverclear.Intent memory _intent, uint8 _status) public {
+  function test_Revert_ExecuteCalldata_InvalidStatus(
+    IEverclear.Intent memory _intent,
+    uint8 _status
+  ) public {
     vm.assume(
       _status != uint8(IEverclear.IntentStatus.SETTLED) && _status < uint8(type(IEverclear.IntentStatus).max) + 1
     );
@@ -2659,7 +2727,10 @@ contract Unit_ReceiveMessage is BaseTest {
   /**
    * @notice Tests that a call to receiveMessage from any address that is not the gateway reverts
    */
-  function test_Revert_ReceiveMessageNonGateway(address _caller, bytes memory _message) public validAddress(_caller) {
+  function test_Revert_ReceiveMessageNonGateway(
+    address _caller,
+    bytes memory _message
+  ) public validAddress(_caller) {
     vm.assume(_caller != address(spokeGateway) && _caller != everclearSpoke.owner());
 
     vm.expectRevert(abi.encodeWithSelector(ISpokeStorage.EverclearSpoke_Unauthorized.selector));
@@ -2682,7 +2753,10 @@ contract Unit_ReceiveMessage is BaseTest {
   /**
    * @notice Tests that a call to receiveMessage with an invalid var update reverts
    */
-  function test_Revert_ReceiveMessage_InvalidVarUpdate(bytes32 _hash, address _address) public {
+  function test_Revert_ReceiveMessage_InvalidVarUpdate(
+    bytes32 _hash,
+    address _address
+  ) public {
     bytes memory _message = MessageLib.formatAddressUpdateMessage(_hash, _address.toBytes32());
 
     vm.expectRevert(abi.encodeWithSelector(ISpokeStorage.EverclearSpoke_InvalidVarUpdate.selector));

@@ -9,7 +9,10 @@ contract TestDAI is ERC20 {
    */
   uint8 private _fakeDecimals = 6;
 
-  constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) {}
+  constructor(
+    string memory _name,
+    string memory _symbol
+  ) ERC20(_name, _symbol) {}
 
   function decimals() public view override returns (uint8) {
     return _fakeDecimals;
