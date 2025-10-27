@@ -72,7 +72,8 @@ contract Unit_GasTank is TestExtended {
 
     vm.prank(_depositor);
     // _gasTank.fillGasTank{value: _amount}();
-    address(_gasTank).call{value: _amount}('');
+    (bool success,) = address(_gasTank).call{value: _amount}('');
+    assertTrue(success);
 
     assertEq(address(_gasTank).balance, _initialAmount + _amount);
   }

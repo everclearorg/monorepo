@@ -1781,9 +1781,9 @@ contract Unit_ProcessQueue is BaseTest {
       uint32(block.chainid), _params.amount, _params.relayer, block.timestamp, 0, _params.bufferBPS, _signedData
     );
 
-    (uint256 _first, uint256 _last) = everclearSpoke.getFillQueueIndexes();
-    assertEq(_first, _params.amount + 1);
-    assertEq(_last, _params.length);
+    (uint256 _firstFinal, uint256 _lastFinal) = everclearSpoke.getFillQueueIndexes();
+    assertEq(_firstFinal, _params.amount + 1);
+    assertEq(_lastFinal, _params.length);
   }
 
   /**
