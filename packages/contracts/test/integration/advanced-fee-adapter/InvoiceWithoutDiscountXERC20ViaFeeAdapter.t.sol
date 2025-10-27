@@ -3,10 +3,8 @@ pragma solidity 0.8.25;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-import {Constants as Common} from 'contracts/common/Constants.sol';
-
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
+import {ERC20, XERC20} from 'test/utils/TestXToken.sol';
 
 contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
   function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferZeroAfterDecimalConversion_FeeInTransacting()

@@ -30,10 +30,10 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ////////////////////
 
   /// @inheritdoc IFeeAdapter
-  IEverclearSpokeV3 public immutable spoke;
+  IEverclearSpokeV3 public immutable SPOKE;
 
   // @inheritdoc IFeeAdapter
-  address public immutable xerc20Module;
+  address public immutable XERC20_MODULE;
 
   /// @inheritdoc IFeeAdapter
   address public feeRecipient;
@@ -54,8 +54,8 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     address _xerc20Module,
     address _owner
   ) Ownable(_owner) {
-    spoke = IEverclearSpokeV3(_spoke);
-    xerc20Module = _xerc20Module;
+    SPOKE = IEverclearSpokeV3(_spoke);
+    XERC20_MODULE = _xerc20Module;
     _updateFeeRecipient(_feeRecipient);
     _updateFeeSigner(_feeSigner);
   }
@@ -84,7 +84,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     uint256 _amount,
     address _recipient
   ) external onlyOwner {
-    spoke.withdraw(_asset, _amount);
+    SPOKE.withdraw(_asset, _amount);
     _pushTokens(_recipient, _asset, _amount);
   }
 
@@ -179,7 +179,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
     for (uint256 i; i < _numIntents - 1; i++) {
       // Create new intent
-      (bytes32 _intentId,) = spoke.newIntent(
+      (bytes32 _intentId,) = SPOKE.newIntent(
         _params.destinations,
         _params.receiver,
         _params.inputAsset,
@@ -194,7 +194,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
     // Create a final intent here with the remainder of balance
     _toSend = _toSend * (_numIntents - 1);
-    (bytes32 _intentId,) = spoke.newIntent(
+    (bytes32 _intentId,) = SPOKE.newIntent(
       _params.destinations,
       _params.receiver,
       _params.inputAsset,
@@ -251,7 +251,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
     _intentIds = new bytes32[](_numIntents);
     for (uint256 i; i < _numIntents; i++) {
       // Create new intent
-      (bytes32 _intentId,) = spoke.newIntent(
+      (bytes32 _intentId,) = SPOKE.newIntent(
         _params[i].destinations,
         _params[i].receiver,
         _params[i].inputAsset,
@@ -308,7 +308,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
     // Create new intent
     (_intentId, _intent) =
-      spoke.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data);
+      SPOKE.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data);
 
     // Emit event
     emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _feeParams.fee, msg.value);
@@ -348,7 +348,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
 
     // Create new intent
     (_intentId, _intent) =
-      spoke.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data);
+      SPOKE.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _maxFee, _ttl, _data);
 
     // Emit event
     emit IntentWithFeesAdded(_intentId, msg.sender.toBytes32(), _feeParams.fee, msg.value);
@@ -436,9 +436,9 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   ) internal {
     // Checking if the strategy is default or not
     address spender;
-    IEverclear.Strategy _strategy = spoke.strategies(_asset);
-    if (_strategy == IEverclear.Strategy.DEFAULT) spender = address(spoke);
-    else spender = xerc20Module;
+    IEverclear.Strategy _strategy = SPOKE.strategies(_asset);
+    if (_strategy == IEverclear.Strategy.DEFAULT) spender = address(SPOKE);
+    else spender = XERC20_MODULE;
 
     // Approve the spoke contract if needed
     IERC20 _token = IERC20(_asset);

@@ -1,33 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
+import {ERC20} from 'test/utils/TestXToken.sol';
 
-import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
-
-import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
-
-import {Vm} from 'forge-std/Vm.sol';
-import {console} from 'forge-std/console.sol';
-
-import {MessageLib} from 'contracts/common/MessageLib.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
 import {Constants as Common} from 'contracts/common/Constants.sol';
 
-import {IEverclear} from 'interfaces/common/IEverclear.sol';
-import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
-
-import {ISettler} from 'interfaces/hub/ISettler.sol';
-
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
 
-import {Constants} from 'test/utils/Constants.sol';
-
 contract Invoice_WithDiscountNonXERC20_Integration is IntegrationBase {
-  uint256 _invoiceSize = 10_000 * 1e6;
-  uint256 _depositSize = _invoiceSize * 10;
+  uint256 internal _invoiceSize = 10_000 * 1e6;
+  uint256 internal _depositSize = _invoiceSize * 10;
 
   function test_DepositPurchasePowerCoversInvoiceSize() public {
     // Create big intent in sepolia

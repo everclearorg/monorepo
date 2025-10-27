@@ -4,7 +4,7 @@ pragma solidity 0.8.25;
 import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
-import {ERC20, XERC20} from 'test/utils/TestXToken.sol';
+import {ERC20} from 'test/utils/TestXToken.sol';
 
 import {Vm} from 'forge-std/Vm.sol';
 
@@ -272,9 +272,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint256 _intentAmount = 100 ether;
     bytes memory _intentCalldata = abi.encode(makeAddr('target'), abi.encodeWithSignature('doSomething()'));
     // creating intent w/ ttl == 0 (slow path intent)
-    (_intentId, _intent) = sepoliaFeeAdapter.newIntent{
-      value: _ethFee
-    }(_dest, _user, address(oUSDT), address(dUSDT), _intentAmount, Constants.MAX_FEE, 0, _intentCalldata, _feeParams);
+    (_intentId, _intent) = sepoliaFeeAdapter.newIntent{value: _ethFee}(
+      _dest, _user, address(oUSDT), address(dUSDT), _intentAmount, Constants.MAX_FEE, 0, _intentCalldata, _feeParams
+    );
 
     // create intent message
     IEverclear.Intent[] memory _intentsA = new IEverclear.Intent[](1);
@@ -349,9 +349,9 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     vm.prank(_user2);
 
     // creating intent w/ ttl == 0 (slow path intent)
-    (_intentId, _intent) = bscFeeAdapter.newIntent{
-      value: _ethFee
-    }(_dest, _user2, address(dUSDT), address(oUSDT), _intentAmount, Constants.MAX_FEE, 0, '', _feeParams);
+    (_intentId, _intent) = bscFeeAdapter.newIntent{value: _ethFee}(
+      _dest, _user2, address(dUSDT), address(oUSDT), _intentAmount, Constants.MAX_FEE, 0, '', _feeParams
+    );
 
     // create intent message
     IEverclear.Intent[] memory _intentsB = new IEverclear.Intent[](1);
@@ -628,9 +628,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
     bytes memory _intentCalldata = abi.encode(makeAddr('target'), abi.encodeWithSignature('doSomething()'));
     // creating intent w/ ttl == 0 (slow path intent)
-    (_intentId, _intent) = sepoliaFeeAdapter.newIntent{
-      value: _feeAmount
-    }(
+    (_intentId, _intent) = sepoliaFeeAdapter.newIntent{value: _feeAmount}(
       _dest,
       _user,
       address(sepoliaXToken),
@@ -1180,9 +1178,7 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
 
     vm.prank(_user);
     (, bytes32[] memory _intentIds) =
-      sepoliaFeeAdapter.newOrderSplitEvenly{
-        value: 1 ether
-      }(
+      sepoliaFeeAdapter.newOrderSplitEvenly{value: 1 ether}(
         _numOfIntents,
         0, // token fee
         _deadline,
@@ -1689,9 +1685,7 @@ contract NewOrder_Integration is IntegrationBase {
 
     vm.prank(_user);
     (, bytes32[] memory _intentIds) =
-      sepoliaFeeAdapter.newOrder{
-        value: 1 ether
-      }(
+      sepoliaFeeAdapter.newOrder{value: 1 ether}(
         0, // token fee
         _deadline,
         _sig,

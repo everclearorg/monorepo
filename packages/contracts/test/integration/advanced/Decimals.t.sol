@@ -5,7 +5,7 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
+import {ERC20, XERC20} from 'test/utils/TestXToken.sol';
 
 import {TestDAI} from 'test/utils/TestDAI.sol';
 

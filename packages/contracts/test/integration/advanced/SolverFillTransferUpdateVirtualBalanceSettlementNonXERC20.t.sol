@@ -3,24 +3,15 @@ pragma solidity 0.8.25;
 
 import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
 
-import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
-import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-
 import {Vm} from 'forge-std/Vm.sol';
-import {console} from 'forge-std/console.sol';
 
-import {MessageLib} from 'contracts/common/MessageLib.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
-import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
-
-import {ISettler} from 'interfaces/hub/ISettler.sol';
 
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
 
 import {Constants as Common} from 'contracts/common/Constants.sol';
-import {Constants} from 'test/utils/Constants.sol';
 
 contract FillIntent_UpdateVirtualBalanceSettlement_Integration is IntegrationBase {
   using stdStorage for StdStorage;

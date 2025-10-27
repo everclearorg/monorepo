@@ -5,13 +5,11 @@ import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';
 
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
+import {ERC20} from 'test/utils/TestXToken.sol';
 
 import {Constants as Common} from 'contracts/common/Constants.sol';
 
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
-
-import {Constants} from 'test/utils/Constants.sol';
 
 contract ChangeUserPreferredDomainForSettle_Integration is IntegrationBase {
   using TypeCasts for address;

@@ -1,13 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
-
-import {Constants as Common} from 'contracts/common/Constants.sol';
+import {ERC20} from 'test/utils/TestXToken.sol';
 
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
-
-import {Constants} from 'test/utils/Constants.sol';
 
 contract InvoiceViaFeeAdapter_WithoutDiscountNonXERC20_Integration is IntegrationBase {
   function test_InvoiceWithoutDiscount_TTLZero_TransferZeroAfterDecimalConversion_FeeInTransacting() public {

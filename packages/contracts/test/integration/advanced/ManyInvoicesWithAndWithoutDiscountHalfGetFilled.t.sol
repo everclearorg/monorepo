@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
-
 import {Constants as Common} from 'contracts/common/Constants.sol';
 
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
 
-import {Constants} from 'test/utils/Constants.sol';
-
 contract ManyInvoicesWithAndWithoutDiscountHalfGetFilled_Integration is IntegrationBase {
-  uint256 _bigIntentAmount = 100_000 * 1e6;
-  uint256 _bigIntentTenth = _bigIntentAmount / 10;
+  uint256 internal _bigIntentAmount = 100_000 * 1e6;
+  uint256 internal _bigIntentTenth = _bigIntentAmount / 10;
 
   function test_ManyInvoices_WithAndWithoutDiscount_HalfGetFilled() public {
     // Create ten intents with different discounts and receive them in the hub

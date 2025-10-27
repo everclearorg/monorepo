@@ -3,8 +3,6 @@ pragma solidity 0.8.25;
 
 import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
 
-import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-
 import {Vm} from 'forge-std/Vm.sol';
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
@@ -20,8 +18,8 @@ contract FastPathIntent_Expired_ManualCalldataExecution is IntegrationBase {
   IEverclear.Intent internal _intent;
   IEverclear.FillMessage internal _fillMessage;
 
-  uint256 intentAmountEth = 100 ether;
-  uint256 intentAmountBsc = 100 ether;
+  uint256 internal _intentAmountEth = 100 ether;
+  uint256 internal _intentAmountBsc = 100 ether;
 
   event ExternalCalldataExecuted(bytes32 indexed _intentId, bytes _returnData);
 

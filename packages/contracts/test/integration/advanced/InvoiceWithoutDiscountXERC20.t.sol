@@ -6,8 +6,7 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {Constants as Common} from 'contracts/common/Constants.sol';
 
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
-import {Constants} from 'test/utils/Constants.sol';
-import {ERC20, IXERC20, XERC20} from 'test/utils/TestXToken.sol';
+import {ERC20, XERC20} from 'test/utils/TestXToken.sol';
 
 contract Invoice_WithoutDiscountXERC20_Integration is IntegrationBase {
   function test_InvoiceWithoutDiscountXERC20_TTLZero_TransferZeroAfterDecimalConversion() public {

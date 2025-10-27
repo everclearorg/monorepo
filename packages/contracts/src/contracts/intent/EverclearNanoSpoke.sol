@@ -24,21 +24,15 @@ import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 
-import {ECDSA} from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
-
 import {AssetUtils} from 'contracts/common/AssetUtils.sol';
 import {Constants as Common} from 'contracts/common/Constants.sol';
 import {MessageLib} from 'contracts/common/MessageLib.sol';
 import {QueueLib} from 'contracts/common/QueueLib.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
-import {Constants} from 'contracts/intent/lib/Constants.sol';
-
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
-import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 import {IEverclearNanoSpoke} from 'interfaces/intent/IEverclearNanoSpoke.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
