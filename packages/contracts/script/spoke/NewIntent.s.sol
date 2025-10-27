@@ -87,7 +87,9 @@ contract NewIntentBase is Script, ScriptUtils {
     // Try to create intent and catch errors
     try _feeAdapter.newIntent(
       _destinations, _to, _inputAsset, _outputAsset, _amount, Constants.MAX_FEE, _ttl, '', _params
-    ) returns (bytes32 intentId, IEverclear.Intent memory intent) {
+    ) returns (
+      bytes32 intentId, IEverclear.Intent memory intent
+    ) {
       console.log('Intent created successfully!');
       console.logBytes32(intentId);
       // Optionally log intent fields if needed
