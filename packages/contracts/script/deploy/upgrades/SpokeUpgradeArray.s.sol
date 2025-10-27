@@ -96,56 +96,49 @@ contract TestnetStaging is DeploySpokeArrayUpgrade, TestnetStagingEnvironment {
 contract MainnetStaging is DeploySpokeArrayUpgrade, MainnetStagingEnvironment {
   function setUp() public {
     //// Arbitrum One
-    _deploymentParams[ARBITRUM_ONE] =
-      DeploymentParams({ // set domain id as mapping key
-        owner: OWNER,
-        spokeProxy: address(0)
-      });
+    _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
+      owner: OWNER,
+      spokeProxy: address(0)
+    });
 
     //// Optimism
-    _deploymentParams[OPTIMISM] =
-      DeploymentParams({ // set domain id as mapping key
-        owner: OWNER,
-        spokeProxy: address(0)
-      });
+    _deploymentParams[OPTIMISM] = DeploymentParams({ // set domain id as mapping key
+      owner: OWNER,
+      spokeProxy: address(0)
+    });
   }
 }
 
 contract MainnetProduction is DeploySpokeArrayUpgrade, MainnetProductionEnvironment {
   function setUp() public {
     //// Arbitrum One
-    _deploymentParams[ARBITRUM_ONE] =
-      DeploymentParams({ // set domain id as mapping key
-        owner: OWNER,
-        spokeProxy: address(ARBITRUM_ONE_SPOKE)
-      });
+    _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
+      owner: OWNER,
+      spokeProxy: address(ARBITRUM_ONE_SPOKE)
+    });
 
     //// Optimism
-    _deploymentParams[OPTIMISM] =
-      DeploymentParams({ // set domain id as mapping key
-        owner: OWNER,
-        spokeProxy: address(OPTIMISM_SPOKE)
-      });
+    _deploymentParams[OPTIMISM] = DeploymentParams({ // set domain id as mapping key
+      owner: OWNER,
+      spokeProxy: address(OPTIMISM_SPOKE)
+    });
 
     //// Base
-    _deploymentParams[BASE] =
-      DeploymentParams({ // set domain id as mapping key
-        owner: OWNER,
-        spokeProxy: address(BASE_SPOKE)
-      });
+    _deploymentParams[BASE] = DeploymentParams({ // set domain id as mapping key
+      owner: OWNER,
+      spokeProxy: address(BASE_SPOKE)
+    });
 
     //// Bnb
-    _deploymentParams[BNB] =
-      DeploymentParams({ // set domain id as mapping key
-        owner: OWNER,
-        spokeProxy: address(BNB_SPOKE)
-      });
+    _deploymentParams[BNB] = DeploymentParams({ // set domain id as mapping key
+      owner: OWNER,
+      spokeProxy: address(BNB_SPOKE)
+    });
 
     //// Ethereum
-    _deploymentParams[ETHEREUM] =
-      DeploymentParams({ // set domain id as mapping key
-        owner: OWNER,
-        spokeProxy: address(ETHEREUM_SPOKE)
-      });
+    _deploymentParams[ETHEREUM] = DeploymentParams({ // set domain id as mapping key
+      owner: OWNER,
+      spokeProxy: address(ETHEREUM_SPOKE)
+    });
   }
 }
