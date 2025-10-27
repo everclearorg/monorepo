@@ -3,6 +3,8 @@ pragma solidity 0.8.25;
 
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
 
+import {Constants} from 'test/utils/Constants.sol';
+
 contract FeeVaultClaims_Integration is IntegrationBase {
   function test_FeeVaultClaims() public {
     uint256 _intentAmount = 1000 * 1e6;

@@ -31,7 +31,7 @@ contract FastPathIntent_Expired_ManualCalldataExecution is IntegrationBase {
       _assetDestination: dUSDT,
       _origin: ETHEREUM_SEPOLIA_ID,
       _destination: BSC_TESTNET_ID,
-      _intentAmount: intentAmountEth,
+      _intentAmount: _intentAmountEth,
       _ttl: 1 days
     });
 
@@ -50,7 +50,7 @@ contract FastPathIntent_Expired_ManualCalldataExecution is IntegrationBase {
       _assetDestination: oUSDT,
       _origin: BSC_TESTNET_ID,
       _destination: ETHEREUM_SEPOLIA_ID,
-      _intentAmount: intentAmountBsc
+      _intentAmount: _intentAmountBsc
     });
 
     _processDepositsAndInvoices(keccak256('USDT'));
@@ -68,7 +68,7 @@ contract FastPathIntent_Expired_ManualCalldataExecution is IntegrationBase {
 
     _processSettlementMessage(BSC_TESTNET_ID, _settlementMessageBody);
 
-    uint256 _amountAfterFees = intentAmountBsc - (intentAmountBsc * totalProtocolFees / Common.DBPS_DENOMINATOR);
+    uint256 _amountAfterFees = _intentAmountBsc - (_intentAmountBsc * totalProtocolFees / Common.DBPS_DENOMINATOR);
 
     assertEq(dUSDT.balanceOf(_user), _amountAfterFees);
 

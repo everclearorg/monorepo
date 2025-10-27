@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
+import {ERC20} from 'test/utils/TestXToken.sol';
+
 import {Constants as Common} from 'contracts/common/Constants.sol';
 
 import {IntegrationBase} from 'test/integration/IntegrationBase.t.sol';
