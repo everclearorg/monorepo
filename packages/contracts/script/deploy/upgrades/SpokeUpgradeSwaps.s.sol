@@ -68,6 +68,7 @@ contract DeploySpokeSwapsUpgrade is Script, ScriptUtils {
     console.log('SpokeMessageReceiverV2 deployed at:', spokeMessageReceiver);
     console.log('EverclearSpokeV5 deployed at:', handlerV2);
     console.log('FeeAdapterV2 deployed at:', feeAdapterV2);
+    console.log('EverclearSpokeV5 deployed at:', everclearSpokeV5);
 
     // NOTE: The upgrade would call
     bytes memory initializeCalldata = abi.encodeWithSelector(
@@ -89,7 +90,7 @@ contract MainnetStaging is DeploySpokeSwapsUpgrade, MainnetStagingEnvironment {
       everclearSpoke: address(ETHEREUM_SPOKE),
       fillSigner: address(FILL_SIGNER),
       xerc20Module: address(ETHEREUM_XERC20_MODULE),
-      spokeImpl: address(0)
+      spokeImpl: ETHEREUM_SPOKE_IMPL
     }); // set domain id as mapping key
 
     /// Base - staging config
@@ -98,7 +99,7 @@ contract MainnetStaging is DeploySpokeSwapsUpgrade, MainnetStagingEnvironment {
       everclearSpoke: address(BASE_SPOKE),
       fillSigner: address(FILL_SIGNER),
       xerc20Module: address(BASE_XERC20_MODULE),
-      spokeImpl: address(0)
+      spokeImpl: BASE_SPOKE_IMPL
     }); // set domain id as mapping key
 
     //// Optimism - staging config
@@ -107,7 +108,7 @@ contract MainnetStaging is DeploySpokeSwapsUpgrade, MainnetStagingEnvironment {
       everclearSpoke: address(OPTIMISM_SPOKE),
       fillSigner: address(FILL_SIGNER),
       xerc20Module: address(OPTIMISM_XERC20_MODULE),
-      spokeImpl: address(0)
+      spokeImpl: OPTIMISM_SPOKE_IMPL
     }); // set domain id as mapping key
   }
 }
