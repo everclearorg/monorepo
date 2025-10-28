@@ -338,32 +338,6 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   ) external returns (bytes32 _intentId, Intent memory _intent);
 
   /**
-   * @notice Creates a new intent with permit2
-   * @param _destinations The possible destination chains of the intent
-   * @param _receiver The destination address of the intent
-   * @param _inputAsset The asset address on origin
-   * @param _outputAsset The asset address on destination
-   * @param _amount The amount of the asset
-   * @param _amountOutMin The minimum amount out the solver should return
-   * @param _ttl The time to live of the intent
-   * @param _data The data of the intent
-   * @param _permit2Params The parameters needed to execute a permit2
-   * @return _intentId The ID of the intent
-   * @return _intent The intent object
-   */
-  function newIntent(
-    uint32[] memory _destinations,
-    address _receiver,
-    address _inputAsset,
-    address _outputAsset,
-    uint256 _amount,
-    uint256 _amountOutMin,
-    uint48 _ttl,
-    bytes calldata _data,
-    Permit2Params calldata _permit2Params
-  ) external returns (bytes32 _intentId, Intent memory _intent);
-
-  /**
    * @notice Fills a batch of intents
    * @param _intents The intents to fill
    * @param _amountOut The amounts of the assets the solver is sending to the users
@@ -432,7 +406,7 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     bytes32 _receiver,
     uint32[] memory _destinations,
     bytes calldata _signature,
-    bytes calldata _fillSignature
+    bool _pullFunds
   ) external returns (FillMessage memory _fillMessage);
 
   /**

@@ -174,48 +174,12 @@ contract EverclearSpokeV5 is
   }
 
   /// @inheritdoc IEverclearSpokeV5
-  function newIntent(
-    uint32[] memory _destinations,
-    address _receiver,
-    address _inputAsset,
-    address _outputAsset,
-    uint256 _amount,
-    uint256 _amountOutMin,
-    uint48 _ttl,
-    bytes calldata _data,
-    Permit2Params calldata _permit2Params
-  ) external whenNotPaused onlyFeeAdapter returns (bytes32 _intentId, Intent memory _intent) {
-    if (_destinations.length > 10) revert EverclearSpoke_NewIntent_InvalidIntent();
-    PERMIT2.permitTransferFrom(
-      IPermit2.PermitTransferFrom({
-        permitted: IPermit2.TokenPermissions({token: IERC20(_inputAsset), amount: _amount}),
-        nonce: _permit2Params.nonce,
-        deadline: _permit2Params.deadline
-      }),
-      IPermit2.SignatureTransferDetails({to: address(this), requestedAmount: _amount}),
-      msg.sender,
-      _permit2Params.signature
-    );
-
-    (_intentId, _intent) = _newIntent({
-      _destinations: _destinations,
-      _receiver: _receiver.toBytes32(),
-      _inputAsset: _inputAsset,
-      _outputAsset: _outputAsset.toBytes32(),
-      _amount: _amount,
-      _amountOutMin: _amountOutMin,
-      _ttl: _ttl,
-      _data: _data,
-      _usesPermit2: true
-    });
-  }
-
-  /// @inheritdoc IEverclearSpokeV5
   function batchFillIntent(
     Intent[] calldata _intents,
     uint256[] calldata _amountOut,
     uint32[][] calldata _destinations,
-    bytes calldata _signature
+    bytes calldata _signature,
+    bool _pullFunds
   ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
     uint256 length = _intents.length;
     if (length != _amountOut.length || length != _receivers.length || length != _destinations.length) {
@@ -295,17 +259,12 @@ contract EverclearSpokeV5 is
     bytes32 _receiver,
     uint32[] memory _destinations,
     bytes calldata _signature,
-    bytes calldata _fillSignature
+    bool _pullFunds
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
     bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data = abi.encode(
-      FILL_INTENT_FOR_SOLVER_TYPEHASH, _domain, _solver, _receiver, _intent, _nonce, _amountOut, _destinations
-    );
-    _verifySignature(_solver, _data, _nonce, _signature);
-
-    bytes memory _fillData =
+    bytes memory _data =
       abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
-    _verifySignature(fillSigner, _fillData, _fillSignature);
+    _verifySignature(fillSigner, _data, _signature);
 
     _fillMessage = _fillIntent(_intent, _solver, _amountOut, _destinations, false);
   }
