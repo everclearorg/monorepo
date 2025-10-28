@@ -168,7 +168,10 @@ contract EverclearNanoSpoke is
   }
 
   /// @inheritdoc IEverclearNanoSpoke
-  function withdraw(address _asset, uint256 _amount) external whenNotPaused {
+  function withdraw(
+    address _asset,
+    uint256 _amount
+  ) external whenNotPaused {
     balances[_asset.toBytes32()][msg.sender.toBytes32()] -= _amount;
 
     _pushTokens(msg.sender, _asset, _amount);
@@ -338,7 +341,11 @@ contract EverclearNanoSpoke is
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function _pullTokens(address _sender, address _asset, uint256 _amount) internal {
+  function _pullTokens(
+    address _sender,
+    address _asset,
+    uint256 _amount
+  ) internal {
     IERC20(_asset).safeTransferFrom(_sender, address(this), _amount);
   }
 
@@ -348,7 +355,11 @@ contract EverclearNanoSpoke is
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function _pushTokens(address _recipient, address _asset, uint256 _amount) internal {
+  function _pushTokens(
+    address _recipient,
+    address _asset,
+    uint256 _amount
+  ) internal {
     IERC20(_asset).safeTransfer(_recipient, _amount);
   }
 
@@ -364,7 +375,10 @@ contract EverclearNanoSpoke is
    * @param _updateVariable The hash of the variable being updated
    * @param _updateData The data of the update
    */
-  function _handleVarUpdate(bytes32 _updateVariable, bytes memory _updateData) internal {
+  function _handleVarUpdate(
+    bytes32 _updateVariable,
+    bytes memory _updateData
+  ) internal {
     if (_updateVariable == Common.GATEWAY_HASH) {
       address _newGateway = MessageLib.parseAddressUpdateMessage(_updateData).toAddress();
       _updateGateway(_newGateway);
