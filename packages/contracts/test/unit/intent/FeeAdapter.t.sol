@@ -380,9 +380,9 @@ contract Unit_NewIntent is BaseTest {
       emit IFeeAdapter.IntentWithFeesAdded(bytes32(uint256(1)), USER.toBytes32(), _fee, _nativeFee);
 
       vm.prank(USER);
-      (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{
-        value: _nativeFee
-      }(_destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams);
+      (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) = adapter.newIntent{value: _nativeFee}(
+        _destinations, USER, inputAsset, address(0), _amount, 0, 0, hex'', _feeParams
+      );
       assertEq(keccak256(abi.encode(_returnedIntent)), keccak256(abi.encode(_intent)), 'returned intent != intent');
       assertEq(_returnedId, bytes32(uint256(1)), 'returned id != id');
     }
@@ -500,9 +500,9 @@ contract Unit_NewIntent is BaseTest {
     uint256 _fee
   ) internal returns (bytes32 _returnedId, IEverclearSpoke.Intent memory _returnedIntent) {
     IEverclearSpoke.Permit2Params memory _permit2Params;
-    (_returnedId, _returnedIntent) = adapter.newIntent{
-      value: _fee
-    }(_destinations, USER, _inputAsset, address(0), _amount, 0, 0, hex'', _permit2Params, _feeParams);
+    (_returnedId, _returnedIntent) = adapter.newIntent{value: _fee}(
+      _destinations, USER, _inputAsset, address(0), _amount, 0, 0, hex'', _permit2Params, _feeParams
+    );
   }
 
   function test_NewIntent_FeeInTransacting_XERC20(
