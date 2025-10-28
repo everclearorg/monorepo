@@ -83,6 +83,7 @@ locals {
       }
       "59144" = {
         providers = [
+          "https://1rpc.io/linea",
           "https://linea-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
