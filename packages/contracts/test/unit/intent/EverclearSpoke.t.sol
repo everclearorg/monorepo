@@ -306,7 +306,7 @@ contract BaseTest is TestExtended {
   function _getDestinations(
     IEverclear.Intent memory _intent,
     uint32 _destination
-  ) internal pure {
+  ) internal {
     uint32[] memory _destinations = new uint32[](1);
     _destinations[0] = _destination;
     _intent.destinations = _destinations;
@@ -416,7 +416,7 @@ contract BaseTest is TestExtended {
   function _assertIntentQueueIndexes(
     uint256 _first,
     uint256 _last
-  ) internal view {
+  ) internal {
     (uint256 _firstIdx, uint256 _lastIdx) = everclearSpoke.getIntentQueueIndexes();
     assertEq(_firstIdx, _first);
     assertEq(_lastIdx, _last);
@@ -425,7 +425,7 @@ contract BaseTest is TestExtended {
   function _assertFillQueueIndexes(
     uint256 _first,
     uint256 _last
-  ) internal view {
+  ) internal {
     (uint256 _firstIdx, uint256 _lastIdx) = everclearSpoke.getFillQueueIndexes();
     assertEq(_firstIdx, _first);
     assertEq(_lastIdx, _last);
