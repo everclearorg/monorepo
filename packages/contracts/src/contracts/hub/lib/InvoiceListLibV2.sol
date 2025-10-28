@@ -51,7 +51,10 @@ library InvoiceListLibV2 {
    * @param _list the list
    * @param _invoice the invoice to add
    */
-  function append(InvoiceList storage _list, IHubStorageV2.Invoice memory _invoice) internal returns (bytes32 _id) {
+  function append(
+    InvoiceList storage _list,
+    IHubStorageV2.Invoice memory _invoice
+  ) internal returns (bytes32 _id) {
     _list.length += 1;
     _id = keccak256(abi.encode(_invoice, ++_list.nonce));
     if (_list.head == 0) {
@@ -71,7 +74,11 @@ library InvoiceListLibV2 {
    * @param _previousId the id of the previous node
    * @dev the previous node is needed to update the next pointer, we are trusting the caller to provide the correct previous node for O(1) removal, if the previousId is incorrect it will revert
    */
-  function remove(InvoiceList storage _list, bytes32 _id, bytes32 _previousId) internal {
+  function remove(
+    InvoiceList storage _list,
+    bytes32 _id,
+    bytes32 _previousId
+  ) internal {
     if (_list.nodes[_id].invoice.intentId == 0) {
       revert InvoiceList_NotFound(_id);
     }
@@ -99,7 +106,10 @@ library InvoiceListLibV2 {
    * @param _id the id of the node
    * @return _node the node
    */
-  function at(InvoiceList storage _list, bytes32 _id) internal view returns (Node memory _node) {
+  function at(
+    InvoiceList storage _list,
+    bytes32 _id
+  ) internal view returns (Node memory _node) {
     if (_list.nodes[_id].invoice.intentId == 0) {
       revert InvoiceList_NotFound(_id);
     }

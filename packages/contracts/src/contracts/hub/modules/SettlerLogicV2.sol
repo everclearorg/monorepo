@@ -22,7 +22,11 @@ abstract contract SettlerLogicV2 is HubStorageV2 {
    * @param _recipient The address of the recipient
    * @dev the algorithm will select the destination with the highest liquidity that can cover the amount
    */
-  function _createSettlementOrInvoice(bytes32 _intentId, bytes32 _tickerHash, bytes32 _recipient) internal {
+  function _createSettlementOrInvoice(
+    bytes32 _intentId,
+    bytes32 _tickerHash,
+    bytes32 _recipient
+  ) internal {
     uint32[] memory _destinations = _getDestinations(_tickerHash, _intentId, _recipient);
     IntentContext storage _intentContext = _contexts[_intentId];
 
@@ -52,12 +56,16 @@ abstract contract SettlerLogicV2 is HubStorageV2 {
    * @param _amount The amount to be settled
    * @param _owner The address of the invoice owner
    */
-  function _createInvoice(bytes32 _tickerHash, bytes32 _intentId, uint256 _amount, bytes32 _owner) internal {
+  function _createInvoice(
+    bytes32 _tickerHash,
+    bytes32 _intentId,
+    uint256 _amount,
+    bytes32 _owner
+  ) internal {
     _contexts[_intentId].status = IEverclearV2.IntentStatus.INVOICED;
     uint48 _currentEpoch = getCurrentEpoch();
-    invoices[_tickerHash].append(
-      Invoice({intentId: _intentId, owner: _owner, entryEpoch: _currentEpoch, amount: _amount})
-    );
+    invoices[_tickerHash]
+    .append(Invoice({intentId: _intentId, owner: _owner, entryEpoch: _currentEpoch, amount: _amount}));
     emit InvoiceEnqueued(_intentId, _tickerHash, _currentEpoch, _amount, _owner);
   }
 

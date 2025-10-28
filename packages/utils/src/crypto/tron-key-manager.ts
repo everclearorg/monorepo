@@ -106,9 +106,9 @@ export class TronKeyManager {
   private getFromEnvironment(): string | null {
     // Priority order for environment variables
     const envVars = [
-      'TRON_PRIVATE_KEY',           // Primary
-      'TRON_SIGNER_PRIVATE_KEY',    // Signer-specific
-      'RELAYER_TRON_PRIVATE_KEY',   // Relayer-specific
+      'TRON_PRIVATE_KEY', // Primary
+      'TRON_SIGNER_PRIVATE_KEY', // Signer-specific
+      'RELAYER_TRON_PRIVATE_KEY', // Relayer-specific
     ];
 
     for (const envVar of envVars) {
@@ -143,7 +143,7 @@ export class TronKeyManager {
       //   CiphertextBlob: Buffer.from(encryptedKey, 'base64'),
       // }).promise();
       // return result.Plaintext.toString();
-      
+
       this.logger.info('KMS integration not yet implemented');
       return null;
     } catch (error) {
@@ -177,8 +177,9 @@ export class TronKeyManager {
    */
   private async getFromHDWallet(): Promise<string | null> {
     const mnemonic = process.env.TRON_MNEMONIC;
-    const keyPath = process.env.TRON_HD_PATH || "m/44'/195'/0'/0/0"; // Tron BIP44 path
-    
+    // Tron BIP44 path
+    // const keyPath = process.env.TRON_HD_PATH || "m/44'/195'/0'/0/0";
+
     if (!mnemonic) {
       return null;
     }
@@ -188,7 +189,7 @@ export class TronKeyManager {
       // const hdkey = HDKey.fromMasterSeed(mnemonicToSeed(mnemonic));
       // const derived = hdkey.derive(keyPath);
       // return derived.privateKey.toString('hex');
-      
+
       this.logger.info('HD wallet derivation not yet implemented');
       return null;
     } catch (error) {
@@ -232,4 +233,4 @@ export class TronKeyManager {
     const keyPair = await this.getKeyPair();
     return keyPair.address.base58;
   }
-} 
+}

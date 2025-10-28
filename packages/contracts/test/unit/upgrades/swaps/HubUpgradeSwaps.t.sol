@@ -2445,7 +2445,10 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     }
   }
 
-  function test_hubUpgradeSwaps_setPrioritizedStrategy(bytes32 _tickerHash, uint8 _strategySeed) public {
+  function test_hubUpgradeSwaps_setPrioritizedStrategy(
+    bytes32 _tickerHash,
+    uint8 _strategySeed
+  ) public {
     _upgradeHub();
 
     IEverclearV2.Strategy _strategy =
@@ -2901,7 +2904,10 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     }
   }
 
-  function _assertIntentsState(bytes32[] memory _intentIds, uint8 _state) internal view {
+  function _assertIntentsState(
+    bytes32[] memory _intentIds,
+    uint8 _state
+  ) internal view {
     for (uint256 i; i < _intentIds.length; i++) {
       IHubStorageV2.IntentContext memory _context = hubProxy.contexts(_intentIds[i]);
       assertEq(uint8(_context.status), _state);
@@ -2933,7 +2939,10 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     return (_fill, _fillMessage);
   }
 
-  function _assertFillInfo(bytes32 _intentId, IEverclearV2.FillMessage memory _fill) internal view {
+  function _assertFillInfo(
+    bytes32 _intentId,
+    IEverclearV2.FillMessage memory _fill
+  ) internal view {
     IHubStorageV2.IntentContext memory _context = hubProxy.contexts(_intentId);
     assertEq(_context.solver, _fill.receiver);
     assertEq(_context.amountOut, _fill.amountOut);
@@ -2944,7 +2953,10 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     }
   }
 
-  function _assertFillInfo(bytes32[] memory _intentIds, IEverclearV2.FillMessage[] memory _fill) internal view {
+  function _assertFillInfo(
+    bytes32[] memory _intentIds,
+    IEverclearV2.FillMessage[] memory _fill
+  ) internal view {
     for (uint256 i; i < _intentIds.length; i++) {
       IHubStorageV2.IntentContext memory _context = hubProxy.contexts(_intentIds[i]);
       assertEq(_context.solver, _fill[i].receiver);
@@ -3028,7 +3040,10 @@ contract HubUpgradeSwaps is BaseTest, UpgradeHelper {
     return _message;
   }
 
-  function _updateCustodiedAssets(bytes32 _assetHash, uint256 _custodiedAssetValue) internal {
+  function _updateCustodiedAssets(
+    bytes32 _assetHash,
+    uint256 _custodiedAssetValue
+  ) internal {
     address _target = address(hubProxy);
     stdstore.target(_target).sig('custodiedAssets(bytes32)').with_key(_assetHash).checked_write(_custodiedAssetValue);
     assertEq(hubProxy.custodiedAssets(_assetHash), _custodiedAssetValue);

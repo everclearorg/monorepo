@@ -49,7 +49,10 @@ contract SpokeMessageReceiverV2 is SpokeStorageV5, OwnableUpgradeable, IMessageR
    * @param _updateVariable The hash of the variable being updated
    * @param _updateData The data of the update
    */
-  function _handleVarUpdate(bytes32 _updateVariable, bytes memory _updateData) internal {
+  function _handleVarUpdate(
+    bytes32 _updateVariable,
+    bytes memory _updateData
+  ) internal {
     if (_updateVariable == Common.GATEWAY_HASH) {
       address _newGateway = MessageLibV2.parseAddressUpdateMessage(_updateData).toAddress();
       _updateGateway(_newGateway);

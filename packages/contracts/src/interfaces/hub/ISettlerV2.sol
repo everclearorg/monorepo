@@ -124,7 +124,11 @@ interface ISettlerV2 {
    * @param _amount The amount of settlements to be batched
    * @param _gasLimit The gas limit for the settlement batch
    */
-  function processSettlementQueue(uint32 _domain, uint32 _amount, uint256 _gasLimit) external payable;
+  function processSettlementQueue(
+    uint32 _domain,
+    uint32 _amount,
+    uint256 _gasLimit
+  ) external payable;
 
   /**
    * @notice Dispatches batch settlements to the transport layer for a domain and amount via a relayer

@@ -239,7 +239,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
    * @param _amount The amount to send
    * @param _receiver The receiver address
    */
-  function test_spokeUpgradeSwaps_newIntentBytes_NettingPath(uint256 _amount, bytes32 _receiver) public {
+  function test_spokeUpgradeSwaps_newIntentBytes_NettingPath(
+    uint256 _amount,
+    bytes32 _receiver
+  ) public {
     vm.assume(_receiver != 0);
     _amount = bound(_amount, 1, type(uint128).max);
 
@@ -329,7 +332,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
    * @param _amount The amount to send
    * @param _receiver The receiver address
    */
-  function test_spokeUpgradeSwaps_newIntent_NettingPath(uint256 _amount, bytes32 _receiver) public {
+  function test_spokeUpgradeSwaps_newIntent_NettingPath(
+    uint256 _amount,
+    bytes32 _receiver
+  ) public {
     vm.assume(_receiver != 0);
     _amount = bound(_amount, 1, type(uint128).max);
 
@@ -414,7 +420,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     vm.stopPrank();
   }
 
-  function test_spokeUpgradeSwaps_fillIntent_AsSolver(address _solver, uint256 _amountOut) public {
+  function test_spokeUpgradeSwaps_fillIntent_AsSolver(
+    address _solver,
+    uint256 _amountOut
+  ) public {
     vm.assume(_solver != address(0));
     address _receiver = address(0x456);
 
@@ -553,7 +562,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(IERC20(USDC_MAINNET).balanceOf(RECEIVER), _startingBalanceReceiver + _amountOut);
   }
 
-  function test_spokeUpgradeSwaps_fillIntentWithPull_Single(address _solver, uint256 _amountOut) public {
+  function test_spokeUpgradeSwaps_fillIntentWithPull_Single(
+    address _solver,
+    uint256 _amountOut
+  ) public {
     vm.assume(_solver != address(0));
     address _receiver = address(0x456);
 
@@ -611,7 +623,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(IERC20(USDC_MAINNET).balanceOf(_receiver), _startingBalanceReceiver + _amountOut);
   }
 
-  function _constructSolverArray(bytes32 _solver, uint256 _length) internal returns (bytes32[] memory _solvers) {
+  function _constructSolverArray(
+    bytes32 _solver,
+    uint256 _length
+  ) internal returns (bytes32[] memory _solvers) {
     _solvers = new bytes32[](_length);
     for (uint256 i; i < _length; i++) {
       _solvers[i] = _solver;
@@ -2191,7 +2206,11 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(_balance - (_intent.amountOutMin + 1), spokeProxyV5.balances(_intent.outputAsset, _solver.toBytes32()));
   }
 
-  function _fillIntentV4(address _token, address _receiver, uint256 _amount) internal {
+  function _fillIntentV4(
+    address _token,
+    address _receiver,
+    uint256 _amount
+  ) internal {
     // configuring spokeProxyV4
     spokeProxyV4 = EverclearSpokeV4(SPOKE_PROXY_MAINNET);
 

@@ -423,7 +423,10 @@ interface IHubStorageV2 {
    * @param _recipient The fee recipient
    * @return _amount The amount of fees accumulated by an account
    */
-  function feeVault(bytes32 _assetHash, address _recipient) external view returns (uint256 _amount);
+  function feeVault(
+    bytes32 _assetHash,
+    address _recipient
+  ) external view returns (uint256 _amount);
 
   /**
    * @notice returns the `HubGateway`
@@ -560,7 +563,10 @@ interface IHubStorageV2 {
    * @param _domain The domain to get the adopted from
    * @return _assetHash The hash for the domain specific asset
    */
-  function assetHash(bytes32 _tickerHash, uint32 _domain) external view returns (bytes32 _assetHash);
+  function assetHash(
+    bytes32 _tickerHash,
+    uint32 _domain
+  ) external view returns (bytes32 _assetHash);
 
   /**
    * @notice returns the current epoch

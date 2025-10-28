@@ -62,7 +62,6 @@ const DEFAULT_MESSAGE_GAS_LIMIT = {
   extraIntent: 300_000,
 };
 
-
 dotenvConfig();
 
 export const TLighthouseService = Type.Union([

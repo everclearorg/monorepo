@@ -76,7 +76,10 @@ interface IEverclearHubV2 is IEverclearV2, ISettlerV2, IManagerV2, IHandlerV2, I
    * @param _type The hash of the module type
    * @param _newAddress The new address for that module
    */
-  function updateModuleAddress(bytes32 _type, address _newAddress) external;
+  function updateModuleAddress(
+    bytes32 _type,
+    address _newAddress
+  ) external;
 
   /**
    * @notice Initialize the hub contract
@@ -85,7 +88,12 @@ interface IEverclearHubV2 is IEverclearV2, ISettlerV2, IManagerV2, IHandlerV2, I
    * @param _handler The new handler address
    * @param _messageReceiver The new message receiver address
    */
-  function initialize(address _settler, address _manager, address _handler, address _messageReceiver) external;
+  function initialize(
+    address _settler,
+    address _manager,
+    address _handler,
+    address _messageReceiver
+  ) external;
 
   /*///////////////////////////////////////////////////////////////
                             VIEWS

@@ -9,7 +9,10 @@ const rejectAfterDelay = (ms: number) =>
     setTimeout(reject, ms, new Error('timeout'));
   });
 
-const fulfilledWithinTimeout = async (promises: Promise<any>[], timeout: number): Promise<any[]> => {
+const fulfilledWithinTimeout = async <T>(
+  promises: Promise<T>[],
+  timeout: number,
+): Promise<PromiseSettledResult<T | Error>[]> => {
   return await Promise.allSettled(promises.map((promise) => Promise.race([promise, rejectAfterDelay(timeout)])));
 };
 
@@ -23,13 +26,14 @@ const addBlockNumberQuery = (queries: string[]): string[] => {
   return [...queries, getBlockNumberQuery()];
 };
 
-const chooseHighestBlockNumber = (results: any[]) => {
+const chooseHighestBlockNumber = <T>(results: T[]): T | undefined => {
   let maxBlockNumber = 0;
   let withMaxBlockIdx = -1;
   for (let i = 0; i < results.length; i++) {
-    const data = results[i];
-    const blockNumber = (data as any)?._meta?.block?.number ?? 0;
-    if (blockNumber > maxBlockNumber) {
+    const data = results[i] as Record<string, unknown>;
+    const blockNumber =
+      ((data._meta as Record<string, unknown>)?.block as Record<string, unknown>)?.number ?? 0;
+    if (typeof blockNumber === 'number' && blockNumber > maxBlockNumber) {
       withMaxBlockIdx = i;
       maxBlockNumber = blockNumber;
     }
@@ -38,7 +42,7 @@ const chooseHighestBlockNumber = (results: any[]) => {
   return withMaxBlockIdx > -1 ? results[withMaxBlockIdx] : undefined;
 };
 
-export const execute = async <T = any>(
+export const execute = async <T = Record<string, unknown>>(
   domain: string,
   queries: string[],
   endpoints: string[],

@@ -297,7 +297,10 @@ interface ISpokeStorageV5 is IEverclearV2 {
    * @param _user The address of the user
    * @return _amount The amount of assets locked in the contract
    */
-  function balances(bytes32 _asset, bytes32 _user) external view returns (uint256 _amount);
+  function balances(
+    bytes32 _asset,
+    bytes32 _user
+  ) external view returns (uint256 _amount);
 
   /**
    * @notice returns the status of an intent

@@ -159,25 +159,19 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
   constructor() {
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: OPTIMISM,
-        blockGasLimit: 30_000_000,
-        gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
+        chainId: OPTIMISM, blockGasLimit: 30_000_000, gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ARBITRUM_ONE,
-        blockGasLimit: 30_000_000,
-        gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
+        chainId: ARBITRUM_ONE, blockGasLimit: 30_000_000, gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ZIRCUIT,
-        blockGasLimit: 30_000_000,
-        gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
+        chainId: ZIRCUIT, blockGasLimit: 30_000_000, gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
       })
     );
 

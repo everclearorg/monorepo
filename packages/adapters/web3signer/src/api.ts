@@ -49,7 +49,7 @@ export class Web3SignerApi {
   }
 
   private sanitizeResponse(
-    response: any,
+    response: { data?: string[] },
     endpoint: (typeof Web3SignerApi.ENDPOINTS)[keyof typeof Web3SignerApi.ENDPOINTS],
   ) {
     if (!response || !response.data || response.data.length === 0) {
