@@ -109,7 +109,7 @@ export class SubgraphReader {
       return { data: ret, domain } as QueryResponse<T>;
     } catch (e: unknown) {
       console.error(jsonifyError(e as Error));
-      throw new RuntimeError(e);
+      throw new RuntimeError(e as Record<string, unknown>);
     }
   }
 

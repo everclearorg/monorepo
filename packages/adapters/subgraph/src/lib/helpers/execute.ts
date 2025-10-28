@@ -13,7 +13,9 @@ const fulfilledWithinTimeout = async <T>(
   promises: Promise<T>[],
   timeout: number,
 ): Promise<PromiseSettledResult<T | Error>[]> => {
-  return await Promise.allSettled(promises.map((promise) => Promise.race([promise, rejectAfterDelay(timeout)])));
+  return (await Promise.allSettled(
+    promises.map((promise) => Promise.race([promise, rejectAfterDelay(timeout)])),
+  )) as PromiseSettledResult<T | Error>[];
 };
 
 const addBlockNumberQuery = (queries: string[]): string[] => {

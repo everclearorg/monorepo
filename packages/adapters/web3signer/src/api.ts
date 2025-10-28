@@ -1,5 +1,6 @@
 import { EverclearError, axiosPost, axiosGet } from '@chimera-monorepo/utils';
 import { Bytes } from 'ethers';
+import { AxiosResponse } from 'axios';
 
 // TODO: This class might benefit from some error handling / logging and response sanitization logic.
 /**
@@ -16,24 +17,24 @@ export class Web3SignerApi {
 
   public async sign(identifier: string, data: string | Bytes): Promise<string> {
     const endpoint = Web3SignerApi.ENDPOINTS.SIGN;
-    let response = await axiosPost(this.formatUrl(endpoint, identifier), {
+    const response = await axiosPost(this.formatUrl(endpoint, identifier), {
       data,
     });
-    response = this.sanitizeResponse(response, endpoint);
+    this.sanitizeResponse(response, endpoint);
     return response.data;
   }
 
   public async getServerStatus(): Promise<string> {
     const endpoint = Web3SignerApi.ENDPOINTS.SERVER_STATUS;
-    let response = await axiosGet(this.formatUrl(endpoint));
-    response = this.sanitizeResponse(response, endpoint);
+    const response = await axiosGet(this.formatUrl(endpoint));
+    this.sanitizeResponse(response, endpoint);
     return response.data[0];
   }
 
   public async getPublicKey(): Promise<string> {
     const endpoint = Web3SignerApi.ENDPOINTS.PUBLIC_KEY;
-    let response = await axiosGet(this.formatUrl(endpoint));
-    response = this.sanitizeResponse(response, endpoint);
+    const response = await axiosGet(this.formatUrl(endpoint));
+    this.sanitizeResponse(response, endpoint);
     return response.data[0];
   }
 
@@ -49,9 +50,9 @@ export class Web3SignerApi {
   }
 
   private sanitizeResponse(
-    response: { data?: string[] },
+    response: AxiosResponse<any>,
     endpoint: (typeof Web3SignerApi.ENDPOINTS)[keyof typeof Web3SignerApi.ENDPOINTS],
-  ) {
+  ): void {
     if (!response || !response.data || response.data.length === 0) {
       throw new EverclearError(
         'Received bad response from web3signer instance; make sure your key file is configured correctly.',
@@ -61,6 +62,5 @@ export class Web3SignerApi {
         },
       );
     }
-    return response;
   }
 }
