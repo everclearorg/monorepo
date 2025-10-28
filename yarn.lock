@@ -1059,8 +1059,8 @@ __metadata:
     "@sinclair/typebox": 0.25.21
     "@solana-program/system": ^0.7.0
     "@solana/kit": ^2.1.1
-    "@types/node": ^24.1.0
-    "@types/node-fetch": ^2.6.12
+    "@types/node": ^24.9.1
+    "@types/node-fetch": ^2.6.13
     ajv: 8.17.1
     eslint: 9.17.0
     ethers: 5.7.2
@@ -6011,7 +6011,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node-fetch@npm:^2.6.12, @types/node-fetch@npm:^2.6.13":
+"@types/node-fetch@npm:^2.6.13":
   version: 2.6.13
   resolution: "@types/node-fetch@npm:2.6.13"
   dependencies:
@@ -6021,7 +6021,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^24.1.0":
+"@types/node@npm:*, @types/node@npm:>=13.7.0":
   version: 24.3.0
   resolution: "@types/node@npm:24.3.0"
   dependencies:
