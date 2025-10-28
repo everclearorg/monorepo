@@ -26,7 +26,10 @@ import {ISettlerV2, SettlerV2} from 'contracts/hub/modules/SettlerV2.sol';
 import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
 
 interface ICREATE3 {
-  function deploy(bytes32 _salt, bytes calldata _creationCode) external payable returns (address _deployed);
+  function deploy(
+    bytes32 _salt,
+    bytes calldata _creationCode
+  ) external payable returns (address _deployed);
 }
 
 contract TestEverclearSpokeV5 is EverclearSpokeV5 {
@@ -102,11 +105,19 @@ contract TestEverclearSpokeV5 is EverclearSpokeV5 {
     return _processQueueChecks(_domain, _relayer, _ttl);
   }
 
-  function executeCalldata(bytes32 _intentId, bytes memory _data) external {
+  function executeCalldata(
+    bytes32 _intentId,
+    bytes memory _data
+  ) external {
     return _executeCalldata(_intentId, _data);
   }
 
-  function verifySignature(address _signer, bytes memory _data, uint256 _nonce, bytes calldata _signature) external {
+  function verifySignature(
+    address _signer,
+    bytes memory _data,
+    uint256 _nonce,
+    bytes calldata _signature
+  ) external {
     return _verifySignature(_signer, _data, _nonce, _signature);
   }
 }

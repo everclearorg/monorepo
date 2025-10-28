@@ -42,10 +42,7 @@ contract Settler is SettlerLogic, ISettler, IEverclear {
 
     // Clean up phase
     _cleanUpClosedEpochsDeposits({
-      _tickerHash: _tickerHash,
-      _currentEpoch: _epoch,
-      _maxEpochs: _maxEpochs,
-      _maxDeposits: _maxDeposits
+      _tickerHash: _tickerHash, _currentEpoch: _epoch, _maxEpochs: _maxEpochs, _maxDeposits: _maxDeposits
     });
 
     uint48 _lastClosedEpochProcessed = lastClosedEpochsProcessed[_tickerHash];
@@ -57,7 +54,10 @@ contract Settler is SettlerLogic, ISettler, IEverclear {
   }
 
   /// @inheritdoc ISettler
-  function processSettlementQueue(uint32 _domain, uint32 _amount) external payable {
+  function processSettlementQueue(
+    uint32 _domain,
+    uint32 _amount
+  ) external payable {
     (bytes memory _message, uint256 _gasLimit) = _processSettlementQueue(_domain, _amount);
 
     (bytes32 _messageId, uint256 _feeSpent) = hubGateway.sendMessage{value: msg.value}(_domain, _message, _gasLimit);
@@ -169,7 +169,11 @@ contract Settler is SettlerLogic, ISettler, IEverclear {
    * @param _domain The domain of the deposit
    * @param _tickerHash The hash of the ticker
    */
-  function _processDeposit(uint48 _epoch, uint32 _domain, bytes32 _tickerHash) internal {
+  function _processDeposit(
+    uint48 _epoch,
+    uint32 _domain,
+    bytes32 _tickerHash
+  ) internal {
     // deposit is removed
     Deposit memory _deposit = deposits[_epoch][_domain][_tickerHash].dequeueDeposit();
 
@@ -196,9 +200,7 @@ contract Settler is SettlerLogic, ISettler, IEverclear {
         if (_expired) {
           // expired, goes slow path and settle and rewards are for depositor
           _createSettlementOrInvoice({
-            _intentId: _deposit.intentId,
-            _tickerHash: _tickerHash,
-            _recipient: _intent.receiver
+            _intentId: _deposit.intentId, _tickerHash: _tickerHash, _recipient: _intent.receiver
           });
         } else {
           // not expired, settle and rewards might be for the solver if filled or for depositor if not filled and goes slow path
@@ -252,7 +254,11 @@ contract Settler is SettlerLogic, ISettler, IEverclear {
    * @param _epoch The epoch of the invoices
    * @param _maxInvoices The maximum number of invoices to be iterated to avoid out of gas error
    */
-  function _processInvoices(bytes32 _tickerHash, uint48 _epoch, uint32 _maxInvoices) internal {
+  function _processInvoices(
+    bytes32 _tickerHash,
+    uint48 _epoch,
+    uint32 _maxInvoices
+  ) internal {
     if (_tokenConfigs[_tickerHash].domains.length() == 0) {
       revert Settler_ProcessDepositsAndInvoices_InvalidTickerHash();
     }
@@ -332,7 +338,12 @@ contract Settler is SettlerLogic, ISettler, IEverclear {
    * @param _data The data of the message
    * @param _signature The signature of the message
    */
-  function _verifySignature(address _signer, bytes memory _data, uint256 _nonce, bytes calldata _signature) internal {
+  function _verifySignature(
+    address _signer,
+    bytes memory _data,
+    uint256 _nonce,
+    bytes calldata _signature
+  ) internal {
     bytes32 _hash = keccak256(_data);
     address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
     if (_recoveredSigner != _signer) {

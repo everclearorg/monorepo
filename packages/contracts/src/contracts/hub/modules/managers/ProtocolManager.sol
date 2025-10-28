@@ -67,7 +67,10 @@ abstract contract ProtocolManager is HubStorage, IProtocolManager {
   }
 
   /// @inheritdoc IProtocolManager
-  function assignRole(address _account, Role _role) external {
+  function assignRole(
+    address _account,
+    Role _role
+  ) external {
     if (msg.sender != owner && (roles[msg.sender] != Role.ADMIN || _role == Role.ADMIN)) {
       revert ProtocolManager_Unauthorized();
     }
@@ -186,7 +189,10 @@ abstract contract ProtocolManager is HubStorage, IProtocolManager {
   }
 
   /// @inheritdoc IProtocolManager
-  function updateChainGateway(uint32 _chainId, bytes32 _gateway) external onlyOwner {
+  function updateChainGateway(
+    uint32 _chainId,
+    bytes32 _gateway
+  ) external onlyOwner {
     hubGateway.setChainGateway(_chainId, _gateway);
   }
 
@@ -258,7 +264,10 @@ abstract contract ProtocolManager is HubStorage, IProtocolManager {
   }
 
   /// @inheritdoc IProtocolManager
-  function setMaxDiscountDbps(bytes32 _tickerHash, uint24 _maxDiscountDbps) external hasRole(Role.ADMIN) {
+  function setMaxDiscountDbps(
+    bytes32 _tickerHash,
+    uint24 _maxDiscountDbps
+  ) external hasRole(Role.ADMIN) {
     if (_maxDiscountDbps > Common.DBPS_DENOMINATOR) {
       revert ProtocolManager_SetMaxDiscountDbps_InvalidDiscount();
     }

@@ -271,6 +271,7 @@ abstract contract ProtocolManagerV2 is HubStorageV2, IProtocolManagerV2 {
     _tokenConfig.maxDiscountDbps = _maxDiscountDbps;
     emit MaxDiscountDbpsSet(_tickerHash, _oldMaxDiscountDbps, _maxDiscountDbps);
   }
+
   /*//////////////////////////////////////////////////////////////
                             VIEW FUNCTIONS
   //////////////////////////////////////////////////////////////*/

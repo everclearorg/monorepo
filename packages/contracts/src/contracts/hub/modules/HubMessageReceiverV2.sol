@@ -99,9 +99,8 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
         }
       } else {
         // store deposit
-        deposits[_currentEpoch][_intent.origin][_tickerHash].enqueueDeposit(
-          Deposit({intentId: _intentId, purchasePower: _intent.amount})
-        );
+        deposits[_currentEpoch][_intent.origin][_tickerHash]
+        .enqueueDeposit(Deposit({intentId: _intentId, purchasePower: _intent.amount}));
         _intentContext.status =
           _previousStatus == IntentStatus.FILLED ? IntentStatus.ADDED_AND_FILLED : IntentStatus.ADDED;
         depositsAvailableInEpoch[_currentEpoch][_intent.origin][_tickerHash] += _intent.amount;

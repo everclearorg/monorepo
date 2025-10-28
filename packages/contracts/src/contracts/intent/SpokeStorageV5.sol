@@ -154,7 +154,11 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
    * @param _last The last index of the queue
    * @param _amount The amount to process
    */
-  modifier validQueueAmount(uint256 _first, uint256 _last, uint256 _amount) {
+  modifier validQueueAmount(
+    uint256 _first,
+    uint256 _last,
+    uint256 _amount
+  ) {
     if (_amount == 0) {
       revert EverclearSpoke_ProcessQueue_ZeroAmount();
     }

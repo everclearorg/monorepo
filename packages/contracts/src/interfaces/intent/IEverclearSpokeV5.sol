@@ -249,14 +249,20 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _asset The asset address
    * @param _strategy The strategy id (see `enum Strategy`)
    */
-  function setStrategyForAsset(address _asset, IEverclearV2.Strategy _strategy) external;
+  function setStrategyForAsset(
+    address _asset,
+    IEverclearV2.Strategy _strategy
+  ) external;
 
   /**
    * @notice Sets a module for a strategy
    * @param _strategy The strategy id (see `enum Strategy`)
    * @param _module The module contract
    */
-  function setModuleForStrategy(IEverclearV2.Strategy _strategy, ISettlementModule _module) external;
+  function setModuleForStrategy(
+    IEverclearV2.Strategy _strategy,
+    ISettlementModule _module
+  ) external;
 
   /**
    * @notice Updates the security module
@@ -277,7 +283,11 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
   /**
    * @notice Initialize the EverclearSpoke contract
    */
-  function initialize(address _feeAdapter, address _messageReceiver, address _fillSigner) external;
+  function initialize(
+    address _feeAdapter,
+    address _messageReceiver,
+    address _fillSigner
+  ) external;
 
   /**
    * @notice Creates a new intent
@@ -487,7 +497,10 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function deposit(address _asset, uint256 _amount) external;
+  function deposit(
+    address _asset,
+    uint256 _amount
+  ) external;
 
   /**
    * @notice withdraws an asset from the EverclearSpoke
@@ -495,7 +508,10 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function withdraw(address _asset, uint256 _amount) external;
+  function withdraw(
+    address _asset,
+    uint256 _amount
+  ) external;
 
   /**
    * @notice Updates the gateway
