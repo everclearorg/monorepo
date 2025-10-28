@@ -29,6 +29,9 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
   ////////////////////
 
   /// @inheritdoc IFeeAdapterV2
+  IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
+
+  /// @inheritdoc IFeeAdapterV2
   IEverclearSpokeV5 public immutable spoke;
 
   // @inheritdoc IFeeAdapterV2
@@ -41,7 +44,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
   address public feeSigner;
 
   /// @inheritdoc IFeeAdapterV2
-  IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
+  mapping(bytes32 => bool) public txExists;
 
   ////////////////////
   /// Constructor ////
@@ -164,7 +167,9 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
     _pullTokens(msg.sender, _params.inputAsset, _params.amount + _fee);
 
     // Send fees to recipient
-    _handleFees(_fee, msg.value, _params.inputAsset, _deadline, _sig);
+    bytes32 _sigData = keccak256(abi.encode(msg.value, _numIntents, _params, _fee, _deadline));
+    _verifySignature(_sigData, _sig);
+    _handleFees(_fee, msg.value, _params.inputAsset, _deadline);
 
     // Approve the spoke contract if needed
     _approveSpokeIfNeeded(_params.inputAsset, _params.amount);
@@ -225,25 +230,27 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
 
     {
       // Get the asset
-      address _asset = _params[0].inputAsset;
+      address _inputAsset = _params[0].inputAsset;
 
       // Get the sum of the order amounts
       uint256 _orderSum;
       for (uint256 i; i < _numIntents; i++) {
         _orderSum += _params[i].amount;
-        if (_params[i].inputAsset != _asset) {
+        if (_params[i].inputAsset != _inputAsset) {
           revert MultipleOrderAssets();
         }
       }
 
       // Transfer once from the user
-      _pullTokens(msg.sender, _asset, _orderSum + _fee);
+      _pullTokens(msg.sender, _inputAsset, _orderSum + _fee);
 
       // Approve the spoke contract if needed
-      _approveSpokeIfNeeded(_asset, _orderSum);
+      _approveSpokeIfNeeded(_inputAsset, _orderSum);
 
       // Send fees to recipient
-      _handleFees(_fee, msg.value, _asset, _deadline, _sig);
+      bytes32 _sigData = keccak256(abi.encode(msg.value, _params, _fee, _deadline));
+      _verifySignature(_sigData, _sig);
+      _handleFees(_fee, msg.value, _inputAsset, _deadline);
     }
 
     // Initialising array length
@@ -300,7 +307,22 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
     IFeeAdapterV2.FeeParams calldata _feeParams
   ) internal returns (bytes32 _intentId, IEverclearV2.Intent memory _intent) {
     // Send fees to recipient
-    _handleFees(_feeParams.fee, msg.value, _inputAsset, _feeParams.deadline, _feeParams.sig);
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        msg.value,
+        _destinations,
+        _inputAsset,
+        _outputAsset,
+        _amount,
+        _amountOutMin,
+        _ttl,
+        _data,
+        _feeParams.fee,
+        _feeParams.deadline
+      )
+    );
+    _verifySignature(_sigData, _feeParams.sig);
+    _handleFees(_feeParams.fee, msg.value, _inputAsset, _feeParams.deadline);
 
     // Approve the spoke contract if needed
     _approveSpokeIfNeeded(_inputAsset, _amount);
@@ -340,7 +362,22 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
     IFeeAdapterV2.FeeParams calldata _feeParams
   ) internal returns (bytes32 _intentId, IEverclearV2.Intent memory _intent) {
     // Send fees to recipient
-    _handleFees(_feeParams.fee, msg.value, _inputAsset, _feeParams.deadline, _feeParams.sig);
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        msg.value,
+        _destinations,
+        _inputAsset,
+        _outputAsset,
+        _amount,
+        _amountOutMin,
+        _ttl,
+        _data,
+        _feeParams.fee,
+        _feeParams.deadline
+      )
+    );
+    _verifySignature(_sigData, _feeParams.sig);
+    _handleFees(_feeParams.fee, msg.value, _inputAsset, _feeParams.deadline);
 
     // Approve the spoke contract if needed
     _approveSpokeIfNeeded(_inputAsset, _amount);
@@ -378,14 +415,18 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
 
   /**
    * @notice Verifies a signature
-   * @param _data The data of the message
+   * @param _dataHash The data of the message
    * @param _signature The signature of the message
    */
   function _verifySignature(
-    bytes memory _data,
+    bytes32 _dataHash,
     bytes calldata _signature
-  ) internal view {
-    bytes32 _hash = keccak256(_data);
+  ) internal {
+    bytes32 _hash = keccak256(abi.encode(_dataHash, msg.sender, address(this), block.chainid));
+
+    if (txExists[_hash]) revert FeeAdapter_SignatureAlreadyUsed();
+    txExists[_hash] = true;
+
     address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
     if (_recoveredSigner != feeSigner) {
       revert FeeAdapter_InvalidSignature();
@@ -401,12 +442,8 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
     uint256 _tokenFee,
     uint256 _nativeFee,
     address _inputAsset,
-    uint256 _deadline,
-    bytes calldata _sig
+    uint256 _deadline
   ) internal {
-    // Verify the signature on the fee
-    _verifySignature(abi.encode(_tokenFee, _nativeFee, _inputAsset, _deadline, msg.sender, block.chainid), _sig);
-
     // Verify the ttl is valid
     if (block.timestamp > _deadline) {
       revert FeeAdapter_InvalidDeadline();

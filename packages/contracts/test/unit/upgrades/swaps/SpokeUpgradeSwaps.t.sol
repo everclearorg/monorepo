@@ -38,6 +38,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
   uint32 internal constant ARBITRUM = 42_161;
   uint32 internal constant OPTIMISM = 10;
 
+  address public constant SENDER = address(0x123);
   address public constant RECEIVER = address(0x456);
   uint256 public constant SOLVER_PK = 9_999_999;
   address public solverAddr = vm.addr(SOLVER_PK);
@@ -262,9 +263,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _sender, block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0, destinations, _inputAsset, _outputAsset, _amount, 0, 0, hex'00', _feeParams.fee, _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -303,9 +308,22 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _sender, block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0,
+        destinations,
+        _inputAsset,
+        _outputAsset,
+        _amount,
+        _amountOutMin,
+        2 hours,
+        hex'00',
+        _feeParams.fee,
+        _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -355,9 +373,22 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _sender, block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0,
+        destinations,
+        _inputAsset,
+        _outputAsset.toBytes32(),
+        _amount,
+        0,
+        0,
+        hex'00',
+        _feeParams.fee,
+        _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -396,9 +427,22 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _sender, block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0,
+        destinations,
+        _inputAsset,
+        _outputAsset,
+        _amount,
+        _amountOutMin,
+        2 hours,
+        hex'00',
+        _feeParams.fee,
+        _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -421,10 +465,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
   }
 
   function test_spokeUpgradeSwaps_fillIntent_AsSolver(
-    address _solver,
     uint256 _amountOut
   ) public {
-    vm.assume(_solver != address(0));
+    address _solver = address(0x999);
     address _receiver = address(0x456);
 
     // upgrading the spoke
@@ -563,10 +606,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
   }
 
   function test_spokeUpgradeSwaps_fillIntentWithPull_Single(
-    address _solver,
     uint256 _amountOut
   ) public {
-    vm.assume(_solver != address(0));
+    address _solver = address(0x999);
     address _receiver = address(0x456);
 
     // upgrading the spoke
@@ -575,7 +617,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // Constructing the user intent
     IEverclearV2.Intent memory _intent = IEverclearV2.Intent({
       initiator: address(0x123).toBytes32(),
-      receiver: _receiver.toBytes32(),
+      receiver: RECEIVER.toBytes32(),
       inputAsset: address(0x987).toBytes32(),
       outputAsset: USDC_MAINNET.toBytes32(),
       destinations: _getDestinations(1),
@@ -594,7 +636,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // storing balances of participants
     deal(USDC_MAINNET, _solver, _amountOut);
     uint256 _startingBalanceSolver = IERC20(USDC_MAINNET).balanceOf(_solver);
-    uint256 _startingBalanceReceiver = IERC20(USDC_MAINNET).balanceOf(_receiver);
+    uint256 _startingBalanceReceiver = IERC20(USDC_MAINNET).balanceOf(RECEIVER);
 
     vm.prank(_solver);
     // approving the amount and depositing to spoke
@@ -620,7 +662,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // asserting changes in state
     assertTrue(spokeProxyV5.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_solver), _startingBalanceSolver - _amountOut);
-    assertEq(IERC20(USDC_MAINNET).balanceOf(_receiver), _startingBalanceReceiver + _amountOut);
+    assertEq(IERC20(USDC_MAINNET).balanceOf(RECEIVER), _startingBalanceReceiver + _amountOut);
   }
 
   function _constructSolverArray(
@@ -1041,9 +1083,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _sender, block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0, destinations, _inputAsset, _outputAsset, _amount, 0, 0, hex'00', _feeParams.fee, _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -1057,8 +1103,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
   function test_spokeUpgradeSwaps_newIntentSameChainSwap_solving() public {
     uint32[] memory destinations = _getDestinations(1);
-    address _sender = address(0x123);
-    address _receiver = _sender;
+    address _receiver = SENDER;
     uint256 _amount = 1e18;
     uint256 _amountOutMin = 1e12;
     uint48 _ttl = 2 days;
@@ -1072,15 +1117,28 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _feeParams.deadline = block.timestamp + 1 days;
 
     // dealing to the user
-    address _inputAsset = deployAndDeal(_sender, _amount + _feeParams.fee).toAddress();
-    address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
+    address _inputAsset = deployAndDeal(SENDER, _amount + _feeParams.fee).toAddress();
+    address _outputAsset = deployAndDeal(SENDER, _amount).toAddress();
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _sender, block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0,
+        destinations,
+        _inputAsset,
+        _outputAsset,
+        _amount,
+        _amountOutMin,
+        _ttl,
+        hex'00',
+        _feeParams.fee,
+        _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, SENDER, address(feeAdapterV2), block.chainid));
 
-    vm.startPrank(_sender);
+    vm.startPrank(SENDER);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
 
     (bytes32 _intentId,) = feeAdapterV2.newIntent(
@@ -1093,8 +1151,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
   function test_spokeUpgradeSwaps_fillIntentSameChainSwap() public {
     uint32[] memory destinations = _getDestinations(1);
-    address _sender = address(0x123);
-    address _receiver = _sender;
     uint256 _amount = 1e18;
     uint256 _amountOutMin = 1e12;
     uint48 _ttl = 2 days;
@@ -1108,19 +1164,32 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _feeParams.deadline = block.timestamp + 1 days;
 
     // dealing to the user
-    address _inputAsset = deployAndDeal(_sender, _amount + _feeParams.fee).toAddress();
-    address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
+    address _inputAsset = deployAndDeal(SENDER, _amount + _feeParams.fee).toAddress();
+    address _outputAsset = deployAndDeal(SENDER, _amount).toAddress();
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _sender, block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0,
+        destinations,
+        _inputAsset,
+        _outputAsset,
+        _amount,
+        _amountOutMin,
+        _ttl,
+        '',
+        _feeParams.fee,
+        _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, SENDER, address(feeAdapterV2), block.chainid));
 
-    vm.startPrank(_sender);
+    vm.startPrank(SENDER);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
 
     (bytes32 _intentId, IEverclearV2.Intent memory _intent) = feeAdapterV2.newIntent(
-      destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '', _feeParams
+      destinations, RECEIVER, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '', _feeParams
     );
     assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
@@ -1900,6 +1969,63 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     spokeProxyV5.batchFillIntentWithPull(_intents, _amountOut, _solvers, _destinations, _fillSignature);
   }
 
+  function testRevert_spokeUpgradeSwaps_verifySiganture_SignatureAlreadyUsed(
+    uint256 _amount,
+    bytes32 _receiver
+  ) public {
+    vm.assume(_receiver != 0);
+    _amount = bound(_amount, 1, type(uint128).max);
+
+    uint32[] memory destinations = _getDestinations(10);
+    address _sender = address(0x123);
+
+    // upgrading the spoke
+    _upgradeSpoke();
+
+    // configuring the feeparams
+    IFeeAdapterV2.FeeParams memory _feeParams;
+    _feeParams.fee = 1e8;
+    _feeParams.deadline = block.timestamp + 1 days;
+
+    // dealing to the user
+    address _inputAsset = deployAndDeal(_sender, (_amount + _feeParams.fee) * 2).toAddress();
+    address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
+
+    // generating signature after asset is created
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0,
+        destinations,
+        _inputAsset,
+        _outputAsset.toBytes32(),
+        _amount,
+        0,
+        0,
+        hex'00',
+        _feeParams.fee,
+        _feeParams.deadline
+      )
+    );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
+
+    vm.startPrank(_sender);
+    IERC20(_inputAsset).approve(address(feeAdapterV2), (_amount + _feeParams.fee) * 2);
+
+    (bytes32 _intentId,) = feeAdapterV2.newIntent(
+      destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00', _feeParams
+    );
+    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+
+    // Retrying the same signature with revert
+    vm.expectRevert(IFeeAdapterV2.FeeAdapter_SignatureAlreadyUsed.selector);
+    feeAdapterV2.newIntent(
+      destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00', _feeParams
+    );
+
+    vm.stopPrank();
+  }
+
   function testRevert_spokeSwapUpgrade_verifySignature_InvalidSignature() public {
     _upgradeSpoke();
     address _relayer = address(0x123);
@@ -1946,9 +2072,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _outputAsset = deployAndDeal(_sender, _amount).toAddress();
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK, abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _sender, block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0, destinations, _inputAsset, _outputAsset, _amount, 0, 0, hex'00', _feeParams.fee, _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -2116,7 +2246,6 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     IEverclearV2.Intent memory _intentParam,
     AdditionalParams memory _params
   ) internal returns (bytes32 _intentId, IEverclearV2.Intent memory _returnIntent) {
-    // vm.assume(_intentParam.amount > 0);
     _intentParam.amount = bound(_intentParam.amount, 1, type(uint128).max);
     vm.assume(_intentParam.receiver.toAddress() != address(0));
     _getDestinations(_intentParam, _params.destination);
@@ -2127,23 +2256,36 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _feeParams.deadline = block.timestamp + 1 days;
 
     // dealing to the user
-    address _inputAsset = deployAndDeal(_intentParam.receiver, _intentParam.amount + _feeParams.fee).toAddress();
-    address _outputAsset = deployAndDeal(_intentParam.receiver, _intentParam.amount).toAddress();
+    address receiver = _intentParam.receiver.toAddress();
+    _intentParam.inputAsset = deployAndDeal(_intentParam.receiver, _intentParam.amount + _feeParams.fee);
+    _intentParam.outputAsset = deployAndDeal(_intentParam.receiver, _intentParam.amount);
 
     // generating signature after asset is created
-    _feeParams.sig = _generateSignature(
-      FEE_SIGNER_PK,
-      abi.encode(_feeParams.fee, 0, _inputAsset, _feeParams.deadline, _intentParam.receiver.toAddress(), block.chainid)
+    bytes32 _sigData = keccak256(
+      abi.encode(
+        0,
+        _intentParam.destinations,
+        _intentParam.inputAsset,
+        _intentParam.outputAsset,
+        _intentParam.amount,
+        _intentParam.amountOutMin,
+        _intentParam.ttl,
+        _intentParam.data,
+        _feeParams.fee,
+        _feeParams.deadline
+      )
     );
+    _feeParams.sig =
+      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, receiver, address(feeAdapterV2), block.chainid));
 
-    vm.startPrank(_intentParam.receiver.toAddress());
-    IERC20(_inputAsset).approve(address(feeAdapterV2), _intentParam.amount + _feeParams.fee);
+    vm.startPrank(receiver);
+    IERC20(_intentParam.inputAsset.toAddress()).approve(address(feeAdapterV2), _intentParam.amount + _feeParams.fee);
 
     (_intentId, _returnIntent) = feeAdapterV2.newIntent(
       _intentParam.destinations,
-      _intentParam.receiver.toAddress(),
-      _inputAsset,
-      _outputAsset,
+      receiver,
+      _intentParam.inputAsset.toAddress(),
+      _intentParam.outputAsset.toAddress(),
       _intentParam.amount,
       _intentParam.amountOutMin,
       _intentParam.ttl,

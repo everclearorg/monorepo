@@ -1,0 +1,153 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.25;
+
+import {ScriptUtils} from '../../utils/Utils.sol';
+
+import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+import {Script} from 'forge-std/Script.sol';
+import {console} from 'forge-std/console.sol';
+
+import {UUPSUpgradeable} from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
+
+import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
+import {FeeAdapterV2} from 'contracts/intent/FeeAdapterV2.sol';
+import {SpokeMessageReceiverV2} from 'contracts/intent/modules/SpokeMessageReceiverV2.sol';
+
+import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
+import {MainnetStagingEnvironment} from '../../MainnetStaging.sol';
+
+contract DeploySpokeSwapsUpgrade is Script, ScriptUtils {
+  using TypeCasts for address;
+  using TypeCasts for bytes32;
+
+  struct DeploymentParams {
+    address owner;
+    address everclearSpoke;
+    address fillSigner;
+    address xerc20Module;
+    address spokeImpl;
+  }
+
+  error EmptyConfig();
+  error InvalidConfig();
+
+  // TODO: Need to populate this
+  address public constant FILL_SIGNER = address(0x123);
+
+  bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+
+  mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
+
+  function run() external {
+    DeploymentParams memory _params = _deploymentParams[block.chainid];
+    if (_params.everclearSpoke == address(0)) revert EmptyConfig();
+    if (_params.owner == address(0)) revert EmptyConfig();
+    if (_params.fillSigner == address(0)) revert EmptyConfig();
+    if (_params.xerc20Module == address(0)) revert EmptyConfig();
+    if (_params.spokeImpl == address(0)) revert EmptyConfig();
+
+    // Deploying delegation contracts
+    vm.startBroadcast();
+
+    // 1 - SpokeMessageReceiverV2
+    address spokeMessageReceiver = address(new SpokeMessageReceiverV2());
+    // 2 - EverclearSpokeV5
+    address handlerV2 = address(new EverclearSpokeV5());
+    // 3 - FeeAdapterV2
+    address feeAdapterV2 = address(
+      new FeeAdapterV2(_params.everclearSpoke, _params.owner, _params.fillSigner, _params.xerc20Module, _params.owner)
+    );
+    // 4 - Deploying Spoke
+    address everclearSpokeV5 = address(new EverclearSpokeV5());
+
+    // asserting expectations for the upgrade
+    address oldImplementation = (vm.load(_params.everclearSpoke, IMPLEMENTATION_SLOT)).toAddress();
+    if (oldImplementation != _params.spokeImpl) revert InvalidConfig();
+
+    // logging
+    console.log('SpokeMessageReceiverV2 deployed at:', spokeMessageReceiver);
+    console.log('EverclearSpokeV5 deployed at:', handlerV2);
+    console.log('FeeAdapterV2 deployed at:', feeAdapterV2);
+
+    // NOTE: The upgrade would call
+    bytes memory initializeCalldata = abi.encodeWithSelector(
+      EverclearSpokeV5.initialize.selector, feeAdapterV2, spokeMessageReceiver, _params.fillSigner
+    );
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, everclearSpokeV5, initializeCalldata);
+    console.log('---- Upgrade data for multi-sig ----');
+    console.logBytes(upgradeCalldata);
+    console.log('---- End of upgrade data ----');
+  }
+}
+
+contract MainnetStaging is DeploySpokeSwapsUpgrade, MainnetStagingEnvironment {
+  function setUp() public {
+    //// Ethereum - staging config
+    _deploymentParams[ETHEREUM] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(ETHEREUM_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(ETHEREUM_XERC20_MODULE),
+      spokeImpl: address(0)
+    }); // set domain id as mapping key
+
+    /// Base - staging config
+    _deploymentParams[BASE] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(BASE_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(BASE_XERC20_MODULE),
+      spokeImpl: address(0)
+    }); // set domain id as mapping key
+
+    //// Optimism - staging config
+    _deploymentParams[OPTIMISM] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(OPTIMISM_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(OPTIMISM_XERC20_MODULE),
+      spokeImpl: address(0)
+    }); // set domain id as mapping key
+  }
+}
+
+contract MainnetProduction is DeploySpokeSwapsUpgrade, MainnetProductionEnvironment {
+  function setUp() public {
+    //// Ethereum - staging config
+    _deploymentParams[ETHEREUM] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(ETHEREUM_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(ETHEREUM_XERC20_MODULE),
+      spokeImpl: address(0)
+    }); // set domain id as mapping key
+
+    /// Base - staging config
+    _deploymentParams[BASE] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(BASE_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(BASE_XERC20_MODULE),
+      spokeImpl: address(0)
+    }); // set domain id as mapping key
+
+    //// Optimism - staging config
+    _deploymentParams[OPTIMISM] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(OPTIMISM_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(OPTIMISM_XERC20_MODULE),
+      spokeImpl: address(0)
+    }); // set domain id as mapping key
+
+    //// Arbitrum - staging config
+    _deploymentParams[ARBITRUM_ONE] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(ARBITRUM_ONE_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(ARBITRUM_ONE_XERC20_MODULE),
+      spokeImpl: address(0)
+    }); // set domain id as mapping key
+  }
+}
