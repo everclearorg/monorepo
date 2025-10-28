@@ -99,9 +99,8 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
         }
       } else {
         // store deposit
-        deposits[_currentEpoch][_intent.origin][_tickerHash].enqueueDeposit(
-          Deposit({intentId: _intentId, purchasePower: _intent.amount})
-        );
+        deposits[_currentEpoch][_intent.origin][_tickerHash]
+        .enqueueDeposit(Deposit({intentId: _intentId, purchasePower: _intent.amount}));
         _intentContext.status =
           _previousStatus == IntentStatus.FILLED ? IntentStatus.ADDED_AND_FILLED : IntentStatus.ADDED;
         depositsAvailableInEpoch[_currentEpoch][_intent.origin][_tickerHash] += _intent.amount;
@@ -138,8 +137,9 @@ contract HubMessageReceiverV2 is SettlerLogicV2, IHubMessageReceiverV2 {
       _intentContext.fillTimestamp = _fillMessage.executionTimestamp;
 
       // checking destinations for the repayment asset - setting to provided array if valid or origin if invalid
-      bool supportedDestinations =
-        _checkSupportedDestinations(_fillMessage.intentInputAsset, _fillMessage.intentOrigin, _fillMessage.destinations);
+      bool supportedDestinations = _checkSupportedDestinations(
+        _fillMessage.intentInputAsset, _fillMessage.intentOrigin, _fillMessage.destinations
+      );
       if (supportedDestinations) {
         _intentContext.solverDestinations = _fillMessage.destinations;
       } else {

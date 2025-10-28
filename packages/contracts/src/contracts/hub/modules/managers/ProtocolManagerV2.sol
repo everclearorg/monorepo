@@ -67,7 +67,10 @@ abstract contract ProtocolManagerV2 is HubStorageV2, IProtocolManagerV2 {
   }
 
   /// @inheritdoc IProtocolManagerV2
-  function assignRole(address _account, Role _role) external {
+  function assignRole(
+    address _account,
+    Role _role
+  ) external {
     if (msg.sender != owner && (roles[msg.sender] != Role.ADMIN || _role == Role.ADMIN)) {
       revert ProtocolManager_Unauthorized();
     }
@@ -181,7 +184,10 @@ abstract contract ProtocolManagerV2 is HubStorageV2, IProtocolManagerV2 {
   }
 
   /// @inheritdoc IProtocolManagerV2
-  function updateChainGateway(uint32 _chainId, bytes32 _gateway) external onlyOwner {
+  function updateChainGateway(
+    uint32 _chainId,
+    bytes32 _gateway
+  ) external onlyOwner {
     hubGateway.setChainGateway(_chainId, _gateway);
   }
 
@@ -253,7 +259,10 @@ abstract contract ProtocolManagerV2 is HubStorageV2, IProtocolManagerV2 {
   }
 
   /// @inheritdoc IProtocolManagerV2
-  function setMaxDiscountDbps(bytes32 _tickerHash, uint24 _maxDiscountDbps) external hasRole(Role.ADMIN) {
+  function setMaxDiscountDbps(
+    bytes32 _tickerHash,
+    uint24 _maxDiscountDbps
+  ) external hasRole(Role.ADMIN) {
     if (_maxDiscountDbps > Common.DBPS_DENOMINATOR) {
       revert ProtocolManager_SetMaxDiscountDbps_InvalidDiscount();
     }
@@ -262,6 +271,7 @@ abstract contract ProtocolManagerV2 is HubStorageV2, IProtocolManagerV2 {
     _tokenConfig.maxDiscountDbps = _maxDiscountDbps;
     emit MaxDiscountDbpsSet(_tickerHash, _oldMaxDiscountDbps, _maxDiscountDbps);
   }
+
   /*//////////////////////////////////////////////////////////////
                             VIEW FUNCTIONS
   //////////////////////////////////////////////////////////////*/

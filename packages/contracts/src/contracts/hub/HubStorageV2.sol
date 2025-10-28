@@ -271,7 +271,10 @@ abstract contract HubStorageV2 is NoncesUpgradeable, IHubStorageV2 {
   }
 
   /// @inheritdoc IHubStorageV2
-  function assetHash(bytes32 _tickerHash, uint32 _domain) external view returns (bytes32 _assetHash) {
+  function assetHash(
+    bytes32 _tickerHash,
+    uint32 _domain
+  ) external view returns (bytes32 _assetHash) {
     return _tokenConfigs[_tickerHash].assetHashes[_domain];
   }
 

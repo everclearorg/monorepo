@@ -76,6 +76,11 @@ interface IFeeAdapterV2 {
   error FeeAdapter_InvalidDeadline();
 
   /**
+   * @notice Thrown when the signature has already been used
+   */
+  error FeeAdapter_SignatureAlreadyUsed();
+
+  /**
    * @notice Returns the spoke contract address
    * @return The EverclearSpoke contract interface
    */
@@ -98,6 +103,14 @@ interface IFeeAdapterV2 {
    * @return The address whose signature is verified
    */
   function feeSigner() external view returns (address);
+
+  /**
+   * @notice Returns if the tx exists
+   * @return _bool True if the tx exists
+   */
+  function txExists(
+    bytes32 _txHash
+  ) external view returns (bool _bool);
 
   /**
    * @notice Creates a new intent with fees
@@ -235,5 +248,9 @@ interface IFeeAdapterV2 {
    * @param _amount Amount of the asset to return
    * @param _recipient Address of the recipient
    */
-  function returnUnsupportedIntent(address _asset, uint256 _amount, address _recipient) external;
+  function returnUnsupportedIntent(
+    address _asset,
+    uint256 _amount,
+    address _recipient
+  ) external;
 }

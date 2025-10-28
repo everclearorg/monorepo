@@ -84,13 +84,19 @@ contract EverclearSpokeV5 is
   }
 
   /// @inheritdoc IEverclearSpokeV5
-  function setStrategyForAsset(address _asset, IEverclearV2.Strategy _strategy) external onlyOwner {
+  function setStrategyForAsset(
+    address _asset,
+    IEverclearV2.Strategy _strategy
+  ) external onlyOwner {
     strategies[_asset] = _strategy;
     emit StrategySetForAsset(_asset, _strategy);
   }
 
   /// @inheritdoc IEverclearSpokeV5
-  function setModuleForStrategy(IEverclearV2.Strategy _strategy, ISettlementModule _module) external onlyOwner {
+  function setModuleForStrategy(
+    IEverclearV2.Strategy _strategy,
+    ISettlementModule _module
+  ) external onlyOwner {
     modules[_strategy] = _module;
     emit ModuleSetForStrategy(_strategy, _module);
   }
@@ -168,49 +174,13 @@ contract EverclearSpokeV5 is
   }
 
   /// @inheritdoc IEverclearSpokeV5
-  function newIntent(
-    uint32[] memory _destinations,
-    address _receiver,
-    address _inputAsset,
-    address _outputAsset,
-    uint256 _amount,
-    uint256 _amountOutMin,
-    uint48 _ttl,
-    bytes calldata _data,
-    Permit2Params calldata _permit2Params
-  ) external whenNotPaused onlyFeeAdapter returns (bytes32 _intentId, Intent memory _intent) {
-    if (_destinations.length > 10) revert EverclearSpoke_NewIntent_InvalidIntent();
-    PERMIT2.permitTransferFrom(
-      IPermit2.PermitTransferFrom({
-        permitted: IPermit2.TokenPermissions({token: IERC20(_inputAsset), amount: _amount}),
-        nonce: _permit2Params.nonce,
-        deadline: _permit2Params.deadline
-      }),
-      IPermit2.SignatureTransferDetails({to: address(this), requestedAmount: _amount}),
-      msg.sender,
-      _permit2Params.signature
-    );
-
-    (_intentId, _intent) = _newIntent({
-      _destinations: _destinations,
-      _receiver: _receiver.toBytes32(),
-      _inputAsset: _inputAsset,
-      _outputAsset: _outputAsset.toBytes32(),
-      _amount: _amount,
-      _amountOutMin: _amountOutMin,
-      _ttl: _ttl,
-      _data: _data,
-      _usesPermit2: true
-    });
-  }
-
-  /// @inheritdoc IEverclearSpokeV5
   function batchFillIntent(
     Intent[] calldata _intents,
     uint256[] calldata _amountOut,
     bytes32[] calldata _receivers,
     uint32[][] calldata _destinations,
-    bytes calldata _signature
+    bytes calldata _signature,
+    bool _pullFunds
   ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
     if (
       _intents.length != _amountOut.length || _intents.length != _receivers.length
@@ -232,39 +202,8 @@ contract EverclearSpokeV5 is
 
     _fillMessages = new FillMessage[](_intents.length);
     for (uint256 i; i < _intents.length; i++) {
-      _fillMessages[i] = _fillIntent(_intents[i], msg.sender, _receivers[i], _amountOut[i], _destinations[i], false);
-    }
-  }
-
-  /// @inheritdoc IEverclearSpokeV5
-  function batchFillIntentWithPull(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    bytes32[] calldata _receivers,
-    uint32[][] calldata _destinations,
-    bytes calldata _signature
-  ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
-    if (
-      _intents.length != _amountOut.length || _intents.length != _receivers.length
-        || _intents.length != _destinations.length
-    ) {
-      revert EverclearSpoke_FillIntent_InvalidArrayLengths();
-    }
-
-    bytes memory _data = abi.encode(
-      BATCH_FILL_INTENT_TYPEHASH,
-      keccak256(abi.encode(block.chainid, address(this))),
-      msg.sender,
-      _intents,
-      _amountOut,
-      _receivers,
-      _destinations
-    );
-    _verifySignature(fillSigner, _data, _signature);
-
-    _fillMessages = new FillMessage[](_intents.length);
-    for (uint256 i; i < _intents.length; i++) {
-      _fillMessages[i] = _fillIntent(_intents[i], msg.sender, _receivers[i], _amountOut[i], _destinations[i], true);
+      _fillMessages[i] =
+        _fillIntent(_intents[i], msg.sender, _receivers[i], _amountOut[i], _destinations[i], _pullFunds);
     }
   }
 
@@ -274,54 +213,15 @@ contract EverclearSpokeV5 is
     uint256 _amountOut,
     bytes32 _receiver,
     uint32[] memory _destinations,
-    bytes calldata _signature
-  ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data =
-      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
-    _verifySignature(fillSigner, _data, _signature);
-
-    _fillMessage = _fillIntent(_intent, msg.sender, _receiver, _amountOut, _destinations, false);
-  }
-
-  /// @inheritdoc IEverclearSpokeV5
-  function fillIntentWithPull(
-    Intent calldata _intent,
-    uint256 _amountOut,
-    bytes32 _receiver,
-    uint32[] memory _destinations,
-    bytes calldata _signature
-  ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data =
-      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
-    _verifySignature(fillSigner, _data, _signature);
-
-    _fillMessage = _fillIntent(_intent, msg.sender, _receiver, _amountOut, _destinations, true);
-  }
-
-  /// @inheritdoc IEverclearSpokeV5
-  function fillIntentForSolver(
-    address _solver,
-    Intent calldata _intent,
-    uint256 _nonce,
-    uint256 _amountOut,
-    bytes32 _receiver,
-    uint32[] memory _destinations,
     bytes calldata _signature,
-    bytes calldata _fillSignature
+    bool _pullFunds
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
     bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data = abi.encode(
-      FILL_INTENT_FOR_SOLVER_TYPEHASH, _domain, _solver, _receiver, _intent, _nonce, _amountOut, _destinations
-    );
-    _verifySignature(_solver, _data, _nonce, _signature);
-
-    bytes memory _fillData =
+    bytes memory _data =
       abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
-    _verifySignature(fillSigner, _fillData, _fillSignature);
+    _verifySignature(fillSigner, _data, _signature);
 
-    _fillMessage = _fillIntent(_intent, _solver, _receiver, _amountOut, _destinations, false);
+    _fillMessage = _fillIntent(_intent, msg.sender, _receiver, _amountOut, _destinations, _pullFunds);
   }
 
   /// @inheritdoc IEverclearSpokeV5
@@ -402,7 +302,10 @@ contract EverclearSpokeV5 is
   }
 
   /// @inheritdoc IEverclearSpokeV5
-  function deposit(address _asset, uint256 _amount) external whenNotPaused {
+  function deposit(
+    address _asset,
+    uint256 _amount
+  ) external whenNotPaused {
     _pullTokens(msg.sender, _asset, _amount);
     balances[_asset.toBytes32()][msg.sender.toBytes32()] += _amount;
 
@@ -410,7 +313,10 @@ contract EverclearSpokeV5 is
   }
 
   /// @inheritdoc IEverclearSpokeV5
-  function withdraw(address _asset, uint256 _amount) external whenNotPaused {
+  function withdraw(
+    address _asset,
+    uint256 _amount
+  ) external whenNotPaused {
     balances[_asset.toBytes32()][msg.sender.toBytes32()] -= _amount;
 
     _pushTokens(msg.sender, _asset, _amount);
@@ -475,7 +381,11 @@ contract EverclearSpokeV5 is
   //////////////////////////////////////////////////////////////*/
 
   /// @inheritdoc IEverclearSpokeV5
-  function initialize(address _feeAdapter, address _messageReceiver, address _fillSigner) public reinitializer(4) {
+  function initialize(
+    address _feeAdapter,
+    address _messageReceiver,
+    address _fillSigner
+  ) public reinitializer(4) {
     if (!_isEmpty(deprecated_intentQueue.first, deprecated_intentQueue.last)) {
       revert EverclearSpoke_Initialize_IntentQueueNotEmpty();
     }
@@ -654,7 +564,12 @@ contract EverclearSpokeV5 is
    * @param _nonce The nonce of the message
    * @param _signature The signature of the message
    */
-  function _verifySignature(address _signer, bytes memory _data, uint256 _nonce, bytes calldata _signature) internal {
+  function _verifySignature(
+    address _signer,
+    bytes memory _data,
+    uint256 _nonce,
+    bytes calldata _signature
+  ) internal {
     bytes32 _hash = keccak256(_data);
     address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
     if (_recoveredSigner != _signer) {
@@ -670,7 +585,11 @@ contract EverclearSpokeV5 is
    * @param _data The data of the message
    * @param _signature The signature of the message
    */
-  function _verifySignature(address _signer, bytes memory _data, bytes calldata _signature) internal {
+  function _verifySignature(
+    address _signer,
+    bytes memory _data,
+    bytes calldata _signature
+  ) internal {
     bytes32 _hash = keccak256(_data);
     address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
     if (_recoveredSigner != _signer) {
@@ -733,7 +652,10 @@ contract EverclearSpokeV5 is
    * @param _intentId The intent ID
    * @param _data The calldata of the intent
    */
-  function _executeCalldata(bytes32 _intentId, bytes memory _data) internal {
+  function _executeCalldata(
+    bytes32 _intentId,
+    bytes memory _data
+  ) internal {
     (address _target, bytes memory _calldata) = abi.decode(_data, (address, bytes));
 
     (bool _success, bytes memory _returnData) = callExecutor.excessivelySafeCall(
@@ -753,7 +675,11 @@ contract EverclearSpokeV5 is
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function _pullTokens(address _sender, address _asset, uint256 _amount) internal {
+  function _pullTokens(
+    address _sender,
+    address _asset,
+    uint256 _amount
+  ) internal {
     IERC20(_asset).safeTransferFrom(_sender, address(this), _amount);
   }
 
@@ -763,7 +689,11 @@ contract EverclearSpokeV5 is
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function _pushTokens(address _recipient, address _asset, uint256 _amount) internal {
+  function _pushTokens(
+    address _recipient,
+    address _asset,
+    uint256 _amount
+  ) internal {
     IERC20(_asset).safeTransfer(_recipient, _amount);
   }
 
@@ -807,7 +737,11 @@ contract EverclearSpokeV5 is
    * @param _relayer The relayer address
    * @param _ttl The time to live of the message
    */
-  function _processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) internal view {
+  function _processQueueChecks(
+    uint32 _domain,
+    address _relayer,
+    uint256 _ttl
+  ) internal view {
     if (_domain != DOMAIN) {
       revert EverclearSpoke_ProcessFillViaRelayer_WrongDomain();
     }
@@ -821,7 +755,10 @@ contract EverclearSpokeV5 is
     }
   }
 
-  function _isEmpty(uint256 first, uint256 last) internal pure returns (bool) {
+  function _isEmpty(
+    uint256 first,
+    uint256 last
+  ) internal pure returns (bool) {
     return (last < first) || (first == 0 && last == 0);
   }
 }

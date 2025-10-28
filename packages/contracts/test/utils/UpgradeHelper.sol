@@ -33,15 +33,27 @@ interface ICREATE3 {
 }
 
 contract TestEverclearSpokeV5 is EverclearSpokeV5 {
-  function processQueueChecks(uint32 _domain, address _relayer, uint256 _ttl) external view {
+  function processQueueChecks(
+    uint32 _domain,
+    address _relayer,
+    uint256 _ttl
+  ) external view {
     return _processQueueChecks(_domain, _relayer, _ttl);
   }
 
-  function executeCalldata(bytes32 _intentId, bytes memory _data) external {
+  function executeCalldata(
+    bytes32 _intentId,
+    bytes memory _data
+  ) external {
     return _executeCalldata(_intentId, _data);
   }
 
-  function verifySignature(address _signer, bytes memory _data, uint256 _nonce, bytes calldata _signature) external {
+  function verifySignature(
+    address _signer,
+    bytes memory _data,
+    uint256 _nonce,
+    bytes calldata _signature
+  ) external {
     return _verifySignature(_signer, _data, _nonce, _signature);
   }
 }
@@ -299,7 +311,10 @@ contract UpgradeHelper is SafeTxBuilder {
     state.messageGasLimit = spokeProxyV4.messageGasLimit();
   }
 
-  function _getDestinations(IEverclearV2.Intent memory _intent, uint32 _destination) internal pure {
+  function _getDestinations(
+    IEverclearV2.Intent memory _intent,
+    uint32 _destination
+  ) internal pure {
     uint32[] memory _destinations = new uint32[](1);
     _destinations[0] = _destination;
     _intent.destinations = _destinations;

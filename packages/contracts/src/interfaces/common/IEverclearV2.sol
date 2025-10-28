@@ -23,7 +23,6 @@ interface IEverclearV2 {
     SETTLED_AND_MANUALLY_EXECUTED, // 7
     UNSUPPORTED, // 8
     UNSUPPORTED_RETURNED // 9
-
   }
 
   /**
