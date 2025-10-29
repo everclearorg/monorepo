@@ -390,7 +390,7 @@ export class TronSyncProvider extends SyncProvider {
         })
       });
 
-      const data = await response.json();
+      const data = await response.json() as any;
       console.log('TRON DEBUG: Raw API response', data);
 
       if (data.constant_result && data.constant_result.length > 0) {
