@@ -15,8 +15,21 @@ contracts:
       - event: IntentAdded
       - event: IntentFilled
   
+  - name: EverclearSpokeV5
+    abi_file_path: ./abis/EverclearSpokeV5.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: IntentAdded
+      - event: IntentFilled
+  
   - name: FeeAdapter
     abi_file_path: ./abis/FeeAdapter.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: IntentWithFeesAdded
+  
+  - name: FeeAdapterV2
+    abi_file_path: ./abis/FeeAdapterV2.json
     handler: ./src/EventHandlers.ts
     events:
       - event: IntentWithFeesAdded
@@ -30,8 +43,12 @@ networks:
     contracts:
       - name: EverclearSpoke
         address: 0xD95Ff203bAAd65A8Fafd5C3dB695FC0a77A809a3
+      - name: EverclearSpokeV5
+        address: 0xD95Ff203bAAd65A8Fafd5C3dB695FC0a77A809a3  # Same address as V1 (upgraded contract)
       - name: FeeAdapter
         address: 0x7621D1085559Ab35513E2a41EC948a8524F619D9
+      - name: FeeAdapterV2
+        address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89  # TODO: Update with actual V2 address
 
   - id: 10
     start_block: 0
@@ -39,8 +56,12 @@ networks:
     contracts:
       - name: EverclearSpoke
         address: 0x91c40B4135eFea3c5A200388CfE316aa0B172b30
+      - name: EverclearSpokeV5
+        address: 0x91c40B4135eFea3c5A200388CfE316aa0B172b30  # Same address as V1 (upgraded contract)
       - name: FeeAdapter
         address: 0xF4a697B7A48e9c7C1944a68a11d3b8D5E716d169
+      - name: FeeAdapterV2
+        address: 0xF4a697B7A48e9c7C1944a68a11d3b8D5E716d169  # TODO: Update with actual V2 address
 
   - id: 8453
     start_block: 0
@@ -48,7 +69,11 @@ networks:
     contracts:
       - name: EverclearSpoke
         address: 0x91c40B4135eFea3c5A200388CfE316aa0B172b30
+      - name: EverclearSpokeV5
+        address: 0x91c40B4135eFea3c5A200388CfE316aa0B172b30  # Same address as V1 (upgraded contract)
       - name: FeeAdapter
         address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89
+      - name: FeeAdapterV2
+        address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89  # TODO: Update with actual V2 address
 
 rollback_on_reorg: true
