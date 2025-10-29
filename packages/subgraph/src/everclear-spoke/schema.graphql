@@ -23,12 +23,12 @@ type OriginIntent @entity {
   receiver: Bytes!
   inputAsset: Bytes!
   outputAsset: Bytes!
-  maxFee: BigInt!
   origin: BigInt!
   nonce: BigInt!
   timestamp: BigInt!
   ttl: BigInt!
   amount: BigInt!
+  amountOutMin: BigInt!
   destinations: [BigInt!]
   data: Bytes!
 
@@ -67,12 +67,12 @@ type DestinationIntent @entity {
   receiver: Bytes!
   inputAsset: Bytes!
   outputAsset: Bytes!
-  maxFee: BigInt!
   origin: BigInt!
   nonce: BigInt!
   timestamp: BigInt!
   ttl: BigInt!
   amount: BigInt!
+  amountOutMin: BigInt!
   destinations: [BigInt!]
   data: Bytes!
 
@@ -85,7 +85,8 @@ type IntentFillEvent @entity(immutable: true) {
   intent: DestinationIntent!
 
   solver: Bytes!
-  fee: BigInt
+  receiver: Bytes!
+  amountOut: BigInt!
 
   # Add Fill Transaction
   transactionHash: Bytes!
