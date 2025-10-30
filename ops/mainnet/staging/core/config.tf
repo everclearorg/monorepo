@@ -109,11 +109,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
@@ -172,11 +172,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
@@ -240,11 +240,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
@@ -340,7 +340,7 @@ locals {
     thresholds = {
       1          = { maxAge = 60, size = 1 },
       10         = { maxAge = 60, size = 1 },
-      # 42161      = { maxAge = 60, size = 1 },
+      42161      = { maxAge = 60, size = 1 },
       8453       = { maxAge = 60, size = 1 },
       25327      = { maxAge = 60, size = 1 },
       1399811149 = { maxAge = 60, size = 1 },
@@ -363,11 +363,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
