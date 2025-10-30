@@ -47,7 +47,7 @@ describe('Subgraph Adapter - parse', () => {
       inputAsset: entity.intent.inputAsset,
       outputAsset: entity.intent.outputAsset,
       amount: entity.intent.amount,
-      maxFee: entity.intent.maxFee,
+      amountOutMin: entity.intent.amountOutMin,
       destinations: entity.intent.destinations,
       origin: domain,
       nonce: entity.intent.nonce,
@@ -197,7 +197,7 @@ describe('Subgraph Adapter - parse', () => {
       initiator: entity.intent.initiator,
       nonce: entity.intent.nonce,
       data: entity.intent.data,
-      maxFee: entity.intent.maxFee,
+      amountOutMin: entity.intent.amountOutMin,
       ttl: entity.intent.ttl,
       returnData: undefined,
 

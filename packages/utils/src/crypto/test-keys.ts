@@ -1,6 +1,6 @@
 /**
  * Test Tron Keys for Development and Testing
- * 
+ *
  * WARNING: These are test keys only! Never use in production!
  * These keys are publicly visible and should only be used for testing.
  */
@@ -8,10 +8,11 @@
 export const TEST_TRON_KEYS = {
   // Generated test key pair for Tron development
   PRIVATE_KEY: 'da146374a75310b9666e834ee4ad0866d6f4035967bfc76217c5a495fff9f0d0',
-  PUBLIC_KEY: '04947c4f5d9e4d8c8a7e2c5f3e1a8b9c6d2e5f4a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b',
+  PUBLIC_KEY:
+    '04947c4f5d9e4d8c8a7e2c5f3e1a8b9c6d2e5f4a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b',
   ADDRESS_HEX: '41928c9af0651632157ef27a2cf17ca72c575a4d21',
   ADDRESS_BASE58: 'TPL66VK2gCXNCD7EJg9pgJRfqcRazjhUZY',
-  
+
   // Corresponding Ethereum-style address (for compatibility)
   ETH_ADDRESS: '0x928c9af0651632157ef27a2cf17ca72c575a4d21',
 } as const;
@@ -44,4 +45,4 @@ export function getTestTronAddress(): string {
  */
 export function getTestEthAddress(): string {
   return TEST_TRON_KEYS.ETH_ADDRESS;
-} 
+}

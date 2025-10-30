@@ -250,7 +250,7 @@ interface IEverclearSpokeV4 is ISpokeStorageV4 {
   /**
    * @notice Creates a new intent
    * @param _destinations The possible destination chains of the intent
-   * @param _receiver The destinantion address of the intent
+   * @param _receiver The destination address of the intent
    * @param _inputAsset The asset address on origin
    * @param _outputAsset The asset address on destination
    * @param _amount The amount of the asset
@@ -274,7 +274,7 @@ interface IEverclearSpokeV4 is ISpokeStorageV4 {
   /**
    * @notice Creates a new intent
    * @param _destinations The possible destination chains of the intent
-   * @param _receiver The destinantion address of the intent
+   * @param _receiver The destination address of the intent
    * @param _inputAsset The asset address on origin
    * @param _outputAsset The asset address on destination
    * @param _amount The amount of the asset
@@ -298,7 +298,7 @@ interface IEverclearSpokeV4 is ISpokeStorageV4 {
   /**
    * @notice Creates a new intent with permit2
    * @param _destinations The possible destination chains of the intent
-   * @param _receiver The destinantion address of the intent
+   * @param _receiver The destination address of the intent
    * @param _inputAsset The asset address on origin
    * @param _outputAsset The asset address on destination
    * @param _amount The amount of the asset

@@ -1949,7 +1949,8 @@ CREATE TABLE public.destination_intents (
     status public.intent_status DEFAULT 'NONE'::public.intent_status NOT NULL,
     destinations character varying(66)[] NOT NULL,
     ttl bigint NOT NULL,
-    return_data character varying
+    return_data character varying,
+    amount_out_min character varying(255)
 );
 
 
@@ -2028,7 +2029,8 @@ CREATE TABLE public.origin_intents (
     native_fee character varying(255),
     token_fee character varying(255),
     fee_adapter_initiator character varying(66),
-    order_id character varying(66)
+    order_id character varying(66),
+    amount_out_min character varying(255)
 );
 
 
@@ -2087,6 +2089,7 @@ CREATE MATERIALIZED VIEW public.intents AS
     origin_intents.token_fee AS origin_token_fee,
     origin_intents.fee_adapter_initiator AS origin_fee_adapter_initiator,
     origin_intents.order_id AS origin_order_id,
+    origin_intents.amount_out_min AS origin_amount_out_min,
     destination_intents.queue_idx AS destination_queue_idx,
     destination_intents.message_id AS destination_message_id,
     destination_intents.status AS destination_status,
@@ -2111,6 +2114,7 @@ CREATE MATERIALIZED VIEW public.intents AS
     destination_intents.tx_origin AS destination_tx_origin,
     destination_intents.tx_nonce AS destination_tx_nonce,
     destination_intents.auto_id AS destination_auto_id,
+    destination_intents.amount_out_min AS settlement_amount_out_min,
     settlement_intents.amount AS settlement_amount,
     settlement_intents.asset AS settlement_asset,
     settlement_intents.recipient AS settlement_recipient,
@@ -2182,6 +2186,7 @@ CREATE MATERIALIZED VIEW public.invoices AS
     origin_intents.token_fee AS origin_token_fee,
     origin_intents.fee_adapter_initiator AS origin_fee_adapter_initiator,
     origin_intents.order_id AS origin_order_id,
+    origin_intents.amount_out_min AS origin_amount_out_min,
     hub_invoices.id AS hub_invoice_id,
     hub_invoices.intent_id AS hub_invoice_intent_id,
     hub_invoices.amount AS hub_invoice_amount,
@@ -2971,6 +2976,104 @@ CREATE TABLE public.solana_lookup_tables (
     chain_id integer NOT NULL,
     slot integer NOT NULL
 );
+
+
+--
+-- Name: swap_fills; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.swap_fills (
+    id integer NOT NULL,
+    intent_id character varying(66) NOT NULL,
+    fill_tx_hash character varying(66) NOT NULL,
+    distribution_tx_hash character varying(66),
+    fill_method character varying(20) NOT NULL,
+    filled_at bigint NOT NULL,
+    distributed_at bigint,
+    gas_used character varying(78)
+);
+
+
+--
+-- Name: swap_fills_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.swap_fills_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: swap_fills_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.swap_fills_id_seq OWNED BY public.swap_fills.id;
+
+
+--
+-- Name: swap_intents; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.swap_intents (
+    intent_id character varying(66) NOT NULL,
+    swap_pair_id character varying(50) NOT NULL,
+    origin_chain character varying(20) NOT NULL,
+    destination_chain character varying(20) NOT NULL,
+    input_amount character varying(78) NOT NULL,
+    expected_output_amount character varying(78) NOT NULL,
+    actual_output_amount character varying(78),
+    margin_bps integer NOT NULL,
+    swap_rate character varying(78) NOT NULL,
+    swap_identifier character varying(66) NOT NULL,
+    micky_address character varying(66) NOT NULL,
+    user_address character varying(66) NOT NULL,
+    status character varying(20) NOT NULL,
+    fill_method character varying(20),
+    fill_timestamp bigint,
+    created_at bigint NOT NULL,
+    updated_at bigint NOT NULL
+);
+
+
+--
+-- Name: swap_inventory_snapshots; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.swap_inventory_snapshots (
+    id integer NOT NULL,
+    chain character varying(20) NOT NULL,
+    asset character varying(66) NOT NULL,
+    total_inventory character varying(78) NOT NULL,
+    reserved_inventory character varying(78) NOT NULL,
+    available_inventory character varying(78) NOT NULL,
+    pending_intent_count integer NOT NULL,
+    threshold_status character varying(20) NOT NULL,
+    "timestamp" bigint NOT NULL
+);
+
+
+--
+-- Name: swap_inventory_snapshots_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.swap_inventory_snapshots_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: swap_inventory_snapshots_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.swap_inventory_snapshots_id_seq OWNED BY public.swap_inventory_snapshots.id;
 
 
 --
@@ -3953,6 +4056,20 @@ ALTER TABLE ONLY public.settlement_intents ALTER COLUMN auto_id SET DEFAULT next
 
 
 --
+-- Name: swap_fills id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_fills ALTER COLUMN id SET DEFAULT nextval('public.swap_fills_id_seq'::regclass);
+
+
+--
+-- Name: swap_inventory_snapshots id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_inventory_snapshots ALTER COLUMN id SET DEFAULT nextval('public.swap_inventory_snapshots_id_seq'::regclass);
+
+
+--
 -- Name: assets assets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4150,6 +4267,30 @@ ALTER TABLE ONLY public.solana_lookup_tables
 
 ALTER TABLE ONLY public.solana_lookup_tables
     ADD CONSTRAINT solana_lookup_tables_user_address_mint_address_key UNIQUE (user_address, mint_address);
+
+
+--
+-- Name: swap_fills swap_fills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_fills
+    ADD CONSTRAINT swap_fills_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: swap_intents swap_intents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_intents
+    ADD CONSTRAINT swap_intents_pkey PRIMARY KEY (intent_id);
+
+
+--
+-- Name: swap_inventory_snapshots swap_inventory_snapshots_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_inventory_snapshots
+    ADD CONSTRAINT swap_inventory_snapshots_pkey PRIMARY KEY (id);
 
 
 --
@@ -4630,6 +4771,13 @@ CREATE INDEX idx_epoch_results_id ON public.epoch_results USING btree (id);
 
 
 --
+-- Name: idx_fill_intent; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_fill_intent ON public.swap_fills USING btree (intent_id);
+
+
+--
 -- Name: idx_merkle_trees_asset; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4676,6 +4824,48 @@ CREATE UNIQUE INDEX idx_proofs_initiator_merkle_root_proof ON public.rewards USI
 --
 
 CREATE INDEX idx_proofs_merkle_root ON public.rewards USING btree (merkle_root);
+
+
+--
+-- Name: idx_snapshot_chain_asset; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_snapshot_chain_asset ON public.swap_inventory_snapshots USING btree (chain, asset);
+
+
+--
+-- Name: idx_snapshot_timestamp; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_snapshot_timestamp ON public.swap_inventory_snapshots USING btree ("timestamp");
+
+
+--
+-- Name: idx_swap_created; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_swap_created ON public.swap_intents USING btree (created_at);
+
+
+--
+-- Name: idx_swap_pair; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_swap_pair ON public.swap_intents USING btree (swap_pair_id);
+
+
+--
+-- Name: idx_swap_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_swap_status ON public.swap_intents USING btree (status);
+
+
+--
+-- Name: idx_swap_user; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_swap_user ON public.swap_intents USING btree (user_address);
 
 
 --
@@ -4807,6 +4997,14 @@ ALTER TABLE ONLY public.origin_intents
 
 
 --
+-- Name: swap_fills swap_fills_intent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_fills
+    ADD CONSTRAINT swap_fills_intent_id_fkey FOREIGN KEY (intent_id) REFERENCES public.swap_intents(intent_id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -4924,4 +5122,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250726140256'),
     ('20250731212912'),
     ('20250801041441'),
-    ('20250801173912');
+    ('20250801173912'),
+    ('20251022134056');

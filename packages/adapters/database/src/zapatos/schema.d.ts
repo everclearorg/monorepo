@@ -1376,6 +1376,12 @@ declare module 'zapatos/schema' {
       */
       amount: string;
       /**
+      * **destination_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min: string | null;
+      /**
       * **destination_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('destination_intents_auto_id_seq'::regclass)`
@@ -1539,6 +1545,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       amount: string;
+      /**
+      * **destination_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min: string | null;
       /**
       * **destination_intents.auto_id**
       * - `int8` in database
@@ -1704,6 +1716,12 @@ declare module 'zapatos/schema' {
       */
       amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **destination_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **destination_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('destination_intents_auto_id_seq'::regclass)`
@@ -1868,6 +1886,12 @@ declare module 'zapatos/schema' {
       */
       amount: string | db.Parameter<string> | db.SQLFragment;
       /**
+      * **destination_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
       * **destination_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('destination_intents_auto_id_seq'::regclass)`
@@ -2031,6 +2055,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       amount?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **destination_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **destination_intents.auto_id**
       * - `int8` in database
@@ -4285,6 +4315,12 @@ declare module 'zapatos/schema' {
       */
       origin_amount: string | null;
       /**
+      * **intents.origin_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_amount_out_min: string | null;
+      /**
       * **intents.origin_auto_id**
       * - `int8` in database
       * - Materialized view column
@@ -4440,6 +4476,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       settlement_amount: string | null;
+      /**
+      * **intents.settlement_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      settlement_amount_out_min: string | null;
       /**
       * **intents.settlement_asset**
       * - `varchar` in database
@@ -4785,6 +4827,12 @@ declare module 'zapatos/schema' {
       */
       origin_amount: string | null;
       /**
+      * **intents.origin_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_amount_out_min: string | null;
+      /**
       * **intents.origin_auto_id**
       * - `int8` in database
       * - Materialized view column
@@ -4940,6 +4988,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       settlement_amount: string | null;
+      /**
+      * **intents.settlement_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      settlement_amount_out_min: string | null;
       /**
       * **intents.settlement_asset**
       * - `varchar` in database
@@ -5285,6 +5339,12 @@ declare module 'zapatos/schema' {
       */
       origin_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **intents.origin_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_amount_out_min?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **intents.origin_auto_id**
       * - `int8` in database
       * - Materialized view column
@@ -5440,6 +5500,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       settlement_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **intents.settlement_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      settlement_amount_out_min?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.settlement_asset**
       * - `varchar` in database
@@ -5617,6 +5683,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_amount: string | null;
+      /**
+      * **invoices.origin_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_amount_out_min: string | null;
       /**
       * **invoices.origin_auto_id**
       * - `int8` in database
@@ -5848,6 +5920,12 @@ declare module 'zapatos/schema' {
       */
       origin_amount: string | null;
       /**
+      * **invoices.origin_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_amount_out_min: string | null;
+      /**
       * **invoices.origin_auto_id**
       * - `int8` in database
       * - Materialized view column
@@ -6077,6 +6155,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **invoices.origin_amount_out_min**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      origin_amount_out_min?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_auto_id**
       * - `int8` in database
@@ -7607,6 +7691,12 @@ declare module 'zapatos/schema' {
       */
       amount: string;
       /**
+      * **origin_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min: string | null;
+      /**
       * **origin_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('origin_intents_auto_id_seq'::regclass)`
@@ -7770,6 +7860,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       amount: string;
+      /**
+      * **origin_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min: string | null;
       /**
       * **origin_intents.auto_id**
       * - `int8` in database
@@ -7935,6 +8031,12 @@ declare module 'zapatos/schema' {
       */
       amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **origin_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **origin_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('origin_intents_auto_id_seq'::regclass)`
@@ -8099,6 +8201,12 @@ declare module 'zapatos/schema' {
       */
       amount: string | db.Parameter<string> | db.SQLFragment;
       /**
+      * **origin_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
       * **origin_intents.auto_id**
       * - `int8` in database
       * - `NOT NULL`, default: `nextval('origin_intents_auto_id_seq'::regclass)`
@@ -8262,6 +8370,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       amount?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **origin_intents.amount_out_min**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out_min?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **origin_intents.auto_id**
       * - `int8` in database
@@ -10531,6 +10645,1095 @@ declare module 'zapatos/schema' {
   }
 
   /**
+   * **swap_fills**
+   * - Table in database
+   */
+  export namespace swap_fills {
+    export type Table = 'swap_fills';
+    export interface Selectable {
+      /**
+      * **swap_fills.distributed_at**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      distributed_at: db.Int8String | null;
+      /**
+      * **swap_fills.distribution_tx_hash**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      distribution_tx_hash: string | null;
+      /**
+      * **swap_fills.fill_method**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_method: string;
+      /**
+      * **swap_fills.fill_tx_hash**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_tx_hash: string;
+      /**
+      * **swap_fills.filled_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      filled_at: db.Int8String;
+      /**
+      * **swap_fills.gas_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gas_used: string | null;
+      /**
+      * **swap_fills.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_fills_id_seq'::regclass)`
+      */
+      id: number;
+      /**
+      * **swap_fills.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id: string;
+    }
+    export interface JSONSelectable {
+      /**
+      * **swap_fills.distributed_at**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      distributed_at: (number | db.Int8String) | null;
+      /**
+      * **swap_fills.distribution_tx_hash**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      distribution_tx_hash: string | null;
+      /**
+      * **swap_fills.fill_method**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_method: string;
+      /**
+      * **swap_fills.fill_tx_hash**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_tx_hash: string;
+      /**
+      * **swap_fills.filled_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      filled_at: (number | db.Int8String);
+      /**
+      * **swap_fills.gas_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gas_used: string | null;
+      /**
+      * **swap_fills.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_fills_id_seq'::regclass)`
+      */
+      id: number;
+      /**
+      * **swap_fills.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id: string;
+    }
+    export interface Whereable {
+      /**
+      * **swap_fills.distributed_at**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      distributed_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_fills.distribution_tx_hash**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      distribution_tx_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_fills.fill_method**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_method?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_fills.fill_tx_hash**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_tx_hash?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_fills.filled_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      filled_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_fills.gas_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gas_used?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_fills.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_fills_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_fills.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **swap_fills.distributed_at**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      distributed_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_fills.distribution_tx_hash**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      distribution_tx_hash?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_fills.fill_method**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_method: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_fills.fill_tx_hash**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_tx_hash: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_fills.filled_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      filled_at: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **swap_fills.gas_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gas_used?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_fills.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_fills_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_fills.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id: string | db.Parameter<string> | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **swap_fills.distributed_at**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      distributed_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_fills.distribution_tx_hash**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      distribution_tx_hash?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_fills.fill_method**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_method?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_fills.fill_tx_hash**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      fill_tx_hash?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_fills.filled_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      filled_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **swap_fills.gas_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gas_used?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_fills.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_fills_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_fills.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'swap_fills_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
+   * **swap_intents**
+   * - Table in database
+   */
+  export namespace swap_intents {
+    export type Table = 'swap_intents';
+    export interface Selectable {
+      /**
+      * **swap_intents.actual_output_amount**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      actual_output_amount: string | null;
+      /**
+      * **swap_intents.created_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      created_at: db.Int8String;
+      /**
+      * **swap_intents.destination_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      destination_chain: string;
+      /**
+      * **swap_intents.expected_output_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      expected_output_amount: string;
+      /**
+      * **swap_intents.fill_method**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_method: string | null;
+      /**
+      * **swap_intents.fill_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      fill_timestamp: db.Int8String | null;
+      /**
+      * **swap_intents.input_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      input_amount: string;
+      /**
+      * **swap_intents.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id: string;
+      /**
+      * **swap_intents.margin_bps**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      margin_bps: number;
+      /**
+      * **swap_intents.micky_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      micky_address: string;
+      /**
+      * **swap_intents.origin_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      origin_chain: string;
+      /**
+      * **swap_intents.status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      status: string;
+      /**
+      * **swap_intents.swap_identifier**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_identifier: string;
+      /**
+      * **swap_intents.swap_pair_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_pair_id: string;
+      /**
+      * **swap_intents.swap_rate**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_rate: string;
+      /**
+      * **swap_intents.updated_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      updated_at: db.Int8String;
+      /**
+      * **swap_intents.user_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      user_address: string;
+    }
+    export interface JSONSelectable {
+      /**
+      * **swap_intents.actual_output_amount**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      actual_output_amount: string | null;
+      /**
+      * **swap_intents.created_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      created_at: (number | db.Int8String);
+      /**
+      * **swap_intents.destination_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      destination_chain: string;
+      /**
+      * **swap_intents.expected_output_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      expected_output_amount: string;
+      /**
+      * **swap_intents.fill_method**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_method: string | null;
+      /**
+      * **swap_intents.fill_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      fill_timestamp: (number | db.Int8String) | null;
+      /**
+      * **swap_intents.input_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      input_amount: string;
+      /**
+      * **swap_intents.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id: string;
+      /**
+      * **swap_intents.margin_bps**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      margin_bps: number;
+      /**
+      * **swap_intents.micky_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      micky_address: string;
+      /**
+      * **swap_intents.origin_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      origin_chain: string;
+      /**
+      * **swap_intents.status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      status: string;
+      /**
+      * **swap_intents.swap_identifier**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_identifier: string;
+      /**
+      * **swap_intents.swap_pair_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_pair_id: string;
+      /**
+      * **swap_intents.swap_rate**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_rate: string;
+      /**
+      * **swap_intents.updated_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      updated_at: (number | db.Int8String);
+      /**
+      * **swap_intents.user_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      user_address: string;
+    }
+    export interface Whereable {
+      /**
+      * **swap_intents.actual_output_amount**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      actual_output_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.created_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      created_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.destination_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      destination_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.expected_output_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      expected_output_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.fill_method**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_method?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.fill_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      fill_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.input_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      input_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.margin_bps**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      margin_bps?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.micky_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      micky_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.origin_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      origin_chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      status?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.swap_identifier**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_identifier?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.swap_pair_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_pair_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.swap_rate**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_rate?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.updated_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      updated_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_intents.user_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      user_address?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **swap_intents.actual_output_amount**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      actual_output_amount?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_intents.created_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      created_at: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **swap_intents.destination_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      destination_chain: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.expected_output_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      expected_output_amount: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.fill_method**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_method?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_intents.fill_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      fill_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_intents.input_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      input_amount: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.margin_bps**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      margin_bps: number | db.Parameter<number> | db.SQLFragment;
+      /**
+      * **swap_intents.micky_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      micky_address: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.origin_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      origin_chain: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      status: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.swap_identifier**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_identifier: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.swap_pair_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_pair_id: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.swap_rate**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_rate: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_intents.updated_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      updated_at: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **swap_intents.user_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      user_address: string | db.Parameter<string> | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **swap_intents.actual_output_amount**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      actual_output_amount?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_intents.created_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      created_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **swap_intents.destination_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      destination_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.expected_output_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      expected_output_amount?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.fill_method**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_method?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_intents.fill_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      fill_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_intents.input_amount**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      input_amount?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.intent_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      intent_id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.margin_bps**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      margin_bps?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      /**
+      * **swap_intents.micky_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      micky_address?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.origin_chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      origin_chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      status?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.swap_identifier**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_identifier?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.swap_pair_id**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_pair_id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.swap_rate**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      swap_rate?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_intents.updated_at**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      updated_at?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **swap_intents.user_address**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      user_address?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'swap_intents_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
+   * **swap_inventory_snapshots**
+   * - Table in database
+   */
+  export namespace swap_inventory_snapshots {
+    export type Table = 'swap_inventory_snapshots';
+    export interface Selectable {
+      /**
+      * **swap_inventory_snapshots.asset**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      asset: string;
+      /**
+      * **swap_inventory_snapshots.available_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      available_inventory: string;
+      /**
+      * **swap_inventory_snapshots.chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      chain: string;
+      /**
+      * **swap_inventory_snapshots.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_inventory_snapshots_id_seq'::regclass)`
+      */
+      id: number;
+      /**
+      * **swap_inventory_snapshots.pending_intent_count**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      pending_intent_count: number;
+      /**
+      * **swap_inventory_snapshots.reserved_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      reserved_inventory: string;
+      /**
+      * **swap_inventory_snapshots.threshold_status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      threshold_status: string;
+      /**
+      * **swap_inventory_snapshots.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: db.Int8String;
+      /**
+      * **swap_inventory_snapshots.total_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      total_inventory: string;
+    }
+    export interface JSONSelectable {
+      /**
+      * **swap_inventory_snapshots.asset**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      asset: string;
+      /**
+      * **swap_inventory_snapshots.available_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      available_inventory: string;
+      /**
+      * **swap_inventory_snapshots.chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      chain: string;
+      /**
+      * **swap_inventory_snapshots.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_inventory_snapshots_id_seq'::regclass)`
+      */
+      id: number;
+      /**
+      * **swap_inventory_snapshots.pending_intent_count**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      pending_intent_count: number;
+      /**
+      * **swap_inventory_snapshots.reserved_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      reserved_inventory: string;
+      /**
+      * **swap_inventory_snapshots.threshold_status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      threshold_status: string;
+      /**
+      * **swap_inventory_snapshots.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: (number | db.Int8String);
+      /**
+      * **swap_inventory_snapshots.total_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      total_inventory: string;
+    }
+    export interface Whereable {
+      /**
+      * **swap_inventory_snapshots.asset**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.available_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      available_inventory?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      chain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_inventory_snapshots_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.pending_intent_count**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      pending_intent_count?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.reserved_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      reserved_inventory?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.threshold_status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      threshold_status?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.total_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      total_inventory?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **swap_inventory_snapshots.asset**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      asset: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.available_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      available_inventory: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      chain: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_inventory_snapshots_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.pending_intent_count**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      pending_intent_count: number | db.Parameter<number> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.reserved_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      reserved_inventory: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.threshold_status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      threshold_status: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.total_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      total_inventory: string | db.Parameter<string> | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **swap_inventory_snapshots.asset**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      asset?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.available_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      available_inventory?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.chain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      chain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('swap_inventory_snapshots_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.pending_intent_count**
+      * - `int4` in database
+      * - `NOT NULL`, no default
+      */
+      pending_intent_count?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.reserved_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      reserved_inventory?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.threshold_status**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      threshold_status?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.timestamp**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.total_inventory**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      total_inventory?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'swap_inventory_snapshots_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
    * **tokens**
    * - Table in database
    */
@@ -10736,20 +11939,20 @@ declare module 'zapatos/schema' {
   /* --- aggregate types --- */
 
   export namespace public {  
-    export type Table = assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | otc_sale_table.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | solana_lookup_tables.Table | tokens.Table;
-    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | otc_sale_table.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | solana_lookup_tables.Selectable | tokens.Selectable;
-    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | otc_sale_table.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | solana_lookup_tables.JSONSelectable | tokens.JSONSelectable;
-    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | otc_sale_table.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | solana_lookup_tables.Whereable | tokens.Whereable;
-    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | otc_sale_table.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | solana_lookup_tables.Insertable | tokens.Insertable;
-    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | otc_sale_table.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | solana_lookup_tables.Updatable | tokens.Updatable;
-    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | otc_sale_table.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | solana_lookup_tables.UniqueIndex | tokens.UniqueIndex;
-    export type Column = assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | otc_sale_table.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | solana_lookup_tables.Column | tokens.Column;
+    export type Table = assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | otc_sale_table.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | solana_lookup_tables.Table | swap_fills.Table | swap_intents.Table | swap_inventory_snapshots.Table | tokens.Table;
+    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | otc_sale_table.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | solana_lookup_tables.Selectable | swap_fills.Selectable | swap_intents.Selectable | swap_inventory_snapshots.Selectable | tokens.Selectable;
+    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | otc_sale_table.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | solana_lookup_tables.JSONSelectable | swap_fills.JSONSelectable | swap_intents.JSONSelectable | swap_inventory_snapshots.JSONSelectable | tokens.JSONSelectable;
+    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | otc_sale_table.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | solana_lookup_tables.Whereable | swap_fills.Whereable | swap_intents.Whereable | swap_inventory_snapshots.Whereable | tokens.Whereable;
+    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | otc_sale_table.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | solana_lookup_tables.Insertable | swap_fills.Insertable | swap_intents.Insertable | swap_inventory_snapshots.Insertable | tokens.Insertable;
+    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | otc_sale_table.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | solana_lookup_tables.Updatable | swap_fills.Updatable | swap_intents.Updatable | swap_inventory_snapshots.Updatable | tokens.Updatable;
+    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | otc_sale_table.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | solana_lookup_tables.UniqueIndex | swap_fills.UniqueIndex | swap_intents.UniqueIndex | swap_inventory_snapshots.UniqueIndex | tokens.UniqueIndex;
+    export type Column = assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | otc_sale_table.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | solana_lookup_tables.Column | swap_fills.Column | swap_intents.Column | swap_inventory_snapshots.Column | tokens.Column;
   
-    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, tokens.Table];
+    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
     export type AllMaterializedViews = [daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, intents.Table, invoices.Table];
-    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, tokens.Table];
+    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
   }
 
 
@@ -26144,6 +27347,9 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Selectable;
     "settlement_intents": settlement_intents.Selectable;
     "solana_lookup_tables": solana_lookup_tables.Selectable;
+    "swap_fills": swap_fills.Selectable;
+    "swap_intents": swap_intents.Selectable;
+    "swap_inventory_snapshots": swap_inventory_snapshots.Selectable;
     "tokens": tokens.Selectable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Selectable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Selectable;
@@ -26213,6 +27419,9 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.JSONSelectable;
     "settlement_intents": settlement_intents.JSONSelectable;
     "solana_lookup_tables": solana_lookup_tables.JSONSelectable;
+    "swap_fills": swap_fills.JSONSelectable;
+    "swap_intents": swap_intents.JSONSelectable;
+    "swap_inventory_snapshots": swap_inventory_snapshots.JSONSelectable;
     "tokens": tokens.JSONSelectable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.JSONSelectable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.JSONSelectable;
@@ -26282,6 +27491,9 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Whereable;
     "settlement_intents": settlement_intents.Whereable;
     "solana_lookup_tables": solana_lookup_tables.Whereable;
+    "swap_fills": swap_fills.Whereable;
+    "swap_intents": swap_intents.Whereable;
+    "swap_inventory_snapshots": swap_inventory_snapshots.Whereable;
     "tokens": tokens.Whereable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Whereable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Whereable;
@@ -26351,6 +27563,9 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Insertable;
     "settlement_intents": settlement_intents.Insertable;
     "solana_lookup_tables": solana_lookup_tables.Insertable;
+    "swap_fills": swap_fills.Insertable;
+    "swap_intents": swap_intents.Insertable;
+    "swap_inventory_snapshots": swap_inventory_snapshots.Insertable;
     "tokens": tokens.Insertable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Insertable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Insertable;
@@ -26420,6 +27635,9 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Updatable;
     "settlement_intents": settlement_intents.Updatable;
     "solana_lookup_tables": solana_lookup_tables.Updatable;
+    "swap_fills": swap_fills.Updatable;
+    "swap_intents": swap_intents.Updatable;
+    "swap_inventory_snapshots": swap_inventory_snapshots.Updatable;
     "tokens": tokens.Updatable;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Updatable;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Updatable;
@@ -26489,6 +27707,9 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.UniqueIndex;
     "settlement_intents": settlement_intents.UniqueIndex;
     "solana_lookup_tables": solana_lookup_tables.UniqueIndex;
+    "swap_fills": swap_fills.UniqueIndex;
+    "swap_intents": swap_intents.UniqueIndex;
+    "swap_inventory_snapshots": swap_inventory_snapshots.UniqueIndex;
     "tokens": tokens.UniqueIndex;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.UniqueIndex;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.UniqueIndex;
@@ -26558,6 +27779,9 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Column;
     "settlement_intents": settlement_intents.Column;
     "solana_lookup_tables": solana_lookup_tables.Column;
+    "swap_fills": swap_fills.Column;
+    "swap_intents": swap_intents.Column;
+    "swap_inventory_snapshots": swap_inventory_snapshots.Column;
     "tokens": tokens.Column;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.Column;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.Column;
@@ -26627,6 +27851,9 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.SQL;
     "settlement_intents": settlement_intents.SQL;
     "solana_lookup_tables": solana_lookup_tables.SQL;
+    "swap_fills": swap_fills.SQL;
+    "swap_intents": swap_intents.SQL;
+    "swap_inventory_snapshots": swap_inventory_snapshots.SQL;
     "tokens": tokens.SQL;
     "tokenomics.bridge_in_error": tokenomics.bridge_in_error.SQL;
     "tokenomics.bridge_updated": tokenomics.bridge_updated.SQL;
