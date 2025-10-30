@@ -23,14 +23,15 @@
     "version": "yarn version"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
-    "@types/node-fetch": "^2.6.12",
+    "@types/node": "^24.9.1",
+    "@types/node-fetch": "^2.6.13",
     "eslint": "9.17.0",
     "mocha": "8.2.0",
     "nyc": "15.1.0",
     "rimraf": "6.0.1",
     "sinon": "17.0.1",
     "ts-mocha": "10.0.0",
+    "ts-node": "10.9.2",
     "typescript": "5.7.2"
   },
   "dependencies": {

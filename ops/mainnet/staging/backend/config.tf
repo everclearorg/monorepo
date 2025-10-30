@@ -55,11 +55,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
