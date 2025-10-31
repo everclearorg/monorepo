@@ -82,7 +82,7 @@ export const createSpokeOriginIntentEntity = (
   inputAsset: mkAddress('0xa'),
   outputAsset: mkAddress('0xb'),
   amount: '1000000000',
-  maxFee: 500,
+  amountOutMin: '50',
   destinations: ['1338'],
   ttl: 1000,
   timestamp: Math.floor(Date.now() / 1000),
@@ -129,7 +129,7 @@ export const createSpokeDestinationIntentEntity = (
   data: '0x',
   ttl: 1000,
   timestamp: Math.floor(Date.now() / 1000),
-  maxFee: 500,
+  amountOutMin: '50',
   calldataExecutedEvent: undefined,
   ...overrides,
 });
