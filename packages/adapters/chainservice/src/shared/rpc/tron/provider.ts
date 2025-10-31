@@ -13,7 +13,7 @@ import { SyncProvider } from '../eth';
 import { UnpredictableGasLimit, TransactionReadError } from '../../errors';
 import { TronWeb } from '../../../mockable';
 import { Interface } from 'ethers/lib/utils';
-import fetch from 'node-fetch';
+// Using native fetch available in Node.js 18+
 
 interface ContractFunctionParameter {
   type: string;
