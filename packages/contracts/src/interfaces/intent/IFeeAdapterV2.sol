@@ -2,7 +2,7 @@
 pragma solidity 0.8.25;
 
 import {IEverclearV2} from '../common/IEverclearV2.sol';
-import {IEverclearSpokeV5} from './IEverclearSpokeV5.sol';
+import {IEverclearSpokeV6} from './IEverclearSpokeV6.sol';
 import {IPermit2} from 'interfaces/common/IPermit2.sol';
 
 interface IFeeAdapterV2 {
@@ -84,7 +84,7 @@ interface IFeeAdapterV2 {
    * @notice Returns the spoke contract address
    * @return The EverclearSpoke contract interface
    */
-  function spoke() external view returns (IEverclearSpokeV5);
+  function spoke() external view returns (IEverclearSpokeV6);
 
   /**
    * @notice returns the permit2 contract
@@ -189,7 +189,7 @@ interface IFeeAdapterV2 {
     uint256 _amountOutMin,
     uint48 _ttl,
     bytes calldata _data,
-    IEverclearSpokeV5.Permit2Params calldata _permit2Params,
+    IEverclearSpokeV6.Permit2Params calldata _permit2Params,
     FeeParams calldata _feeParams
   ) external payable returns (bytes32, IEverclearV2.Intent memory);
 

@@ -7,7 +7,7 @@ import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
 import {EverclearSpokeV3} from 'contracts/intent/EverclearSpokeV3.sol';
 import {EverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
-import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
+import {EverclearSpokeV6} from 'contracts/intent/EverclearSpokeV6.sol';
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
 
@@ -32,7 +32,7 @@ interface ICREATE3 {
   ) external payable returns (address _deployed);
 }
 
-contract TestEverclearSpokeV5 is EverclearSpokeV5 {
+contract TestEverclearSpokeV6 is EverclearSpokeV6 {
   function processQueueChecks(
     uint32 _domain,
     address _relayer,
@@ -320,8 +320,8 @@ contract UpgradeHelper is SafeTxBuilder {
   address internal constant USDC_ARBITRUM = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831;
   address public immutable MANAGER = makeAddr('Manager');
 
-  EverclearSpokeV5 public spokeProxyV5;
-  TestEverclearSpokeV5 public testSpokeProxyV5;
+  EverclearSpokeV6 public spokeProxyV6;
+  TestEverclearSpokeV6 public testSpokeProxyV6;
   IEverclearHubV2 public hubProxy;
   IHubMessageReceiverV2 public hubMessageReceiverV2;
   IHandlerV2 public handlerV2;
@@ -385,18 +385,18 @@ contract UpgradeHelper is SafeTxBuilder {
   }
 
   function _cacheSpokeStateV5() internal view returns (CachedSpokeState memory state) {
-    state.permit = address(spokeProxyV5.PERMIT2());
-    state.EVERCLEAR = spokeProxyV5.EVERCLEAR();
-    state.DOMAIN = spokeProxyV5.DOMAIN();
-    state.lighthouse = spokeProxyV5.lighthouse();
-    state.watchtower = spokeProxyV5.watchtower();
-    state.messageReceiver = spokeProxyV5.messageReceiver();
-    state.gateway = address(spokeProxyV5.gateway());
-    state.callExecutor = address(spokeProxyV5.callExecutor());
-    state.paused = spokeProxyV5.paused();
-    state.nonce = spokeProxyV5.nonce();
-    state.messageGasLimit = spokeProxyV5.messageGasLimit();
-    state.feeAdapter = spokeProxyV5.feeAdapter();
+    state.permit = address(spokeProxyV6.PERMIT2());
+    state.EVERCLEAR = spokeProxyV6.EVERCLEAR();
+    state.DOMAIN = spokeProxyV6.DOMAIN();
+    state.lighthouse = spokeProxyV6.lighthouse();
+    state.watchtower = spokeProxyV6.watchtower();
+    state.messageReceiver = spokeProxyV6.messageReceiver();
+    state.gateway = address(spokeProxyV6.gateway());
+    state.callExecutor = address(spokeProxyV6.callExecutor());
+    state.paused = spokeProxyV6.paused();
+    state.nonce = spokeProxyV6.nonce();
+    state.messageGasLimit = spokeProxyV6.messageGasLimit();
+    state.feeAdapter = spokeProxyV6.feeAdapter();
   }
 
   function _cacheHubState() internal view returns (CachedHubState memory state) {

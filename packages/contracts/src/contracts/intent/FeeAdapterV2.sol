@@ -13,7 +13,7 @@ import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
 
 import {IPermit2} from 'interfaces/common/IPermit2.sol';
-import {IEverclearSpokeV5} from 'interfaces/intent/IEverclearSpokeV5.sol';
+import {IEverclearSpokeV6} from 'interfaces/intent/IEverclearSpokeV6.sol';
 import {IFeeAdapterV2} from 'interfaces/intent/IFeeAdapterV2.sol';
 
 contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
@@ -32,7 +32,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
   IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
 
   /// @inheritdoc IFeeAdapterV2
-  IEverclearSpokeV5 public immutable spoke;
+  IEverclearSpokeV6 public immutable spoke;
 
   // @inheritdoc IFeeAdapterV2
   address public immutable xerc20Module;
@@ -56,7 +56,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
     address _xerc20Module,
     address _owner
   ) Ownable(_owner) {
-    spoke = IEverclearSpokeV5(_spoke);
+    spoke = IEverclearSpokeV6(_spoke);
     xerc20Module = _xerc20Module;
     _updateFeeRecipient(_feeRecipient);
     _updateFeeSigner(_feeSigner);
@@ -144,7 +144,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
     uint256 _amountOutMin,
     uint48 _ttl,
     bytes calldata _data,
-    IEverclearSpokeV5.Permit2Params calldata _permit2Params,
+    IEverclearSpokeV6.Permit2Params calldata _permit2Params,
     IFeeAdapterV2.FeeParams calldata _feeParams
   ) external payable returns (bytes32 _intentId, IEverclearV2.Intent memory _intent) {
     // Transfer from caller using permit2
@@ -502,7 +502,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
   function _pullWithPermit2(
     address _asset,
     uint256 _amount,
-    IEverclearSpokeV5.Permit2Params calldata _permit2Params
+    IEverclearSpokeV6.Permit2Params calldata _permit2Params
   ) internal {
     // Transfer from caller using permit2
     PERMIT2.permitTransferFrom(

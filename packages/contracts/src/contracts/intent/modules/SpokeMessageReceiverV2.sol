@@ -13,9 +13,9 @@ import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
-import {SpokeStorageV5} from 'contracts/intent/SpokeStorageV5.sol';
+import {SpokeStorageV6} from 'contracts/intent/SpokeStorageV6.sol';
 
-contract SpokeMessageReceiverV2 is SpokeStorageV5, OwnableUpgradeable, IMessageReceiver {
+contract SpokeMessageReceiverV2 is SpokeStorageV6, OwnableUpgradeable, IMessageReceiver {
   using TypeCasts for bytes32;
 
   /**
