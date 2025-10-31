@@ -310,5 +310,14 @@ contract MainnetStaging is DeployAdapterBase, MainnetStagingEnvironment {
       feeSigner: L2_FEE_SIGNER,
       owner: BASE_ENG_MULTISIG
     });
+
+    // Arbitrum
+    _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(ARBITRUM_ONE_SPOKE),
+      xerc20Module: address(ARBITRUM_ONE_XERC20_MODULE),
+      feeRecipient: ARBITRUM_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: ARBITRUM_ENG_MULTISIG
+    });
   }
 }
