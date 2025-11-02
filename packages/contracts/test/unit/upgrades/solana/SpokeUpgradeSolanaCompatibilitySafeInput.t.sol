@@ -209,7 +209,10 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     return _destinations;
   }
 
-  function deployAndDeal(address _receiver, uint256 _amount) public returns (bytes32 _token) {
+  function deployAndDeal(
+    address _receiver,
+    uint256 _amount
+  ) public returns (bytes32 _token) {
     address _tokenAddress = address(new TestERC20('Token', 'TKN'));
     deal(_tokenAddress, _receiver, _amount);
     _token = _tokenAddress.toBytes32();

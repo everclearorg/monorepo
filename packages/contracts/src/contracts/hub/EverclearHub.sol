@@ -49,12 +49,20 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   //////////////////////////////////////////////////////////////*/
 
   /// @inheritdoc ISettler
-  function processDepositsAndInvoices(bytes32, uint32, uint32, uint32) external {
+  function processDepositsAndInvoices(
+    bytes32,
+    uint32,
+    uint32,
+    uint32
+  ) external {
     _delegate(_SETTLEMENT_MODULE);
   }
 
   /// @inheritdoc ISettler
-  function processSettlementQueue(uint32, uint32) external payable whenNotPaused {
+  function processSettlementQueue(
+    uint32,
+    uint32
+  ) external payable whenNotPaused {
     _delegate(_SETTLEMENT_MODULE);
   }
 
@@ -90,7 +98,12 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   }
 
   /// @inheritdoc IHandler
-  function withdrawFees(bytes32, bytes32, uint256, uint32[] calldata) external {
+  function withdrawFees(
+    bytes32,
+    bytes32,
+    uint256,
+    uint32[] calldata
+  ) external {
     _delegate(_HANDLER_MODULE);
   }
 
@@ -124,7 +137,10 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   }
 
   /// @inheritdoc IAssetManager
-  function setPrioritizedStrategy(bytes32, IEverclear.Strategy) external {
+  function setPrioritizedStrategy(
+    bytes32,
+    IEverclear.Strategy
+  ) external {
     _delegate(_MANAGER_MODULE);
   }
 
@@ -136,7 +152,10 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   }
 
   /// @inheritdoc IAssetManager
-  function setDiscountPerEpoch(bytes32, uint24) external {
+  function setDiscountPerEpoch(
+    bytes32,
+    uint24
+  ) external {
     _delegate(_MANAGER_MODULE);
   }
 
@@ -196,7 +215,10 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   }
 
   /// @inheritdoc IProtocolManager
-  function assignRole(address, Role) external {
+  function assignRole(
+    address,
+    Role
+  ) external {
     _delegate(_MANAGER_MODULE);
   }
 
@@ -239,7 +261,10 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   }
 
   /// @inheritdoc IProtocolManager
-  function updateMailbox(bytes32, uint32[] calldata) external payable {
+  function updateMailbox(
+    bytes32,
+    uint32[] calldata
+  ) external payable {
     _delegate(_MANAGER_MODULE);
   }
 
@@ -258,12 +283,18 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   }
 
   /// @inheritdoc IProtocolManager
-  function updateGateway(bytes32, uint32[] calldata) external payable {
+  function updateGateway(
+    bytes32,
+    uint32[] calldata
+  ) external payable {
     _delegate(_MANAGER_MODULE);
   }
 
   /// @inheritdoc IProtocolManager
-  function updateChainGateway(uint32, bytes32) external {
+  function updateChainGateway(
+    uint32,
+    bytes32
+  ) external {
     _delegate(_MANAGER_MODULE);
   }
 
@@ -296,7 +327,10 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   }
 
   /// @inheritdoc IProtocolManager
-  function setMaxDiscountDbps(bytes32, uint24) external {
+  function setMaxDiscountDbps(
+    bytes32,
+    uint24
+  ) external {
     _delegate(_MANAGER_MODULE);
   }
 
@@ -305,7 +339,10 @@ contract EverclearHub is HubStorage, UUPSUpgradeable, IEverclearHub {
   //////////////////////////////////////////////////////////////*/
 
   /// @inheritdoc IEverclearHub
-  function updateModuleAddress(bytes32 _type, address _newAddress) external onlyOwner {
+  function updateModuleAddress(
+    bytes32 _type,
+    address _newAddress
+  ) external onlyOwner {
     address _previousAddress = modules[_type];
     modules[_type] = _newAddress;
     emit ModuleAddressUpdated(_type, _previousAddress, _newAddress);
