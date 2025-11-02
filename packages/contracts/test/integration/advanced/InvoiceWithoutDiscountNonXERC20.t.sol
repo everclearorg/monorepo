@@ -50,7 +50,9 @@ contract Invoice_WithoutDiscountNonXERC20_Integration is IntegrationBase {
       _smallestIntentAmount - (_smallestIntentAmount * totalProtocolFees / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
 
     // after decimal conversion 1e18 to 1e6 the amount to transfer end up being 0
     assertEq(ERC20(address(sepoliaDAI)).balanceOf(_user2), 0);
@@ -105,7 +107,9 @@ contract Invoice_WithoutDiscountNonXERC20_Integration is IntegrationBase {
       _smallestIntentAmount - (_smallestIntentAmount * totalProtocolFees / Common.DBPS_DENOMINATOR);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
 
     // after decimal conversion 1e18 to 1e18 the amount to transfer end up being 1
     assertEq(ERC20(address(sepoliaWETH)).balanceOf(_user2), 1);

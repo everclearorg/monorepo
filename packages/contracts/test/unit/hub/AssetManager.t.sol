@@ -22,7 +22,12 @@ import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
 import {Deploy} from 'utils/Deploy.sol';
 
 contract TestAssetManager is AssetManager, ProtocolManager {
-  constructor(address __owner, address __admin, address __hubGateway, address __lighthouse) {
+  constructor(
+    address __owner,
+    address __admin,
+    address __hubGateway,
+    address __lighthouse
+  ) {
     // Set the internal state vars for tests, these are set in the constructor of the HubStorage originally
     owner = __owner;
     roles[__admin] = IHubStorage.Role.ADMIN;
@@ -36,7 +41,10 @@ contract TestAssetManager is AssetManager, ProtocolManager {
     return _tokenConfigs[_tickerHash].prioritizedStrategy;
   }
 
-  function _mockTokenMaxDiscountDbps(bytes32 _tickerHash, uint24 _maxDiscountDbps) external {
+  function _mockTokenMaxDiscountDbps(
+    bytes32 _tickerHash,
+    uint24 _maxDiscountDbps
+  ) external {
     _tokenConfigs[_tickerHash].maxDiscountDbps = _maxDiscountDbps;
   }
 }
@@ -67,13 +75,18 @@ contract BaseTest is TestExtended {
     assertEq(_predictedHubGateway, address(hubGateway));
   }
 
-  function _mockRole(address _account, IHubStorage.Role _role) internal {
-    stdstore.target(address(assetManager)).sig(IHubStorage.roles.selector).with_key(_account).checked_write(
-      uint8(_role)
-    );
+  function _mockRole(
+    address _account,
+    IHubStorage.Role _role
+  ) internal {
+    stdstore.target(address(assetManager)).sig(IHubStorage.roles.selector).with_key(_account)
+      .checked_write(uint8(_role));
   }
 
-  function _mockMaxDiscountDbps(bytes32 _tickerHash, uint24 _maxDiscountDbps) internal {
+  function _mockMaxDiscountDbps(
+    bytes32 _tickerHash,
+    uint24 _maxDiscountDbps
+  ) internal {
     TestAssetManager(address(assetManager))._mockTokenMaxDiscountDbps(_tickerHash, _maxDiscountDbps);
   }
 }
@@ -353,7 +366,10 @@ contract Unit_SetTokenConfigs is BaseTest {
   /**
    * @notice Test set token configs reverts if the caller is not the asset manager
    */
-  function test_Revert_SetTokenConfigsNotAssetManager(address _caller, uint8 _configsNumber) public {
+  function test_Revert_SetTokenConfigsNotAssetManager(
+    address _caller,
+    uint8 _configsNumber
+  ) public {
     vm.assume(_caller != assetManager.owner());
     IHubStorage.TokenSetup[] memory _configs = new IHubStorage.TokenSetup[](_configsNumber);
 
@@ -550,7 +566,11 @@ contract Unit_SetPrioritizedStrategy is BaseTest {
    * @param _tickerHash The hash of the ticker symbol
    * @param _strategySeed The seed for the strategy
    */
-  function test_SetPrioritizedStrategy(address _caller, bytes32 _tickerHash, uint8 _strategySeed) public {
+  function test_SetPrioritizedStrategy(
+    address _caller,
+    bytes32 _tickerHash,
+    uint8 _strategySeed
+  ) public {
     _mockRole(_caller, IHubStorage.Role.ASSET_MANAGER);
 
     IEverclear.Strategy _strategy = IEverclear.Strategy(bound(_strategySeed, 0, uint256(type(IEverclear.Strategy).max)));

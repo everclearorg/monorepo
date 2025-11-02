@@ -66,6 +66,8 @@ contract IntercalatedAbleToFillAndNotAbleToFill_Integration is IntegrationBase {
 
     // Process settlements for Ethereum Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 3);
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
   }
 }

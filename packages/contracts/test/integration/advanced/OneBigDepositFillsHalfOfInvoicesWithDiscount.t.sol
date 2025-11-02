@@ -64,6 +64,8 @@ contract OneBigDepositFillsHalfOfInvoicesWithDiscount_Integration is Integration
 
     // Process settlements for Ethereum Sepolia
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 1);
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
   }
 }

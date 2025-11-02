@@ -5,7 +5,10 @@ contract ScriptUtils {
   error InvalidDomain(uint32 _domain);
   error NotImplemented();
 
-  function _addressFrom(address _origin, uint256 _nonce) internal pure returns (address _address) {
+  function _addressFrom(
+    address _origin,
+    uint256 _nonce
+  ) internal pure returns (address _address) {
     bytes memory _data;
     if (_nonce == 0x00) {
       _data = abi.encodePacked(bytes1(0xd6), bytes1(0x94), _origin, bytes1(0x80));

@@ -132,25 +132,19 @@ abstract contract TestnetStagingSupportedDomainsAndGateways is TestnetStagingDom
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: BSC_TESTNET,
-        blockGasLimit: 70_000_000,
-        gateway: address(BSC_SPOKE_GATEWAY).toBytes32()
+        chainId: BSC_TESTNET, blockGasLimit: 70_000_000, gateway: address(BSC_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: OP_SEPOLIA,
-        blockGasLimit: 30_000_000,
-        gateway: address(OP_SEPOLIA_SPOKE_GATEWAY).toBytes32()
+        chainId: OP_SEPOLIA, blockGasLimit: 30_000_000, gateway: address(OP_SEPOLIA_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ARB_SEPOLIA,
-        blockGasLimit: 30_000_000,
-        gateway: address(ARB_SEPOLIA_SPOKE_GATEWAY).toBytes32()
+        chainId: ARB_SEPOLIA, blockGasLimit: 30_000_000, gateway: address(ARB_SEPOLIA_SPOKE_GATEWAY).toBytes32()
       })
     );
   }
