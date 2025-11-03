@@ -77,6 +77,7 @@ export const originIntent = (entity: SpokeAddIntentEventEntity): OriginIntent =>
     nativeFee: entity.intent.fees?.nativeFee ?? undefined,
     feeAdapterInitiator: entity.intent.fees?.initiator ?? undefined,
     orderId: entity.intent.order?.id ?? undefined,
+    isSwap: undefined, // Will be computed by cartographer based on ticker hash comparison
   };
 };
 

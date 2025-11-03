@@ -372,6 +372,7 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       tokenFee: invoice.origin_token_fee ?? undefined,
       feeAdapterInitiator: invoice.origin_fee_adapter_initiator ?? undefined,
       orderId: invoice.origin_order_id ?? undefined,
+      isSwap: invoice.origin_is_swap ?? false,
       transactionHash: invoice.origin_transaction_hash!.trim(),
       timestamp: +invoice.origin_timestamp!,
       blockNumber: +invoice.origin_block_number!,
