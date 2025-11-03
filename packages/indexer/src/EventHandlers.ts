@@ -5,26 +5,26 @@ import {
   EverclearSpokeV5_IntentFilled_handler,
   FeeAdapter_IntentWithFeesAdded_handler,
   FeeAdapterV2_IntentWithFeesAdded_handler,
-} from "../generated/src/Handlers.gen";
+} from '../generated/src/Handlers.gen';
 
 // Helper: Convert bytes32 to address (remove leading zeros)
 function bytes32ToAddress(bytes32: string): string {
   // Remove 0x prefix if present
-  const hex = bytes32.startsWith("0x") ? bytes32.slice(2) : bytes32;
+  const hex = bytes32.startsWith('0x') ? bytes32.slice(2) : bytes32;
   // Take last 40 characters (20 bytes) and prepend 0x
-  return "0x" + hex.slice(-40);
+  return '0x' + hex.slice(-40);
 }
 
 // Helper: Check if an address is a FeeAdapter contract
 function isFeeAdapterAddress(address: string): boolean {
   const feeAdapterAddresses = [
-    "0x00000000000000000000000020ff5ea948881d18f7d64b64410ec2b81f8797f4", // V2Ethereum
-    "0x00000000000000000000000065588b1121eb7dd41ba7d82a4f387548381584a9", // V2 Base
-    "0x000000000000000000000000fb1792b0992b9685be041a69a082241ce991f231", // V2 Optimism
-    "0x00000000000000000000000012dc8f91767021760391d691fd4bd2a642aebe2d", // V2 Arbitrum
-    "0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75", // V1 most chains
-    "0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508", // 
-    "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", //
+    '0x00000000000000000000000020ff5ea948881d18f7d64b64410ec2b81f8797f4', // V2Ethereum
+    '0x00000000000000000000000065588b1121eb7dd41ba7d82a4f387548381584a9', // V2 Base
+    '0x000000000000000000000000fb1792b0992b9685be041a69a082241ce991f231', // V2 Optimism
+    '0x00000000000000000000000012dc8f91767021760391d691fd4bd2a642aebe2d', // V2 Arbitrum
+    '0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75', // V1 most chains
+    '0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508', //
+    '0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1', //
   ];
   return feeAdapterAddresses.includes(address.toLowerCase());
 }
@@ -38,9 +38,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
   const chainId = event.chainId;
   const txHash = event.transaction.hash;
 
-  context.log.info(
-    `Processing IntentAdded: ${_intentId} on chain ${chainId}`
-  );
+  context.log.info(`Processing IntentAdded: ${_intentId} on chain ${chainId}`);
 
   // Access _intent as a tuple: [initiator, receiver, inputAsset, outputAsset, maxFee, origin, nonce, timestamp, ttl, amount, destinations, data]
   const [
@@ -55,7 +53,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     ttl,
     amount,
     destinations,
-    data
+    data,
   ] = _intent;
 
   // Check if Intent already exists (could be placeholder from FeeAdapter event)
@@ -63,14 +61,14 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
 
   // Detect if this intent was created via FeeAdapter (initiator is FeeAdapter address)
   const isViaFeeAdapter = isFeeAdapterAddress(initiator);
-  
+
   // If this intent was created via FeeAdapter, we need to wait for IntentWithFeesAdded
   // to get the correct user address. Create a placeholder if no existing intent.
   if (isViaFeeAdapter && !existingIntent) {
     context.log.info(
-      `Intent ${_intentId} created via FeeAdapter, creating placeholder (waiting for IntentWithFeesAdded event)`
+      `Intent ${_intentId} created via FeeAdapter, creating placeholder (waiting for IntentWithFeesAdded event)`,
     );
-    
+
     // Create placeholder intent with FeeAdapter as initiator temporarily
     // This will be updated when IntentWithFeesAdded event is processed
     const placeholderIntent = {
@@ -88,7 +86,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
       timestamp,
       ttl,
       originAmount: amount, // Use actual amount, not 0
-      destinations: destinations.map(d => Number(d)),
+      destinations: destinations.map((d) => Number(d)),
       data,
       chainId,
       blockNumber: BigInt(event.block.number),
@@ -98,16 +96,16 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
       isFastPath: ttl !== 0n,
       tokenFee: undefined,
       nativeFee: undefined,
-      status: "ADDED" as const,
+      status: 'ADDED' as const,
     };
-    
+
     context.Intent.set(placeholderIntent);
-    
+
     // Update statistics for this intent
-    let globalStats = await context.IntentStatistics.get("global");
+    let globalStats = await context.IntentStatistics.get('global');
     if (!globalStats) {
       globalStats = {
-        id: "global",
+        id: 'global',
         totalUniqueIntents: 0n,
         totalNettableIntents: 0n,
         totalFillableIntents: 0n,
@@ -117,7 +115,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
 
     const isNettable = ttl === 0n;
     context.IntentStatistics.set({
-      id: "global",
+      id: 'global',
       totalUniqueIntents: globalStats.totalUniqueIntents + 1n,
       totalNettableIntents: globalStats.totalNettableIntents + (isNettable ? 1n : 0n),
       totalFillableIntents: globalStats.totalFillableIntents + (isNettable ? 0n : 1n),
@@ -128,7 +126,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     const inputAssetAddress = bytes32ToAddress(inputAsset);
     const assetId = `${inputAssetAddress}-${chainId}`;
     let asset = await context.Asset.get(assetId);
-    
+
     if (!asset) {
       asset = {
         id: assetId,
@@ -150,7 +148,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
       intentCount: asset.intentCount + 1n,
       fillCount: asset.fillCount,
     });
-    
+
     return; // Don't process the regular intent creation
   }
 
@@ -170,7 +168,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     timestamp,
     ttl,
     originAmount: amount,
-    destinations: destinations.map(d => Number(d)),
+    destinations: destinations.map((d) => Number(d)),
     data,
     chainId,
     blockNumber: BigInt(event.block.number),
@@ -181,7 +179,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     // Preserve fee information if it was already set by FeeAdapter
     tokenFee: existingIntent?.tokenFee,
     nativeFee: existingIntent?.nativeFee,
-    status: "ADDED" as const,
+    status: 'ADDED' as const,
   };
 
   context.Intent.set(intent);
@@ -189,12 +187,12 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
   // Update global statistics (only if this is a real intent, not updating a placeholder)
   // Placeholder intents have originAmount of 0
   const isNewIntent = !existingIntent || existingIntent.originAmount === 0n;
-  
+
   if (isNewIntent) {
-    let globalStats = await context.IntentStatistics.get("global");
+    let globalStats = await context.IntentStatistics.get('global');
     if (!globalStats) {
       globalStats = {
-        id: "global",
+        id: 'global',
         totalUniqueIntents: 0n,
         totalNettableIntents: 0n,
         totalFillableIntents: 0n,
@@ -206,7 +204,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     const isNettable = ttl === 0n;
 
     context.IntentStatistics.set({
-      id: "global",
+      id: 'global',
       totalUniqueIntents: globalStats.totalUniqueIntents + 1n,
       totalNettableIntents: globalStats.totalNettableIntents + (isNettable ? 1n : 0n),
       totalFillableIntents: globalStats.totalFillableIntents + (isNettable ? 0n : 1n),
@@ -219,7 +217,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     const inputAssetAddress = bytes32ToAddress(inputAsset);
     const assetId = `${inputAssetAddress}-${chainId}`;
     let asset = await context.Asset.get(assetId);
-    
+
     if (!asset) {
       asset = {
         id: assetId,
@@ -256,9 +254,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
   const chainId = event.chainId;
   const txHash = event.transaction.hash;
 
-  context.log.info(
-    `Processing IntentAdded (V5): ${_intentId} on chain ${chainId}`
-  );
+  context.log.info(`Processing IntentAdded (V5): ${_intentId} on chain ${chainId}`);
 
   // Access _intent as a tuple (V5 structure): [initiator, receiver, inputAsset, outputAsset, origin, nonce, timestamp, ttl, amount, amountOutMin, destinations, data]
   // Note: V5 uses amountOutMin instead of maxFee, so maxFee is not available in V5
@@ -274,22 +270,20 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     amount,
     amountOutMin,
     destinations,
-    data
+    data,
   ] = _intent;
 
   // Check if Intent already exists (could be placeholder from FeeAdapter event)
-  let existingIntent = await context.Intent.get(_intentId);
+  const existingIntent = await context.Intent.get(_intentId);
 
   // Detect if this intent was created via FeeAdapter (initiator is FeeAdapter address)
   const isViaFeeAdapter = isFeeAdapterAddress(initiator);
-  
   // If this intent was created via FeeAdapter, we need to wait for IntentWithFeesAdded
   // to get the correct user address. Create a placeholder if no existing intent.
   if (isViaFeeAdapter && !existingIntent) {
     context.log.info(
-      `Intent ${_intentId} created via FeeAdapter (V5), creating placeholder (waiting for IntentWithFeesAdded event)`
+      `Intent ${_intentId} created via FeeAdapter (V5), creating placeholder (waiting for IntentWithFeesAdded event)`,
     );
-    
     // Create placeholder intent with FeeAdapter as initiator temporarily
     // This will be updated when IntentWithFeesAdded event is processed
     const placeholderIntent = {
@@ -307,7 +301,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
       timestamp,
       ttl,
       originAmount: amount, // Use actual amount, not 0
-      destinations: destinations.map(d => Number(d)),
+      destinations: destinations.map((d) => Number(d)),
       data,
       chainId,
       blockNumber: BigInt(event.block.number),
@@ -317,16 +311,14 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
       isFastPath: ttl !== 0n,
       tokenFee: undefined,
       nativeFee: undefined,
-      status: "ADDED" as const,
+      status: 'ADDED' as const,
     };
-    
     context.Intent.set(placeholderIntent);
-    
     // Update statistics for this intent
-    let globalStats = await context.IntentStatistics.get("global");
+    let globalStats = await context.IntentStatistics.get('global');
     if (!globalStats) {
       globalStats = {
-        id: "global",
+        id: 'global',
         totalUniqueIntents: 0n,
         totalNettableIntents: 0n,
         totalFillableIntents: 0n,
@@ -336,7 +328,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
 
     const isNettable = ttl === 0n;
     context.IntentStatistics.set({
-      id: "global",
+      id: 'global',
       totalUniqueIntents: globalStats.totalUniqueIntents + 1n,
       totalNettableIntents: globalStats.totalNettableIntents + (isNettable ? 1n : 0n),
       totalFillableIntents: globalStats.totalFillableIntents + (isNettable ? 0n : 1n),
@@ -347,7 +339,6 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     const inputAssetAddress = bytes32ToAddress(inputAsset);
     const assetId = `${inputAssetAddress}-${chainId}`;
     let asset = await context.Asset.get(assetId);
-    
     if (!asset) {
       asset = {
         id: assetId,
@@ -369,7 +360,6 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
       intentCount: asset.intentCount + 1n,
       fillCount: asset.fillCount,
     });
-    
     return; // Don't process the regular intent creation
   }
 
@@ -378,7 +368,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     id: _intentId,
     intentId: _intentId,
     queueIdx: _queueIdx,
-    initiator: existingIntent?.initiator || initiator,
+    initiator: initiator,
     receiver,
     inputAsset,
     outputAsset,
@@ -389,7 +379,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     timestamp,
     ttl,
     originAmount: amount,
-    destinations: destinations.map(d => Number(d)),
+    destinations: destinations.map((d) => Number(d)),
     data,
     chainId,
     blockNumber: BigInt(event.block.number),
@@ -400,7 +390,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     // Preserve fee information if it was already set by FeeAdapter
     tokenFee: existingIntent?.tokenFee,
     nativeFee: existingIntent?.nativeFee,
-    status: "ADDED" as const,
+    status: 'ADDED' as const,
   };
 
   context.Intent.set(intent);
@@ -408,12 +398,11 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
   // Update global statistics (only if this is a real intent, not updating a placeholder)
   // Placeholder intents have originAmount of 0
   const isNewIntent = !existingIntent || existingIntent.originAmount === 0n;
-  
   if (isNewIntent) {
-    let globalStats = await context.IntentStatistics.get("global");
+    let globalStats = await context.IntentStatistics.get('global');
     if (!globalStats) {
       globalStats = {
-        id: "global",
+        id: 'global',
         totalUniqueIntents: 0n,
         totalNettableIntents: 0n,
         totalFillableIntents: 0n,
@@ -425,7 +414,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     const isNettable = ttl === 0n;
 
     context.IntentStatistics.set({
-      id: "global",
+      id: 'global',
       totalUniqueIntents: globalStats.totalUniqueIntents + 1n,
       totalNettableIntents: globalStats.totalNettableIntents + (isNettable ? 1n : 0n),
       totalFillableIntents: globalStats.totalFillableIntents + (isNettable ? 0n : 1n),
@@ -438,7 +427,6 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     const inputAssetAddress = bytes32ToAddress(inputAsset);
     const assetId = `${inputAssetAddress}-${chainId}`;
     let asset = await context.Asset.get(assetId);
-    
     if (!asset) {
       asset = {
         id: assetId,
@@ -476,9 +464,7 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
   const chainId = event.chainId;
   const txHash = event.transaction.hash;
 
-  context.log.info(
-    `Processing IntentFilled: ${_intentId} on chain ${chainId} by solver ${_solver}`
-  );
+  context.log.info(`Processing IntentFilled: ${_intentId} on chain ${chainId} by solver ${_solver}`);
 
   // Access _intent as a tuple
   const [
@@ -493,17 +479,16 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
     ttl,
     amount,
     destinations,
-    data
+    data,
   ] = _intent;
 
   // Check if Intent exists - solvers should wait for intent to be in subgraph
   // This prevents counting invalid fills (edge case where fill has wrong info)
-  let intent = await context.Intent.get(_intentId);
-  
+  const intent = await context.Intent.get(_intentId);
   if (!intent) {
     context.log.warn(
       `Intent ${_intentId} not found when processing Fill on chain ${chainId}. ` +
-      `This fill will NOT be counted in statistics (likely invalid fill with wrong info).`
+        `This fill will NOT be counted in statistics (likely invalid fill with wrong info).`,
     );
     // Don't create Fill entity or update stats for invalid fills
     return;
@@ -535,7 +520,7 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
     ttl,
     originAmount: amount,
     fillAmount,
-    destinations: destinations.map(d => Number(d)),
+    destinations: destinations.map((d) => Number(d)),
     data,
     chainId,
     blockNumber: BigInt(event.block.number),
@@ -549,14 +534,14 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
   context.Intent.set({
     ...intent,
     receiveBlockNumber: BigInt(event.block.number),
-    status: "FILLED" as const,
+    status: 'FILLED' as const,
   });
 
   // Update global statistics - only increment fills for valid fills
-  let globalStats = await context.IntentStatistics.get("global");
+  const globalStats = await context.IntentStatistics.get('global');
   if (globalStats) {
     context.IntentStatistics.set({
-      id: "global",
+      id: 'global',
       totalUniqueIntents: globalStats.totalUniqueIntents,
       totalNettableIntents: globalStats.totalNettableIntents,
       totalFillableIntents: globalStats.totalFillableIntents,
@@ -568,7 +553,7 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
   const outputAssetAddress = bytes32ToAddress(outputAsset);
   const assetId = `${outputAssetAddress}-${chainId}`;
   let asset = await context.Asset.get(assetId);
-  
+
   if (!asset) {
     asset = {
       id: assetId,
@@ -591,9 +576,7 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
     fillCount: asset.fillCount + 1n,
   });
 
-  context.log.info(
-    `Successfully processed IntentFilled: ${_intentId} on chain ${chainId} (valid fill)`
-  );
+  context.log.info(`Successfully processed IntentFilled: ${_intentId} on chain ${chainId} (valid fill)`);
 });
 
 /**
@@ -606,9 +589,7 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
   const chainId = event.chainId;
   const txHash = event.transaction.hash;
 
-  context.log.info(
-    `Processing IntentFilled (V5): ${_intentId} on chain ${chainId} by solver ${_solver}`
-  );
+  context.log.info(`Processing IntentFilled (V5): ${_intentId} on chain ${chainId} by solver ${_solver}`);
 
   // Access _intent as a tuple (V5 structure): [initiator, receiver, inputAsset, outputAsset, origin, nonce, timestamp, ttl, amount, amountOutMin, destinations, data]
   // Note: V5 uses amountOutMin instead of maxFee
@@ -624,17 +605,17 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
     amount,
     amountOutMin,
     destinations,
-    data
+    data,
   ] = _intent;
 
   // Check if Intent exists - solvers should wait for intent to be in subgraph
   // This prevents counting invalid fills (edge case where fill has wrong info)
-  let intent = await context.Intent.get(_intentId);
-  
+  const intent = await context.Intent.get(_intentId);
+
   if (!intent) {
     context.log.warn(
       `Intent ${_intentId} not found when processing Fill (V5) on chain ${chainId}. ` +
-      `This fill will NOT be counted in statistics (likely invalid fill with wrong info).`
+        `This fill will NOT be counted in statistics (likely invalid fill with wrong info).`,
     );
     // Don't create Fill entity or update stats for invalid fills
     return;
@@ -665,7 +646,7 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
     ttl,
     originAmount: amount,
     fillAmount,
-    destinations: destinations.map(d => Number(d)),
+    destinations: destinations.map((d) => Number(d)),
     data,
     chainId,
     blockNumber: BigInt(event.block.number),
@@ -679,14 +660,14 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
   context.Intent.set({
     ...intent,
     receiveBlockNumber: BigInt(event.block.number),
-    status: "FILLED" as const,
+    status: 'FILLED' as const,
   });
 
   // Update global statistics - only increment fills for valid fills
-  let globalStats = await context.IntentStatistics.get("global");
+  let globalStats = await context.IntentStatistics.get('global');
   if (globalStats) {
     context.IntentStatistics.set({
-      id: "global",
+      id: 'global',
       totalUniqueIntents: globalStats.totalUniqueIntents,
       totalNettableIntents: globalStats.totalNettableIntents,
       totalFillableIntents: globalStats.totalFillableIntents,
@@ -698,7 +679,7 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
   const outputAssetAddress = bytes32ToAddress(outputAsset);
   const assetId = `${outputAssetAddress}-${chainId}`;
   let asset = await context.Asset.get(assetId);
-  
+
   if (!asset) {
     asset = {
       id: assetId,
@@ -721,9 +702,7 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
     fillCount: asset.fillCount + 1n,
   });
 
-  context.log.info(
-    `Successfully processed IntentFilled (V5): ${_intentId} on chain ${chainId} (valid fill)`
-  );
+  context.log.info(`Successfully processed IntentFilled (V5): ${_intentId} on chain ${chainId} (valid fill)`);
 });
 
 /**
@@ -740,7 +719,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
   const nativeFee = typeof _nativeFee === 'bigint' ? _nativeFee : BigInt(String(_nativeFee));
 
   context.log.info(
-    `Processing IntentWithFeesAdded: ${_intentId} on chain ${chainId} (tokenFee: ${tokenFee}, nativeFee: ${nativeFee})`
+    `Processing IntentWithFeesAdded: ${_intentId} on chain ${chainId} (tokenFee: ${tokenFee}, nativeFee: ${nativeFee})`,
   );
 
   // Try to load existing Intent
@@ -750,7 +729,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
     // Intent doesn't exist yet - create a placeholder Intent
     // This can happen when the FeeAdapter event is emitted before IntentAdded
     context.log.info(
-      `Intent ${_intentId} not found, creating placeholder for fees (will be populated by IntentAdded event)`
+      `Intent ${_intentId} not found, creating placeholder for fees (will be populated by IntentAdded event)`,
     );
 
     intent = {
@@ -759,8 +738,8 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
       queueIdx: 0n, // Will be updated by IntentAdded
       initiator: _initiator,
       receiver: _initiator, // Placeholder, will be updated
-      inputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
-      outputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
+      inputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
+      outputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
       maxFee: 0, // Placeholder
       amountOutMin: 0n, // Placeholder (will be set by IntentAdded if V5)
       origin: chainId,
@@ -769,7 +748,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
       ttl: 0n, // Placeholder
       originAmount: 0n, // Placeholder
       destinations: [],
-      data: "0x",
+      data: '0x',
       chainId,
       blockNumber: BigInt(event.block.number),
       blockTimestamp: BigInt(event.block.timestamp),
@@ -778,7 +757,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
       isFastPath: false, // Placeholder
       tokenFee: tokenFee,
       nativeFee: nativeFee,
-      status: "ADDED" as const,
+      status: 'ADDED' as const,
     };
 
     context.Intent.set(intent);
@@ -786,11 +765,9 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
     // Intent already exists - update it with fee information
     // Also update initiator to ensure we have the correct user address (msg.sender from FeeAdapter)
     // instead of the FeeAdapter contract address from IntentAdded event
-    
-    context.log.info(
-      `Updating existing intent ${_intentId} with correct initiator and fee information`
-    );
-    
+
+    context.log.info(`Updating existing intent ${_intentId} with correct initiator and fee information`);
+
     // Update intent with correct initiator and fee information
     context.Intent.set({
       ...intent,
@@ -800,9 +777,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
     });
   }
 
-  context.log.info(
-    `Successfully processed IntentWithFeesAdded: ${_intentId} on chain ${chainId}`
-  );
+  context.log.info(`Successfully processed IntentWithFeesAdded: ${_intentId} on chain ${chainId}`);
 });
 
 /**
@@ -818,7 +793,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
   const nativeFee = typeof _nativeFee === 'bigint' ? _nativeFee : BigInt(String(_nativeFee));
 
   context.log.info(
-    `Processing IntentWithFeesAdded (V2): ${_intentId} on chain ${chainId} (tokenFee: ${tokenFee}, nativeFee: ${nativeFee})`
+    `Processing IntentWithFeesAdded (V2): ${_intentId} on chain ${chainId} (tokenFee: ${tokenFee}, nativeFee: ${nativeFee})`,
   );
 
   // Try to load existing Intent
@@ -828,7 +803,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
     // Intent doesn't exist yet - create a placeholder Intent
     // This can happen when the FeeAdapter event is emitted before IntentAdded
     context.log.info(
-      `Intent ${_intentId} not found, creating placeholder for fees (V2) (will be populated by IntentAdded event)`
+      `Intent ${_intentId} not found, creating placeholder for fees (V2) (will be populated by IntentAdded event)`,
     );
 
     intent = {
@@ -837,8 +812,8 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
       queueIdx: 0n, // Will be updated by IntentAdded
       initiator: _initiator,
       receiver: _initiator, // Placeholder, will be updated
-      inputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
-      outputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
+      inputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
+      outputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
       maxFee: 0, // Placeholder
       amountOutMin: 0n, // Placeholder (will be set by IntentAdded if V5)
       origin: chainId,
@@ -847,7 +822,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
       ttl: 0n, // Placeholder
       originAmount: 0n, // Placeholder
       destinations: [],
-      data: "0x",
+      data: '0x',
       chainId,
       blockNumber: BigInt(event.block.number),
       blockTimestamp: BigInt(event.block.timestamp),
@@ -856,7 +831,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
       isFastPath: false, // Placeholder
       tokenFee: tokenFee,
       nativeFee: nativeFee,
-      status: "ADDED" as const,
+      status: 'ADDED' as const,
     };
 
     context.Intent.set(intent);
@@ -864,21 +839,16 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
     // Intent already exists - update it with fee information
     // Also update initiator to ensure we have the correct user address (msg.sender from FeeAdapter)
     // instead of the FeeAdapter contract address from IntentAdded event
-    
-    context.log.info(
-      `Updating existing intent ${_intentId} with correct initiator and fee information (V2)`
-    );
-    
+
+    context.log.info(`Updating existing intent ${_intentId} with correct initiator and fee information (V2)`);
+
     // Update intent with correct initiator and fee information
     context.Intent.set({
       ...intent,
-      initiator: _initiator,
       tokenFee: tokenFee,
       nativeFee: nativeFee,
     });
   }
 
-  context.log.info(
-    `Successfully processed IntentWithFeesAdded (V2): ${_intentId} on chain ${chainId}`
-  );
+  context.log.info(`Successfully processed IntentWithFeesAdded (V2): ${_intentId} on chain ${chainId}`);
 });
