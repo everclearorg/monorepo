@@ -82,6 +82,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
       inputAsset,
       outputAsset,
       maxFee: Number(maxFee),
+      amountOutMin: 0n, // V1 doesn't have amountOutMin
       origin: Number(chainId),
       nonce,
       timestamp,
@@ -163,6 +164,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     inputAsset,
     outputAsset,
     maxFee: Number(maxFee),
+    amountOutMin: 0n, // V1 doesn't have amountOutMin
     origin: Number(chainId),
     nonce,
     timestamp,
@@ -258,18 +260,19 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     `Processing IntentAdded (V5): ${_intentId} on chain ${chainId}`
   );
 
-  // Access _intent as a tuple: [initiator, receiver, inputAsset, outputAsset, maxFee, origin, nonce, timestamp, ttl, amount, destinations, data]
+  // Access _intent as a tuple (V5 structure): [initiator, receiver, inputAsset, outputAsset, origin, nonce, timestamp, ttl, amount, amountOutMin, destinations, data]
+  // Note: V5 uses amountOutMin instead of maxFee, so maxFee is not available in V5
   const [
     initiator,
     receiver,
     inputAsset,
     outputAsset,
-    maxFee,
     origin,
     nonce,
     timestamp,
     ttl,
     amount,
+    amountOutMin,
     destinations,
     data
   ] = _intent;
@@ -297,7 +300,8 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
       receiver,
       inputAsset,
       outputAsset,
-      maxFee: Number(maxFee),
+      maxFee: 0, // V5 doesn't use maxFee, uses amountOutMin instead
+      amountOutMin: amountOutMin, // V5 uses amountOutMin
       origin: Number(chainId),
       nonce,
       timestamp,
@@ -378,7 +382,8 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     receiver,
     inputAsset,
     outputAsset,
-    maxFee: Number(maxFee),
+    maxFee: 0, // V5 doesn't use maxFee, uses amountOutMin instead
+    amountOutMin: amountOutMin, // V5 uses amountOutMin
     origin: Number(chainId),
     nonce,
     timestamp,
@@ -605,18 +610,19 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
     `Processing IntentFilled (V5): ${_intentId} on chain ${chainId} by solver ${_solver}`
   );
 
-  // Access _intent as a tuple
+  // Access _intent as a tuple (V5 structure): [initiator, receiver, inputAsset, outputAsset, origin, nonce, timestamp, ttl, amount, amountOutMin, destinations, data]
+  // Note: V5 uses amountOutMin instead of maxFee
   const [
     initiator,
     receiver,
     inputAsset,
     outputAsset,
-    maxFee,
     origin,
     nonce,
     timestamp,
     ttl,
     amount,
+    amountOutMin,
     destinations,
     data
   ] = _intent;
@@ -652,7 +658,7 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
     receiver,
     inputAsset,
     outputAsset,
-    maxFee: Number(maxFee),
+    maxFee: 0, // V5 doesn't use maxFee, uses amountOutMin instead
     origin: Number(chainId),
     nonce,
     timestamp,
@@ -756,6 +762,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
       inputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
       outputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
       maxFee: 0, // Placeholder
+      amountOutMin: 0n, // Placeholder (will be set by IntentAdded if V5)
       origin: chainId,
       nonce: 0n, // Placeholder
       timestamp: BigInt(event.block.timestamp),
@@ -833,6 +840,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
       inputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
       outputAsset: "0x0000000000000000000000000000000000000000000000000000000000000000", // Placeholder
       maxFee: 0, // Placeholder
+      amountOutMin: 0n, // Placeholder (will be set by IntentAdded if V5)
       origin: chainId,
       nonce: 0n, // Placeholder
       timestamp: BigInt(event.block.timestamp),
