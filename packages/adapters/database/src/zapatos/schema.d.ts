@@ -4375,6 +4375,12 @@ declare module 'zapatos/schema' {
       */
       origin_input_asset: string | null;
       /**
+      * **intents.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap: boolean | null;
+      /**
       * **intents.origin_max_fee**
       * - `varchar` in database
       * - Materialized view column
@@ -4886,6 +4892,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_input_asset: string | null;
+      /**
+      * **intents.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap: boolean | null;
       /**
       * **intents.origin_max_fee**
       * - `varchar` in database
@@ -5399,6 +5411,12 @@ declare module 'zapatos/schema' {
       */
       origin_input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **intents.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **intents.origin_max_fee**
       * - `varchar` in database
       * - Materialized view column
@@ -5744,6 +5762,12 @@ declare module 'zapatos/schema' {
       */
       origin_input_asset: string | null;
       /**
+      * **invoices.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap: boolean | null;
+      /**
       * **invoices.origin_max_fee**
       * - `varchar` in database
       * - Materialized view column
@@ -5980,6 +6004,12 @@ declare module 'zapatos/schema' {
       */
       origin_input_asset: string | null;
       /**
+      * **invoices.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap: boolean | null;
+      /**
       * **invoices.origin_max_fee**
       * - `varchar` in database
       * - Materialized view column
@@ -6215,6 +6245,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **invoices.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_max_fee**
       * - `varchar` in database
@@ -7757,6 +7793,12 @@ declare module 'zapatos/schema' {
       */
       input_asset: string;
       /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap: boolean;
+      /**
       * **origin_intents.max_fee**
       * - `varchar` in database
       * - `NOT NULL`, no default
@@ -7926,6 +7968,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       input_asset: string;
+      /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap: boolean;
       /**
       * **origin_intents.max_fee**
       * - `varchar` in database
@@ -8097,6 +8145,12 @@ declare module 'zapatos/schema' {
       */
       input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **origin_intents.max_fee**
       * - `varchar` in database
       * - `NOT NULL`, no default
@@ -8267,6 +8321,12 @@ declare module 'zapatos/schema' {
       */
       input_asset: string | db.Parameter<string> | db.SQLFragment;
       /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap?: boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment;
+      /**
       * **origin_intents.max_fee**
       * - `varchar` in database
       * - `NOT NULL`, no default
@@ -8436,6 +8496,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       input_asset?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap?: boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment>;
       /**
       * **origin_intents.max_fee**
       * - `varchar` in database

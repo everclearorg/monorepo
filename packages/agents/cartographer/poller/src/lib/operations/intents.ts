@@ -52,15 +52,65 @@ export const updateOriginIntents = async () => {
   // Get origin intents for all domains in the mapping.
   const intents = await subgraph.getOriginIntentsByNonce(queryMetaParams);
   logger.info('Retrieved origin intents', requestContext, methodContext, { intents: intents.length });
-  intents.forEach((intent) => {
+  
+  // Compute is_swap for each intent by comparing ticker hashes
+  const intentsWithSwapFlag = intents.map((intent) => {
     const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(
       updateOriginIntents.name,
     );
     logger.debug('Retrieved origin intent', _requestContext, _methodContext, { intent });
+
+    // Determine if this is a swap by comparing ticker hashes of input and output assets
+    let isSwap = false;
+    try {
+      const originChain = config.chains[intent.origin];
+      const destinationChain = intent.destinations.length > 0 ? config.chains[intent.destinations[0]] : null;
+
+      if (originChain?.assets && destinationChain?.assets) {
+        // Find asset configs by address
+        const inputAssetConfig = Object.values(originChain.assets).find(
+          (asset) => asset.address.toLowerCase() === intent.inputAsset.toLowerCase(),
+        );
+        const outputAssetConfig = Object.values(destinationChain.assets).find(
+          (asset) => asset.address.toLowerCase() === intent.outputAsset.toLowerCase(),
+        );
+
+        // Compare ticker hashes - different tickers mean different assets = swap
+        if (inputAssetConfig && outputAssetConfig) {
+          isSwap = inputAssetConfig.tickerHash.toLowerCase() !== outputAssetConfig.tickerHash.toLowerCase();
+          logger.debug('Computed is_swap flag', _requestContext, _methodContext, {
+            intentId: intent.id,
+            inputAsset: intent.inputAsset,
+            outputAsset: intent.outputAsset,
+            inputTickerHash: inputAssetConfig.tickerHash,
+            outputTickerHash: outputAssetConfig.tickerHash,
+            isSwap,
+          });
+        } else {
+          logger.debug('Could not find asset configs for intent', _requestContext, _methodContext, {
+            intentId: intent.id,
+            inputAsset: intent.inputAsset,
+            outputAsset: intent.outputAsset,
+            foundInputAsset: !!inputAssetConfig,
+            foundOutputAsset: !!outputAssetConfig,
+          });
+        }
+      }
+    } catch (error) {
+      logger.error('Error computing is_swap flag', _requestContext, _methodContext, jsonifyError(error as Error), {
+        intentId: intent.id,
+      });
+    }
+
+    return {
+      ...intent,
+      isSwap,
+    };
   });
+
   const checkpoints = domains
     .map((domain) => {
-      const domainIntents = intents.filter((intent) => intent.origin === domain);
+      const domainIntents = intentsWithSwapFlag.filter((intent) => intent.origin === domain);
       const max = getMaxTxNonce(domainIntents);
       const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
       if (domainIntents.length > 0 && max > latest) {
@@ -70,7 +120,7 @@ export const updateOriginIntents = async () => {
     })
     .filter((x) => !!x) as { domain: string; checkpoint: number }[];
 
-  await database.saveOriginIntents(intents);
+  await database.saveOriginIntents(intentsWithSwapFlag);
   for (const checkpoint of checkpoints) {
     await database.saveCheckPoint('origin_intent_' + checkpoint.domain, checkpoint.checkpoint);
   }

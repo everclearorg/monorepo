@@ -81,6 +81,7 @@ export function toOriginIntents(originIntent: OriginIntent): origin_intents.Inse
     token_fee: originIntent.tokenFee,
     fee_adapter_initiator: originIntent.feeAdapterInitiator,
     order_id: originIntent.orderId,
+    is_swap: originIntent.isSwap ?? false,
   };
 }
 export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): OriginIntent {
@@ -113,6 +114,7 @@ export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): O
     tokenFee: originIntent.token_fee ?? undefined,
     feeAdapterInitiator: originIntent.fee_adapter_initiator ?? undefined,
     orderId: originIntent.order_id ?? undefined,
+    isSwap: originIntent.is_swap ?? false,
   };
 }
 
@@ -150,6 +152,7 @@ export function originIntentFromIntent(intent: intents.JSONSelectable): OriginIn
     tokenFee: intent.origin_token_fee ?? undefined,
     feeAdapterInitiator: intent.origin_fee_adapter_initiator ?? undefined,
     orderId: intent.origin_order_id ?? undefined,
+    isSwap: intent.origin_is_swap ?? false,
   };
 }
 
