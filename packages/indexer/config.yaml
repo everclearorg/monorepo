@@ -48,7 +48,7 @@ networks:
       - name: FeeAdapter
         address: 0x7621D1085559Ab35513E2a41EC948a8524F619D9
       - name: FeeAdapterV2
-        address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89  # TODO: Update with actual V2 address
+        address: 0x20fF5EA948881D18f7d64B64410ec2B81F8797F4  # TODO: Update with actual V2 address
 
   - id: 10
     start_block: 0
@@ -61,7 +61,7 @@ networks:
       - name: FeeAdapter
         address: 0xF4a697B7A48e9c7C1944a68a11d3b8D5E716d169
       - name: FeeAdapterV2
-        address: 0xF4a697B7A48e9c7C1944a68a11d3b8D5E716d169  # TODO: Update with actual V2 address
+        address: 0xfB1792b0992B9685be041A69a082241CE991F231  # TODO: Update with actual V2 address
 
   - id: 8453
     start_block: 0
@@ -74,6 +74,19 @@ networks:
       - name: FeeAdapter
         address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89
       - name: FeeAdapterV2
-        address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89  # TODO: Update with actual V2 address
+        address: 0x65588B1121EB7dD41ba7d82A4f387548381584A9  # TODO: Update with actual V2 address
+
+  - id: 42161
+    start_block: 0
+    confirmed_block_threshold: 10
+    contracts:
+      - name: EverclearSpoke
+        address: 0x91c40B4135eFea3c5A200388CfE316aa0B172b30
+      - name: EverclearSpokeV5
+        address: 0x91c40B4135eFea3c5A200388CfE316aa0B172b30  # Same address as V1 (upgraded contract)
+      - name: FeeAdapter
+        address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89
+      - name: FeeAdapterV2
+        address: 0x12Dc8f91767021760391d691FD4Bd2A642aEBE2d  # TODO: Update with actual V2 address
 
 rollback_on_reorg: true

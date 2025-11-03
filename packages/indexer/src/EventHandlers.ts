@@ -18,9 +18,13 @@ function bytes32ToAddress(bytes32: string): string {
 // Helper: Check if an address is a FeeAdapter contract
 function isFeeAdapterAddress(address: string): boolean {
   const feeAdapterAddresses = [
-    "0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75", // Most chains
-    "0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508", // Linea
-    "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", // Unizen
+    "0x00000000000000000000000020ff5ea948881d18f7d64b64410ec2b81f8797f4", // V2Ethereum
+    "0x00000000000000000000000065588b1121eb7dd41ba7d82a4f387548381584a9", // V2 Base
+    "0x000000000000000000000000fb1792b0992b9685be041a69a082241ce991f231", // V2 Optimism
+    "0x00000000000000000000000012dc8f91767021760391d691fd4bd2a642aebe2d", // V2 Arbitrum
+    "0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75", // V1 most chains
+    "0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508", // 
+    "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", //
   ];
   return feeAdapterAddresses.includes(address.toLowerCase());
 }
@@ -78,7 +82,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
       inputAsset,
       outputAsset,
       maxFee: Number(maxFee),
-      origin: Number(origin),
+      origin: Number(chainId),
       nonce,
       timestamp,
       ttl,
@@ -159,7 +163,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     inputAsset,
     outputAsset,
     maxFee: Number(maxFee),
-    origin: Number(origin),
+    origin: Number(chainId),
     nonce,
     timestamp,
     ttl,
@@ -294,7 +298,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
       inputAsset,
       outputAsset,
       maxFee: Number(maxFee),
-      origin: Number(origin),
+      origin: Number(chainId),
       nonce,
       timestamp,
       ttl,
@@ -375,7 +379,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     inputAsset,
     outputAsset,
     maxFee: Number(maxFee),
-    origin: Number(origin),
+    origin: Number(chainId),
     nonce,
     timestamp,
     ttl,
@@ -520,7 +524,7 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
     inputAsset,
     outputAsset,
     maxFee: Number(maxFee),
-    origin: Number(origin),
+    origin: Number(chainId),
     nonce,
     timestamp,
     ttl,
@@ -649,7 +653,7 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
     inputAsset,
     outputAsset,
     maxFee: Number(maxFee),
-    origin: Number(origin),
+    origin: Number(chainId),
     nonce,
     timestamp,
     ttl,
@@ -725,8 +729,12 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
   const { _intentId, _initiator, _tokenFee, _nativeFee } = event.params;
   const chainId = event.chainId;
 
+  // Convert to BigInt if needed (event params might be strings or already BigInt)
+  const tokenFee = typeof _tokenFee === 'bigint' ? _tokenFee : BigInt(String(_tokenFee));
+  const nativeFee = typeof _nativeFee === 'bigint' ? _nativeFee : BigInt(String(_nativeFee));
+
   context.log.info(
-    `Processing IntentWithFeesAdded: ${_intentId} on chain ${chainId} (tokenFee: ${_tokenFee}, nativeFee: ${_nativeFee})`
+    `Processing IntentWithFeesAdded: ${_intentId} on chain ${chainId} (tokenFee: ${tokenFee}, nativeFee: ${nativeFee})`
   );
 
   // Try to load existing Intent
@@ -761,8 +769,8 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
       transactionHash: event.transaction.hash,
       receiveBlockNumber: undefined,
       isFastPath: false, // Placeholder
-      tokenFee: _tokenFee,
-      nativeFee: _nativeFee,
+      tokenFee: tokenFee,
+      nativeFee: nativeFee,
       status: "ADDED" as const,
     };
 
@@ -780,8 +788,8 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
     context.Intent.set({
       ...intent,
       initiator: _initiator,
-      tokenFee: _tokenFee,
-      nativeFee: _nativeFee,
+      tokenFee: tokenFee,
+      nativeFee: nativeFee,
     });
   }
 
@@ -798,8 +806,12 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
   const { _intentId, _initiator, _tokenFee, _nativeFee } = event.params;
   const chainId = event.chainId;
 
+  // Convert to BigInt if needed (event params might be strings or already BigInt)
+  const tokenFee = typeof _tokenFee === 'bigint' ? _tokenFee : BigInt(String(_tokenFee));
+  const nativeFee = typeof _nativeFee === 'bigint' ? _nativeFee : BigInt(String(_nativeFee));
+
   context.log.info(
-    `Processing IntentWithFeesAdded (V2): ${_intentId} on chain ${chainId} (tokenFee: ${_tokenFee}, nativeFee: ${_nativeFee})`
+    `Processing IntentWithFeesAdded (V2): ${_intentId} on chain ${chainId} (tokenFee: ${tokenFee}, nativeFee: ${nativeFee})`
   );
 
   // Try to load existing Intent
@@ -834,8 +846,8 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
       transactionHash: event.transaction.hash,
       receiveBlockNumber: undefined,
       isFastPath: false, // Placeholder
-      tokenFee: _tokenFee,
-      nativeFee: _nativeFee,
+      tokenFee: tokenFee,
+      nativeFee: nativeFee,
       status: "ADDED" as const,
     };
 
@@ -853,8 +865,8 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
     context.Intent.set({
       ...intent,
       initiator: _initiator,
-      tokenFee: _tokenFee,
-      nativeFee: _nativeFee,
+      tokenFee: tokenFee,
+      nativeFee: nativeFee,
     });
   }
 
