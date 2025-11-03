@@ -77,7 +77,26 @@ export const updateOriginIntents = async () => {
 
         // Compare ticker hashes - different tickers mean different assets = swap
         if (inputAssetConfig && outputAssetConfig) {
-          isSwap = inputAssetConfig.tickerHash.toLowerCase() !== outputAssetConfig.tickerHash.toLowerCase();
+          if (
+            typeof inputAssetConfig.tickerHash === 'string' &&
+            typeof outputAssetConfig.tickerHash === 'string'
+          ) {
+            isSwap = inputAssetConfig.tickerHash.toLowerCase() !== outputAssetConfig.tickerHash.toLowerCase();
+          } else {
+            isSwap = false;
+            logger.warn(
+              'Missing tickerHash on asset config when computing is_swap flag',
+              _requestContext,
+              _methodContext,
+              {
+                intentId: intent.id,
+                inputAsset: intent.inputAsset,
+                outputAsset: intent.outputAsset,
+                inputTickerHash: inputAssetConfig.tickerHash,
+                outputTickerHash: outputAssetConfig.tickerHash,
+              },
+            );
+          }
           logger.debug('Computed is_swap flag', _requestContext, _methodContext, {
             intentId: intent.id,
             inputAsset: intent.inputAsset,
