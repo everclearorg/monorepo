@@ -51,7 +51,12 @@ contract XERC20Module is IXERC20Module {
   }
 
   /// @inheritdoc ISettlementModule
-  function handleBurnStrategy(address _asset, address _user, uint256 _amount, bytes calldata) external onlySpoke {
+  function handleBurnStrategy(
+    address _asset,
+    address _user,
+    uint256 _amount,
+    bytes calldata
+  ) external onlySpoke {
     uint256 _limit = IXERC20(_asset).burningMaxLimitOf(address(this));
     if (_limit < _amount) revert XERC20Module_HandleBurnStrategy_InsufficientBurningLimit(_asset, _limit, _amount);
 
@@ -59,7 +64,11 @@ contract XERC20Module is IXERC20Module {
   }
 
   /// @inheritdoc IXERC20Module
-  function mintDebt(address _asset, address _recipient, uint256 _amount) external {
+  function mintDebt(
+    address _asset,
+    address _recipient,
+    uint256 _amount
+  ) external {
     uint256 _limit = IXERC20(_asset).mintingMaxLimitOf(address(this));
 
     if (_limit < _amount) revert XERC20Module_MintDebt_InsufficientMintingLimit(_asset, _limit, _amount);

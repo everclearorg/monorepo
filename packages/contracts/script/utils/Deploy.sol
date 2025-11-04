@@ -36,14 +36,12 @@ library Deploy {
   ) internal returns (SpokeGateway _gateway) {
     address _impl = address(new SpokeGateway());
     _gateway = SpokeGateway(
-      payable(
-        UnsafeUpgrades.deployUUPSProxy(
+      payable(UnsafeUpgrades.deployUUPSProxy(
           _impl,
           abi.encodeCall(
             SpokeGateway.initialize, (_owner, _mailbox, _spoke, _securityModule, _everclearId, _hubGateway)
           )
-        )
-      )
+        ))
     );
   }
 
@@ -63,11 +61,9 @@ library Deploy {
   ) internal returns (HubGateway _gateway) {
     address _impl = address(new HubGateway());
     _gateway = HubGateway(
-      payable(
-        UnsafeUpgrades.deployUUPSProxy(
+      payable(UnsafeUpgrades.deployUUPSProxy(
           _impl, abi.encodeCall(HubGateway.initialize, (_owner, _mailbox, _hub, _securityModule))
-        )
-      )
+        ))
     );
   }
 }

@@ -115,7 +115,10 @@ contract Unit_Settler is BaseTest {
    * @param _domain The domain
    * @param _amount The amount
    */
-  function test_ProcessSettlementQueue(uint32 _domain, uint32 _amount) public {
+  function test_ProcessSettlementQueue(
+    uint32 _domain,
+    uint32 _amount
+  ) public {
     vm.mockCall(
       SETTLER, abi.encodeWithSelector(ISettler.processSettlementQueue.selector, _domain, _amount), abi.encode(0)
     );
@@ -339,7 +342,10 @@ contract Unit_AssetManager is BaseTest {
    * @param _tickerHash The ticker hash
    * @param _strategySeed The strategy seed
    */
-  function test_SetPrioritizedStrategy(bytes32 _tickerHash, uint8 _strategySeed) public {
+  function test_SetPrioritizedStrategy(
+    bytes32 _tickerHash,
+    uint8 _strategySeed
+  ) public {
     IEverclear.Strategy _strategy = IEverclear.Strategy(bound(_strategySeed, 0, uint256(type(IEverclear.Strategy).max)));
 
     vm.mockCall(
@@ -374,7 +380,10 @@ contract Unit_AssetManager is BaseTest {
    * @param _tickerHash The ticker hash
    * @param _discountPerEpoch The discount per epoch
    */
-  function test_SetDiscountPerEpoch(bytes32 _tickerHash, uint24 _discountPerEpoch) public {
+  function test_SetDiscountPerEpoch(
+    bytes32 _tickerHash,
+    uint24 _discountPerEpoch
+  ) public {
     vm.mockCall(
       MANAGER,
       abi.encodeWithSelector(IAssetManager.setDiscountPerEpoch.selector, _tickerHash, _discountPerEpoch),
@@ -492,7 +501,10 @@ contract Unit_ProtocolManager is BaseTest {
    * @param _account The account
    * @param _role The role
    */
-  function test_AssignRole(address _account, uint256 _role) public {
+  function test_AssignRole(
+    address _account,
+    uint256 _role
+  ) public {
     IHubStorage.Role _role = IHubStorage.Role(bound(_role, 0, uint256(type(IHubStorage.Role).max)));
 
     vm.mockCall(MANAGER, abi.encodeWithSelector(IProtocolManager.assignRole.selector, _account, _role), abi.encode(0));
@@ -582,7 +594,10 @@ contract Unit_ProtocolManager is BaseTest {
    * @param _newMailbox The new mailbox
    * @param _domains The domains
    */
-  function test_UpdateMailboxWithDomains(bytes32 _newMailbox, uint32[] calldata _domains) public {
+  function test_UpdateMailboxWithDomains(
+    bytes32 _newMailbox,
+    uint32[] calldata _domains
+  ) public {
     vm.mockCall(
       MANAGER, abi.encodeWithSignature('updateMailbox(bytes32,uint32[])', _newMailbox, _domains), abi.encode(0)
     );
@@ -622,7 +637,10 @@ contract Unit_ProtocolManager is BaseTest {
    * @param _newGateway The new gateway
    * @param _domains The domains
    */
-  function test_UpdateGatewayWithDomains(bytes32 _newGateway, uint32[] calldata _domains) public {
+  function test_UpdateGatewayWithDomains(
+    bytes32 _newGateway,
+    uint32[] calldata _domains
+  ) public {
     vm.mockCall(
       MANAGER, abi.encodeWithSignature('updateGateway(bytes32,uint32[])', _newGateway, _domains), abi.encode(0)
     );
@@ -636,7 +654,10 @@ contract Unit_ProtocolManager is BaseTest {
    * @param _chainId The chain ID
    * @param _gateway The gateway
    */
-  function test_UpdateChainGateway(uint32 _chainId, bytes32 _gateway) public {
+  function test_UpdateChainGateway(
+    uint32 _chainId,
+    bytes32 _gateway
+  ) public {
     vm.mockCall(
       MANAGER, abi.encodeWithSelector(IProtocolManager.updateChainGateway.selector, _chainId, _gateway), abi.encode(0)
     );
@@ -678,7 +699,10 @@ contract Unit_ProtocolManager is BaseTest {
    * @param _tickerHash The ticker hash
    * @param _newDiscount The new discount
    */
-  function test_SetDiscountPerEpoch(bytes32 _tickerHash, uint24 _newDiscount) public {
+  function test_SetDiscountPerEpoch(
+    bytes32 _tickerHash,
+    uint24 _newDiscount
+  ) public {
     vm.mockCall(
       MANAGER,
       abi.encodeWithSelector(IAssetManager.setDiscountPerEpoch.selector, _tickerHash, _newDiscount),
@@ -709,7 +733,10 @@ contract Unit_ProtocolManager is BaseTest {
    * @param _tickerHash The ticker hash
    * @param _newMaxDiscount The new max discount
    */
-  function test_SetMaxDiscountDbps(bytes32 _tickerHash, uint24 _newMaxDiscount) public {
+  function test_SetMaxDiscountDbps(
+    bytes32 _tickerHash,
+    uint24 _newMaxDiscount
+  ) public {
     vm.mockCall(
       MANAGER,
       abi.encodeWithSelector(IProtocolManager.setMaxDiscountDbps.selector, _tickerHash, _newMaxDiscount),
@@ -729,7 +756,10 @@ contract Unit_UpdateFunctions is BaseTest {
    * @param _moduleType The module type
    * @param _newAddress The new address
    */
-  function test_UpdateModuleAddress(bytes32 _moduleType, address _newAddress) public {
+  function test_UpdateModuleAddress(
+    bytes32 _moduleType,
+    address _newAddress
+  ) public {
     vm.prank(OWNER);
     everclearHub.updateModuleAddress(_moduleType, _newAddress);
 
@@ -742,7 +772,11 @@ contract Unit_UpdateFunctions is BaseTest {
    * @param _moduleType The module type
    * @param _newAddress The new address
    */
-  function test_Revert_UpdateModuleAddress_NotOwner(address _caller, bytes32 _moduleType, address _newAddress) public {
+  function test_Revert_UpdateModuleAddress_NotOwner(
+    address _caller,
+    bytes32 _moduleType,
+    address _newAddress
+  ) public {
     vm.assume(_caller != OWNER);
     vm.expectRevert(IHubStorage.HubStorage_OnlyOwner.selector);
 
