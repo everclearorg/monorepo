@@ -1950,7 +1950,8 @@ CREATE TABLE public.destination_intents (
     destinations character varying(66)[] NOT NULL,
     ttl bigint NOT NULL,
     return_data character varying,
-    amount_out_min character varying(255)
+    amount_out_min character varying(255),
+    amount_out character varying(255)
 );
 
 
@@ -2117,6 +2118,7 @@ CREATE MATERIALIZED VIEW public.intents AS
     t.destination_tx_nonce,
     t.destination_auto_id,
     t.settlement_amount_out_min,
+    t.destination_amount_out,
     t.settlement_amount,
     t.settlement_asset,
     t.settlement_recipient,
@@ -2203,6 +2205,7 @@ CREATE MATERIALIZED VIEW public.intents AS
             destination_intents.tx_nonce AS destination_tx_nonce,
             destination_intents.auto_id AS destination_auto_id,
             destination_intents.amount_out_min AS settlement_amount_out_min,
+            destination_intents.amount_out AS destination_amount_out,
             settlement_intents.amount AS settlement_amount,
             settlement_intents.asset AS settlement_asset,
             settlement_intents.recipient AS settlement_recipient,
@@ -3067,7 +3070,7 @@ ALTER SEQUENCE public.rewards_id_seq OWNED BY public.rewards.id;
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying(255) NOT NULL
+    version character varying(128) NOT NULL
 );
 
 
@@ -5260,5 +5263,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250801041441'),
     ('20250801173912'),
     ('20251022134056'),
-    ('20251103221638'),
-    ('20251103222403');
+    ('20251103222403'),
+    ('20251104200144');

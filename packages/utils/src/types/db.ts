@@ -139,6 +139,7 @@ export const DestinationIntentSchema = Type.Intersect([
     status: Type.Enum(TIntentStatus),
     solver: TAddress,
     fee: TIntegerString,
+    amountOut: TIntegerString,
     destination: TDomainId, // where intent calldata is executed / dispatched to
   }),
 ]);
