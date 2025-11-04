@@ -118,7 +118,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },
