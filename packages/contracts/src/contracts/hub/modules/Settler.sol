@@ -149,7 +149,7 @@ contract Settler is SettlerLogic, ISettler, IEverclear {
 
       uint256 _depositsAmount = depositsAvailableInEpoch[_epoch][_domainResult.selectedDomain][_tickerHash];
       depositsAvailableInEpoch[_epoch][_domainResult.selectedDomain][_tickerHash] = _depositsAmount
-        > _domainResult.selectedAmountAfterDiscount
+          > _domainResult.selectedAmountAfterDiscount
         ? _depositsAmount - _domainResult.selectedAmountAfterDiscount
         : 0;
 

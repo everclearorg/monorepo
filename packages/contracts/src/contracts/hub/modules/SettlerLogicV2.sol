@@ -64,9 +64,8 @@ abstract contract SettlerLogicV2 is HubStorageV2 {
   ) internal {
     _contexts[_intentId].status = IEverclearV2.IntentStatus.INVOICED;
     uint48 _currentEpoch = getCurrentEpoch();
-    invoices[_tickerHash].append(
-      Invoice({intentId: _intentId, owner: _owner, entryEpoch: _currentEpoch, amount: _amount})
-    );
+    invoices[_tickerHash]
+    .append(Invoice({intentId: _intentId, owner: _owner, entryEpoch: _currentEpoch, amount: _amount}));
     emit InvoiceEnqueued(_intentId, _tickerHash, _currentEpoch, _amount, _owner);
   }
 
