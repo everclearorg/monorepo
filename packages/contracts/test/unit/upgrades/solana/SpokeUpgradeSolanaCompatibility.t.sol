@@ -194,10 +194,7 @@ contract SpokeSolanaCompatibilityUpgradeTest is BaseTest, UpgradeHelper {
    * @param _amount The amount to send
    * @param _receiver The receiver address
    */
-  function test_spokeSolanaCompatibilityUpgrade_newIntentBytes(
-    uint256 _amount,
-    bytes32 _receiver
-  ) public {
+  function test_spokeSolanaCompatibilityUpgrade_newIntentBytes(uint256 _amount, bytes32 _receiver) public {
     vm.assume(_receiver != 0);
     _amount = bound(_amount, 1, type(uint128).max);
 

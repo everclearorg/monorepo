@@ -44,10 +44,7 @@ library QueueLib {
    * @param _queue The IntentQueue
    * @param _intentId The intent id to enqueue
    */
-  function enqueueIntent(
-    IntentQueue storage _queue,
-    bytes32 _intentId
-  ) internal {
+  function enqueueIntent(IntentQueue storage _queue, bytes32 _intentId) internal {
     _queue.last += 1;
     _queue.queue[_queue.last] = _intentId;
   }
@@ -57,10 +54,7 @@ library QueueLib {
    * @param _queue The FillQueue
    * @param _fillMessage The fill message to enqueue
    */
-  function enqueueFill(
-    FillQueue storage _queue,
-    IEverclear.FillMessage memory _fillMessage
-  ) internal {
+  function enqueueFill(FillQueue storage _queue, IEverclear.FillMessage memory _fillMessage) internal {
     _queue.last += 1;
     _queue.queue[_queue.last] = _fillMessage;
   }

@@ -75,11 +75,7 @@ interface IXERC20 {
    * @param _burningLimit The updated burning limit we are setting to the bridge
    * @param _bridge The address of the bridge we are setting the limits too
    */
-  function setLimits(
-    address _bridge,
-    uint256 _mintingLimit,
-    uint256 _burningLimit
-  ) external;
+  function setLimits(address _bridge, uint256 _mintingLimit, uint256 _burningLimit) external;
 
   /**
    * @notice Mints tokens for a user
@@ -87,10 +83,7 @@ interface IXERC20 {
    * @param _user The address of the user who needs tokens minted
    * @param _amount The amount of tokens being minted
    */
-  function mint(
-    address _user,
-    uint256 _amount
-  ) external;
+  function mint(address _user, uint256 _amount) external;
 
   /**
    * @notice Burns tokens for a user
@@ -98,10 +91,7 @@ interface IXERC20 {
    * @param _user The address of the user who needs tokens burned
    * @param _amount The amount of tokens being burned
    */
-  function burn(
-    address _user,
-    uint256 _amount
-  ) external;
+  function burn(address _user, uint256 _amount) external;
 
   /**
    * @notice Returns the max limit of a minter

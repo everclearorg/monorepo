@@ -42,10 +42,7 @@ contract TestExtended is Mocker {
     _;
   }
 
-  modifier validAndDifferentAddresses(
-    address _address1,
-    address _address2
-  ) {
+  modifier validAndDifferentAddresses(address _address1, address _address2) {
     _validAndDifferentAddresses(_address1, _address2);
     _;
   }
@@ -67,10 +64,7 @@ contract TestExtended is Mocker {
     vm.expectEmit(true, true, true, true, _contract);
   }
 
-  function _addressFrom(
-    address _origin,
-    uint256 _nonce
-  ) internal pure returns (address _address) {
+  function _addressFrom(address _origin, uint256 _nonce) internal pure returns (address _address) {
     bytes memory _data;
     if (_nonce == 0x00) {
       _data = abi.encodePacked(bytes1(0xd6), bytes1(0x94), _origin, bytes1(0x80));
@@ -93,26 +87,17 @@ contract TestExtended is Mocker {
     }
   }
 
-  function deployAndDeal(
-    bytes32 _receiver,
-    uint256 _amount
-  ) public returns (bytes32 _token) {
+  function deployAndDeal(bytes32 _receiver, uint256 _amount) public returns (bytes32 _token) {
     _token = deployAndDeal(_receiver.toAddress(), _amount);
   }
 
-  function deployAndDeal(
-    address _receiver,
-    uint256 _amount
-  ) public returns (bytes32 _token) {
+  function deployAndDeal(address _receiver, uint256 _amount) public returns (bytes32 _token) {
     address _tokenAddress = address(new TestERC20('Token', 'TKN'));
     deal(_tokenAddress, _receiver, _amount);
     _token = _tokenAddress.toBytes32();
   }
 
-  function _validAndDifferentAddresses(
-    address _address1,
-    address _address2
-  ) internal pure {
+  function _validAndDifferentAddresses(address _address1, address _address2) internal pure {
     vm.assume(_address1 != address(0) && _address2 != address(0) && _address1 != _address2);
   }
 
@@ -150,10 +135,7 @@ contract TestExtended is Mocker {
     return _intent;
   }
 
-  function _generateSignature(
-    uint256 _feeSignerPk,
-    bytes memory _data
-  ) internal pure returns (bytes memory) {
+  function _generateSignature(uint256 _feeSignerPk, bytes memory _data) internal pure returns (bytes memory) {
     bytes32 _digest = keccak256(_data).toEthSignedMessageHash();
     (uint8 _v, bytes32 _r, bytes32 _s) = vm.sign(_feeSignerPk, _digest);
     return abi.encodePacked(_r, _s, _v);

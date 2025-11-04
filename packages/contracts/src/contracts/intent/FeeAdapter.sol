@@ -79,11 +79,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
   }
 
   /// @inheritdoc IFeeAdapter
-  function returnUnsupportedIntent(
-    address _asset,
-    uint256 _amount,
-    address _recipient
-  ) external onlyOwner {
+  function returnUnsupportedIntent(address _asset, uint256 _amount, address _recipient) external onlyOwner {
     spoke.withdraw(_asset, _amount);
     _pushTokens(_recipient, _asset, _amount);
   }
@@ -382,10 +378,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @param _data The data of the message
    * @param _signature The signature of the message
    */
-  function _verifySignature(
-    bytes memory _data,
-    bytes calldata _signature
-  ) internal view {
+  function _verifySignature(bytes memory _data, bytes calldata _signature) internal view {
     bytes32 _hash = keccak256(_data);
     address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
     if (_recoveredSigner != feeSigner) {
@@ -430,10 +423,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @param _asset Asset to approve to spoke.
    * @param _minimum Minimum required approval budget.
    */
-  function _approveSpokeIfNeeded(
-    address _asset,
-    uint256 _minimum
-  ) internal {
+  function _approveSpokeIfNeeded(address _asset, uint256 _minimum) internal {
     // Checking if the strategy is default or not
     address spender;
     IEverclear.Strategy _strategy = spoke.strategies(_asset);
@@ -487,11 +477,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function _pullTokens(
-    address _sender,
-    address _asset,
-    uint256 _amount
-  ) internal {
+  function _pullTokens(address _sender, address _asset, uint256 _amount) internal {
     IERC20(_asset).safeTransferFrom(_sender, address(this), _amount);
   }
 
@@ -501,11 +487,7 @@ contract FeeAdapter is IFeeAdapter, Ownable2Step {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function _pushTokens(
-    address _recipient,
-    address _asset,
-    uint256 _amount
-  ) internal {
+  function _pushTokens(address _recipient, address _asset, uint256 _amount) internal {
     IERC20(_asset).safeTransfer(_recipient, _amount);
   }
 }

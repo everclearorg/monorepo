@@ -12,12 +12,7 @@ import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
 
 contract SetModuleForStrategy is Script, ScriptUtils {
-  function run(
-    string memory _account,
-    address _spoke,
-    uint8 _strategy,
-    address _module
-  ) public {
+  function run(string memory _account, address _spoke, uint8 _strategy, address _module) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 

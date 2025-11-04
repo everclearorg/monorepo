@@ -155,7 +155,9 @@ contract Dashboard is Script, ScriptUtils {
     uint256 _proposedOwnershipTimestamp = _hub.proposedOwnershipTimestamp();
 
     _data = OwnershipData({
-      owner: _owner, proposedOwner: _proposedOwner, proposedOwnershipTimestamp: _proposedOwnershipTimestamp
+      owner: _owner,
+      proposedOwner: _proposedOwner,
+      proposedOwnershipTimestamp: _proposedOwnershipTimestamp
     });
   }
 
@@ -219,7 +221,12 @@ contract Dashboard is Script, ScriptUtils {
     }
 
     _data = GatewayData({
-      owner: _owner, mailbox: _mailbox, receiver: _receiver, ism: _ism, domains: _supported, gateways: _gateways
+      owner: _owner,
+      mailbox: _mailbox,
+      receiver: _receiver,
+      ism: _ism,
+      domains: _supported,
+      gateways: _gateways
     });
   }
 }

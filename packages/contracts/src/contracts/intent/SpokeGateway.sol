@@ -53,10 +53,7 @@ contract SpokeGateway is Gateway, UUPSUpgradeable, ISpokeGateway {
    * @param _origin The origin domain of the message
    * @param _sender The sender of the message
    */
-  function _checkValidSender(
-    uint32 _origin,
-    bytes32 _sender
-  ) internal view override(Gateway) {
+  function _checkValidSender(uint32 _origin, bytes32 _sender) internal view override(Gateway) {
     if (_origin != EVERCLEAR_ID) revert Gateway_Handle_InvalidOriginDomain();
     if (_sender != EVERCLEAR_GATEWAY) revert Gateway_Handle_InvalidSender();
   }
