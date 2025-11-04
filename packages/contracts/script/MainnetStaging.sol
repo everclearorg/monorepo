@@ -14,14 +14,14 @@ import {IXERC20Module} from 'interfaces/intent/modules/IXERC20Module.sol';
 
 abstract contract DefaultValues {
   ///////////////////// HUB ARGUMENTS /////////////////////////
-  uint256 constant ACCEPTANCE_DELAY = 1 days;
-  uint24 constant MAX_FEE = 5000; // 5%
-  uint8 constant MIN_ROUTER_SUPPORTED_DOMAINS = 2;
-  uint48 constant EXPIRY_TIME_BUFFER = 12 hours;
-  uint48 constant EPOCH_LENGTH_BLOCKS = 120; // ~30min (15s block)
-  uint256 constant SETTLEMENT_BASE_GAS_UNITS = 40_000;
-  uint256 constant AVG_GAS_UNITS_PER_SETTLEMENT = 50_000;
-  uint256 constant BUFFER_DBPS = 10_000; // 10%
+  uint256 internal constant ACCEPTANCE_DELAY = 1 days;
+  uint24 internal constant MAX_FEE = 5000; // 5%
+  uint8 internal constant MIN_ROUTER_SUPPORTED_DOMAINS = 2;
+  uint48 internal constant EXPIRY_TIME_BUFFER = 12 hours;
+  uint48 internal constant EPOCH_LENGTH_BLOCKS = 120; // ~30min (15s block)
+  uint256 internal constant SETTLEMENT_BASE_GAS_UNITS = 40_000;
+  uint256 internal constant AVG_GAS_UNITS_PER_SETTLEMENT = 50_000;
+  uint256 internal constant BUFFER_DBPS = 10_000; // 10%
 
   ///////////////////// ACCOUNTS /////////////////////////
   address public constant OWNER = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
@@ -199,7 +199,7 @@ abstract contract MainnetStagingEnvironment is
    * in the same batch as the `EverclearSpoke`. `discountPerEpoch` is
    * not being used anymore on the Hub as it's now set per asset.
    */
-  IEverclearHub.HubInitializationParams hubParams = IEverclearHub.HubInitializationParams({
+  IEverclearHub.HubInitializationParams public hubParams = IEverclearHub.HubInitializationParams({
     owner: OWNER,
     admin: ADMIN,
     manager: address(0), // to be deployed
