@@ -1376,6 +1376,12 @@ declare module 'zapatos/schema' {
       */
       amount: string;
       /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out: string | null;
+      /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
       * - Nullable, no default
@@ -1545,6 +1551,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       amount: string;
+      /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out: string | null;
       /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
@@ -1716,6 +1728,12 @@ declare module 'zapatos/schema' {
       */
       amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
       * - Nullable, no default
@@ -1886,6 +1904,12 @@ declare module 'zapatos/schema' {
       */
       amount: string | db.Parameter<string> | db.SQLFragment;
       /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
       * - Nullable, no default
@@ -2055,6 +2079,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       amount?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
@@ -4057,6 +4087,12 @@ declare module 'zapatos/schema' {
       */
       destination_amount: string | null;
       /**
+      * **intents.destination_amount_out**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      destination_amount_out: string | null;
+      /**
       * **intents.destination_auto_id**
       * - `int8` in database
       * - Materialized view column
@@ -4575,6 +4611,12 @@ declare module 'zapatos/schema' {
       */
       destination_amount: string | null;
       /**
+      * **intents.destination_amount_out**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      destination_amount_out: string | null;
+      /**
       * **intents.destination_auto_id**
       * - `int8` in database
       * - Materialized view column
@@ -5092,6 +5134,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       destination_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **intents.destination_amount_out**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      destination_amount_out?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_auto_id**
       * - `int8` in database

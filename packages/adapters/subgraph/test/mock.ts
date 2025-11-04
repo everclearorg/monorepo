@@ -99,7 +99,8 @@ export const createSpokeFillIntentEventEntity = (
   id: mkBytes32('0x1'),
   intent: createSpokeDestinationIntentEntity(),
   solver: mkAddress('0x2'),
-  fee: '100000',
+  receiver: mkAddress('0x3').toLowerCase(),
+  amountOut: '1000000',
 
   transactionHash: mkHash('0x2'),
   timestamp: Math.floor(Date.now() / 1000),
