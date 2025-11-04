@@ -113,6 +113,7 @@ export const createOriginIntent = (overrides: Partial<OriginIntent> = {}): Origi
   nativeFee: undefined,
   feeAdapterInitiator: undefined,
   orderId: undefined,
+  isSwap: false, // Defaults to false when stored in database
   ...overrides,
 });
 
