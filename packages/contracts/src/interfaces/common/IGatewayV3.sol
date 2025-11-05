@@ -51,32 +51,58 @@ interface IGatewayV3 {
   event MailboxUpdated(address _oldMailbox, address _newMailbox);
 
   /**
-   * @notice Emitted when the mailbox is updated
-   * @param _origin The old mailbox address
-   * @param _oldMailbox The old mailbox address
-   * @param _newMailbox The new mailbox address
-   */
-  event ActiveMailboxUpdated(uint32 _origin, address _oldMailbox, address _newMailbox);
-
-  /**
    * @notice Emitted when the security module is updated
    * @param _oldSecurityModule The old security module address
    * @param _newSecurityModule The new security module address
    */
   event SecurityModuleUpdated(address _oldSecurityModule, address _newSecurityModule);
 
-  event Dispatch(uint256 indexed destinationDomain, bytes32 indexed recipient, bytes message);
+  /**
+   * @notice Emitted when a message is dispatched to the transport layer
+   * @param destinationDomain The destination domain of the message
+   * @param recipient The recipient of the message
+   * @param message The message payload
+   */
+  event Dispatch(uint32 indexed destinationDomain, bytes32 indexed recipient, bytes message);
 
-  event MailboxIdUpdated(uint32 _mailboxId);
+  /**
+   * @notice Emitted when the Hyperlane mailbox is updated
+   * @param _oldMailbox The old Hyperlane mailbox address
+   * @param _newMailbox The new Hyperlane mailbox address
+   */
+  event HyperlaneMailboxUpdated(address _oldMailbox, address _newMailbox);
+
+  /**
+   * @notice Emitted when the CCIP mailbox is updated
+   * @param _oldMailbox The old CCIP mailbox address
+   * @param _newMailbox The new CCIP mailbox address
+   */
+  event CCIPMailboxUpdated(address _oldMailbox, address _newMailbox);
+
+  /**
+   * @notice Emitted when the Polymer mailbox is updated
+   * @param _oldMailbox The old Polymer mailbox address
+   * @param _newMailbox The new Polymer mailbox address
+   */
+  event PolymerMailboxUpdated(address _oldMailbox, address _newMailbox);
+
+  /**
+   * @notice Emitted when the Polymer prover is updated
+   * @param _oldProver The old Polymer prover address
+   * @param _newProver The new Polymer prover address
+   */
+  event PolymerProverUpdated(address _oldProver, address _newProver);
+
+  /**
+   * @notice Emitted when the CCIP mappings are updated
+   * @param _everclearId The Everclear chain ids
+   * @param _ccipChainId The CCIP chain ids
+   */
+  event CCIPMappingsUpdated(uint256[] _everclearId, uint256[] _ccipChainId);
 
   /*///////////////////////////////////////////////////////////////
                               ERRORS
   //////////////////////////////////////////////////////////////*/
-
-  /**
-   * @notice Thrown when the message origin is invalid
-   */
-  error GatewayV3_Handle_InvalidOriginDomain();
 
   /**
    * @notice Thrown when the sender is not the appropriate remote Gateway
@@ -109,19 +135,9 @@ interface IGatewayV3 {
   error GatewayV3_ZeroAddress();
 
   /**
-   * @notice Thrown when trying to set a singleton mailbox on a GatewayV2
-   */
-  error GatewayV3_Deprecated_SingletonMailbox();
-
-  /**
    * @notice Thrown when the domain from message is not the same as the local domain
    */
   error GatewayV3_Handle_InvalidEventSelector();
-
-  /**
-   * @notice Thrown when active mailbox functionality is unused
-   */
-  error GatewayV3_ActiveMailbox_NotSupported();
 
   /**
    * @notice Thrown when array mismatch occurs
@@ -215,5 +231,9 @@ interface IGatewayV3 {
    * @param _gasLimit The gas limit for delivering the message
    * @return _fee The fee to send the message
    */
-  function quoteMessage(uint32 _chainId, bytes memory _message, uint256 _gasLimit) external view returns (uint256 _fee);
+  function quoteMessage(
+    uint32 _chainId,
+    bytes memory _message,
+    uint256 _gasLimit
+  ) external view returns (uint256 _fee);
 }

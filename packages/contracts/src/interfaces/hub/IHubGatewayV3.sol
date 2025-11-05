@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IGatewayV2} from 'interfaces/common/IGatewayV2.sol';
+import {IGatewayV3} from 'interfaces/common/IGatewayV3.sol';
 
 import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
 
 /**
- * @title IHubGateway
+ * @title IHubGatewayV3
  * @notice Interface for the HubGateway contract, sends and receives messages to and from the transport layer
  */
-interface IHubGatewayV2 is IGatewayV2 {
+interface IHubGatewayV3 is IGatewayV3 {
   /*///////////////////////////////////////////////////////////////
                               EVENTS
   //////////////////////////////////////////////////////////////*/
@@ -27,6 +27,14 @@ interface IHubGatewayV2 is IGatewayV2 {
    * @param _gateway The address of the gateway
    */
   event ChainGatewayRemoved(uint32 _chainId, bytes32 _gateway);
+
+  /**
+   * @notice Emitted when the active mailbox is updated
+   * @param _origin The origin domain
+   * @param _oldMailbox The old mailbox address
+   * @param _newMailbox The new mailbox address
+   */
+  event ActiveMailboxUpdated(uint32 _origin, address _oldMailbox, address _newMailbox);
 
   /*///////////////////////////////////////////////////////////////
                               ERRORS
@@ -49,17 +57,41 @@ interface IHubGatewayV2 is IGatewayV2 {
    */
   error Gateway_Initialize_MismatchedArrays();
 
+  /**
+   * @notice Thrown when the sender is not the appropriate remote Gateway
+   */
+  error Gateway_Handle_InvalidSender();
+
+  /**
+   * @notice Thrown when the message origin is invalid
+   */
+  error Gateway_Handle_InvalidOriginDomain();
+
   /*///////////////////////////////////////////////////////////////
                               LOGIC
   //////////////////////////////////////////////////////////////*/
 
   /**
    * @notice Initialize Gateway variables
+   * @param _owner The owner of the gateway
+   * @param _receiver The address of the receiver contract on Hub
+   * @param _interchainSecurityModule The address of the interchain security module
+   * @param _polymerProver The address of the Polymer prover contract
+   * @param _hyperlaneMailbox The address of the Hyperlane mailbox contract
+   * @param _ccipMailbox The address of the CCIP mailbox contract
+   * @param _polymerMailbox The address of the Polymer mailbox contract
    * @param _mailboxes The list of mailboxes on Hub for each chain
    * @param _chainIds The list of chains
    */
   function initialize(
-    IMailbox[] memory _mailboxes,
+    address _owner,
+    address _receiver,
+    address _interchainSecurityModule,
+    address _polymerProver,
+    address _hyperlaneMailbox,
+    address _ccipMailbox,
+    address _polymerMailbox,
+    address[] memory _mailboxes,
     uint32[] memory _chainIds
   ) external;
 
@@ -108,7 +140,7 @@ interface IHubGatewayV2 is IGatewayV2 {
    */
   function mailboxes(
     uint32 _chainId
-  ) external view returns (IMailbox _mailbox);
+  ) external view returns (address _mailbox);
 
   /**
    * @notice Returns the chain gateway address for the chain id
@@ -121,10 +153,10 @@ interface IHubGatewayV2 is IGatewayV2 {
 
   /**
    * @notice Returns the mailbox for a given domain
-   * @param _origin The origin domain of the message
+   * @param _origin The domain used to find the destination mailbox
    * @return _mailbox The mailbox contract
    */
   function activeMailbox(
     uint32 _origin
-  ) external view returns (IMailbox _mailbox);
+  ) external view returns (address _mailbox);
 }

@@ -3,41 +3,47 @@ pragma solidity 0.8.25;
 
 import {UUPSUpgradeable} from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
 
-import {GatewayV2} from 'contracts/common/GatewayV2.sol';
+import {GatewayV3} from 'contracts/common/GatewayV3.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
-import {IHubGatewayV2} from 'interfaces/hub/IHubGatewayV2.sol';
+import {IHubGatewayV3} from 'interfaces/hub/IHubGatewayV3.sol';
 
 import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
 
-import {IGatewayV2} from 'interfaces/common/IGatewayV2.sol';
-
-contract HubGatewayV2 is GatewayV2, UUPSUpgradeable, IHubGatewayV2 {
+contract HubGatewayV3 is GatewayV3, UUPSUpgradeable, IHubGatewayV3 {
   using TypeCasts for address;
 
-  /// @inheritdoc IHubGatewayV2
+  /// @inheritdoc IHubGatewayV3
   mapping(uint32 _chainId => bytes32 _gateway) public chainGateways;
 
-  /**
-   * Configurable Mailbox Update  ************************
-   */
-  /// @inheritdoc IHubGatewayV2
-  mapping(uint32 => IMailbox) public mailboxes;
+  /// @inheritdoc IHubGatewayV3
+  mapping(uint32 => address) public mailboxes;
 
-  constructor() GatewayV2() {}
+  constructor() GatewayV3() {}
 
   /*//////////////////////////////////////////////////////////////
                         GATEWAY FUNCTIONS
   //////////////////////////////////////////////////////////////*/
 
-  /// @inheritdoc IHubGatewayV2
+  /// @inheritdoc IHubGatewayV3
   function initialize(
-    IMailbox[] memory _mailboxes,
+    address _owner,
+    address _receiver,
+    address _interchainSecurityModule,
+    address _polymerProver,
+    address _hyperlaneMailbox,
+    address _ccipMailbox,
+    address _polymerMailbox,
+    address[] memory _mailboxes,
     uint32[] memory _chainIds
-  ) external reinitializer(2) onlyOwner {
+  ) external initializer {
     if (_mailboxes.length != _chainIds.length) {
       revert Gateway_Initialize_MismatchedArrays();
     }
+    _initializeGateway(
+      _owner, _receiver, _interchainSecurityModule, _polymerProver, _hyperlaneMailbox, _ccipMailbox, _polymerMailbox
+    );
+
     for (uint256 i; i < _mailboxes.length; i++) {
       mailboxes[_chainIds[i]] = _mailboxes[i];
       emit ActiveMailboxUpdated(_chainIds[i], address(0), address(_mailboxes[i]));
@@ -48,7 +54,7 @@ contract HubGatewayV2 is GatewayV2, UUPSUpgradeable, IHubGatewayV2 {
                          HUB FUNCTIONS
   //////////////////////////////////////////////////////////////*/
 
-  /// @inheritdoc IHubGatewayV2
+  /// @inheritdoc IHubGatewayV3
   function setChainGateway(
     uint32 _chainId,
     bytes32 _gateway
@@ -57,7 +63,7 @@ contract HubGatewayV2 is GatewayV2, UUPSUpgradeable, IHubGatewayV2 {
     emit ChainGatewayAdded(_chainId, _gateway);
   }
 
-  /// @inheritdoc IHubGatewayV2
+  /// @inheritdoc IHubGatewayV3
   function removeChainGateway(
     uint32 _chainId
   ) external onlyReceiver {
@@ -67,29 +73,29 @@ contract HubGatewayV2 is GatewayV2, UUPSUpgradeable, IHubGatewayV2 {
     emit ChainGatewayRemoved(_chainId, _gateway);
   }
 
-  /// @inheritdoc IHubGatewayV2
+  /// @inheritdoc IHubGatewayV3
   function updateActiveMailbox(
     uint32 _origin,
     address _newMailbox
   ) external onlyOwner validAddress(_newMailbox.toBytes32()) {
-    address _oldMailbox = address(mailboxes[_origin]);
-    mailboxes[_origin] = IMailbox(_newMailbox);
+    address _oldMailbox = mailboxes[_origin];
+    mailboxes[_origin] = _newMailbox;
     emit ActiveMailboxUpdated(_origin, _oldMailbox, _newMailbox);
   }
 
-  /// @inheritdoc IHubGatewayV2
+  /// @inheritdoc IHubGatewayV3
   function disableActiveMailbox(
     uint32 _origin
   ) external onlyOwner {
-    address _oldMailbox = address(mailboxes[_origin]);
+    address _oldMailbox = mailboxes[_origin];
     delete mailboxes[_origin];
     emit ActiveMailboxUpdated(_origin, _oldMailbox, address(0));
   }
 
-  /// @inheritdoc IHubGatewayV2
+  /// @inheritdoc IHubGatewayV3
   function activeMailbox(
     uint32 _origin
-  ) public view returns (IMailbox _mailbox) {
+  ) public view returns (address _mailbox) {
     return _activeMailbox(_origin);
   }
 
@@ -98,8 +104,8 @@ contract HubGatewayV2 is GatewayV2, UUPSUpgradeable, IHubGatewayV2 {
    */
   function _activeMailbox(
     uint32 _origin
-  ) internal view override(GatewayV2) returns (IMailbox) {
-    IMailbox _mailbox = mailboxes[_origin];
+  ) internal view override(GatewayV3) returns (address) {
+    address _mailbox = mailboxes[_origin];
     if (address(_mailbox) == address(0)) {
       revert HubGateway_Mailbox_InvalidOriginDomain(_origin);
     }
@@ -121,7 +127,7 @@ contract HubGatewayV2 is GatewayV2, UUPSUpgradeable, IHubGatewayV2 {
   function _checkValidSender(
     uint32 _origin,
     bytes32 _sender
-  ) internal view override(GatewayV2) {
+  ) internal view override(GatewayV3) {
     bytes32 _gateway = chainGateways[_origin];
     if (_sender != _gateway) revert Gateway_Handle_InvalidSender();
   }
@@ -133,7 +139,7 @@ contract HubGatewayV2 is GatewayV2, UUPSUpgradeable, IHubGatewayV2 {
    */
   function _getGateway(
     uint32 _domain
-  ) internal view override(GatewayV2) returns (bytes32 _gateway) {
+  ) internal view override(GatewayV3) returns (bytes32 _gateway) {
     _gateway = chainGateways[_domain];
     if (_gateway == 0) revert Gateway_Handle_InvalidOriginDomain();
   }

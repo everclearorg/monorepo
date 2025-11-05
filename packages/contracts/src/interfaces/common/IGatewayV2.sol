@@ -155,5 +155,9 @@ interface IGatewayV2 {
    * @param _gasLimit The gas limit for delivering the message
    * @return _fee The fee to send the message
    */
-  function quoteMessage(uint32 _chainId, bytes memory _message, uint256 _gasLimit) external view returns (uint256 _fee);
+  function quoteMessage(
+    uint32 _chainId,
+    bytes memory _message,
+    uint256 _gasLimit
+  ) external view returns (uint256 _fee);
 }
