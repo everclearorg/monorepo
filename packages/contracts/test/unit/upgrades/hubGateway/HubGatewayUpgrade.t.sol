@@ -19,7 +19,10 @@ import {OwnableUpgradeable} from '@openzeppelin/contracts-upgradeable/access/Own
 import {Initializable} from '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 
 contract TestHubGatewayV2 is HubGatewayV2 {
-  function checkValidSender(uint32 _origin, bytes32 _sender) external view {
+  function checkValidSender(
+    uint32 _origin,
+    bytes32 _sender
+  ) external view {
     return _checkValidSender(_origin, _sender);
   }
 
@@ -572,7 +575,11 @@ contract HubGatewayUpgrade is BaseTest, UpgradeHelper {
   }
 
   ////////////////////////////////////// Helpers //////////////////////////////////////
-  function _cacheState() internal view returns (address _mailbox, address _receiver, address _interchainSecurityModule) {
+  function _cacheState()
+    internal
+    view
+    returns (address _mailbox, address _receiver, address _interchainSecurityModule)
+  {
     _mailbox = address(hubGatewayProxy.mailbox());
     _receiver = address(hubGatewayProxy.receiver());
     _interchainSecurityModule = address(hubGatewayProxy.interchainSecurityModule());
