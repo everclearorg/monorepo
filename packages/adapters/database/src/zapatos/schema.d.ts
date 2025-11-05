@@ -11586,23 +11586,29 @@ declare module 'zapatos/schema' {
       */
       id: number;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count: number;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count: number;
+      pending_inventory: string;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count: number;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory: string;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status: string;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
@@ -11642,23 +11648,29 @@ declare module 'zapatos/schema' {
       */
       id: number;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count: number;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count: number;
+      pending_inventory: string;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count: number;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory: string;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status: string;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
@@ -11698,23 +11710,29 @@ declare module 'zapatos/schema' {
       */
       id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      pending_inventory?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
@@ -11754,23 +11772,29 @@ declare module 'zapatos/schema' {
       */
       id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count: number | db.Parameter<number> | db.SQLFragment;
+      pending_inventory: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory: string | db.Parameter<string> | db.SQLFragment;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status: string | db.Parameter<string> | db.SQLFragment;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
@@ -11810,23 +11834,29 @@ declare module 'zapatos/schema' {
       */
       id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      pending_inventory?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database

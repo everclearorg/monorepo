@@ -31,13 +31,6 @@ CREATE SCHEMA crypto;
 
 
 --
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
--- *not* creating schema, since initdb creates it
-
-
---
 -- Name: solana; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -3182,9 +3175,10 @@ CREATE TABLE public.swap_inventory_snapshots (
     total_inventory character varying(78) NOT NULL,
     reserved_inventory character varying(78) NOT NULL,
     available_inventory character varying(78) NOT NULL,
-    pending_intent_count integer NOT NULL,
-    threshold_status character varying(20) NOT NULL,
-    "timestamp" bigint NOT NULL
+    "timestamp" bigint NOT NULL,
+    pending_inventory character varying(78) NOT NULL,
+    reserved_count integer DEFAULT 0 NOT NULL,
+    pending_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -5265,4 +5259,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251022134056'),
     ('20251103222403'),
     ('20251104200144'),
-    ('20251105135808');
+    ('20251105135808'),
+    ('20251105153713');
