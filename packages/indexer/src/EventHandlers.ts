@@ -368,7 +368,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     id: _intentId,
     intentId: _intentId,
     queueIdx: _queueIdx,
-    initiator: initiator,
+    initiator: existingIntent?.initiator || initiator,
     receiver,
     inputAsset,
     outputAsset,
@@ -845,6 +845,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
     // Update intent with correct initiator and fee information
     context.Intent.set({
       ...intent,
+      initiator: _initiator,
       tokenFee: tokenFee,
       nativeFee: nativeFee,
     });
