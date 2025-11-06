@@ -9,6 +9,7 @@ type Intent @entity {
   inputAsset: Bytes!
   outputAsset: Bytes!
   maxFee: Int!
+  amountOutMin: BigInt! # Minimum amount out (V5 uses this, V1 sets to 0)
   origin: Int!
   nonce: BigInt!
   timestamp: BigInt!
