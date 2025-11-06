@@ -397,6 +397,15 @@ export const dispatchMessageQueueViaRelayers = async (
           signer: walletAddr,
         });
 
+        const funcSig = everclearIface.getFunction(queueMethodName).format();
+
+        logger.info('Generating transaction', requestContext, methodContext, {
+          queueDomain: queue.domain,
+          transactionDomain,
+          funcSig,
+          intentStructs,
+        });
+
         const tx: WriteTransaction = {
           data: everclearIface.encodeFunctionData(queueMethodName, [
             +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
@@ -410,7 +419,7 @@ export const dispatchMessageQueueViaRelayers = async (
           to: everclear,
           value: '0',
           domain: +transactionDomain,
-          funcSig: everclearIface.getFunction(queueMethodName).format(),
+          funcSig,
         };
 
         logger.debug(
