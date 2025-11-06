@@ -31,6 +31,13 @@ CREATE SCHEMA crypto;
 
 
 --
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+-- *not* creating schema, since initdb creates it
+
+
+--
 -- Name: solana; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -3063,7 +3070,7 @@ ALTER SEQUENCE public.rewards_id_seq OWNED BY public.rewards.id;
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying(128) NOT NULL
+    version character varying(255) NOT NULL
 );
 
 
@@ -5072,6 +5079,20 @@ CREATE INDEX settlement_intents_id_domain_index ON public.settlement_intents USI
 
 
 --
+-- Name: new_lock_position_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
+--
+
+CREATE INDEX new_lock_position_timestamp_idx ON tokenomics.new_lock_position USING btree (insert_timestamp);
+
+
+--
+-- Name: reward_claimed_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
+--
+
+CREATE INDEX reward_claimed_timestamp_idx ON tokenomics.reward_claimed USING btree (insert_timestamp);
+
+
+--
 -- Name: destination_intents destination_intent_status_change_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -5104,6 +5125,20 @@ CREATE TRIGGER queue_type_change_trigger AFTER UPDATE OF type ON public.queues F
 --
 
 CREATE TRIGGER process_cpi_events_trigger BEFORE INSERT OR UPDATE ON solana.solana_spoke_instructions FOR EACH ROW EXECUTE FUNCTION public.process_cpi_events();
+
+
+--
+-- Name: new_lock_position new_lock_position_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
+--
+
+CREATE TRIGGER new_lock_position_set_timestamp_and_latency BEFORE INSERT ON tokenomics.new_lock_position FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
+
+
+--
+-- Name: reward_claimed reward_claimed_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
+--
+
+CREATE TRIGGER reward_claimed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.reward_claimed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
 
 
 --
@@ -5260,4 +5295,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251103222403'),
     ('20251104200144'),
     ('20251105135808'),
-    ('20251105153713');
+    ('20251105153713'),
+    ('20251106014319');
