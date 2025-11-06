@@ -16,7 +16,7 @@
   {
     "name": "Arbitrum One",
     "id": 42161,
-    "rpc": "https://arbitrum-one.public.blastapi.io",
+    "rpc": "https://arbitrum-one-rpc.publicnode.com",
     "environments": ["MainnetStaging", "MainnetProduction"],
     "realm": "spoke"
   },
@@ -31,7 +31,7 @@
   {
     "name": "Bnb",
     "id": 56,
-    "rpc": "https://bsc-mainnet.public.blastapi.io",
+    "rpc": "https://bsc.drpc.org",
     "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
@@ -52,7 +52,7 @@
   {
     "name": "Blast",
     "id": 81457,
-    "rpc": "https://blastl2-mainnet.public.blastapi.io",
+    "rpc": "https://blast.drpc.org",
     "verifierUrl": "https://api.blastscan.io/api",
     "environments": ["MainnetStaging", "MainnetProduction"],
     "realm": "spoke"
@@ -147,7 +147,7 @@
   {
     "name": "Unichain",
     "id": 130,
-    "rpc": "https://mainnet.unichain.org",
+    "rpc": "https://unichain-rpc.publicnode.com",
     "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
