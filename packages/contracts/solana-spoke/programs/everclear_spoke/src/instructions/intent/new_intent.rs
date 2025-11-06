@@ -35,7 +35,6 @@ pub fn new_intent(
     input_asset: Pubkey,
     output_asset: Pubkey,
     amount: u64,
-    max_fee: u32,
     ttl: u64,
     destinations: Vec<u32>,
     data: Vec<u8>,

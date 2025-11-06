@@ -85,7 +85,6 @@ pub mod everclear_spoke {
             input_asset,
             output_asset,
             amount,
-            max_fee,
             ttl,
             destinations,
             data,
