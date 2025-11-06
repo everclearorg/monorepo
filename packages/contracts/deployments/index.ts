@@ -51,6 +51,12 @@ import StagingSpokeGatewayZircuit from './staging/48900/SpokeGateway.json';
 import StagingEverclearSpokeBlast from './staging/81457/EverclearSpoke.json';
 import StagingSpokeGatewayBlast from './staging/81457/SpokeGateway.json';
 
+import StagingEverclearSpokeEthereum from './staging/1/EverclearSpoke.json';
+import StagingSpokeGatewayEthereum from './staging/1/SpokeGateway.json';
+
+import StagingEverclearSpokeBase from './staging/8453/EverclearSpoke.json';
+import StagingSpokeGatewayBase from './staging/8453/SpokeGateway.json';
+
 //////// Mainnet Production Deployments ////////
 
 import ProductionEverclearHubEverclearMainnet from './production/25327/EverclearHub.json';
@@ -283,6 +289,10 @@ export const Deployments = {
     25327: {
       everclear: StagingEverclearHubEverclearMainnet,
       gateway: StagingHubGatewayEverclearMainnet,
+      // use the production values here instead for now
+      gauge: ProductionTokenomicsHubGaugeEverclearSepolia,
+      rewardDistributor: ProductionTokenomicsRewardDistributorEverclearSepolia,
+      tokenomicsHubGateway: ProductionTokenomicsHubGatewayEverclearSepolia,
     },
     42161: {
       everclear: StagingEverclearSpokeArbitrumOne,
@@ -299,6 +309,14 @@ export const Deployments = {
     81457: {
       everclear: StagingEverclearSpokeBlast,
       gateway: StagingSpokeGatewayBlast,
+    },
+    1: {
+      everclear: StagingEverclearSpokeEthereum,
+      gateway: StagingSpokeGatewayEthereum,
+    },
+    8453: {
+      everclear: StagingEverclearSpokeBase,
+      gateway: StagingSpokeGatewayBase,
     },
   },
 };
