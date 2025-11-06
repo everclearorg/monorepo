@@ -95,7 +95,6 @@ pub fn new_intent(
         input_asset,
         output_asset,
         amount,
-        max_fee,
         ttl,
         destinations,
         data,
@@ -130,7 +129,6 @@ pub fn handle_new_intent<'info>(
     input_asset: Pubkey,
     output_asset: Pubkey,
     amount: u64,
-    max_fee: u32,
     ttl: u64,
     destinations: Vec<u32>,
     data: Vec<u8>,
@@ -153,8 +151,7 @@ pub fn handle_new_intent<'info>(
             SpokeError::InvalidIntent
         );
     }
-    // Check max_fee is within allowed range (for example, <= 10_000 for basis points)
-    require!(max_fee <= 10_000, SpokeError::MaxFeeExceeded);
+    
     // NOTE: we do not need to check data len as this is implicitly done with solana tx size limitation of 1232 bytes
 
     let minted_decimals = accounts.mint.decimals;
@@ -201,12 +198,13 @@ pub fn handle_new_intent<'info>(
         receiver: receiver.to_bytes(),
         input_asset: accounts.mint.key().to_bytes(),
         output_asset: output_asset.to_bytes(),
-        max_fee,              // watch out for 24-bit range if that matters
         origin: state.domain, // your "origin_domain"
         nonce: new_nonce,
         timestamp: clock.unix_timestamp as u64,
         ttl,
         amount: u128_to_u256_be(normalized_amount),
+        // NOTE: we dont support swap flow from solana now and hardcode amountOutMin to 0
+        amount_out_min: u128_to_u256_be(0),
         destinations: destinations.clone(),
         data: data.clone(),
     };
@@ -267,7 +265,7 @@ pub fn handle_new_intent<'info>(
         input_asset: accounts.mint.key(),
         output_asset,
         normalized_amount,
-        max_fee,
+        max_fee: u32::MAX,
         origin_domain: state.domain,
         nonce: new_nonce,
         ttl,
@@ -306,6 +304,9 @@ pub struct EventData {
     pub input_asset: Pubkey,
     pub output_asset: Pubkey,
     pub normalized_amount: u128,
+    /// NOTE: max_fee is now irrelevant and not used in V2 spoke
+    /// 
+    /// This is kept here only for not changing the event data structure
     pub max_fee: u32,
     pub origin_domain: u32,
     pub nonce: u64,

@@ -65,6 +65,7 @@ pub mod everclear_spoke {
     /// Create a new intent.
     /// The user "locks" funds (previously deposited) and creates an intent.
     /// For simplicity, we assume full deposit has been made before.
+    /// NOTE: max_fee is not used now and we do not support amountOutMin yet for swaps.
     pub fn new_intent(
         ctx: Context<NewIntent>,
         receiver: Pubkey,
