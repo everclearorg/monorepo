@@ -1,67 +1,55 @@
-import { mkAddress, mkBytes32 } from '@chimera-monorepo/utils';
-import { expect } from 'chai';
-import { stub, restore, SinonStub } from 'sinon';
-
+import { Logger, expect, mkBytes32 } from '@chimera-monorepo/utils';
+import { restore, reset, stub, SinonStub, SinonStubbedInstance } from 'sinon';
 import { checkDepositQueueCount } from '../../../src/checklist/queue/deposit';
-import { getContext } from '../../../src/context';
-import { sendAlerts, resolveAlerts } from '../../../src/mockable';
-import { getCurrentEpoch } from '../../../src/helpers';
-
-const mockRequestContext = { id: 'mock-request-id', origin: 'test' };
-const mockLogger = {
-  debug: stub(),
-  info: stub(),
-  warn: stub(),
-  error: stub(),
-};
+import { getContextStub, mock } from '../../globalTestHook';
+import { ChainReader } from '@chimera-monorepo/chainservice';
+import { createProcessEnv } from '../../mock';
+import { Database } from '@chimera-monorepo/database';
+import * as Mockable from '../../../src/mockable';
+import * as Helpers from '../../../src/helpers';
 
 describe('DepositQueueCount: Alert Resolution Bug Fix', () => {
-  let getContextStub: SinonStub;
+  let chainreader: SinonStubbedInstance<ChainReader>;
+  let logger: SinonStubbedInstance<Logger>;
   let sendAlertsStub: SinonStub;
   let resolveAlertsStub: SinonStub;
   let getCurrentEpochStub: SinonStub;
-  let getAllEnqueuedDepositsStub: SinonStub;
-
-  const mockConfig = {
-    chains: {
-      '1': { network: 'evm', assets: { USDC: { address: mkAddress('0x1') } } },
-      '8453': { network: 'evm', assets: { USDC: { address: mkAddress('0x2') } } },
-    },
-    thresholds: {
-      maxDepositQueueCount: 15,
-    },
-    environment: 'test',
-    network: 'testnet',
-  };
+  let database: SinonStubbedInstance<Database>;
 
   const USDC_TICKER_HASH = mkBytes32('0xabc');
   const CURRENT_EPOCH = 260800;
 
   beforeEach(() => {
-    sendAlertsStub = stub();
-    resolveAlertsStub = stub();
-    getCurrentEpochStub = stub().resolves(CURRENT_EPOCH);
-    getAllEnqueuedDepositsStub = stub();
-
-    getContextStub = stub().returns({
-      config: mockConfig,
-      logger: mockLogger,
-      adapters: {
-        database: {
-          getAllEnqueuedDeposits: getAllEnqueuedDepositsStub,
-        },
+    stub(process, 'env').value({
+      ...process.env,
+      ...createProcessEnv(),
+    });
+    
+    database = mock.instances.database() as SinonStubbedInstance<Database>;
+    chainreader = mock.instances.chainreader() as SinonStubbedInstance<ChainReader>;
+    logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
+    
+    const config = {
+      ...mock.config(),
+      thresholds: {
+        ...mock.config().thresholds,
+        maxDepositQueueCount: 15,
       },
+    };
+    
+    getContextStub.returns({
+      ...mock.context(),
+      config,
     });
 
-    // Stub the imported functions
-    stub(require('../../../src/context'), 'getContext').callsFake(getContextStub);
-    stub(require('../../../src/mockable'), 'sendAlerts').callsFake(sendAlertsStub);
-    stub(require('../../../src/mockable'), 'resolveAlerts').callsFake(resolveAlertsStub);
-    stub(require('../../../src/helpers'), 'getCurrentEpoch').callsFake(getCurrentEpochStub);
+    sendAlertsStub = stub(Mockable, 'sendAlerts').resolves();
+    resolveAlertsStub = stub(Mockable, 'resolveAlerts').resolves();
+    getCurrentEpochStub = stub(Helpers, 'getCurrentEpoch').resolves(CURRENT_EPOCH);
   });
 
   afterEach(() => {
     restore();
+    reset();
   });
 
   describe('Bug: Alert triggered but never resolved', () => {
