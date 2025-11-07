@@ -7,7 +7,6 @@ import {
 import { getContext } from '../../context';
 import { Severity } from '../../types';
 import { resolveAlerts, sendAlerts } from '../../mockable';
-import { getCurrentEpoch } from '../../helpers';
 
 export const checkDepositQueueCount = async (): Promise<Map<string, number>> => {
   const {
@@ -22,7 +21,7 @@ export const checkDepositQueueCount = async (): Promise<Map<string, number>> => 
 
   const queueCountByKey: Map<string, number> = new Map();
   for (const deposit of enqueuedDepositsByDomain) {
-    const queueKey = `${deposit.epoch}-${deposit.domain}-${deposit.tickerHash}`;
+    const queueKey = `${deposit.domain}-${deposit.tickerHash}`;
     if (queueCountByKey.has(queueKey)) {
       const queueCount = queueCountByKey.get(queueKey)!;
       queueCountByKey.set(queueKey, queueCount + 1);
@@ -61,50 +60,19 @@ export const checkDepositQueueCount = async (): Promise<Map<string, number>> => 
   };
 
   if (!aboveThreshold.length) {
-    // Generate keys for recent epochs to resolve any stuck alerts
-    // This is necessary because once deposits are processed, their queue keys
-    // disappear from the database query, so we must explicitly construct
-    // possible alert keys to ensure BetterUptime can match and resolve them.
+    // Resolve all possible keys for configured domains and tickers
     const tickerHashes = getConfiguredTickerHashes(config.chains);
     const keysToResolve: string[] = [];
-
-    try {
-      // Get current epoch from hub contract
-      const currentEpoch = await getCurrentEpoch();
-      
-      // Generate keys for recent epochs (last 200 epochs covers ~8-16 hours depending on epoch length)
-      // This ensures we catch and resolve alerts that were triggered recently
-      const RECENT_EPOCHS_LOOKBACK = 200;
-      
-      for (let i = 0; i < RECENT_EPOCHS_LOOKBACK; i++) {
-        const epoch = currentEpoch - i;
-        if (epoch < 0) break; // Don't go negative
-        
-        for (const domain of domains) {
-          for (const tickerHash of tickerHashes) {
-            keysToResolve.push(`${epoch}-${domain}-${tickerHash}`);
-          }
-        }
+    
+    for (const domain of domains) {
+      for (const tickerHash of tickerHashes) {
+        keysToResolve.push(`${domain}-${tickerHash}`);
       }
-      
-      logger.debug('Generated resolution keys for recent epochs', requestContext, methodContext, {
-        currentEpoch,
-        lookback: RECENT_EPOCHS_LOOKBACK,
-        totalKeys: keysToResolve.length,
-        domains: domains.length,
-        tickers: tickerHashes.length,
-      });
-    } catch (error) {
-      // If we can't get current epoch, fall back to current queue keys only
-      logger.warn('Failed to get current epoch for resolution, using current queue keys only', requestContext, methodContext, {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      keysToResolve.push(...queueCountByKey.keys());
     }
 
     report.ids = keysToResolve;
     await resolveAlerts(report, logger, { ...config, network: config.network || 'unknown' }, requestContext);
-    logger.info('Deposit queue counts are within threshold, resolved alerts for recent epochs', requestContext, methodContext, {
+    logger.info('Deposit queue counts are within threshold, resolved alerts', requestContext, methodContext, {
       threshold,
       keysResolved: keysToResolve.length,
     });
