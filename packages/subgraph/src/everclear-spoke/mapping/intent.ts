@@ -50,7 +50,7 @@ function getOrCreateQueue(type: string): Queue {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-function getOrCreateIntentQueueMapping(queueIdx: bigint): IntentQueueMapping {
+function getOrCreateIntentQueueMapping(queueIdx: BigInt): IntentQueueMapping {
   let mapping = IntentQueueMapping.load(BigIntToBytes(queueIdx));
   if (mapping == null) {
     mapping = new IntentQueueMapping(BigIntToBytes(queueIdx));
@@ -61,7 +61,7 @@ function getOrCreateIntentQueueMapping(queueIdx: bigint): IntentQueueMapping {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-function getOrCreateFillQueueMapping(queueIdx: bigint): FillQueueMapping {
+function getOrCreateFillQueueMapping(queueIdx: BigInt): FillQueueMapping {
   let mapping = FillQueueMapping.load(BigIntToBytes(queueIdx));
   if (mapping == null) {
     mapping = new FillQueueMapping(BigIntToBytes(queueIdx));
@@ -71,7 +71,7 @@ function getOrCreateFillQueueMapping(queueIdx: bigint): FillQueueMapping {
   return mapping;
 }
 
-function createEmptyOriginIntent(intentId: Bytes, initiator: Bytes, timestamp: bigint): OriginIntent {
+function createEmptyOriginIntent(intentId: Bytes, initiator: Bytes, timestamp: BigInt): OriginIntent {
   const intent = new OriginIntent(intentId);
   intent.status = 'ADDED';
   intent.initiator = initiator;
@@ -266,7 +266,10 @@ export function handleIntentQueueProcessed(event: IntentQueueProcessed): void {
   const length = event.params._lastIdx.minus(event.params._firstIdx).toI32();
   for (let idx = 0; idx < length; idx++) {
     const mapping = IntentQueueMapping.load(BigIntToBytes(event.params._firstIdx.plus(BigInt.fromI32(idx))));
-    const intentId = mapping!.intentId;
+    if (mapping == null) {
+      continue;
+    }
+    const intentId = mapping.intentId;
     const intent = OriginIntent.load(intentId);
     if (intent != null) {
       intent.status = 'DISPATCHED';
@@ -316,7 +319,10 @@ export function handleFillQueueProcessed(event: FillQueueProcessed): void {
   const length = event.params._lastIdx.minus(event.params._firstIdx).toI32();
   for (let idx = 0; idx < length; idx++) {
     const mapping = FillQueueMapping.load(BigIntToBytes(event.params._firstIdx.plus(BigInt.fromI32(idx))));
-    const intentId = mapping!.intentId;
+    if (mapping == null) {
+      continue;
+    }
+    const intentId = mapping.intentId;
     const intent = DestinationIntent.load(intentId);
     if (intent != null) {
       intent.status = 'DISPATCHED';
