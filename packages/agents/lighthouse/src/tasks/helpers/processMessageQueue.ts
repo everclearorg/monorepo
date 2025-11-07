@@ -28,10 +28,12 @@ async function getOnchainQueueState(
 ): Promise<OnchainQueueState | null> {
   const {
     logger,
+    config: { hub },
     adapters: { chainservice },
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext('getOnchainQueueState');
-
+  // For settlement queues, we need to check the hub domain, not the spoke domain
+  const checkDomain = queueType === 'SETTLEMENT' ? hub.domain : domain;
   try {
     const iface = new Interface(abi);
 
@@ -59,6 +61,7 @@ async function getOnchainQueueState(
 
     let queueData: string;
     if (isSettlementQueue) {
+      // NOTE: this is using spoke domain as param, while the readTx is called on hub domain
       queueData = iface.encodeFunctionData(queueMethodName, [parseInt(domain)]);
     } else {
       queueData = iface.encodeFunctionData(queueMethodName, []);
@@ -66,7 +69,7 @@ async function getOnchainQueueState(
 
     const result = await chainservice.readTx(
       {
-        domain: parseInt(domain),
+        domain: parseInt(checkDomain),
         to: everclearAddress,
         data: queueData,
         funcSig: iface.getFunction(queueMethodName).format(),
@@ -188,9 +191,7 @@ export const processMessageQueue = async (type: QueueType) => {
         const abi = transactionDomain === hub.domain ? abis.hub.everclear : abis.spoke.everclear;
 
         // Check onchain queue state
-        // For settlement queues, we need to check the hub domain, not the spoke domain
-        const checkDomain = type === 'SETTLEMENT' ? hub.domain : domain;
-        const onchainState = await getOnchainQueueState(checkDomain, type, everclear, abi);
+        const onchainState = await getOnchainQueueState(domain, type, everclear, abi);
 
         if (onchainState) {
           // Compare database size with onchain size
