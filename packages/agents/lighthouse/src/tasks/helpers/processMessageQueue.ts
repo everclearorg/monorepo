@@ -4,6 +4,7 @@ import { getContext } from '../../context';
 import { MissingThresholds, UnknownQueueType } from '../../errors';
 import { dispatchMessageQueueViaRelayers } from './dispatchMessageQueueViaRelayers';
 import { Interface } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 
 interface OnchainQueueState {
   first: number;
@@ -75,8 +76,9 @@ async function getOnchainQueueState(
 
     // Decode the result (returns first, last)
     const decoded = iface.decodeFunctionResult(queueMethodName, result);
-    const first = decoded[0];
-    const last = decoded[1];
+    // NOTE: decoded are in BigNumber (uint256)
+    const first = decoded[0].toNumber();
+    const last = decoded[1].toNumber();
     const size = last >= first ? last - first + 1 : 0;
 
     logger.debug('Onchain queue state retrieved', requestContext, methodContext, {
