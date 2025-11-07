@@ -311,6 +311,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
       abi.encode(
         msg.value,
         _destinations,
+        _receiver,
         _inputAsset,
         _outputAsset,
         _amount,
@@ -366,6 +367,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
       abi.encode(
         msg.value,
         _destinations,
+        _receiver,
         _inputAsset,
         _outputAsset,
         _amount,
@@ -422,7 +424,7 @@ contract FeeAdapterV2 is IFeeAdapterV2, Ownable2Step {
     bytes32 _dataHash,
     bytes calldata _signature
   ) internal {
-    bytes32 _hash = keccak256(abi.encode(_dataHash, msg.sender, address(this), block.chainid));
+    bytes32 _hash = keccak256(abi.encode(_dataHash, address(this), block.chainid));
 
     if (txExists[_hash]) revert FeeAdapter_SignatureAlreadyUsed();
     txExists[_hash] = true;
