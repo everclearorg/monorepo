@@ -845,7 +845,6 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
     // Update intent with correct initiator and fee information
     context.Intent.set({
       ...intent,
-      initiator: _initiator,
       tokenFee: tokenFee,
       nativeFee: nativeFee,
     });
