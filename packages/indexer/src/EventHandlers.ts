@@ -92,6 +92,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
       blockNumber: BigInt(event.block.number),
       blockTimestamp: BigInt(event.block.timestamp),
       transactionHash: txHash,
+      sender: '0x0000000000000000000000000000000000000000000000000000000000000000', // Zeroed for IntentAdded events
       receiveBlockNumber: undefined,
       isFastPath: ttl !== 0n,
       tokenFee: undefined,
@@ -174,6 +175,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     blockNumber: BigInt(event.block.number),
     blockTimestamp: BigInt(event.block.timestamp),
     transactionHash: txHash,
+    sender: existingIntent?.sender || '0x0000000000000000000000000000000000000000000000000000000000000000', // Zeroed for IntentAdded events, preserve if set by FeeAdapter
     receiveBlockNumber: undefined, // Will be set when filled
     isFastPath: ttl !== 0n,
     // Preserve fee information if it was already set by FeeAdapter
@@ -307,6 +309,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
       blockNumber: BigInt(event.block.number),
       blockTimestamp: BigInt(event.block.timestamp),
       transactionHash: txHash,
+      sender: '0x0000000000000000000000000000000000000000000000000000000000000000', // Zeroed for IntentAdded events
       receiveBlockNumber: undefined,
       isFastPath: ttl !== 0n,
       tokenFee: undefined,
@@ -385,6 +388,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     blockNumber: BigInt(event.block.number),
     blockTimestamp: BigInt(event.block.timestamp),
     transactionHash: txHash,
+    sender: existingIntent?.sender || '0x0000000000000000000000000000000000000000000000000000000000000000', // Zeroed for IntentAdded events, preserve if set by FeeAdapter
     receiveBlockNumber: undefined, // Will be set when filled
     isFastPath: ttl !== 0n,
     // Preserve fee information if it was already set by FeeAdapter
@@ -753,6 +757,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
       blockNumber: BigInt(event.block.number),
       blockTimestamp: BigInt(event.block.timestamp),
       transactionHash: event.transaction.hash,
+      sender: _initiator, // msg.sender from FeeAdapter IntentWithFeesAdded event
       receiveBlockNumber: undefined,
       isFastPath: false, // Placeholder
       tokenFee: tokenFee,
@@ -762,16 +767,17 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
 
     context.Intent.set(intent);
   } else {
-    // Intent already exists - update it with fee information
-    // Also update initiator to ensure we have the correct user address (msg.sender from FeeAdapter)
-    // instead of the FeeAdapter contract address from IntentAdded event
+    // Intent already exists - update it with sender and fee information
+    // Note: initiator is NOT updated here - it reflects what's in the intent struct
+    // (which may be the FeeAdapter address if created via FeeAdapter)
+    // sender is set to the actual user address (msg.sender from FeeAdapter)
 
-    context.log.info(`Updating existing intent ${_intentId} with correct initiator and fee information`);
+    context.log.info(`Updating existing intent ${_intentId} with sender and fee information`);
 
-    // Update intent with correct initiator and fee information
+    // Update intent with sender and fee information
     context.Intent.set({
       ...intent,
-      initiator: _initiator,
+      sender: _initiator, // msg.sender from FeeAdapter IntentWithFeesAdded event
       tokenFee: tokenFee,
       nativeFee: nativeFee,
     });
@@ -827,6 +833,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
       blockNumber: BigInt(event.block.number),
       blockTimestamp: BigInt(event.block.timestamp),
       transactionHash: event.transaction.hash,
+      sender: _initiator, // msg.sender from FeeAdapter IntentWithFeesAdded event
       receiveBlockNumber: undefined,
       isFastPath: false, // Placeholder
       tokenFee: tokenFee,
@@ -836,15 +843,17 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
 
     context.Intent.set(intent);
   } else {
-    // Intent already exists - update it with fee information
-    // Also update initiator to ensure we have the correct user address (msg.sender from FeeAdapter)
-    // instead of the FeeAdapter contract address from IntentAdded event
+    // Intent already exists - update it with sender and fee information
+    // Note: initiator is NOT updated here - it reflects what's in the intent struct
+    // (which may be the FeeAdapter address if created via FeeAdapter)
+    // sender is set to the actual user address (msg.sender from FeeAdapter)
 
-    context.log.info(`Updating existing intent ${_intentId} with correct initiator and fee information (V2)`);
+    context.log.info(`Updating existing intent ${_intentId} with sender and fee information (V2)`);
 
-    // Update intent with correct initiator and fee information
+    // Update intent with sender and fee information
     context.Intent.set({
       ...intent,
+      sender: _initiator, // msg.sender from FeeAdapter IntentWithFeesAdded event
       tokenFee: tokenFee,
       nativeFee: nativeFee,
     });

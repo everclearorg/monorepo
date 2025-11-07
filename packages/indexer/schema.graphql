@@ -23,6 +23,7 @@ type Intent @entity {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  sender: Bytes! # The address that submitted the intent
   
   # Fill metadata
   receiveBlockNumber: BigInt # Block number when filled (from Fill event)
