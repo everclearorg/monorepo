@@ -92,17 +92,14 @@ function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[
 
 function messageGasLimit(domain: string, intentCount: number): number {
   const {
-    config: { hub, chains },
+    config: { chains },
   } = getContext();
   const defaultMessageGasLimit = {
     base: DEFAULT_BASE_MESSAGE_GAS_LIMIT,
     extraIntent: DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT,
   };
   const chainMessageGasLimit = chains[domain]?.messageGasLimit ?? defaultMessageGasLimit;
-  // NOTE: if queue = hub, we call contract with _bufferDBPS as hub contract do not have dynamic message gas limit upgrade
-  return domain === hub.domain
-    ? DEFAULT_HYPERLANE_BUFFER
-    : chainMessageGasLimit.base + (intentCount - 1) * chainMessageGasLimit.extraIntent;
+  return chainMessageGasLimit.base + (intentCount - 1) * chainMessageGasLimit.extraIntent;
 }
 
 export const dispatchMessageQueueViaRelayers = async (
@@ -299,7 +296,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, toDequeue),
+          messageGasLimit(queue.domain, toDequeue),
         ]);
         const digest = keccak256(payload);
 
@@ -366,7 +363,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
+          messageGasLimit(queue.domain, actualIntentCount),
         ]);
         const correctedDigest = keccak256(correctedPayload);
 
@@ -413,7 +410,7 @@ export const dispatchMessageQueueViaRelayers = async (
             relayerAddress,
             ttl,
             nonce,
-            messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
+            messageGasLimit(queue.domain, actualIntentCount),
             correctedSignature, // Use corrected signature
           ]),
           to: everclear,
