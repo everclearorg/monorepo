@@ -45,7 +45,7 @@ describe('checkDepositQueueState', () => {
       const enqueuedDeposit = mock.depositQueue({ epoch, domain, tickerHash });
       database.getAllEnqueuedDeposits.resolves([enqueuedDeposit]);
       const result = await checkDepositQueueCount();
-      const validResult = new Map([[`100-1337-${tickerHash}`, 1]]);
+      const validResult = new Map([[`1337-${tickerHash}`, 1]]);
       expect(result).to.deep.equal(validResult);
     });
     it('should work with no data in db', async () => {
