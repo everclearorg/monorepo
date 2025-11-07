@@ -48,7 +48,7 @@ networks:
       - name: FeeAdapter
         address: 0x7621D1085559Ab35513E2a41EC948a8524F619D9
       - name: FeeAdapterV2
-        address: 0x20fF5EA948881D18f7d64B64410ec2B81F8797F4
+        address: 0x2944F6fEF163365A382E9397b582bfbeB7C4F300
   - id: 10
     start_block: 0
     confirmed_block_threshold: 10
@@ -60,7 +60,7 @@ networks:
       - name: FeeAdapter
         address: 0xF4a697B7A48e9c7C1944a68a11d3b8D5E716d169
       - name: FeeAdapterV2
-        address: 0xfB1792b0992B9685be041A69a082241CE991F231
+        address: 0x2944F6fEF163365A382E9397b582bfbeB7C4F300
   - id: 8453
     start_block: 0
     confirmed_block_threshold: 10
@@ -72,7 +72,7 @@ networks:
       - name: FeeAdapter
         address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89
       - name: FeeAdapterV2
-        address: 0x65588B1121EB7dD41ba7d82A4f387548381584A9
+        address: 0x2944F6fEF163365A382E9397b582bfbeB7C4F300
   - id: 42161
     start_block: 0
     confirmed_block_threshold: 10
@@ -84,5 +84,5 @@ networks:
       - name: FeeAdapter
         address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89
       - name: FeeAdapterV2
-        address: 0x12Dc8f91767021760391d691FD4Bd2A642aEBE2d
+        address: 0x2944F6fEF163365A382E9397b582bfbeB7C4F300
 rollback_on_reorg: true
