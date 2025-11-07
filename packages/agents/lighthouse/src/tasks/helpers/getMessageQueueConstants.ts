@@ -33,5 +33,6 @@ export const PROCESS_INTENT_VIA_RELAYER_TYPEHASH = '0xf3f51acca0066ef7defe3ea640
 // keccak256('function processFillQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _dynamicGasLimit)')
 export const PROCESS_FILL_VIA_RELAYER_TYPEHASH = '0xce1faaeef1bc26cbe90f4e1a23cfed5940bbac04f28982812ae07a8d0ad23c39';
 
+// keccak256(''function processQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _gasLimit, bytes calldata _signature)')
 export const PROCESS_SETTLEMENT_VIA_RELAYER_TYPEHASH =
-  '0x9ee676d393dd5facc07ae4ba72101da49596c33d1358807aba1cc4687c098eb9';
+  '0x09b3b633d13dee4d3dded11a692b0a71b91231547cf1117793ee8fdf9d09f017';

@@ -37,7 +37,7 @@ describe('getSpokeQueueConstants', () => {
 
     it('should return correct type hash for SETTLEMENT', () => {
       const result = getTypeHash('SETTLEMENT');
-      expect(result).to.equal('0x9ee676d393dd5facc07ae4ba72101da49596c33d1358807aba1cc4687c098eb9');
+      expect(result).to.equal('0x09b3b633d13dee4d3dded11a692b0a71b91231547cf1117793ee8fdf9d09f017');
     });
 
     it('should throw UnknownQueueType for unknown types', () => {
