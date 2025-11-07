@@ -30,7 +30,7 @@ locals {
 
   local_cartographer_config = jsonencode({
     logLevel = "debug"
-    environment = "production" 
+    environment = "staging" 
     databaseUrl = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear"
     healthUrls = {
       intents     = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_intents_heartbeat}"
