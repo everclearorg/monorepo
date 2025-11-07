@@ -33,6 +33,7 @@ contracts:
     handler: ./src/EventHandlers.ts
     events:
       - event: IntentWithFeesAdded
+      - event: OrderCreated
 
 # Define all networks
 # NOTE: we are using reorg-safe values from hyperlane: https://docs.hyperlane.xyz/docs/reference/addresses/validators/latencies

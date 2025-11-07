@@ -5,6 +5,7 @@ import {
   EverclearSpokeV5_IntentFilled_handler,
   FeeAdapter_IntentWithFeesAdded_handler,
   FeeAdapterV2_IntentWithFeesAdded_handler,
+  FeeAdapterV2_OrderCreated_handler
 } from '../generated/src/Handlers.gen';
 
 // Helper: Convert bytes32 to address (remove leading zeros)
@@ -18,13 +19,14 @@ function bytes32ToAddress(bytes32: string): string {
 // Helper: Check if an address is a FeeAdapter contract
 function isFeeAdapterAddress(address: string): boolean {
   const feeAdapterAddresses = [
-    '0x00000000000000000000000020ff5ea948881d18f7d64b64410ec2b81f8797f4', // V2Ethereum
-    '0x00000000000000000000000065588b1121eb7dd41ba7d82a4f387548381584a9', // V2 Base
-    '0x000000000000000000000000fb1792b0992b9685be041a69a082241ce991f231', // V2 Optimism
-    '0x00000000000000000000000012dc8f91767021760391d691fd4bd2a642aebe2d', // V2 Arbitrum
+    '0x00000000000000000000000020ff5ea948881d18f7d64b64410ec2b81f8797f4', // V2Ethereum (old)
+    '0x00000000000000000000000065588b1121eb7dd41ba7d82a4f387548381584a9', // V2 Base (old)
+    '0x000000000000000000000000fb1792b0992b9685be041a69a082241ce991f231', // V2 Optimism (old)
+    '0x00000000000000000000000012dc8f91767021760391d691fd4bd2a642aebe2d', // V2 Arbitrum (old)
     '0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75', // V1 most chains
     '0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508', //
     '0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1', //
+    '0x00000000000000000000002944f6fef163365a382e9397b582bfbeb7c4f300', // V2 all chains (actual deployed)
   ];
   return feeAdapterAddresses.includes(address.toLowerCase());
 }
@@ -158,7 +160,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     id: _intentId,
     intentId: _intentId,
     queueIdx: _queueIdx,
-    initiator: existingIntent?.initiator || initiator,
+    initiator: initiator, // Always use initiator from IntentAdded event (will be FeeAdapter for FeeAdapter intents)
     receiver,
     inputAsset,
     outputAsset,
@@ -371,7 +373,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     id: _intentId,
     intentId: _intentId,
     queueIdx: _queueIdx,
-    initiator: existingIntent?.initiator || initiator,
+    initiator: initiator, // Always use initiator from IntentAdded event (will be FeeAdapter for FeeAdapter intents)
     receiver,
     inputAsset,
     outputAsset,
@@ -718,9 +720,9 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
   const { _intentId, _initiator, _tokenFee, _nativeFee } = event.params;
   const chainId = event.chainId;
 
-  // Convert to BigInt if needed (event params might be strings or already BigInt)
-  const tokenFee = typeof _tokenFee === 'bigint' ? _tokenFee : BigInt(String(_tokenFee));
-  const nativeFee = typeof _nativeFee === 'bigint' ? _nativeFee : BigInt(String(_nativeFee));
+  // Convert to BigInt - handle all possible input types
+  const tokenFee = BigInt(_tokenFee);
+  const nativeFee = BigInt(_nativeFee);
 
   context.log.info(
     `Processing IntentWithFeesAdded: ${_intentId} on chain ${chainId} (tokenFee: ${tokenFee}, nativeFee: ${nativeFee})`,
@@ -740,7 +742,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
       id: _intentId,
       intentId: _intentId,
       queueIdx: 0n, // Will be updated by IntentAdded
-      initiator: _initiator,
+      initiator: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder - will be set to FeeAdapter address by IntentAdded
       receiver: _initiator, // Placeholder, will be updated
       inputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
       outputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
@@ -794,9 +796,9 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
   const { _intentId, _initiator, _tokenFee, _nativeFee } = event.params;
   const chainId = event.chainId;
 
-  // Convert to BigInt if needed (event params might be strings or already BigInt)
-  const tokenFee = typeof _tokenFee === 'bigint' ? _tokenFee : BigInt(String(_tokenFee));
-  const nativeFee = typeof _nativeFee === 'bigint' ? _nativeFee : BigInt(String(_nativeFee));
+  // Convert to BigInt - handle all possible input types
+  const tokenFee = BigInt(_tokenFee);
+  const nativeFee = BigInt(_nativeFee);
 
   context.log.info(
     `Processing IntentWithFeesAdded (V2): ${_intentId} on chain ${chainId} (tokenFee: ${tokenFee}, nativeFee: ${nativeFee})`,
@@ -816,7 +818,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
       id: _intentId,
       intentId: _intentId,
       queueIdx: 0n, // Will be updated by IntentAdded
-      initiator: _initiator,
+      initiator: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder - will be set to FeeAdapter address by IntentAdded
       receiver: _initiator, // Placeholder, will be updated
       inputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
       outputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
@@ -860,4 +862,84 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
   }
 
   context.log.info(`Successfully processed IntentWithFeesAdded (V2): ${_intentId} on chain ${chainId}`);
+});
+
+/**
+ * Handler for OrderCreated events from FeeAdapterV2
+ * Updates all intents in the order with sender and divided fees
+ */
+FeeAdapterV2_OrderCreated_handler(async ({ event, context }: any) => {
+  const { _orderId, _initiator, _intentIds, _tokenFee, _nativeFee } = event.params;
+  const chainId = event.chainId;
+
+  // Convert to BigInt
+  const totalTokenFee = BigInt(_tokenFee);
+  const totalNativeFee = BigInt(_nativeFee);
+
+  context.log.info(
+    `Processing OrderCreated: ${_orderId} on chain ${chainId} with ${_intentIds.length} intents (totalTokenFee: ${totalTokenFee}, totalNativeFee: ${totalNativeFee})`,
+  );
+
+  // Calculate per-intent fees by dividing by the number of intents
+  const numIntents = BigInt(_intentIds.length);
+  const perIntentTokenFee = totalTokenFee > 0n ? totalTokenFee / numIntents : 0n;
+  const perIntentNativeFee = totalNativeFee > 0n ? totalNativeFee / numIntents : 0n;
+
+  // Update each intent with sender and divided fees
+  for (const _intentId of _intentIds) {
+    let intent = await context.Intent.get(_intentId);
+
+    if (!intent) {
+      // Intent doesn't exist yet - create a placeholder
+      // This can happen when OrderCreated is emitted before IntentAdded events
+      context.log.info(
+        `Intent ${_intentId} not found in OrderCreated, creating placeholder (will be populated by IntentAdded event)`,
+      );
+
+      intent = {
+        id: _intentId,
+        intentId: _intentId,
+        queueIdx: 0n, // Will be updated by IntentAdded
+        initiator: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder - will be set to FeeAdapter address by IntentAdded
+        receiver: _initiator, // Placeholder, will be updated
+        inputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
+        outputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
+        maxFee: 0, // Placeholder
+        amountOutMin: 0n, // Placeholder
+        origin: chainId,
+        nonce: 0n, // Placeholder
+        timestamp: BigInt(event.block.timestamp),
+        ttl: 0n, // Placeholder
+        originAmount: 0n, // Placeholder
+        destinations: [],
+        data: '0x',
+        chainId,
+        blockNumber: BigInt(event.block.number),
+        blockTimestamp: BigInt(event.block.timestamp),
+        transactionHash: event.transaction.hash,
+        sender: _initiator, // msg.sender from OrderCreated event
+        receiveBlockNumber: undefined,
+        isFastPath: false, // Placeholder
+        tokenFee: perIntentTokenFee,
+        nativeFee: perIntentNativeFee,
+        status: 'ADDED' as const,
+      };
+
+      context.Intent.set(intent);
+    } else {
+      // Intent already exists - update it with sender and divided fees
+      context.Intent.set({
+        ...intent,
+        sender: _initiator, // msg.sender from OrderCreated event
+        tokenFee: perIntentTokenFee,
+        nativeFee: perIntentNativeFee,
+      });
+    }
+
+    context.log.info(
+      `Updated intent ${_intentId} in order ${_orderId} with sender and fees (tokenFee: ${perIntentTokenFee}, nativeFee: ${perIntentNativeFee})`,
+    );
+  }
+
+  context.log.info(`Successfully processed OrderCreated: ${_orderId} with ${_intentIds.length} intents`);
 });
