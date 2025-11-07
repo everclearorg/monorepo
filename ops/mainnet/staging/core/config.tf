@@ -89,7 +89,7 @@ locals {
   local_relayer_config = jsonencode({
     logLevel        = "debug"
     network         = "mainnet"
-    environment     = "production"
+    environment     = "staging"
     web3SignerUrl   = "https://${module.relayer_web3signer.service_endpoint}"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
     hub = {
@@ -152,7 +152,7 @@ locals {
   local_watchtower_config = jsonencode({
     logLevel        = "debug"
     network         = "mainnet"
-    environment     = "production"
+    environment     = "staging"
     web3SignerUrl   = "https://${module.watchtower_web3signer.service_endpoint}"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
     hub = {
@@ -221,7 +221,7 @@ locals {
   local_monitor_config = jsonencode({
     logLevel        = "debug"
     network         = "mainnet"
-    environment     = "production"
+    environment     = "staging"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
     hub = {
       domain = "25327",
@@ -323,7 +323,7 @@ locals {
   local_lighthouse_config = jsonencode({
     logLevel        = "debug"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
-    environment     = "production"
+    environment     = "staging"
     network         = "mainnet"
     relayers = [
       {
