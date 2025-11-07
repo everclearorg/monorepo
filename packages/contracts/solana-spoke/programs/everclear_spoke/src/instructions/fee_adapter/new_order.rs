@@ -82,7 +82,6 @@ pub fn new_order(
             p.input_asset,
             p.output_asset,
             p.amount,
-            p.max_fee,
             p.ttl,
             p.destinations.clone(),
             p.data.clone(),
