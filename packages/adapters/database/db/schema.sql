@@ -143,14 +143,14 @@ CREATE FUNCTION public.add_new_tron_destination_intent(rec record) RETURNS boole
 DECLARE
     destination_intent_id TEXT;
     solver TEXT;
-    totalFeeDBPS NUMERIC;
+    amount_out NUMERIC;
     queue_index NUMERIC;
     tx_initiator TEXT;
     receiver TEXT;
     input_asset TEXT;
     output_asset TEXT;
     amount NUMERIC;
-    max_fee INT;
+    amount_out_min NUMERIC;
     origin INT;
     nonce NUMERIC;
     ttl NUMERIC;
@@ -172,7 +172,7 @@ BEGIN
     destination_intent_id := SUBSTRING(rec.topics, 68, 66);
     solver := get_tron_address(SUBSTRING(rec.topics, 135, 66));
 
-    totalFeeDBPS := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
+    amount_out := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
     pos := pos + 64;
     queue_index := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
@@ -184,8 +184,6 @@ BEGIN
     pos := pos + 64;
     output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
-    max_fee := to_int(SUBSTRING(rec.data, pos + 56, 8));
-    pos := pos + 64;
     origin := to_int(SUBSTRING(rec.data, pos + 56, 8));
     pos := pos + 64;
     nonce := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
@@ -195,6 +193,8 @@ BEGIN
     ttl := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
     amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
+    pos := pos + 64;
+    amount_out_min := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
     pos := pos + 64 + 64 + 64; -- Skip destination and data offsets
     destination_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
 
@@ -233,7 +233,9 @@ BEGIN
         gas_price,
         status,
         destinations,
-        ttl
+        ttl,
+        amount_out,
+        amount_out_min
     )
     VALUES (
         destination_intent_id,
@@ -244,7 +246,7 @@ BEGIN
         input_asset,
         output_asset,
         amount,
-        totalFeeDBPS,
+        '0',
         origin,
         '728126428',
         nonce,
@@ -254,12 +256,14 @@ BEGIN
         rec.block_number,
         tx_initiator,
         0,
-        max_fee,
+        '0',
         0,
         1,
         'ADDED',
         destinations,
-        ttl
+        ttl,
+        amount_out,
+        amount_out_min
     )
     ON CONFLICT (id)
     DO UPDATE SET
@@ -285,7 +289,9 @@ BEGIN
         gas_price = EXCLUDED.gas_price,
         status = EXCLUDED.status,
         destinations = EXCLUDED.destinations,
-        ttl = EXCLUDED.ttl;
+        ttl = EXCLUDED.ttl,
+        amount_out = EXCLUDED.amount_out,
+        amount_out_min = EXCLUDED.amount_out_min;
 
     SELECT message_id, message_timestamp INTO msg_id, msg_timestamp
     FROM tron.fill_queue
@@ -736,7 +742,7 @@ DECLARE
     input_asset TEXT;
     output_asset TEXT;
     amount NUMERIC;
-    max_fee INT;
+    amount_out_min NUMERIC;
     origin INT;
     nonce NUMERIC;
     ttl NUMERIC;
@@ -772,8 +778,6 @@ BEGIN
     pos := pos + 64;
     output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
-    max_fee := to_int(SUBSTRING(rec.data, pos + 56, 8));
-    pos := pos + 64;
     origin := to_int(SUBSTRING(rec.data, pos + 56, 8));
     pos := pos + 64;
     nonce := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
@@ -783,6 +787,8 @@ BEGIN
     ttl := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
     amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
+    pos := pos + 64;
+    amount_out_min := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
     pos := pos + 64 + 64 + 64; -- Skip destination and data offsets
     destination_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
 
@@ -827,7 +833,8 @@ BEGIN
         native_fee,
         token_fee,
         fee_adapter_initiator,
-        order_id
+        order_id,
+        amount_out_min
     )
     VALUES (
         origin_intent_id,
@@ -836,7 +843,7 @@ BEGIN
         input_asset,
         output_asset,
         amount,
-        max_fee,
+        '0',
         origin,
         nonce,
         data,
@@ -854,7 +861,8 @@ BEGIN
         fee_native,
         fee_token,
         origin_intent_initiator,
-        origin_order_id
+        origin_order_id,
+        amount_out_min
     )
     ON CONFLICT (id)
     DO UPDATE SET
@@ -881,7 +889,8 @@ BEGIN
         native_fee = EXCLUDED.native_fee,
         token_fee = EXCLUDED.token_fee,
         fee_adapter_initiator = EXCLUDED.fee_adapter_initiator,
-        order_id = EXCLUDED.order_id;
+        order_id = EXCLUDED.order_id,
+        amount_out_min = EXCLUDED.amount_out_min;
 
     SELECT message_id, message_timestamp INTO msg_id, msg_timestamp
     FROM tron.intent_queue
@@ -1717,13 +1726,13 @@ DECLARE
     res BOOLEAN;
 BEGIN
     -- IntentAdded event
-    IF NEW.topics LIKE '0xefe68281645929e2db845c5b42e12f7c73485fb5f18737b7b29379da006fa5f7%' THEN
+    IF NEW.topics LIKE '0x80eb6c87e9da127233fe2ecab8adf29403109adc6bec90147df35eeee0745991%' THEN
         res := add_new_tron_origin_intent(NEW);
         IF res IS FALSE THEN
             RAISE WARNING 'Failed to parse and insert new tron origin intent, transaction %', NEW.transaction_hash;
         END IF;
     -- IntentFilled event
-    ELSIF NEW.topics LIKE '0x11cd513bfc9cb4365a2f38d87c35bea962f9cea1c1fe9c8a9a9488df7d507275%' THEN
+    ELSIF NEW.topics LIKE '0xe3bc4b05ac625e8c55084d86f8bb9a4c1ff02777dccc7ec0f3b3b7e7468cf383%' THEN
         res := add_new_tron_destination_intent(NEW);
         IF res IS FALSE THEN
             RAISE WARNING 'Failed to parse and insert new tron destination intent, transaction %', NEW.transaction_hash;
@@ -5294,4 +5303,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251105153713'),
     ('20251106014319'),
     ('20251110024449'),
-    ('20251110053118');
+    ('20251110053118'),
+    ('20251110182740');
