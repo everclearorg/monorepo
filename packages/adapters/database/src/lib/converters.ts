@@ -81,6 +81,7 @@ export function toOriginIntents(originIntent: OriginIntent): origin_intents.Inse
     token_fee: originIntent.tokenFee,
     fee_adapter_initiator: originIntent.feeAdapterInitiator,
     order_id: originIntent.orderId,
+    is_swap: originIntent.isSwap ?? false,
   };
 }
 export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): OriginIntent {
@@ -113,6 +114,7 @@ export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): O
     tokenFee: originIntent.token_fee ?? undefined,
     feeAdapterInitiator: originIntent.fee_adapter_initiator ?? undefined,
     orderId: originIntent.order_id ?? undefined,
+    isSwap: originIntent.is_swap ?? false,
   };
 }
 
@@ -150,6 +152,7 @@ export function originIntentFromIntent(intent: intents.JSONSelectable): OriginIn
     tokenFee: intent.origin_token_fee ?? undefined,
     feeAdapterInitiator: intent.origin_fee_adapter_initiator ?? undefined,
     orderId: intent.origin_order_id ?? undefined,
+    isSwap: intent.origin_is_swap ?? false,
   };
 }
 
@@ -228,6 +231,7 @@ export function toDestinationIntents(destinationIntent: DestinationIntent): dest
     output_asset: destinationIntent.outputAsset,
     amount: destinationIntent.amount,
     amount_out_min: destinationIntent.amountOutMin,
+    amount_out: destinationIntent.amountOut,
     fee: destinationIntent.fee,
     origin: destinationIntent.origin,
     destinations: destinationIntent.destinations,
@@ -261,6 +265,7 @@ export function fromDestinationIntent(destinationIntent: destination_intents.JSO
     outputAsset: destinationIntent.output_asset,
     amount: destinationIntent.amount,
     amountOutMin: destinationIntent.amount_out_min ?? '0',
+    amountOut: destinationIntent.amount_out ?? '0',
     fee: destinationIntent.fee,
     origin: destinationIntent.origin,
     destinations: destinationIntent.destinations,
@@ -369,6 +374,7 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       tokenFee: invoice.origin_token_fee ?? undefined,
       feeAdapterInitiator: invoice.origin_fee_adapter_initiator ?? undefined,
       orderId: invoice.origin_order_id ?? undefined,
+      isSwap: invoice.origin_is_swap ?? false,
       transactionHash: invoice.origin_transaction_hash!.trim(),
       timestamp: +invoice.origin_timestamp!,
       blockNumber: +invoice.origin_block_number!,

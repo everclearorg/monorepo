@@ -67,6 +67,7 @@ describe('Subgraph Adapter - parse', () => {
       nativeFee: undefined,
       feeAdapterInitiator: undefined,
       orderId: undefined,
+      isSwap: undefined, // Will be computed by cartographer, not from subgraph
     };
 
     it('should work for added intents', async () => {
@@ -80,7 +81,7 @@ describe('Subgraph Adapter - parse', () => {
         ...entity,
         intent: { ...entity.intent, message: { id: messageId } as any },
       });
-      expect(parsed).to.be.deep.eq({ ...expected, messageId, status: TIntentStatus.Dispatched });
+      expect(parsed).to.be.deep.eq({ ...expected, messageId, status: TIntentStatus.Dispatched, isSwap: undefined });
     });
 
     it('should include fee information when present', async () => {
@@ -107,6 +108,7 @@ describe('Subgraph Adapter - parse', () => {
         tokenFee: fees.tokenFee,
         nativeFee: fees.nativeFee,
         feeAdapterInitiator: fees.initiator,
+        isSwap: undefined,
       });
     });
 
@@ -132,6 +134,7 @@ describe('Subgraph Adapter - parse', () => {
       expect(parsed).to.be.deep.eq({
         ...expected,
         orderId: order.id,
+        isSwap: undefined,
       });
     });
 
@@ -174,6 +177,7 @@ describe('Subgraph Adapter - parse', () => {
         nativeFee: fees.nativeFee,
         feeAdapterInitiator: fees.initiator,
         orderId: order.id,
+        isSwap: undefined,
       });
     });
   });
@@ -193,7 +197,8 @@ describe('Subgraph Adapter - parse', () => {
       destinations: entity.intent.destinations,
       origin: domain,
       solver: entity.solver,
-      fee: entity.fee,
+      fee: '0',
+      amountOut: entity.amountOut,
       initiator: entity.intent.initiator,
       nonce: entity.intent.nonce,
       data: entity.intent.data,

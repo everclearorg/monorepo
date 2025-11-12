@@ -77,6 +77,7 @@ export const originIntent = (entity: SpokeAddIntentEventEntity): OriginIntent =>
     nativeFee: entity.intent.fees?.nativeFee ?? undefined,
     feeAdapterInitiator: entity.intent.fees?.initiator ?? undefined,
     orderId: entity.intent.order?.id ?? undefined,
+    isSwap: undefined, // Will be computed by cartographer based on ticker hash comparison
   };
 };
 
@@ -92,7 +93,8 @@ export const destinationIntent = (domain: string, entity: SpokeFillIntentEventEn
     inputAsset: entity.intent.inputAsset,
     outputAsset: entity.intent.outputAsset,
     amount: entity.intent.amount,
-    fee: entity.fee,
+    fee: '0',
+    amountOut: entity.amountOut,
     destinations: entity.intent.destinations,
     origin: entity.intent.origin,
     nonce: StringToNumber(entity.intent.nonce),

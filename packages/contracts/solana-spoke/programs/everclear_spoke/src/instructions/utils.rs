@@ -67,7 +67,7 @@ pub(crate) fn encode_single_intent(intent: &EVMIntent) -> Vec<u8> {
 
     let mut head = Vec::new();
 
-    // Now we write the struct #0 "head," which is 12 * 32 bytes
+    // Now we write the struct #0 "head," which is 13 * 32 bytes
 
     // word0: initiator (bytes32)
     head.extend_from_slice(&intent.initiator);
@@ -81,25 +81,25 @@ pub(crate) fn encode_single_intent(intent: &EVMIntent) -> Vec<u8> {
     // word3: output_asset (bytes32)
     head.extend_from_slice(&intent.output_asset);
 
-    // word4: max_fee => stored in top 3 bytes or simply zero-extended as a 32-byte word
-    // For abi.encode, the entire 32 bytes get used, with the last 3 bytes carrying the value for a uint24
-    head.extend_from_slice(&u256_to_32bytes(u128::from(intent.max_fee)));
-
-    // word5: origin (uint32 => 4 bytes used, the other 28 are zero)
+    // word4: origin (uint32 => 4 bytes used, the other 28 are zero)
     head.extend_from_slice(&u256_to_32bytes(u128::from(intent.origin)));
 
-    // word6: nonce (uint64)
+    // word5: nonce (uint64)
     head.extend_from_slice(&u256_to_32bytes(intent.nonce as u128));
 
-    // word7: timestamp (uint48 => we store in 32 bytes, last 6 bytes used)
+    // word6: timestamp (uint48 => we store in 32 bytes, last 6 bytes used)
     head.extend_from_slice(&u256_to_32bytes(intent.timestamp as u128));
 
-    // word8: ttl (uint48 => same reasoning)
+    // word7: ttl (uint48 => same reasoning)
     head.extend_from_slice(&u256_to_32bytes(intent.ttl as u128));
 
-    // word9: amount (uint256 => already 32 bytes big-endian).
+    // word8: amount (uint256 => already 32 bytes big-endian).
     // In typical abi.encode, we just place it as-is, but ensure it's 32 bytes big-endian
     head.extend_from_slice(&intent.amount);
+
+    // word9: amountOutMin (uint256 => already 32 bytes big-endian)
+    // In typical abi.encode, we just place it as-is, but ensure it's 32 bytes big-endian
+    head.extend_from_slice(&intent.amount_out_min);
 
     // We have 2 dynamic fields => destinations[] and data
     // They each get a 32-byte "offset" word. The offset is from the start of struct #0 head (i.e. offset=0 there)
@@ -204,6 +204,7 @@ fn u256_to_32bytes(val: u128) -> [u8; 32] {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use hex::FromHex;
 
     fn u128_to_u256_be(val: u128) -> [u8; 32] {
         let mut out = [0u8; 32];
@@ -214,7 +215,29 @@ mod tests {
 
     #[test]
     fn test_compute_intent_hash() {
+        // NOTE: this intent data is taken from actual intent from EVM
         let intent = EVMIntent {
+            initiator: <[u8; 32]>::from_hex("00000000000000000000000065588b1121eb7dd41ba7d82a4f387548381584a9").unwrap(),
+            receiver: <[u8; 32]>::from_hex("00000000000000000000000039096a17ba70fe5c1eddb923f940b2e6deae5c3b").unwrap(),
+            input_asset: <[u8; 32]>::from_hex("000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913").unwrap(),
+            output_asset: <[u8; 32]>::from_hex("00000000000000000000000094b008aa00579c1307b0ef2c499ad98a8ce58e58").unwrap(),
+            origin: 8453,
+            nonce: 168,
+            timestamp: 1762404021,
+            ttl: 7200,
+            amount: u128_to_u256_be(422401000000000000),
+            amount_out_min: u128_to_u256_be(422352),
+            destinations: vec![10],
+            data: vec![],
+        };
+        let intent_id = compute_intent_hash(&intent);
+        assert_eq!(
+            hex::encode(intent_id),
+            "d6db7d3cefc524dc4717361e8b77c7cdca1f700971ae36c61823c17a38a7472a"
+        );
+
+        // NOTE: this is a made-up solana intent
+        let solana_intent = EVMIntent {
             initiator: Pubkey::from_str_const("AUgefcX2VZq9v72gqXUg8rgUNxsbHV7RVWuw42yU4LyQ")
                 .to_bytes(),
             receiver: Pubkey::from_str_const("1111111111113FiC6QTSLv7Up9gSeUwhPifXRCoH").to_bytes(),
@@ -222,19 +245,19 @@ mod tests {
                 .to_bytes(),
             output_asset: Pubkey::from_str_const("1111111111112q2Gg8TH19xwTZeyUCme313nZsTQ")
                 .to_bytes(),
-            max_fee: 10000,
             origin: 1399811149,
             nonce: 35,
             timestamp: 1743782830,
             ttl: 0,
             amount: u128_to_u256_be(2000000000000000000),
+            amount_out_min: u128_to_u256_be(0),
             destinations: vec![8453],
             data: vec![],
         };
-        let intent_id = compute_intent_hash(&intent);
+        let intent_id = compute_intent_hash(&solana_intent);
         assert_eq!(
             hex::encode(intent_id),
-            "f8d48e46ed43d8b79f5a48a0f34c2deb5b554a7cb130654425d8385c118d2a7b"
+            "8200900c8aa6b771a0cc3a6936d9313bfb9721f2506d4e6b884813c7f50db86e"
         );
     }
 }

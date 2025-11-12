@@ -113,6 +113,7 @@ export const createOriginIntent = (overrides: Partial<OriginIntent> = {}): Origi
   nativeFee: undefined,
   feeAdapterInitiator: undefined,
   orderId: undefined,
+  isSwap: false, // Defaults to false when stored in database
   ...overrides,
 });
 
@@ -137,6 +138,7 @@ export const createDestinationIntent = (overrides: Partial<DestinationIntent> = 
   solver: mkAddress('0xfffffff'),
   initiator: mkAddress('0x11111'),
   fee: '100',
+  amountOut: '0',
   data: '0x',
   amountOutMin: '50',
   destinations: ['1338'],

@@ -8,6 +8,7 @@ import {
 import { getContext } from '../../context';
 import * as anchor from '@coral-xyz/anchor';
 import idlFile from '../../idl/everclear_spoke.json';
+import stagingIdlFile from '../../idl/everclear_spoke.staging.json';
 
 const MAX_RETRIES = 60;
 
@@ -18,7 +19,7 @@ const MAX_RETRIES = 60;
  */
 export const processSolanaTransactions = async () => {
   const {
-    config: { chains, solana },
+    config: { chains, solana, environment },
     logger,
     adapters: { database },
   } = getContext();
@@ -31,7 +32,12 @@ export const processSolanaTransactions = async () => {
 
   // Check if Solana chain is configured
   const chainConfig = chains[SOLANA_CHAINID];
-  const idl = JSON.parse(JSON.stringify(idlFile));
+  let idl;
+  if (environment === 'production') {
+    idl = JSON.parse(JSON.stringify(idlFile));
+  } else {
+    idl = JSON.parse(JSON.stringify(stagingIdlFile));
+  }
 
   if (!chainConfig) {
     logger.warn('Solana chain not configured', requestContext, methodContext);

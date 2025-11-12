@@ -1376,6 +1376,12 @@ declare module 'zapatos/schema' {
       */
       amount: string;
       /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out: string | null;
+      /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
       * - Nullable, no default
@@ -1545,6 +1551,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       amount: string;
+      /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out: string | null;
       /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
@@ -1716,6 +1728,12 @@ declare module 'zapatos/schema' {
       */
       amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
       * - Nullable, no default
@@ -1886,6 +1904,12 @@ declare module 'zapatos/schema' {
       */
       amount: string | db.Parameter<string> | db.SQLFragment;
       /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
       * - Nullable, no default
@@ -2055,6 +2079,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       amount?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **destination_intents.amount_out**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      amount_out?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
       /**
       * **destination_intents.amount_out_min**
       * - `varchar` in database
@@ -4057,6 +4087,12 @@ declare module 'zapatos/schema' {
       */
       destination_amount: string | null;
       /**
+      * **intents.destination_amount_out**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      destination_amount_out: string | null;
+      /**
       * **intents.destination_auto_id**
       * - `int8` in database
       * - Materialized view column
@@ -4375,6 +4411,12 @@ declare module 'zapatos/schema' {
       */
       origin_input_asset: string | null;
       /**
+      * **intents.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap: boolean | null;
+      /**
       * **intents.origin_max_fee**
       * - `varchar` in database
       * - Materialized view column
@@ -4568,6 +4610,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       destination_amount: string | null;
+      /**
+      * **intents.destination_amount_out**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      destination_amount_out: string | null;
       /**
       * **intents.destination_auto_id**
       * - `int8` in database
@@ -4887,6 +4935,12 @@ declare module 'zapatos/schema' {
       */
       origin_input_asset: string | null;
       /**
+      * **intents.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap: boolean | null;
+      /**
       * **intents.origin_max_fee**
       * - `varchar` in database
       * - Materialized view column
@@ -5080,6 +5134,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       destination_amount?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **intents.destination_amount_out**
+      * - `varchar` in database
+      * - Materialized view column
+      */
+      destination_amount_out?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.destination_auto_id**
       * - `int8` in database
@@ -5398,6 +5458,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **intents.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
       /**
       * **intents.origin_max_fee**
       * - `varchar` in database
@@ -5744,6 +5810,12 @@ declare module 'zapatos/schema' {
       */
       origin_input_asset: string | null;
       /**
+      * **invoices.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap: boolean | null;
+      /**
       * **invoices.origin_max_fee**
       * - `varchar` in database
       * - Materialized view column
@@ -5980,6 +6052,12 @@ declare module 'zapatos/schema' {
       */
       origin_input_asset: string | null;
       /**
+      * **invoices.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap: boolean | null;
+      /**
       * **invoices.origin_max_fee**
       * - `varchar` in database
       * - Materialized view column
@@ -6215,6 +6293,12 @@ declare module 'zapatos/schema' {
       * - Materialized view column
       */
       origin_input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **invoices.origin_is_swap**
+      * - `bool` in database
+      * - Materialized view column
+      */
+      origin_is_swap?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
       /**
       * **invoices.origin_max_fee**
       * - `varchar` in database
@@ -7757,6 +7841,12 @@ declare module 'zapatos/schema' {
       */
       input_asset: string;
       /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap: boolean;
+      /**
       * **origin_intents.max_fee**
       * - `varchar` in database
       * - `NOT NULL`, no default
@@ -7926,6 +8016,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       input_asset: string;
+      /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap: boolean;
       /**
       * **origin_intents.max_fee**
       * - `varchar` in database
@@ -8097,6 +8193,12 @@ declare module 'zapatos/schema' {
       */
       input_asset?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
+      /**
       * **origin_intents.max_fee**
       * - `varchar` in database
       * - `NOT NULL`, no default
@@ -8267,6 +8369,12 @@ declare module 'zapatos/schema' {
       */
       input_asset: string | db.Parameter<string> | db.SQLFragment;
       /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap?: boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment;
+      /**
       * **origin_intents.max_fee**
       * - `varchar` in database
       * - `NOT NULL`, no default
@@ -8436,6 +8544,12 @@ declare module 'zapatos/schema' {
       * - `NOT NULL`, no default
       */
       input_asset?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **origin_intents.is_swap**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      is_swap?: boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment>;
       /**
       * **origin_intents.max_fee**
       * - `varchar` in database
@@ -11472,23 +11586,29 @@ declare module 'zapatos/schema' {
       */
       id: number;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count: number;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count: number;
+      pending_inventory: string;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count: number;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory: string;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status: string;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
@@ -11528,23 +11648,29 @@ declare module 'zapatos/schema' {
       */
       id: number;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count: number;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count: number;
+      pending_inventory: string;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count: number;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory: string;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status: string;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
@@ -11584,23 +11710,29 @@ declare module 'zapatos/schema' {
       */
       id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      pending_inventory?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
@@ -11640,23 +11772,29 @@ declare module 'zapatos/schema' {
       */
       id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count: number | db.Parameter<number> | db.SQLFragment;
+      pending_inventory: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory: string | db.Parameter<string> | db.SQLFragment;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status: string | db.Parameter<string> | db.SQLFragment;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
@@ -11696,23 +11834,29 @@ declare module 'zapatos/schema' {
       */
       id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
       /**
-      * **swap_inventory_snapshots.pending_intent_count**
+      * **swap_inventory_snapshots.pending_count**
       * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      pending_count?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.pending_inventory**
+      * - `varchar` in database
       * - `NOT NULL`, no default
       */
-      pending_intent_count?: number | db.Parameter<number> | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment>;
+      pending_inventory?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **swap_inventory_snapshots.reserved_count**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      reserved_count?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
       /**
       * **swap_inventory_snapshots.reserved_inventory**
       * - `varchar` in database
       * - `NOT NULL`, no default
       */
       reserved_inventory?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
-      /**
-      * **swap_inventory_snapshots.threshold_status**
-      * - `varchar` in database
-      * - `NOT NULL`, no default
-      */
-      threshold_status?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
       /**
       * **swap_inventory_snapshots.timestamp**
       * - `int8` in database
