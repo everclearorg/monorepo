@@ -182,8 +182,7 @@ export class TronKeyManager {
    */
   private async getFromHDWallet(): Promise<string | null> {
     const mnemonic = process.env.TRON_MNEMONIC;
-    // Tron BIP44 path
-    // const keyPath = process.env.TRON_HD_PATH || "m/44'/195'/0'/0/0";
+    const keyPath = process.env.TRON_HD_PATH || "m/44'/195'/0'/0/0"; // Tron BIP44 path
 
     if (!mnemonic) {
       return null;
