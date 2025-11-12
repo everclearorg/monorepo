@@ -6,7 +6,7 @@ locals {
   cartographer_monitor_config_param_name = "cartographer-monitor-${var.environment}-${var.stage}-config"
 
   cartographer_env_vars = {
-    DATABASE_URL        = "postgres://${var.postgres_user}:${var.postgres_password}@invalid-db-host.local:5432/everclear",
+    DATABASE_URL        = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear",
     ENVIRONMENT         = var.environment,
     EVERCLEAR_CONFIG    = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.json",
     STAGE               = var.stage,
@@ -19,7 +19,7 @@ locals {
 
   postgrest_env_vars = [
     { name = "PGRST_ADMIN_SERVER_PORT", value = "3001" },
-    { name = "PGRST_DB_URI", value = "postgres://${var.postgres_user}:${var.postgres_password}@invalid-db-host.local:5432/everclear" },
+    { name = "PGRST_DB_URI", value = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear" },
     { name = "PGRST_DB_SCHEMA", value = "public" },
     { name = "PGRST_DB_ANON_ROLE", value = "query" },
     { name = "PGRST_JWT_SECRET", value = "${var.postgrest_jwt_secret}"},
@@ -31,7 +31,7 @@ locals {
   local_cartographer_config = jsonencode({
     logLevel = "debug"
     environment = "production" 
-    databaseUrl = "postgres://${var.postgres_user}:${var.postgres_password}@invalid-db-host.local:5432/everclear"
+    databaseUrl = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear"
     healthUrls = {
       intents     = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_intents_heartbeat}"
       invoices     = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_invoices_heartbeat}"
