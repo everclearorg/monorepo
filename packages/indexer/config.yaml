@@ -33,6 +33,7 @@ contracts:
     handler: ./src/EventHandlers.ts
     events:
       - event: IntentWithFeesAdded
+      - event: OrderCreated
 
 # Define all networks
 # NOTE: we are using reorg-safe values from hyperlane: https://docs.hyperlane.xyz/docs/reference/addresses/validators/latencies
@@ -48,7 +49,7 @@ networks:
       - name: EverclearSpokeV5
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0x30aE75cECC2c06da9f881fbD105a3A5e7C11625c
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
 
   - id: 42161
     start_block: 0
@@ -61,7 +62,7 @@ networks:
       - name: EverclearSpokeV5
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0x30aE75cECC2c06da9f881fbD105a3A5e7C11625c
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
         
   - id: 10
     start_block: 0
@@ -74,7 +75,7 @@ networks:
       - name: EverclearSpokeV5
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0x30aE75cECC2c06da9f881fbD105a3A5e7C11625c
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
 
   - id: 8453
     start_block: 0
@@ -87,7 +88,7 @@ networks:
       - name: EverclearSpokeV5
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0x30aE75cECC2c06da9f881fbD105a3A5e7C11625c
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
 
   - id: 56
     start_block: 0
@@ -101,7 +102,7 @@ networks:
       - name: EverclearSpokeV5
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0x30aE75cECC2c06da9f881fbD105a3A5e7C11625c
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
 
   - id: 59144
     start_block: 0
@@ -114,7 +115,7 @@ networks:
       - name: EverclearSpokeV5
         address: 0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0x15c9688Ec13308aCf630ca5438efB2cBE7e1e98a
+        address: 0xAa7ee09f745a3c5De329EB0CD67878Ba87B70Ffe
 
   - id: 137
     start_block: 0
@@ -128,7 +129,7 @@ networks:
       - name: EverclearSpokeV5
         address: 0x7189C59e245135696bFd2906b56607755F84F3fD  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0x30aE75cECC2c06da9f881fbD105a3A5e7C11625c
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
 
   - id: 43114
     start_block: 0
@@ -141,7 +142,7 @@ networks:
       - name: EverclearSpokeV5
         address: 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0x30aE75cECC2c06da9f881fbD105a3A5e7C11625c
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
 
   - id: 130
     start_block: 0
@@ -154,6 +155,6 @@ networks:
       - name: EverclearSpokeV5
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
-        address: 0xd7CED74eec0CE5b6661578eD3924A3c75e0865E2
+        address: 0x877Fd0A881B63eBE413124EeE6abbCD7E82cf10b
 
 rollback_on_reorg: true
