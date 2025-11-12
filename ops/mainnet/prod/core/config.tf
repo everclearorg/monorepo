@@ -126,7 +126,7 @@ locals {
       }
       "48900" = {
         providers = [
-          "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
           "https://zircuit1-mainnet.p2pify.com"
         ]
       }
@@ -167,7 +167,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },
@@ -281,7 +280,7 @@ locals {
       }
       "48900" = {
         providers = [
-          "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
           "https://zircuit1-mainnet.p2pify.com"
         ]
       }
@@ -322,7 +321,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },
@@ -412,8 +410,8 @@ locals {
       }
       "48900" = {
         providers = [
-          "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
-          # "https://zircuit1-mainnet.p2pify.com"
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
+          "https://zircuit1-mainnet.p2pify.com"
         ]
       }
       "81457" = {
@@ -462,7 +460,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },
@@ -657,8 +654,8 @@ locals {
       }
       "48900" = {
         providers = [
-          "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
-          #"https://zircuit1-mainnet.p2pify.com"
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
+          "https://zircuit1-mainnet.p2pify.com"
         ]
       }
       "81457" = {
@@ -703,7 +700,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },
