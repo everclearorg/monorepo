@@ -1,7 +1,7 @@
 locals {
 
   base_domain              = "everclear.ninja"
-  default_db_endpoint      = "rds-postgres-cartographer-chimera.c64s9irwuemi.us-west-2.rds.amazonaws.com"
+  default_db_endpoint      = "invalid-db-host.local"
   default_db_url           = "postgresql://${var.postgres_user}:${var.postgres_password}@${local.default_db_endpoint}:5432/everclear"
 
   lighthouse_intent_config_param_name = "lighthouse-intent-${var.environment}-${var.stage}-config"
