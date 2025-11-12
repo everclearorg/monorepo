@@ -89,7 +89,7 @@ locals {
   local_relayer_config = jsonencode({
     logLevel        = "debug"
     network         = "mainnet"
-    environment     = "production"
+    environment     = "staging"
     web3SignerUrl   = "https://${module.relayer_web3signer.service_endpoint}"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
     hub = {
@@ -109,11 +109,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
@@ -152,7 +152,7 @@ locals {
   local_watchtower_config = jsonencode({
     logLevel        = "debug"
     network         = "mainnet"
-    environment     = "production"
+    environment     = "staging"
     web3SignerUrl   = "https://${module.watchtower_web3signer.service_endpoint}"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
     hub = {
@@ -172,11 +172,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
@@ -221,7 +221,7 @@ locals {
   local_monitor_config = jsonencode({
     logLevel        = "debug"
     network         = "mainnet"
-    environment     = "production"
+    environment     = "staging"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
     hub = {
       domain = "25327",
@@ -240,11 +240,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
@@ -323,7 +323,7 @@ locals {
   local_lighthouse_config = jsonencode({
     logLevel        = "debug"
     everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
-    environment     = "production"
+    environment     = "staging"
     network         = "mainnet"
     relayers = [
       {
@@ -340,7 +340,7 @@ locals {
     thresholds = {
       1          = { maxAge = 60, size = 1 },
       10         = { maxAge = 60, size = 1 },
-      # 42161      = { maxAge = 60, size = 1 },
+      42161      = { maxAge = 60, size = 1 },
       8453       = { maxAge = 60, size = 1 },
       25327      = { maxAge = 60, size = 1 },
       1399811149 = { maxAge = 60, size = 1 },
@@ -363,11 +363,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"

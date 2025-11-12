@@ -60,7 +60,8 @@ export function toOriginIntents(originIntent: OriginIntent): origin_intents.Inse
     input_asset: originIntent.inputAsset,
     output_asset: originIntent.outputAsset,
     amount: originIntent.amount,
-    max_fee: originIntent.maxFee.toString(),
+    max_fee: '0', // Deprecated, keep for backward compatibility
+    amount_out_min: originIntent.amountOutMin,
     destinations: originIntent.destinations,
     origin: originIntent.origin,
     nonce: originIntent.nonce,
@@ -80,6 +81,7 @@ export function toOriginIntents(originIntent: OriginIntent): origin_intents.Inse
     token_fee: originIntent.tokenFee,
     fee_adapter_initiator: originIntent.feeAdapterInitiator,
     order_id: originIntent.orderId,
+    is_swap: originIntent.isSwap ?? false,
   };
 }
 export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): OriginIntent {
@@ -93,7 +95,7 @@ export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): O
     inputAsset: originIntent.input_asset,
     outputAsset: originIntent.output_asset,
     amount: originIntent.amount,
-    maxFee: +originIntent.max_fee,
+    amountOutMin: originIntent.amount_out_min ?? '0',
     destinations: originIntent.destinations,
     origin: originIntent.origin,
     nonce: +originIntent.nonce,
@@ -112,6 +114,7 @@ export function fromOriginIntent(originIntent: origin_intents.JSONSelectable): O
     tokenFee: originIntent.token_fee ?? undefined,
     feeAdapterInitiator: originIntent.fee_adapter_initiator ?? undefined,
     orderId: originIntent.order_id ?? undefined,
+    isSwap: originIntent.is_swap ?? false,
   };
 }
 
@@ -130,7 +133,7 @@ export function originIntentFromIntent(intent: intents.JSONSelectable): OriginIn
     inputAsset: intent.origin_input_asset!,
     outputAsset: intent.origin_output_asset!,
     amount: intent.origin_amount!,
-    maxFee: +intent.origin_max_fee!,
+    amountOutMin: intent.origin_amount_out_min ?? '0',
     destinations: intent.origin_destinations!,
     origin: intent.origin_origin!,
     nonce: +intent.origin_nonce!,
@@ -149,6 +152,7 @@ export function originIntentFromIntent(intent: intents.JSONSelectable): OriginIn
     tokenFee: intent.origin_token_fee ?? undefined,
     feeAdapterInitiator: intent.origin_fee_adapter_initiator ?? undefined,
     orderId: intent.origin_order_id ?? undefined,
+    isSwap: intent.origin_is_swap ?? false,
   };
 }
 
@@ -226,13 +230,15 @@ export function toDestinationIntents(destinationIntent: DestinationIntent): dest
     input_asset: destinationIntent.inputAsset,
     output_asset: destinationIntent.outputAsset,
     amount: destinationIntent.amount,
+    amount_out_min: destinationIntent.amountOutMin,
+    amount_out: destinationIntent.amountOut,
     fee: destinationIntent.fee,
     origin: destinationIntent.origin,
     destinations: destinationIntent.destinations,
     filled_domain: destinationIntent.destination,
     nonce: destinationIntent.nonce,
     data: destinationIntent.data,
-    max_fee: destinationIntent.maxFee.toString(),
+    max_fee: '0', // Deprecated, keep for backward compatibility
     ttl: destinationIntent.ttl,
     return_data: destinationIntent.returnData,
 
@@ -258,13 +264,14 @@ export function fromDestinationIntent(destinationIntent: destination_intents.JSO
     inputAsset: destinationIntent.input_asset,
     outputAsset: destinationIntent.output_asset,
     amount: destinationIntent.amount,
+    amountOutMin: destinationIntent.amount_out_min ?? '0',
+    amountOut: destinationIntent.amount_out ?? '0',
     fee: destinationIntent.fee,
     origin: destinationIntent.origin,
     destinations: destinationIntent.destinations,
     destination: destinationIntent.filled_domain,
     nonce: +destinationIntent.nonce,
     data: destinationIntent.data ?? '0x',
-    maxFee: +destinationIntent.max_fee,
     ttl: +destinationIntent.ttl,
     returnData: destinationIntent.return_data ?? undefined,
 
@@ -357,7 +364,7 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       inputAsset: invoice.origin_input_asset!,
       outputAsset: invoice.origin_output_asset!,
       amount: invoice.origin_amount!,
-      maxFee: +invoice.origin_max_fee!,
+      amountOutMin: invoice.origin_amount_out_min ?? '0',
       destinations: invoice.origin_destinations!,
       origin: invoice.origin_origin!,
       nonce: +invoice.origin_nonce!,
@@ -367,6 +374,7 @@ export function fromInvoices(invoice: invoices.JSONSelectable): Invoice {
       tokenFee: invoice.origin_token_fee ?? undefined,
       feeAdapterInitiator: invoice.origin_fee_adapter_initiator ?? undefined,
       orderId: invoice.origin_order_id ?? undefined,
+      isSwap: invoice.origin_is_swap ?? false,
       transactionHash: invoice.origin_transaction_hash!.trim(),
       timestamp: +invoice.origin_timestamp!,
       blockNumber: +invoice.origin_block_number!,

@@ -18,7 +18,7 @@ export const INTENT_FIELDS = `
     receiver
     inputAsset
     outputAsset
-    maxFee
+    amountOutMin
     origin
     timestamp
     destinations
@@ -246,7 +246,8 @@ export type SpokeFillIntentEventEntity = {
   id: string;
   intent: SpokeDestinationIntentEntity;
   solver: string;
-  fee: string;
+  receiver: string;
+  amountOut: string;
 
   transactionHash: string;
   timestamp: number;
@@ -262,7 +263,8 @@ export const SPOKE_FILL_INTENT_EVENT_ENTITY = `
       ${SPOKE_DESTINATION_INTENT_ENTITY}
     }
     solver
-    fee
+    receiver
+    amountOut
 
     transactionHash
     timestamp

@@ -80,9 +80,14 @@ export class TronKeyManager {
     const privateKey = await this.getPrivateKey();
     const tronWeb = createTronWeb(privateKey, 'https://api.trongrid.io');
 
+    // Validate that defaultAddress is properly set
+    if (!tronWeb.defaultAddress.hex || !tronWeb.defaultAddress.base58) {
+      throw new Error('Failed to derive Tron address from private key');
+    }
+
     this.cachedKeyPair = {
       privateKey,
-      publicKey: tronWeb.defaultAddress.hex,
+      publicKey: tronWeb.defaultAddress.hex as string,
       address: {
         hex: tronWeb.defaultAddress.hex as string,
         base58: tronWeb.defaultAddress.base58 as string,

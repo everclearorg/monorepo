@@ -125,7 +125,7 @@ export async function verifyMessage(message: string, signature: string): Promise
 /**
  * Create a TronWeb instance with private key
  */
-export function createTronWeb(privateKey: string, fullHost: string = 'https://api.trongrid.io'): any {
+export function createTronWeb(privateKey: string, fullHost: string = 'https://api.trongrid.io'): TronWeb {
   const tronWeb = new TronWeb({
     fullHost,
     privateKey,

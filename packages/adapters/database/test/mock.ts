@@ -95,7 +95,7 @@ export const createOriginIntent = (overrides: Partial<OriginIntent> = {}): Origi
   inputAsset: mkAddress('0x456'),
   outputAsset: mkAddress('0x789'),
   amount: '100',
-  maxFee: 100,
+  amountOutMin: '50',
   destinations: ['1338'],
   ttl: 10000,
   origin: '1337',
@@ -113,6 +113,7 @@ export const createOriginIntent = (overrides: Partial<OriginIntent> = {}): Origi
   nativeFee: undefined,
   feeAdapterInitiator: undefined,
   orderId: undefined,
+  isSwap: false, // Defaults to false when stored in database
   ...overrides,
 });
 
@@ -137,8 +138,9 @@ export const createDestinationIntent = (overrides: Partial<DestinationIntent> = 
   solver: mkAddress('0xfffffff'),
   initiator: mkAddress('0x11111'),
   fee: '100',
+  amountOut: '0',
   data: '0x',
-  maxFee: 500,
+  amountOutMin: '50',
   destinations: ['1338'],
   ttl: 10000,
   returnData: '0x',

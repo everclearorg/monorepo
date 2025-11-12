@@ -19,7 +19,7 @@
         "build": "tsc --build ./tsconfig.json",
         "purge": "yarn clean && rimraf ./coverage ./node_modules",
         "tsp": "yarn run tsp:root \"$@\" --cwd $(pwd)",
-        "docker:start:postgres": "docker run --name cartographer-db --rm -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=qwerty ghcr.io/connext/database:sha-67ebbe2",
+        "docker:start:postgres": "docker run --name cartographer-db --rm -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=qwerty db:latest",
         "dbmate": "dbmate",
         "zapatos": "zapatos",
         "version": "yarn version"

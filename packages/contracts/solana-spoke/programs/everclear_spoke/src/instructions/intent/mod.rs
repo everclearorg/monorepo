@@ -12,12 +12,12 @@ pub struct EVMIntent {
     pub receiver: [u8; 32],
     pub input_asset: [u8; 32],
     pub output_asset: [u8; 32],
-    pub max_fee: u32, // actually uint24 in Solidity
     pub origin: u32,
     pub nonce: u64,
     pub timestamp: u64,   // actually uint48 in Solidity
     pub ttl: u64,         // actually uint48 in Solidity
     pub amount: [u8; 32], // big-endian, matching typical EVM usage
+    pub amount_out_min: [u8; 32], // uint256
     pub destinations: Vec<u32>,
     pub data: Vec<u8>,
 }
@@ -40,12 +40,12 @@ fn encode_array_of_one_intent(intent: &EVMIntent) -> Vec<u8> {
     //   word1: receiver  (bytes32)
     //   word2: input_asset (bytes32)
     //   word3: output_asset (bytes32)
-    //   word4: max_fee (uint24 => but zero-extended to 32 bytes)
-    //   word5: origin (uint32)
-    //   word6: nonce (uint64)
-    //   word7: timestamp (uint48 => but zero-extended to 32 bytes)
-    //   word8: ttl (uint48 => but zero-extended to 32 bytes)
-    //   word9: amount (uint256 => 32 bytes as is)
+    //   word4: origin (uint32)
+    //   word5: nonce (uint64)
+    //   word6: timestamp (uint48 => but zero-extended to 32 bytes)
+    //   word7: ttl (uint48 => but zero-extended to 32 bytes)
+    //   word8: amount (uint256 => 32 bytes as is)
+    //   word9: amountOutMin (uint256 => 32 bytes as is)
     //   word10: offset to destinations (dynamic array) from start of struct #0 head
     //   word11: offset to data (dynamic bytes) from start of struct #0 head
     //

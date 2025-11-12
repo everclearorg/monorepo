@@ -81,13 +81,13 @@ contract TestEverclearSpoke is EverclearSpoke {
 
   function getBalance(
     bytes32 _asset
-  ) public returns (uint256 _amount) {
+  ) public view returns (uint256 _amount) {
     _amount = IERC20(_asset.toAddress()).balanceOf(address(this));
   }
 
   function getBalance(
     address _asset
-  ) public returns (uint256 _amount) {
+  ) public view returns (uint256 _amount) {
     _amount = IERC20(_asset).balanceOf(address(this));
   }
 
@@ -290,7 +290,7 @@ contract BaseTest is TestExtended {
 
   function _getDestinations(
     uint32 _destination
-  ) internal view returns (uint32[] memory _destinations) {
+  ) internal pure returns (uint32[] memory _destinations) {
     uint32[] memory _destinations = new uint32[](1);
     _destinations[0] = _destination;
     return _destinations;

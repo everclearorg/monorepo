@@ -1,3 +1,6 @@
+-- Dumped from database version 16.10 (Debian 16.10-1.pgdg13+1)
+-- Dumped by pg_dump version 16.10 (Ubuntu 16.10-1.pgdg22.04+1)
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -28,13 +31,6 @@ COMMENT ON EXTENSION pg_cron IS 'Job scheduler for PostgreSQL';
 --
 
 CREATE SCHEMA crypto;
-
-
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
--- *not* creating schema, since initdb creates it
 
 
 --
@@ -147,14 +143,14 @@ CREATE FUNCTION public.add_new_tron_destination_intent(rec record) RETURNS boole
 DECLARE
     destination_intent_id TEXT;
     solver TEXT;
-    totalFeeDBPS NUMERIC;
+    amount_out NUMERIC;
     queue_index NUMERIC;
     tx_initiator TEXT;
     receiver TEXT;
     input_asset TEXT;
     output_asset TEXT;
     amount NUMERIC;
-    max_fee INT;
+    amount_out_min NUMERIC;
     origin INT;
     nonce NUMERIC;
     ttl NUMERIC;
@@ -176,7 +172,7 @@ BEGIN
     destination_intent_id := SUBSTRING(rec.topics, 68, 66);
     solver := get_tron_address(SUBSTRING(rec.topics, 135, 66));
 
-    totalFeeDBPS := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
+    amount_out := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
     pos := pos + 64;
     queue_index := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64 + 64;
@@ -188,8 +184,6 @@ BEGIN
     pos := pos + 64;
     output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
-    max_fee := to_int(SUBSTRING(rec.data, pos + 56, 8));
-    pos := pos + 64;
     origin := to_int(SUBSTRING(rec.data, pos + 56, 8));
     pos := pos + 64;
     nonce := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
@@ -199,6 +193,8 @@ BEGIN
     ttl := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
     amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
+    pos := pos + 64;
+    amount_out_min := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
     pos := pos + 64 + 64 + 64; -- Skip destination and data offsets
     destination_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
 
@@ -237,7 +233,9 @@ BEGIN
         gas_price,
         status,
         destinations,
-        ttl
+        ttl,
+        amount_out,
+        amount_out_min
     )
     VALUES (
         destination_intent_id,
@@ -248,7 +246,7 @@ BEGIN
         input_asset,
         output_asset,
         amount,
-        totalFeeDBPS,
+        '0',
         origin,
         '728126428',
         nonce,
@@ -258,12 +256,14 @@ BEGIN
         rec.block_number,
         tx_initiator,
         0,
-        max_fee,
+        '0',
         0,
         1,
         'ADDED',
         destinations,
-        ttl
+        ttl,
+        amount_out,
+        amount_out_min
     )
     ON CONFLICT (id)
     DO UPDATE SET
@@ -289,7 +289,9 @@ BEGIN
         gas_price = EXCLUDED.gas_price,
         status = EXCLUDED.status,
         destinations = EXCLUDED.destinations,
-        ttl = EXCLUDED.ttl;
+        ttl = EXCLUDED.ttl,
+        amount_out = EXCLUDED.amount_out,
+        amount_out_min = EXCLUDED.amount_out_min;
 
     SELECT message_id, message_timestamp INTO msg_id, msg_timestamp
     FROM tron.fill_queue
@@ -740,7 +742,7 @@ DECLARE
     input_asset TEXT;
     output_asset TEXT;
     amount NUMERIC;
-    max_fee INT;
+    amount_out_min NUMERIC;
     origin INT;
     nonce NUMERIC;
     ttl NUMERIC;
@@ -776,8 +778,6 @@ BEGIN
     pos := pos + 64;
     output_asset := '0x' || SUBSTRING(rec.data, pos, 64);
     pos := pos + 64;
-    max_fee := to_int(SUBSTRING(rec.data, pos + 56, 8));
-    pos := pos + 64;
     origin := to_int(SUBSTRING(rec.data, pos + 56, 8));
     pos := pos + 64;
     nonce := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
@@ -787,6 +787,8 @@ BEGIN
     ttl := to_numeric(SUBSTRING(rec.data, pos + 48, 16));
     pos := pos + 64;
     amount := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
+    pos := pos + 64;
+    amount_out_min := to_numeric(SUBSTRING(rec.data, pos + 32, 32));
     pos := pos + 64 + 64 + 64; -- Skip destination and data offsets
     destination_count := to_int(SUBSTRING(rec.data, pos + 56, 8));
 
@@ -831,7 +833,8 @@ BEGIN
         native_fee,
         token_fee,
         fee_adapter_initiator,
-        order_id
+        order_id,
+        amount_out_min
     )
     VALUES (
         origin_intent_id,
@@ -840,7 +843,7 @@ BEGIN
         input_asset,
         output_asset,
         amount,
-        max_fee,
+        '0',
         origin,
         nonce,
         data,
@@ -858,7 +861,8 @@ BEGIN
         fee_native,
         fee_token,
         origin_intent_initiator,
-        origin_order_id
+        origin_order_id,
+        amount_out_min
     )
     ON CONFLICT (id)
     DO UPDATE SET
@@ -885,7 +889,8 @@ BEGIN
         native_fee = EXCLUDED.native_fee,
         token_fee = EXCLUDED.token_fee,
         fee_adapter_initiator = EXCLUDED.fee_adapter_initiator,
-        order_id = EXCLUDED.order_id;
+        order_id = EXCLUDED.order_id,
+        amount_out_min = EXCLUDED.amount_out_min;
 
     SELECT message_id, message_timestamp INTO msg_id, msg_timestamp
     FROM tron.intent_queue
@@ -1721,13 +1726,13 @@ DECLARE
     res BOOLEAN;
 BEGIN
     -- IntentAdded event
-    IF NEW.topics LIKE '0xefe68281645929e2db845c5b42e12f7c73485fb5f18737b7b29379da006fa5f7%' THEN
+    IF NEW.topics LIKE '0x80eb6c87e9da127233fe2ecab8adf29403109adc6bec90147df35eeee0745991%' THEN
         res := add_new_tron_origin_intent(NEW);
         IF res IS FALSE THEN
             RAISE WARNING 'Failed to parse and insert new tron origin intent, transaction %', NEW.transaction_hash;
         END IF;
     -- IntentFilled event
-    ELSIF NEW.topics LIKE '0x11cd513bfc9cb4365a2f38d87c35bea962f9cea1c1fe9c8a9a9488df7d507275%' THEN
+    ELSIF NEW.topics LIKE '0xe3bc4b05ac625e8c55084d86f8bb9a4c1ff02777dccc7ec0f3b3b7e7468cf383%' THEN
         res := add_new_tron_destination_intent(NEW);
         IF res IS FALSE THEN
             RAISE WARNING 'Failed to parse and insert new tron destination intent, transaction %', NEW.transaction_hash;
@@ -1949,7 +1954,9 @@ CREATE TABLE public.destination_intents (
     status public.intent_status DEFAULT 'NONE'::public.intent_status NOT NULL,
     destinations character varying(66)[] NOT NULL,
     ttl bigint NOT NULL,
-    return_data character varying
+    return_data character varying,
+    amount_out_min character varying(255),
+    amount_out character varying(255)
 );
 
 
@@ -2028,7 +2035,9 @@ CREATE TABLE public.origin_intents (
     native_fee character varying(255),
     token_fee character varying(255),
     fee_adapter_initiator character varying(66),
-    order_id character varying(66)
+    order_id character varying(66),
+    amount_out_min character varying(255),
+    is_swap boolean DEFAULT false NOT NULL
 );
 
 
@@ -2060,93 +2069,184 @@ CREATE TABLE public.settlement_intents (
 --
 
 CREATE MATERIALIZED VIEW public.intents AS
- SELECT origin_intents.id,
-    origin_intents.queue_idx AS origin_queue_idx,
-    origin_intents.message_id AS origin_message_id,
-    origin_intents.status AS origin_status,
-    origin_intents.initiator AS origin_initiator,
-    origin_intents.receiver AS origin_receiver,
-    origin_intents.input_asset AS origin_input_asset,
-    origin_intents.output_asset AS origin_output_asset,
-    origin_intents.amount AS origin_amount,
-    origin_intents.max_fee AS origin_max_fee,
-    origin_intents.origin AS origin_origin,
-    origin_intents.destinations AS origin_destinations,
-    origin_intents.ttl AS origin_ttl,
-    origin_intents.nonce AS origin_nonce,
-    origin_intents.data AS origin_data,
-    origin_intents.transaction_hash AS origin_transaction_hash,
-    origin_intents."timestamp" AS origin_timestamp,
-    origin_intents.block_number AS origin_block_number,
-    origin_intents.gas_limit AS origin_gas_limit,
-    origin_intents.gas_price AS origin_gas_price,
-    origin_intents.tx_origin AS origin_tx_origin,
-    origin_intents.tx_nonce AS origin_tx_nonce,
-    origin_intents.auto_id AS origin_auto_id,
-    origin_intents.native_fee AS origin_native_fee,
-    origin_intents.token_fee AS origin_token_fee,
-    origin_intents.fee_adapter_initiator AS origin_fee_adapter_initiator,
-    origin_intents.order_id AS origin_order_id,
-    destination_intents.queue_idx AS destination_queue_idx,
-    destination_intents.message_id AS destination_message_id,
-    destination_intents.status AS destination_status,
-    destination_intents.initiator AS destination_initiator,
-    destination_intents.receiver AS destination_receiver,
-    destination_intents.solver AS destination_solver,
-    destination_intents.input_asset AS destination_input_asset,
-    destination_intents.output_asset AS destination_output_asset,
-    destination_intents.amount AS destination_amount,
-    destination_intents.fee AS destination_fee,
-    destination_intents.origin AS destination_origin,
-    destination_intents.destinations AS destination_destinations,
-    destination_intents.ttl AS destination_ttl,
-    destination_intents.filled_domain AS destination_filled,
-    destination_intents.nonce AS destination_nonce,
-    destination_intents.data AS destination_data,
-    destination_intents.transaction_hash AS destination_transaction_hash,
-    destination_intents."timestamp" AS destination_timestamp,
-    destination_intents.block_number AS destination_block_number,
-    destination_intents.gas_limit AS destination_gas_limit,
-    destination_intents.gas_price AS destination_gas_price,
-    destination_intents.tx_origin AS destination_tx_origin,
-    destination_intents.tx_nonce AS destination_tx_nonce,
-    destination_intents.auto_id AS destination_auto_id,
-    settlement_intents.amount AS settlement_amount,
-    settlement_intents.asset AS settlement_asset,
-    settlement_intents.recipient AS settlement_recipient,
-    settlement_intents.domain AS settlement_domain,
-    settlement_intents.status AS settlement_status,
-    COALESCE(destination_intents.return_data, settlement_intents.return_data) AS destination_return_data,
-    settlement_intents.transaction_hash AS settlement_transaction_hash,
-    settlement_intents."timestamp" AS settlement_timestamp,
-    settlement_intents.block_number AS settlement_block_number,
-    settlement_intents.gas_limit AS settlement_gas_limit,
-    settlement_intents.gas_price AS settlement_gas_price,
-    settlement_intents.tx_origin AS settlement_tx_origin,
-    settlement_intents.tx_nonce AS settlement_tx_nonce,
-    settlement_intents.auto_id AS settlement_auto_id,
-    hub_intents.domain AS hub_domain,
-    hub_intents.queue_idx AS hub_queue_idx,
-    hub_intents.message_id AS hub_message_id,
-    hub_intents.status AS hub_status,
-    hub_intents.settlement_domain AS hub_settlement_domain,
-    hub_intents.settlement_amount AS hub_settlement_amount,
-    hub_intents.added_tx_nonce AS hub_added_tx_nonce,
-    hub_intents.added_timestamp AS hub_added_timestamp,
-    hub_intents.filled_tx_nonce AS hub_filled_tx_nonce,
-    hub_intents.filled_timestamp AS hub_filled_timestamp,
-    hub_intents.settlement_enqueued_tx_nonce AS hub_settlement_enqueued_tx_nonce,
-    hub_intents.settlement_enqueued_block_number AS hub_settlement_enqueued_block_number,
-    hub_intents.settlement_enqueued_timestamp AS hub_settlement_enqueued_timestamp,
-    hub_intents.settlement_epoch AS hub_settlement_epoch,
-    hub_intents.update_virtual_balance AS hub_update_virtual_balance,
-    public.genstatus(origin_intents.status, hub_intents.status, settlement_intents.status, public.hascalldata(origin_intents.data)) AS status,
-    public.hascalldata(origin_intents.data) AS has_calldata,
-    hub_intents.auto_id AS hub_auto_id
-   FROM (((public.origin_intents
-     LEFT JOIN public.destination_intents ON ((origin_intents.id = destination_intents.id)))
-     LEFT JOIN public.settlement_intents ON ((origin_intents.id = settlement_intents.id)))
-     LEFT JOIN public.hub_intents ON ((origin_intents.id = hub_intents.id)))
+ SELECT id,
+    origin_queue_idx,
+    origin_message_id,
+    origin_status,
+    origin_initiator,
+    origin_receiver,
+    origin_input_asset,
+    origin_output_asset,
+    origin_amount,
+    origin_max_fee,
+    origin_origin,
+    origin_destinations,
+    origin_ttl,
+    origin_nonce,
+    origin_data,
+    origin_transaction_hash,
+    origin_timestamp,
+    origin_block_number,
+    origin_gas_limit,
+    origin_gas_price,
+    origin_tx_origin,
+    origin_tx_nonce,
+    origin_auto_id,
+    origin_native_fee,
+    origin_token_fee,
+    origin_fee_adapter_initiator,
+    origin_order_id,
+    origin_amount_out_min,
+    origin_is_swap,
+    destination_queue_idx,
+    destination_message_id,
+    destination_status,
+    destination_initiator,
+    destination_receiver,
+    destination_solver,
+    destination_input_asset,
+    destination_output_asset,
+    destination_amount,
+    destination_fee,
+    destination_origin,
+    destination_destinations,
+    destination_ttl,
+    destination_filled,
+    destination_nonce,
+    destination_data,
+    destination_transaction_hash,
+    destination_timestamp,
+    destination_block_number,
+    destination_gas_limit,
+    destination_gas_price,
+    destination_tx_origin,
+    destination_tx_nonce,
+    destination_auto_id,
+    settlement_amount_out_min,
+    destination_amount_out,
+    settlement_amount,
+    settlement_asset,
+    settlement_recipient,
+    settlement_domain,
+    settlement_status,
+    destination_return_data,
+    settlement_transaction_hash,
+    settlement_timestamp,
+    settlement_block_number,
+    settlement_gas_limit,
+    settlement_gas_price,
+    settlement_tx_origin,
+    settlement_tx_nonce,
+    settlement_auto_id,
+    hub_domain,
+    hub_queue_idx,
+    hub_message_id,
+    hub_status,
+    hub_settlement_domain,
+    hub_settlement_amount,
+    hub_added_tx_nonce,
+    hub_added_timestamp,
+    hub_filled_tx_nonce,
+    hub_filled_timestamp,
+    hub_settlement_enqueued_tx_nonce,
+    hub_settlement_enqueued_block_number,
+    hub_settlement_enqueued_timestamp,
+    hub_settlement_epoch,
+    hub_update_virtual_balance,
+    status,
+    has_calldata,
+    hub_auto_id
+   FROM ( SELECT origin_intents.id,
+            origin_intents.queue_idx AS origin_queue_idx,
+            origin_intents.message_id AS origin_message_id,
+            origin_intents.status AS origin_status,
+            origin_intents.initiator AS origin_initiator,
+            origin_intents.receiver AS origin_receiver,
+            origin_intents.input_asset AS origin_input_asset,
+            origin_intents.output_asset AS origin_output_asset,
+            origin_intents.amount AS origin_amount,
+            origin_intents.max_fee AS origin_max_fee,
+            origin_intents.origin AS origin_origin,
+            origin_intents.destinations AS origin_destinations,
+            origin_intents.ttl AS origin_ttl,
+            origin_intents.nonce AS origin_nonce,
+            origin_intents.data AS origin_data,
+            origin_intents.transaction_hash AS origin_transaction_hash,
+            origin_intents."timestamp" AS origin_timestamp,
+            origin_intents.block_number AS origin_block_number,
+            origin_intents.gas_limit AS origin_gas_limit,
+            origin_intents.gas_price AS origin_gas_price,
+            origin_intents.tx_origin AS origin_tx_origin,
+            origin_intents.tx_nonce AS origin_tx_nonce,
+            origin_intents.auto_id AS origin_auto_id,
+            origin_intents.native_fee AS origin_native_fee,
+            origin_intents.token_fee AS origin_token_fee,
+            origin_intents.fee_adapter_initiator AS origin_fee_adapter_initiator,
+            origin_intents.order_id AS origin_order_id,
+            origin_intents.amount_out_min AS origin_amount_out_min,
+            origin_intents.is_swap AS origin_is_swap,
+            destination_intents.queue_idx AS destination_queue_idx,
+            destination_intents.message_id AS destination_message_id,
+            destination_intents.status AS destination_status,
+            destination_intents.initiator AS destination_initiator,
+            destination_intents.receiver AS destination_receiver,
+            destination_intents.solver AS destination_solver,
+            destination_intents.input_asset AS destination_input_asset,
+            destination_intents.output_asset AS destination_output_asset,
+            destination_intents.amount AS destination_amount,
+            destination_intents.fee AS destination_fee,
+            destination_intents.origin AS destination_origin,
+            destination_intents.destinations AS destination_destinations,
+            destination_intents.ttl AS destination_ttl,
+            destination_intents.filled_domain AS destination_filled,
+            destination_intents.nonce AS destination_nonce,
+            destination_intents.data AS destination_data,
+            destination_intents.transaction_hash AS destination_transaction_hash,
+            destination_intents."timestamp" AS destination_timestamp,
+            destination_intents.block_number AS destination_block_number,
+            destination_intents.gas_limit AS destination_gas_limit,
+            destination_intents.gas_price AS destination_gas_price,
+            destination_intents.tx_origin AS destination_tx_origin,
+            destination_intents.tx_nonce AS destination_tx_nonce,
+            destination_intents.auto_id AS destination_auto_id,
+            destination_intents.amount_out_min AS settlement_amount_out_min,
+            destination_intents.amount_out AS destination_amount_out,
+            settlement_intents.amount AS settlement_amount,
+            settlement_intents.asset AS settlement_asset,
+            settlement_intents.recipient AS settlement_recipient,
+            settlement_intents.domain AS settlement_domain,
+            settlement_intents.status AS settlement_status,
+            COALESCE(destination_intents.return_data, settlement_intents.return_data) AS destination_return_data,
+            settlement_intents.transaction_hash AS settlement_transaction_hash,
+            settlement_intents."timestamp" AS settlement_timestamp,
+            settlement_intents.block_number AS settlement_block_number,
+            settlement_intents.gas_limit AS settlement_gas_limit,
+            settlement_intents.gas_price AS settlement_gas_price,
+            settlement_intents.tx_origin AS settlement_tx_origin,
+            settlement_intents.tx_nonce AS settlement_tx_nonce,
+            settlement_intents.auto_id AS settlement_auto_id,
+            hub_intents.domain AS hub_domain,
+            hub_intents.queue_idx AS hub_queue_idx,
+            hub_intents.message_id AS hub_message_id,
+            hub_intents.status AS hub_status,
+            hub_intents.settlement_domain AS hub_settlement_domain,
+            hub_intents.settlement_amount AS hub_settlement_amount,
+            hub_intents.added_tx_nonce AS hub_added_tx_nonce,
+            hub_intents.added_timestamp AS hub_added_timestamp,
+            hub_intents.filled_tx_nonce AS hub_filled_tx_nonce,
+            hub_intents.filled_timestamp AS hub_filled_timestamp,
+            hub_intents.settlement_enqueued_tx_nonce AS hub_settlement_enqueued_tx_nonce,
+            hub_intents.settlement_enqueued_block_number AS hub_settlement_enqueued_block_number,
+            hub_intents.settlement_enqueued_timestamp AS hub_settlement_enqueued_timestamp,
+            hub_intents.settlement_epoch AS hub_settlement_epoch,
+            hub_intents.update_virtual_balance AS hub_update_virtual_balance,
+            public.genstatus(origin_intents.status, hub_intents.status, settlement_intents.status, public.hascalldata(origin_intents.data)) AS status,
+            public.hascalldata(origin_intents.data) AS has_calldata,
+            hub_intents.auto_id AS hub_auto_id
+           FROM (((public.origin_intents
+             LEFT JOIN public.destination_intents ON ((origin_intents.id = destination_intents.id)))
+             LEFT JOIN public.settlement_intents ON ((origin_intents.id = settlement_intents.id)))
+             LEFT JOIN public.hub_intents ON ((origin_intents.id = hub_intents.id)))) t
   WITH NO DATA;
 
 
@@ -2155,47 +2255,89 @@ CREATE MATERIALIZED VIEW public.intents AS
 --
 
 CREATE MATERIALIZED VIEW public.invoices AS
- SELECT origin_intents.id,
-    origin_intents.queue_idx AS origin_queue_idx,
-    origin_intents.message_id AS origin_message_id,
-    origin_intents.status AS origin_status,
-    origin_intents.initiator AS origin_initiator,
-    origin_intents.receiver AS origin_receiver,
-    origin_intents.input_asset AS origin_input_asset,
-    origin_intents.output_asset AS origin_output_asset,
-    origin_intents.amount AS origin_amount,
-    origin_intents.max_fee AS origin_max_fee,
-    origin_intents.origin AS origin_origin,
-    origin_intents.destinations AS origin_destinations,
-    origin_intents.ttl AS origin_ttl,
-    origin_intents.nonce AS origin_nonce,
-    origin_intents.data AS origin_data,
-    origin_intents.transaction_hash AS origin_transaction_hash,
-    origin_intents."timestamp" AS origin_timestamp,
-    origin_intents.block_number AS origin_block_number,
-    origin_intents.gas_limit AS origin_gas_limit,
-    origin_intents.gas_price AS origin_gas_price,
-    origin_intents.tx_origin AS origin_tx_origin,
-    origin_intents.tx_nonce AS origin_tx_nonce,
-    origin_intents.auto_id AS origin_auto_id,
-    origin_intents.native_fee AS origin_native_fee,
-    origin_intents.token_fee AS origin_token_fee,
-    origin_intents.fee_adapter_initiator AS origin_fee_adapter_initiator,
-    origin_intents.order_id AS origin_order_id,
-    hub_invoices.id AS hub_invoice_id,
-    hub_invoices.intent_id AS hub_invoice_intent_id,
-    hub_invoices.amount AS hub_invoice_amount,
-    hub_invoices.ticker_hash AS hub_invoice_ticker_hash,
-    hub_invoices.owner AS hub_invoice_owner,
-    hub_invoices.entry_epoch AS hub_invoice_entry_epoch,
-    hub_invoices.enqueued_tx_nonce AS hub_invoice_enqueued_tx_nonce,
-    hub_invoices.enqueued_timestamp AS hub_invoice_enqueued_timestamp,
-    hub_invoices.auto_id AS hub_invoice_auto_id,
-    hub_intents.status AS hub_status,
-    hub_intents.settlement_epoch AS hub_settlement_epoch
-   FROM ((public.hub_invoices
-     LEFT JOIN public.origin_intents ON ((origin_intents.id = hub_invoices.intent_id)))
-     LEFT JOIN public.hub_intents ON ((origin_intents.id = hub_intents.id)))
+ SELECT id,
+    origin_queue_idx,
+    origin_message_id,
+    origin_status,
+    origin_initiator,
+    origin_receiver,
+    origin_input_asset,
+    origin_output_asset,
+    origin_amount,
+    origin_max_fee,
+    origin_origin,
+    origin_destinations,
+    origin_ttl,
+    origin_nonce,
+    origin_data,
+    origin_transaction_hash,
+    origin_timestamp,
+    origin_block_number,
+    origin_gas_limit,
+    origin_gas_price,
+    origin_tx_origin,
+    origin_tx_nonce,
+    origin_auto_id,
+    origin_native_fee,
+    origin_token_fee,
+    origin_fee_adapter_initiator,
+    origin_order_id,
+    origin_amount_out_min,
+    origin_is_swap,
+    hub_invoice_id,
+    hub_invoice_intent_id,
+    hub_invoice_amount,
+    hub_invoice_ticker_hash,
+    hub_invoice_owner,
+    hub_invoice_entry_epoch,
+    hub_invoice_enqueued_tx_nonce,
+    hub_invoice_enqueued_timestamp,
+    hub_invoice_auto_id,
+    hub_status,
+    hub_settlement_epoch
+   FROM ( SELECT origin_intents.id,
+            origin_intents.queue_idx AS origin_queue_idx,
+            origin_intents.message_id AS origin_message_id,
+            origin_intents.status AS origin_status,
+            origin_intents.initiator AS origin_initiator,
+            origin_intents.receiver AS origin_receiver,
+            origin_intents.input_asset AS origin_input_asset,
+            origin_intents.output_asset AS origin_output_asset,
+            origin_intents.amount AS origin_amount,
+            origin_intents.max_fee AS origin_max_fee,
+            origin_intents.origin AS origin_origin,
+            origin_intents.destinations AS origin_destinations,
+            origin_intents.ttl AS origin_ttl,
+            origin_intents.nonce AS origin_nonce,
+            origin_intents.data AS origin_data,
+            origin_intents.transaction_hash AS origin_transaction_hash,
+            origin_intents."timestamp" AS origin_timestamp,
+            origin_intents.block_number AS origin_block_number,
+            origin_intents.gas_limit AS origin_gas_limit,
+            origin_intents.gas_price AS origin_gas_price,
+            origin_intents.tx_origin AS origin_tx_origin,
+            origin_intents.tx_nonce AS origin_tx_nonce,
+            origin_intents.auto_id AS origin_auto_id,
+            origin_intents.native_fee AS origin_native_fee,
+            origin_intents.token_fee AS origin_token_fee,
+            origin_intents.fee_adapter_initiator AS origin_fee_adapter_initiator,
+            origin_intents.order_id AS origin_order_id,
+            origin_intents.amount_out_min AS origin_amount_out_min,
+            origin_intents.is_swap AS origin_is_swap,
+            hub_invoices.id AS hub_invoice_id,
+            hub_invoices.intent_id AS hub_invoice_intent_id,
+            hub_invoices.amount AS hub_invoice_amount,
+            hub_invoices.ticker_hash AS hub_invoice_ticker_hash,
+            hub_invoices.owner AS hub_invoice_owner,
+            hub_invoices.entry_epoch AS hub_invoice_entry_epoch,
+            hub_invoices.enqueued_tx_nonce AS hub_invoice_enqueued_tx_nonce,
+            hub_invoices.enqueued_timestamp AS hub_invoice_enqueued_timestamp,
+            hub_invoices.auto_id AS hub_invoice_auto_id,
+            hub_intents.status AS hub_status,
+            hub_intents.settlement_epoch AS hub_settlement_epoch
+           FROM ((public.hub_invoices
+             LEFT JOIN public.origin_intents ON ((origin_intents.id = hub_invoices.intent_id)))
+             LEFT JOIN public.hub_intents ON ((origin_intents.id = hub_intents.id)))) t
   WITH NO DATA;
 
 
@@ -2315,31 +2457,31 @@ CREATE MATERIALIZED VIEW public.daily_metrics_by_chains_tokens AS
            FROM (netted_final n
              FULL JOIN settled_final s ON (((n.day = s.day) AND (n.from_chain_id = s.from_chain_id) AND (n.to_chain_id = s.to_chain_id) AND ((n.from_asset_address)::text = (s.from_asset_address)::text) AND ((n.to_asset_address)::text = (s.to_asset_address)::text))))
         )
- SELECT combined.day,
-    combined.from_chain_id,
-    combined.from_asset_address,
-    combined.from_asset_symbol,
-    combined.to_chain_id,
-    combined.to_asset_address,
-    combined.to_asset_symbol,
-    combined.netting_volume,
-    combined.netting_avg_intent_size,
-    combined.netting_protocol_revenue,
-    combined.netting_total_intents,
-    combined.netting_avg_time_in_hrs,
-    combined.volume_settled_by_mm,
-    combined.total_intents_by_mm,
-    combined.discounts_by_mm,
-    combined.avg_discounts_by_mm,
-    combined.rewards_for_invoices,
-    combined.avg_rewards_by_invoice,
-    combined.avg_settlement_time_in_hrs_by_mm,
-    combined.apy,
-    combined.avg_discount_epoch_by_mm,
-    combined.total_volume,
-    combined.total_intents,
-    combined.total_protocol_revenue,
-    combined.total_rebalancing_fee
+ SELECT day,
+    from_chain_id,
+    from_asset_address,
+    from_asset_symbol,
+    to_chain_id,
+    to_asset_address,
+    to_asset_symbol,
+    netting_volume,
+    netting_avg_intent_size,
+    netting_protocol_revenue,
+    netting_total_intents,
+    netting_avg_time_in_hrs,
+    volume_settled_by_mm,
+    total_intents_by_mm,
+    discounts_by_mm,
+    avg_discounts_by_mm,
+    rewards_for_invoices,
+    avg_rewards_by_invoice,
+    avg_settlement_time_in_hrs_by_mm,
+    apy,
+    avg_discount_epoch_by_mm,
+    total_volume,
+    total_intents,
+    total_protocol_revenue,
+    total_rebalancing_fee
    FROM combined
   WITH NO DATA;
 
@@ -2933,7 +3075,7 @@ ALTER SEQUENCE public.rewards_id_seq OWNED BY public.rewards.id;
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying(128) NOT NULL
+    version character varying(255) NOT NULL
 );
 
 
@@ -2971,6 +3113,105 @@ CREATE TABLE public.solana_lookup_tables (
     chain_id integer NOT NULL,
     slot integer NOT NULL
 );
+
+
+--
+-- Name: swap_fills; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.swap_fills (
+    id integer NOT NULL,
+    intent_id character varying(66) NOT NULL,
+    fill_tx_hash character varying(66) NOT NULL,
+    distribution_tx_hash character varying(66),
+    fill_method character varying(20) NOT NULL,
+    filled_at bigint NOT NULL,
+    distributed_at bigint,
+    gas_used character varying(78)
+);
+
+
+--
+-- Name: swap_fills_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.swap_fills_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: swap_fills_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.swap_fills_id_seq OWNED BY public.swap_fills.id;
+
+
+--
+-- Name: swap_intents; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.swap_intents (
+    intent_id character varying(66) NOT NULL,
+    swap_pair_id character varying(50) NOT NULL,
+    origin_chain character varying(20) NOT NULL,
+    destination_chain character varying(20) NOT NULL,
+    input_amount character varying(78) NOT NULL,
+    expected_output_amount character varying(78) NOT NULL,
+    actual_output_amount character varying(78),
+    margin_bps integer NOT NULL,
+    swap_rate character varying(78) NOT NULL,
+    swap_identifier character varying(66) NOT NULL,
+    micky_address character varying(66) NOT NULL,
+    user_address character varying(66) NOT NULL,
+    status character varying(20) NOT NULL,
+    fill_method character varying(20),
+    fill_timestamp bigint,
+    created_at bigint NOT NULL,
+    updated_at bigint NOT NULL
+);
+
+
+--
+-- Name: swap_inventory_snapshots; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.swap_inventory_snapshots (
+    id integer NOT NULL,
+    chain character varying(20) NOT NULL,
+    asset character varying(66) NOT NULL,
+    total_inventory character varying(78) NOT NULL,
+    reserved_inventory character varying(78) NOT NULL,
+    available_inventory character varying(78) NOT NULL,
+    "timestamp" bigint NOT NULL,
+    pending_inventory character varying(78) NOT NULL,
+    reserved_count integer DEFAULT 0 NOT NULL,
+    pending_count integer DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: swap_inventory_snapshots_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.swap_inventory_snapshots_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: swap_inventory_snapshots_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.swap_inventory_snapshots_id_seq OWNED BY public.swap_inventory_snapshots.id;
 
 
 --
@@ -3953,6 +4194,20 @@ ALTER TABLE ONLY public.settlement_intents ALTER COLUMN auto_id SET DEFAULT next
 
 
 --
+-- Name: swap_fills id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_fills ALTER COLUMN id SET DEFAULT nextval('public.swap_fills_id_seq'::regclass);
+
+
+--
+-- Name: swap_inventory_snapshots id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_inventory_snapshots ALTER COLUMN id SET DEFAULT nextval('public.swap_inventory_snapshots_id_seq'::regclass);
+
+
+--
 -- Name: assets assets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4150,6 +4405,30 @@ ALTER TABLE ONLY public.solana_lookup_tables
 
 ALTER TABLE ONLY public.solana_lookup_tables
     ADD CONSTRAINT solana_lookup_tables_user_address_mint_address_key UNIQUE (user_address, mint_address);
+
+
+--
+-- Name: swap_fills swap_fills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_fills
+    ADD CONSTRAINT swap_fills_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: swap_intents swap_intents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_intents
+    ADD CONSTRAINT swap_intents_pkey PRIMARY KEY (intent_id);
+
+
+--
+-- Name: swap_inventory_snapshots swap_inventory_snapshots_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_inventory_snapshots
+    ADD CONSTRAINT swap_inventory_snapshots_pkey PRIMARY KEY (id);
 
 
 --
@@ -4630,6 +4909,13 @@ CREATE INDEX idx_epoch_results_id ON public.epoch_results USING btree (id);
 
 
 --
+-- Name: idx_fill_intent; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_fill_intent ON public.swap_fills USING btree (intent_id);
+
+
+--
 -- Name: idx_merkle_trees_asset; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4658,6 +4944,13 @@ CREATE UNIQUE INDEX idx_merkle_trees_root ON public.merkle_trees USING btree (ro
 
 
 --
+-- Name: idx_origin_intents_is_swap; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_origin_intents_is_swap ON public.origin_intents USING btree (is_swap);
+
+
+--
 -- Name: idx_proofs_initiator; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4676,6 +4969,48 @@ CREATE UNIQUE INDEX idx_proofs_initiator_merkle_root_proof ON public.rewards USI
 --
 
 CREATE INDEX idx_proofs_merkle_root ON public.rewards USING btree (merkle_root);
+
+
+--
+-- Name: idx_snapshot_chain_asset; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_snapshot_chain_asset ON public.swap_inventory_snapshots USING btree (chain, asset);
+
+
+--
+-- Name: idx_snapshot_timestamp; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_snapshot_timestamp ON public.swap_inventory_snapshots USING btree ("timestamp");
+
+
+--
+-- Name: idx_swap_created; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_swap_created ON public.swap_intents USING btree (created_at);
+
+
+--
+-- Name: idx_swap_pair; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_swap_pair ON public.swap_intents USING btree (swap_pair_id);
+
+
+--
+-- Name: idx_swap_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_swap_status ON public.swap_intents USING btree (status);
+
+
+--
+-- Name: idx_swap_user; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_swap_user ON public.swap_intents USING btree (user_address);
 
 
 --
@@ -4749,6 +5084,20 @@ CREATE INDEX settlement_intents_id_domain_index ON public.settlement_intents USI
 
 
 --
+-- Name: new_lock_position_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
+--
+
+CREATE INDEX new_lock_position_timestamp_idx ON tokenomics.new_lock_position USING btree (insert_timestamp);
+
+
+--
+-- Name: reward_claimed_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
+--
+
+CREATE INDEX reward_claimed_timestamp_idx ON tokenomics.reward_claimed USING btree (insert_timestamp);
+
+
+--
 -- Name: destination_intents destination_intent_status_change_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -4784,6 +5133,20 @@ CREATE TRIGGER process_cpi_events_trigger BEFORE INSERT OR UPDATE ON solana.sola
 
 
 --
+-- Name: new_lock_position new_lock_position_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
+--
+
+CREATE TRIGGER new_lock_position_set_timestamp_and_latency BEFORE INSERT ON tokenomics.new_lock_position FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
+
+
+--
+-- Name: reward_claimed reward_claimed_set_timestamp_and_latency; Type: TRIGGER; Schema: tokenomics; Owner: -
+--
+
+CREATE TRIGGER reward_claimed_set_timestamp_and_latency BEFORE INSERT ON tokenomics.reward_claimed FOR EACH ROW EXECUTE FUNCTION tokenomics.set_timestamp_and_latency();
+
+
+--
 -- Name: tron_spoke_raw_logs process_tron_spoke_events_trigger; Type: TRIGGER; Schema: tron; Owner: -
 --
 
@@ -4804,6 +5167,14 @@ ALTER TABLE ONLY public.balances
 
 ALTER TABLE ONLY public.origin_intents
     ADD CONSTRAINT origin_intents_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id);
+
+
+--
+-- Name: swap_fills swap_fills_intent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.swap_fills
+    ADD CONSTRAINT swap_fills_intent_id_fkey FOREIGN KEY (intent_id) REFERENCES public.swap_intents(intent_id);
 
 
 --
@@ -4924,4 +5295,13 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20250726140256'),
     ('20250731212912'),
     ('20250801041441'),
-    ('20250801173912');
+    ('20250801173912'),
+    ('20251022134056'),
+    ('20251103222403'),
+    ('20251104200144'),
+    ('20251105135808'),
+    ('20251105153713'),
+    ('20251106014319'),
+    ('20251110024449'),
+    ('20251110053118'),
+    ('20251110182740');

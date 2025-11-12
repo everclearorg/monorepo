@@ -62,6 +62,7 @@ abstract contract Everclear {
 
   IEverclearHub public constant HUB = IEverclearHub(0x372396818F125b8f3AA5a73e70C30F54c6195331);
   IHubGateway public constant HUB_GATEWAY = IHubGateway(0xe5F2F4afAd6211cfBD6a882D5a6a435530Ee3909);
+  address public constant HUB_IMPL = 0xEa7fBf043eAbE43ACe71d5c3B24E26A76DB329a1;
 
   address public HUB_MANAGER = address(0x53c91cFc48a3B9e30C3E73a6eDCb584917C19Ab4);
   address public SETTLER = address(0xcebcc29F32C5f23251Dd218e28485e3a02e83bED);
@@ -78,7 +79,10 @@ abstract contract Ethereum {
   IEverclearSpoke public ETHEREUM_SPOKE = IEverclearSpoke(0xD95Ff203bAAd65A8Fafd5C3dB695FC0a77A809a3);
   ISpokeGateway public ETHEREUM_SPOKE_GATEWAY = ISpokeGateway(0xF712520F89d295dFdcC4d71B7E8787c060f44e39);
   ICallExecutor public ETHEREUM_EXECUTOR = ICallExecutor(0xcA48aCE7387574a6120392722eB6f2018C60eF3B);
-  address public ETHEREUM_SPOKE_IMPL = 0x8B5401516fBf40621fec17A3b8D15D5E16754107;
+  address public ETHEREUM_SPOKE_IMPL = 0x24a26B463a59EBB88FDe49363C6c8f44351E8524;
+  address public ETHEREUM_XERC20_MODULE = 0xDEe6fD45a585fa890BA12262AFc2312adE23e41e;
+
+  address public constant ETHEREUM_FEE_ADAPTER = 0x7621D1085559Ab35513E2a41EC948a8524F619D9;
 }
 
 abstract contract ArbitrumOne {
@@ -101,8 +105,10 @@ abstract contract Optimism {
   ISpokeGateway public OPTIMISM_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
   ICallExecutor public OPTIMISM_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
   IXERC20Module public OPTIMISM_XERC20_MODULE = IXERC20Module(0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541);
-  address public OPTIMISM_SPOKE_IMPL = 0x172A786fA844A3fa0aEE2031D7955F82f7a8a984;
+  address public OPTIMISM_SPOKE_IMPL = 0x3404e2F93ebE912a0C2b8315f7eD1c6eC5686873;
   address public constant OPTIMISM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+
+  address public OPTIMISM_FEE_ADAPTER = 0xF4a697B7A48e9c7C1944a68a11d3b8D5E716d169;
 }
 
 abstract contract Zircuit {
@@ -132,8 +138,10 @@ abstract contract Base {
   ICallExecutor public BASE_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
 
   IXERC20Module public BASE_XERC20_MODULE = IXERC20Module(0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541);
-  address public BASE_SPOKE_IMPL = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
+  address public BASE_SPOKE_IMPL = 0x3404e2F93ebE912a0C2b8315f7eD1c6eC5686873;
   address public constant BASE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+
+  address public BASE_FEE_ADAPTER = 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89;
 }
 
 abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum, Base {}

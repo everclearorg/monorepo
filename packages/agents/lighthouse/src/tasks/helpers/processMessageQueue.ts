@@ -1,7 +1,107 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createLoggingContext, getNtpTimeSeconds, Queue, QueueType } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import { MissingThresholds, UnknownQueueType } from '../../errors';
 import { dispatchMessageQueueViaRelayers } from './dispatchMessageQueueViaRelayers';
+import { Interface } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
+
+interface OnchainQueueState {
+  first: number;
+  last: number;
+  size: number;
+}
+
+/**
+ * Check onchain queue state to prevent duplicate processing
+ * @param domain The domain to check
+ * @param queueType The type of queue (INTENT, FILL, SETTLEMENT)
+ * @param everclearAddress The contract address
+ * @param abi The contract ABI
+ * @returns Onchain queue state or null if check fails
+ */
+async function getOnchainQueueState(
+  domain: string,
+  queueType: QueueType,
+  everclearAddress: string,
+  abi: any,
+): Promise<OnchainQueueState | null> {
+  const {
+    logger,
+    config: { hub },
+    adapters: { chainservice },
+  } = getContext();
+  const { requestContext, methodContext } = createLoggingContext('getOnchainQueueState');
+  // For settlement queues, we need to check the hub domain, not the spoke domain
+  const checkDomain = queueType === 'SETTLEMENT' ? hub.domain : domain;
+  try {
+    const iface = new Interface(abi);
+
+    // Determine which queue to check based on a queue type
+    let queueMethodName: string;
+    let isSettlementQueue = false;
+    switch (queueType) {
+      case 'INTENT':
+        queueMethodName = 'intentQueue';
+        break;
+      case 'FILL':
+        queueMethodName = 'fillQueue';
+        break;
+      case 'SETTLEMENT':
+        queueMethodName = 'settlements';
+        isSettlementQueue = true;
+        break;
+      default:
+        logger.warn('Unknown queue type for onchain check', requestContext, methodContext, {
+          domain,
+          queueType,
+        });
+        return null;
+    }
+
+    let queueData: string;
+    if (isSettlementQueue) {
+      // NOTE: this is using spoke domain as param, while the readTx is called on hub domain
+      queueData = iface.encodeFunctionData(queueMethodName, [parseInt(domain)]);
+    } else {
+      queueData = iface.encodeFunctionData(queueMethodName, []);
+    }
+
+    const result = await chainservice.readTx(
+      {
+        domain: parseInt(checkDomain),
+        to: everclearAddress,
+        data: queueData,
+        funcSig: iface.getFunction(queueMethodName).format(),
+      },
+      'latest',
+    );
+
+    // Decode the result (returns first, last)
+    const decoded = iface.decodeFunctionResult(queueMethodName, result);
+    // NOTE: decoded are in BigNumber (uint256)
+    const first = decoded[0].toNumber();
+    const last = decoded[1].toNumber();
+    const size = last >= first ? last - first + 1 : 0;
+
+    logger.debug('Onchain queue state retrieved', requestContext, methodContext, {
+      domain,
+      queueType,
+      first: first.toString(),
+      last: last.toString(),
+      size: size.toString(),
+    });
+
+    return { first, last, size };
+  } catch (error) {
+    logger.warn('Failed to check onchain queue state', requestContext, methodContext, {
+      domain,
+      queueType,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
 
 /**
  * A message queue holds references to all hyperlane messages pending dispatch onchain.
@@ -16,7 +116,7 @@ export const processMessageQueue = async (type: QueueType) => {
   // Get the config
   const {
     logger,
-    config: { chains, thresholds, hub },
+    config: { chains, thresholds, hub, abis },
     adapters: { database },
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(processMessageQueue.name);
@@ -57,19 +157,22 @@ export const processMessageQueue = async (type: QueueType) => {
   // Determine the message queues to dispatch:
   // - If message queue is full, dispatch.
   // - If the oldest message in the queue is older than the max age, dispatch.
-  const toDispatch = queues.filter((queue: Queue) => {
-    const { size, lastProcessed } = queue;
+  // - Skip if onchain state differs from the database state (prevents duplicate processing)
+  const toDispatch: Queue[] = [];
+
+  for (const queue of queues) {
+    const { size, lastProcessed, domain } = queue;
     const age = getNtpTimeSeconds() - (lastProcessed ?? 0);
-    const { maxAge, size: maxSize } = thresholds[queue.domain] ?? {};
+    const { maxAge, size: maxSize } = thresholds[domain] ?? {};
 
     if (maxAge == undefined && maxSize == undefined) {
-      throw new MissingThresholds(type, queue.domain, thresholds);
+      throw new MissingThresholds(type, domain, thresholds);
     }
 
     const shouldDispatch = size >= maxSize || (age >= maxAge && size > 0);
 
     logger.debug('Dispatch decision for queue', requestContext, methodContext, {
-      domain: queue.domain,
+      domain,
       size,
       maxSize,
       age,
@@ -78,8 +181,68 @@ export const processMessageQueue = async (type: QueueType) => {
       reason: shouldDispatch ? (size >= maxSize ? 'size threshold' : 'age threshold') : 'no dispatch needed',
     });
 
-    return shouldDispatch;
-  });
+    // If we should dispatch, check onchain state to prevent duplicate processing
+    if (shouldDispatch) {
+      const transactionDomain = type === 'SETTLEMENT' ? hub.domain : domain;
+      const { everclear } =
+        transactionDomain === hub.domain ? hub.deployments : chains[transactionDomain].deployments ?? {};
+
+      if (everclear) {
+        const abi = transactionDomain === hub.domain ? abis.hub.everclear : abis.spoke.everclear;
+
+        // Check onchain queue state
+        const onchainState = await getOnchainQueueState(domain, type, everclear, abi);
+
+        if (onchainState) {
+          // Compare database size with onchain size
+          const onchainSize = onchainState.size;
+
+          logger.debug('Queue state comparison', requestContext, methodContext, {
+            domain,
+            queueType: type,
+            dbSize: size,
+            onchainSize: onchainSize.toString(),
+            dbFirst: queue.first?.toString(),
+            dbLast: queue.last?.toString(),
+            onchainFirst: onchainState.first.toString(),
+            onchainLast: onchainState.last.toString(),
+          });
+
+          // If onchain size is smaller than database size, the queue has been processed
+          if (onchainSize !== size) {
+            logger.info(
+              'Skipping queue dispatch - onchain state indicates queue already processed',
+              requestContext,
+              methodContext,
+              {
+                domain,
+                queueType: type,
+                dbSize: size,
+                onchainSize: onchainSize.toString(),
+                reason: 'onchain_queue_already_processed',
+              },
+            );
+            continue;
+          }
+        } else {
+          logger.warn('Could not check onchain queue state, proceeding with dispatch', requestContext, methodContext, {
+            domain,
+            queueType: type,
+            transactionDomain,
+          });
+        }
+      } else {
+        logger.warn('Missing contract address for onchain check', requestContext, methodContext, {
+          domain,
+          queueType: type,
+          transactionDomain,
+        });
+      }
+
+      // Add to the dispatch list if we reach here
+      toDispatch.push(queue);
+    }
+  }
 
   const toLog = queues.map((queue: Queue) => {
     return {
