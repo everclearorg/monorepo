@@ -27,7 +27,7 @@ const MAX_EPOCHS_TO_PROCESS = 0; // 250;
 const MAX_DEPOSITS_TO_PROCESS = 0; // 100;
 const MAX_INVOICES_TO_PROCESS = 0; // 35;
 
-export const MAX_UNPORCESSED_EPOCHS_COUNT = 100;
+export const MAX_UNPROCESSED_EPOCHS_COUNT = 100;
 
 export const processDepositsAndInvoices = async () => {
   const {
@@ -142,9 +142,9 @@ export const processDepositsAndInvoices = async () => {
     }
     const hasInvoicesToProcess = invoices.head != mkBytes32();
 
-    // Processed last MAX_UNPORCESSED_EPOCHS_COUNT epochs even if there are no deposits/invoices to avoid
+    // Processed last MAX_UNPROCESSED_EPOCHS_COUNT epochs even if there are no deposits/invoices to avoid
     // out of gas transaction reverts when the number of epochs to process is too large.
-    const hitUnprocessedEpochsLimit = unprocessedEpochsCount >= MAX_UNPORCESSED_EPOCHS_COUNT;
+    const hitUnprocessedEpochsLimit = unprocessedEpochsCount >= MAX_UNPROCESSED_EPOCHS_COUNT;
 
     logger.debug(
       'Checking the possibility of calling the processDepositsAndInvoices method',

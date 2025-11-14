@@ -8,7 +8,7 @@ import { ChainService } from '@chimera-monorepo/chainservice';
 import { processDepositsAndInvoices } from '../../../src/tasks/invoice';
 import { LighthouseConfig } from '../../../src/config';
 import { Database } from '@chimera-monorepo/database';
-import { MAX_UNPORCESSED_EPOCHS_COUNT } from '../../../src/tasks/invoice/processDepositsAndInvoices';
+import { MAX_UNPROCESSED_EPOCHS_COUNT } from '../../../src/tasks/invoice/processDepositsAndInvoices';
 
 describe('#processDepositsAndInvoices', () => {
   let chainservice: SinonStubbedInstance<ChainService>;
@@ -162,7 +162,7 @@ describe('#processDepositsAndInvoices', () => {
       // Mock iface.decodeFunctionResult('getCurrentEpoch', ...);
       // Current epoch: 152 (so lastClosedEpoch = 151)
       // unprocessedEpochsCount = 151 - 50 = 101 > 100 (limit hit)
-      decodeFunctionResult.onCall(2).returns([BigNumber.from(50 + 1 + MAX_UNPORCESSED_EPOCHS_COUNT + 1)]);
+      decodeFunctionResult.onCall(2).returns([BigNumber.from(50 + 1 + MAX_UNPROCESSED_EPOCHS_COUNT + 1)]);
 
       // Mock depositsAvailableInEpoch calls - return 0 for all remaining calls
       // Set default return first, then override with onCall for specific calls
@@ -171,7 +171,7 @@ describe('#processDepositsAndInvoices', () => {
       await processDepositsAndInvoices();
 
       const hub = mock.hub();
-      // Should call relayer because unprocessedEpochsCount > MAX_UNPORCESSED_EPOCHS_COUNT
+      // Should call relayer because unprocessedEpochsCount > MAX_UNPROCESSED_EPOCHS_COUNT
       expect(
         Relayer.sendWithRelayerWithBackup.calledWith(
           +hub.domain,
@@ -197,7 +197,7 @@ describe('#processDepositsAndInvoices', () => {
       // Mock iface.decodeFunctionResult('getCurrentEpoch', ...);
       // Current epoch: 151 (so lastClosedEpoch = 150)
       // unprocessedEpochsCount = 150 - 50 = 100 (exactly at limit, but limit check is >, so not hit)
-      decodeFunctionResult.onCall(2).returns([BigNumber.from(50 + 1 + MAX_UNPORCESSED_EPOCHS_COUNT)]);
+      decodeFunctionResult.onCall(2).returns([BigNumber.from(50 + 1 + MAX_UNPROCESSED_EPOCHS_COUNT)]);
 
       // Mock depositsAvailableInEpoch calls - return 0 for all remaining calls
       decodeFunctionResult.returns([BigNumber.from(0)]);
@@ -208,7 +208,7 @@ describe('#processDepositsAndInvoices', () => {
       // Should NOT call relayer because:
       // - No invoices
       // - No deposits
-      // - unprocessedEpochsCount is NOT > MAX_UNPORCESSED_EPOCHS_COUNT
+      // - unprocessedEpochsCount is NOT > MAX_UNPROCESSED_EPOCHS_COUNT
       expect(
         Relayer.sendWithRelayerWithBackup.calledWith(
           +hub.domain,
@@ -234,7 +234,7 @@ describe('#processDepositsAndInvoices', () => {
       // Mock iface.decodeFunctionResult('getCurrentEpoch', ...);
       // Current epoch: 200 (so lastClosedEpoch = 199)
       // unprocessedEpochsCount = 199 - 100 = 99 <= 100 (limit not hit)
-      decodeFunctionResult.onCall(2).returns([BigNumber.from(100 + 1 + MAX_UNPORCESSED_EPOCHS_COUNT - 1)]);
+      decodeFunctionResult.onCall(2).returns([BigNumber.from(100 + 1 + MAX_UNPROCESSED_EPOCHS_COUNT - 1)]);
 
       // Mock depositsAvailableInEpoch calls - return 0 for all remaining calls
       decodeFunctionResult.returns([BigNumber.from(0)]);
@@ -245,7 +245,7 @@ describe('#processDepositsAndInvoices', () => {
       // Should NOT call relayer because:
       // - No invoices
       // - No deposits (all depositsAvailableInEpoch = 0)
-      // - unprocessedEpochsCount < MAX_UNPORCESSED_EPOCHS_COUNT
+      // - unprocessedEpochsCount < MAX_UNPROCESSED_EPOCHS_COUNT
       expect(
         Relayer.sendWithRelayerWithBackup.calledWith(
           +hub.domain,
@@ -271,7 +271,7 @@ describe('#processDepositsAndInvoices', () => {
       // Mock iface.decodeFunctionResult('getCurrentEpoch', ...);
       // Current epoch: 151 (so lastClosedEpoch = 150)
       // unprocessedEpochsCount = 151 - 100 = 50 <= 100 (limit not hit)
-      decodeFunctionResult.onCall(2).returns([BigNumber.from(100 + 1 + MAX_UNPORCESSED_EPOCHS_COUNT / 2)]);
+      decodeFunctionResult.onCall(2).returns([BigNumber.from(100 + 1 + MAX_UNPROCESSED_EPOCHS_COUNT / 2)]);
 
       // Mock depositsAvailableInEpoch calls - return 0 for all remaining calls
       decodeFunctionResult.returns([BigNumber.from(0)]);
@@ -305,7 +305,7 @@ describe('#processDepositsAndInvoices', () => {
       // Mock iface.decodeFunctionResult('getCurrentEpoch', ...);
       // Current epoch: 151 (so lastClosedEpoch = 150)
       // unprocessedEpochsCount = 150 - 100 = 50 <= 100 (limit not hit)
-      decodeFunctionResult.onCall(2).returns([BigNumber.from(100 + 1 + MAX_UNPORCESSED_EPOCHS_COUNT / 2)]);
+      decodeFunctionResult.onCall(2).returns([BigNumber.from(100 + 1 + MAX_UNPROCESSED_EPOCHS_COUNT / 2)]);
 
       // Mock depositsAvailableInEpoch calls
       // First call (epoch 101, spoke 1337) has deposits, which will cause early break
