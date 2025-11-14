@@ -205,10 +205,10 @@ describe('#processDepositsAndInvoices', () => {
       await processDepositsAndInvoices();
 
       const hub = mock.hub();
-      // Should NOT call relayer because:
+      // Should call relayer because:
       // - No invoices
       // - No deposits
-      // - unprocessedEpochsCount is NOT > MAX_UNPROCESSED_EPOCHS_COUNT
+      // - unprocessedEpochsCount is NOT >= MAX_UNPROCESSED_EPOCHS_COUNT
       expect(
         Relayer.sendWithRelayerWithBackup.calledWith(
           +hub.domain,
