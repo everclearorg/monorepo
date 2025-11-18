@@ -229,7 +229,8 @@ export function handleExternalCalldataExecuted(event: ExternalCalldataExecuted):
   // Get the intent id
   const intentId = event.params._intentId;
   // Create the event
-  const log = new ExternalCalldataExecutedEvent(intentId);
+  const log = new ExternalCalldataExecutedEvent(generateIdFromTx(event));
+  log.intent = intentId;
   log.returnData = event.params._returnData;
 
   log.blockNumber = event.block.number;
