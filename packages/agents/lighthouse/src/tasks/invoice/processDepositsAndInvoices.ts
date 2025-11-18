@@ -27,7 +27,7 @@ const MAX_EPOCHS_TO_PROCESS = 0; // 250;
 const MAX_DEPOSITS_TO_PROCESS = 0; // 100;
 const MAX_INVOICES_TO_PROCESS = 0; // 35;
 
-export const MAX_UNPROCESSED_EPOCHS_COUNT = 100;
+export const MAX_UNPROCESSED_EPOCHS_COUNT = 50;
 
 export const processDepositsAndInvoices = async () => {
   const {
@@ -169,6 +169,9 @@ export const processDepositsAndInvoices = async () => {
         'Skip to call the processDepositsAndInvoices method - no invoices or deposits to process or hit unprocessed epochs limit',
         requestContext,
         methodContext,
+        {
+          unprocessedEpochsCount,
+        },
       );
       continue;
     }
