@@ -252,6 +252,10 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: TAC, blockGasLimit: 30_000_000, gateway: address(TAC_SPOKE_GATEWAY).toBytes32()})
+    );
   }
 }
 
@@ -261,7 +265,7 @@ abstract contract MainnetStagingEnvironment is
   MainnetAssets,
   MainnetStagingSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE];
+  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE, TAC];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed

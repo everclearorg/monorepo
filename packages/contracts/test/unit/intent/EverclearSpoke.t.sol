@@ -416,7 +416,11 @@ contract BaseTest is TestExtended {
   function _assertIntentQueueIndexes(
     uint256 _first,
     uint256 _last
+  ) internal {
     (uint256 _firstIdx, uint256 _lastIdx) = everclearSpoke.getIntentQueueIndexes();
+    assertEq(_firstIdx, _first);
+    assertEq(_lastIdx, _last);
+  }
 
   function _assertFillQueueIndexes(
     uint256 _first,

@@ -5,7 +5,7 @@ import {ScriptUtils} from '../utils/Utils.sol';
 
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {Script} from 'forge-std/Script.sol';
-import {console} from 'forge-std/console.sol';
+import {console2} from 'forge-std/console2.sol';
 
 import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 import {
@@ -122,16 +122,16 @@ contract DeploySpokeBase is Script, ScriptUtils {
 
     vm.stopBroadcast();
 
-    console.log('------------------------------------------------');
-    console.log('Everclear Spoke:', address(_spoke));
-    console.log('Spoke Gateway:', address(_gateway));
-    console.log('Message Receiver:', address(_messageReceiver));
-    console.log(
+    console2.log('------------------------------------------------');
+    console2.log('Everclear Spoke:', address(_spoke));
+    console2.log('Spoke Gateway:', address(_gateway));
+    console2.log('Message Receiver:', address(_messageReceiver));
+    console2.log(
       'ISM:', address(ISpecifiesInterchainSecurityModule(address(_spoke.gateway())).interchainSecurityModule())
     );
-    console.log('Call Executor:', address(_executor));
-    console.log('Chain ID:', block.chainid);
-    console.log('------------------------------------------------');
+    console2.log('Call Executor:', address(_executor));
+    console2.log('Chain ID:', block.chainid);
+    console2.log('------------------------------------------------');
   }
 }
 
@@ -326,6 +326,21 @@ contract MainnetStaging is DeploySpokeBase, MainnetStagingEnvironment {
       watchtower: WATCHTOWER,
       ism: address(0), // using the default ism
       mailbox: address(BASE_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // TAC
+    _deploymentParams[TAC] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(TAC_MAILBOX), // domain mailbox
       hubDomain: EVERCLEAR_DOMAIN,
       hubGateway: address(HUB_GATEWAY),
       owner: OWNER,
@@ -645,6 +660,21 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       watchtower: WATCHTOWER,
       ism: address(0), // using the default ism
       mailbox: address(INK_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // TAC
+    _deploymentParams[TAC] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(TAC_MAILBOX), // domain mailbox
       hubDomain: EVERCLEAR_DOMAIN,
       hubGateway: address(HUB_GATEWAY),
       owner: OWNER,

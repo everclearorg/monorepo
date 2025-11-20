@@ -307,25 +307,17 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    * @return _intentId The ID of the intent
    * @return _intent The intent object
    */
-  function batchFillIntent(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations,
-    bytes calldata _signature
-  ) external returns (FillMessage[] memory _fillMessages);
-
-  /**
-   * @notice Fills a batch of intents
-   * @param _intents The intents to fill
-   * @param _amountOut The amounts of the assets the solver is sending to the users
-   * @param _destinations The destinations for the repayment
-   */
-  function batchFillIntentWithPull(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    uint32[][] calldata _destinations,
-    bytes calldata _signature
-  ) external returns (FillMessage[] memory _fillMessages);
+  function newIntent(
+    uint32[] memory _destinations,
+    address _receiver,
+    address _inputAsset,
+    address _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    Permit2Params calldata _permit2Params
+  ) external returns (bytes32 _intentId, Intent calldata _intent);
 
   /**
    * @notice fills an intent
@@ -335,30 +327,15 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
    */
   function fillIntent(
     Intent calldata _intent,
-    uint256 _amountOut,
-    uint32[] memory _destinations,
-    bytes calldata _signature
-  ) external returns (FillMessage memory _fillMessage);
-
-  /**
-   * @notice fills an intent pulling funds from callers wallet
-   * @param _intent The intent structure
-   * @param _amountOut The amount of the asset the solver is sending to the user
-   * @return _fillMessage The enqueued fill message
-   */
-  function fillIntentWithPull(
-    Intent calldata _intent,
-    uint256 _amountOut,
-    uint32[] memory _destinations,
-    bytes calldata _signature
-  ) external returns (FillMessage memory _fillMessage);
+    uint24 _fee
+  ) external returns (FillMessage calldata _fillMessage);
 
   /**
    * @notice Allows a relayer to fill an intent for a solver
    * @param _solver The address of the solver
    * @param _intent The intent structure
    * @param _nonce The nonce of the signature
-   * @param _amountOut The amount of the asset the solver is sending to the user
+   * @param _fee The total fee, expressed in dbps, represents the solver fee plus the sum of protocol fees for the token
    * @param _signature The solver signature
    * @return _fillMessage The enqueued fill message
    */
@@ -366,11 +343,8 @@ interface IEverclearSpokeV5 is ISpokeStorageV5 {
     address _solver,
     Intent calldata _intent,
     uint256 _nonce,
-    uint256 _amountOut,
-    bytes32 _receiver,
-    uint32[] memory _destinations,
-    bytes calldata _signature,
-    bool _pullFunds
+    uint24 _fee,
+    bytes calldata _signature
   ) external returns (FillMessage memory _fillMessage);
 
   /**

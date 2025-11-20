@@ -127,6 +127,15 @@ contract MainnetStaging is DeploySpokeSwapsUpgrade, MainnetStagingEnvironment {
       xerc20Module: address(ARBITRUM_ONE_XERC20_MODULE),
       spokeImpl: ARBITRUM_SPOKE_IMPL
     }); // set domain id as mapping key
+
+    // Tac - staging config
+    _deploymentParams[TAC] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(TAC_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(TAC_XERC20_MODULE),
+      spokeImpl: TAC_SPOKE_IMPL
+    }); // set domain id as mapping key
   }
 }
 
@@ -166,6 +175,15 @@ contract MainnetProduction is DeploySpokeSwapsUpgrade, MainnetProductionEnvironm
       fillSigner: address(FILL_SIGNER),
       xerc20Module: address(ARBITRUM_ONE_XERC20_MODULE),
       spokeImpl: address(0)
+    }); // set domain id as mapping key
+
+    // Tac
+    _deploymentParams[TAC] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(TAC_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(TAC_XERC20_MODULE),
+      spokeImpl: TAC_SPOKE_IMPL
     }); // set domain id as mapping key
   }
 }
