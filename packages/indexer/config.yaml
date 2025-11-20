@@ -157,4 +157,17 @@ networks:
       - name: FeeAdapterV2
         address: 0x877Fd0A881B63eBE413124EeE6abbCD7E82cf10b
 
+  - id: 239
+    rpc_config:
+      url: https://rpc.ankr.com/tac
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpoke
+        address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa
+      - name: EverclearSpokeV5
+        address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa  # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0xA388d644241A2185440EAf0ADd41C9Da30958ba5
+
 rollback_on_reorg: true
