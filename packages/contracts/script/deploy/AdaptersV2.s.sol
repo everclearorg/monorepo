@@ -54,7 +54,7 @@ contract DeployAdapterBase is Script, ScriptUtils {
     vm.startBroadcast(_deployerPk);
 
     // Selecting CREATE3 address based on chain
-    address create3Used = LIFI_CREATE3;
+    address create3Used = address(0);
 
     // Generating the inputs for CREATE3
     if (create3Used == address(0)) {
@@ -299,6 +299,15 @@ contract MainnetProduction is DeployAdapterBase, MainnetProductionEnvironment {
       feeSigner: L2_FEE_SIGNER,
       owner: GNOSIS_ENG_MULTISIG
     });
+
+    // TAC
+    _deploymentParams[TAC] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(TAC_SPOKE),
+      xerc20Module: address(TAC_XERC20_MODULE),
+      feeRecipient: TAC_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: TAC_ENG_MULTISIG
+    });
   }
 }
 
@@ -338,6 +347,15 @@ contract MainnetStaging is DeployAdapterBase, MainnetStagingEnvironment {
       feeRecipient: ARBITRUM_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
       owner: ARBITRUM_ENG_MULTISIG
+    });
+
+    // TAC
+    _deploymentParams[TAC] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(TAC_SPOKE),
+      xerc20Module: address(TAC_XERC20_MODULE),
+      feeRecipient: TAC_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: TAC_ENG_MULTISIG
     });
   }
 }

@@ -74,6 +74,7 @@ abstract contract MainnetAssets {
   address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
   address public constant SONIC_USDT = 0x6047828dc181963ba44974801FF68e538dA5eaF9;
   bytes32 public constant SOLANA_USDT = 0xce010e60afedb22717bd63192f54145a3f965a33bb82d2c7029eb2ce1e208264;
+  address public constant TAC_USDT = 0xAF988C3f7CB2AceAbB15f96b19388a259b6C438f;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -477,6 +478,20 @@ abstract contract Solana {
   bytes32 public SOLANA_SPOKE_GATEWAY = 0x09b727b9209c8539f72647d10dd4f4670b53960ba169f034c513c758db0e9656;
 }
 
+abstract contract Tac {
+  uint32 public constant TAC = 239;
+  IMailbox public TAC_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public TAC_SPOKE = IEverclearSpoke(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
+  ISpokeGateway public TAC_SPOKE_GATEWAY = ISpokeGateway(0x7B435CCF350DBC773e077410e8FEFcd46A1cDfAA);
+  ICallExecutor public TAC_EXECUTOR = ICallExecutor(0x1FC1f47a6a7c61f53321643A14bEc044213AbF95);
+  IXERC20Module public TAC_XERC20_MODULE = IXERC20Module(0x92dcaf947DB325ac023b105591d76315743883eD);
+  address public TAC_SPOKE_IMPL = 0x315bCf956e887378836f6E57bC735F0cf7022352;
+
+  address public constant TAC_ENG_MULTISIG = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
+  address public TAC_FEE_ADAPTER = 0xA388d644241A2185440EAf0ADd41C9Da30958ba5;
+}
+
 abstract contract MainnetProductionDomains is
   Everclear,
   Ethereum,
@@ -501,7 +516,8 @@ abstract contract MainnetProductionDomains is
   Mantle,
   Sonic,
   Ink,
-  Solana
+  Solana,
+  Tac
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
@@ -628,6 +644,10 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: SOLANA, blockGasLimit: 48_000_000, gateway: SOLANA_SPOKE_GATEWAY})
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: TAC, blockGasLimit: 30_000_000, gateway: address(TAC_SPOKE_GATEWAY).toBytes32()})
     );
   }
 }

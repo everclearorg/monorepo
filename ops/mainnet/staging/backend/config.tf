@@ -72,6 +72,12 @@ locals {
         ],
         network = "solana"
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      }
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"

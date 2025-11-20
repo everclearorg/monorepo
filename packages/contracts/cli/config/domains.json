@@ -85,63 +85,49 @@
     "name": "zkSync",
     "id": 324,
     "rpc": "https://1rpc.io/zksync2-era",
-    "environments": [
-      "MainnetProduction"
-    ],
+    "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
   {
     "name": "Polygon",
     "id": 137,
     "rpc": "https://polygon.drpc.org",
-    "environments": [
-      "MainnetProduction"
-    ],
+    "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
   {
     "name": "Scroll",
     "id": 534352,
     "rpc": "https://scroll.drpc.org",
-    "environments": [
-      "MainnetProduction"
-    ],
+    "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
   {
     "name": "Taiko",
     "id": 167000,
     "rpc": "https://taiko.drpc.org",
-    "environments": [
-      "MainnetProduction"
-    ],
+    "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
   {
     "name": "Apechain",
     "id": 33139,
     "rpc": "https://apechain.drpc.org",
-    "environments": [
-      "MainnetProduction"
-    ],
+    "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
   {
     "name": "Avalanche",
     "id": 43114,
     "rpc": "https://avalanche.drpc.org",
-    "environments": [
-      "MainnetProduction"
-    ],
+    "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
   {
     "name": "Mode",
     "id": 34443,
     "rpc": "https://mode.drpc.org",
-    "environments": [
-      "MainnetProduction"
-    ],
+    "environments": ["MainnetProduction"],
     "realm": "spoke"
   },
   {
@@ -195,6 +181,13 @@
     "id": 57073,
     "rpc": "https://rpc-gel.inkonchain.com",
     "environments": ["MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
+    "name": "TAC",
+    "id": 239,
+    "rpc": "https://rpc.tac.build",
+    "environments": ["MainnetStaging","MainnetProduction"],
     "realm": "spoke"
   },
   {

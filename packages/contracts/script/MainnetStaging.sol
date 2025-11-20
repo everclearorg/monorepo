@@ -46,6 +46,8 @@ abstract contract MainnetAssets {
   // NOTE: USDT is not supported on Base
   address public constant ARBITRUM_USDT = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
   address public constant OPTIMISM_USDT = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58;
+  address public constant ETHEREUM_USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+  address public constant TAC_USDT = 0xAF988C3f7CB2AceAbB15f96b19388a259b6C438f;
 
   ///////////////////// USDC -- Not whitelisted
   address public constant ARBITRUM_USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831; // NOT USDC.e
@@ -145,7 +147,21 @@ abstract contract Base {
   address public BASE_FEE_ADAPTER = 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89;
 }
 
-abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum, Base {}
+abstract contract Tac {
+  uint32 public constant TAC = 239;
+  IMailbox public TAC_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public TAC_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public TAC_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public TAC_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public TAC_XERC20_MODULE = IXERC20Module(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
+  address public TAC_SPOKE_IMPL = 0xc192b47fD86C52d987FFf2579B64c28037Bf7567;
+
+  address public constant TAC_ENG_MULTISIG = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
+  address public TAC_FEE_ADAPTER = 0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe;
+}
+
+abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum, Base, Tac {}
 
 abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDomains {
   using TypeCasts for address;
@@ -184,6 +200,10 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: TAC, blockGasLimit: 30_000_000, gateway: address(TAC_SPOKE_GATEWAY).toBytes32()})
+    );
   }
 }
 
@@ -193,7 +213,7 @@ abstract contract MainnetStagingEnvironment is
   MainnetAssets,
   MainnetStagingSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE];
+  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE, TAC];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed

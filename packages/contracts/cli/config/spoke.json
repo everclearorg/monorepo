@@ -64,6 +64,13 @@
   },
   {
     "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "feeAdapterAddress": "",
+    "domainName": "TAC",
+    "domainId": 239,
+    "environment": "MainnetStaging"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
     "domainName": "Optimism",
     "domainId": 10,
     "environment": "MainnetProduction"
@@ -186,6 +193,12 @@
     "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
     "domainName": "Ink",
     "domainId": 57073,
+    "environment": "MainnetProduction"
+  },
+  {
+    "address": "0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa",
+    "domainName": "TAC",
+    "domainId": 239,
     "environment": "MainnetProduction"
   }
 ]

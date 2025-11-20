@@ -51,6 +51,12 @@ import StagingSpokeGatewayZircuit from './staging/48900/SpokeGateway.json';
 import StagingEverclearSpokeBlast from './staging/81457/EverclearSpoke.json';
 import StagingSpokeGatewayBlast from './staging/81457/SpokeGateway.json';
 
+import StagingEverclearSpokeBase from './staging/8453/EverclearSpoke.json';
+import StagingSpokeGatewayBase from './staging/8453/SpokeGateway.json';
+
+import StagingEverclearSpokeTac from './staging/239/EverclearSpoke.json';
+import StagingSpokeGatewayTac from './staging/239/SpokeGateway.json';
+
 //////// Mainnet Production Deployments ////////
 
 import ProductionEverclearHubEverclearMainnet from './production/25327/EverclearHub.json';
@@ -127,6 +133,9 @@ import ProductionSpokeGatewaySonic from './production/146/SpokeGateway.json';
 // Add Ink deployments here
 import ProductionEverclearSpokeInk from './production/57073/EverclearSpoke.json';
 import ProductionSpokeGatewayInk from './production/57073/SpokeGateway.json';
+
+import ProductionEverclearSpokeTac from './production/239/EverclearSpoke.json';
+import ProductionSpokeGatewayTac from './production/239/SpokeGateway.json';
 
 export const Deployments = {
   local: {},
@@ -251,6 +260,10 @@ export const Deployments = {
       everclear: ProductionEverclearSpokeInk,
       gateway: ProductionSpokeGatewayInk,
     },
+    239: {
+      everclear: ProductionEverclearSpokeTac,
+      gateway: ProductionSpokeGatewayTac,
+    },
   },
   staging: {
     //////// Testnet Staging Deployments ////////
@@ -299,6 +312,14 @@ export const Deployments = {
     81457: {
       everclear: StagingEverclearSpokeBlast,
       gateway: StagingSpokeGatewayBlast,
+    },
+    8453: {
+      everclear: StagingEverclearSpokeBase,
+      gateway: StagingSpokeGatewayBase,
+    },
+    239: {
+      everclear: StagingEverclearSpokeTac,
+      gateway: StagingSpokeGatewayTac,
     },
   },
 };
