@@ -86,4 +86,16 @@ networks:
         address: 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89
       - name: FeeAdapterV2
         address: 0x2944F6fEF163365A382E9397b582bfbeB7C4F300
+  - id: 239 # TAC 
+    rpc_config:
+      url: https://rpc.tac.build
+    start_block: 0
+    confirmed_block_threshold: 10
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816  # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe
 rollback_on_reorg: true
