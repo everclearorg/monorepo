@@ -93,6 +93,8 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(146);
   } else if (network == 'ink') {
     chainId = BigInt.fromI32(57073);
+  } else if (network == 'tac') {
+    chainId = BigInt.fromI32(239);
   } else {
     throw new Error(`No chainName for network ${network}`);
   }
