@@ -275,14 +275,14 @@ locals {
     }
     relayers = [
       {
-        type   = "Everclear",
-        apiKey = "${var.admin_token_relayer}",
-        url    = "https://${module.relayer_server.service_endpoint}"
-      },
-      {
         type   = "Gelato",
         apiKey = "${var.gelato_api_key}",
         url    = "https://relay.gelato.digital"
+      },
+      {
+        type   = "Everclear",
+        apiKey = "${var.admin_token_relayer}",
+        url    = "https://${module.relayer_server.service_endpoint}"
       }
     ]
     agents = {
@@ -327,14 +327,14 @@ locals {
     network         = "mainnet"
     relayers = [
       {
-        type   = "Everclear",
-        apiKey = "${var.admin_token_relayer}",
-        url    = "https://${module.relayer_server.service_endpoint}"
-      },
-      {
         type   = "Gelato",
         apiKey = "${var.gelato_api_key}",
         url    = "https://relay.gelato.digital"
+      },
+      {
+        type   = "Everclear",
+        apiKey = "${var.admin_token_relayer}",
+        url    = "https://${module.relayer_server.service_endpoint}"
       }
     ]
     thresholds = {
