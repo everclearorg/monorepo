@@ -84,4 +84,14 @@ pub enum SpokeError {
     InvalidFeeSignature,
     #[msg("Fee adapter paused")]
     FeeAdapterPaused,
+    #[msg("Wrong destination for fill intent")]
+    WrongDestination,
+    #[msg("fill intent expired")]
+    IntentExpired,
+    #[msg("fill intent amountOut is less than amountOutMin")]
+    AmountOutInvalid,
+    #[msg("invalid intent destinations")]
+    InvalidDestinationArray,
+    #[msg("intent is already filled")]
+    InvalidFillIntentStatus,
 }

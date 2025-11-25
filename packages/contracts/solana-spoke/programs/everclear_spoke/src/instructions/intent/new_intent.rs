@@ -1,3 +1,4 @@
+use super::evm_encode::{encode_full, u128_to_u256_be, EVMIntent};
 use crate::instructions::fee_adapter::{
     handle_fees, FeeData, FeeParams, HandleFeeAccounts, SignatureAccounts,
 };
@@ -21,7 +22,6 @@ use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::IntentAddedEvent,
-    intent::{encode_full, u128_to_u256_be, EVMIntent},
     state::SpokeState,
     utils::{compute_intent_hash, normalize_decimals},
 };
@@ -137,8 +137,14 @@ pub fn handle_new_intent<'info>(
 
     let state = &mut accounts.spoke_state;
     require!(!state.paused, SpokeError::ContractPaused);
-    require!(!destinations.is_empty(), SpokeError::InvalidOperation);
-    require!(destinations.len() <= 10, SpokeError::InvalidIntent);
+    require!(
+        !destinations.is_empty(),
+        SpokeError::InvalidDestinationArray
+    );
+    require!(
+        destinations.len() <= 10,
+        SpokeError::InvalidDestinationArray
+    );
 
     // If a single destination and ttl != 0, require output_asset is non-zero.
     if destinations.len() == 1 {
@@ -150,7 +156,7 @@ pub fn handle_new_intent<'info>(
             SpokeError::InvalidIntent
         );
     }
-    
+
     // NOTE: we do not need to check data len as this is implicitly done with solana tx size limitation of 1232 bytes
 
     let minted_decimals = accounts.mint.decimals;
@@ -219,6 +225,7 @@ pub fn handle_new_intent<'info>(
     let xfer = TransferRemote {
         destination_domain: EVERCLEAR_DOMAIN,
         recipient: everclear_gateway(),
+        // TODO: set this to 0, this is not used.
         amount_or_id: U256::from(normalized_amount),
         gas_amount: message_gas_limit,
         message_body: evm_encoded_message, // now in EVM ABI format
@@ -304,7 +311,6 @@ pub struct EventData {
     pub output_asset: Pubkey,
     pub normalized_amount: u128,
     /// NOTE: max_fee is now irrelevant and not used in V2 spoke
-    /// 
     /// This is kept here only for not changing the event data structure
     pub max_fee: u32,
     pub origin_domain: u32,

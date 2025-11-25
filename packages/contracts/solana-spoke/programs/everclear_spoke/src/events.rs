@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{
     hyperlane::{InterchainGasPaymasterType, SerializableAccountMeta},
-    instructions::messages::Settlement,
+    instructions::{messages::Settlement, EVMIntent},
 };
 
 // =====================================================================
@@ -148,4 +148,14 @@ pub struct IntentWithFeesAddedEvent {
     pub amount: u64,
     /// native amount in Solana
     pub fee: u64,
+}
+
+#[event]
+pub struct IntentFilledEvent {
+    pub intent_id: [u8; 32],
+    pub message_id: [u8; 32],
+    pub solver: Pubkey,
+    pub receiver: [u8; 32],
+    pub amount_out: u64,
+    pub intent: EVMIntent,
 }

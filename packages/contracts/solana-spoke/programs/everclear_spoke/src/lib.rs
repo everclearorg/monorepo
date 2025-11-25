@@ -101,6 +101,53 @@ pub mod everclear_spoke {
         instructions::new_order(ctx, params, fee_param)
     }
 
+    /// Fills a new intent.
+    /// The user "locks" funds (previously deposited) and fills an intent.
+    /// NOTE: different from EVM, we do not support pullFunds, i.e. we requires funds to be sent during the tx
+    /// and not deposited prior in the spoke.
+    pub fn fill_intent(
+        ctx: Context<FillIntent>,
+        // origin intent, flattened
+        origin_initiator: [u8; 32],
+        // NOTE: origin_receiver is put in ctx for space saving using LUT
+        origin_input_asset: [u8; 32],
+        // NOTE: we do not need output_asset here as this woule be `ctx.mint`. This is removed for space saving using LUT.
+        intent_origin: u32,
+        origin_nonce: u64,
+        origin_timestamp: u64,           // actually uint48 in Solidity
+        origin_ttl: u64,                 // actually uint48 in Solidity
+        origin_amount: [u8; 32],         // big-endian, matching typical EVM usage
+        origin_amount_out_min: [u8; 32], // uint256
+        origin_destinations: Vec<u32>,
+        origin_data: Vec<u8>,
+
+        // data for fill intent
+        amount_out: u64,
+        receiver: Pubkey,
+        destinations: Vec<u32>,
+
+        // hyperlane params
+        message_gas_limit: u64,
+    ) -> Result<()> {
+        instructions::fill_intent(
+            ctx,
+            origin_initiator,
+            origin_input_asset,
+            intent_origin,
+            origin_nonce,
+            origin_timestamp,
+            origin_ttl,
+            origin_amount,
+            origin_amount_out_min,
+            origin_destinations,
+            origin_data,
+            amount_out,
+            receiver,
+            destinations,
+            message_gas_limit,
+        )
+    }
+
     // Instruction relates to message receiving
 
     /// Receive a cross‑chain message via Hyperlane.

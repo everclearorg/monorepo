@@ -34,6 +34,7 @@ pub struct TransferRemote {
     pub destination_domain: u32,
     /// The remote recipient.
     pub recipient: H256,
+    /// NOTE: this is not used by default in intent flows
     /// The amount or ID of the token to transfer.
     pub amount_or_id: U256,
     // Gas amount
