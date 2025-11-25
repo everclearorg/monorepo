@@ -80,7 +80,7 @@ fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
     data_bytes.extend_from_slice(&intent.data);
     // pad
     let padding = (32 - (intent.data.len() % 32)) % 32;
-    data_bytes.extend(std::iter::repeat_n(0u8, padding));
+    data_bytes.extend(std::iter::repeat(0u8).take(padding));
 
     // We place "destinations_bytes" first, then "data_bytes" in the tail
     let destinations_offset = 384; // from start of struct #0
