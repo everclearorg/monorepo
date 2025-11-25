@@ -64,7 +64,8 @@ export const makePoller = async (_configOverride?: CartographerConfig) => {
      `,
   );
 
-  await runMigration(context);
+  // Temporary disabled migrations for cross chain swap launch
+  // await runMigration(context);
   await bind(context);
   await closeDatabase();
   if (context.config.healthUrls[context.config.service] !== undefined) {
