@@ -28,7 +28,9 @@ export const updateDepositors = async () => {
         spoke,
         latestTxNonce,
       });
-      const events = await subgraph.getDepositorEvents(spoke, latestTxNonce);
+      // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+      const queryFromNonce = latestTxNonce > 0 ? latestTxNonce + 1 : latestTxNonce;
+      const events = await subgraph.getDepositorEvents(spoke, queryFromNonce);
       return events.map((e) => ({ ...e, domain: spoke }));
     }),
   );

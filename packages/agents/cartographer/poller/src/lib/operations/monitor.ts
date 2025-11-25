@@ -51,6 +51,8 @@ export const updateMessages = async () => {
   for (const domain of evmDomains) {
     // Retrieve the most recent timestamp
     const latestNonce = await database.getCheckPoint('message_' + domain);
+    // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+    const queryFromNonce = latestNonce > 0 ? latestNonce + 1 : latestNonce;
 
     logger.debug('Retrieving messages', requestContext, methodContext, {
       domain,
@@ -59,7 +61,7 @@ export const updateMessages = async () => {
 
     let messages = [];
     if (domain === config.hub.domain) {
-      messages = await subgraph.getHubMessages(domain, latestNonce);
+      messages = await subgraph.getHubMessages(domain, queryFromNonce);
       await Promise.all(
         messages.map(async (message) => {
           message.status = await getMessageStatus(message.id, config, message.destinationDomain);
@@ -81,7 +83,7 @@ export const updateMessages = async () => {
         });
       await database.saveMessages(messages as Message[], [], [], hubIntentUpdates);
     } else {
-      messages = await subgraph.getSpokeMessages(domain, latestNonce);
+      messages = await subgraph.getSpokeMessages(domain, queryFromNonce);
       await Promise.all(
         messages.map(async (message) => {
           // all spoke messages go to the hub, use this domain if no destination on message

@@ -36,9 +36,11 @@ export const updateOriginIntents = async () => {
       // Retrieve the most recent origin intent nonce we've saved for this domain.
       const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
       const latestNonce = await database.getCheckPoint('origin_intent_' + domain);
+      // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+      const queryFromNonce = latestNonce > 0 ? latestNonce + 1 : latestNonce;
       queryMetaParams.set(domain, {
         maxBlockNumber: latestBlockNumber - safeConfirmations,
-        latestNonce: latestNonce,
+        latestNonce: queryFromNonce,
         orderDirection: 'asc',
       });
     }),
@@ -132,7 +134,9 @@ export const updateOriginIntents = async () => {
       const domainIntents = intentsWithSwapFlag.filter((intent) => intent.origin === domain);
       const max = getMaxTxNonce(domainIntents);
       const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-      if (domainIntents.length > 0 && max > latest) {
+      // Since we query from latest = latestNonce + 1, any results will have max >= latestNonce + 1 > latestNonce
+      // So we always update the checkpoint when we have results
+      if (domainIntents.length > 0 && max >= latest) {
         return { domain, checkpoint: max };
       }
       return undefined;
@@ -178,9 +182,11 @@ export const updateDestinationIntents = async () => {
       // Retrieve the most recent destination intent nonce we've saved for this domain.
       const latestNonce = await database.getCheckPoint('destination_intent_' + domain);
       const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
+      // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+      const queryFromNonce = latestNonce > 0 ? latestNonce + 1 : latestNonce;
       queryMetaParams.set(domain, {
         maxBlockNumber: latestBlockNumber - safeConfirmations,
-        latestNonce: latestNonce,
+        latestNonce: queryFromNonce,
         orderDirection: 'asc',
       });
     }),
@@ -200,7 +206,7 @@ export const updateDestinationIntents = async () => {
         const domainIntents = intents.filter((intent) => intent.destination === domain);
         const max = getMaxTxNonce(domainIntents);
         const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-        if (domainIntents.length > 0 && max > latest) {
+        if (domainIntents.length > 0 && max >= latest) {
           return { domain, checkpoint: max };
         }
         return undefined;
@@ -246,6 +252,10 @@ export const updateHubIntents = async () => {
   const enqueuedLatestNonce = await database.getCheckPoint('hub_intent_enqueued_' + config.hub.domain);
   const safeConfirmations = config.hub.confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
   const maxBlockNumber = latestBlockMap.get(config.hub.domain)! - safeConfirmations;
+  // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+  const queryAddedNonce = addedLatestNonce > 0 ? addedLatestNonce + 1 : addedLatestNonce;
+  const queryFilledNonce = filledLatestNonce > 0 ? filledLatestNonce + 1 : filledLatestNonce;
+  const queryEnqueuedNonce = enqueuedLatestNonce > 0 ? enqueuedLatestNonce + 1 : enqueuedLatestNonce;
   logger.debug('Querying subgraph for hub intents', requestContext, methodContext, {
     addedLatestNonce,
     filledLatestNonce,
@@ -258,9 +268,9 @@ export const updateHubIntents = async () => {
   // NOTE: enqueued intents will also include the slow path intents
   const [addedIntents, filledIntents, enqueuedIntents] = await subgraph.getHubIntentsByNonce(
     config.hub.domain,
-    addedLatestNonce,
-    filledLatestNonce,
-    enqueuedLatestNonce,
+    queryAddedNonce,
+    queryFilledNonce,
+    queryEnqueuedNonce,
     maxBlockNumber,
   );
   logger.debug('Retrieved hub intents', requestContext, methodContext, {
@@ -340,9 +350,11 @@ export const updateSettlementIntents = async () => {
       // Retrieve the most recent settlement intent nonce we've saved for this domain.
       const latestNonce = await database.getCheckPoint('settlement_intent_' + domain);
       const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
+      // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+      const queryFromNonce = latestNonce > 0 ? latestNonce + 1 : latestNonce;
       queryMetaParams.set(domain, {
         maxBlockNumber: latestBlockNumber - safeConfirmations,
-        latestNonce: latestNonce,
+        latestNonce: queryFromNonce,
         orderDirection: 'asc',
       });
     }),
@@ -367,7 +379,7 @@ export const updateSettlementIntents = async () => {
       const domainIntents = intents.filter((intent) => intent.domain === domain);
       const max = getMaxTxNonce(domainIntents);
       const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-      if (domainIntents.length > 0 && max > latest) {
+      if (domainIntents.length > 0 && max >= latest) {
         return { domain, checkpoint: max };
       }
       return undefined;
@@ -414,9 +426,11 @@ export const updateOrders = async () => {
       // Retrieve the most recent order nonce we've saved for this domain
       const latestNonce = await database.getCheckPoint('order_' + domain);
       const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
+      // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+      const queryFromNonce = latestNonce > 0 ? latestNonce + 1 : latestNonce;
       queryMetaParams.set(domain, {
         maxBlockNumber: latestBlockNumber - safeConfirmations,
-        latestNonce: latestNonce,
+        latestNonce: queryFromNonce,
         orderDirection: 'asc',
       });
     }),
@@ -440,7 +454,7 @@ export const updateOrders = async () => {
       const domainOrders = orders.filter((order) => order.domain === domain);
       const max = getMaxTxNonce(domainOrders);
       const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-      if (domainOrders.length > 0 && max > latest) {
+      if (domainOrders.length > 0 && max >= latest) {
         return { domain, checkpoint: max };
       }
       return undefined;

@@ -36,6 +36,8 @@ export const updateHubInvoices = async () => {
   // Get the latest checkpoint for the hub domain
   const enqueuedLatestNonce = await database.getCheckPoint('hub_invoice_' + config.hub.domain);
   const maxBlockNumber = latestBlockMap.get(config.hub.domain)!;
+  // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+  const queryEnqueuedNonce = enqueuedLatestNonce > 0 ? enqueuedLatestNonce + 1 : enqueuedLatestNonce;
   logger.debug('Querying subgraph for hub invoices', requestContext, methodContext, {
     enqueuedLatestNonce,
     domain: config.hub.domain,
@@ -45,7 +47,7 @@ export const updateHubInvoices = async () => {
   // Get invoices from subgraph
   const [hubInvoices, hubIntents] = await subgraph.getHubInvoicesByNonce(
     config.hub.domain,
-    enqueuedLatestNonce,
+    queryEnqueuedNonce,
     maxBlockNumber,
   );
   logger.debug('Retrieved hub invoices', requestContext, methodContext, {
@@ -114,6 +116,9 @@ export const updateHubDeposits = async () => {
     database.getCheckPoint('hub_deposit_processed_' + config.hub.domain),
   ]);
   const maxBlockNumber = latestBlockMap.get(config.hub.domain)!;
+  // Increase the latest nonce to exclude already-processed events (query uses txNonce_gte)
+  const queryEnqueuedNonce = enqueuedLatestNonce > 0 ? enqueuedLatestNonce + 1 : enqueuedLatestNonce;
+  const queryProcessedNonce = processedLatestNonce > 0 ? processedLatestNonce + 1 : processedLatestNonce;
   logger.debug('Querying subgraph for hub deposits', requestContext, methodContext, {
     processedLatestNonce,
     enqueuedLatestNonce,
@@ -123,8 +128,8 @@ export const updateHubDeposits = async () => {
 
   // Get deposits from subgraph
   const [enqueuedDeposits, processedDeposits] = await Promise.all([
-    subgraph.getDepositsEnqueuedByNonce(config.hub.domain, enqueuedLatestNonce, maxBlockNumber),
-    subgraph.getDepositsProcessedByNonce(config.hub.domain, processedLatestNonce, maxBlockNumber),
+    subgraph.getDepositsEnqueuedByNonce(config.hub.domain, queryEnqueuedNonce, maxBlockNumber),
+    subgraph.getDepositsProcessedByNonce(config.hub.domain, queryProcessedNonce, maxBlockNumber),
   ]);
   logger.debug('Retrieved hub deposits', requestContext, methodContext, {
     enqueuedDeposits: enqueuedDeposits.map((i) => ({ id: i.id })),
