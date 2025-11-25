@@ -23,11 +23,7 @@ pub fn new_order(
         SpokeError::FeeAdapterPaused
     );
 
-    let asset = params[0].input_asset;
-    for p in &params {
-        require!(p.input_asset == asset, SpokeError::MultipleOrderAssets);
-    }
-
+    // NOTE: asset is required to be the same from accounts.mint.
     let mut accounts = NewIntentAccounts {
         spoke_state: ctx.accounts.spoke_state.as_ref().clone(),
         mint: ctx.accounts.mint.clone(),
@@ -54,7 +50,7 @@ pub fn new_order(
     let fee_data = FeeData {
         token_fee: fee_param.token_fee,
         native_fee: fee_param.native_fee,
-        input_asset: asset,
+        input_asset: ctx.accounts.mint.key(),
         deadline: fee_param.deadline,
     };
     let fee_accounts = HandleFeeAccounts {
@@ -79,9 +75,9 @@ pub fn new_order(
             &mut accounts,
             program_id,
             p.receiver,
-            p.input_asset,
             p.output_asset,
             p.amount,
+            p.amount_out_min,
             p.ttl,
             p.destinations.clone(),
             p.data.clone(),
@@ -125,9 +121,9 @@ pub fn new_order(
 pub struct OrderParameters {
     pub destinations: Vec<u32>,
     pub receiver: Pubkey,
-    pub input_asset: Pubkey,
     pub output_asset: Pubkey,
     pub amount: u64,
+    pub amount_out_min: u64,
     pub max_fee: u32,
     pub ttl: u64,
     pub data: Vec<u8>,

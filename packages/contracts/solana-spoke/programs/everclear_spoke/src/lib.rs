@@ -69,10 +69,9 @@ pub mod everclear_spoke {
     pub fn new_intent(
         ctx: Context<NewIntent>,
         receiver: Pubkey,
-        input_asset: Pubkey,
         output_asset: Pubkey,
         amount: u64,
-        max_fee: u32,
+        amount_out_min: u64,
         ttl: u64,
         destinations: Vec<u32>,
         data: Vec<u8>,
@@ -82,9 +81,9 @@ pub mod everclear_spoke {
         instructions::new_intent(
             ctx,
             receiver,
-            input_asset,
             output_asset,
             amount,
+            amount_out_min,
             ttl,
             destinations,
             data,

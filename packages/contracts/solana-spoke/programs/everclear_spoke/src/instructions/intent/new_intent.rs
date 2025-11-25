@@ -32,9 +32,9 @@ use crate::{
 pub fn new_intent(
     ctx: Context<NewIntent>,
     receiver: Pubkey,
-    input_asset: Pubkey,
     output_asset: Pubkey,
     amount: u64,
+    amount_out_min: u64,
     ttl: u64,
     destinations: Vec<u32>,
     data: Vec<u8>,
@@ -66,7 +66,7 @@ pub fn new_intent(
     let fee_data = FeeData {
         token_fee: fee_param.token_fee,
         native_fee: fee_param.native_fee,
-        input_asset,
+        input_asset: ctx.accounts.mint.key(),
         deadline: fee_param.deadline,
     };
     let fee_accounts = HandleFeeAccounts {
@@ -91,9 +91,9 @@ pub fn new_intent(
         &mut accounts,
         program_id,
         receiver,
-        input_asset,
         output_asset,
         amount,
+        amount_out_min,
         ttl,
         destinations,
         data,
@@ -125,9 +125,9 @@ pub fn handle_new_intent<'info>(
     accounts: &mut NewIntentAccounts<'info>,
     program_id: Pubkey, // for ctx.programId
     receiver: Pubkey,
-    input_asset: Pubkey,
     output_asset: Pubkey,
     amount: u64,
+    amount_out_min: u64,
     ttl: u64,
     destinations: Vec<u32>,
     data: Vec<u8>,
@@ -208,8 +208,8 @@ pub fn handle_new_intent<'info>(
         timestamp: clock.unix_timestamp as u64,
         ttl,
         amount: u128_to_u256_be(normalized_amount),
-        // NOTE: we dont support swap flow from solana now and hardcode amountOutMin to 0
-        amount_out_min: u128_to_u256_be(0),
+        // NOTE: amount_out_min should be already normalized based on how fill works
+        amount_out_min: u128_to_u256_be(amount_out_min.into()),
         destinations: destinations.clone(),
         data: data.clone(),
     };
