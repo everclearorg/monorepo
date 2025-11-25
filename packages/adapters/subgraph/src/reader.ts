@@ -101,11 +101,20 @@ export class SubgraphReader {
     const { config } = getContext();
     const subgraphConfig = config.subgraphs[domain];
     const { endpoints, timeout } = subgraphConfig ?? {};
+    
+    // Validate that the domain has a valid subgraph configuration
     if (!endpoints?.length || !timeout) {
       throw new DomainInvalid(domain);
     }
+    
+    // Validate that endpoints contain at least one non-empty URL
+    const validEndpoints = endpoints.filter((url) => url && url.trim() !== '');
+    if (validEndpoints.length === 0) {
+      throw new DomainInvalid(domain);
+    }
+    
     try {
-      const ret = await execute<T>(domain, queries, endpoints, timeout);
+      const ret = await execute<T>(domain, queries, validEndpoints, timeout);
       return { data: ret, domain } as QueryResponse<T>;
     } catch (e: unknown) {
       console.error(jsonifyError(e as Error));
