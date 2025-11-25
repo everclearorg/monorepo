@@ -3,6 +3,7 @@ import { SubgraphQueryMetaParams } from '@chimera-monorepo/adapters-subgraph';
 
 import { getContext } from '../../shared';
 import { DEFAULT_SAFE_CONFIRMATIONS } from '.';
+import { getSubgraphSupportedDomains } from './helper';
 
 export const updateOriginIntents = async () => {
   const {
@@ -11,7 +12,7 @@ export const updateOriginIntents = async () => {
     logger,
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateOriginIntents.name);
-  const domains = Object.keys(config.chains).filter((domain) => domain !== config.hub.domain);
+  const domains = getSubgraphSupportedDomains(config);
 
   logger.debug('Method start', requestContext, methodContext, { domains, chains: Object.keys(config.chains) });
 
@@ -159,7 +160,7 @@ export const updateDestinationIntents = async () => {
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateDestinationIntents.name);
 
-  const domains = Object.keys(config.chains).filter((domain) => domain !== config.hub.domain);
+  const domains = getSubgraphSupportedDomains(config);
 
   const queryMetaParams: Map<string, SubgraphQueryMetaParams> = new Map();
   const latestBlockNumbers: Map<string, number> = await subgraph.getLatestBlockNumber(domains);
@@ -325,7 +326,7 @@ export const updateSettlementIntents = async () => {
     logger,
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateSettlementIntents.name);
-  const domains = Object.keys(config.chains).filter((domain) => domain !== config.hub.domain);
+  const domains = getSubgraphSupportedDomains(config);
 
   logger.debug('Method start', requestContext, methodContext, { domains, chains: Object.keys(config.chains) });
 
@@ -401,7 +402,7 @@ export const updateOrders = async () => {
     logger,
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(updateOrders.name);
-  const domains = Object.keys(config.chains).filter((domain) => domain !== config.hub.domain);
+  const domains = getSubgraphSupportedDomains(config);
 
   logger.debug('Method start', requestContext, methodContext, { domains, chains: Object.keys(config.chains) });
 
