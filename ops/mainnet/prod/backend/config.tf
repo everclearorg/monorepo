@@ -70,6 +70,12 @@ locals {
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      }
       "48900" = {
         providers = [
           "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
