@@ -56,7 +56,7 @@ contract AaveReceiverTest is Test {
     // Call supply on receiver
     receiver.supply(address(USDT), supplyAmount, user, 0);
 
-    // Aserting balance reduction
+    // Asserting balance reduction
     uint256 receiverUSDTBalanceAfter = USDT.balanceOf(address(receiver));
     assertEq(receiverUSDTBalanceAfter, 0, 'receiver USDT balance after');
   }
@@ -75,7 +75,7 @@ contract AaveReceiverTest is Test {
     // Call supply on receiver
     receiver.supply(address(USDC), supplyAmount, user, 0);
 
-    // Aserting balance reduction
+    // Asserting balance reduction
     uint256 receiverUSDCBalanceAfter = USDC.balanceOf(address(receiver));
     assertEq(receiverUSDCBalanceAfter, 0, 'receiver USDC balance after');
   }
@@ -94,7 +94,7 @@ contract AaveReceiverTest is Test {
     // Call supply on receiver
     receiver.supply(address(DAI), supplyAmount, user, 0);
 
-    // Aserting balance reduction
+    // Asserting balance reduction
     uint256 receiverDAIBalanceAfter = DAI.balanceOf(address(receiver));
     assertEq(receiverDAIBalanceAfter, 0, 'receiver DAI balance after');
   }
@@ -113,7 +113,7 @@ contract AaveReceiverTest is Test {
     // Call supply on receiver
     receiver.supply(address(WBTC), supplyAmount, user, 0);
 
-    // Aserting balance reduction
+    // Asserting balance reduction
     uint256 receiverWBTCBalanceAfter = WBTC.balanceOf(address(receiver));
     assertEq(receiverWBTCBalanceAfter, 0, 'receiver WBTC balance after');
   }
@@ -234,7 +234,7 @@ contract AaveReceiverTest is Test {
     // Call supply on receiver
     IAaveV3Pool(AAVE_POOL).supply(address(USDC), supplyAmount, user, 0);
 
-    // Aserting balance reduction
+    // Asserting balance reduction
     uint256 userUSDCBalanceAfter = USDC.balanceOf(address(user));
     assertEq(userUSDCBalanceAfter, 0, 'user USDC balance after');
     vm.stopPrank();
@@ -256,7 +256,7 @@ contract AaveReceiverTest is Test {
     // Call supply on receiver
     IAaveV3Pool(AAVE_POOL).supply(address(DAI), supplyAmount, user, 0);
 
-    // Aserting balance reduction
+    // Asserting balance reduction
     uint256 userDAIBalanceAfter = DAI.balanceOf(address(user));
     assertEq(userDAIBalanceAfter, 0, 'user DAI balance after');
     vm.stopPrank();
@@ -278,7 +278,7 @@ contract AaveReceiverTest is Test {
     // Call supply on receiver
     IAaveV3Pool(AAVE_POOL).supply(address(WBTC), supplyAmount, user, 0);
 
-    // Aserting balance reduction
+    // Asserting balance reduction
     uint256 userWBTCBalanceAfter = WBTC.balanceOf(address(user));
     assertEq(userWBTCBalanceAfter, 0, 'user WBTC balance after');
     vm.stopPrank();
