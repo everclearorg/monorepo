@@ -119,6 +119,12 @@ locals {
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      }
       "1399811149" = {
         providers = [
           "https://mainnet.helius-rpc.com/?api-key=${var.helius_key}",
@@ -180,6 +186,12 @@ locals {
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+        ]
+      }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
         ]
       }
       "1399811149" = {
@@ -248,6 +260,12 @@ locals {
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
         ]
       }
       "1399811149" = {
@@ -342,6 +360,7 @@ locals {
       10         = { maxAge = 60, size = 1 },
       42161      = { maxAge = 60, size = 1 },
       8453       = { maxAge = 60, size = 1 },
+      239        = { maxAge = 60, size = 1 },
       25327      = { maxAge = 60, size = 1 },
       1399811149 = { maxAge = 60, size = 1 },
       728126428  = { maxAge = 60, size = 1 }
@@ -371,6 +390,12 @@ locals {
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
         ]
       }
       "1399811149" = {

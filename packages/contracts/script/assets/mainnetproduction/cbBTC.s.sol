@@ -36,7 +36,7 @@ contract CBBTC is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](3);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](2);
 
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -47,17 +47,8 @@ contract CBBTC is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
-    ///// Arbitrum
-    _assetConfigs[1] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: ARBITRUM_CBBTC.toBytes32(),
-      domain: ARBITRUM_ONE,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
     ///// Base
-    _assetConfigs[2] = IHubStorage.AssetConfig({
+    _assetConfigs[1] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
       adopted: BASE_CBBTC.toBytes32(),
       domain: BASE,
