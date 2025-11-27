@@ -72,7 +72,7 @@ locals {
       }
       "239" = {
         providers = [
-          "https://rpc.ankr.com/tac",
+          "https://rpc.ankr.com/tac/${var.ankr_key}",
           "https://rpc.tac.build"
         ]
       }
