@@ -62,6 +62,11 @@ variable "alchemy_key" {
   sensitive = true
 }
 
+variable "ankr_key" {
+  type      = string
+  sensitive = true
+}
+
 variable "helius_key" {
   type      = string
   sensitive = true
