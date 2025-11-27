@@ -1,5 +1,7 @@
--- Dumped from database version 16.10 (Debian 16.10-1.pgdg13+1)
--- Dumped by pg_dump version 16.10 (Ubuntu 16.10-1.pgdg22.04+1)
+\restrict cZInaaWNXHJxHzU89H9PAd1E1yyhu49WDdq8q68x05QaVOa4epd1cuJQufgVe13
+
+-- Dumped from database version 16.3 (Debian 16.3-1.pgdg120+1)
+-- Dumped by pg_dump version 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1595,7 +1597,7 @@ DECLARE
     input_asset TEXT;
     output_asset TEXT;
     normalized_amount NUMERIC;
-    max_fee INT;
+    amount_out_min NUMERIC;
     origin_domain INT;
     nonce NUMERIC;
     ttl NUMERIC;
@@ -1621,8 +1623,8 @@ BEGIN
 	pos := pos + 64;
 	normalized_amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
 	pos := pos + 32;
-	max_fee := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
-	pos := pos + 8;
+	amount_out_min := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
+	pos := pos + 32;
 	origin_domain := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
 	pos := pos + 8;
 	nonce := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
@@ -1652,6 +1654,7 @@ BEGIN
 		input_asset,
 		output_asset,
 		amount,
+		amount_out_min,
 		max_fee,
 		origin,
 		nonce,
@@ -1676,7 +1679,8 @@ BEGIN
 		input_asset,
 		output_asset,
 		normalized_amount,
-		max_fee,
+		amount_out_min,
+		0,
 		origin_domain,
 		nonce,
 		data,
@@ -1700,6 +1704,7 @@ BEGIN
 		input_asset = EXCLUDED.input_asset,
 		output_asset = EXCLUDED.output_asset,
 		amount = EXCLUDED.amount,
+		amount_out_min = EXCLUDED.amount_out_min,
 		max_fee = EXCLUDED.max_fee,
 		origin = EXCLUDED.origin,
 		nonce = EXCLUDED.nonce,
@@ -3239,7 +3244,7 @@ ALTER SEQUENCE public.rewards_id_seq OWNED BY public.rewards.id;
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying(255) NOT NULL
+    version character varying(128) NOT NULL
 );
 
 
@@ -5345,6 +5350,8 @@ ALTER TABLE ONLY public.swap_fills
 -- PostgreSQL database dump complete
 --
 
+\unrestrict cZInaaWNXHJxHzU89H9PAd1E1yyhu49WDdq8q68x05QaVOa4epd1cuJQufgVe13
+
 
 --
 -- Dbmate schema migrations
@@ -5469,4 +5476,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251110024449'),
     ('20251110053118'),
     ('20251110182740'),
-    ('20251125175538');
+    ('20251125175538'),
+    ('20251127055400');
