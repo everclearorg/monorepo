@@ -36,7 +36,7 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](15);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](19);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -169,6 +169,42 @@ contract USDT is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: SOLANA_USDT,
       domain: SOLANA,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// TAC
+    _assetConfigs[15] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: TAC_USDT.toBytes32(),
+      domain: TAC,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    /// BAse
+    _assetConfigs[16] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BASE_USDT.toBytes32(),
+      domain: BASE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    /// Tron
+    _assetConfigs[17] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: TRON_USDT.toBytes32(),
+      domain: TRON,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    /// Zircut
+    _assetConfigs[18] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: ZIRCUIT_USDT.toBytes32(),
+      domain: ZIRCUIT,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
