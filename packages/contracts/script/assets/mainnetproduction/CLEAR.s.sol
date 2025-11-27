@@ -36,7 +36,7 @@ contract CLEAR is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](6);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](5);
 
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -79,15 +79,6 @@ contract CLEAR is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: POLYGON_CLEAR.toBytes32(),
       domain: POLYGON,
-      approval: true,
-      strategy: IEverclear.Strategy.XERC20
-    });
-
-    ///// Gnosis
-    _assetConfigs[5] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: GNOSIS_CLEAR.toBytes32(),
-      domain: GNOSIS,
       approval: true,
       strategy: IEverclear.Strategy.XERC20
     });
