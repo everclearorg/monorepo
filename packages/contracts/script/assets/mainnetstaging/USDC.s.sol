@@ -29,14 +29,14 @@ contract USDC is AddAssetBase, MainnetStagingEnvironment {
                               TOKEN FEES
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](1);
-    _fees[0] = IHubStorage.Fee({recipient: OWNER, fee: 100}); // 10 BPS
+    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](0);
+    // _fees[0] = IHubStorage.Fee({recipient: OWNER, fee: 100}); // 10 BPS
 
     /*///////////////////////////////////////////////////////////////
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](2);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](6);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -56,6 +56,42 @@ contract USDC is AddAssetBase, MainnetStagingEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    //// Base
+    _assetConfigs[2] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BASE_USDC.toBytes32(),
+      domain: BASE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    //// Ethereum
+    _assetConfigs[3] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: ETHEREUM_USDC.toBytes32(),
+      domain: ETHEREUM,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Solana
+    _assetConfigs[4] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SOLANA_USDC,
+      domain: SOLANA,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Mantle
+    _assetConfigs[5] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MANTLE_USDC.toBytes32(),
+      domain: MANTLE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
                           TOKEN SETUP
     //////////////////////////////////////////////////////////////*/
@@ -64,8 +100,8 @@ contract USDC is AddAssetBase, MainnetStagingEnvironment {
       tickerHash: _tickerHash,
       initLastClosedEpochProcessed: true,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
-      maxDiscountDbps: 10_000,
-      discountPerEpoch: 8,
+      maxDiscountDbps: 0,
+      discountPerEpoch: 0,
       fees: _fees,
       adoptedForAssets: _assetConfigs
     });
