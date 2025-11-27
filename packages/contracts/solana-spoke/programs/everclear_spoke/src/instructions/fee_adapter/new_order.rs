@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::error::SpokeError;
-use crate::events::{IntentAddedEvent, OrderCreated};
+use crate::events::OrderCreated;
 use crate::instructions::fee_adapter::{
     handle_fees, FeeData, FeeParams, HandleFeeAccounts, SignatureAccounts,
 };
@@ -84,22 +84,7 @@ pub fn new_order(
             p.message_gas_limit,
         )?;
 
-        emit_cpi!(IntentAddedEvent {
-            intent_id: event_data.intent_id,
-            message_id: event_data.message_id,
-            initiator: event_data.initiator,
-            receiver: event_data.receiver,
-            input_asset: event_data.input_asset,
-            output_asset: event_data.output_asset,
-            normalized_amount: event_data.normalized_amount,
-            max_fee: event_data.max_fee,
-            origin_domain: event_data.origin_domain,
-            nonce: event_data.nonce,
-            ttl: event_data.ttl,
-            timestamp: event_data.timestamp,
-            destinations: event_data.destinations,
-            data: event_data.data,
-        });
+        emit_cpi!(event_data);
 
         intent_ids.push(event_data.intent_id);
     }
@@ -123,7 +108,7 @@ pub struct OrderParameters {
     pub receiver: Pubkey,
     pub output_asset: Pubkey,
     pub amount: u64,
-    pub amount_out_min: u64,
+    pub amount_out_min: u128,
     pub max_fee: u32,
     pub ttl: u64,
     pub data: Vec<u8>,

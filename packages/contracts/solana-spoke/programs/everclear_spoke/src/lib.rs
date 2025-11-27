@@ -71,7 +71,7 @@ pub mod everclear_spoke {
         receiver: Pubkey,
         output_asset: Pubkey,
         amount: u64,
-        amount_out_min: u64,
+        amount_out_min: u128,
         ttl: u64,
         destinations: Vec<u32>,
         data: Vec<u8>,

@@ -34,7 +34,7 @@ pub fn new_intent(
     receiver: Pubkey,
     output_asset: Pubkey,
     amount: u64,
-    amount_out_min: u64,
+    amount_out_min: u128,
     ttl: u64,
     destinations: Vec<u32>,
     data: Vec<u8>,
@@ -87,7 +87,7 @@ pub fn new_intent(
         handle_fees(fee_data, fee_param.signature, fee_accounts)?;
     }
 
-    let event_data = handle_new_intent(
+    let event = handle_new_intent(
         &mut accounts,
         program_id,
         receiver,
@@ -101,22 +101,7 @@ pub fn new_intent(
     )
     .unwrap();
 
-    emit_cpi!(IntentAddedEvent {
-        intent_id: event_data.intent_id,
-        message_id: event_data.message_id,
-        initiator: event_data.initiator,
-        receiver: event_data.receiver,
-        input_asset: event_data.input_asset,
-        output_asset: event_data.output_asset,
-        normalized_amount: event_data.normalized_amount,
-        max_fee: event_data.max_fee,
-        origin_domain: event_data.origin_domain,
-        nonce: event_data.nonce,
-        ttl: event_data.ttl,
-        timestamp: event_data.timestamp,
-        destinations: event_data.destinations,
-        data: event_data.data,
-    });
+    emit_cpi!(event);
 
     Ok(())
 }
@@ -127,12 +112,12 @@ pub fn handle_new_intent<'info>(
     receiver: Pubkey,
     output_asset: Pubkey,
     amount: u64,
-    amount_out_min: u64,
+    amount_out_min: u128,
     ttl: u64,
     destinations: Vec<u32>,
     data: Vec<u8>,
     message_gas_limit: u64,
-) -> Result<EventData> {
+) -> Result<IntentAddedEvent> {
     let spoke_state = accounts.spoke_state.clone();
 
     let state = &mut accounts.spoke_state;
@@ -209,7 +194,7 @@ pub fn handle_new_intent<'info>(
         ttl,
         amount: u128_to_u256_be(normalized_amount),
         // NOTE: amount_out_min should be already normalized based on how fill works
-        amount_out_min: u128_to_u256_be(amount_out_min.into()),
+        amount_out_min: u128_to_u256_be(amount_out_min),
         destinations: destinations.clone(),
         data: data.clone(),
     };
@@ -263,7 +248,7 @@ pub fn handle_new_intent<'info>(
     let message_id = transfer_remote(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
-    Ok(EventData {
+    Ok(IntentAddedEvent {
         intent_id,
         message_id: message_id.into(),
         initiator: accounts.authority.key(),
@@ -271,7 +256,7 @@ pub fn handle_new_intent<'info>(
         input_asset: accounts.mint.key(),
         output_asset,
         normalized_amount,
-        max_fee: u32::MAX,
+        amount_out_min,
         origin_domain: state.domain,
         nonce: new_nonce,
         ttl,
