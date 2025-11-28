@@ -35,8 +35,6 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   // Note: not available for Solana VM based chains.
   bytes4 public constant GENERIC_EXTRA_ARGS_V2_TAG = 0x181dcf10;
 
-  address public mailbox;
-
   IMessageReceiver public receiver;
 
   /// @inheritdoc ISpecifiesInterchainSecurityModule
@@ -56,7 +54,7 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
 
   mapping(bytes32 => bool) public usedUniqueHashes;
 
-  uint256[50] _GAP;
+  uint256[50] _gap;
 
   /**
    * @notice Checks that the function is called by the local receiver
@@ -133,15 +131,6 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   /*//////////////////////////////////////////////////////////////
                         GATED RECEIVER FUNCTIONS
   //////////////////////////////////////////////////////////////*/
-
-  function updateMailbox(
-    address _newMailbox
-  ) external onlyReceiver {
-    address oldMailbox = mailbox;
-    mailbox = _newMailbox;
-    emit MailboxUpdated(oldMailbox, _newMailbox);
-  }
-
   function updateSecurityModule(
     address _newSecurityModule
   ) external onlyReceiver validAddress(_newSecurityModule.toBytes32()) {

@@ -128,6 +128,7 @@ contract HubGatewayV2 is GatewayV2, UUPSUpgradeable, IHubGatewayV2 {
 
   /**
    * @notice Returns the address of the gateway for the given domain
+   * @dev Reverts if no gateway is set for the domain
    * @param _domain The domain of the message
    * @return _gateway The address of the gateway
    */
