@@ -84,7 +84,7 @@ export const IntentSchema = Type.Object({
   nonce: Type.Integer(),
   timestamp: Type.Integer(),
   data: Type.String(),
-  maxFee: Type.Integer(),
+  amountOutMin: TIntegerString,
   ttl: Type.Integer(),
 });
 export type Intent = Static<typeof IntentSchema>;
@@ -123,6 +123,7 @@ export const OriginIntentSchema = Type.Intersect([
     tokenFee: Type.Optional(TIntegerString),
     feeAdapterInitiator: Type.Optional(TAddress),
     orderId: Type.Optional(TBytes32),
+    isSwap: Type.Optional(Type.Boolean({ default: false })),
   }),
 ]);
 export type OriginIntent = Static<typeof OriginIntentSchema>;
@@ -138,6 +139,7 @@ export const DestinationIntentSchema = Type.Intersect([
     status: Type.Enum(TIntentStatus),
     solver: TAddress,
     fee: TIntegerString,
+    amountOut: TIntegerString,
     destination: TDomainId, // where intent calldata is executed / dispatched to
   }),
 ]);

@@ -15,15 +15,24 @@ import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {Uint32Set} from 'contracts/hub/lib/Uint32Set.sol';
 
 contract TestHandler is Handler {
-  function mockStatus(bytes32 _intentId, uint8 _status) public {
+  function mockStatus(
+    bytes32 _intentId,
+    uint8 _status
+  ) public {
     _contexts[_intentId].status = IEverclear.IntentStatus(_status);
   }
 
-  function mockTTL(bytes32 _intentId, uint48 _ttl) public {
+  function mockTTL(
+    bytes32 _intentId,
+    uint48 _ttl
+  ) public {
     _contexts[_intentId].intent.ttl = _ttl;
   }
 
-  function mockIntentTimestamp(bytes32 _intentId, uint48 _intentTimestamp) public {
+  function mockIntentTimestamp(
+    bytes32 _intentId,
+    uint48 _intentTimestamp
+  ) public {
     _contexts[_intentId].intent.timestamp = _intentTimestamp;
   }
 
@@ -39,14 +48,21 @@ contract TestHandler is Handler {
     hubGateway = IHubGateway(_hubGateway);
   }
 
-  function mockIntentData(bytes32 _intentId, IEverclear.Intent memory _intent) public {
+  function mockIntentData(
+    bytes32 _intentId,
+    IEverclear.Intent memory _intent
+  ) public {
     _contexts[_intentId].intent = _intent;
     _contexts[_intentId].intent.amount = _intent.amount;
     _contexts[_intentId].intent.inputAsset = _intent.inputAsset;
     _contexts[_intentId].intent.initiator = _intent.initiator;
   }
 
-  function mockFeeVault(bytes32 _tickerHash, address _caller, uint256 _feeVault) public {
+  function mockFeeVault(
+    bytes32 _tickerHash,
+    address _caller,
+    uint256 _feeVault
+  ) public {
     feeVault[_tickerHash][_caller] = _feeVault;
   }
 
@@ -56,7 +72,11 @@ contract TestHandler is Handler {
     epochLength = _epochLength;
   }
 
-  function mockLiquidity(bytes32 _tickerHash, uint256 _liquidity, uint32 _destination) public {
+  function mockLiquidity(
+    bytes32 _tickerHash,
+    uint256 _liquidity,
+    uint32 _destination
+  ) public {
     TokenConfig storage _tokenConfig = _tokenConfigs[_tickerHash];
     custodiedAssets[_tokenConfig.assetHashes[_destination]] = _liquidity;
   }
@@ -82,7 +102,10 @@ contract Unit_HandleExpiredIntents is BaseTest {
    * @param _intentId The intent ID
    * @param _status The status
    */
-  function test_Revert_HandleExpiredIntent_InvalidStatus(bytes32 _intentId, uint8 _status) public {
+  function test_Revert_HandleExpiredIntent_InvalidStatus(
+    bytes32 _intentId,
+    uint8 _status
+  ) public {
     vm.assume(
       _status != uint8(IEverclear.IntentStatus.DEPOSIT_PROCESSED) && _status < uint8(type(IEverclear.IntentStatus).max)
     );
@@ -220,7 +243,10 @@ contract Unit_ReturnUnsupportedIntent is BaseTest {
    * @param _intentId The intent ID
    * @param _status The status
    */
-  function test_Revert_ReturnUnsupportedIntent_InvalidStatus(bytes32 _intentId, uint8 _status) public {
+  function test_Revert_ReturnUnsupportedIntent_InvalidStatus(
+    bytes32 _intentId,
+    uint8 _status
+  ) public {
     vm.assume(
       _status != uint8(IEverclear.IntentStatus.UNSUPPORTED) && _status < uint8(type(IEverclear.IntentStatus).max)
     );

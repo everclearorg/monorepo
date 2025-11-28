@@ -56,8 +56,9 @@ contract InvoiceViaFeeAdapter_XERC20 is IntegrationBase {
     assertEq(ERC20(address(sepoliaXToken)).balanceOf(sepoliaFeeAdapter.feeRecipient()), _feeAmount);
   }
 
-  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferNotZeroAfterDecimalConversion_FeeInTransacting(
-  ) public {
+  function test_InvoiceViaFeeAdapterWithoutDiscountXERC20_TTLZero_TransferNotZeroAfterDecimalConversion_FeeInTransacting()
+    public
+  {
     _switchFork(BSC_TESTNET_FORK);
 
     // reduce decimals to 6

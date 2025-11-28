@@ -28,23 +28,23 @@ import { gelatoRelay } from '.';
 
 /// MARK - Gelato Relay API
 /// Docs: https://relay.gelato.digital/api-docs/
-const GAS_LIMIT_FOR_RELAYER = (chainId: number): string | undefined => {
+const GAS_LIMIT_FOR_RELAYER = (chainId: number): bigint | undefined => {
   switch (chainId) {
     case 42161: {
-      return '100000000';
+      return BigInt('100000000');
     }
     case 421613: {
-      return '50000000';
+      return BigInt('50000000');
     }
     default: {
-      return '6000000';
+      return BigInt('6000000');
     }
   }
 };
 
 export const isChainSupportedByGelato = async (chainId: number): Promise<boolean> => {
   try {
-    const result = await gelatoRelay.isNetworkSupported(chainId);
+    const result = await gelatoRelay.isNetworkSupported(BigInt(chainId));
     return result;
   } catch (error: unknown) {
     throw new UnableToGetGelatoSupportedChains(chainId, { err: jsonifyError(error as Error) });
@@ -66,9 +66,7 @@ enum TaskState {
   ExecSuccess = 'ExecSuccess',
   ExecReverted = 'ExecReverted',
   WaitingForConfirmation = 'WaitingForConfirmation',
-  Blacklisted = 'Blacklisted',
   Cancelled = 'Cancelled',
-  NotFound = 'NotFound',
 }
 
 /**
@@ -95,14 +93,8 @@ export const getTaskStatus = async (taskId: string): Promise<RelayerTaskStatus> 
       case TaskState.WaitingForConfirmation: {
         return RelayerTaskStatus.WaitingForConfirmation;
       }
-      case TaskState.Blacklisted: {
-        return RelayerTaskStatus.Blacklisted;
-      }
       case TaskState.Cancelled: {
         return RelayerTaskStatus.Cancelled;
-      }
-      case TaskState.NotFound: {
-        return RelayerTaskStatus.NotFound;
       }
       default: {
         return RelayerTaskStatus.NotFound;
@@ -236,7 +228,7 @@ export const send = async (
   });
 
   const request: RelayerSyncFeeRequest = {
-    chainId: chainId,
+    chainId: BigInt(chainId),
     target: destinationAddress,
     data: encodedData,
     isRelayContext: false,

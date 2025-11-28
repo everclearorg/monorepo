@@ -39,7 +39,7 @@ export const getOriginIntentAddedQuery = (
   return `
     intentAddEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${destinationDomains.length ? `,intent_: {destination_in: [${destinationDomains}]}` : ''}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
@@ -61,7 +61,7 @@ export const getSettlementIntentEventQuery = (
   return `
     intentSettleEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},
@@ -95,7 +95,7 @@ export const getSpokeMessagesQuery = (
   return `
     messages (
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},
@@ -132,7 +132,7 @@ export const getDestinationIntentFilledQuery = (
   return `
     intentFillEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${originDomains.length ? `,intent_: {origin_in: [${originDomains}]}` : ''}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
@@ -179,7 +179,7 @@ export const getDepositorEventsQuery = (
   return `
     depositorEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},
@@ -222,7 +222,7 @@ export const getHubIntentAddedQuery = (
   return `
     intentAddEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},
@@ -243,7 +243,7 @@ export const getHubIntentFilledQuery = (
   return `
     intentFillEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},
@@ -264,7 +264,7 @@ export const getSettlementEnqueuedQuery = (
   return `
     settlementEnqueuedEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},
@@ -285,7 +285,7 @@ export const getInvoiceEnqueuedQuery = (
   return `
     invoiceEnqueuedEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},
@@ -319,7 +319,7 @@ export const getDepositsEnqueuedQuery = (
   return `
     depositEnqueuedEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit},
@@ -340,7 +340,7 @@ export const getDepositsProcessedQuery = (
   return `
     depositProcessedEvents(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit},
@@ -390,7 +390,7 @@ export const getSettlementMessagesQuery = (
   return `
     settlementMessages (
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},
@@ -419,7 +419,7 @@ export const getOrdersByNonce = (
   return `
     orderCreateds(
       where: {
-        txNonce_gte: ${fromNonce}
+        txNonce_gt: ${fromNonce}
         ${maxBlockNumber ? `, blockNumber_lte: ${maxBlockNumber}` : ''}
       },
       first: ${limit ?? 200},

@@ -34,13 +34,18 @@ contract Unit_GasTank is TestExtended {
       GasTank(payable(UnsafeUpgrades.deployUUPSProxy(_impl, abi.encodeCall(GasTankForTest.publicInit, (_OWNER)))));
   }
 
-  function _mockAuthorizedGasReceiver(address _address, bool _isAuthorized) internal {
-    stdstore.target(address(_gasTank)).sig(GasTank.isAuthorizedGasReceiver.selector).with_key(_address).checked_write(
-      _isAuthorized
-    );
+  function _mockAuthorizedGasReceiver(
+    address _address,
+    bool _isAuthorized
+  ) internal {
+    stdstore.target(address(_gasTank)).sig(GasTank.isAuthorizedGasReceiver.selector).with_key(_address)
+      .checked_write(_isAuthorized);
   }
 
-  function _mockFailedGasReceipt(address _receiver, uint256 _value) internal {
+  function _mockFailedGasReceipt(
+    address _receiver,
+    uint256 _value
+  ) internal {
     vm.mockCallRevert(_receiver, _value, '', abi.encode(false));
   }
 
@@ -75,7 +80,10 @@ contract Unit_GasTank is TestExtended {
   /**
    * @notice Test the `withdrawGas` function, as the owner
    */
-  function test_WithdrawGasAsOwner(uint256 _initialAmount, uint256 _amount) public {
+  function test_WithdrawGasAsOwner(
+    uint256 _initialAmount,
+    uint256 _amount
+  ) public {
     vm.assume(_initialAmount >= _amount);
     deal(address(_gasTank), _initialAmount);
 

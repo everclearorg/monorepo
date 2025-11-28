@@ -30,7 +30,7 @@ locals {
 
   local_cartographer_config = jsonencode({
     logLevel = "debug"
-    environment = "production" 
+    environment = "staging" 
     databaseUrl = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear"
     healthUrls = {
       intents     = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_intents_heartbeat}"
@@ -55,11 +55,11 @@ locals {
           "https://opt-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
-      # "42161" = {
-      #   providers = [
-      #     "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
-      #   ]
-      # }
+      "42161" = {
+        providers = [
+          "https://arb-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
@@ -77,6 +77,17 @@ locals {
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ],
         network = "tron"
+      }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      }
+      "5000" = {
+        providers = [
+          "https://mantle.drpc.org"
+        ]
       }
     }
   })

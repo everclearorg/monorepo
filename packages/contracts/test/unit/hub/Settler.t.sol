@@ -63,38 +63,65 @@ contract SettlerForTest is Settler {
     return _findDestinationWithStrategiesForInvoice(_epoch, _tickerHash, _invoice);
   }
 
-  function processDeposit(uint48 _epoch, uint32 _domain, bytes32 _tickerHash) public {
+  function processDeposit(
+    uint48 _epoch,
+    uint32 _domain,
+    bytes32 _tickerHash
+  ) public {
     _processDeposit(_epoch, _domain, _tickerHash);
   }
 
-  function processInvoice(uint48 _epoch, bytes32 _tickerHash, Invoice memory _invoice) public returns (bool _settled) {
+  function processInvoice(
+    uint48 _epoch,
+    bytes32 _tickerHash,
+    Invoice memory _invoice
+  ) public returns (bool _settled) {
     return _processInvoice(_epoch, _tickerHash, _invoice);
   }
 
-  function mockAssetMaxDiscountDbps(bytes32 _tickerHash, uint24 _maxDiscountDbps) public {
+  function mockAssetMaxDiscountDbps(
+    bytes32 _tickerHash,
+    uint24 _maxDiscountDbps
+  ) public {
     _tokenConfigs[_tickerHash].maxDiscountDbps = _maxDiscountDbps;
   }
 
-  function mockDiscountPerEpoch(bytes32 _tickerHash, uint24 _discountPerEpoch) public {
+  function mockDiscountPerEpoch(
+    bytes32 _tickerHash,
+    uint24 _discountPerEpoch
+  ) public {
     _tokenConfigs[_tickerHash].discountPerEpoch = _discountPerEpoch;
   }
 
-  function mockCustodiedAssets(bytes32 _assetHash, uint256 _amount) public {
+  function mockCustodiedAssets(
+    bytes32 _assetHash,
+    uint256 _amount
+  ) public {
     custodiedAssets[_assetHash] = _amount;
   }
 
-  function mockTokenConfigAssetHash(bytes32 _tickerHash, uint32 _destination, bytes32 _assetHash) public {
+  function mockTokenConfigAssetHash(
+    bytes32 _tickerHash,
+    uint32 _destination,
+    bytes32 _assetHash
+  ) public {
     _tokenConfigs[_tickerHash].assetHashes[_destination] = _assetHash;
     _adoptedForAssets[_assetHash].adopted = _assetHash;
   }
 
-  function mockTokenSupportedDomains(bytes32 _tickerHash, uint32[] memory _tokenSupportedDomains) public {
+  function mockTokenSupportedDomains(
+    bytes32 _tickerHash,
+    uint32[] memory _tokenSupportedDomains
+  ) public {
     for (uint256 _i; _i < _tokenSupportedDomains.length; _i++) {
       _tokenConfigs[_tickerHash].domains.add(_tokenSupportedDomains[_i]);
     }
   }
 
-  function mockTokenSupportedDomains(bytes32 _tickerHash, uint32 _tokenSupportedDomain) public {
+  function mockTokenSupportedDomains(
+    bytes32 _tickerHash,
+    uint32 _tokenSupportedDomain
+  ) public {
     _tokenConfigs[_tickerHash].domains.add(_tokenSupportedDomain);
   }
 
@@ -107,25 +134,42 @@ contract SettlerForTest is Settler {
     depositsAvailableInEpoch[_epoch][_domain][_tickerHash] = _depositsAvailable;
   }
 
-  function mockAssetPrioritizedStrategy(bytes32 _tickerHash, IEverclear.Strategy _strategy) public {
+  function mockAssetPrioritizedStrategy(
+    bytes32 _tickerHash,
+    IEverclear.Strategy _strategy
+  ) public {
     _tokenConfigs[_tickerHash].prioritizedStrategy = _strategy;
   }
 
-  function mockAssetHashStrategy(bytes32 _assetHash, IEverclear.Strategy _strategy) public {
+  function mockAssetHashStrategy(
+    bytes32 _assetHash,
+    IEverclear.Strategy _strategy
+  ) public {
     _adoptedForAssets[_assetHash].strategy = _strategy;
   }
 
-  function mockUserSupportedDomains(bytes32 _user, uint32[] memory _domains) public {
+  function mockUserSupportedDomains(
+    bytes32 _user,
+    uint32[] memory _domains
+  ) public {
     for (uint256 _i; _i < _domains.length; _i++) {
       _usersSupportedDomains[_user].add(_domains[_i]);
     }
   }
 
-  function mockDeposit(uint48 _epoch, uint32 _domain, bytes32 _tickerHash, IHubStorage.Deposit memory _deposit) public {
+  function mockDeposit(
+    uint48 _epoch,
+    uint32 _domain,
+    bytes32 _tickerHash,
+    IHubStorage.Deposit memory _deposit
+  ) public {
     deposits[_epoch][_domain][_tickerHash].enqueueDeposit(_deposit);
   }
 
-  function mockIntentContext(bytes32 _intentId, IntentContext memory _context) public {
+  function mockIntentContext(
+    bytes32 _intentId,
+    IntentContext memory _context
+  ) public {
     _contexts[_intentId] = _context;
   }
 
@@ -135,11 +179,17 @@ contract SettlerForTest is Settler {
     epochLength = _epochLength;
   }
 
-  function mockInvoice(bytes32 _tickerHash, Invoice memory _invoice) public {
+  function mockInvoice(
+    bytes32 _tickerHash,
+    Invoice memory _invoice
+  ) public {
     invoices[_tickerHash].append(_invoice);
   }
 
-  function mockLastEpochProcessed(bytes32 _tickerHash, uint48 _lastEpochProcessed) public {
+  function mockLastEpochProcessed(
+    bytes32 _tickerHash,
+    uint48 _lastEpochProcessed
+  ) public {
     lastClosedEpochsProcessed[_tickerHash] = _lastEpochProcessed;
   }
 
@@ -149,7 +199,10 @@ contract SettlerForTest is Settler {
     _supportedDomains.add(_domain);
   }
 
-  function mockSettlements(uint32 _domain, uint256 _amount) public {
+  function mockSettlements(
+    uint32 _domain,
+    uint256 _amount
+  ) public {
     for (uint256 _i; _i < _amount; _i++) {
       settlements[_domain].enqueueSettlement(
         IEverclear.Settlement({
@@ -320,10 +373,8 @@ contract Unit_GetDiscountedAmount is BaseTest {
     vm.assume(_params.depositsAvailable >= _params.invoiceAmount);
     vm.assume(
       _params.discountDbps == 0
-        || (
-          _params.discountDbps <= Constants.DBPS_DENOMINATOR
-            && type(uint256).max / _params.discountDbps >= _params.invoiceAmount
-        )
+        || (_params.discountDbps <= Constants.DBPS_DENOMINATOR
+          && type(uint256).max / _params.discountDbps >= _params.invoiceAmount)
     );
     settler.mockDepositsAvailableInEpoch(_params.epoch, _params.domain, _params.tickerHash, _params.depositsAvailable);
 
@@ -331,8 +382,9 @@ contract Unit_GetDiscountedAmount is BaseTest {
     uint256 _expectedRewardsForDepositors = _params.invoiceAmount * _params.discountDbps / Constants.DBPS_DENOMINATOR;
     uint256 _expectedAmountAfterDiscount = _params.invoiceAmount - _expectedRewardsForDepositors;
 
-    (uint256 _amountAfterDiscount, uint256 _amountToBeDiscounted, uint256 _rewardsForDepositors) = settler
-      .getDiscountedAmount(_params.tickerHash, _params.discountDbps, _params.domain, _params.epoch, _params.invoiceAmount);
+    (uint256 _amountAfterDiscount, uint256 _amountToBeDiscounted, uint256 _rewardsForDepositors) = settler.getDiscountedAmount(
+      _params.tickerHash, _params.discountDbps, _params.domain, _params.epoch, _params.invoiceAmount
+    );
 
     assertEq(_amountAfterDiscount, _expectedAmountAfterDiscount, 'invalid amount after discount');
     assertEq(_amountToBeDiscounted, _expectedAmountToBeDiscounted, 'invalid amount to be discounted');
@@ -349,10 +401,8 @@ contract Unit_GetDiscountedAmount is BaseTest {
     vm.assume(_params.depositsAvailable < _params.invoiceAmount);
     vm.assume(
       _params.discountDbps == 0
-        || (
-          _params.discountDbps <= Constants.DBPS_DENOMINATOR
-            && type(uint256).max / _params.discountDbps >= _params.invoiceAmount
-        )
+        || (_params.discountDbps <= Constants.DBPS_DENOMINATOR
+          && type(uint256).max / _params.discountDbps >= _params.invoiceAmount)
     );
     settler.mockDepositsAvailableInEpoch(_params.epoch, _params.domain, _params.tickerHash, _params.depositsAvailable);
 
@@ -361,8 +411,9 @@ contract Unit_GetDiscountedAmount is BaseTest {
       _params.depositsAvailable * _params.discountDbps / Constants.DBPS_DENOMINATOR;
     uint256 _expectedAmountAfterDiscount = _params.invoiceAmount - _expectedRewardsForDepositors;
 
-    (uint256 _amountAfterDiscount, uint256 _amountToBeDiscounted, uint256 _rewardsForDepositors) = settler
-      .getDiscountedAmount(_params.tickerHash, _params.discountDbps, _params.domain, _params.epoch, _params.invoiceAmount);
+    (uint256 _amountAfterDiscount, uint256 _amountToBeDiscounted, uint256 _rewardsForDepositors) = settler.getDiscountedAmount(
+      _params.tickerHash, _params.discountDbps, _params.domain, _params.epoch, _params.invoiceAmount
+    );
 
     assertEq(_amountAfterDiscount, _expectedAmountAfterDiscount, 'invalid amount after discount');
     assertEq(_amountToBeDiscounted, _expectedAmountToBeDiscounted, 'invalid amount to be discounted');
@@ -425,10 +476,7 @@ contract Unit_FindLowestDiscountAndHighestLiquidity is BaseTest {
     settler.mockDepositsAvailableInEpoch(_params.epoch, _params.domainB, _params.tickerHash, _params.depositsAvailableB);
 
     ISettler.FindDomainParams memory params = ISettler.FindDomainParams({
-      tickerHash: _params.tickerHash,
-      domains: domains,
-      invoice: _params.invoice,
-      epoch: _params.epoch
+      tickerHash: _params.tickerHash, domains: domains, invoice: _params.invoice, epoch: _params.epoch
     });
 
     ISettler.FindDomainResult memory result = settler.findLowestDiscountAndHighestLiquidity(params);
@@ -478,10 +526,7 @@ contract Unit_FindLowestDiscountAndHighestLiquidity is BaseTest {
     settler.mockDepositsAvailableInEpoch(_params.epoch, _params.domainB, _params.tickerHash, _params.depositsAvailableB);
 
     ISettler.FindDomainParams memory params = ISettler.FindDomainParams({
-      tickerHash: _params.tickerHash,
-      domains: domains,
-      invoice: _params.invoice,
-      epoch: _params.epoch
+      tickerHash: _params.tickerHash, domains: domains, invoice: _params.invoice, epoch: _params.epoch
     });
 
     ISettler.FindDomainResult memory result = settler.findLowestDiscountAndHighestLiquidity(params);
@@ -525,10 +570,7 @@ contract Unit_FindLowestDiscountAndHighestLiquidity is BaseTest {
     settler.mockDepositsAvailableInEpoch(_params.epoch, _params.domainB, _params.tickerHash, _params.depositsAvailableA);
 
     ISettler.FindDomainParams memory params = ISettler.FindDomainParams({
-      tickerHash: _params.tickerHash,
-      domains: domains,
-      invoice: _params.invoice,
-      epoch: _params.epoch
+      tickerHash: _params.tickerHash, domains: domains, invoice: _params.invoice, epoch: _params.epoch
     });
 
     ISettler.FindDomainResult memory result = settler.findLowestDiscountAndHighestLiquidity(params);
@@ -572,10 +614,7 @@ contract Unit_FindLowestDiscountAndHighestLiquidity is BaseTest {
     settler.mockDepositsAvailableInEpoch(_params.epoch, _params.domainB, _params.tickerHash, _params.depositsAvailableA);
 
     ISettler.FindDomainParams memory params = ISettler.FindDomainParams({
-      tickerHash: _params.tickerHash,
-      domains: domains,
-      invoice: _params.invoice,
-      epoch: _params.epoch
+      tickerHash: _params.tickerHash, domains: domains, invoice: _params.invoice, epoch: _params.epoch
     });
 
     ISettler.FindDomainResult memory result = settler.findLowestDiscountAndHighestLiquidity(params);
@@ -628,10 +667,7 @@ contract Unit_FindLowestDiscountAndHighestLiquidity is BaseTest {
     settler.mockDepositsAvailableInEpoch(_params.epoch, _params.domainB, _params.tickerHash, _params.depositsAvailableB);
 
     ISettler.FindDomainParams memory params = ISettler.FindDomainParams({
-      tickerHash: _params.tickerHash,
-      domains: domains,
-      invoice: _params.invoice,
-      epoch: _params.epoch
+      tickerHash: _params.tickerHash, domains: domains, invoice: _params.invoice, epoch: _params.epoch
     });
 
     ISettler.FindDomainResult memory result = settler.findLowestDiscountAndHighestLiquidity(params);
@@ -1650,10 +1686,7 @@ contract Unit_ProcessInvoice is BaseTest {
     settler.mockUserSupportedDomains(_params.owner, _domains);
 
     IHubStorage.Invoice memory _invoice = IHubStorage.Invoice({
-      intentId: _params.intentId,
-      owner: _params.owner,
-      entryEpoch: _params.entryEpoch,
-      amount: _params.amount
+      intentId: _params.intentId, owner: _params.owner, entryEpoch: _params.entryEpoch, amount: _params.amount
     });
 
     uint48 _currentEpoch = settler.getCurrentEpoch();
@@ -1690,10 +1723,7 @@ contract Unit_ProcessInvoice is BaseTest {
     settler.mockUserSupportedDomains(_params.owner, _domains);
 
     IHubStorage.Invoice memory _invoice = IHubStorage.Invoice({
-      intentId: _params.intentId,
-      owner: _params.owner,
-      entryEpoch: _params.entryEpoch,
-      amount: _params.amount
+      intentId: _params.intentId, owner: _params.owner, entryEpoch: _params.entryEpoch, amount: _params.amount
     });
 
     bool _settled = settler.processInvoice(_params.epoch, _params.tickerHash, _invoice);
@@ -1721,10 +1751,7 @@ contract Unit_ProcessInvoice is BaseTest {
     settler.mockUserSupportedDomains(_params.owner, _domains);
 
     IHubStorage.Invoice memory _invoice = IHubStorage.Invoice({
-      intentId: _params.intentId,
-      owner: _params.owner,
-      entryEpoch: _params.entryEpoch,
-      amount: _params.amount
+      intentId: _params.intentId, owner: _params.owner, entryEpoch: _params.entryEpoch, amount: _params.amount
     });
 
     uint48 _currentEpoch = settler.getCurrentEpoch();
@@ -1783,10 +1810,7 @@ contract Unit_ProcessInvoice is BaseTest {
     _domains[0] = _params.destination;
     settler.mockUserSupportedDomains(_params.owner, _domains);
     IHubStorage.Invoice memory _invoice = IHubStorage.Invoice({
-      intentId: _params.intentId,
-      owner: _params.owner,
-      entryEpoch: _params.entryEpoch,
-      amount: _params.amount
+      intentId: _params.intentId, owner: _params.owner, entryEpoch: _params.entryEpoch, amount: _params.amount
     });
 
     _runAssertions(_params, _depositIntentId, _depositAvailable, _discountDbps, _interval, _invoice);
@@ -2727,7 +2751,10 @@ contract Unit_ProcessSettlementQueue is BaseTest {
   /**
    * @notice Test the case where the settlement queue is processed and the domain is not supported
    */
-  function test_Revert_ProcessSettlementQueue_DomainNotSupported(uint32 _domain, uint32 _amount) public {
+  function test_Revert_ProcessSettlementQueue_DomainNotSupported(
+    uint32 _domain,
+    uint32 _amount
+  ) public {
     vm.expectRevert(ISettler.Settler_DomainNotSupported.selector);
 
     settler.processSettlementQueue(_domain, _amount);
@@ -2736,7 +2763,10 @@ contract Unit_ProcessSettlementQueue is BaseTest {
   /**
    * @notice Test the case where the settlement queue is processed and there are insufficient settlements
    */
-  function test_Revert_ProcessSettlementQueue_InsufficientSettlements(uint32 _domain, uint32 _amount) public {
+  function test_Revert_ProcessSettlementQueue_InsufficientSettlements(
+    uint32 _domain,
+    uint32 _amount
+  ) public {
     // TODO: check why 1 doesn't trigger revert
     vm.assume(_amount > 1);
     settler.mockSupportedDomain(_domain);
@@ -2749,7 +2779,10 @@ contract Unit_ProcessSettlementQueue is BaseTest {
   /**
    * @notice Test the case where the settlement queue is processed and the block gas limit is exceeded
    */
-  function test_Revert_ProcessSettlementQueue_BlockGasLimitExceeded(uint32 _domain, uint32 _amount) public {
+  function test_Revert_ProcessSettlementQueue_BlockGasLimitExceeded(
+    uint32 _domain,
+    uint32 _amount
+  ) public {
     vm.assume(_amount > 0 && _amount <= 1000);
     settler.mockSupportedDomain(_domain);
     settler.mockSettlements(_domain, _amount);

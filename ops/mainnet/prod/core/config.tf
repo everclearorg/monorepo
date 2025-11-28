@@ -124,9 +124,15 @@ locals {
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      }
       "48900" = {
         providers = [
-          "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
           "https://zircuit1-mainnet.p2pify.com"
         ]
       }
@@ -167,7 +173,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },
@@ -279,9 +284,15 @@ locals {
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      }
       "48900" = {
         providers = [
-          "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
           "https://zircuit1-mainnet.p2pify.com"
         ]
       }
@@ -322,7 +333,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },
@@ -410,10 +420,16 @@ locals {
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      }
       "48900" = {
         providers = [
-          "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
-          # "https://zircuit1-mainnet.p2pify.com"
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
+          "https://zircuit1-mainnet.p2pify.com"
         ]
       }
       "81457" = {
@@ -462,7 +478,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },
@@ -603,6 +618,7 @@ locals {
       42161 = { maxAge = 60, size = 1 },
       10 = { maxAge = 60, size = 1 },
       8453 = { maxAge = 60, size = 1 },
+      239 = { maxAge = 60, size = 1 },
       48900 = { maxAge = 60, size = 1 },
       25327 = { maxAge = 60, size = 1 },
       81457 = { maxAge = 60, size = 1 },
@@ -655,10 +671,16 @@ locals {
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      }
       "48900" = {
         providers = [
-          "https://lb.drpc.org/ogrpc?network=zircuit-mainnet&dkey=${var.drpc_key}",
-          #"https://zircuit1-mainnet.p2pify.com"
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
+          "https://zircuit1-mainnet.p2pify.com"
         ]
       }
       "81457" = {
@@ -703,7 +725,6 @@ locals {
       },
       "34443" = {
         providers = [
-          "https://mode-mainnet.blastapi.io/${var.blast_key}",
           "https://mainnet.mode.network"
         ]
       },

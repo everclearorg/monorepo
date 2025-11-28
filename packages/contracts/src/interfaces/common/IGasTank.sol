@@ -73,7 +73,10 @@ interface IGasTank {
    * @param _address The address to authorize
    * @param _authorized True if the address is to be authorized
    */
-  function authorizeGasReceiver(address _address, bool _authorized) external;
+  function authorizeGasReceiver(
+    address _address,
+    bool _authorized
+  ) external;
 
   /*//////////////////////////////////////////////////////////////
                                   VIEWS

@@ -30,8 +30,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
   function test_IntentViaFeeAdapter_HappyPath_Slow_Default_FeeInTransacting() public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // select origin fork
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
@@ -81,8 +81,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     assertEq(oUSDT.balanceOf(address(sepoliaFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -110,8 +110,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     hubMailbox.process(bytes(''), _intentMessageA);
 
     /*///////////////////////////////////////////////////////////////
-                        DESTINATION DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                          DESTINATION DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to destination fork
     vm.selectFork(BSC_TESTNET_FORK);
@@ -158,8 +158,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     assertEq(dUSDT.balanceOf(address(bscFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -202,7 +202,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     bytes memory _settlementMessageBody = abi.decode(entries[0].data, (bytes));
 
     /*///////////////////////////////////////////////////////////////
-                          SETTLEMENT DOMAIN 
+                          SETTLEMENT DOMAIN
     //////////////////////////////////////////////////////////////*/
 
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
@@ -236,8 +236,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
   function test_IntentViaFeeAdapter_HappyPath_Slow_Default_FeeInEth() public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // select origin fork
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
@@ -291,8 +291,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     assertEq(oUSDT.balanceOf(address(sepoliaFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -320,8 +320,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     hubMailbox.process(bytes(''), _intentMessageA);
 
     /*///////////////////////////////////////////////////////////////
-                        DESTINATION DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                          DESTINATION DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to destination fork
     vm.selectFork(BSC_TESTNET_FORK);
@@ -368,8 +368,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     assertEq(dUSDT.balanceOf(address(bscFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -412,7 +412,7 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     bytes memory _settlementMessageBody = abi.decode(entries[0].data, (bytes));
 
     /*///////////////////////////////////////////////////////////////
-                          SETTLEMENT DOMAIN 
+                          SETTLEMENT DOMAIN
     //////////////////////////////////////////////////////////////*/
 
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
@@ -446,8 +446,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
   function test_Intent_Slow_SingleDomain_XERC20_FeeInTransacting() public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     uint256 _intentAmount = 100 ether;
     uint256 _feeAmount = 1 ether;
 
@@ -511,8 +511,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint256 _amountAfterFees = _calculateFee(_intentAmount, totalProtocolFees);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -595,8 +595,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
   function test_Intent_Slow_SingleDomain_XERC20_FeeInEth() public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     uint256 _intentAmount = 100 ether;
     uint256 _feeAmount = 1 ether;
 
@@ -658,8 +658,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint256 _amountAfterFees = _calculateFee(_intentAmount, totalProtocolFees);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -742,8 +742,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
 
   function test_Intent_Slow_MultipleDomain_XERC20_FeeInTransacting() public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     uint256 _intentAmount = 100 ether;
     uint256 _feeAmount = 1 ether;
 
@@ -812,8 +812,8 @@ contract NewIntentViaFeeAdapter_Integration is IntegrationBase {
     uint256 _amountAfterFees = _calculateFee(_intentAmount, totalProtocolFees);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -903,8 +903,8 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     uint32 _numOfIntents
   ) public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     vm.assume(_numOfIntents < 10);
     if (_numOfIntents < 2) _numOfIntents = 2;
 
@@ -946,13 +946,14 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(1 ether, 0, address(oUSDT), _deadline));
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrderSplitEvenly(
-      _numOfIntents,
-      1 ether, // token fee
-      _deadline,
-      _sig,
-      _params
-    );
+    (, bytes32[] memory _intentIds) =
+      sepoliaFeeAdapter.newOrderSplitEvenly(
+        _numOfIntents,
+        1 ether, // token fee
+        _deadline,
+        _sig,
+        _params
+      );
 
     // create intent message
     IEverclear.Intent[] memory _intents = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
@@ -971,8 +972,8 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     assertEq(oUSDT.balanceOf(address(sepoliaFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
 
@@ -999,8 +1000,8 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     hubMailbox.process(bytes(''), _intentMessageA);
 
     /*///////////////////////////////////////////////////////////////
-                        DESTINATION DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                          DESTINATION DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to destination fork
     vm.selectFork(BSC_TESTNET_FORK);
@@ -1051,8 +1052,8 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     assertEq(dUSDT.balanceOf(address(bscFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -1132,8 +1133,8 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     uint32 _numOfIntents
   ) public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     vm.assume(_numOfIntents < 10);
     if (_numOfIntents < 2) _numOfIntents = 2;
 
@@ -1176,13 +1177,14 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(0, 1 ether, address(oUSDT), _deadline));
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrderSplitEvenly{value: 1 ether}(
-      _numOfIntents,
-      0, // token fee
-      _deadline,
-      _sig,
-      _params
-    );
+    (, bytes32[] memory _intentIds) =
+      sepoliaFeeAdapter.newOrderSplitEvenly{value: 1 ether}(
+        _numOfIntents,
+        0, // token fee
+        _deadline,
+        _sig,
+        _params
+      );
 
     // create intent message
     IEverclear.Intent[] memory _intents = _generateEvenSplitIntentsAndConfirmStatusIsAdded(
@@ -1201,8 +1203,8 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     assertEq(oUSDT.balanceOf(address(sepoliaFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
 
@@ -1229,8 +1231,8 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     hubMailbox.process(bytes(''), _intentMessageA);
 
     /*///////////////////////////////////////////////////////////////
-                        DESTINATION DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                          DESTINATION DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to destination fork
     vm.selectFork(BSC_TESTNET_FORK);
@@ -1283,8 +1285,8 @@ contract NewOrderSplitEvenly_Integration is IntegrationBase {
     assertEq(dUSDT.balanceOf(address(bscFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -1368,8 +1370,8 @@ contract NewOrder_Integration is IntegrationBase {
 
   function test_NewOrder_HappyPath_FeeInTransacting() public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     uint256 _amountOne = 100 ether;
     uint256 _amountTwo = 50 ether;
 
@@ -1423,12 +1425,13 @@ contract NewOrder_Integration is IntegrationBase {
     bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(1 ether, 0, address(oUSDT), _deadline));
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder(
-      1 ether, // token fee
-      _deadline,
-      _sig,
-      _params
-    );
+    (, bytes32[] memory _intentIds) =
+      sepoliaFeeAdapter.newOrder(
+        1 ether, // token fee
+        _deadline,
+        _sig,
+        _params
+      );
 
     // create intent message
     IEverclear.Intent[] memory _intents = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
@@ -1447,8 +1450,8 @@ contract NewOrder_Integration is IntegrationBase {
     assertEq(oUSDT.balanceOf(address(sepoliaFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
 
@@ -1475,8 +1478,8 @@ contract NewOrder_Integration is IntegrationBase {
     hubMailbox.process(bytes(''), _intentMessage);
 
     /*///////////////////////////////////////////////////////////////
-                        DESTINATION DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                          DESTINATION DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to destination fork
     vm.selectFork(BSC_TESTNET_FORK);
@@ -1537,8 +1540,8 @@ contract NewOrder_Integration is IntegrationBase {
     assertEq(dUSDT.balanceOf(address(bscFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     // switch to everclear fork
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
 
@@ -1547,8 +1550,8 @@ contract NewOrder_Integration is IntegrationBase {
     uint256 _spokeBalance = _intentSum - _amountAfterFees;
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
@@ -1624,8 +1627,8 @@ contract NewOrder_Integration is IntegrationBase {
 
   function test_NewOrder_HappyPath_FeeInEth() public {
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     uint256 _amountOne = 100 ether;
     uint256 _amountTwo = 50 ether;
 
@@ -1681,12 +1684,13 @@ contract NewOrder_Integration is IntegrationBase {
     bytes memory _sig = _generateSignature(_feeSignerPk, abi.encode(0, 1 ether, address(oUSDT), _deadline));
 
     vm.prank(_user);
-    (, bytes32[] memory _intentIds) = sepoliaFeeAdapter.newOrder{value: 1 ether}(
-      0, // token fee
-      _deadline,
-      _sig,
-      _params
-    );
+    (, bytes32[] memory _intentIds) =
+      sepoliaFeeAdapter.newOrder{value: 1 ether}(
+        0, // token fee
+        _deadline,
+        _sig,
+        _params
+      );
 
     // create intent message
     IEverclear.Intent[] memory _intents = _generateUnknownSplitIntentsAndConfirmStatusIsAdded(
@@ -1705,8 +1709,8 @@ contract NewOrder_Integration is IntegrationBase {
     assertEq(oUSDT.balanceOf(address(sepoliaFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
 
@@ -1733,8 +1737,8 @@ contract NewOrder_Integration is IntegrationBase {
     hubMailbox.process(bytes(''), _intentMessageA);
 
     /*///////////////////////////////////////////////////////////////
-                        DESTINATION DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                          DESTINATION DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to destination fork
     vm.selectFork(BSC_TESTNET_FORK);
@@ -1796,8 +1800,8 @@ contract NewOrder_Integration is IntegrationBase {
     assertEq(dUSDT.balanceOf(address(bscFeeAdapter)), 0);
 
     /*///////////////////////////////////////////////////////////////
-                          ORIGIN DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            ORIGIN DOMAIN
+    //////////////////////////////////////////////////////////////*/
     // switch to everclear fork
     vm.selectFork(ETHEREUM_SEPOLIA_FORK);
 
@@ -1806,8 +1810,8 @@ contract NewOrder_Integration is IntegrationBase {
     uint256 _balance = _intentSum - _amountAfterFees;
 
     /*///////////////////////////////////////////////////////////////
-                          EVERCLEAR DOMAIN 
-  //////////////////////////////////////////////////////////////*/
+                            EVERCLEAR DOMAIN
+    //////////////////////////////////////////////////////////////*/
 
     // switch to everclear fork
     vm.selectFork(HUB_FORK);
