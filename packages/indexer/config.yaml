@@ -156,6 +156,16 @@ networks:
         address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
         address: 0x877Fd0A881B63eBE413124EeE6abbCD7E82cf10b
+    
+  - id: 5000
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xe0F010e465f15dcD42098dF9b99F1038c11B3056  # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
+
 
   - id: 239
     rpc_config:

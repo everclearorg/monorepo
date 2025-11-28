@@ -10,7 +10,7 @@
     "test": "envio test"
   },
   "dependencies": {
-    "envio": "2.30.0"
+    "envio": "latest"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
