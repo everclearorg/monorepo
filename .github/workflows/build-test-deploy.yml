@@ -213,7 +213,6 @@ jobs:
           done
 
       - name: Extract version, determine tag, and publish chainservice package
-        if: ${{ github.ref == 'refs/heads/mainnet-prod' }}
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
