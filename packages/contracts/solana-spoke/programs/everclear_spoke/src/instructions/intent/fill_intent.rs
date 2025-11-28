@@ -102,7 +102,7 @@ pub fn fill_intent(
     // verify signatures
     let intent_id = compute_intent_hash(&evm_intent);
     let sign_params = FillSignParams {
-        intent_id: intent_id,
+        intent_id,
         domain: THIS_DOMAIN,
         filler: ctx.accounts.authority.key(),
         amount_out,
