@@ -13,18 +13,17 @@ use bytemuck::bytes_of;
 
 use crate::error::SpokeError;
 
-use super::{FeeData, SignatureAccounts};
+use super::SignatureAccounts;
 const PUBLIC_KEY_OFFSET: usize = DATA_START;
 const SIGNATURE_OFFSET: usize = PUBLIC_KEY_OFFSET.saturating_add(PUBKEY_SERIALIZED_SIZE);
 const MESSAGE_DATA_OFFSET: usize = SIGNATURE_OFFSET.saturating_add(SIGNATURE_SERIALIZED_SIZE);
 
-pub fn verify_signature(
-    fee: &FeeData,
-    signature: Vec<u8>,
-    accounts: SignatureAccounts,
-) -> Result<()> {
+pub fn verify_signature<T>(data: &T, signature: Vec<u8>, accounts: SignatureAccounts) -> Result<()>
+where
+    T: AnchorSerialize,
+{
     let mut encoded_message = vec![];
-    fee.serialize(&mut encoded_message)?;
+    data.serialize(&mut encoded_message)?;
 
     // NOTE: signature programs are native in nodes but they requires lamports to run, thus this have
     // to be done in preinstructions.

@@ -127,6 +127,7 @@ pub mod everclear_spoke {
 
         // hyperlane params
         message_gas_limit: u64,
+        signature: Vec<u8>,
     ) -> Result<()> {
         instructions::fill_intent(
             ctx,
@@ -144,6 +145,7 @@ pub mod everclear_spoke {
             receiver,
             destinations,
             message_gas_limit,
+            signature,
         )
     }
 

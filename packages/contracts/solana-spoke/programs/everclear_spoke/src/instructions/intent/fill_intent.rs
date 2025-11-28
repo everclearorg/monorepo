@@ -2,6 +2,8 @@ use anchor_lang::solana_program::sysvar::instructions::ID as SYSVAR_INSTRUCTIONS
 use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
+use crate::instructions::signature::verify_signature;
+use crate::instructions::SignatureAccounts;
 use crate::intent::encode_full;
 use crate::{
     consts::{everclear_gateway, EVERCLEAR_DOMAIN, THIS_DOMAIN},
@@ -23,13 +25,13 @@ use crate::{
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct FillSignParams {
     pub domain: u32,
+    pub intent_id: [u8; 32],
     /// provided in the accounts
     pub filler: Pubkey,
     pub amount_out: u64,
     /// receiver in bytes32 format
     pub receiver: [u8; 32],
-    pub destinations: Vec<u8>,
-    pub signature: Vec<u8>,
+    pub destinations: Vec<u32>,
 }
 
 pub fn fill_intent(
@@ -55,6 +57,7 @@ pub fn fill_intent(
 
     // hyperlane params
     message_gas_limit: u64,
+    signature: Vec<u8>,
 ) -> Result<()> {
     let evm_intent = EVMIntent {
         initiator: origin_initiator,
@@ -97,6 +100,20 @@ pub fn fill_intent(
     let program_id = *ctx.program_id;
 
     // verify signatures
+    let intent_id = compute_intent_hash(&evm_intent);
+    let sign_params = FillSignParams {
+        intent_id: intent_id,
+        domain: THIS_DOMAIN,
+        filler: ctx.accounts.authority.key(),
+        amount_out,
+        receiver: receiver.to_bytes(),
+        destinations: destinations.clone(),
+    };
+    let signature_accounts = SignatureAccounts {
+        signer: ctx.accounts.signer.clone(),
+        instruction_sysvar: ctx.accounts.instruction_sysvar.clone(),
+    };
+    verify_signature(&sign_params, signature, signature_accounts)?;
 
     let event_data: IntentFilledEvent = handle_fill_intent(
         &mut accounts,
