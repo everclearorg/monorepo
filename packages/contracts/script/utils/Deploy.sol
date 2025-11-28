@@ -11,10 +11,12 @@ import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
 
 import {EverclearHub, IEverclearHub} from 'contracts/hub/EverclearHub.sol';
 import {HubGateway, IHubGateway} from 'contracts/hub/HubGateway.sol';
+import {HubGatewayV3} from 'contracts/hub/HubGatewayV3.sol';
 
 import {HubGateway} from 'contracts/hub/HubGateway.sol';
 import {EverclearSpoke} from 'contracts/intent/EverclearSpoke.sol';
 import {ISpokeGateway, SpokeGateway} from 'contracts/intent/SpokeGateway.sol';
+import {SpokeGatewayV2} from 'contracts/intent/SpokeGatewayV2.sol';
 import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
 
 library Deploy {
@@ -63,6 +65,72 @@ library Deploy {
     _gateway = HubGateway(
       payable(UnsafeUpgrades.deployUUPSProxy(
           _impl, abi.encodeCall(HubGateway.initialize, (_owner, _mailbox, _hub, _securityModule))
+        ))
+    );
+  }
+
+  function HubGatewayV3Proxy(
+    address _owner,
+    address _receiver,
+    address _interchainSecurityModule,
+    address _polymerProver,
+    address _hyperlaneMailbox,
+    address _ccipMailbox,
+    address _polymerMailbox,
+    address[] memory _mailboxes,
+    uint32[] memory _chainIds
+  ) internal returns (HubGatewayV3 _gateway) {
+    address _impl = address(new HubGatewayV3());
+    _gateway = HubGatewayV3(
+      payable(UnsafeUpgrades.deployUUPSProxy(
+          _impl,
+          abi.encodeCall(
+            HubGatewayV3.initialize,
+            (
+              _owner,
+              _receiver,
+              _interchainSecurityModule,
+              _polymerProver,
+              _hyperlaneMailbox,
+              _ccipMailbox,
+              _polymerMailbox,
+              _mailboxes,
+              _chainIds
+            )
+          )
+        ))
+    );
+  }
+
+  function SpokeGatewayV2Proxy(
+    address _owner,
+    address _receiver,
+    address _interchainSecurityModule,
+    uint32 _everclearId,
+    bytes32 _hubGateway,
+    address _polymerProver,
+    address _hyperlaneMailbox,
+    address _ccipMailbox,
+    address _polymerMailbox
+  ) internal returns (SpokeGatewayV2 _gateway) {
+    address _impl = address(new SpokeGatewayV2());
+    _gateway = SpokeGatewayV2(
+      payable(UnsafeUpgrades.deployUUPSProxy(
+          _impl,
+          abi.encodeCall(
+            SpokeGatewayV2.initialize,
+            (
+              _owner,
+              _receiver,
+              _interchainSecurityModule,
+              _everclearId,
+              _hubGateway,
+              _polymerProver,
+              _hyperlaneMailbox,
+              _ccipMailbox,
+              _polymerMailbox
+            )
+          )
         ))
     );
   }

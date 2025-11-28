@@ -14,6 +14,7 @@ contract SpokeGatewayV2 is GatewayV3, UUPSUpgradeable, ISpokeGatewayV2 {
 
   uint32 public EVERCLEAR_ID;
   bytes32 public EVERCLEAR_GATEWAY;
+  address public mailbox;
 
   constructor() GatewayV3() {}
 
@@ -39,6 +40,14 @@ contract SpokeGatewayV2 is GatewayV3, UUPSUpgradeable, ISpokeGatewayV2 {
     EVERCLEAR_GATEWAY = _hubGateway;
   }
 
+  function updateMailbox(
+    address _newMailbox
+  ) external onlyOwner {
+    address oldMailbox = mailbox;
+    mailbox = _newMailbox;
+    emit MailboxUpdated(oldMailbox, _newMailbox);
+  }
+
   /*//////////////////////////////////////////////////////////////
                         INTERNAL FUNCTIONS
   //////////////////////////////////////////////////////////////*/
@@ -51,7 +60,7 @@ contract SpokeGatewayV2 is GatewayV3, UUPSUpgradeable, ISpokeGatewayV2 {
 
   /**
    * @notice Always returns the address for the HubGateway on the Everclear domain
-   * @return _gateway The address of the everyclear gateway
+   * @return _gateway The address of the Everclear Hub gateway
    */
   function _getGateway(
     uint32
@@ -73,7 +82,7 @@ contract SpokeGatewayV2 is GatewayV3, UUPSUpgradeable, ISpokeGatewayV2 {
   }
 
   function _activeMailbox(
-    uint32 _domain
+    uint32
   ) internal view override(GatewayV3) returns (address) {
     return mailbox;
   }

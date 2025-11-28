@@ -42,6 +42,15 @@ interface ISpokeGatewayV2 is IGatewayV3 {
     address _polymerMailbox
   ) external;
 
+  /**
+   * @notice Updates the mailbox
+   * @param _mailbox The new mailbox address
+   * @dev only called by the `receiver`
+   */
+  function updateMailbox(
+    address _mailbox
+  ) external;
+
   /*///////////////////////////////////////////////////////////////
                               VIEWS
   //////////////////////////////////////////////////////////////*/
@@ -57,4 +66,12 @@ interface ISpokeGatewayV2 is IGatewayV3 {
    * @return _hubGateway The `HubGateway` address
    */
   function EVERCLEAR_GATEWAY() external view returns (bytes32 _hubGateway);
+
+  /**
+   * @notice Returns the transport layer message routing smart contract
+   * @dev this is independent of the transport layer used, adopting mailbox name because its descriptive enough
+   *      using address instead of specific interface to be independent from HL or any other TL
+   * @return _mailbox The mailbox contract
+   */
+  function mailbox() external view returns (address _mailbox);
 }
