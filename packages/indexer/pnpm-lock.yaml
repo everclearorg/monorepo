@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       envio:
-        specifier: latest
+        specifier: ^2.32.3
         version: 2.32.3(typescript@5.9.3)
     devDependencies:
       '@types/node':
