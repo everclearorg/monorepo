@@ -29,7 +29,6 @@ import {
   FeesWithdrawnEvent,
 } from '../../../generated/schema';
 import { BigIntToBytes, ConcatBigIntsToBytes, generateIdFromTx, generateTxNonce } from '../../common';
-import { getOrCreateMeta } from './meta';
 
 enum HubIntentStatus {
   NONE,
@@ -381,8 +380,6 @@ export function handleReturnUnsupportedIntent(event: ReturnUnsupportedIntent): v
 export function handleInvoiceEnqueued(event: InvoiceEnqueued): void {
   const intentId = event.params._intentId;
 
-  const meta = getOrCreateMeta();
-
   const id = generateIdFromTx(event);
   let invoice = Invoice.load(id);
   if (invoice == null) {
@@ -425,7 +422,12 @@ export function handleDepositEnqueued(event: DepositEnqueued): void {
   const intentId = event.params._intentId;
 
   // Update Deposit Queue
-  const queue = getOrCreateDepositQueue(event.params._epoch, event.params._domain, event.params._tickerHash, event.block.number);
+  const queue = getOrCreateDepositQueue(
+    event.params._epoch,
+    event.params._domain,
+    event.params._tickerHash,
+    event.block.number,
+  );
   queue.last = queue.last.plus(BigInt.fromI32(1));
   queue.size = queue.size.plus(BigInt.fromI32(1));
   queue.save();
@@ -468,7 +470,12 @@ export function handleDepositProcessed(event: DepositProcessed): void {
     Bytes.fromBigInt(event.params._epoch).concat(Bytes.fromBigInt(event.params._domain)),
   ).concat(event.params._tickerHash);
   const existing = DepositQueue.load(queueId) != null;
-  const queue = getOrCreateDepositQueue(event.params._epoch, event.params._domain, event.params._tickerHash, event.block.number);
+  const queue = getOrCreateDepositQueue(
+    event.params._epoch,
+    event.params._domain,
+    event.params._tickerHash,
+    event.block.number,
+  );
 
   // Processed Transaction
   const intentId = event.params._intentId;

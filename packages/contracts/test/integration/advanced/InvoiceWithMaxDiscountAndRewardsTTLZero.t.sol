@@ -99,7 +99,9 @@ contract InvoiceWithMaxDiscountAndRewardsTTLZero_Integration is IntegrationBase 
     bytes memory _settlementMessageBodySepolia = _processSettlementQueue(ETHEREUM_SEPOLIA_ID, 10);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
 
     // We chech the settlements of the small intents with and without rewards
     for (uint256 _i = 1; _i <= 3; _i++) {

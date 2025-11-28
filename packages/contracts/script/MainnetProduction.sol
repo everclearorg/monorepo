@@ -56,6 +56,7 @@ abstract contract MainnetAssets {
   address public constant SONIC_WETH = 0x50c42dEAcD8Fc9773493ED674b675bE577f2634b;
   address public constant INK_WETH = 0x4200000000000000000000000000000000000006;
   bytes32 public constant SOLANA_WETH = 0x66e5188a1308a1db90b6d31f3fbdca8c3df2678c8112dfdd3d192c5a3cc457a8;
+  address public constant ZIRCUIT_WETH = 0x4200000000000000000000000000000000000006;
 
   ///////////////////// USDT
   // NOTE: USDT is not supported on Base, Apechain
@@ -74,6 +75,10 @@ abstract contract MainnetAssets {
   address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
   address public constant SONIC_USDT = 0x6047828dc181963ba44974801FF68e538dA5eaF9;
   bytes32 public constant SOLANA_USDT = 0xce010e60afedb22717bd63192f54145a3f965a33bb82d2c7029eb2ce1e208264;
+  address public constant TAC_USDT = 0xAF988C3f7CB2AceAbB15f96b19388a259b6C438f;
+  address public constant BASE_USDT = 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2;
+  address public constant TRON_USDT = 0xa614f803B6FD780986A42c78Ec9c7f77e6DeD13C;
+  address public constant ZIRCUIT_USDT = 0x46dDa6a5a559d861c06EC9a95Fb395f5C3Db0742;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -95,6 +100,7 @@ abstract contract MainnetAssets {
   address public constant SONIC_USDC = 0x29219dd400f2Bf60E5a23d13Be72B486D4038894;
   address public constant INK_USDC = 0xF1815bd50389c46847f0Bda824eC8da914045D14;
   bytes32 public constant SOLANA_USDC = 0xc6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d61;
+  address public constant ZIRCUIT_USDC = 0x3b952c8C9C44e8Fe201e2b26F6B2200203214cfF;
 
   ///////////////////// xPufETH
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
@@ -131,6 +137,7 @@ abstract contract Everclear {
 
   IEverclearHub public constant HUB = IEverclearHub(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
   IHubGateway public constant HUB_GATEWAY = IHubGateway(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
+  address public constant HUB_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
 
   address public HUB_MANAGER = address(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
   address public SETTLER = address(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
@@ -476,6 +483,28 @@ abstract contract Solana {
   bytes32 public SOLANA_SPOKE_GATEWAY = 0x09b727b9209c8539f72647d10dd4f4670b53960ba169f034c513c758db0e9656;
 }
 
+abstract contract Tac {
+  uint32 public constant TAC = 239;
+  IMailbox public TAC_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public TAC_SPOKE = IEverclearSpoke(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
+  ISpokeGateway public TAC_SPOKE_GATEWAY = ISpokeGateway(0x7B435CCF350DBC773e077410e8FEFcd46A1cDfAA);
+  ICallExecutor public TAC_EXECUTOR = ICallExecutor(0x1FC1f47a6a7c61f53321643A14bEc044213AbF95);
+  IXERC20Module public TAC_XERC20_MODULE = IXERC20Module(0x92dcaf947DB325ac023b105591d76315743883eD);
+  address public TAC_SPOKE_IMPL = 0x315bCf956e887378836f6E57bC735F0cf7022352;
+
+  // Fee adapter constants
+  address public constant TAC_ENG_MULTISIG = 0x1F08FACb1b2FD7859250e896400180691EA39763;
+  address public constant TAC_FEE_ADAPTER = 0xA388d644241A2185440EAf0ADd41C9Da30958ba5;
+}
+
+abstract contract Tron {
+  uint32 public constant TRON = 728_126_428;
+  IEverclearSpoke public TRON_SPOKE = IEverclearSpoke(0x9b266df36C882A73D45B18876104D5728424828f);
+  ISpokeGateway public TRON_SPOKE_GATEWAY = ISpokeGateway(0x8Fd8a4D1980FA73f060A37AF5Bf23d8fb2B68A0b);
+  IXERC20Module public TRON_XERC20_MODULE = IXERC20Module(0x9b266df36C882A73D45B18876104D5728424828f);
+}
+
 abstract contract MainnetProductionDomains is
   Everclear,
   Ethereum,
@@ -500,7 +529,9 @@ abstract contract MainnetProductionDomains is
   Mantle,
   Sonic,
   Ink,
-  Solana
+  Solana,
+  Tac,
+  Tron
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
@@ -517,9 +548,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
   constructor() {
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ETHEREUM,
-        blockGasLimit: 30_000_000,
-        gateway: address(ETHEREUM_SPOKE_GATEWAY).toBytes32()
+        chainId: ETHEREUM, blockGasLimit: 30_000_000, gateway: address(ETHEREUM_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -529,17 +558,13 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: OPTIMISM,
-        blockGasLimit: 30_000_000,
-        gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
+        chainId: OPTIMISM, blockGasLimit: 30_000_000, gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ARBITRUM_ONE,
-        blockGasLimit: 30_000_000,
-        gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
+        chainId: ARBITRUM_ONE, blockGasLimit: 30_000_000, gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -549,9 +574,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ZIRCUIT,
-        blockGasLimit: 30_000_000,
-        gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
+        chainId: ZIRCUIT, blockGasLimit: 30_000_000, gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -565,17 +588,13 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: POLYGON,
-        blockGasLimit: 30_000_000,
-        gateway: address(POLYGON_SPOKE_GATEWAY).toBytes32()
+        chainId: POLYGON, blockGasLimit: 30_000_000, gateway: address(POLYGON_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: AVALANCHE,
-        blockGasLimit: 15_000_000,
-        gateway: address(AVALANCHE_SPOKE_GATEWAY).toBytes32()
+        chainId: AVALANCHE, blockGasLimit: 15_000_000, gateway: address(AVALANCHE_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -589,9 +608,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: APECHAIN,
-        blockGasLimit: 30_000_000,
-        gateway: address(APECHAIN_SPOKE_GATEWAY).toBytes32()
+        chainId: APECHAIN, blockGasLimit: 30_000_000, gateway: address(APECHAIN_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -601,9 +618,7 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: UNICHAIN,
-        blockGasLimit: 30_000_000,
-        gateway: address(UNICHAIN_SPOKE_GATEWAY).toBytes32()
+        chainId: UNICHAIN, blockGasLimit: 30_000_000, gateway: address(UNICHAIN_SPOKE_GATEWAY).toBytes32()
       })
     );
 
@@ -621,18 +636,20 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: BERACHAIN,
-        blockGasLimit: 30_000_000,
-        gateway: address(BERACHAIN_SPOKE_GATEWAY).toBytes32()
+        chainId: BERACHAIN, blockGasLimit: 30_000_000, gateway: address(BERACHAIN_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: MANTLE, blockGasLimit: 250_000_000, gateway: address(MANTLE_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({
+        chainId: MANTLE, blockGasLimit: 250_000_000, gateway: address(MANTLE_SPOKE_GATEWAY).toBytes32()
+      })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: SONIC, blockGasLimit: 5_000_000_000, gateway: address(SONIC_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({
+        chainId: SONIC, blockGasLimit: 5_000_000_000, gateway: address(SONIC_SPOKE_GATEWAY).toBytes32()
+      })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(

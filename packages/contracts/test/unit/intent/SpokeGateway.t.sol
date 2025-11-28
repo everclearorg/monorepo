@@ -15,7 +15,10 @@ contract TestSpokeGateway is SpokeGateway {
     return _getGateway(_chainId);
   }
 
-  function checkValidSender(uint32 _origin, bytes32 _sender) external view {
+  function checkValidSender(
+    uint32 _origin,
+    bytes32 _sender
+  ) external view {
     _checkValidSender(_origin, _sender);
   }
 }
@@ -46,14 +49,12 @@ contract BaseTest is TestExtended {
   ) internal returns (TestSpokeGateway _gateway) {
     address _impl = address(new TestSpokeGateway());
     _gateway = TestSpokeGateway(
-      payable(
-        UnsafeUpgrades.deployUUPSProxy(
+      payable(UnsafeUpgrades.deployUUPSProxy(
           _impl,
           abi.encodeCall(
             SpokeGateway.initialize, (_owner, _mailbox, _spoke, _securityModule, _everclearId, _hubGateway)
           )
-        )
-      )
+        ))
     );
   }
 }

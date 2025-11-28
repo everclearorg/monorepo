@@ -76,7 +76,10 @@ interface IEverclearHub is IEverclear, ISettler, IManager, IHandler, IHubMessage
    * @param _type The hash of the module type
    * @param _newAddress The new address for that module
    */
-  function updateModuleAddress(bytes32 _type, address _newAddress) external;
+  function updateModuleAddress(
+    bytes32 _type,
+    address _newAddress
+  ) external;
 
   /**
    * @notice Initialize the hub contract

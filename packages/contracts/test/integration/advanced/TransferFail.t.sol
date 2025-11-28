@@ -55,7 +55,9 @@ contract TransferFail_Integration is IntegrationBase {
     TestWETH(address(sepoliaWETH)).mockFailTransfer(true);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
 
     // assert balance is 0
     assertEq(_getTokenBalanceInSepolia(_user2, address(sepoliaWETH)), 0);
@@ -123,7 +125,9 @@ contract TransferFail_Integration is IntegrationBase {
     TestWETH(address(sepoliaWETH)).mockRevertTransfer(true);
 
     // deliver the settlement message to SEPOLIA
-    _processSettlementMessage({_destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia});
+    _processSettlementMessage({
+      _destination: ETHEREUM_SEPOLIA_ID, _settlementMessageBody: _settlementMessageBodySepolia
+    });
 
     // assert balance is 0
     assertEq(_getTokenBalanceInSepolia(_user2, address(sepoliaWETH)), 0);

@@ -216,7 +216,7 @@ interface IEverclearNanoSpoke is ISpokeStorage {
   /**
    * @notice Creates a new intent
    * @param _destinations The possible destination chains of the intent
-   * @param _receiver The destinantion address of the intent
+   * @param _receiver The destination address of the intent
    * @param _inputAsset The asset address on origin
    * @param _outputAsset The asset address on destination
    * @param _amount The amount of the asset
@@ -251,7 +251,10 @@ interface IEverclearNanoSpoke is ISpokeStorage {
    * @param _asset The address of the asset
    * @param _amount The amount of the asset
    */
-  function withdraw(address _asset, uint256 _amount) external;
+  function withdraw(
+    address _asset,
+    uint256 _amount
+  ) external;
 
   /**
    * @notice Updates the gateway

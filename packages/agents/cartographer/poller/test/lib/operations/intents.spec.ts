@@ -1,7 +1,7 @@
 import { SinonStub, SinonStubbedInstance } from 'sinon';
 
 import { updateDestinationIntents, updateOriginIntents, updateSettlementIntents } from '../../../src/lib/operations';
-import { expect, mkBytes32 } from '@chimera-monorepo/utils';
+import { expect, mkBytes32, mkAddress } from '@chimera-monorepo/utils';
 import { mockAppContext } from '../../globalTestHook';
 import { createDestinationIntents, createHubIntents, createOriginIntents, createSettlementIntents } from '@chimera-monorepo/database/test/mock';
 import { updateHubIntents } from '../../../src/lib/operations/intents';
@@ -23,8 +23,11 @@ describe('Intents operations', () => {
 
       await updateOriginIntents();
 
+      // Intents are now modified to include isSwap flag (defaults to false when asset configs not found)
+      const expectedIntents = intents.map(intent => ({ ...intent, isSwap: false }));
+
       expect(mockAppContext.adapters.database.saveOriginIntents as SinonStub).callCount(1);
-      expect(mockAppContext.adapters.database.saveOriginIntents as SinonStub).to.be.calledWithExactly(intents);
+      expect(mockAppContext.adapters.database.saveOriginIntents as SinonStub).to.be.calledWithExactly(expectedIntents);
 
       expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length);
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(domains.length);
@@ -45,6 +48,127 @@ describe('Intents operations', () => {
 
       expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(0);
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(0);
+    });
+
+    it('should set isSwap to false when input and output assets have same ticker hash', async () => {
+      // Setup config with assets having same ticker hash (bridge scenario)
+      const usdcTickerHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+      mockAppContext.config.chains['1337'].assets = {
+        USDC: {
+          symbol: 'USDC',
+          address: mkAddress('0xa0b86991'),
+          decimals: 6,
+          isNative: false,
+          price: { isStable: true },
+          tickerHash: usdcTickerHash,
+        },
+      };
+      mockAppContext.config.chains['1338'].assets = {
+        USDC: {
+          symbol: 'USDC',
+          address: mkAddress('0xaf88d065'),
+          decimals: 6,
+          isNative: false,
+          price: { isStable: true },
+          tickerHash: usdcTickerHash, // Same ticker hash
+        },
+      };
+
+      const domains = Object.keys(mockAppContext.config.chains).filter(
+        (domain) => domain !== mockAppContext.config.hub.domain,
+      );
+      const intents = createOriginIntents(1, [{
+        origin: '1337',
+        inputAsset: mkAddress('0xa0b86991'),
+        outputAsset: mkAddress('0xaf88d065'),
+        destinations: ['1338'],
+      }]);
+
+      (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
+        new Map(domains.map((domain) => [domain, 1])),
+      );
+      (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
+
+      await updateOriginIntents();
+
+      const savedIntents = (mockAppContext.adapters.database.saveOriginIntents as SinonStub).getCall(0).args[0];
+      expect(savedIntents[0].isSwap).to.equal(false);
+    });
+
+    it('should set isSwap to true when input and output assets have different ticker hashes', async () => {
+      // Setup config with assets having different ticker hashes (swap scenario)
+      const usdcTickerHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+      const wethTickerHash = '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+      
+      mockAppContext.config.chains['1337'].assets = {
+        USDC: {
+          symbol: 'USDC',
+          address: mkAddress('0xa0b86991'),
+          decimals: 6,
+          isNative: false,
+          price: { isStable: true },
+          tickerHash: usdcTickerHash,
+        },
+      };
+      mockAppContext.config.chains['1338'].assets = {
+        WETH: {
+          symbol: 'WETH',
+          address: mkAddress('0x82af4944'),
+          decimals: 18,
+          isNative: false,
+          price: { isStable: false },
+          tickerHash: wethTickerHash, // Different ticker hash
+        },
+      };
+
+      const domains = Object.keys(mockAppContext.config.chains).filter(
+        (domain) => domain !== mockAppContext.config.hub.domain,
+      );
+      const intents = createOriginIntents(1, [{
+        origin: '1337',
+        inputAsset: mkAddress('0xa0b86991'),
+        outputAsset: mkAddress('0x82af4944'),
+        destinations: ['1338'],
+      }]);
+
+      (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
+        new Map(domains.map((domain) => [domain, 1])),
+      );
+      (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
+
+      await updateOriginIntents();
+
+      const savedIntents = (mockAppContext.adapters.database.saveOriginIntents as SinonStub).getCall(0).args[0];
+      expect(savedIntents[0].isSwap).to.equal(true);
+    });
+
+    it('should set isSwap to false when asset configs are not found', async () => {
+      // No assets configured - should default to false
+      mockAppContext.config.chains['1337'].assets = {};
+      mockAppContext.config.chains['1338'].assets = {};
+
+      const domains = Object.keys(mockAppContext.config.chains).filter(
+        (domain) => domain !== mockAppContext.config.hub.domain,
+      );
+      const intents = createOriginIntents(1, [{
+        origin: '1337',
+        inputAsset: mkAddress('0xa0b86991'),
+        outputAsset: mkAddress('0xaf88d065'),
+        destinations: ['1338'],
+      }]);
+
+      (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
+        new Map(domains.map((domain) => [domain, 1])),
+      );
+      (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
+
+      await updateOriginIntents();
+
+      const savedIntents = (mockAppContext.adapters.database.saveOriginIntents as SinonStub).getCall(0).args[0];
+      expect(savedIntents[0].isSwap).to.equal(false);
     });
   });
 

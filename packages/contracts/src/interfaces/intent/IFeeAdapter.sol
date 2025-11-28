@@ -96,7 +96,7 @@ interface IFeeAdapter {
 
   /**
    * @notice Returns the current fee signer address
-   * @return The address whos signature is verified
+   * @return The address whose signature is verified
    */
   function feeSigner() external view returns (address);
 
@@ -236,5 +236,9 @@ interface IFeeAdapter {
    * @param _amount Amount of the asset to return
    * @param _recipient Address of the recipient
    */
-  function returnUnsupportedIntent(address _asset, uint256 _amount, address _recipient) external;
+  function returnUnsupportedIntent(
+    address _asset,
+    uint256 _amount,
+    address _recipient
+  ) external;
 }
