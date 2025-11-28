@@ -83,9 +83,9 @@
     "@openzeppelin/contracts-upgradeable": "5.0.2",
     "@solana-developers/helpers": "^2.8.1",
     "dotenv": "^16.4.5",
-    "solmate": "^6.8.0",
     "isolmate": "github:defi-wonderland/isolmate#59e18043c2450fef550f1744b3705ce9ebcaf1c8",
     "node-fetch": "^3.3.2",
+    "solmate": "^6.8.0",
     "ts-node": "^10.9.2",
     "tweetnacl": "^1.0.3",
     "viem": "^2.19.8"
