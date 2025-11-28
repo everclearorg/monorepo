@@ -29,6 +29,14 @@ interface IGatewayV3 {
     bytes extraArgs; // Populate this with _argsToBytes(EVMExtraArgsV2).
   }
 
+  struct SVMExtraArgsV1 {
+    uint32 computeUnits;
+    uint64 accountIsWritableBitmap;
+    bool allowOutOfOrderExecution;
+    bytes32 tokenReceiver;
+    bytes32[] accounts;
+  }
+
   /// @param gasLimit: gas limit for the callback on the destination chain.
   /// @param allowOutOfOrderExecution: if true, it indicates that the message can be executed in any order relative to
   /// other messages from the same sender. This value's default varies by chain. On some chains, a particular value is
@@ -143,6 +151,11 @@ interface IGatewayV3 {
    * @notice Thrown when array mismatch occurs
    */
   error GatewayV3_Domain_ArrayLengthMismatch();
+
+  /**
+  * @notice Thrown when the caller is not the active mailbox
+   */
+  error GatewayV3_Handle_NotCalledByActiveMailbox();
 
   error GatewayV3_Handle_InvalidDestinationDomain();
   error GatewayV3_Handle_InvalidRecipient();

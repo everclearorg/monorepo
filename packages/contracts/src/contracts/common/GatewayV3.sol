@@ -35,6 +35,9 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   // Note: not available for Solana VM based chains.
   bytes4 public constant GENERIC_EXTRA_ARGS_V2_TAG = 0x181dcf10;
 
+  // Note: used for solana
+  bytes4 public constant SVM_EXTRA_ARGS_V1_TAG = 0x1f3b3aba;
+
   IMessageReceiver public receiver;
 
   /// @inheritdoc ISpecifiesInterchainSecurityModule
@@ -298,6 +301,12 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
     bytes32 _sender,
     bytes memory _message
   ) internal {
+    // // checking the mailbox calling is configured for the chain
+    // address _mailbox = address(_activeMailbox(_origin));
+    // if (msg.sender != address(_mailbox)) {
+    //   revert GatewayV3_Handle_NotCalledByActiveMailbox();
+    // }
+
     _checkValidSender(_origin, _sender);
 
     receiver.receiveMessage(_message);
