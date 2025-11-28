@@ -4,14 +4,14 @@ pragma solidity 0.8.25;
 import {Test} from 'forge-std/Test.sol';
 import {console2} from 'forge-std/console2.sol';
 
-import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 
 import {GatewayV3, IGatewayV3} from 'contracts/common/GatewayV3.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {ISpokeGatewayV2, SpokeGatewayV2} from 'contracts/intent/SpokeGatewayV2.sol';
-import {IPolymer} from 'interfaces/common/IPolymer.sol';
 import {IGasTank} from 'interfaces/common/IGasTank.sol';
+import {IPolymer} from 'interfaces/common/IPolymer.sol';
 
 import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
 import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
@@ -420,12 +420,12 @@ contract SpokeGatewayV2Test is Test, Mocker {
     bytes memory metadata = StandardHookMetadata.formatMetadata(0, gasLimit, address(gateway), '');
 
     bytes32 expectedMessageId = keccak256(abi.encodePacked('hyperlane_message_id'));
-    
+
     vm.expectCall(
       hyperlaneMailbox,
       abi.encodeWithSignature('dispatch(uint32,bytes32,bytes,bytes)', EVERCLEAR, hubGateway, message, metadata)
     );
-    
+
     vm.mockCall(
       hyperlaneMailbox,
       abi.encodeWithSignature('dispatch(uint32,bytes32,bytes,bytes)', EVERCLEAR, hubGateway, message, metadata),
@@ -464,7 +464,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
     });
 
     bytes32 expectedMessageId = keccak256(abi.encodePacked('ccip_message_id'));
-    
+
     vm.expectCall(
       ccipMailbox,
       abi.encodeWithSignature(
@@ -473,7 +473,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
         evm2AnyMessage
       )
     );
-    
+
     vm.mockCall(
       ccipMailbox,
       abi.encodeWithSignature(
@@ -503,12 +503,12 @@ contract SpokeGatewayV2Test is Test, Mocker {
     bytes memory metadata = StandardHookMetadata.formatMetadata(0, gasLimit, address(gateway), '');
 
     bytes32 expectedMessageId = keccak256(abi.encodePacked('polymer_message_id'));
-    
+
     vm.expectCall(
       polymerMailbox,
       abi.encodeWithSignature('dispatch(uint32,bytes32,bytes,bytes)', EVERCLEAR, hubGateway, message, metadata)
     );
-    
+
     vm.mockCall(
       polymerMailbox,
       abi.encodeWithSignature('dispatch(uint32,bytes32,bytes,bytes)', EVERCLEAR, hubGateway, message, metadata),
@@ -1020,7 +1020,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
   }
 
   function test_spokeGateway_integration_sendMessage_ccip() public {
-    // Real CCIP Router on Ethereum mainnet  
+    // Real CCIP Router on Ethereum mainnet
     address realCCIPRouter = 0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D;
 
     // Update to use real CCIP router
@@ -1045,10 +1045,12 @@ contract SpokeGatewayV2Test is Test, Mocker {
     // Fund the gateway for fees
     vm.deal(address(gateway), 10 ether);
 
-    // Send message - CCIP will revert if the destination selector is invalid, 
+    // Send message - CCIP will revert if the destination selector is invalid,
     // but this tests the integration with the real router
     vm.prank(receiver);
-    try gateway.sendMessage{value: 1 ether}(EVERCLEAR, message, gasLimit) returns (bytes32 messageId, uint256 feeSpent) {
+    try gateway.sendMessage{value: 1 ether}(EVERCLEAR, message, gasLimit) returns (
+      bytes32 messageId, uint256 feeSpent
+    ) {
       assertTrue(messageId != bytes32(0), 'Message ID should be non-zero');
     } catch {
       // Expected to fail with real CCIP router if destination not configured
@@ -1072,7 +1074,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
 
     // Quote should return a real fee from Hyperlane
     uint256 fee = gateway.quoteMessage(EVERCLEAR, message, gasLimit);
-    
+
     // Fee should be greater than 0 for real Hyperlane
     assertTrue(fee > 0, 'Hyperlane should return non-zero fee');
   }

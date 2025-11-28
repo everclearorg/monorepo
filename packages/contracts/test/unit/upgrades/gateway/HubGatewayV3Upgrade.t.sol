@@ -4,8 +4,8 @@ pragma solidity 0.8.25;
 import {Test} from 'forge-std/Test.sol';
 import {console2} from 'forge-std/console2.sol';
 
-import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 
 import {GatewayV3, IGatewayV3} from 'contracts/common/GatewayV3.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
@@ -1391,7 +1391,9 @@ contract HubGatewayV3Test is Test, Mocker {
   function testRevert_hubGateway_activeMailbox_unconfiguredDomain() public {
     uint32 unconfiguredChain = 888;
 
-    vm.expectRevert(abi.encodeWithSelector(IHubGatewayV3.HubGateway_Mailbox_InvalidOriginDomain.selector, unconfiguredChain));
+    vm.expectRevert(
+      abi.encodeWithSelector(IHubGatewayV3.HubGateway_Mailbox_InvalidOriginDomain.selector, unconfiguredChain)
+    );
     gateway.activeMailbox(unconfiguredChain);
   }
 

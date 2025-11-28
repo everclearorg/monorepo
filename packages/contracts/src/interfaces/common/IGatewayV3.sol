@@ -153,7 +153,7 @@ interface IGatewayV3 {
   error GatewayV3_Domain_ArrayLengthMismatch();
 
   /**
-  * @notice Thrown when the caller is not the active mailbox
+   * @notice Thrown when the caller is not the active mailbox
    */
   error GatewayV3_Handle_NotCalledByActiveMailbox();
 
