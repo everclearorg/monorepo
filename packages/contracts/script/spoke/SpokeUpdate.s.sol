@@ -12,7 +12,11 @@ import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
 contract TransferOwnership is Script, ScriptUtils {
   error FailedToTransferOwnership();
 
-  function run(string memory _account, address _spoke, address _newOwner) public {
+  function run(
+    string memory _account,
+    address _spoke,
+    address _newOwner
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -29,7 +33,11 @@ contract TransferOwnership is Script, ScriptUtils {
 contract TransferGatewayOwnership is Script, ScriptUtils {
   error FailedToTransferOwnership();
 
-  function run(string memory _account, address _spoke, address _newOwner) public {
+  function run(
+    string memory _account,
+    address _spoke,
+    address _newOwner
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -46,7 +54,10 @@ contract TransferGatewayOwnership is Script, ScriptUtils {
 }
 
 contract Pause is Script, ScriptUtils {
-  function run(string memory _account, address _spoke) public {
+  function run(
+    string memory _account,
+    address _spoke
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 
@@ -57,7 +68,10 @@ contract Pause is Script, ScriptUtils {
 }
 
 contract Unpause is Script, ScriptUtils {
-  function run(string memory _account, address _spoke) public {
+  function run(
+    string memory _account,
+    address _spoke
+  ) public {
     uint256 _accountPk = vm.envUint(_account);
     vm.startBroadcast(_accountPk);
 

@@ -21,7 +21,7 @@ export const checkDepositQueueCount = async (): Promise<Map<string, number>> => 
 
   const queueCountByKey: Map<string, number> = new Map();
   for (const deposit of enqueuedDepositsByDomain) {
-    const queueKey = `${deposit.epoch}-${deposit.domain}-${deposit.tickerHash}`;
+    const queueKey = `${deposit.domain}-${deposit.tickerHash}`;
     if (queueCountByKey.has(queueKey)) {
       const queueCount = queueCountByKey.get(queueKey)!;
       queueCountByKey.set(queueKey, queueCount + 1);
@@ -60,10 +60,22 @@ export const checkDepositQueueCount = async (): Promise<Map<string, number>> => 
   };
 
   if (!aboveThreshold.length) {
-    const keys = [...queueCountByKey.keys()];
-    report.ids = keys;
+    // Resolve all possible keys for configured domains and tickers
+    const tickerHashes = getConfiguredTickerHashes(config.chains);
+    const keysToResolve: string[] = [];
+    
+    for (const domain of domains) {
+      for (const tickerHash of tickerHashes) {
+        keysToResolve.push(`${domain}-${tickerHash}`);
+      }
+    }
+
+    report.ids = keysToResolve;
     await resolveAlerts(report, logger, { ...config, network: config.network || 'unknown' }, requestContext);
-    logger.info(`Deposit queue counts are within threshold`, requestContext, methodContext, { threshold, keys });
+    logger.info('Deposit queue counts are within threshold, resolved alerts', requestContext, methodContext, {
+      threshold,
+      keysResolved: keysToResolve.length,
+    });
     return queueCountByKey;
   }
 

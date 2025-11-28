@@ -38,7 +38,9 @@ const MAX_SETTLEMENT_DEQUEUE = 900;
 const MAX_SETTLEMENT_DEQUEUE_SOLANA = 1;
 
 // NOTE: We are now capping intents because of hyperlane gas calculations
-const MAX_INTENT_DEQUEUE = 6;
+// NOTE: This is reduced from 6 to 5 because of "default" gas limit on spoke is currently at 2M < 605_000 + 300_000 * 5
+// TODO: increase this while increase messageGasLimit on spoke
+const MAX_INTENT_DEQUEUE = 5;
 
 const DEFAULT_HYPERLANE_BUFFER = 15_000; // 15%
 const BPS_DENOMINATOR = 100_000;
@@ -76,7 +78,7 @@ function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[
       receiver: convertAddressToBytes32(intent.receiver, intent.origin),
       inputAsset: convertAddressToBytes32(intent.inputAsset, intent.origin),
       outputAsset: convertAddressToBytes32(intent.outputAsset, intent.origin),
-      maxFee: intent.maxFee,
+      amountOutMin: intent.amountOutMin,
       origin: intent.origin,
       nonce: intent.nonce,
       timestamp: intent.timestamp,
@@ -90,17 +92,14 @@ function convertOriginIntentsToIntentStructs(originIntents: unknown[]): unknown[
 
 function messageGasLimit(domain: string, intentCount: number): number {
   const {
-    config: { hub, chains },
+    config: { chains },
   } = getContext();
   const defaultMessageGasLimit = {
     base: DEFAULT_BASE_MESSAGE_GAS_LIMIT,
     extraIntent: DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT,
   };
   const chainMessageGasLimit = chains[domain]?.messageGasLimit ?? defaultMessageGasLimit;
-  // NOTE: if queue = hub, we call contract with _bufferDBPS as hub contract do not have dynamic message gas limit upgrade
-  return domain === hub.domain
-    ? DEFAULT_HYPERLANE_BUFFER
-    : chainMessageGasLimit.base + (intentCount - 1) * chainMessageGasLimit.extraIntent;
+  return chainMessageGasLimit.base + (intentCount - 1) * chainMessageGasLimit.extraIntent;
 }
 
 export const dispatchMessageQueueViaRelayers = async (
@@ -297,7 +296,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, toDequeue),
+          messageGasLimit(queue.domain, toDequeue),
         ]);
         const digest = keccak256(payload);
 
@@ -364,7 +363,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerAddress,
           ttl,
           nonce,
-          messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
+          messageGasLimit(queue.domain, actualIntentCount),
         ]);
         const correctedDigest = keccak256(correctedPayload);
 
@@ -395,6 +394,15 @@ export const dispatchMessageQueueViaRelayers = async (
           signer: walletAddr,
         });
 
+        const funcSig = everclearIface.getFunction(queueMethodName).format();
+
+        logger.info('Generating transaction', requestContext, methodContext, {
+          queueDomain: queue.domain,
+          transactionDomain,
+          funcSig,
+          intentStructs,
+        });
+
         const tx: WriteTransaction = {
           data: everclearIface.encodeFunctionData(queueMethodName, [
             +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
@@ -402,13 +410,13 @@ export const dispatchMessageQueueViaRelayers = async (
             relayerAddress,
             ttl,
             nonce,
-            messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
+            messageGasLimit(queue.domain, actualIntentCount),
             correctedSignature, // Use corrected signature
           ]),
           to: everclear,
           value: '0',
           domain: +transactionDomain,
-          funcSig: everclearIface.getFunction(queueMethodName).format(),
+          funcSig,
         };
 
         logger.debug(

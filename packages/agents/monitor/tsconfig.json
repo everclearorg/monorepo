@@ -1,9 +1,10 @@
 {
     "extends": "./tsconfig.build.json",
     "compilerOptions": {
-      "types": ["node", "mocha", "chai"]
+      "types": ["node", "mocha", "chai"],
+      "skipLibCheck": true
     },
     "exclude": [],
     "references": []
-  }
+}
   

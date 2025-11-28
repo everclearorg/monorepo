@@ -26,17 +26,17 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
     bytes32 _tickerHash = keccak256(bytes(_symbol));
 
     /*///////////////////////////////////////////////////////////////
-                              TOKEN FEES 
+                              TOKEN FEES
     //////////////////////////////////////////////////////////////*/
 
     IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](0);
     // _fees[0] = IHubStorage.Fee({recipient: FEE_RECIPIENT, fee: 0}); // 0 BPS
 
     /*///////////////////////////////////////////////////////////////
-                         ADOPTED CONFIGURATION  
+                         ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](19);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](20);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -209,8 +209,17 @@ contract USDC is AddAssetBase, MainnetProductionEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    ///// Zircuit
+    _assetConfigs[19] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: ZIRCUIT_USDC.toBytes32(),
+      domain: ZIRCUIT,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
-                          TOKEN SETUP 
+                          TOKEN SETUP
     //////////////////////////////////////////////////////////////*/
 
     _setup = IHubStorage.TokenSetup({

@@ -245,5 +245,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-tac",
+    "domain": "239",
+    "environment": "production",
+    "network": "tac",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]

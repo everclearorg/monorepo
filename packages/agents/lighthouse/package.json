@@ -51,7 +51,7 @@
         "rimraf": "5.0.1",
         "sinon": "15.0.1",
         "ts-mocha": "10.0.0",
-        "ts-node": "10.9.1",
+        "ts-node": "10.9.2",
         "typescript": "5.3.3"
     },
     "packageManager": "yarn@3.3.1"

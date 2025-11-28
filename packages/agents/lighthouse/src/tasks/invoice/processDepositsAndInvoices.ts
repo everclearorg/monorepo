@@ -27,6 +27,8 @@ const MAX_EPOCHS_TO_PROCESS = 0; // 250;
 const MAX_DEPOSITS_TO_PROCESS = 0; // 100;
 const MAX_INVOICES_TO_PROCESS = 0; // 35;
 
+export const MAX_UNPROCESSED_EPOCHS_COUNT = 50;
+
 export const processDepositsAndInvoices = async () => {
   const {
     config: { chains, hub, abis },
@@ -86,10 +88,11 @@ export const processDepositsAndInvoices = async () => {
       },
       'latest',
     );
-    const [lastClosedEpochProcessed] = iface.decodeFunctionResult(
+    const [lastClosedEpochsProcessed] = iface.decodeFunctionResult(
       'lastClosedEpochsProcessed',
       encodedDataForLastClosedEpochRes,
     );
+    const lastClosedEpochProcessed = +lastClosedEpochsProcessed.toString();
 
     const encodedDataForGetCurrentEpoch = iface.encodeFunctionData('getCurrentEpoch', []);
     const encodedDataForGetCurrentEpochRes = await chainservice.readTx(
@@ -106,9 +109,11 @@ export const processDepositsAndInvoices = async () => {
     const lastClosedEpoch = currentEpoch > 0 ? currentEpoch - 1 : 0;
     // Check if there are deposits to process in unprocessed epochs across all spokes
     let hasDepositsToProcess = false;
-    if (lastClosedEpoch > +lastClosedEpochProcessed.toString()) {
+    let unprocessedEpochsCount = 0;
+    if (lastClosedEpoch > lastClosedEpochProcessed) {
+      unprocessedEpochsCount = lastClosedEpoch - lastClosedEpochProcessed;
       for (const spokeDomain of spokes) {
-        for (let epoch = +lastClosedEpochProcessed.toString() + 1; epoch <= lastClosedEpoch; epoch++) {
+        for (let epoch = lastClosedEpochProcessed + 1; epoch <= lastClosedEpoch; epoch++) {
           const encodedDataForDepositsAvailable = iface.encodeFunctionData('depositsAvailableInEpoch', [
             epoch,
             +spokeDomain,
@@ -136,6 +141,11 @@ export const processDepositsAndInvoices = async () => {
       }
     }
     const hasInvoicesToProcess = invoices.head != mkBytes32();
+
+    // Processed last MAX_UNPROCESSED_EPOCHS_COUNT epochs even if there are no deposits/invoices to avoid
+    // out of gas transaction reverts when the number of epochs to process is too large.
+    const hitUnprocessedEpochsLimit = unprocessedEpochsCount >= MAX_UNPROCESSED_EPOCHS_COUNT;
+
     logger.debug(
       'Checking the possibility of calling the processDepositsAndInvoices method',
       requestContext,
@@ -148,14 +158,20 @@ export const processDepositsAndInvoices = async () => {
         lastClosedEpoch,
         hasInvoicesToProcess,
         hasDepositsToProcess,
+        unprocessedEpochsCount,
+        hitUnprocessedEpochsLimit,
       },
     );
-    // Only call relayer if there are invoices to process OR deposits to process
-    if (!hasInvoicesToProcess && !hasDepositsToProcess) {
+
+    // Call relayer if there are invoices to process OR deposits to process OR there are unprocessed epochs
+    if (!hasInvoicesToProcess && !hasDepositsToProcess && !hitUnprocessedEpochsLimit) {
       logger.debug(
-        'Skip to call the processDepositsAndInvoices method - no invoices or deposits to process',
+        'Skip to call the processDepositsAndInvoices method - no invoices or deposits to process or hit unprocessed epochs limit',
         requestContext,
         methodContext,
+        {
+          unprocessedEpochsCount,
+        },
       );
       continue;
     }
@@ -172,6 +188,8 @@ export const processDepositsAndInvoices = async () => {
       maxDeposits: MAX_DEPOSITS_TO_PROCESS,
       maxInvoices: MAX_INVOICES_TO_PROCESS,
       encodedDataToProcess,
+      invoicesCount: invoices.length.toString(),
+      unprocessedEpochsCount,
     });
 
     // Call the `processDepositsAndInvoices` method on the hub

@@ -35,10 +35,10 @@ dataSources:
           file: {{filePath}}
       eventHandlers:
         # event IntentAdded(bytes32 indexed _intentId, uint256 _queueIdx, Intent _intent);
-        - event: IntentAdded(indexed bytes32,uint256,(bytes32,bytes32,bytes32,bytes32,uint24,uint32,uint64,uint48,uint48,uint256,uint32[],bytes))
+        - event: IntentAdded(indexed bytes32,uint256,(bytes32,bytes32,bytes32,bytes32,uint32,uint64,uint48,uint48,uint256,uint256,uint32[],bytes))
           handler: handleIntentAdded
-        # event IntentFilled(bytes32 indexed _intentId, address indexed _solver, uint256 _totalFeeDBPS, uint256 _queueIdx, Intent _intent);
-        - event: IntentFilled(indexed bytes32,indexed address,uint256,uint256,(bytes32,bytes32,bytes32,bytes32,uint24,uint32,uint64,uint48,uint48,uint256,uint32[],bytes))
+        # event IntentFilled(bytes32 indexed _intentId, address indexed _solver, bytes32 indexed _receiver, uint256 _amountOut, uint256 _queueIdx, Intent _intent);
+        - event: IntentFilled(indexed bytes32,indexed address,indexed bytes32,uint256,uint256,(bytes32,bytes32,bytes32,bytes32,uint32,uint64,uint48,uint48,uint256,uint256,uint32[],bytes))
           handler: handleIntentFilled
         # event Deposited(address indexed _depositant, address indexed _asset, uint256 _amount);
         - event: Deposited(indexed address,indexed address,uint256)
