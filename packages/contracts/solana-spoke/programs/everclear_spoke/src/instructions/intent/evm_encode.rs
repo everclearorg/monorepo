@@ -404,11 +404,21 @@ pub fn u128_to_u256_be(val: u128) -> [u8; 32] {
 pub(crate) fn try_32bytes_to_u64(val: [u8; 32]) -> Result<u64> {
     let mut result: u64 = 0;
     for byte in val.iter().take(24) {
-        require!(*byte != 0, SpokeError::IntegerOverflow);
+        require!(*byte == 0, SpokeError::IntegerOverflow);
     }
     for byte in val.iter().skip(24) {
-        result += *byte as u64;
         result <<= 8;
+        result += *byte as u64;
     }
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::instructions::try_32bytes_to_u64;
+
+    #[test]
+    fn test_try_32bytes_to_u64() {
+        assert_eq!(try_32bytes_to_u64([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 12, 196]).unwrap(), 789700);
+    }
 }
