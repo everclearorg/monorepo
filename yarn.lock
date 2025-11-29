@@ -1089,7 +1089,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/chainservice@workspace:packages/adapters/chainservice"
   dependencies:
-    "@chimera-monorepo/utils": 0.0.1-alpha.12
+    "@chimera-monorepo/utils": 0.0.1-alpha.13
     "@safe-global/api-kit": ^2.5.6
     "@safe-global/protocol-kit": ^5.1.1
     "@safe-global/types-kit": ^1.0.1
@@ -1113,7 +1113,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@chimera-monorepo/contracts@workspace:*, @chimera-monorepo/contracts@workspace:packages/contracts":
+"@chimera-monorepo/contracts@0.0.1-alpha.12, @chimera-monorepo/contracts@workspace:*, @chimera-monorepo/contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/contracts@workspace:packages/contracts"
   dependencies:
@@ -1262,7 +1262,29 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@chimera-monorepo/utils@0.0.1-alpha.12, @chimera-monorepo/utils@workspace:*, @chimera-monorepo/utils@workspace:packages/utils":
+"@chimera-monorepo/utils@npm:0.0.1-alpha.12":
+  version: 0.0.1-alpha.12
+  resolution: "@chimera-monorepo/utils@npm:0.0.1-alpha.12"
+  dependencies:
+    "@aws-sdk/client-ssm": ^3.735.0
+    "@chimera-monorepo/contracts": 0.0.1-alpha.12
+    "@hyperlane-xyz/sdk": 3.15.1
+    "@sinclair/typebox": 0.25.21
+    "@urql/core": 5.0.4
+    ajv: 8.12.0
+    ajv-formats: 2.1.1
+    axios: 0.24.0
+    chai: 4.3.7
+    chai-as-promised: 7.1.1
+    chai-subset: 1.6.0
+    hyperid: 3.2.0
+    secp256k1: 4.0.3
+    sinon-chai: 3.7.0
+    tronweb: ^6.0.3
+  languageName: node
+  linkType: hard
+
+"@chimera-monorepo/utils@workspace:*, @chimera-monorepo/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/utils@workspace:packages/utils"
   dependencies:
