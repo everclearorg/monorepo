@@ -182,33 +182,33 @@ impl FillMessage {
     ///   - the offset (in bytes) from the start of the struct's head to the destinations data
     ///
     /// We know:
-    ///   - The struct "head" is 6 words = 192 bytes.
-    ///   - So the tail region physically begins at offset = 192 from the start of the struct head.
+    ///   - The struct "head" is 7 words = 224 bytes.
+    ///   - So the tail region physically begins at offset = 224 from the start of the struct head.
     ///   - The offset we store in word5 is the distance from 0.. to where destinations data starts in the tail.
     ///
     fn encode_tail(&self) -> (Vec<u8>, u64) {
         let mut tail = Vec::new();
-        // The tail offset starts right after the struct's 192-byte head,
+        // The tail offset starts right after the struct's 224-byte head,
         // but the offsets *within* the struct are measured from the start of that head (i.e. 0).
         // So the first dynamic field (destinations) will be at offset = 0
         // Actually, in the ABI spec, the offset stored in the struct’s head is measured
         // *relative to the start of that struct’s head*. So if the tail is appended
-        // immediately after 192 bytes, then the first dynamic field is at offset = 192 - 192 = 0 from the tail’s start.
+        // immediately after 224 bytes, then the first dynamic field is at offset = 224 - 224 = 0 from the tail’s start.
         //
-        // However, we typically store just the numeric offset "192" in the top-level array encoding,
+        // However, we typically store just the numeric offset "224" in the top-level array encoding,
         // then plus the struct's index. But because we have an array of length=1, we measure from the
-        // start of that single struct's head, so it is indeed 192. But inside that single struct,
+        // start of that single struct's head, so it is indeed 224. But inside that single struct,
         // it is "0" to the first tail chunk. The EVM looks at (headStart + offset).
         //
         // In practice, to keep consistent with the standard approach:
-        //   - For the first dynamic field, we store offset=192 in the struct’s head.
-        //   - Then for the second dynamic field, offset=192 + [size of the first], etc.
+        //   - For the first dynamic field, we store offset=224 in the struct’s head.
+        //   - Then for the second dynamic field, offset=224 + [size of the first], etc.
         //
-        // Because there's only one struct, that "192" is the distance from the struct start
+        // Because there's only one struct, that "224" is the distance from the struct start
         // up to the tail. So let's do this carefully:
         //
         // We'll figure out the size of the destinations chunk, then we know where data begins.
-        // Then we know the offsets to store in the head are (192) for destinations.
+        // Then we know the offsets to store in the head are (224) for destinations.
 
         // 1) Encode destinations
         let mut destinations_bytes = Vec::new();
@@ -223,7 +223,7 @@ impl FillMessage {
         }
 
         // We place "destinations_bytes" first, then "data_bytes" in the tail
-        let destinations_offset = 192; // from start of struct #0
+        let destinations_offset = 224; // from start of struct #0
 
         tail.extend_from_slice(&destinations_bytes);
 
@@ -259,7 +259,7 @@ impl EVMEncode for FillMessage {
 
         // We have 1 dynamic fields => destinations[]
         // It gets a 32-byte "offset" word. The offset is from the start of struct #0 head (i.e. offset=0 there)
-        // We know the struct head is 192 bytes total => that means the "tail" starts at offset 192
+        // We know the struct head is 224 bytes total => that means the "tail" starts at offset 224
         // But we must figure out how big "destinations" is to know where "data" begins in that tail.
 
         // We'll build the tail in a separate buffer, so we can figure out lengths
@@ -271,7 +271,7 @@ impl EVMEncode for FillMessage {
         // word6: executionTimestamp (uint48 => we store in 32 bytes, last 6 bytes used)
         head.extend_from_slice(&u256_to_32bytes(self.execution_timestamp as u128));
 
-        // Finally, we put the entire head (192 bytes) after the initial 32 bytes for array length:
+        // Finally, we put the entire head (224 bytes) after the initial 32 bytes for array length:
         out.extend_from_slice(&head);
 
         // Then we append the tail:
@@ -419,6 +419,13 @@ mod tests {
 
     #[test]
     fn test_try_32bytes_to_u64() {
-        assert_eq!(try_32bytes_to_u64([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 12, 196]).unwrap(), 789700);
+        assert_eq!(
+            try_32bytes_to_u64([
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 12, 12, 196
+            ])
+            .unwrap(),
+            789700
+        );
     }
 }
