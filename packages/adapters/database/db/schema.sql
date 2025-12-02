@@ -1512,10 +1512,10 @@ BEGIN
     pos := pos + 16;
     ttl := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
     pos := pos + 16;
-    amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
-    pos := pos + 32;
-    amount_out_min := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
-    pos := pos + 32;
+    amount := to_numeric(SUBSTRING(hex_data, pos + 32, 32));
+    pos := pos + 64;
+    amount_out_min := to_numeric(SUBSTRING(hex_data, pos + 32, 32));
+    pos := pos + 64;
     destination_count := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
     pos := pos + 8;
 
@@ -1548,6 +1548,7 @@ BEGIN
         block_number,
         tx_origin,
         tx_nonce,
+        max_fee,
         gas_limit,
         gas_price,
         status,
@@ -1576,6 +1577,7 @@ BEGIN
         rec.block_slot,
         solver,
         0,
+        '0',
         rec.tx_fee,
         1,
         'FILLED',
@@ -1603,6 +1605,7 @@ BEGIN
         block_number = EXCLUDED.block_number,
         tx_origin = EXCLUDED.tx_origin,
         tx_nonce = EXCLUDED.tx_nonce,
+        max_fee = EXCLUDED.max_fee,
         gas_limit = EXCLUDED.gas_limit,
         gas_price = EXCLUDED.gas_price,
         status = EXCLUDED.status,
@@ -2168,7 +2171,7 @@ CREATE TABLE public.destination_intents (
     filled_domain character varying(66) NOT NULL,
     nonce bigint NOT NULL,
     data text,
-    transaction_hash character(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
     "timestamp" bigint NOT NULL,
     block_number bigint NOT NULL,
     tx_origin character varying(66) NOT NULL,
@@ -5563,4 +5566,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251110182740'),
     ('20251125175538'),
     ('20251127055400'),
-    ('20251202011749');
+    ('20251202011749'),
+    ('20251202161540'),
+    ('20251202165553');
