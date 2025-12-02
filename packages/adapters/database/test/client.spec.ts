@@ -981,19 +981,26 @@ describe('Database Adapter:Client', () => {
 
   describe('#updateSettlementStatus', () => {
     const intents = createSettlementIntents(2, [
-      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1339' },
-      { intentId: mkBytes32('0x2'), status: TIntentStatus.Delivered, domain: '1340' },
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.SettledAndManuallyExecuted, domain: '1339' },
+      { intentId: mkBytes32('0x2'), status: TIntentStatus.SettledAndManuallyExecuted, domain: '1340' },
     ]);
 
     const expectedIntents = createSettlementIntents(1, [
-      { intentId: mkBytes32('0x1'), status: TIntentStatus.Settled, domain: '1339' },
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1339' },
     ]);
 
     it('should work', async () => {
       await saveSettlementIntents(intents, pool);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Delivered, pool)).to.be.empty;
+      await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Delivered, pool);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Delivered, pool)).to.be.deep.eq(expectedIntents);
+    });
+
+    it('should not work when attempt to downgrade status', async () => {
+      await saveSettlementIntents(intents, pool);
       expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.empty;
       await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Settled, pool);
-      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.deep.eq(expectedIntents);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.empty;
     });
   });
 
