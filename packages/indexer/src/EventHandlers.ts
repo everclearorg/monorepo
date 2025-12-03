@@ -101,6 +101,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
       isFastPath: ttl !== 0n,
       tokenFee: undefined,
       nativeFee: undefined,
+      orderId: undefined, // Will be set by OrderCreated event if part of a batch order
       status: 'ADDED' as const,
     };
 
@@ -182,9 +183,10 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     sender: existingIntent?.sender || '0x0000000000000000000000000000000000000000000000000000000000000000', // Zeroed for IntentAdded events, preserve if set by FeeAdapter
     receiveBlockNumber: undefined, // Will be set when filled
     isFastPath: ttl !== 0n,
-    // Preserve fee information if it was already set by FeeAdapter
+    // Preserve fee and order information if it was already set by FeeAdapter
     tokenFee: existingIntent?.tokenFee,
     nativeFee: existingIntent?.nativeFee,
+    orderId: existingIntent?.orderId, // Preserve orderId if set by OrderCreated event
     status: 'ADDED' as const,
   };
 
@@ -318,6 +320,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
       isFastPath: ttl !== 0n,
       tokenFee: undefined,
       nativeFee: undefined,
+      orderId: undefined, // Will be set by OrderCreated event if part of a batch order
       status: 'ADDED' as const,
     };
     context.Intent.set(placeholderIntent);
@@ -395,9 +398,10 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     sender: existingIntent?.sender || '0x0000000000000000000000000000000000000000000000000000000000000000', // Zeroed for IntentAdded events, preserve if set by FeeAdapter
     receiveBlockNumber: undefined, // Will be set when filled
     isFastPath: ttl !== 0n,
-    // Preserve fee information if it was already set by FeeAdapter
+    // Preserve fee and order information if it was already set by FeeAdapter
     tokenFee: existingIntent?.tokenFee,
     nativeFee: existingIntent?.nativeFee,
+    orderId: existingIntent?.orderId, // Preserve orderId if set by OrderCreated event
     status: 'ADDED' as const,
   };
 
@@ -766,6 +770,7 @@ FeeAdapter_IntentWithFeesAdded_handler(async ({ event, context }) => {
       isFastPath: false, // Placeholder
       tokenFee: tokenFee,
       nativeFee: nativeFee,
+      orderId: undefined, // V1 FeeAdapter doesn't have orderId
       status: 'ADDED' as const,
     };
 
@@ -842,6 +847,7 @@ FeeAdapterV2_IntentWithFeesAdded_handler(async ({ event, context }) => {
       isFastPath: false, // Placeholder
       tokenFee: tokenFee,
       nativeFee: nativeFee,
+      orderId: undefined, // Will be set by OrderCreated event if part of a batch order
       status: 'ADDED' as const,
     };
 
@@ -887,7 +893,7 @@ FeeAdapterV2_OrderCreated_handler(async ({ event, context }: any) => {
   const perIntentTokenFee = totalTokenFee > 0n ? totalTokenFee / numIntents : 0n;
   const perIntentNativeFee = totalNativeFee > 0n ? totalNativeFee / numIntents : 0n;
 
-  // Update each intent with sender and divided fees
+  // Update each intent with sender, divided fees, and orderId
   for (const _intentId of _intentIds) {
     let intent = await context.Intent.get(_intentId);
 
@@ -924,22 +930,24 @@ FeeAdapterV2_OrderCreated_handler(async ({ event, context }: any) => {
         isFastPath: false, // Placeholder
         tokenFee: perIntentTokenFee,
         nativeFee: perIntentNativeFee,
+        orderId: _orderId, // Store the order ID for batch filtering
         status: 'ADDED' as const,
       };
 
       context.Intent.set(intent);
     } else {
-      // Intent already exists - update it with sender and divided fees
+      // Intent already exists - update it with sender, divided fees, and orderId
       context.Intent.set({
         ...intent,
         sender: _initiator, // msg.sender from OrderCreated event
         tokenFee: perIntentTokenFee,
         nativeFee: perIntentNativeFee,
+        orderId: _orderId, // Store the order ID for batch filtering
       });
     }
 
     context.log.info(
-      `Updated intent ${_intentId} in order ${_orderId} with sender and fees (tokenFee: ${perIntentTokenFee}, nativeFee: ${perIntentNativeFee})`,
+      `Updated intent ${_intentId} in order ${_orderId} with sender, fees, and orderId (tokenFee: ${perIntentTokenFee}, nativeFee: ${perIntentNativeFee})`,
     );
   }
 

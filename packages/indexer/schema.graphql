@@ -33,6 +33,9 @@ type Intent @entity {
   tokenFee: BigInt # Token fee paid by initiator
   nativeFee: BigInt # Native token fee paid by initiator
   
+  # Order information (from FeeAdapterV2 OrderCreated event)
+  orderId: Bytes # The order ID if this intent was created as part of a batch order
+  
   # Relations
   fills: [Fill!]! @derivedFrom(field: "intent")
   
