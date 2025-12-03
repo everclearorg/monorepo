@@ -14,6 +14,7 @@ contracts:
     events:
       - event: IntentAdded
       - event: IntentFilled
+      - event: IntentQueueProcessed
   
   - name: EverclearSpokeV5
     abi_file_path: ./abis/EverclearSpokeV5.json
@@ -21,6 +22,7 @@ contracts:
     events:
       - event: IntentAdded
       - event: IntentFilled
+      - event: IntentQueueProcessed
   
   - name: FeeAdapter
     abi_file_path: ./abis/FeeAdapter.json
