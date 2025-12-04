@@ -41,7 +41,7 @@ contract PTSUSDE is AddAssetBase, MainnetStagingEnvironment {
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ETHERUEM_PTSUSDE.toBytes32(),
+      adopted: ETHEREUM_PTSUSDE.toBytes32(),
       domain: ETHEREUM,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
