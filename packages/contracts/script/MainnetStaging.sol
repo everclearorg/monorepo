@@ -66,6 +66,10 @@ abstract contract MainnetAssets {
   ///////////////////// xTEST (xERC20) -- Whitelisted ✅
   address public constant ARBITRUM_XTEST = 0xCDFAb2b2fA913385056E713D104c1b268e4898A5;
   address public constant ZIRCUIT_XTEST = 0xad560465f00fCcf3F10Ad3474cb8440A143b16Df;
+
+    ///////////////////// PT-sUSDE -- Whitelisted ✅
+    address public ETHERUEM_PTSUSDE = 0xE8483517077afa11A9B07f849cee2552f040d7b2;
+    bytes32 public SOLANA_PTSUSDE = 0x05c0ad344d082fe99030a0414acc5726b24c89e1a511eac6e58d809145dd6503;
 }
 
 abstract contract Everclear {
