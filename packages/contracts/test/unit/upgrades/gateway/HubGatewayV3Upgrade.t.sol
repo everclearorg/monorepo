@@ -10,12 +10,11 @@ import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {GatewayV3, IGatewayV3} from 'contracts/common/GatewayV3.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {HubGatewayV3, IHubGatewayV3} from 'contracts/hub/HubGatewayV3.sol';
-import {IPolymer} from 'interfaces/common/IPolymer.sol';
 import {ICCIP} from 'interfaces/common/ICCIP.sol';
+import {IPolymer} from 'interfaces/common/IPolymer.sol';
 
 import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
 import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
-
 
 import {Mocker} from 'test/utils/mocks/Mocker.sol';
 
