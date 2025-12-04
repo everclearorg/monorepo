@@ -155,7 +155,7 @@ export class SolanaProvider implements RpcProvider {
     } else {
       return signer;
     }
-    const buffer = key.startsWith('0x') ? Buffer.from(key.slice(2), 'hex') : Buffer.from(key);
+    const buffer = key.startsWith('0x') ? Buffer.from(key.slice(2), 'hex') : Buffer.from(key, 'hex');
     const keypairSigner = await createKeyPairSignerFromPrivateKeyBytes(Uint8Array.from(buffer));
     return new SolanaWeb3Signer(this.rpc, this.rpcSubscription, keypairSigner);
   }
