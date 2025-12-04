@@ -11,9 +11,11 @@ import {GatewayV3, IGatewayV3} from 'contracts/common/GatewayV3.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {HubGatewayV3, IHubGatewayV3} from 'contracts/hub/HubGatewayV3.sol';
 import {IPolymer} from 'interfaces/common/IPolymer.sol';
+import {ICCIP} from 'interfaces/common/ICCIP.sol';
 
 import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
 import {IInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
+
 
 import {Mocker} from 'test/utils/mocks/Mocker.sol';
 
@@ -30,13 +32,13 @@ contract HubGatewayV3Test is Test, Mocker {
   HubGatewayV3 public implementation;
 
   // Mock addresses
-  address public owner = address(0x1);
-  address public receiver = address(0x2);
-  address public interchainSecurityModule = address(0x3);
-  address public polymerProver = address(0x4);
-  address public hyperlaneMailbox = address(0x5);
-  address public ccipMailbox = address(0x6);
-  address public polymerMailbox = address(0x7);
+  address public owner = address(0x1234);
+  address public receiver = address(0x2345);
+  address public interchainSecurityModule = address(0x3456);
+  address public polymerProver = address(0x4567);
+  address public hyperlaneMailbox = address(0x5678);
+  address public ccipMailbox = address(0x6789);
+  address public polymerMailbox = address(0x789);
 
   // Chain IDs
   uint32 public constant ETHEREUM = 1;
@@ -46,10 +48,10 @@ contract HubGatewayV3Test is Test, Mocker {
   uint32 public constant EVERCLEAR = 25_327;
 
   // Gateway addresses for spokes
-  bytes32 public ethereumGateway = address(0x100).toBytes32();
-  bytes32 public arbitrumGateway = address(0x101).toBytes32();
-  bytes32 public optimismGateway = address(0x102).toBytes32();
-  bytes32 public baseGateway = address(0x103).toBytes32();
+  bytes32 public ethereumGateway = address(0x12345678919111212).toBytes32();
+  bytes32 public arbitrumGateway = address(0x12345678919111213).toBytes32();
+  bytes32 public optimismGateway = address(0x12345678919111214).toBytes32();
+  bytes32 public baseGateway = address(0x12345678919111215).toBytes32();
 
   // CCIP chain selectors
   uint256 public constant ETHEREUM_CCIP_SELECTOR = 5_009_297_550_715_157_269;
@@ -520,7 +522,7 @@ contract HubGatewayV3Test is Test, Mocker {
     );
 
     vm.prank(receiver);
-    vm.expectRevert(IGatewayV3.GatewayV3_SendMessage_CallFailure.selector);
+    vm.expectRevert();
     gateway.sendMessage(ETHEREUM, message, gasLimit);
   }
 
@@ -603,13 +605,13 @@ contract HubGatewayV3Test is Test, Mocker {
     // Construct expected CCIP message for expectCall
     bytes memory extraArgs = abi.encodeWithSelector(
       gateway.GENERIC_EXTRA_ARGS_V2_TAG(),
-      IGatewayV3.GenericExtraArgsV2({gasLimit: gasLimit, allowOutOfOrderExecution: true})
+      ICCIP.GenericExtraArgsV2({gasLimit: gasLimit, allowOutOfOrderExecution: true})
     );
 
-    IGatewayV3.EVM2AnyMessage memory evm2AnyMessage = IGatewayV3.EVM2AnyMessage({
+    ICCIP.EVM2AnyMessage memory evm2AnyMessage = ICCIP.EVM2AnyMessage({
       receiver: abi.encode(optimismGateway),
       data: message,
-      tokenAmounts: new IGatewayV3.EVMTokenAmount[](0),
+      tokenAmounts: new ICCIP.EVMTokenAmount[](0),
       feeToken: address(0),
       extraArgs: extraArgs
     });
@@ -670,7 +672,7 @@ contract HubGatewayV3Test is Test, Mocker {
     gateway.updateActiveMailbox(OPTIMISM, address(mockCCIPMailbox));
 
     vm.prank(receiver);
-    vm.expectRevert(IGatewayV3.GatewayV3_SendMessage_CallFailure.selector);
+    vm.expectRevert(MockCCIPMailbox.CCIPSendFailed.selector);
     gateway.sendMessage(OPTIMISM, message, gasLimit);
   }
 
@@ -776,12 +778,12 @@ contract HubGatewayV3Test is Test, Mocker {
   function test_hubGateway_ccipReceive_success() public {
     bytes memory message = abi.encode('incoming ccip message');
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(ETHEREUM_CCIP_SELECTOR),
       sender: abi.encode(ethereumGateway),
       data: message,
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     // Mock the receiver call
@@ -792,12 +794,12 @@ contract HubGatewayV3Test is Test, Mocker {
   }
 
   function testRevert_hubGateway_ccipReceive_notMailbox() public {
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(ETHEREUM_CCIP_SELECTOR),
       sender: abi.encode(ethereumGateway),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.expectRevert(IGatewayV3.GatewayV3_Handle_NotCalledByMailbox.selector);
@@ -807,12 +809,12 @@ contract HubGatewayV3Test is Test, Mocker {
   function testRevert_hubGateway_ccipReceive_invalidSender() public {
     bytes32 wrongGateway = address(0x999).toBytes32();
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(ETHEREUM_CCIP_SELECTOR),
       sender: abi.encode(wrongGateway),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.prank(ccipMailbox);
@@ -824,12 +826,12 @@ contract HubGatewayV3Test is Test, Mocker {
     // Test conversion from CCIP chain ID to EC ID when CCIP selector is unmapped
     uint256 unmappedCCIPSelector = 999_999_999;
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(unmappedCCIPSelector),
       sender: abi.encode(ethereumGateway),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.prank(ccipMailbox);
@@ -1089,7 +1091,7 @@ contract HubGatewayV3Test is Test, Mocker {
 
   function test_hubGateway_sendMessage_hyperlane_integration() public {
     // Fork Ethereum mainnet
-    vm.createSelectFork(vm.envString('ETHEREUM_RPC'));
+    vm.createSelectFork(vm.envString('MAINNET_RPC'));
 
     // Real Hyperlane mailbox on Ethereum
     address realHyperlaneMailbox = 0xc005dc82818d67AF737725bD4bf75435d065D239;
@@ -1144,7 +1146,7 @@ contract HubGatewayV3Test is Test, Mocker {
 
   function test_hubGateway_sendMessage_ccip_integration() public {
     // Fork Ethereum mainnet
-    vm.createSelectFork(vm.envString('ETHEREUM_RPC'));
+    vm.createSelectFork(vm.envString('MAINNET_RPC'));
 
     // Real CCIP mailbox on Ethereum
     address realCCIPMailbox = 0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D;
@@ -1205,7 +1207,7 @@ contract HubGatewayV3Test is Test, Mocker {
 
   function test_hubGateway_sendMessage_polymer_integration() public {
     // Fork Ethereum mainnet
-    vm.createSelectFork(vm.envString('ETHEREUM_RPC'));
+    vm.createSelectFork(vm.envString('MAINNET_RPC'));
 
     // Real Polymer mailbox on Ethereum
     address realPolymerMailbox = 0xE4412AEa45a7121042c33b65291d11F71F4d0363;
@@ -1323,12 +1325,12 @@ contract HubGatewayV3Test is Test, Mocker {
     vm.prank(owner);
     gateway.setCCIPChainIdMappings(ecChainIds, ccipChainIds);
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(888_888_888),
       sender: abi.encode(unknownGateway),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.prank(ccipMailbox);
@@ -1350,7 +1352,7 @@ contract HubGatewayV3Test is Test, Mocker {
     gateway.updateActiveMailbox(BASE, address(mockPolymerMailbox));
 
     vm.prank(receiver);
-    vm.expectRevert(IGatewayV3.GatewayV3_SendMessage_CallFailure.selector);
+    vm.expectRevert(MockRevertingMailbox.MailboxFailed.selector);
     gateway.sendMessage(BASE, message, gasLimit);
   }
 
@@ -1358,12 +1360,12 @@ contract HubGatewayV3Test is Test, Mocker {
     // Test receiving from a CCIP selector that has no EC mapping
     uint256 unmappedCCIPSelector = 111_111_111;
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(unmappedCCIPSelector),
       sender: abi.encode(ethereumGateway),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.prank(ccipMailbox);

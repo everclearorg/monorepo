@@ -13,6 +13,7 @@ import {IPolymer} from 'interfaces/common/IPolymer.sol';
 import {GasTank} from 'contracts/common/GasTank.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
+import {ICCIP} from 'interfaces/common/ICCIP.sol';
 import {IGatewayV3} from 'interfaces/common/IGatewayV3.sol';
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
 
@@ -180,7 +181,7 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   }
 
   function ccipReceive(
-    Any2EVMMessage calldata message
+    ICCIP.Any2EVMMessage calldata message
   ) external {
     // only called by mailbox
     if (msg.sender != address(ccipMailbox)) {
@@ -327,61 +328,34 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
       return keccak256(abi.encode(block.chainid, address(this), _selectorHash, _destDomain, _destGateway, _message));
     } else {
       uint256 mailboxId;
-      if (_mailbox == hyperlaneMailbox && hyperlaneMailbox != address(0)) mailboxId = HL_ID;
-      else if (_mailbox == ccipMailbox && ccipMailbox != address(0)) mailboxId = CCIP_ID;
-      else if (_mailbox == polymerMailbox && polymerMailbox != address(0)) mailboxId = POLYMER_ID;
-      else revert GatewayV3_SendMessage_UnsupportedMailbox();
-
-      bytes memory _calldata = _constructCalldata(mailboxId, _destDomain, _destGateway, _message, _gasLimit);
-      (bool success, bytes memory data) = _mailbox.call{value: _value}(_calldata);
-      if (!success) revert GatewayV3_SendMessage_CallFailure();
-      _messageId = abi.decode(data, (bytes32));
+      if (_mailbox == hyperlaneMailbox && hyperlaneMailbox != address(0)) {
+        bytes memory _metadata = StandardHookMetadata.formatMetadata(0, _gasLimit, address(this), '');
+        _messageId = IMailbox(hyperlaneMailbox).dispatch{value: _value}(_destDomain, _destGateway, _message, _metadata);
+      } else if (_mailbox == polymerMailbox && polymerMailbox != address(0)) {
+        bytes memory _metadata = StandardHookMetadata.formatMetadata(0, _gasLimit, address(this), '');
+        _messageId = IMailbox(polymerMailbox).dispatch(_destDomain, _destGateway, _message, _metadata);
+      } else if (_mailbox == ccipMailbox && ccipMailbox != address(0)) {
+        uint64 _destDomainCCIP = _convertToCCIPChainId(_destDomain);
+        ICCIP.EVM2AnyMessage memory _evm2AnyMessage = ICCIP.EVM2AnyMessage({
+          receiver: abi.encode(_destGateway),
+          data: _message,
+          tokenAmounts: new ICCIP.EVMTokenAmount[](0),
+          feeToken: address(0),
+          extraArgs: abi.encodeWithSelector(
+            GENERIC_EXTRA_ARGS_V2_TAG, (ICCIP.GenericExtraArgsV2({gasLimit: _gasLimit, allowOutOfOrderExecution: true}))
+          )
+        });
+        _messageId = ICCIP(ccipMailbox).ccipSend{value: _value}(_destDomainCCIP, _evm2AnyMessage);
+      } else {
+        revert GatewayV3_SendMessage_UnsupportedMailbox();
+      }
     }
   }
 
   /**
-   * @notice Constructs the calldata for dispatching a message via the specified mailbox
-   * @param _mailboxId The identifier of the mailbox to use
-   * @param _destDomain The destination domain for the message
-   * @param _recipient The recipient address on the destination domain
-   * @param _message The message payload
-   * @param _gasLimit The gas limit for processing the message on the destination domain
-   * @return The constructed calldata for the mailbox call
-   */
-  function _constructCalldata(
-    uint256 _mailboxId,
-    uint32 _destDomain,
-    bytes32 _recipient,
-    bytes memory _message,
-    uint256 _gasLimit
-  ) internal view returns (bytes memory) {
-    if (_mailboxId == HL_ID || _mailboxId == POLYMER_ID) {
-      bytes memory _metadata = StandardHookMetadata.formatMetadata(0, _gasLimit, address(this), '');
-      return
-        abi.encodeWithSignature('dispatch(uint32,bytes32,bytes,bytes)', _destDomain, _recipient, _message, _metadata);
-    } else if (_mailboxId == CCIP_ID) {
-      uint64 _destDomainCCIP = _convertToCCIPChainId(_destDomain);
-      EVM2AnyMessage memory _evm2AnyMessage = EVM2AnyMessage({
-        receiver: abi.encode(_recipient),
-        data: _message,
-        tokenAmounts: new EVMTokenAmount[](0),
-        feeToken: address(0),
-        extraArgs: abi.encodeWithSelector(
-          GENERIC_EXTRA_ARGS_V2_TAG, (GenericExtraArgsV2({gasLimit: _gasLimit, allowOutOfOrderExecution: true}))
-        )
-      });
-      return abi.encodeWithSignature(
-        'ccipSend(uint64,(bytes,bytes,(address,uint256)[],address,bytes))', _destDomainCCIP, _evm2AnyMessage
-      );
-    } else {
-      revert GatewayV3_SendMessage_UnsupportedMailbox();
-    }
-  }
-
-  /**
-   * @notice Converts a CCIP chain ID to an Everclear chain ID
-   * @param _ecChainId The CCIP chain ID to convert
-   * @return _id The corresponding Everclear chain ID
+   * @notice Converts an Everclear chain ID to a CCIP chain ID
+   * @param _ecChainId The Everclear chain ID to convert
+   * @return _id The corresponding CCIP chain ID
    */
   function _convertToCCIPChainId(
     uint256 _ecChainId
@@ -391,9 +365,9 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   }
 
   /**
-   * @notice Converts an Everclear chain ID to a CCIP chain ID
-   * @param _ccipChainId The Everclear chain ID to convert
-   * @return _id The corresponding CCIP chain ID
+   * @notice Converts a CCIP chain ID to an Everclear chain ID
+   * @param _ccipChainId The CCIP chain ID to convert
+   * @return _id The corresponding Everclear chain ID
    */
   function _convertFromCCIPChainId(
     uint256 _ccipChainId
