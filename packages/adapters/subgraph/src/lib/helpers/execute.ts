@@ -1,8 +1,9 @@
-import { gql } from 'graphql-request';
+import { gql, GraphQLClient } from 'graphql-request';
 import { DocumentInvalid } from '../errors';
 import { getBlockNumberQuery } from '../operations';
 import { isFulfilled, isRejected } from '../types';
 import { gqlRequest } from './mockable';
+import { SubgraphConfig } from '../entities';
 
 const rejectAfterDelay = (ms: number) =>
   new Promise((_, reject) => {
@@ -71,4 +72,56 @@ export const execute = async <T = Record<string, unknown>>(
   } else {
     return chooseHighestBlockNumber(fulfilled) as T;
   }
+};
+
+/**
+ * Execute a GraphQL query against Envio HyperIndex
+ * Envio is multichain and environment-specific (not domain-specific like Goldsky)
+ *
+ * @param config - SubgraphConfig containing Envio configuration
+ * @param query - GraphQL query string
+ * @param variables - Optional query variables
+ * @returns Query result
+ */
+export const executeEnvioQuery = async <T = Record<string, unknown>>(
+  config: SubgraphConfig,
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<T> => {
+  if (!config.envio?.url) {
+    throw new Error('Envio configuration is missing. Please provide envio.url in SubgraphConfig.');
+  }
+
+  // Build headers only if an API key is provided and not a placeholder value
+  // Note: The hosted Envio endpoint (indexer.hyperindex.xyz) does not require authentication
+  const headers: Record<string, string> = {};
+  if (
+    config.envio.apiKey &&
+    config.envio.apiKey.trim() !== '' &&
+    config.envio.apiKey !== 'testing' &&
+    !config.envio.url.includes('indexer.hyperindex.xyz')
+  ) {
+    headers['x-hasura-admin-secret'] = config.envio.apiKey;
+  }
+
+  const client = new GraphQLClient(config.envio.url, {
+    headers,
+  });
+
+  const timeout = (config.envio.timeout || 10) * 1000; // Convert to milliseconds
+
+  const results = await fulfilledWithinTimeout(
+    [client.request<T>(query, variables)],
+    timeout,
+  );
+
+  const fulfilled = results.filter(isFulfilled).map(({ value }) => value);
+  const errors = results.filter(isRejected).map(({ reason }) => reason);
+
+  if (fulfilled.length === 0) {
+    const errorMessage = errors.length > 0 ? errors[0]?.message || 'Unknown error' : 'Envio query timeout';
+    throw new Error(`Envio query failed: ${errorMessage}`);
+  }
+
+  return fulfilled[0] as T;
 };

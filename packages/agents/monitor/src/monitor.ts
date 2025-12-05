@@ -21,15 +21,28 @@ export type MonitorService = (typeof MonitorService)[keyof typeof MonitorService
 const DEFAULT_SUBGRAPH_TIMEOUT = 7500;
 /**
  * Helper to get subgraph reader config
- * @param chains Chain entry of monitor config
+ * @param chains Chain entry of monitor config (includes hub domain)
+ * @param hubConfig Optional hub config for Envio URL
  * @returns SubgraphConfig used to instantiate subgraph reader
  */
-export const getSubgraphReaderConfig = (chains: MonitorConfig['chains']): SubgraphConfig => {
+export const getSubgraphReaderConfig = (
+  chains: MonitorConfig['chains'],
+  hubConfig?: MonitorConfig['hub'],
+): SubgraphConfig => {
   const subgraphs: Record<string, { endpoints: string[]; timeout: number }> = {};
   Object.keys(chains).forEach((domainId) => {
     subgraphs[domainId] = { endpoints: chains[domainId].subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   });
-  return { subgraphs };
+  
+  // Add Envio configuration if available from hub config
+  const envioConfig: SubgraphConfig['envio'] = hubConfig?.envioSubgraphUrl
+    ? {
+        url: hubConfig.envioSubgraphUrl,
+        timeout: DEFAULT_SUBGRAPH_TIMEOUT / 1000, // Convert to seconds
+      }
+    : undefined;
+
+  return { subgraphs, ...(envioConfig && { envio: envioConfig }) };
 };
 
 export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppContext['adapters']['blockMap']) => {
@@ -123,7 +136,7 @@ export const makeMonitor = async (service: MonitorService) => {
 
     const { domain: hubDomain, ...remainder } = context.config.hub;
     context.adapters.subgraph = await setupSubgraphReader(
-      getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }),
+      getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }, context.config.hub),
       context.logger,
       requestContext,
     );
@@ -241,7 +254,7 @@ export const bindConfig = async () => {
       if (reloadSubgraph) {
         const { domain: hubDomain, ...remainder } = context.config.hub;
         context.adapters.subgraph = await setupSubgraphReader(
-          getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }),
+          getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }, context.config.hub),
           context.logger,
           requestContext,
         );
