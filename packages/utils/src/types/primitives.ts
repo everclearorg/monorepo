@@ -74,6 +74,7 @@ export type ChainConfig = Static<typeof TChainConfig>;
 export const THubConfig = Type.Object({
   domain: Type.String(),
   providers: Type.Array(Type.String()),
+  envioSubgraphUrl: Type.Optional(Type.String()),
   subgraphUrls: Type.Array(Type.String()),
   confirmations: Type.Optional(Type.Number()),
   deployments: Type.Object({

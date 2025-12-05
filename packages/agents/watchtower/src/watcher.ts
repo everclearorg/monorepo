@@ -66,7 +66,7 @@ export const setupContext = async () => {
 
     const { domain: hubDomain, ...remainder } = context.config.hub;
     context.adapters.subgraph = await setupSubgraphReader(
-      getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }),
+      getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }, context.config.hub),
       context.logger,
       requestContext,
     );
