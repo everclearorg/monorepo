@@ -26,6 +26,9 @@ describe('EnvioReader', () => {
     // Restore any existing stubs to ensure a clean state
     restore();
     
+    // Reset singleton instance to ensure clean state for each test
+    (EnvioReader as any).instance = undefined;
+    
     executeEnvioQuery = stub();
     stub(Helpers, 'getHelpers').returns({
       execute: stub(),
@@ -107,6 +110,8 @@ describe('EnvioReader', () => {
 
   describe('#queryEnvio', () => {
     it('should throw if envio config is missing', async () => {
+      // Reset singleton instance to test with new config
+      (EnvioReader as any).instance = undefined;
       const readerWithoutConfig = EnvioReader.create({ subgraphs: {} });
       await expect(readerWithoutConfig.queryEnvio('query')).to.be.rejectedWith(
         'Envio configuration is missing',
