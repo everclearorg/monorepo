@@ -404,3 +404,162 @@ export const order = (domain: string, entity: OrderEntity): Order & { domain: st
     timestamp: StringToNumber(entity.timestamp),
   };
 };
+
+export interface EnvioIntentEntity {
+  id: string;
+  intentId: string;
+  queueIdx: string;
+  initiator: string;
+  receiver: string;
+  inputAsset: string;
+  outputAsset: string;
+  maxFee: number;
+  amountOutMin: string;
+  origin: number;
+  nonce: string;
+  timestamp: string;
+  ttl: string;
+  originAmount: string;
+  destinations: number[];
+  data: string;
+  chainId: number;
+  blockNumber: string;
+  blockTimestamp: string;
+  transactionHash: string;
+  sender: string;
+  receiveBlockNumber?: string;
+  isFastPath: boolean;
+  tokenFee?: string;
+  nativeFee?: string;
+  status: 'ADDED' | 'FILLED';
+  fills?: EnvioFillEntity[];
+}
+
+export interface EnvioFillEntity {
+  id: string;
+  intentId: string;
+  solver: string;
+  totalFeeDBPS: string;
+  queueIdx: string;
+  initiator: string;
+  receiver: string;
+  inputAsset: string;
+  outputAsset: string;
+  maxFee: number;
+  origin: number;
+  nonce: string;
+  timestamp: string;
+  ttl: string;
+  originAmount: string;
+  fillAmount: string;
+  destinations: number[];
+  data: string;
+  chainId: number;
+  blockNumber: string;
+  blockTimestamp: string;
+  transactionHash: string;
+}
+
+/**
+ * Convert bytes32 (32-byte padded) address to regular Ethereum address (20 bytes)
+ */
+const bytes32ToAddress = (bytes32: string): string => {
+  if (!bytes32 || bytes32.length < 42) {
+    return bytes32;
+  }
+  if (bytes32.length === 42) {
+    return bytes32;
+  }
+  return '0x' + bytes32.slice(-40);
+};
+
+/**
+ * Parse Envio Intent to OriginIntent
+ * Envio Intent represents an intent added (origin intent)
+ */
+export const envioToOriginIntent = (entity: EnvioIntentEntity, domain?: string): OriginIntent => {
+  const originDomain = domain || entity.origin.toString();
+
+  return {
+    id: entity.intentId,
+    queueIdx: StringToNumber(entity.queueIdx),
+    messageId: undefined, // Envio doesn't track messageId
+    status: entity.status === 'FILLED' ? TIntentStatus.Settled : TIntentStatus.Added,
+    receiver: bytes32ToAddress(entity.receiver),
+    inputAsset: bytes32ToAddress(entity.inputAsset),
+    outputAsset: bytes32ToAddress(entity.outputAsset),
+    amount: entity.originAmount,
+    amountOutMin: entity.amountOutMin,
+    destinations: entity.destinations.map((d) => d.toString()),
+    origin: originDomain,
+    nonce: StringToNumber(entity.nonce),
+    initiator: bytes32ToAddress(entity.initiator),
+    data: entity.data,
+    ttl: StringToNumber(entity.ttl),
+
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp), // Use timestamp from intent struct
+    blockNumber: StringToNumber(entity.blockNumber),
+    gasLimit: '0', // Envio doesn't track gasLimit
+    gasPrice: '0', // Envio doesn't track gasPrice
+    txOrigin: bytes32ToAddress(entity.sender), // Use sender (actual user address)
+    txNonce: StringToNumber(entity.nonce),
+
+    tokenFee: entity.tokenFee,
+    nativeFee: entity.nativeFee,
+    feeAdapterInitiator: bytes32ToAddress(entity.sender), // Use sender (actual user address)
+    orderId: undefined, // Envio doesn't track orderId
+    isSwap: undefined,
+  };
+};
+
+/**
+ * Parse Envio Intent to DestinationIntent
+ * Envio Intent with fills represents destination intent (filled intent)
+ */
+export const envioToDestinationIntent = (
+  entity: EnvioIntentEntity,
+  destinationDomain: string,
+): DestinationIntent | undefined => {
+  // Only return destination intent if it has fills
+  if (!entity.fills || entity.fills.length === 0) {
+    return undefined;
+  }
+
+  // Find fill for this destination domain
+  const fill = entity.fills.find((f) => f.chainId.toString() === destinationDomain);
+  if (!fill) {
+    return undefined;
+  }
+
+  return {
+    id: entity.intentId,
+    queueIdx: StringToNumber(entity.queueIdx),
+    messageId: undefined, // Envio doesn't track messageId
+    status: entity.status === 'FILLED' ? TIntentStatus.Settled : TIntentStatus.Added,
+    initiator: bytes32ToAddress(entity.initiator),
+    receiver: bytes32ToAddress(entity.receiver),
+    solver: bytes32ToAddress(fill.solver),
+    inputAsset: bytes32ToAddress(entity.inputAsset),
+    outputAsset: bytes32ToAddress(entity.outputAsset),
+    amount: entity.originAmount,
+    fee: '0', // Fee is calculated as originAmount - fillAmount
+    amountOut: fill.fillAmount, // Use fillAmount from Fill entity
+    destinations: entity.destinations.map((d) => d.toString()),
+    origin: entity.origin.toString(),
+    nonce: StringToNumber(entity.nonce),
+    amountOutMin: entity.amountOutMin,
+    data: entity.data,
+    ttl: StringToNumber(entity.ttl),
+    destination: destinationDomain,
+    returnData: undefined, // Envio doesn't track returnData
+
+    transactionHash: fill.transactionHash, // Use fill transaction hash
+    timestamp: StringToNumber(fill.timestamp), // Use fill timestamp
+    blockNumber: StringToNumber(fill.blockNumber), // Use fill block number
+    gasLimit: '0', // Envio doesn't track gasLimit
+    gasPrice: '0', // Envio doesn't track gasPrice
+    txOrigin: bytes32ToAddress(fill.solver), // Use solver as txOrigin
+    txNonce: StringToNumber(fill.nonce),
+  };
+};

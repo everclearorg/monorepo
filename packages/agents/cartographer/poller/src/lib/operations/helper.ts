@@ -27,7 +27,16 @@ export const getSubgraphReaderConfig = (config: CartographerConfig): SubgraphCon
   if (hasValidSubgraphUrls(config.hub.subgraphUrls)) {
     subgraphs[config.hub.domain] = { endpoints: config.hub.subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   }
-  return { subgraphs };
+  
+  // Add Envio configuration if available
+  const envioConfig: SubgraphConfig['envio'] = config.hub.envioSubgraphUrl
+    ? {
+        url: config.hub.envioSubgraphUrl,
+        timeout: DEFAULT_SUBGRAPH_TIMEOUT / 1000, // Convert to seconds
+      }
+    : undefined;
+
+  return { subgraphs, ...(envioConfig && { envio: envioConfig }) };
 };
 
 /**

@@ -123,7 +123,9 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments;
   const hubAssets = configJson?.hub?.assets || configFile?.hub?.assets || everclearConfig?.hub?.assets;
   const hubSubgraphUrls =
-    configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [];
+    configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub?.subgraphUrls || [];
+  const hubEnvioSubgraphUrl =
+    configJson?.hub?.envioSubgraphUrl || configFile?.hub?.envioSubgraphUrl || everclearConfig?.hub?.envioSubgraphUrl;
 
   // Get hub-specific gas thresholds if provided
   const hubMinGasOnRelayer =
@@ -143,6 +145,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     deployments: hubDeployments,
     assets: hubAssets,
     subgraphUrls: hubSubgraphUrls,
+    envioSubgraphUrl: hubEnvioSubgraphUrl,
     // Only include these properties if they were specified
     ...(hubMinGasOnRelayer !== undefined && { minGasOnRelayer: hubMinGasOnRelayer }),
     ...(hubMinGasOnGateway !== undefined && { minGasOnGateway: hubMinGasOnGateway }),

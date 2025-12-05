@@ -1,12 +1,10 @@
-import { SinonStub, SinonStubbedInstance } from 'sinon';
+import { SinonStub } from 'sinon';
 
 import { updateDestinationIntents, updateOriginIntents, updateSettlementIntents } from '../../../src/lib/operations';
-import { expect, mkBytes32, mkAddress } from '@chimera-monorepo/utils';
+import { expect, mkAddress } from '@chimera-monorepo/utils';
 import { mockAppContext } from '../../globalTestHook';
 import { createDestinationIntents, createHubIntents, createOriginIntents, createSettlementIntents } from '@chimera-monorepo/database/test/mock';
-import { updateHubIntents } from '../../../src/lib/operations/intents';
-import { SubgraphReader } from '../../../../../../adapters/subgraph/src';
-import { Database } from '@chimera-monorepo/database';
+import { updateHubIntents } from '../../../src/lib/operations';
 
 describe('Intents operations', () => {
   describe('#updateOriginIntents', () => {

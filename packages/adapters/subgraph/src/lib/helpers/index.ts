@@ -1,9 +1,10 @@
 import * as parser from './parse';
-import { execute } from './execute';
+import { execute, executeEnvioQuery } from './execute';
 
 export const getHelpers = () => {
   return {
     execute,
     parser,
+    executeEnvioQuery,
   };
 };

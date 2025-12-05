@@ -84,7 +84,9 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
     providers: configJson?.hub?.providers || configFile?.hub?.providers || everclearConfig?.hub.providers,
     deployments: configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments,
     subgraphUrls:
-      configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [],
+      configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub?.subgraphUrls || [],
+    envioSubgraphUrl:
+      configJson?.hub?.envioSubgraphUrl || configFile?.hub?.envioSubgraphUrl || everclearConfig?.hub?.envioSubgraphUrl,
     confirmations: configJson?.hub?.confirmations || configFile?.hub?.confirmations || DEFAULT_SAFE_CONFIRMATIONS,
   };
 
