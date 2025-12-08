@@ -1,6 +1,5 @@
 import { getContext } from '../../context';
 import { createLoggingContext, LockPosition } from '@chimera-monorepo/utils';
-import { BigNumber } from 'ethers';
 import { NewLockPositionZero } from '../../errors/tasks/rewards';
 
 export const NEW_LOCK_POSITIONS_CHECKPOINT = 'lighthouse_rewards_last_processed_new_lock_position_vid';
@@ -39,15 +38,15 @@ export const processNewLockPositions = async (limit: number = 100): Promise<numb
   }
 
   const lockPositions = new Map<string, LockPosition[]>();
-  const totalStakes = new Map<string, BigNumber>();
+  const totalStakes = new Map<string, bigint>();
   for (const newLockPosition of newLockPositions) {
     const user: string = newLockPosition.user;
-    const newTotalAmountLocked = BigNumber.from(newLockPosition.newTotalAmountLocked);
+    const newTotalAmountLocked = BigInt(newLockPosition.newTotalAmountLocked);
     if (!lockPositions.has(user)) {
       const userLockPositions = await database.getLockPositions(user);
       if (!userLockPositions.length) {
         // This is the first lock position ever or the user withdrew all tokens previously.
-        if (newTotalAmountLocked.isZero()) {
+        if (newTotalAmountLocked === BigInt(0)) {
           const error = new NewLockPositionZero({ user });
           logger.error('invalid new lock position', requestContext, methodContext, error);
           throw error;
@@ -68,14 +67,14 @@ export const processNewLockPositions = async (limit: number = 100): Promise<numb
 
       lockPositions.set(user, userLockPositions);
       const sum = userLockPositions.reduce((sum, pos) => {
-        return sum.add(BigNumber.from(pos.amountLocked));
-      }, BigNumber.from(0));
+        return sum + BigInt(pos.amountLocked);
+      }, BigInt(0));
       totalStakes.set(user, sum);
     }
 
     let userTotalStake = totalStakes.get(user)!;
     const userLockPositions = lockPositions.get(user)!;
-    if (newTotalAmountLocked.gt(userTotalStake)) {
+    if (newTotalAmountLocked > userTotalStake) {
       // Lock position increased.
 
       // Find lock positions that starts at the same time.
@@ -84,31 +83,32 @@ export const processNewLockPositions = async (limit: number = 100): Promise<numb
       });
       if (lockIndex >= 0) {
         // Lock position with the same start time found, add newly locked amount to it.
-        userLockPositions[lockIndex].amountLocked = BigNumber.from(userLockPositions[lockIndex].amountLocked)
-          .add(newTotalAmountLocked.sub(userTotalStake))
-          .toString();
+        userLockPositions[lockIndex].amountLocked = (
+          BigInt(userLockPositions[lockIndex].amountLocked) +
+          (newTotalAmountLocked - userTotalStake)
+        ).toString();
       } else {
         // No lock position with the same start time, create new lock position.
         userLockPositions.push({
           user,
-          amountLocked: newTotalAmountLocked.sub(userTotalStake).toString(),
+          amountLocked: (newTotalAmountLocked - userTotalStake).toString(),
           start: newLockPosition.blockTimestamp,
           expiry: newLockPosition.expiry,
         });
       }
-    } else if (newTotalAmountLocked.lt(userTotalStake)) {
+    } else if (newTotalAmountLocked < userTotalStake) {
       // Early exit, remove the earliest lock positions until the total locked amount is equal to
       // the new total locked amount.
-      let amountUnlocked = userTotalStake.sub(newTotalAmountLocked);
+      let amountUnlocked = userTotalStake - newTotalAmountLocked;
       let index = 0;
-      while (amountUnlocked.gt(0)) {
-        const amountLocked = BigNumber.from(userLockPositions[index].amountLocked);
-        if (amountUnlocked.gte(amountLocked)) {
+      while (amountUnlocked > BigInt(0)) {
+        const amountLocked = BigInt(userLockPositions[index].amountLocked);
+        if (amountUnlocked >= amountLocked) {
           userLockPositions[index++].amountLocked = '0';
-          amountUnlocked = amountUnlocked.sub(amountLocked);
+          amountUnlocked = amountUnlocked - amountLocked;
         } else {
-          userLockPositions[index++].amountLocked = amountLocked.sub(amountUnlocked).toString();
-          amountUnlocked = BigNumber.from(0);
+          userLockPositions[index++].amountLocked = (amountLocked - amountUnlocked).toString();
+          amountUnlocked = BigInt(0);
         }
       }
     }

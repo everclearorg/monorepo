@@ -1,13 +1,15 @@
-import { Asset, canonizeId, Fee, Token } from '@chimera-monorepo/utils';
-import { keccak256, defaultAbiCoder, isHexString } from 'ethers/lib/utils';
+import { Asset, canonizeId, Fee, Token, chainWrapper } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { getContract } from '../mockable';
 
 export const getAssetHash = (address: string, domain: string): string => {
   // Return the asset hash.
-  return keccak256(
-    defaultAbiCoder.encode(['bytes32', 'uint32'], [isHexString(address, 32) ? address : canonizeId(address), domain]),
-  );
+  return chainWrapper.keccak256(
+    chainWrapper.encodeAbiParameters(
+      [{ type: 'bytes32' }, { type: 'uint32' }],
+      [address.startsWith('0x') && address.length === 66 ? address : canonizeId(address), domain],
+    ),
+  ) as string;
 };
 
 export const getRegisteredAssetHashFromContract = async (tickerHash: string, domain: string): Promise<string> => {
@@ -22,12 +24,20 @@ export const getRegisteredAssetHashFromContract = async (tickerHash: string, dom
     {
       to: hubEverclear.address,
       domain: +config.hub.domain,
-      data: hubEverclear.interface.encodeFunctionData('assetHash', [tickerHash, domain]),
-      funcSig: hubEverclear.interface.getFunction('assetHash').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: hubEverclear.abi,
+        functionName: 'assetHash',
+        args: [tickerHash, domain],
+      }),
+      funcSig: 'assetHash(bytes32,uint32)',
     },
     'latest',
   );
-  const [assetHash] = hubEverclear.interface.decodeFunctionResult('assetHash', encodedAssetHash);
+  const [assetHash] = chainWrapper.decodeFunctionResult({
+    abi: hubEverclear.abi,
+    functionName: 'assetHash',
+    data: encodedAssetHash as `0x${string}`,
+  }) as [string];
 
   return assetHash;
 };
@@ -47,12 +57,20 @@ export const getAssetFromContract = async (address: string, domain: string): Pro
     {
       to: hubEverclear.address,
       domain: +config.hub.domain,
-      data: hubEverclear.interface.encodeFunctionData('adoptedForAssets', [assetHash]),
-      funcSig: hubEverclear.interface.getFunction('adoptedForAssets').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: hubEverclear.abi,
+        functionName: 'adoptedForAssets',
+        args: [assetHash],
+      }),
+      funcSig: 'adoptedForAssets(bytes32)',
     },
     'latest',
   );
-  const [assetConfig] = hubEverclear.interface.decodeFunctionResult('adoptedForAssets', encodedAssetConfig);
+  const [assetConfig] = chainWrapper.decodeFunctionResult({
+    abi: hubEverclear.abi,
+    functionName: 'adoptedForAssets',
+    data: encodedAssetConfig as `0x${string}`,
+  }) as [any];
 
   return { ...assetConfig, id: assetConfig.tickerHash };
 };
@@ -69,23 +87,39 @@ export const getTokenFromContract = async (tickerHash: string): Promise<Token> =
     {
       to: hubEverclear.address,
       domain: +config.hub.domain,
-      data: hubEverclear.interface.encodeFunctionData('tokenConfigs', [tickerHash]),
-      funcSig: hubEverclear.interface.getFunction('tokenConfigs').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: hubEverclear.abi,
+        functionName: 'tokenConfigs',
+        args: [tickerHash],
+      }),
+      funcSig: 'tokenConfigs(bytes32)',
     },
     'latest',
   );
-  const tokenConfig = hubEverclear.interface.decodeFunctionResult('tokenConfigs', encodedTokenConfig);
+  const tokenConfig = chainWrapper.decodeFunctionResult({
+    abi: hubEverclear.abi,
+    functionName: 'tokenConfigs',
+    data: encodedTokenConfig as `0x${string}`,
+  }) as any;
   // Get the protocol fees
   const encodedFees = await chainreader.readTx(
     {
       to: hubEverclear.address,
       domain: +config.hub.domain,
-      data: hubEverclear.interface.encodeFunctionData('tokenFees', [tickerHash]),
-      funcSig: hubEverclear.interface.getFunction('tokenFees').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: hubEverclear.abi,
+        functionName: 'tokenFees',
+        args: [tickerHash],
+      }),
+      funcSig: 'tokenFees(bytes32)',
     },
     'latest',
   );
-  const [decodedFees] = hubEverclear.interface.decodeFunctionResult('tokenFees', encodedFees);
+  const [decodedFees] = chainWrapper.decodeFunctionResult({
+    abi: hubEverclear.abi,
+    functionName: 'tokenFees',
+    data: encodedFees as `0x${string}`,
+  }) as [Fee[]];
 
   return {
     id: tickerHash,
@@ -109,12 +143,20 @@ export const getCustodiedAssetsFromHubContract = async (assetHash: string): Prom
     {
       to: hubEverclear.address,
       domain: +config.hub.domain,
-      data: hubEverclear.interface.encodeFunctionData('custodiedAssets', [assetHash]),
-      funcSig: hubEverclear.interface.getFunction('custodiedAssets').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: hubEverclear.abi,
+        functionName: 'custodiedAssets',
+        args: [assetHash],
+      }),
+      funcSig: 'custodiedAssets(bytes32)',
     },
     'latest',
   );
-  const [custodied] = hubEverclear.interface.decodeFunctionResult('custodiedAssets', encoded);
+  const [custodied] = chainWrapper.decodeFunctionResult({
+    abi: hubEverclear.abi,
+    functionName: 'custodiedAssets',
+    data: encoded as `0x${string}`,
+  }) as [string];
 
   return custodied;
 };

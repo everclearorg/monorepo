@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import { stub, SinonStub, restore } from 'sinon';
 import { TronSyncProvider, TronWebFactory } from '../../../../src/shared/rpc/tron/provider';
 import { TronWeb } from 'tronweb';
-import { BigNumber, Bytes } from 'ethers';
 import { ISigner, ISignerApi } from '../../../../src';
 import { TEST_ERROR, TEST_SENDER_DOMAIN } from '../../../utils';
 
@@ -37,7 +36,6 @@ type MockTronWeb = {
   setPrivateKey: SinonStub;
   sign: SinonStub;
   providers: Record<string, any>;
-  BigNumber: any;
   plugin: any;
   event: any;
   version: string;
@@ -114,7 +112,6 @@ describe('TronSyncProvider', () => {
       }),
       sign: stub(),
       providers: {},
-      BigNumber: {},
       plugin: {},
       event: {},
       version: '1.0.0',
@@ -274,16 +271,8 @@ describe('TronSyncProvider', () => {
         hash: '0x123',
         confirmations: 5, // 12345 - 12340
         nonce: 0, // Tron doesn't use nonces
-        gasPrice: BigNumber.from(1),
-        gasLimit: BigNumber.from(1000000),
-        to: '0xcontract',
-        from: '0xowner',
-        data: '0xdata',
-        value: BigNumber.from('1000000000'),
-        chainId: TEST_SENDER_DOMAIN,
-        blockNumber: 12340,
-        blockHash: '0xblock123',
-        wait: result.wait // Using the actual wait function since it's a Promise.reject
+        gasPrice: BigInt(1),
+        gasLimit: BigInt(1000000),
       });
     });
 
@@ -338,10 +327,10 @@ describe('TronSyncProvider', () => {
 
       expect(result).to.deep.include({
         hash: '0x123',
-        confirmations: 0,
-        blockNumber: undefined,
-        blockHash: undefined
+        confirmations: 0
       });
+      expect(result).to.not.have.property('blockNumber');
+      expect(result).to.not.have.property('blockHash');
     });
 
     it('should handle transaction with missing contract data', async () => {
@@ -391,10 +380,11 @@ describe('TronSyncProvider', () => {
       const result = await provider.getTransaction('0x123');
 
       expect(result).to.deep.include({
-        to: '',
-        data: undefined,
-        value: BigNumber.from(0)
+        hash: '0x123'
       });
+      expect(result).to.not.have.property('to');
+      expect(result).to.not.have.property('data');
+      expect(result).to.not.have.property('value');
     });
 
     it('should handle getTransactionInfo failure', async () => {
@@ -571,18 +561,7 @@ describe('TronSyncProvider', () => {
           transactionHash: '0x123',
           transactionIndex: 0,
           removed: false
-        }],
-        to: '0xcontract',
-        from: '0xowner',
-        contractAddress: '0xdeployed',
-        transactionIndex: 0,
-        gasUsed: BigNumber.from(100000),
-        effectiveGasPrice: BigNumber.from(0),
-        type: 0,
-        byzantium: true,
-        logsBloom: '0x',
-        blockHash: '0xblock123',
-        cumulativeGasUsed: BigNumber.from(100000)
+        }]
       });
     });
   });
@@ -745,16 +724,7 @@ describe('TronSyncProvider', () => {
         hash: '0x123',
         parentHash: '0xparent',
         number: 12345,
-        timestamp: 1000000,
-        transactions: [],
-        nonce: '',
-        difficulty: 0,
-        _difficulty: BigNumber.from(0),
-        gasLimit: BigNumber.from(0),
-        gasUsed: BigNumber.from(0),
-        miner: '',
-        extraData: '',
-        baseFeePerGas: null
+        timestamp: 1000000
       });
       expect(mockTronWeb.trx.getBlock.calledWith('0x123')).to.be.true;
     });
@@ -798,7 +768,7 @@ describe('TronSyncProvider', () => {
     it('should set signer API and return tronWeb instance', async () => {
       const mockSignerApi = {
         getPublicKey: () => Promise.resolve('0xpublickey'),
-        sign: (identifier: string, data: string | Bytes) => Promise.resolve('signed_data')
+        sign: (identifier: string, data: string) => Promise.resolve('signed_data')
       };
       const mockSigner: ISigner = {
         getAddress: () => Promise.resolve('0x123'),
@@ -806,8 +776,8 @@ describe('TronSyncProvider', () => {
           hash: '0x123',
           confirmations: 0,
           nonce: 0,
-          gasPrice: BigNumber.from(1),
-          gasLimit: BigNumber.from(0)
+          gasPrice: BigInt(1),
+          gasLimit: BigInt(0)
         }),
         signerApi: mockSignerApi,
       };
@@ -825,7 +795,7 @@ describe('TronSyncProvider', () => {
       it('should set signer API and return tronWeb instance', async () => {
         const mockSignerApi = {
           getPublicKey: () => Promise.resolve('0xpublickey'),
-          sign: (identifier: string, data: string | Bytes) => Promise.resolve('signed_data')
+          sign: (identifier: string, data: string) => Promise.resolve('signed_data')
         };
         const mockSigner: ISigner = {
           getAddress: () => Promise.resolve('0x123'),
@@ -833,8 +803,8 @@ describe('TronSyncProvider', () => {
             hash: '0x123',
             confirmations: 0,
             nonce: 0,
-            gasPrice: BigNumber.from(1),
-            gasLimit: BigNumber.from(0)
+            gasPrice: BigInt(1),
+            gasLimit: BigInt(0)
           }),
           signerApi: mockSignerApi,
         };
@@ -875,7 +845,7 @@ describe('TronSyncProvider', () => {
     const signStub: SinonStub = stub().resolves('mockSignature');
     const mockSignerApi: ISignerApi = {
       getPublicKey: getPublicKeyStub,
-      sign: (identifier: string, data: string | Bytes) => signStub(identifier, data),
+      sign: (identifier: string, data: string) => signStub(identifier, data),
     };
 
     beforeEach(() => {
@@ -919,8 +889,8 @@ describe('TronSyncProvider', () => {
           hash: '0x123',
           confirmations: 0,
           nonce: 0,
-          gasPrice: BigNumber.from(1),
-          gasLimit: BigNumber.from(0)
+          gasPrice: BigInt(1),
+          gasLimit: BigInt(0)
         }),
       };
       const signer = await provider.getSigner(mockSigner);
@@ -931,8 +901,8 @@ describe('TronSyncProvider', () => {
         hash: '0x123',
         confirmations: 0,
         nonce: 0,
-        gasPrice: BigNumber.from(1),
-        gasLimit: '100000'
+        gasPrice: BigInt(1),
+        gasLimit: BigInt(100000)
       });
 
       expect(mockTronWeb.transactionBuilder.sendTrx.calledOnce).to.be.true;
@@ -978,8 +948,8 @@ describe('TronSyncProvider', () => {
           hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
           confirmations: 0,
           nonce: 0,
-          gasPrice: BigNumber.from(1),
-          gasLimit: BigNumber.from(0)
+          gasPrice: BigInt(1),
+          gasLimit: BigInt(0)
         }),
         signerApi: mockSignerApi,
       };
@@ -991,8 +961,8 @@ describe('TronSyncProvider', () => {
         hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
         confirmations: 0,
         nonce: 0,
-        gasPrice: BigNumber.from(1),
-        gasLimit: '100000'
+        gasPrice: BigInt(1),
+        gasLimit: BigInt(100000)
       });
 
       expect(mockTronWeb.transactionBuilder.sendTrx.calledOnce).to.be.true;
@@ -1049,8 +1019,8 @@ describe('TronSyncProvider', () => {
           hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
           confirmations: 0,
           nonce: 0,
-          gasPrice: BigNumber.from(1),
-          gasLimit: BigNumber.from(0)
+          gasPrice: BigInt(1),
+          gasLimit: BigInt(0)
         }),
       };
       const signer = await provider.getSigner(mockSigner);
@@ -1061,8 +1031,8 @@ describe('TronSyncProvider', () => {
         hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
         confirmations: 5,
         nonce: 0,
-        gasPrice: BigNumber.from(1),
-        gasLimit: '100000'
+        gasPrice: BigInt(1),
+        gasLimit: BigInt(100000)
       });
 
       expect(mockTronWeb.transactionBuilder.triggerSmartContract.calledOnce).to.be.true;
@@ -1122,8 +1092,8 @@ describe('TronSyncProvider', () => {
           hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
           confirmations: 0,
           nonce: 0,
-          gasPrice: BigNumber.from(1),
-          gasLimit: BigNumber.from(0)
+          gasPrice: BigInt(1),
+          gasLimit: BigInt(0)
         }),
         signerApi: mockSignerApi,
       };
@@ -1135,8 +1105,8 @@ describe('TronSyncProvider', () => {
         hash: '0x1234567890123456789012345678901234567890123456789012345678901234',
         confirmations: 5,
         nonce: 0,
-        gasPrice: BigNumber.from(1),
-        gasLimit: '100000'
+        gasPrice: BigInt(1),
+        gasLimit: BigInt(100000)
       });
 
       expect(mockTronWeb.transactionBuilder.triggerSmartContract.calledOnce).to.be.true;

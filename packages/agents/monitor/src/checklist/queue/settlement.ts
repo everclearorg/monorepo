@@ -1,5 +1,4 @@
-import { createLoggingContext, getNtpTimeSeconds } from '@chimera-monorepo/utils';
-import { BigNumber, utils } from 'ethers';
+import { createLoggingContext, getNtpTimeSeconds, chainWrapper } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import { Severity } from '../../types';
 import { resolveAlerts, sendAlerts } from '../../mockable';
@@ -58,7 +57,7 @@ export const checkSettlementQueueStatusCount = async (): Promise<Map<string, Map
   return statusCountByTicker;
 };
 
-export const checkSettlementQueueAmount = async (): Promise<Map<string, BigNumber> | undefined> => {
+export const checkSettlementQueueAmount = async (): Promise<Map<string, bigint> | undefined> => {
   const {
     config,
     logger,
@@ -75,7 +74,7 @@ export const checkSettlementQueueAmount = async (): Promise<Map<string, BigNumbe
 
   // Get all of the queued settlements
   const queuedSettlements = await database.getAllQueuedSettlements(config.hub.domain);
-  const amountByDomain = new Map<string, BigNumber>();
+  const amountByDomain = new Map<string, bigint>();
 
   // Set up a map of decimals by ticker
   const decimalsByAsset = new Map<string, number>();
@@ -98,12 +97,12 @@ export const checkSettlementQueueAmount = async (): Promise<Map<string, BigNumbe
           let _amount = amountByDomain.get(destinationDomain);
           const _decimals = decimalsByAsset.get(originIntent.outputAsset.toLowerCase());
           if (_amount && _decimals) {
-            _amount = utils.parseUnits(_amount.toString(), _decimals);
+            _amount = chainWrapper.parseUnits(_amount.toString(), _decimals);
           } else {
-            _amount = BigNumber.from(0);
+            _amount = BigInt(0);
           }
 
-          amountByDomain.set(destinationDomain, _amount.add(BigNumber.from(settlement.settlementAmount)));
+          amountByDomain.set(destinationDomain, _amount + BigInt(settlement.settlementAmount || 0));
         }),
       );
 
@@ -125,9 +124,9 @@ export const checkSettlementQueueAmount = async (): Promise<Map<string, BigNumbe
         env: config.environment,
       };
       if (
-        amountByDomain
-          .get(destinationDomain)
-          ?.gt(BigNumber.from(config.thresholds.maxSettlementQueueAssetAmounts[destinationDomain]))
+        amountByDomain.get(destinationDomain) &&
+        amountByDomain.get(destinationDomain)! >
+          BigInt(config.thresholds.maxSettlementQueueAssetAmounts[destinationDomain])
       ) {
         logger.warn(`Pending queue amount for ${destinationDomain} exceeds threshold`, requestContext, methodContext, {
           amount: amountByDomain.get(destinationDomain)?.toString(),

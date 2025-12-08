@@ -1,39 +1,42 @@
-import { Interface } from 'ethers/lib/utils';
-import { providers } from "ethers";
-import { SinonStubbedInstance, reset, restore, createStubInstance } from 'sinon';
-import { getTokenPriceFromChainlink, aggregatorV3InterfaceABI, expect } from "../../../src";
-
-class MockProvider extends providers.JsonRpcProvider {
-  private mockCallData = "0x";
-
-  async setMockCallData(_mockCallData: string) {
-    this.mockCallData = _mockCallData;
-  }
-
-  async call(): Promise<any> {
-    return this.mockCallData;
-  }
-}
+import { expect } from 'chai';
+import { reset, restore, stub } from 'sinon';
+import { getTokenPriceFromChainlink, aggregatorV3InterfaceABI } from "../../../src";
+import { PublicClient } from 'viem';
 
 describe('chainlink', () => {
-  let contractIface: SinonStubbedInstance<Interface>;
-  let providerIface: SinonStubbedInstance<MockProvider>;
+  let mockClient: PublicClient;
+
   beforeEach(() => {
-    contractIface = createStubInstance(Interface);
-    providerIface = createStubInstance(MockProvider);
+    reset();
+    restore();
+    mockClient = {
+      readContract: stub().resolves(['1', '500000000', '1', '1', '1']),
+    } as any;
   });
+  
   afterEach(() => {
     reset();
     restore();
   });
+  
   describe('#getTokenPriceFromChainlink', () => {
     it('happy: should return price', async () => {
-      const feedIface = new Interface(aggregatorV3InterfaceABI);
-      const mockEncodedResult = feedIface.encodeFunctionResult('latestRoundData', ['1', '500000000', '1', '1', '1']);
-      const mockProvider = new MockProvider();
-      mockProvider.setMockCallData(mockEncodedResult);
-      const chainlinkPrice = await getTokenPriceFromChainlink('1111', '0x', mockProvider);
+      const chainlinkPrice = await getTokenPriceFromChainlink('1111', '0x', mockClient);
+      
       expect(chainlinkPrice).to.be.eq(5);
+      expect(mockClient.readContract).to.have.been.calledOnce;
+      expect(mockClient.readContract).to.have.been.calledWith({
+        address: '0x',
+        abi: aggregatorV3InterfaceABI,
+        functionName: 'latestRoundData',
+      });
+    });
+
+    it('should handle client request errors', async () => {
+      (mockClient.readContract as any).rejects(new Error('RPC Error'));
+
+      await expect(getTokenPriceFromChainlink('1111', '0x1234567890123456789012345678901234567890', mockClient))
+        .to.be.rejectedWith('RPC Error');
     });
   });
 });

@@ -1,6 +1,6 @@
 import { createLoggingContext, sendAlerts, Severity } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
-import { Interface } from 'ethers/lib/utils';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { UpdateRewardsMetadataTxFailure } from '../../errors/tasks/rewards';
 
 const REWARDS_METADATA_UPDATE_CHECKPOINT = 'rewards_metadata_update_epoch';
@@ -43,23 +43,26 @@ export const updateRewardsMetadata = async () => {
   }
 
   // Dispatch updateRewardsMetadata tx
-  const iface = new Interface(config.abis.hub.rewardDistributor);
-  const encodedData = iface.encodeFunctionData('updateRewardsMetadata', [
-    rewardDistributions.map((dist) => {
-      return {
-        token: dist.asset,
-        merkleRoot: dist.root,
-        proof: dist.proof,
-      };
-    }),
-  ]);
+  const encodedData = chainWrapper.encodeFunctionData({
+    abi: config.abis.hub.rewardDistributor,
+    functionName: 'updateRewardsMetadata',
+    args: [
+      rewardDistributions.map((dist) => {
+        return {
+          token: dist.asset,
+          merkleRoot: dist.root,
+          proof: dist.proof,
+        };
+      }),
+    ],
+  });
   const tx = {
     from: await wallet.getAddress(),
     to: config.hub.deployments.rewardDistributor,
     data: encodedData,
     domain: +config.hub.domain,
     value: '0',
-    funcSig: iface.getFunction('updateRewardsMetadata').format(),
+    funcSig: 'updateRewardsMetadata((address,bytes32,bytes32)[])',
   };
   try {
     const txHash = await safeservice.proposeTransaction(tx, requestContext);

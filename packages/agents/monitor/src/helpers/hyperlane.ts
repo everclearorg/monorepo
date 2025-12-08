@@ -1,17 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  RequestContext,
   canonizeId,
+  chainWrapper,
   createLoggingContext,
-  jsonifyError,
   HyperlaneMessageResponse,
   HyperlaneStatus,
+  jsonifyError,
   Message,
+  RequestContext,
   SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
-import { Interface, hexlify, solidityPack } from 'ethers/lib/utils';
-import { NoDispatchEventOnMessage, NoGatewayConfigured } from '../types/errors';
+import { NoDispatchEventOnMessage, NoGatewayConfigured } from '../types';
 import { getContext } from '../context';
-import { getHyperlaneMessageStatus, getHyperlaneMsgDelivered, getMailboxInterface } from './../mockable';
+import { getHyperlaneMessageStatus, getHyperlaneMsgDelivered, getMailboxInterface } from '../mockable';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 
 export const getMessageStatus = async (
@@ -56,17 +57,23 @@ export const getMessageStatus = async (
   if (!gateway) {
     throw new NoGatewayConfigured(message.destinationDomain, chains);
   }
-  const gatewayIface = new Interface(abis.spoke.gateway);
   const encodedMailbox = await chainreader.readTx(
     {
       to: gateway,
       domain: +message.destinationDomain,
-      data: gatewayIface.encodeFunctionData('mailbox'),
-      funcSig: gatewayIface.getFunction('mailbox').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: abis.spoke.gateway,
+        functionName: 'mailbox',
+      }),
+      funcSig: 'mailbox()',
     },
     'latest',
   );
-  const [mailbox] = gatewayIface.decodeFunctionResult('mailbox', encodedMailbox);
+  const [mailbox] = chainWrapper.decodeFunctionResult({
+    abi: abis.spoke.gateway,
+    functionName: 'mailbox',
+    data: encodedMailbox as `0x${string}`,
+  }) as [`0x${string}`];
   logger.debug('Got mailbox from gateway', requestContext, methodContext, { mailbox, gateway });
   const iface = getMailboxInterface();
   const providers =
@@ -106,14 +113,18 @@ export const getMessageStatus = async (
     logger.debug('Generating hyperlane relay tx', requestContext, methodContext);
     const hyperlaneMessage = validResult ? getDispatchedMessage(result) : await getDispatchedMessageFromEvent(message);
     const tx = {
-      to: mailbox,
+      to: mailbox as `0x${string}`,
       domain: +message.destinationDomain,
-      data: iface.encodeFunctionData('process', [
-        '0x', // TODO: ensure no metadata
-        hyperlaneMessage,
-      ]),
+      data: chainWrapper.encodeFunctionData({
+        abi: iface,
+        functionName: 'process',
+        args: [
+          '0x', // TODO: ensure no metadata
+          hyperlaneMessage,
+        ],
+      }),
       value: '0',
-      funcSig: iface.getFunction('process').format(),
+      funcSig: 'process(bytes,bytes)',
     };
     logger.debug('Estimating gas for hyperlane relay tx', requestContext, methodContext, { tx });
     const gas = await chainreader.getGasEstimateWithRevertCode(tx);
@@ -143,22 +154,31 @@ export const getDispatchedMessageFromEvent = async (message: Message): Promise<s
 
   const iface = getMailboxInterface();
   const receipt = await chainreader.getTransactionReceipt(+message.originDomain, message.transactionHash);
-  const dispatchEvent = iface.getEvent('Dispatch');
-  const log = receipt.logs.find((log) => log.topics.includes(iface.getEventTopic(dispatchEvent)));
+  const dispatchEventSignature = '0x3d0c9a00'; // keccak256('Dispatch(address,uint32,bytes32,bytes)')
+  const log = receipt.logs.find((log) => log.topics.includes(dispatchEventSignature));
   if (!log) {
     throw new NoDispatchEventOnMessage(message.id, message.transactionHash);
   }
-  const parsed = iface.parseLog(log);
-  return parsed.args.message;
+
+  try {
+    const decodedLog = chainWrapper.decodeEventLog({
+      abi: iface,
+      data: log.data as `0x${string}`,
+      topics: log.topics as [`0x${string}`, ...`0x${string}`[]],
+    });
+
+    return (decodedLog.args as any).message as string;
+  } catch (error) {
+    throw new NoDispatchEventOnMessage(message.id, message.transactionHash);
+  }
 };
 
 export const getDispatchedMessage = (message: HyperlaneMessageResponse) => {
   const { destinationDomainId, body, originDomainId, recipient, nonce, sender } = message;
 
-  const dispatched = solidityPack(
+  return chainWrapper.encodePacked(
     // version, nonce, origin, sender, destination, receiver, body
     ['uint8', 'uint32', 'uint32', 'bytes32', 'uint32', 'bytes32', 'bytes'],
-    [3, nonce, originDomainId, hexlify(canonizeId(sender)), destinationDomainId, hexlify(canonizeId(recipient)), body],
+    [3, nonce, originDomainId, canonizeId(sender), destinationDomainId, canonizeId(recipient), body],
   );
-  return dispatched;
 };

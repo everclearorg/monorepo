@@ -1,7 +1,7 @@
 import SafeApiKit from '@safe-global/api-kit';
 import Safe from '@safe-global/protocol-kit';
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit';
-import { Wallet } from 'ethers';
+import { chainWrapper, type Hex } from '@chimera-monorepo/utils';
 import { SafeServiceConfig } from './config';
 import { createLoggingContext, Logger, RequestContext } from '@chimera-monorepo/utils';
 import { WriteTransaction } from './shared';
@@ -17,8 +17,7 @@ export class SafeService {
     protected readonly logger: Logger,
     protected readonly config: SafeServiceConfig,
   ) {
-    const wallet = new Wallet(this.config.safe.signer);
-    this.senderAddress = wallet.address;
+    this.senderAddress = chainWrapper.privateKeyToAccount(this.config.safe.signer as Hex).address;
   }
 
   /**

@@ -1,4 +1,4 @@
-import { stub, SinonStub, SinonStubbedInstance, createStubInstance } from 'sinon';
+import { stub, SinonStub, SinonStubbedInstance, createStubInstance, restore } from 'sinon';
 import {
   mkAddress,
   expect,
@@ -10,7 +10,7 @@ import {
   RelayerTaskStatus,
 } from '@chimera-monorepo/utils';
 import { ChainReader, WriteTransaction } from '@chimera-monorepo/chainservice';
-import { constants } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 import {
   everclearRelayerSend,
@@ -44,6 +44,10 @@ describe('Everclear Relayer', () => {
     stub(RelayerIndexFns, 'url').value('http://example.com');
   });
 
+  afterEach(() => {
+    restore();
+  });
+
   describe('#everclearRelayerSend', () => {
     it('happy: should post data successfully', async () => {
       axiosGetStub.resolves({ data: mkAddress('0xaaa') });
@@ -54,7 +58,7 @@ describe('Everclear Relayer', () => {
         fee: {
           amount: '0',
           chain: mockChainId,
-          token: constants.AddressZero,
+          token: chainWrapper.zeroAddress,
         },
         apiKey: 'foo',
         funcSig: 'bar()',

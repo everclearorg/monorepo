@@ -4,7 +4,7 @@ import {
   axiosGet as _axiosGet,
   axiosPost as _axiosPost,
 } from '@chimera-monorepo/utils';
-import { Contract, ContractInterface, providers } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { Twilio as _twilio } from 'twilio';
 import { MessageInstance } from 'twilio/lib/rest/api/v2010/account/message';
 import { createClient as _createClient } from 'redis';
@@ -20,8 +20,32 @@ export const readFileSync = fs.readFileSync;
 
 export const getEverclearConfig = _getEverclearConfig;
 
-export const getContract = (address: string, abi: ContractInterface, provider?: providers.JsonRpcProvider) =>
-  new Contract(address, abi, provider);
+export const getContract = (address: string, abi: any[], provider?: string) => {
+  // Return a mock contract object that provides the interface methods needed
+  return {
+    address,
+    abi,
+    interface: {
+      encodeFunctionData: (functionName: string, args: any[] = []) => {
+        return chainWrapper.encodeFunctionData({
+          abi,
+          functionName,
+          args,
+        });
+      },
+      decodeFunctionResult: (functionName: string, data: string) => {
+        return chainWrapper.decodeFunctionResult({
+          abi,
+          functionName,
+          data: data as `0x${string}`,
+        });
+      },
+      getFunction: (functionName: string) => ({
+        format: () => `${functionName}()`,
+      }),
+    },
+  };
+};
 
 export const axiosPost = _axiosPost;
 export const axiosGet = _axiosGet;

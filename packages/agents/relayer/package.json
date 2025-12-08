@@ -34,7 +34,6 @@
     "@chimera-monorepo/chainservice": "workspace:*",
     "@chimera-monorepo/utils": "workspace:*",
     "@sinclair/typebox": "0.25.21",
-    "ethers": "5.7.2",
     "fastify": "4.13.0",
     "interval-promise": "1.4.0",
     "pino": "8.10.0",
@@ -48,6 +47,6 @@
     "rimraf": "5.0.1",
     "sinon": "17.0.1",
     "ts-mocha": "10.0.0",
-    "typescript": "5.3.3"
+    "typescript": "5.9.2"
   }
 }

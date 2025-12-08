@@ -1,6 +1,4 @@
-import { Interface } from 'ethers/lib/utils';
-import { providers } from 'ethers';
-import { AssetConfig, createLoggingContext, univ2PairABI } from '@chimera-monorepo/utils';
+import { AssetConfig, createLoggingContext, univ2PairABI, chainWrapper, PublicClient } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import {
   getTokenPriceFromCoingecko,
@@ -10,6 +8,26 @@ import {
   getBestProvider,
 } from '../mockable';
 import { MissingAssetConfig, MissingTokenPrice } from '../types';
+
+/**
+ * Create a PublicClient from an RPC URL
+ * @param rpcUrl - The RPC URL
+ * @returns PublicClient instance
+ */
+const createClientFromRpcUrl = (rpcUrl: string): PublicClient => {
+  return chainWrapper.createPublicClient({
+    chain: {
+      id: 1,
+      name: 'Ethereum',
+      nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+      rpcUrls: {
+        default: { http: [rpcUrl] },
+        public: { http: [rpcUrl] },
+      },
+    },
+    transport: chainWrapper.http(rpcUrl),
+  }) as PublicClient;
+};
 
 /**
  * Get the token price for a specified asset on a given domain.
@@ -29,11 +47,11 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
   if (asset.price.isStable) return 1;
 
   const bestRpcUrlForDomain = await getBestProvider(config.chains[domain].providers);
-  const bestProviderForDomain = bestRpcUrlForDomain ? new providers.JsonRpcProvider(bestRpcUrlForDomain) : undefined;
 
   // 2. If a chainlink price feed is configured for the asset, retrieve the token price from the data feed.
-  if (asset.price.priceFeed && bestProviderForDomain) {
-    const chainlinkPrice = await getTokenPriceFromChainlink(domain, asset.price.priceFeed, bestProviderForDomain);
+  if (asset.price.priceFeed && bestRpcUrlForDomain) {
+    const client = createClientFromRpcUrl(bestRpcUrlForDomain);
+    const chainlinkPrice = await getTokenPriceFromChainlink(domain, asset.price.priceFeed, client);
     logger.debug('Got the token price from the chainlink', requestContext, methodContext, {
       asset: asset.address.toLowerCase(),
       price: chainlinkPrice,
@@ -55,17 +73,22 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
   }
 
   // 4. If a univ2 pair is configured, calculate token price from reserves by calling `getReserves` method from the pair contract.
-  if (asset.price.univ2 && bestProviderForDomain) {
-    const univ2PairIface = new Interface(univ2PairABI);
-    const encodedDataForToken0 = univ2PairIface.encodeFunctionData('token0');
-    const encodedDataForToken1 = univ2PairIface.encodeFunctionData('token1');
+  if (asset.price.univ2 && bestRpcUrlForDomain) {
+    const encodedDataForToken0 = chainWrapper.encodeFunctionData({
+      abi: univ2PairABI,
+      functionName: 'token0',
+    });
+    const encodedDataForToken1 = chainWrapper.encodeFunctionData({
+      abi: univ2PairABI,
+      functionName: 'token1',
+    });
     const [encodedToken0Result, encodedToken1Result] = await Promise.all([
       chainreader.readTx(
         {
           to: asset.price.univ2.pair,
           domain: +domain,
           data: encodedDataForToken0,
-          funcSig: univ2PairIface.getFunction('token0').format(),
+          funcSig: 'token0()',
         },
         'latest',
       ),
@@ -74,26 +97,35 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
           to: asset.price.univ2.pair,
           domain: +domain,
           data: encodedDataForToken1,
-          funcSig: univ2PairIface.getFunction('token1').format(),
+          funcSig: 'token1()',
         },
         'latest',
       ),
     ]);
 
-    const [token0] = univ2PairIface.decodeFunctionResult('token0', encodedToken0Result);
-    const [token1] = univ2PairIface.decodeFunctionResult('token1', encodedToken1Result);
+    const [token0] = chainWrapper.decodeFunctionResult({
+      abi: univ2PairABI,
+      functionName: 'token0',
+      data: encodedToken0Result as `0x${string}`,
+    }) as [`0x${string}`];
+    const [token1] = chainWrapper.decodeFunctionResult({
+      abi: univ2PairABI,
+      functionName: 'token1',
+      data: encodedToken1Result as `0x${string}`,
+    }) as [`0x${string}`];
     const token0Config = getAssetConfig(domain, token0);
     const token1Config = getAssetConfig(domain, token1);
 
     const baseAsset = token0.toLowerCase() == asset.address.toLowerCase() ? token1 : token0;
     const baseAssetConfig = getAssetConfig(domain, baseAsset);
     const baseTokenPrice = await getTokenPrice(domain, baseAssetConfig);
+    const client = createClientFromRpcUrl(bestRpcUrlForDomain);
     const token0Price = await getTokenPriceFromUniV2(
       domain,
       asset.price.univ2.pair,
       token0Config,
       token1Config,
-      bestProviderForDomain,
+      client,
     );
     const assetPrice =
       token0.toLowerCase() == asset.address.toLowerCase()
@@ -109,10 +141,15 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
   }
 
   // 5. If a univ3 pool is configured, calculate the token price using the tick returned from the `slot0` method call of the univ3 pool.
-  if (asset.price.univ3 && bestProviderForDomain) {
-    const univ3PoolIface = new Interface(univ2PairABI);
-    const encodedDataForToken0 = univ3PoolIface.encodeFunctionData('token0');
-    const encodedDataForToken1 = univ3PoolIface.encodeFunctionData('token1');
+  if (asset.price.univ3 && bestRpcUrlForDomain) {
+    const encodedDataForToken0 = chainWrapper.encodeFunctionData({
+      abi: univ2PairABI,
+      functionName: 'token0',
+    });
+    const encodedDataForToken1 = chainWrapper.encodeFunctionData({
+      abi: univ2PairABI,
+      functionName: 'token1',
+    });
 
     const [encodedToken0Result, encodedToken1Result] = await Promise.all([
       chainreader.readTx(
@@ -120,7 +157,7 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
           to: asset.price.univ3.pool,
           domain: +domain,
           data: encodedDataForToken0,
-          funcSig: univ3PoolIface.getFunction('token0').format(),
+          funcSig: 'token0()',
         },
         'latest',
       ),
@@ -129,14 +166,22 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
           to: asset.price.univ3.pool,
           domain: +domain,
           data: encodedDataForToken1,
-          funcSig: univ3PoolIface.getFunction('token1').format(),
+          funcSig: 'token1()',
         },
         'latest',
       ),
     ]);
 
-    const [token0] = univ3PoolIface.decodeFunctionResult('token0', encodedToken0Result);
-    const [token1] = univ3PoolIface.decodeFunctionResult('token1', encodedToken1Result);
+    const [token0] = chainWrapper.decodeFunctionResult({
+      abi: univ2PairABI,
+      functionName: 'token0',
+      data: encodedToken0Result as `0x${string}`,
+    }) as [`0x${string}`];
+    const [token1] = chainWrapper.decodeFunctionResult({
+      abi: univ2PairABI,
+      functionName: 'token1',
+      data: encodedToken1Result as `0x${string}`,
+    }) as [`0x${string}`];
 
     const token0Config = getAssetConfig(domain, token0);
     const token1Config = getAssetConfig(domain, token1);
@@ -144,12 +189,13 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
     const baseAsset = token0.toLowerCase() == asset.address.toLowerCase() ? token1 : token0;
     const baseAssetConfig = getAssetConfig(domain, baseAsset);
     const baseTokenPrice = await getTokenPrice(domain, baseAssetConfig);
+    const client = createClientFromRpcUrl(bestRpcUrlForDomain);
     const token0Price = await getTokenPriceFromUniV3(
       domain,
       asset.price.univ3.pool,
       token0Config,
       token1Config,
-      bestProviderForDomain,
+      client,
     );
     const assetPrice =
       token0.toLowerCase() == asset.address.toLowerCase()

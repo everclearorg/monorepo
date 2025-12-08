@@ -1,4 +1,4 @@
-import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { SinonStub, stub, SinonStubbedInstance } from 'sinon';
 
 import * as PriceLib from '../../src/libs/price';
@@ -20,7 +20,7 @@ describe('Checklist - epochs', () => {
   let config;
 
   describe('#checkElapsedEpochsByTickerHash', () => {
-    const tickerHashes = [keccak256(toUtf8Bytes('ETH')), keccak256(toUtf8Bytes('WETH'))];
+    const tickerHashes = [chainWrapper.keccak256(chainWrapper.stringToBytes('ETH')), chainWrapper.keccak256(chainWrapper.stringToBytes('WETH'))];
     const invoices = new Map();
 
     beforeEach(() => {

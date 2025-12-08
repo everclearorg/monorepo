@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Values, EverclearError } from '@chimera-monorepo/utils';
-import { providers } from 'ethers';
-import { Interface, Logger } from 'ethers/lib/utils';
-import { ITransactionReceipt } from './types';
+import { ITransactionReceipt, ITransactionResponse } from './types';
 
 export class MissingSigner extends EverclearError {
   /**
@@ -155,8 +153,8 @@ export class TransactionReplaced extends EverclearError {
   static readonly type = TransactionReplaced.name;
 
   constructor(
-    public readonly receipt: providers.TransactionReceipt,
-    public readonly replacement: providers.TransactionResponse,
+    public readonly receipt: ITransactionReceipt,
+    public readonly replacement: ITransactionResponse,
     public readonly context: any = {},
   ) {
     super('Transaction replaced.', context, TransactionReplaced.type);
@@ -413,7 +411,7 @@ export class TransactionProcessingError extends EverclearError {
  * @param error from ethers.js package
  * @returns EverclearError
  */
-export const parseError = (error: any, iface?: Interface): EverclearError => {
+export const parseError = (error: any): EverclearError => {
   if (error.isEverclearError) {
     // If the error has already been parsed into a native error, just return it.
     return error;
@@ -452,22 +450,12 @@ export const parseError = (error: any, iface?: Interface): EverclearError => {
     }
   }
 
-  // Identify the error's name given its sighash, if possible.
-  let name;
-  try {
-    name = iface?.getError(data)?.name ?? 'n/a';
-  } catch {
-    // Will throw "no matching error" if no error matching the given sighash
-    // was found.
-    name = 'n/a';
-  }
-
   // Preserve the original message before making it lower case.
   const originalMessage = message;
   message = (message || '').toLowerCase();
   const context = {
     data: data ?? 'n/a',
-    name,
+    name: 'n/a',
     message: originalMessage,
     code: error.code ?? 'n/a',
     reason: error.reason ?? 'n/a',
@@ -499,16 +487,16 @@ export const parseError = (error: any, iface?: Interface): EverclearError => {
   } else if (message.match(/insufficient funds/)) {
     return new TransactionReverted(
       TransactionReverted.reasons.InsufficientFunds,
-      error.receipt as providers.TransactionReceipt,
+      error.receipt as ITransactionReceipt,
       context,
     );
   }
 
   switch (error.code) {
-    case Logger.errors.TRANSACTION_REPLACED:
+    case 'TRANSACTION_REPLACED':
       return new TransactionReplaced(
-        error.receipt as providers.TransactionReceipt,
-        error.replacement as providers.TransactionResponse,
+        error.receipt as ITransactionReceipt,
+        error.replacement as ITransactionResponse,
         {
           ...context,
           hash: error.hash,
@@ -516,29 +504,29 @@ export const parseError = (error: any, iface?: Interface): EverclearError => {
           cancelled: error.cancelled,
         },
       );
-    case Logger.errors.INSUFFICIENT_FUNDS:
+    case 'INSUFFICIENT_FUNDS':
       return new TransactionReverted(
         TransactionReverted.reasons.InsufficientFunds,
-        error.receipt as providers.TransactionReceipt,
+        error.receipt as ITransactionReceipt,
         context,
       );
-    case Logger.errors.CALL_EXCEPTION:
+    case 'CALL_EXCEPTION':
       return new TransactionReverted(
         TransactionReverted.reasons.CallException,
-        error.receipt as providers.TransactionReceipt,
+        error.receipt as ITransactionReceipt,
         context,
       );
-    case Logger.errors.NONCE_EXPIRED:
+    case 'NONCE_EXPIRED':
       return new BadNonce(BadNonce.reasons.NonceExpired, context);
-    case Logger.errors.REPLACEMENT_UNDERPRICED:
+    case 'REPLACEMENT_UNDERPRICED':
       return new BadNonce(BadNonce.reasons.ReplacementUnderpriced, context);
-    case Logger.errors.UNPREDICTABLE_GAS_LIMIT:
+    case 'UNPREDICTABLE_GAS_LIMIT':
       return new UnpredictableGasLimit(context);
-    case Logger.errors.TIMEOUT:
+    case 'TIMEOUT':
       return new OperationTimeout(context);
-    case Logger.errors.NETWORK_ERROR:
+    case 'NETWORK_ERROR':
       return new RpcError(RpcError.reasons.NetworkError, context);
-    case Logger.errors.SERVER_ERROR:
+    case 'SERVER_ERROR':
       return new ServerError(ServerError.reasons.BadResponse, context);
     default:
       return error;

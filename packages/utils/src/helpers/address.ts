@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { chainWrapper, type ViemAddress as Address } from '../helpers/chain';
 import { publicKeyConvert } from 'secp256k1';
 
 /**
@@ -8,13 +8,28 @@ import { publicKeyConvert } from 'secp256k1';
  *
  * @returns the address
  */
-export const getAddressFromPublicKey = (publicKey: string): string => {
-  try {
-    return utils.computeAddress(compressPublicKey(publicKey));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
-    throw new Error(`Invalid public key, errorMsg: ${e.toString()}`);
+export const getAddressFromPublicKey = (publicKey: string): Address => {
+  let key = publicKey.replace(/^0x/, '');
+
+  // Validate that the key contains only valid hex characters
+  if (!/^[0-9a-fA-F]+$/.test(key)) {
+    throw new Error('Invalid public key: contains non-hex characters');
   }
+
+  // Ensure we have the uncompressed format (04 prefix (optional) + 64 bytes)
+  if (key.length === 130 && key.startsWith('04')) {
+    key = key.slice(2);
+  } else if (key.length !== 128) {
+    throw new Error('Invalid public key format');
+  }
+
+  // Hash the 64-byte public key with Keccak256
+  const hash = chainWrapper.keccak256(`0x${key}`);
+
+  // Take the last 20 bytes (40 hex characters) as the address
+  const address = `0x${hash.slice(-40)}`;
+
+  return chainWrapper.getAddress(address);
 };
 
 /**
