@@ -106,7 +106,7 @@ describe('EthWallet', () => {
     const gasPrice = '20000000000';
 
     it('should work', async () => {
-      const wallet = new EthWallet(privateKey, { rpcUrl: 'https://eth.llamarpc.com' });
+      const wallet = new EthWallet(privateKey, { rpcUrls: ['https://eth.llamarpc.com'] });
       
       // Stub the walletClient.sendTransaction method
       const mockHash = '0x1234567890123456789012345678901234567890123456789012345678901234';
@@ -138,7 +138,7 @@ describe('EthWallet', () => {
   describe('connect', () => {
     it('should connect wallet to provider', () => {
       const wallet = new EthWallet(privateKey);
-      const config = { rpcUrl: 'https://eth.llamarpc.com' };
+      const config = { rpcUrls: ['https://eth.llamarpc.com'] };
       const connectedWallet = wallet.connect(config);
 
       expect((connectedWallet as any).walletClient).to.exist;

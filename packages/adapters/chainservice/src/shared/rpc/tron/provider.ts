@@ -390,7 +390,7 @@ export class TronSyncProvider extends SyncProvider {
     urlObj.searchParams.delete('apiKey');
     const cleanUrl = urlObj.toString();
     
-    super(cleanUrl, domain, stallTimeout, debugLogging);
+    super([cleanUrl], domain, stallTimeout, debugLogging);
     this.tronWeb = this.tronWebFactory.create({ fullHost: cleanUrl, apiKey: apiKey || undefined });
   }
 

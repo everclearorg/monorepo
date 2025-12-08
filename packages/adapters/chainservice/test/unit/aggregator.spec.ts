@@ -105,20 +105,11 @@ describe('RpcProviderAggregator', () => {
 
     // Testing instance
     chainProvider = new RpcProviderAggregator(logger, domain, config);
-    
-    // Stub the providers to prevent real HTTP calls
-    stub(chainProvider as any, 'providers').value([providerStub]);
-    
-    // Stub the signer to prevent real signer creation
-    stub(chainProvider as any, 'signer').value(signer);
-    
-    // Stub the leadProvider to prevent real provider creation
-    stub(chainProvider as any, 'leadProvider').value(providerStub);
-    
-    // Also stub the setSigner method to ensure signer is set
-    stub(chainProvider as any, 'setSigner').resolves();
-    
     await chainProvider.setSigner(privateKey);
+
+    // Stub the provider to prevent real HTTP calls
+    stub(chainProvider as any, 'provider').value(providerStub);
+
     // // One block = 10ms for the purposes of testing.
     // (chainProvider as any).blockPeriod = 10;
     // stub(chainProvider as any, 'execute').callsFake(fakeExecuteMethod as any);
@@ -231,8 +222,6 @@ describe('RpcProviderAggregator', () => {
       providerStub.getTransactionReceipt.onCall(1).resolves(insufficientReceipt);
       providerStub.getTransactionReceipt.onCall(2).resolves(sufficientReceipt);
 
-      // So we can check the block args in the wait call below.
-      (chainProvider as any).cache.update(currentBlockNumber);
       // To ensure we don't bother with the initial wait mechanism.
       transaction.minedBlockNumber = -1;
 
@@ -429,28 +418,6 @@ describe('RpcProviderAggregator', () => {
       const result = await (chainProvider as any).getGasPrice();
       expect(providerStub.getGasPrice.callCount).to.equal(0);
       expect(result.toString()).to.be.eq(expectedGas);
-    });
-
-    // TODO: Should eventually cache per block.
-    it('should use cached gas price if calls < 3 seconds apart', async () => {
-      const testGasPrice = chainWrapper.parseGwei('80');
-      const expectedGas = (testGasPrice + (testGasPrice * BigInt((chainProvider as any).config.gasPriceInitialBoostPercent)) / BigInt(100)).toString();
-      providerStub.getGasPrice.resolves(testGasPrice);
-
-      // First call should use provider.
-      let result = await (chainProvider as any).getGasPrice();
-      expect(result.toString()).to.be.eq(expectedGas);
-
-      // Throwing in a bunk value to make sure this isn't called.
-      providerStub.getGasPrice.resolves(chainWrapper.parseGwei('1300'));
-
-      // Second call should use cached value.
-      result = await (chainProvider as any).getGasPrice();
-
-      // Values should be the same.
-      expect(result.toString()).to.be.eq(expectedGas);
-      // Provider should have only been called once.
-      expect(providerStub.getGasPrice.callCount).to.equal(1);
     });
 
     it('should bump gas price up to minimum if it is below that', async () => {
@@ -650,261 +617,12 @@ describe('RpcProviderAggregator', () => {
       expect(providerStub.getTransactionCount.callCount).to.equal(1);
       expect(providerStub.getTransactionCount.getCall(0).args).to.deep.eq([testAddress, 'latest']);
     });
-
-    it('uses cached transaction count if available', async () => {
-      const testTransactionCount = Math.floor(Math.random() * 1000);
-      (chainProvider as any).cache.set({ transactionCount: testTransactionCount });
-
-      const result = await chainProvider.getTransactionCount();
-
-      expect(result).to.be.eq(testTransactionCount);
-      expect(providerStub.getTransactionCount.callCount).to.equal(0);
-    });
   });
 
   describe('#checkSigner', () => {
     it('throws if no signer available', async () => {
       (chainProvider as any).signer = undefined;
       expect(() => (chainProvider as any).checkSigner()).to.throw(EverclearError);
-    });
-  });
-
-  describe('#execute', () => {
-    const goodRpcProvider: any = {};
-    const badRpcProvider: any = {};
-    const testRpcError = new RpcError('test: bad rpc provider');
-    let testSyncProviders: any[] = [];
-    let shuffleSyncedProvidersStub: SinonStub;
-    const mockMethodParam = (provider: any) => provider.method();
-
-    beforeEach(() => {
-      shuffleSyncedProvidersStub = stub(chainProvider as any, 'shuffleSyncedProviders').callsFake(
-        () => testSyncProviders,
-      );
-      goodRpcProvider.method = stub().resolves(true);
-      badRpcProvider.method = stub().rejects(testRpcError);
-    });
-
-    it('happy', async () => {
-      // Testing with bad and good rpc providers.
-      testSyncProviders = [badRpcProvider, goodRpcProvider];
-
-      // First, make sure we get the correct value back.
-      expect(await (chainProvider as any).execute(false, mockMethodParam)).to.be.true;
-      expect(badRpcProvider.method.callCount).to.equal(1);
-      expect(goodRpcProvider.method.callCount).to.equal(1);
-      expect(shuffleSyncedProvidersStub.callCount).to.equal(1);
-    });
-
-    it('happy, with quorum > 1', async () => {
-      testSyncProviders = [goodRpcProvider, badRpcProvider, goodRpcProvider];
-
-      // Quorum required = 2. The 2 good RPC providers we supplied should suffice.
-      (chainProvider as any).config.quorum = 2;
-      (chainProvider as any).providers = testSyncProviders;
-
-      expect(await (chainProvider as any).execute(false, mockMethodParam)).to.be.true;
-      // 1 call for bad, 2 for good. 0 calls to shuffle, we should have consulted all providers!
-      expect(badRpcProvider.method.callCount).to.equal(1);
-      expect(goodRpcProvider.method.callCount).to.equal(2);
-      expect(shuffleSyncedProvidersStub.callCount).to.equal(0);
-    });
-
-    it('works with quorum > 1 and different return types', async () => {
-      (chainProvider as any).config.quorum = 2;
-
-      for (const returnValue of ['hello test', false, 12345, '12345', { hello: 'test' }]) {
-        goodRpcProvider.method = stub().resolves(returnValue);
-        badRpcProvider.method = stub().rejects(testRpcError);
-
-        testSyncProviders = [goodRpcProvider, badRpcProvider, goodRpcProvider];
-        (chainProvider as any).providers = testSyncProviders;
-
-        expect(await (chainProvider as any).execute(false, mockMethodParam)).to.be.deep.eq(returnValue);
-      }
-    });
-
-    it('works with quorum > 1 and picks the top response', async () => {
-      testSyncProviders = [goodRpcProvider, badRpcProvider, goodRpcProvider, badRpcProvider, goodRpcProvider];
-
-      (chainProvider as any).config.quorum = 2;
-      (chainProvider as any).providers = testSyncProviders;
-
-      // Hi or Bye, which one is it? It should be "hi" since the goodRpcProviders outnumber the bad.
-      goodRpcProvider.method = stub().resolves('hi');
-      badRpcProvider.method = stub().resolves('bye');
-
-      const result = await (chainProvider as any).execute(false, mockMethodParam);
-      expect(result).to.be.eq('hi');
-
-      expect(badRpcProvider.method.callCount).to.equal(2);
-      expect(goodRpcProvider.method.callCount).to.equal(3);
-    });
-
-    it('works with quorum > 1 and multiple top responses', async () => {
-      testSyncProviders = [goodRpcProvider, badRpcProvider, goodRpcProvider, badRpcProvider];
-
-      (chainProvider as any).config.quorum = 2;
-      (chainProvider as any).providers = testSyncProviders;
-
-      // Hi or Bye, which one is it? Unfortunately will just have to pick one...
-      goodRpcProvider.method = stub().resolves('hi');
-      badRpcProvider.method = stub().resolves('bye');
-
-      const result = await (chainProvider as any).execute(false, mockMethodParam);
-      expect(result === 'hi' || result === 'bye').to.be.true;
-
-      expect(badRpcProvider.method.callCount).to.equal(2);
-      expect(goodRpcProvider.method.callCount).to.equal(2);
-    });
-
-    it('should fail if quorum not met', async () => {
-      testSyncProviders = [badRpcProvider, badRpcProvider, goodRpcProvider];
-
-      // Quorum required = 2. The 2 BAD RPC providers we supplied should NOT suffice!
-      (chainProvider as any).config.quorum = 2;
-      (chainProvider as any).providers = testSyncProviders;
-
-      // First, make sure we get the correct value back.
-      await expect((chainProvider as any).execute(false, mockMethodParam)).to.be.rejectedWith(QuorumNotMet);
-      expect(badRpcProvider.method.callCount).to.equal(2);
-      expect(goodRpcProvider.method.callCount).to.equal(1);
-    });
-
-    it('should fail if the call needs a signer and needsSigner throws', async () => {
-      const testError = new Error('test: needs signer');
-      stub(chainProvider as any, 'checkSigner').throws(testError);
-      await expect((chainProvider as any).execute(true, () => {})).to.be.rejectedWith(testError);
-    });
-
-    it('should error with RpcError if all providers throw an RpcError', async () => {
-      testSyncProviders = [badRpcProvider, badRpcProvider, badRpcProvider, badRpcProvider];
-      const testError = new RpcError('test error');
-      badRpcProvider.method.rejects(testError);
-
-      expect(badRpcProvider.method.callCount).to.equal(0);
-      await expect((chainProvider as any).execute(false, mockMethodParam)).to.be.rejectedWith(RpcError);
-      expect(badRpcProvider.method.callCount).to.equal(testSyncProviders.length);
-    });
-
-    it('should short circuit and throw transaction reverted (i.e. non-RpcError) right away', async () => {
-      // Should never reach the "good rpc providers" - we ALWAYS short circuit and throw TransactionReverted error immediately.
-      testSyncProviders = [badRpcProvider, goodRpcProvider, goodRpcProvider, goodRpcProvider];
-      const revertedError = new TransactionReverted('test error');
-      badRpcProvider.method.rejects(revertedError);
-
-      await expect((chainProvider as any).execute(false, mockMethodParam)).to.be.rejectedWith(revertedError);
-      expect(goodRpcProvider.method.callCount).to.equal(0);
-    });
-  });
-
-  describe('#syncProviders', () => {
-    const testSyncedBlockNumber = 1234567;
-    const testOutOfSyncBlockNumber = 1234000;
-    let outOfSyncProvider: SinonStubbedInstance<SyncProvider>;
-    let coreSyncProvider: SinonStubbedInstance<SyncProvider>;
-
-    let syncUpdate;
-
-    beforeEach(() => {
-      coreSyncProvider = createStubInstance(SyncProvider);
-      stub(coreSyncProvider, 'synced').get(() => true);
-      stub(coreSyncProvider, 'synced').set(() => false);
-      stub(coreSyncProvider, 'syncedBlockNumber').get(() => testSyncedBlockNumber);
-      stub(coreSyncProvider, 'priority').set(() => {});
-      stub(coreSyncProvider, 'lag').set(() => {});
-      stub(coreSyncProvider, 'reliability').set(() => {});
-      // stub(coreSyncProvider, 'reliability').get(() => 0.5);
-      // stub(coreSyncProvider, 'cps').get(() => 1);
-      // stub(coreSyncProvider, 'latency').get(() => 0.5);
-      stub(coreSyncProvider, 'name').get(() => 'synced');
-
-      outOfSyncProvider = createStubInstance(SyncProvider);
-      stub(outOfSyncProvider, 'synced').get(() => false);
-      stub(outOfSyncProvider, 'synced').set(() => false);
-      stub(outOfSyncProvider, 'syncedBlockNumber').get(() => testOutOfSyncBlockNumber);
-      stub(outOfSyncProvider, 'priority').set(() => {});
-      stub(outOfSyncProvider, 'lag').set((updated) => {
-        syncUpdate = updated;
-      });
-      stub(outOfSyncProvider, 'reliability').set(() => {});
-      stub(outOfSyncProvider, 'name').get(() => 'synced');
-
-      outOfSyncProvider.sync.callsFake(async () => {
-        (outOfSyncProvider as any)._syncedBlockNumber = testOutOfSyncBlockNumber;
-      });
-
-      (outOfSyncProvider as any).url = 'https://------badProvider----';
-      stub(outOfSyncProvider, 'syncedBlockNumber').get(() => (outOfSyncProvider as any)._syncedBlockNumber);
-
-      // These metrics are used in the calculation algorithm for provider priority: no need to test them for now.
-      for (const provider of [coreSyncProvider, outOfSyncProvider]) {
-        stub(provider, 'lag').get(() => 0);
-        stub(provider, 'priority').get(() => 0);
-        stub(provider, 'reliability').get(() => 0.5);
-        stub(provider, 'cps').get(() => 1);
-        stub(provider, 'latency').get(() => 0.5);
-      }
-    });
-
-    it('happy', async () => {
-      (chainProvider as any).providers = [coreSyncProvider, outOfSyncProvider];
-      await (chainProvider as any).syncProviders();
-
-      expect(coreSyncProvider.lag).to.be.eq(0);
-      const expectedOutOfSyncLag = testSyncedBlockNumber - testOutOfSyncBlockNumber;
-      expect(syncUpdate).to.be.eq(expectedOutOfSyncLag);
-
-      expect(outOfSyncProvider.sync.callCount).to.equal(1);
-
-      expect(outOfSyncProvider.synced).to.be.false;
-      expect(coreSyncProvider.synced).to.be.true;
-    });
-  });
-
-  describe('#shuffleSyncedProviders', () => {
-    it('happy', async () => {
-      const testProviders: SinonStubbedInstance<SyncProvider>[] = [];
-      const testMaxLag = 10;
-      const lagValues = [0, 0, 0, 1, 2, 2, 4, 5, 7, 10, 12, 17, 19, 42, 123, 456, 789, 999];
-      const inSyncProvidersCount = lagValues.filter((lag) => lag <= testMaxLag).length;
-      for (const lag of lagValues) {
-        const provider = createStubInstance(SyncProvider, {
-          sync: Promise.resolve(),
-        });
-        stub(provider, 'lag').get(() => lag);
-        stub(provider, 'synced').get(() => lag <= testMaxLag);
-        stub(provider, 'priority').get(() => -9999);
-        stub(provider, 'priority').set(() => {});
-        stub(provider, 'reliability').get(() => 0.5);
-        stub(provider, 'cps').get(() => 1);
-        stub(provider, 'latency').get(() => 0.5);
-        stub(provider, 'name').get(() => 'non-lead');
-        stub(provider, 'url').get(() => 'non-lead provider');
-        testProviders.push(provider);
-      }
-      const leadProviderUrl = 'mr. lead provider';
-      stub(testProviders[0], 'url').get(() => leadProviderUrl);
-      (chainProvider as any).providers = testProviders;
-      (chainProvider as any).leadProvider = { url: leadProviderUrl };
-
-      const shuffledProviders = await (chainProvider as any).shuffleSyncedProviders();
-
-      expect(shuffledProviders).to.be.an('array');
-
-      // Should return list in order: first <inSyncProvidersCount> are in-sync, remaining are out-of-sync.
-      expect(shuffledProviders.slice(0, inSyncProvidersCount).every((p: SyncProvider) => p.synced)).to.be.true;
-      expect(shuffledProviders.slice(inSyncProvidersCount).every((p: SyncProvider) => p.synced)).to.be.false;
-
-      // First provider should be the lead provider.
-      expect(shuffledProviders[0].url).to.be.eq(leadProviderUrl);
-
-      // Priority should be in ascending order.
-      expect(
-        shuffledProviders.every((p: SyncProvider, i: number) =>
-          i > 0 ? p.priority >= shuffledProviders[i - 1].priority : true,
-        ),
-      ).to.be.true;
     });
   });
 });

@@ -32,12 +32,11 @@ import {
 import { ChainConfig } from './config';
 import { RpcProviderAggregator } from './aggregator';
 
-// TODO: Merge responsibility with ChainService. Should not extend ProviderAggregator.
+// TODO: Merge responsibility with ChainService.
 /**
  * @classdesc Transaction lifecycle manager.
- *
  */
-export class TransactionDispatch extends RpcProviderAggregator {
+export class TransactionDispatch {
   private loopsRunning = false;
 
   // Based on default per account rate limiting on geth.
@@ -60,26 +59,26 @@ export class TransactionDispatch extends RpcProviderAggregator {
   private lastReceivedTxCount = -1;
 
   /**
-   * Transaction lifecycle management class. Extends ChainRpcProvider, thus exposing all provider methods
-   * through this class.
+   * Transaction lifecycle management class. Delegates RPC operations
+   * to RpcProviderAggregator while managing the transaction lifecycle.
    *
    * @param logger Logger used for logging.
-   * @param signer Signer instance or private key used for signing transactions.
    * @param domain The ID of the chain for which this class's providers will be servicing.
-   * @param chainConfig Configuration for this specified chain, including the providers we'll
+   * @param config Configuration for this specified chain, including the providers we'll
    * be using for it.
-   * @param config The shared ChainServiceConfig with general configuration.
+   * @param rpcProvider A provider for RPC operations.
+   * @param startLoops Whether to start background loops immediately.
    *
    * @throws ChainError.reasons.ProviderNotFound if no valid providers are found in the
    * configuration.
    */
   constructor(
-    logger: Logger,
+    private readonly logger: Logger,
     public readonly domain: number,
-    config: ChainConfig,
+    private readonly config: ChainConfig,
+    private readonly rpcProvider: RpcProviderAggregator,
     startLoops = true,
   ) {
-    super(logger, domain, config);
     this.inflightBuffer = new TransactionBuffer(logger, TransactionDispatch.MAX_INFLIGHT_TRANSACTIONS, {
       name: 'INFLIGHT',
       domain: this.domain,
@@ -93,22 +92,15 @@ export class TransactionDispatch extends RpcProviderAggregator {
     }
   }
 
-  public async setSigner(signer: ISigner | string) {
-    await super.setSigner(signer);
-  }
-
   /**
    * Start background loops for mining and confirming transactions.
    */
-  public startLoops() {
+  private startLoops() {
     if (!this.loopsRunning) {
       this.loopsRunning = true;
       // Use interval promise to make sure loop iterations don't overlap.
       interval(async () => await this.mineLoop(), 2_000);
       interval(async () => await this.confirmLoop(), 2_000);
-
-      // Starts an interval loop that synchronizes the provider every configured interval.
-      interval(async () => await this.syncProviders(), this.config.syncProvidersInterval);
     }
   }
 
@@ -152,7 +144,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
 
             if (error.type === OperationTimeout.type || error.type === BadNonce.type) {
               // Check to see if the transaction did indeed make it to chain.
-              const responses = await this.getTransaction(transaction);
+              const responses = await this.rpcProvider.getTransaction(transaction);
               if (responses.every((response) => response === null)) {
                 // If all responses are null, then this transaction was not found / does not exist.
                 this.logger.warn('Transaction was not found on chain!', requestContext, methodContext, {
@@ -162,7 +154,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
                 });
 
                 // Check to see if this nonce has already been mined.
-                const transactionCount = await this.getTransactionCount('latest');
+                const transactionCount = await this.rpcProvider.getTransactionCount('latest');
                 if (transactionCount > transaction.nonce) {
                   // Transaction must have been replaced by another.
                   transaction.error = new TransactionBackfilled({
@@ -283,7 +275,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
     attemptedNonces: number[],
     error?: BadNonce,
   ): Promise<{ nonce: number; backfill: boolean; transactionCount: number }> {
-    const transactionCount = await this.getTransactionCount('latest');
+    const transactionCount = await this.rpcProvider.getTransactionCount('latest');
 
     // Set the nonce initially to the last used nonce. If no nonce has been used yet (i.e. this is the first initial send attempt),
     // set to whichever value is higher: local nonce or txcount. This should almost always be our local nonce, but often both will be the same.
@@ -314,7 +306,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
           nonce = transactionCount;
         } else {
           // If we haven't tried the up-to-date tx count (latest or pending), let's try that next.
-          const pendingTransactionCount = await this.getTransactionCount('pending');
+          const pendingTransactionCount = await this.rpcProvider.getTransactionCount('pending');
           if (!attemptedNonces.includes(pendingTransactionCount)) {
             nonce = pendingTransactionCount;
           } else {
@@ -394,8 +386,8 @@ export class TransactionDispatch extends RpcProviderAggregator {
             // that, if we get past this method, we can *generally* assume that the transaction will go through on submit - although it's
             // still possible to revert due to a state change below.
             const [gasLimit, gasPrice, nonceInfo] = await Promise.all([
-              minTx.gasLimit ? Promise.resolve(minTx.gasLimit) : this.estimateGas(minTx),
-              minTx.gasPrice ? Promise.resolve(minTx.gasPrice) : this.getGasPrice(requestContext),
+              minTx.gasLimit ? Promise.resolve(minTx.gasLimit) : this.rpcProvider.estimateGas(minTx),
+              minTx.gasPrice ? Promise.resolve(minTx.gasPrice) : this.rpcProvider.getGasPrice(requestContext),
               this.determineNonce(attemptedNonces),
             ]);
             gas.limit = gasLimit;
@@ -554,8 +546,8 @@ export class TransactionDispatch extends RpcProviderAggregator {
 
     // Send the tx.
     try {
-      console.log(`=== DISPATCH SUBMIT about to call this.sendTransaction ===`);
-      const response = await this.sendTransaction(transaction);
+      console.log(`=== DISPATCH SUBMIT about to call sendTransaction ===`);
+      const response = await this.rpcProvider.sendTransaction(transaction);
       // Add this response to our local response history.
       if (transaction.hashes.includes(response.hash)) {
         // Duplicate response? This should never happen.
@@ -624,7 +616,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
     try {
       // Get receipt for tx with at least 1 confirmation. If it times out (using default, configured timeout),
       // it will throw a TransactionTimeout error.
-      const receipt = await this.confirmTransaction(transaction, 1);
+      const receipt = await this.rpcProvider.confirmTransaction(transaction, 1);
 
       // Sanity checks.
       if (receipt.status === 0) {
@@ -737,7 +729,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
     const timeout = this.config.confirmationTimeout * this.config.confirmations * 2;
     let receipt: ITransactionReceipt;
     try {
-      receipt = await this.confirmTransaction(transaction, this.config.confirmations, timeout);
+      receipt = await this.rpcProvider.confirmTransaction(transaction, this.config.confirmations, timeout);
     } catch (error: unknown) {
       this.logger.error(
         'Did not get enough confirmations for a *mined* transaction! Did a re-org occur?',
@@ -818,7 +810,7 @@ export class TransactionDispatch extends RpcProviderAggregator {
     // Get the current gas baseline price, in case it has changed drastically in the last block.
     let updatedGasPrice: bigint;
     try {
-      updatedGasPrice = BigInt(await this.getGasPrice(requestContext, false));
+      updatedGasPrice = BigInt(await this.rpcProvider.getGasPrice(requestContext, false));
     } catch {
       updatedGasPrice = BigInt(this.config.gasPriceMinimum);
     }

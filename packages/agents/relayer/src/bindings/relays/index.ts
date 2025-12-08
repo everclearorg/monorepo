@@ -78,11 +78,6 @@ export const pollCache = async () => {
     const domain = chainIdToDomain(chain)!;
 
     const _provider = await chainservice.getProvider(domain);
-    const rpcProvider = await _provider.leadProvider;
-    if (!rpcProvider) {
-      logger.debug('Bad rpcs', _requestContext, methodContext, { domain, providers: config.chains[domain].providers });
-      continue;
-    }
 
     for (const task of tasksByChain[chain]) {
       // TODO: Sanity check: should have enough balance to pay for gas on the specified chain.
@@ -138,7 +133,7 @@ export const pollCache = async () => {
         }
 
         // Get Nonce
-        const nonce = await rpcProvider.getTransactionCount(await wallet.getAddress(), 'latest');
+        const nonce = await _provider.getTransactionCount('latest');
 
         // Execute the calldata.
         logger.info('Sending tx', requestContext, methodContext, {

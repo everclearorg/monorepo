@@ -208,7 +208,7 @@ export class ChainReader {
    * @throws TransactionError.reasons.ProviderNotFound if provider is not configured for
    * that ID.
    */
-  protected async getProvider(domain: number): Promise<RpcProviderAggregator> {
+  public async getProvider(domain: number): Promise<RpcProviderAggregator> {
     await this.providerPromise;
     // Ensure that a signer, provider, etc are present to execute on this domain.
     if (!this.providers.has(domain)) {

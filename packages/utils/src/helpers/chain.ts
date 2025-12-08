@@ -40,6 +40,7 @@ export const chainWrapper = {
   createWalletClient: (...args: Parameters<typeof viem.createWalletClient>) => viem.createWalletClient(...args),
   createPublicClient: (...args: Parameters<typeof viem.createPublicClient>) => viem.createPublicClient(...args),
   http: viem.http,
+  fallback: viem.fallback,
   pad: (...args: Parameters<typeof viem.pad>) => viem.pad(...args),
   isAddress: (...args: Parameters<typeof viem.isAddress>) => viem.isAddress(...args),
   isAddressEqual: (...args: Parameters<typeof viem.isAddressEqual>) => viem.isAddressEqual(...args),

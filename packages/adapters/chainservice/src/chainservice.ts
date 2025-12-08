@@ -1,7 +1,7 @@
 import { createLoggingContext, Logger, EverclearError, RequestContext } from '@chimera-monorepo/utils';
 
 import { ChainConfig } from './config';
-import { WriteTransaction, ConfigurationError, ProviderNotConfigured, ITransactionReceipt, ISigner } from './shared';
+import { WriteTransaction, ProviderNotConfigured, ITransactionReceipt, ISigner } from './shared';
 import { ChainReader } from './chainreader';
 import { TransactionDispatch } from './dispatch';
 import { RpcProviderAggregator } from './aggregator';
@@ -11,6 +11,8 @@ import { RpcProviderAggregator } from './aggregator';
  * @classdesc Handles submitting, confirming, and bumping gas of arbitrary transactions onchain. Also performs onchain reads with embedded retries
  */
 export class ChainService extends ChainReader {
+  private transactionProviders: Map<number, TransactionDispatch> = new Map();
+  
   // TODO: #152 Add an object/dictionary statically to the class prototype mapping the
   // signer to a flag indicating whether there is an instance using that signer.
   // This will prevent two queue instances using the same signer and therefore colliding.
@@ -75,7 +77,7 @@ export class ChainService extends ChainReader {
     this.logger.debug('Method start', requestContext, methodContext, {
       tx: { ...tx, value: tx.value.toString(), data: `${tx.data.substring(0, 9)}...` },
     });
-    const provider = await this.getProvider(tx.domain);
+    const provider = await this.getTransactionProvider(tx.domain);
     return await provider.send(tx, context);
   }
 
@@ -101,54 +103,31 @@ export class ChainService extends ChainReader {
   }
 
   /**
-   * Helper to wrap getting provider for specified domain.
+   * Helper to wrap getting transaction provider for specified domain.
    * @param domain The domain of the chain for which we want a provider.
-   * @returns The ChainRpcProvider for that chain.
+   * @returns The TransactionDispatch for that chain.
    * @throws TransactionError.reasons.ProviderNotFound if provider is not configured for
    * that ID.
    */
-  public async getProvider(domain: number): Promise<TransactionDispatch> {
-    const provider = await super.getProvider(domain);
-    return provider as TransactionDispatch;
+  private async getTransactionProvider(domain: number): Promise<TransactionDispatch> {
+    await this.providerPromise;
+    if (!this.transactionProviders.has(domain)) {
+      throw new ProviderNotConfigured(domain.toString());
+    }
+    return this.transactionProviders.get(domain)!;
   }
 
-  // TODO: Use a generic type in ChainReader.setupProviders for this method such that we don't have to overload it here.
   /**
    * Populate the provider mapping using chain configurations.
    * @param context - The request context object used for logging.
    * @param signer - The signer that will be used for onchain operations.
    */
   protected async setupProviders(context: RequestContext, signer: string) {
-    const { methodContext } = createLoggingContext(this.setupProviders.name, context);
-    // For each domain / provider, map out all the utils needed for each chain.
-    for (const _domain in this.config) {
-      // Convert to number
-      const domain = +_domain;
-      // Get this chain's config.
+    await super.setupProviders(context, signer)
+    for (const [domain, rpcProvider] of this.providers) {
       const chain: ChainConfig = this.config[domain];
-      // Ensure at least one provider is configured.
-      if (chain.providers.length === 0) {
-        const error = new ConfigurationError(
-          [
-            {
-              parameter: 'providers',
-              error: 'No valid providers were supplied in configuration for this chain.',
-              value: chain.providers,
-            },
-          ],
-          {
-            domain,
-          },
-        );
-        this.logger.error('Failed to create transaction service', context, methodContext, error.toJson(), {
-          domain,
-          providers: chain.providers,
-        });
-        throw error;
-      }
-      const provider = new TransactionDispatch(this.logger, domain, chain);
-      await provider.setSigner(signer);
-      this.providers.set(domain, provider);
+      const provider = new TransactionDispatch(this.logger, domain, chain, rpcProvider);
+      this.transactionProviders.set(domain, provider);
     }
   }
 }

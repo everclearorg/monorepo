@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { randomInt } from 'crypto';
-import { reset, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { reset, restore, SinonStub, stub } from 'sinon';
 import { expect } from '@chimera-monorepo/utils';
 
-import { RpcError, TransactionReverted, SyncProvider } from '../../../../src/shared';
+import { RpcError, TransactionReverted, SyncProvider } from '../../../../src';
 import { TEST_ERROR, TEST_SENDER_DOMAIN } from '../../../utils';
 
 describe('Eth RpcProvider', () => {
@@ -13,7 +13,7 @@ describe('Eth RpcProvider', () => {
   beforeEach(() => {
     provider = new SyncProvider(
       {
-        url: 'http://localhost:8545', // Use a valid URL format
+        urls: ['http://localhost:8545'], // Use a valid URL format
       },
       TEST_SENDER_DOMAIN,
       testStallTimeout,

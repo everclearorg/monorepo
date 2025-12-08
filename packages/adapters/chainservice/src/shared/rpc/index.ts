@@ -105,15 +105,15 @@ export const getVmFromDomainId = (domainId: number): SupportedVm => {
  * Returns an RPC provider for the given domain. Must pass in a qualified URL
  * for the given domain.
  */
-export const getRpcClient = (domainId: number, url: string): RpcProvider => {
+export const getRpcClient = (domainId: number, urls: string[]): RpcProvider => {
   const vm = getVmFromDomainId(domainId);
   switch (vm) {
     case SupportedVms.evm:
-      return getEthRpcProvider(domainId, url);
+      return getEthRpcProvider(domainId, urls);
     case SupportedVms.tvm:
-      return getTronRpcProvider(domainId, url);
+      return getTronRpcProvider(domainId, urls[0]);
     case SupportedVms.svm:
-      return getSolanaRpcProvider(domainId, url);
+      return getSolanaRpcProvider(domainId, urls[0]);
     default:
       throw new Error(`Unsupported vm: ${vm}`);
   }

@@ -9,7 +9,7 @@ import {
 import { ISigner, ITransactionRequest, ITransactionResponse } from '../../types';
 
 export interface EthWalletConfig {
-  rpcUrl?: string;
+  rpcUrls?: string[];
   chainId?: number;
 }
 
@@ -27,10 +27,15 @@ export class EthWallet implements ISigner {
     this.account = chainWrapper.privateKeyToAccount(this._privateKey as Hex);
     this.address = this.account.address;
 
-    if (this.config.rpcUrl) {
+    if (this.config.rpcUrls) {
+      // Create transport: fallback for multiple URLs, http for single URL
+      const transport = this.config.rpcUrls.length > 1
+        ? chainWrapper.fallback(this.config.rpcUrls.map(url => chainWrapper.http(url)), { rank: true })
+        : chainWrapper.http(this.config.rpcUrls[0]);
+
       this.walletClient = chainWrapper.createWalletClient({
         account: this.account,
-        transport: chainWrapper.http(this.config.rpcUrl),
+        transport,
       }) as WalletClient;
     }
   }

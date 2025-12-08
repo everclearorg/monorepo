@@ -1,9 +1,9 @@
 import { EverclearError, delay, domainToChainId, parseHostname, ERC20Abi } from '@chimera-monorepo/utils';
-import { chainWrapper, type PublicClient, type Block } from '@chimera-monorepo/utils';
+import { chainWrapper, type PublicClient } from '@chimera-monorepo/utils';
 
 import { parseError, RpcError, ServerError, StallTimeout } from '../../errors';
 import { ISigner, ReadTransaction, WriteTransaction, ITransactionReceipt, ITransactionResponse, IBlock } from '../../types';
-import { RpcProvider, SignerTypeMaps } from '..';
+import { RpcProvider } from '..';
 import { EthWallet } from './wallet';
 
 // TODO: Wrap metrics in a type, and add a getter for it for logging purposes (after sync() calls, for example)
@@ -13,19 +13,11 @@ import { EthWallet } from './wallet';
  * and intercepts all RPC send() calls to ensure that the provider is in sync.
  */
 class BaseSyncProvider {
-  private readonly connectionInfo: { url: string };
+  public readonly rpcUrls: string[];
   public readonly name: string;
   public readonly domain: number;
   public readonly stallTimeout: number;
   public readonly client: PublicClient;
-
-  public get url(): string {
-    return this.connectionInfo.url;
-  }
-
-  public set url(value: string) {
-    this.connectionInfo.url = value;
-  }
 
   public synced = true;
   public lag = 0;
@@ -66,32 +58,48 @@ class BaseSyncProvider {
   }
 
   constructor(
-    _connectionInfo: { url: string } | string,
+    _connectionInfo: { urls: string[] } | string[],
     domain: number,
     stallTimeout = 10_000,
     private readonly debugLogging = false,
   ) {
     this.domain = domain;
     this.stallTimeout = stallTimeout;
-    this.connectionInfo = typeof _connectionInfo === 'string' ? { url: _connectionInfo } : _connectionInfo;
-    this.name = parseHostname(this.connectionInfo.url)
-      ? parseHostname(this.connectionInfo.url)!.split('.').slice(0, -1).join('.')
-      : this.connectionInfo.url;
+
+    if (Array.isArray(_connectionInfo)) {
+      this.rpcUrls = _connectionInfo;
+    } else {
+      this.rpcUrls = _connectionInfo.urls;
+    }
+
+    const hostnames = this.rpcUrls
+      .map(url => {
+        const hostname = parseHostname(url);
+        if (!hostname) return url;
+        return hostname.split('.').slice(0, -1).join('.') || hostname;
+      })
+      .filter((name, index, array) => array.indexOf(name) === index); // Remove duplicates
+
+    this.name = hostnames.join(',');
+
+    const transport = this.rpcUrls.length > 1
+      ? chainWrapper.fallback(this.rpcUrls.map(url => chainWrapper.http(url)), { rank: true })
+      : chainWrapper.http(this.rpcUrls[0]);
 
     this.client = chainWrapper.createPublicClient({
-      chain: { 
+      chain: {
         id: domainToChainId(domain),
         name: `Chain ${domain}`,
         nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-        rpcUrls: { 
-          default: { http: [this.connectionInfo.url] },
-          public: { http: [this.connectionInfo.url] }
+        rpcUrls: {
+          default: { http: this.rpcUrls },
+          public: { http: this.rpcUrls }
         },
         blockExplorers: {
           default: { name: 'Explorer', url: 'https://etherscan.io' }
         },
       },
-      transport: chainWrapper.http(this.connectionInfo.url),
+      transport,
       batch: {
         multicall: true,
       },
@@ -258,7 +266,7 @@ class BaseSyncProvider {
       blockHash: typeof blockTag === 'string' && blockTag.startsWith('0x') ? blockTag as any : undefined,
       blockNumber: typeof blockTag === 'number' ? BigInt(blockTag) : undefined,
     });
-    
+
     // Convert viem Block to IBlock
     return {
       hash: block.hash || '',
@@ -352,7 +360,7 @@ class BaseSyncProvider {
 export class SyncProvider implements RpcProvider {
   private readonly provider: BaseSyncProvider;
   constructor(
-    connectionInfo: { url: string } | string,
+    connectionInfo: { urls: string[] } | string[],
     domain: number,
     stallTimeout = 10_000,
     debugLogging = false,
@@ -519,19 +527,9 @@ export class SyncProvider implements RpcProvider {
     return this.provider.getTransactionCount(address, block.toString());
   }
 
-  public get url(): string {
-    return this.provider?.url || '';
-  }
-
-  public set url(value: string) {
-    if (this.provider) {
-      this.provider.url = value;
-    }
-  }
-
   public async getSigner(signer: ISigner | string): Promise<ISigner> {
     if (typeof signer === 'string') {
-      return new EthWallet(signer, { rpcUrl: this.url });
+      return new EthWallet(signer, { rpcUrls: this.provider.rpcUrls });
     }
     return signer;
   }

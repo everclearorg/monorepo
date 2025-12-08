@@ -46,7 +46,7 @@ describe('SyncProvider', () => {
     stub(chainWrapper, 'http').returns({} as any);
     stub(chainWrapper, 'zeroAddress').value('0x0000000000000000000000000000000000000000');
 
-    provider = new SyncProvider('https://test-rpc.com', 1337, 5000, true);
+    provider = new SyncProvider(['https://test-rpc.com'], 1337, 5000, true);
   });
 
   afterEach(() => {
@@ -55,24 +55,36 @@ describe('SyncProvider', () => {
 
   describe('constructor', () => {
     it('should initialize with string URL', () => {
-      const testProvider = new SyncProvider('https://test-rpc.com', 1337);
+      const testProvider = new SyncProvider(['https://test-rpc.com'], 1337);
       expect(testProvider.name).to.be.a('string');
-      expect(testProvider.url).to.equal('https://test-rpc.com');
+      expect(testProvider.name).to.equal('test-rpc');
+    });
+
+    it('should initialize with multiple URLs', () => {
+      const testProvider = new SyncProvider(['https://test-rpc1.com', 'https://test-rpc2.com', 'https://test-rpc3.com'], 1337);
+      expect(testProvider.name).to.be.a('string');
+      expect(testProvider.name).to.equal('test-rpc1,test-rpc2,test-rpc3');
     });
 
     it('should initialize with connection info object', () => {
-      const testProvider = new SyncProvider({ url: 'https://test-rpc.com' }, 1337);
+      const testProvider = new SyncProvider({ urls: ['https://test-rpc.com'] }, 1337);
       expect(testProvider.name).to.be.a('string');
-      expect(testProvider.url).to.equal('https://test-rpc.com');
+      expect(testProvider.name).to.equal('test-rpc');
+    });
+
+    it('should initialize with connection info object with multiple URLs', () => {
+      const testProvider = new SyncProvider({ urls: ['https://test-rpc1.com', 'https://test-rpc2.com', 'https://test-rpc3.com'] }, 1337);
+      expect(testProvider.name).to.be.a('string');
+      expect(testProvider.name).to.equal('test-rpc1,test-rpc2,test-rpc3');
     });
 
     it('should set default stall timeout', () => {
-      const testProvider = new SyncProvider('https://test-rpc.com', 1337);
+      const testProvider = new SyncProvider(['https://test-rpc.com'], 1337);
       expect(testProvider.stallTimeout).to.equal(10000);
     });
 
     it('should set custom stall timeout', () => {
-      const testProvider = new SyncProvider('https://test-rpc.com', 1337, 5000);
+      const testProvider = new SyncProvider(['https://test-rpc.com'], 1337, 5000);
       expect(testProvider.stallTimeout).to.equal(5000);
     });
   });
@@ -570,74 +582,6 @@ describe('SyncProvider', () => {
       await provider.connect('0x123');
       
       expect(getSignerStub.calledWith('0x123')).to.be.true;
-    });
-  });
-
-  describe('url property', () => {
-    it('should get URL from provider', () => {
-      expect(provider.url).to.equal('https://test-rpc.com');
-    });
-
-    it('should set URL on provider', () => {
-      provider.url = 'https://new-rpc.com';
-      expect(provider.url).to.equal('https://new-rpc.com');
-    });
-
-    it('should handle undefined provider', () => {
-      const testProvider = new SyncProvider('https://test-rpc.com', 1337);
-      // Access internal provider to test edge case
-      const internalProvider = testProvider.internalProvider;
-      expect(internalProvider).to.be.an('object');
-    });
-  });
-
-  describe('metrics and reliability', () => {
-    it('should track CPS timestamps', () => {
-      const now = Date.now();
-      provider.internalProvider.cpsTimestamps = [
-        now - 5000, // 5 seconds ago
-        now - 3000, // 3 seconds ago
-        now - 1000, // 1 second ago
-      ];
-
-      const cps = provider.cps;
-      expect(cps).to.equal(0.3); // 3 calls over 10 seconds
-    });
-
-    it('should filter old CPS timestamps', () => {
-      const now = Date.now();
-      provider.internalProvider.cpsTimestamps = [
-        now - 15000, // 15 seconds ago (should be filtered)
-        now - 5000,  // 5 seconds ago
-        now - 1000,  // 1 second ago
-      ];
-
-      const cps = provider.cps;
-      expect(cps).to.equal(0.2); // 2 calls over 10 seconds
-      expect(provider.internalProvider.cpsTimestamps).to.have.length(2);
-    });
-
-    it('should calculate latency', () => {
-      provider.internalProvider.latencies = [0.1, 0.2, 0.3];
-      
-      const latency = provider.latency;
-      expect(latency).to.be.closeTo(0.2, 0.01); // Allow for floating point precision
-    });
-
-    it('should return 0 latency when no samples', () => {
-      provider.internalProvider.latencies = [];
-      
-      const latency = provider.latency;
-      expect(latency).to.equal(0.0);
-    });
-
-    it('should limit latency samples to N_SAMPLES', () => {
-      // Create more than N_SAMPLES (100) latency entries
-      const latencies = Array.from({ length: 150 }, (_, i) => i * 0.01);
-      provider.internalProvider.latencies = latencies;
-      
-      const latency = provider.latency;
-      expect(provider.internalProvider.latencies).to.have.length(100);
     });
   });
 });
