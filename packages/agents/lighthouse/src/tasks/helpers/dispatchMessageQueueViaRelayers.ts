@@ -9,6 +9,7 @@ import {
   getNtpTimeSeconds,
   SOLANA_CHAINID,
   TRON_CHAINID,
+  RelayerType,
 } from '@chimera-monorepo/utils';
 import { chainWrapper } from '@chimera-monorepo/utils';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
@@ -181,6 +182,31 @@ export const dispatchMessageQueueViaRelayers = async (
   const totalIntents = queue.size;
   logger.debug('Processing queue', requestContext, methodContext, { type, queue, totalIntents, maxDequeue });
 
+  // Check if any relayer supports this chain before doing expensive operations
+  // Store results to avoid duplicate calls inside the loop
+  const chainId = domainToChainId(transactionDomain);
+  const relayerSupportEntries = await Promise.all(
+    relayers.map(
+      async (relayer): Promise<[RelayerType, boolean]> => [
+        relayer.type,
+        await relayer.instance.isChainSupported(chainId),
+      ],
+    ),
+  );
+  const relayerSupportMap = new Map<RelayerType, boolean>(relayerSupportEntries);
+  const hasSupportedRelayer = Array.from(relayerSupportMap.values()).some((supported) => supported);
+  if (!hasSupportedRelayer) {
+    logger.info('Failed to dispatch full queue', requestContext, methodContext, {
+      completed: 0,
+      pending: totalIntents,
+      tasks: [],
+      type,
+      queue,
+      reason: 'No relayers support this chain',
+    });
+    return [];
+  }
+
   // Dequeue in batches
   // This handles the case where the queue is too large to dequeue in a single transaction
   // Can happen in failure scenarios where the queue is not processed for a long time
@@ -275,6 +301,19 @@ export const dispatchMessageQueueViaRelayers = async (
     const errors: Error[] = [];
     for (const relayer of relayers) {
       try {
+        // Check if relayer supports this chain before generating a signature
+        // Use cached result from an earlier check to avoid duplicate calls
+        const supported = relayerSupportMap.get(relayer.type);
+        if (!supported) {
+          logger.warn('Skipping relayer - chain not supported', requestContext, methodContext, {
+            relayer: relayer.type,
+            chainId,
+            transactionDomain,
+            queue,
+          });
+          continue;
+        }
+
         logger.debug('Generating transaction for relayer', requestContext, methodContext, {
           relayer: relayer.type,
           queue,

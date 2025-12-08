@@ -3,7 +3,7 @@ import * as Relayer from '@chimera-monorepo/adapters-relayer';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { EthWallet } from '@chimera-monorepo/chainservice';
 
-import { dispatchMessageQueueViaRelayers, getQueueMethodName } from '../../../src/tasks/helpers';
+import { dispatchMessageQueueViaRelayers } from '../../../src/tasks/helpers';
 import { createIntentQueues, getContextStub, mock } from '../../globalTestHook';
 import { LighthouseContext } from '../../../src/context';
 import { RelayerSendFailed } from '../../../src/errors';
@@ -17,7 +17,6 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
 
   let sendWithRelayerWithBackupStub: SinonStub;
   let encodeStub: SinonStub;
-  let decodeStub: SinonStub;
   let wallet: SinonStubbedInstance<EthWallet>;
 
   beforeEach(() => {
@@ -56,7 +55,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
     // Function stubs
     getContextStub.returns(context);
     encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0xencoded');
-    decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(BigInt(0));
+    stub(chainWrapper, 'decodeFunctionResult').returns(BigInt(0));
     sendWithRelayerWithBackupStub = stub(Relayer, 'sendWithRelayerWithBackup').resolves({
       taskId: '123',
       relayerType: RelayerType.Everclear,
@@ -68,6 +67,14 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
     expect(result).to.be.empty;
     expect(sendWithRelayerWithBackupStub.callCount).to.be.eq(0);
     expect((context.logger.warn as SinonStub).calledWith('Missing chain config')).to.be.true;
+  });
+
+  it('should return early if chain is not supported', async () => {
+    (context.adapters.relayers[0].instance.isChainSupported as SinonStub).resolves(false);
+    const result = await dispatchMessageQueueViaRelayers('INTENT', queue, intents, rc);
+    expect(result).to.be.empty;
+    expect(sendWithRelayerWithBackupStub.callCount).to.be.eq(0);
+    expect((context.logger.info as SinonStub).calledWith('Failed to dispatch full queue')).to.be.true;
   });
 
   it('should return early if deployments are not configured', async () => {

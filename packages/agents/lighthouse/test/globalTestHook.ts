@@ -321,6 +321,7 @@ export const mock = {
             apiKey: r.apiKey,
             instance: {
               getRelayerAddress: stub().resolves(mkAddress('0x1234')),
+              isChainSupported: stub().resolves(true),
             } as any,
           };
         }),
