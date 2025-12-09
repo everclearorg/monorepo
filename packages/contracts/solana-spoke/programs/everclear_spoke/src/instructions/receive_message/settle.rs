@@ -22,6 +22,10 @@ pub fn settle_delivered_intent(
     ctx: Context<SettleDeliveredIntentContext>,
     _ix: SettleDeliveredIntentInstruction,
 ) -> Result<()> {
+    // verifying the contract is not paused
+    let state = &mut ctx.accounts.spoke_state;
+    require!(!state.paused, SpokeError::ContractPaused);
+
     // assert settlement exists and the status is delivered
     require!(
         ctx.accounts.intent_status_pda.settlement.is_some()
