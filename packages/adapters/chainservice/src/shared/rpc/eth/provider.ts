@@ -343,7 +343,12 @@ class BaseSyncProvider {
       data: tx.data,
       blockTag: block as any,
     });
-    return (result as unknown as string) || '0x';
+    // Viem's call() can return either a string or a CallResult object with a data property
+    if (typeof result === 'string') {
+      return result || '0x';
+    } else {
+      return (result && result.data) ? result.data : '0x';
+    }
   }
 
   public async getBalance(address: string): Promise<string> {
