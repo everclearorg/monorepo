@@ -64,9 +64,15 @@ pub fn new_intent(
     let program_id = *ctx.program_id;
 
     let fee_data = FeeData {
+        destinations: destinations.clone(),
+        input_asset: ctx.accounts.mint.key(),
+        output_asset: output_asset,
+        amount: amount,
+        amount_out_min: amount_out_min,
+        ttl: ttl,
+        data: data.clone(),
         token_fee: fee_param.token_fee,
         native_fee: fee_param.native_fee,
-        input_asset: ctx.accounts.mint.key(),
         deadline: fee_param.deadline,
     };
     let fee_accounts = HandleFeeAccounts {
