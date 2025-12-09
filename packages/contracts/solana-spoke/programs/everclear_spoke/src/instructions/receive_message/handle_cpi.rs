@@ -37,7 +37,6 @@ pub fn handle_account_metas(
     let message: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
     match message.message_type {
         MessageType::Settlement => {
-            msg!("Processing settlement batch message");
             let batch: Settlements = AnchorDeserialize::deserialize(&mut message.rest.as_ref())
                 .map_err(|_| error!(SpokeError::InvalidMessage))?;
 
@@ -136,7 +135,6 @@ pub(crate) fn mark_message_as_delivered(
     let msg: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
     match msg.message_type {
         MessageType::Settlement => {
-            msg!("Processing settlement batch message");
             let batch: Settlements = AnchorDeserialize::deserialize(&mut msg.rest.as_ref())
                 .map_err(|_| error!(SpokeError::InvalidMessage))?;
 
@@ -194,15 +192,6 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
             "pda_payer".as_bytes(),
         ];
         let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
-
-        msg!("{:?}", inst);
-        msg!(
-            "{:?}",
-            Pubkey::create_program_address(
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                ctx.program_id
-            )
-        );
 
         invoke_signed(
             &inst,

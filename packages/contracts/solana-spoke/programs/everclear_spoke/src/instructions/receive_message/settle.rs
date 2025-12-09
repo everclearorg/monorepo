@@ -107,7 +107,6 @@ pub fn settle_delivered_intent(
         &ctx.accounts.mint_account.key(),
         ctx.accounts.token_program.key,
     );
-    msg!("{:?}", create_idempotent_inst);
     anchor_lang::solana_program::program::invoke(
         &create_idempotent_inst,
         &[

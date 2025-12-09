@@ -211,15 +211,6 @@ pub fn handle_fill_intent<'info>(
         ];
         let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, &program_id);
 
-        msg!("{:?}", inst);
-        msg!(
-            "{:?}",
-            Pubkey::create_program_address(
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                &program_id
-            )
-        );
-
         invoke_signed(
             &inst,
             &[
