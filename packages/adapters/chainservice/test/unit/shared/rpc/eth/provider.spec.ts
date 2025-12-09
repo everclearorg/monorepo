@@ -432,7 +432,7 @@ describe('SyncProvider', () => {
     });
 
     it('should return 0x for empty result', async () => {
-      mockClient.call.resolves(null);
+      mockClient.call.resolves({ data: undefined });
       
       const tx = {
         domain: 1337,
