@@ -1,4 +1,4 @@
-import { SinonStub, stub } from 'sinon';
+import { SinonStub, stub, restore } from 'sinon';
 import Axios from 'axios';
 
 import { EVERCLEAR_CONFIG_URL, expect, getEverclearConfig, mock, parseEverclearConfig } from '../../src';
@@ -25,6 +25,10 @@ describe('Helpers:Config', () => {
     beforeEach(() => {
       getMock = stub(Axios, 'get');
       getMock.resolves({ data: mock.config() });
+    });
+
+    afterEach(() => {
+      restore();
     });
 
     it('should return undefined if it axios.get fails and fallback fails', async () => {

@@ -1,4 +1,4 @@
-import { SinonStub, stub, SinonStubbedInstance, createStubInstance } from 'sinon';
+import { SinonStub, stub, SinonStubbedInstance, createStubInstance, restore } from 'sinon';
 
 import * as Mockable from '../../src/alerts/mockable';
 import { alertDiscord } from '../../src/alerts';
@@ -59,6 +59,10 @@ describe('alertDiscord', () => {
     logger.info = stub(Logger.prototype, 'info').returns();
     logger.warn = stub(Logger.prototype, 'warn').returns();
     logger.error = stub(Logger.prototype, 'error').returns();
+  });
+
+  afterEach(() => {
+    restore();
   });
 
   it('Should pass with a valid config', async () => {

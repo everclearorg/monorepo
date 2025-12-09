@@ -24,8 +24,6 @@ import {
   Order,
 } from '@chimera-monorepo/utils';
 
-import { BigNumber } from 'ethers';
-
 import * as pg from 'pg';
 import { Pool } from 'pg';
 import * as db from 'zapatos/db';
@@ -265,7 +263,7 @@ export const getCheckPoint = async (
   const poolToUse = _pool ?? pool;
 
   const result = await db.selectOne('checkpoints', { check_name }).run(poolToUse);
-  return BigNumber.from(result?.check_point ?? 0).toNumber();
+  return Number(BigInt(result?.check_point ?? 0));
 };
 
 export const getMessageQueues = async (
@@ -779,10 +777,10 @@ export const saveLockPositions = async (
 ) => {
   const poolToUse = _pool ?? pool;
   const toRemove = lockPositions.filter((lockPosition) => {
-    return BigNumber.from(lockPosition.amountLocked).eq(BigNumber.from(0));
+    return BigInt(lockPosition.amountLocked) === BigInt(0);
   });
   const toAdd = lockPositions.filter((lockPosition) => {
-    return BigNumber.from(lockPosition.amountLocked).gt(BigNumber.from(0));
+    return BigInt(lockPosition.amountLocked) > BigInt(0);
   });
   await db.transaction(poolToUse, db.IsolationLevel.Serializable, async (client) => {
     await saveCheckPoint(check, point, client);

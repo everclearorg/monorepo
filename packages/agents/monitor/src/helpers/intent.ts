@@ -1,4 +1,4 @@
-import { Intent, TIntentStatus } from '@chimera-monorepo/utils';
+import { Intent, TIntentStatus, chainWrapper } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { getContract } from '../mockable';
 
@@ -33,12 +33,20 @@ export const getIntentContextFromContract = async (intentId: string): Promise<In
     {
       to: hubEverclear.address,
       domain: +config.hub.domain,
-      data: hubEverclear.interface.encodeFunctionData('contexts', [intentId]),
-      funcSig: hubEverclear.interface.getFunction('contexts').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: hubEverclear.abi,
+        functionName: 'contexts',
+        args: [intentId],
+      }),
+      funcSig: 'contexts(bytes32)',
     },
     'latest',
   );
-  const [context] = hubEverclear.interface.decodeFunctionResult('contexts', encoded);
+  const [context] = chainWrapper.decodeFunctionResult({
+    abi: hubEverclear.abi,
+    functionName: 'contexts',
+    data: encoded as `0x${string}`,
+  }) as [any];
 
   return { ...context, intentStatus: convertChainToReadableIntentStatus(context.status) };
 };
@@ -55,11 +63,19 @@ export const getCurrentEpoch = async (): Promise<number> => {
     {
       to: hubEverclear.address,
       domain: +config.hub.domain,
-      data: hubEverclear.interface.encodeFunctionData('getCurrentEpoch', []),
-      funcSig: hubEverclear.interface.getFunction('getCurrentEpoch').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: hubEverclear.abi,
+        functionName: 'getCurrentEpoch',
+        args: [],
+      }),
+      funcSig: 'getCurrentEpoch()',
     },
     'latest',
   );
-  const [epoch] = hubEverclear.interface.decodeFunctionResult('getCurrentEpoch', encoded);
+  const [epoch] = chainWrapper.decodeFunctionResult({
+    abi: hubEverclear.abi,
+    functionName: 'getCurrentEpoch',
+    data: encoded as `0x${string}`,
+  }) as [number];
   return epoch;
 };

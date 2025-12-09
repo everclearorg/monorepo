@@ -96,8 +96,8 @@ class SolanaWeb3Signer implements ISigner {
       hash: signature,
       confirmations: MAX_CONFIRMATION,
       nonce: 0, // Solana does not use nonces in the same way as EVM
-      gasPrice: '0', // Solana does not use gas price
-      gasLimit: transaction.gasLimit || '0',
+      gasPrice: BigInt(0), // Solana does not use gas price
+      gasLimit: BigInt(transaction.gasLimit || '0'),
     };
   }
 }
@@ -197,14 +197,9 @@ export class SolanaProvider implements RpcProvider {
       hash: hash,
       confirmations: result ? SOLANA_MAX_CONFIRMATIONS : 0,
       nonce: 0, // this is not used in solana
-      gasPrice: '1', // assume 1 lamport per unit
-      gasLimit: result?.meta?.fee?.toString() || '0',
+      gasPrice: BigInt(1), // assume 1 lamport per unit
+      gasLimit: BigInt(result?.meta?.fee?.toString() || '0'),
     };
-  }
-
-  public prepareRequest(method: string, params: unknown): [string, unknown[]] {
-    // Implement prepareRequest method
-    throw new Error('Method not implemented.');
   }
 
   public async estimateGas(tx: ReadTransaction | WriteTransaction): Promise<string> {
@@ -244,8 +239,8 @@ export class SolanaProvider implements RpcProvider {
   public async getGasPrice(): Promise<string> {
     // return lamports estimated by the rpc via getRecentPrioritizationFees
     const result = await this.rpc.getRecentPrioritizationFees().send();
-    let sum = 0n;
-    let count = 0n;
+    let sum = BigInt(0);
+    let count = BigInt(0);
     result.forEach(value => {
       sum += value.prioritizationFee.valueOf() as bigint;
       count++;

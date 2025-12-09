@@ -6,9 +6,8 @@ import {
   Logger,
   mkAddress,
   getNtpTimeSeconds,
+  chainWrapper,
 } from '@chimera-monorepo/utils';
-import { Interface } from 'ethers/lib/utils';
-import { BigNumber, ethers } from 'ethers';
 import { ChainService } from '@chimera-monorepo/chainservice';
 import {
   getEpochDuration,
@@ -37,23 +36,20 @@ describe('#getGenesisEpoch', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockGenesis = 1734307200;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
     chainservice.readTx.resolves('0xencoded');
 
-    encodeFunctionData = stub(Interface.prototype, 'encodeFunctionData');
+    encodeFunctionData = stub(chainWrapper, 'encodeFunctionData');
     encodeFunctionData.returns('0xencoded');
-    decodeFunctionResult = stub(Interface.prototype, 'decodeFunctionResult');
-    decodeFunctionResult.returns([BigNumber.from(mockGenesis)]);
+    decodeFunctionResult = stub(chainWrapper, 'decodeFunctionResult');
+    decodeFunctionResult.returns(BigInt(mockGenesis));
 
     getContextStub.returns({
       ...mock.context(),
       config: { ...mock.config() },
     });
-
-    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   afterEach(() => {
@@ -76,23 +72,20 @@ describe('#getEpochDuration', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockDuration = 7200;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
     chainservice.readTx.resolves('0xencoded');
 
-    encodeFunctionData = stub(Interface.prototype, 'encodeFunctionData');
+    encodeFunctionData = stub(chainWrapper, 'encodeFunctionData');
     encodeFunctionData.returns('0xencoded');
-    decodeFunctionResult = stub(Interface.prototype, 'decodeFunctionResult');
-    decodeFunctionResult.returns([BigNumber.from(mockDuration)]);
+    decodeFunctionResult = stub(chainWrapper, 'decodeFunctionResult');
+    decodeFunctionResult.returns(BigInt(mockDuration));
     
     getContextStub.returns({
       ...mock.context(),
       config: { ...mock.config() },
     });
-
-    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   afterEach(() => {
@@ -115,23 +108,20 @@ describe('#getRewardDistributorUpdateCount', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   const mockUpdateCount = 25;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
     chainservice.readTx.resolves('0xencoded');
 
-    encodeFunctionData = stub(Interface.prototype, 'encodeFunctionData');
+    encodeFunctionData = stub(chainWrapper, 'encodeFunctionData');
     encodeFunctionData.returns('0xencoded');
-    decodeFunctionResult = stub(Interface.prototype, 'decodeFunctionResult');
-    decodeFunctionResult.returns({
-      token: '0x',
-      merkleRoot: '0x',
-      proof: '0x',
-      updateCount: mockUpdateCount
-    });
-
-    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
+    decodeFunctionResult = stub(chainWrapper, 'decodeFunctionResult');
+    decodeFunctionResult.returns([
+      '0x', // token
+      '0x', // merkleRoot
+      '0x', // proof
+      mockUpdateCount // updateCount at index 3
+    ]);
 
     getContextStub.returns({
       ...mock.context(),
@@ -162,7 +152,6 @@ describe('#processRewards', () => {
   let encodeFunctionData: SinonStub;
   let decodeFunctionResult: SinonStub;
   let processNewLockPositionsStub: SinonStub;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   const genesisEpoch = 1734307200;
   const epochDuration = 7200;
@@ -208,7 +197,7 @@ describe('#processRewards', () => {
         const merkleTree = StandardMerkleTree.of(item.rewards, ['address', 'uint256']);
         merkleTreesMap.set(item.token, merkleTree);
         const combinedData = `${item.token}${merkleTree.root}${JSON.stringify({ timestamp: data.epoch + epochDuration, updateCount: rewardDistributorUpdateCount })}`;
-        const proof = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(combinedData));
+        const proof = chainWrapper.keccak256(chainWrapper.stringToBytes(combinedData));
         merkleTrees.push({
           asset: item.token,
           root: merkleTree.root,
@@ -257,7 +246,7 @@ describe('#processRewards', () => {
 
   beforeEach(() => {
     chainservice = mock.instances.chainservice() as SinonStubbedInstance<ChainService>;
-    chainservice.readTx.resolves('0xencoded');
+    // Remove local readTx stub - use global one
     logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
     database = mock.instances.database() as SinonStubbedInstance<Database>;
     processNewLockPositionsStub = stub(Mockable, 'processNewLockPositions').resolves(0);
@@ -270,19 +259,28 @@ describe('#processRewards', () => {
       return 2000.0
     });
 
-    encodeFunctionData = stub(Interface.prototype, 'encodeFunctionData');
+    encodeFunctionData = stub(chainWrapper, 'encodeFunctionData');
     encodeFunctionData.returns('0xencoded');
-    decodeFunctionResult = stub(Interface.prototype, 'decodeFunctionResult');
-    decodeFunctionResult.withArgs('genesisEpoch').returns([BigNumber.from(genesisEpoch)]);
-    decodeFunctionResult.withArgs('EPOCH_DURATION').returns([BigNumber.from(epochDuration)]);
-    decodeFunctionResult.withArgs('rewards').returns({
-      token: '',
-      merkleRoot: '',
-      proof: '',
-      updateCount: rewardDistributorUpdateCount
-    });
+    decodeFunctionResult = stub(chainWrapper, 'decodeFunctionResult');
 
-    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
+    decodeFunctionResult.callsFake((args) => {
+      if (args.functionName === 'genesisEpoch') {
+        return BigInt(genesisEpoch);
+      }
+      if (args.functionName === 'EPOCH_DURATION') {
+        return BigInt(epochDuration);
+      }
+      if (args.functionName === 'rewards') {
+        return [
+          '', // token
+          '', // merkleRoot
+          '', // proof
+          rewardDistributorUpdateCount // updateCount at index 3
+        ];
+      }
+
+      return BigInt(0);
+    });
 
     getContextStub.returns({
       ...mock.context(),

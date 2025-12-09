@@ -1,5 +1,4 @@
 import { createLoggingContext, LockPosition, TokenStakingReward } from '@chimera-monorepo/utils';
-import { BigNumber } from 'ethers';
 import { APY_MULTIPLIER, MONTH_SECONDS, USD_MULTIPLIER, YEAR_SECONDS } from './constants';
 import { HistoricPrice } from './historicPrice';
 import { RewardDistributions } from './processRewards';
@@ -7,9 +6,9 @@ import { getContext } from '../../context';
 import { InvalidAsset, InvalidState } from '../../errors/tasks/rewards';
 
 type StakeMetadata = {
-  stakeApyBps: BigNumber;
-  stakeRewards: BigNumber;
-  totalClearStaked: BigNumber;
+  stakeApyBps: bigint;
+  stakeRewards: bigint;
+  totalClearStaked: bigint;
 };
 
 type StakeMetadatas = {
@@ -73,12 +72,12 @@ export const processStakingRewards = async (
   }
 
   const totalClearStaked: {
-    [user: string]: BigNumber;
+    [user: string]: bigint;
   } = {};
   // This is sum of lock position * apy;
   const weightedStake: {
     [assetAddress: string]: {
-      [userAddress: string]: BigNumber;
+      [userAddress: string]: bigint;
     };
   } = {};
 
@@ -93,9 +92,9 @@ export const processStakingRewards = async (
     const user = position.user;
     users.add(user);
     if (!totalClearStaked[user]) {
-      totalClearStaked[user] = BigNumber.from(0);
+      totalClearStaked[user] = BigInt(0);
     }
-    totalClearStaked[user] = totalClearStaked[user].add(position.amountLocked);
+    totalClearStaked[user] = totalClearStaked[user] + BigInt(position.amountLocked);
     for (const assetRewardsConfig of tokens) {
       const apy = calculateApy(assetRewardsConfig, position);
       // APY is proportional to how much time the lock position lasts in the epoch.
@@ -109,10 +108,9 @@ export const processStakingRewards = async (
       // NOTE: apybps is scaled up to account for 3 d.p. of bps
       const multipliedApy = Math.round((apy * effectiveLockDuration * APY_MULTIPLIER) / YEAR_SECONDS);
       // dividing 10000 accounting the multipliedApy is in bps (100% = 10000 bps)
-      let positionReward = BigNumber.from(position.amountLocked)
-        .mul(multipliedApy)
-        .div(APY_MULTIPLIER * 10000);
-      if (positionReward.lt(0)) {
+      let positionReward =
+        (BigInt(position.amountLocked) * BigInt(multipliedApy)) / (BigInt(APY_MULTIPLIER) * BigInt(10000));
+      if (positionReward < BigInt(0)) {
         const error = new InvalidState({
           user,
           asset: assetRewardsConfig.address,
@@ -150,50 +148,49 @@ export const processStakingRewards = async (
         }
         const tokenPrice = await historicPrice.getHistoricTokenPrice(assetConfig, new Date(epochEnd * 1000));
         const clearPrice = await historicPrice.getHistoricTokenPrice(clearConfig, new Date(epochEnd * 1000));
-        const scaledTokenPrice = BigNumber.from(Math.round(tokenPrice * USD_MULTIPLIER));
-        const scaledClearPrice = BigNumber.from(Math.round(clearPrice * USD_MULTIPLIER));
+        const scaledTokenPrice = BigInt(Math.round(tokenPrice * USD_MULTIPLIER));
+        const scaledClearPrice = BigInt(Math.round(clearPrice * USD_MULTIPLIER));
         // usd reward = equivalent reward in clear * clear price
         // token reward = usd reward / token price; the usd multiplier is cancelled out in the process
-        positionReward = positionReward.mul(scaledClearPrice).div(scaledTokenPrice);
+        positionReward = (positionReward * scaledClearPrice) / scaledTokenPrice;
       }
 
       if (!stakingRewardDist[assetRewardsConfig.address][user]) {
-        stakingRewardDist[assetRewardsConfig.address][user] = BigNumber.from(0);
+        stakingRewardDist[assetRewardsConfig.address][user] = BigInt(0);
       }
       stakingRewardDist[assetRewardsConfig.address][user] =
-        stakingRewardDist[assetRewardsConfig.address][user].add(positionReward);
+        stakingRewardDist[assetRewardsConfig.address][user] + positionReward;
 
       // average APY related computations
       if (!weightedStake[assetRewardsConfig.address][user]) {
-        weightedStake[assetRewardsConfig.address][user] = BigNumber.from(0);
+        weightedStake[assetRewardsConfig.address][user] = BigInt(0);
       }
-      weightedStake[assetRewardsConfig.address][user] = weightedStake[assetRewardsConfig.address][user].add(
-        BigNumber.from(position.amountLocked).mul(apy),
-      );
+      weightedStake[assetRewardsConfig.address][user] =
+        weightedStake[assetRewardsConfig.address][user] + BigInt(position.amountLocked) * BigInt(apy);
     }
   }
 
   for (const token of tokens) {
-    let totalStakeRewards = BigNumber.from(0);
-    let totalUserClearStaked = BigNumber.from(0);
+    let totalStakeRewards = BigInt(0);
+    let totalUserClearStaked = BigInt(0);
     for (const user of users) {
       metadata[token.address][user] = {
-        stakeApyBps: weightedStake[token.address][user].div(totalClearStaked[user]),
+        stakeApyBps: weightedStake[token.address][user] / totalClearStaked[user],
         stakeRewards: stakingRewardDist[token.address][user],
         totalClearStaked: totalClearStaked[user],
       };
-      totalStakeRewards = totalStakeRewards.add(stakingRewardDist[token.address][user]);
-      totalUserClearStaked = totalUserClearStaked.add(totalClearStaked[user]);
+      totalStakeRewards = totalStakeRewards + stakingRewardDist[token.address][user];
+      totalUserClearStaked = totalUserClearStaked + totalClearStaked[user];
 
       // adding stakingRewardDist to the total rewardDist
       if (!rewardDist[token.address][user]) {
-        rewardDist[token.address][user] = BigNumber.from(0);
+        rewardDist[token.address][user] = BigInt(0);
       }
-      rewardDist[token.address][user] = rewardDist[token.address][user].add(stakingRewardDist[token.address][user]);
+      rewardDist[token.address][user] = rewardDist[token.address][user] + stakingRewardDist[token.address][user];
     }
     const assetConfig = assetConfigs.get(token.address);
     const tokenPrice = await historicPrice.getHistoricTokenPrice(assetConfig!, new Date(epochEnd * 1000));
-    const scaledTokenPrice = BigNumber.from(Math.round(tokenPrice * USD_MULTIPLIER));
+    const scaledTokenPrice = BigInt(Math.round(tokenPrice * USD_MULTIPLIER));
     logger.info('computed staking rewards for token', requestContext, methodContext, {
       epoch,
       token,

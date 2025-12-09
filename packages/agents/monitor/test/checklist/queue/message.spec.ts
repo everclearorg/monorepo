@@ -3,6 +3,7 @@ import {
   expect,
   getNtpTimeSeconds,
   mkBytes32,
+  chainWrapper,
 } from '@chimera-monorepo/utils';
 import { restore, reset, stub, SinonStub, SinonStubbedInstance } from 'sinon';
 import { checkMessageStatus, getIntentStatus } from '../../../src/checklist/queue';
@@ -12,7 +13,6 @@ import * as mockFunctions from '../../../src/mockable';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { createProcessEnv } from '../../mock';
 import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
-import { Interface } from 'ethers/lib/utils';
 import { IntentMessageSummary } from '../../../src/types';
 import * as Mockable from '../../../src/mockable';
 
@@ -26,7 +26,6 @@ describe('checkMessageStatus', () => {
   let getHyperlaneMsgDeliveredStub: SinonStub;
   let getHyperlaneMessageStatusStub: SinonStub;
   let database: SinonStubbedInstance<Database>;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     stub(process, 'env').value({
@@ -37,14 +36,13 @@ describe('checkMessageStatus', () => {
     subgraph = mock.instances.subgraph() as SinonStubbedInstance<SubgraphReader>;
     logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
     database = mock.instances.database() as SinonStubbedInstance<Database>;
-    encode = stub(Interface.prototype, 'encodeFunctionData');
-    decode = stub(Interface.prototype, 'decodeFunctionResult');
-    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
+    encode = stub(chainWrapper, 'encodeFunctionData');
+    decode = stub(chainWrapper, 'decodeFunctionResult');
     getContextStub.returns({
       ...mock.context(),
       config: { ...mock.config() },
     });
-    encode.returns('0xencoded');
+    encode.returns('0xencoded' as `0x${string}`);
     decode.returns(['FILLED']);
     getHyperlaneMsgDeliveredStub = stub(mockFunctions, 'getHyperlaneMsgDelivered');
     subgraph.getDestinationIntentById.resolves(mock.destinationIntent());

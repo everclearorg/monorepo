@@ -4,9 +4,7 @@ import { ChainStatusResponse, Severity } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
 import { getLatestBlockFromBlockMap } from '../helpers/chain';
 
-const CALL_DELAY = 15_000;
-
-export const checkChains = async (shouldAlert = true): Promise<ChainStatusResponse> => {
+export const checkChains = async (shouldAlert = true, timeoutMs: number = 15000): Promise<ChainStatusResponse> => {
   const {
     config,
     logger,
@@ -40,10 +38,10 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
         throw e;
       }),
     (async () => {
-      await delay(CALL_DELAY);
+      await delay(timeoutMs);
       logger.warn('Subgraph took longer than tolerated to resolve latest block', requestContext, methodContext, {
         chains: domains,
-        delay: CALL_DELAY,
+        delay: timeoutMs,
       });
       return new Map();
     })(),
@@ -80,10 +78,10 @@ export const checkChains = async (shouldAlert = true): Promise<ChainStatusRespon
               throw e;
             }),
           (async () => {
-            await delay(CALL_DELAY);
+            await delay(timeoutMs);
             logger.warn('Chain took longer than tolerated to resolve latest block', requestContext, methodContext, {
               chain: +domainId,
-              delay: CALL_DELAY,
+              delay: timeoutMs,
             });
             return { number: 0, timestamp: Math.floor(Date.now() / 1000) };
           })(),

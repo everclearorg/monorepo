@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber, constants } from 'ethers';
-import { Block, TransactionReceipt, TransactionResponse } from '@ethersproject/abstract-provider';
+import { chainWrapper } from '@chimera-monorepo/utils';
+import { IBlock, ITransactionReceipt } from '../../types';
 import {
   ISigner,
   ISignerApi,
@@ -12,7 +12,6 @@ import {
 import { SyncProvider } from '../eth';
 import { UnpredictableGasLimit, TransactionReadError } from '../../errors';
 import { TronWeb } from '../../../mockable';
-import { Interface } from 'ethers/lib/utils';
 // Using native fetch available in Node.js 18+
 
 interface ContractFunctionParameter {
@@ -44,20 +43,34 @@ class DefaultTronWebFactory implements TronWebFactory {
   }
 }
 
-// For simple parameters, decode and convert to TronWeb format
-function decodeSimpleParameters(data: string, funcSig: string, value?: string): ContractFunctionParameter[] {
+// Parse function signature string into ABI format
+function parseFunctionSignature(funcSig: string): any[] {
   try {
-    const iface = new Interface([`function ${funcSig}`]);
-    const tx = iface.parseTransaction({ data, value });
+    // Extract function name and parameters from signature
+    // Example: "transfer(address,uint256)" -> name: "transfer", params: ["address", "uint256"]
+    const match = funcSig.match(/^(\w+)\((.*)\)$/);
+    if (!match) {
+      throw new Error('Invalid function signature format');
+    }
+
+    const [, functionName, paramsString] = match;
+
+    // Parse parameters
+    const paramTypes: string[] = [];
+    if (paramsString.trim()) {
+      // Split by comma and clean up whitespace
+      const params = paramsString.split(',').map(p => p.trim());
+      paramTypes.push(...params);
+    }
 
     // Check if any parameter is a complex type (tuple, array of tuples, etc.)
-    const hasComplexTypes = tx.functionFragment.inputs.some(
-      (input: any) =>
-        input.type.includes('tuple') ||
-        (input.type.includes('[]') &&
-          input.type !== 'uint256[]' &&
-          input.type !== 'address[]' &&
-          input.type !== 'bytes32[]'),
+    const hasComplexTypes = paramTypes.some(
+      (type: string) =>
+        type.includes('tuple') ||
+        (type.includes('[]') &&
+          type !== 'uint256[]' &&
+          type !== 'address[]' &&
+          type !== 'bytes32[]'),
     );
 
     if (hasComplexTypes) {
@@ -65,8 +78,49 @@ function decodeSimpleParameters(data: string, funcSig: string, value?: string): 
       return [];
     }
 
-    return tx.args.map((arg: any, index: number) => ({
-      type: tx.functionFragment.inputs[index].type,
+    // Create ABI format for viem
+    const abi = [
+      {
+        type: 'function',
+        name: functionName,
+        inputs: paramTypes.map((type, index) => ({
+          name: `param${index}`,
+          type: type,
+        })),
+        outputs: [],
+        stateMutability: 'nonpayable',
+      },
+    ];
+
+    return abi;
+  } catch (error) {
+    // If parsing fails, return empty array to trigger raw parameter usage
+    return [];
+  }
+}
+
+// For simple parameters, decode and convert to TronWeb format
+function decodeSimpleParameters(data: string, funcSig: string, value?: string): ContractFunctionParameter[] {
+  try {
+    const abi = parseFunctionSignature(funcSig);
+
+    if (abi.length === 0) {
+      // For complex types, return empty array to trigger raw parameter usage
+      return [];
+    }
+
+    // Use viem's decodeFunctionData to decode the parameters
+    const decoded = chainWrapper.decodeFunctionData({
+      abi,
+      data: data as `0x${string}`,
+    });
+
+    // Extract parameter types from the ABI
+    const paramTypes = abi[0].inputs.map((input: any) => input.type);
+
+    // Convert decoded arguments to ContractFunctionParameter format
+    return decoded.args.map((arg: any, index: number) => ({
+      type: paramTypes[index],
       value: arg.toString(),
     }));
   } catch (error) {
@@ -94,7 +148,7 @@ class TronWeb3Signer implements ISigner {
       // Use the original signer's getAddress method
       return await this.originalSigner.getAddress();
     }
-    return this.tronWeb.defaultAddress.hex as string;
+    return this.tronWeb.defaultAddress.base58 as string;
   }
 
   public async sendTransaction(transaction: ITransactionRequest): Promise<ITransactionResponse> {
@@ -144,8 +198,8 @@ class TronWeb3Signer implements ISigner {
         hash: result.txid,
         confirmations: 0,
         nonce: 0,
-        gasPrice: BigNumber.from(1),
-        gasLimit: transaction.gasLimit || '0',
+        gasPrice: BigInt(1),
+        gasLimit: BigInt(transaction.gasLimit || '0'),
       };
     } else {
       // Handle smart contract transaction - USE DIRECT APPROACH WITHOUT MANUAL INJECTION
@@ -283,8 +337,8 @@ class TronWeb3Signer implements ISigner {
           hash: result.txid,
           confirmations,
           nonce: 0, // Tron doesn't use nonces
-          gasPrice: BigNumber.from(1),
-          gasLimit: transaction.gasLimit || '0',
+          gasPrice: BigInt(1),
+          gasLimit: BigInt(transaction.gasLimit || '0'),
         };
 
       } catch (error) {
@@ -336,7 +390,7 @@ export class TronSyncProvider extends SyncProvider {
     urlObj.searchParams.delete('apiKey');
     const cleanUrl = urlObj.toString();
     
-    super(cleanUrl, domain, stallTimeout, debugLogging);
+    super([cleanUrl], domain, stallTimeout, debugLogging);
     this.tronWeb = this.tronWebFactory.create({ fullHost: cleanUrl, apiKey: apiKey || undefined });
   }
 
@@ -436,27 +490,19 @@ export class TronSyncProvider extends SyncProvider {
     return { tx, txInfo, from, to, status, currentBlock, confirmations, blockHash, callValue };
   }
 
-  public async getTransaction(hash: string): Promise<TransactionResponse> {
+  public async getTransaction(hash: string): Promise<ITransactionResponse | undefined> {
     const { tx, txInfo, from, to, confirmations, blockHash, callValue } = await this.getTransactionData(hash);
 
     return {
       hash: tx.txID,
       confirmations,
       nonce: 0, // Tron doesn't use nonces
-      gasPrice: BigNumber.from(1),
-      gasLimit: BigNumber.from(tx.raw_data.fee_limit || 0),
-      to,
-      from,
-      data: (tx as any).raw_data.contract[0].parameter.value.data,
-      value: BigNumber.from(callValue),
-      chainId: this.internalProvider.domain,
-      blockNumber: txInfo.blockNumber,
-      blockHash,
-      wait: () => Promise.reject(new Error('Not implemented')),
+      gasPrice: BigInt(1),
+      gasLimit: BigInt(tx.raw_data.fee_limit || 0),
     };
   }
 
-  public async getTransactionReceipt(hash: string): Promise<TransactionReceipt> {
+  public async getTransactionReceipt(hash: string): Promise<ITransactionReceipt> {
     const { tx, txInfo, from, to, status, confirmations, blockHash } = await this.getTransactionData(hash);
 
     // 🎯 ENHANCED DEBUG: Log detailed transaction info for revert analysis
@@ -501,21 +547,10 @@ export class TronSyncProvider extends SyncProvider {
           transactionIndex: 0, // Tron doesn't have transaction index
           removed: false,
         })) || [],
-      to,
-      from,
-      contractAddress: txInfo.contract_address || '',
-      transactionIndex: 0, // Tron doesn't have transaction index
-      gasUsed: BigNumber.from(txInfo.receipt?.energy_usage || 0),
-      effectiveGasPrice: BigNumber.from(0),
-      type: 0,
-      byzantium: true,
-      logsBloom: '0x',
-      blockHash,
-      cumulativeGasUsed: BigNumber.from(txInfo.receipt?.energy_usage_total || 0),
     };
   }
 
-  public async getBlock(block: number | string): Promise<Block> {
+  public async getBlock(block: number | string): Promise<IBlock> {
     const blockData =
       typeof block === 'string'
         ? await this.tronWeb.trx.getBlock(block)
@@ -526,15 +561,6 @@ export class TronSyncProvider extends SyncProvider {
       parentHash: blockData.block_header.raw_data.parentHash,
       number: blockData.block_header.raw_data.number,
       timestamp: blockData.block_header.raw_data.timestamp,
-      transactions: blockData.transactions?.map((tx: any) => tx.txID) || [],
-      nonce: '',
-      difficulty: 0,
-      _difficulty: BigNumber.from(0),
-      gasLimit: BigNumber.from(0),
-      gasUsed: BigNumber.from(0),
-      miner: '',
-      extraData: '',
-      baseFeePerGas: null,
     };
   }
 
@@ -550,7 +576,7 @@ export class TronSyncProvider extends SyncProvider {
 
   public async getBalance(address: string, assetId: string): Promise<string> {
     const tronAddress = this.getTronAddress(address);
-    if (assetId === constants.AddressZero) {
+    if (assetId === chainWrapper.zeroAddress) {
       // Get TRX balance
       const balance = await this.tronWeb.trx.getBalance(tronAddress);
       return balance.toString();
@@ -572,7 +598,7 @@ export class TronSyncProvider extends SyncProvider {
   }
 
   public async getDecimals(address: string): Promise<number> {
-    if (address === constants.AddressZero) {
+    if (address === chainWrapper.zeroAddress) {
       return 6; // TRX has 6 decimals
     }
     const contract = await this.tronWeb.contract().at(this.getTronAddress(address));

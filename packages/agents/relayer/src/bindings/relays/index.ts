@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import {
   chainIdToDomain,
   createLoggingContext,
@@ -16,7 +15,7 @@ import { getContext } from '../../make';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 import { getFastifyInstance } from '../../mockable';
 
-export const MIN_GAS_LIMIT = BigNumber.from(4_000_000);
+export const MIN_GAS_LIMIT = BigInt(4_000_000);
 export const MIN_HEART_INTERVAL_SECONDS = 60; // 1min
 let cachedHeartbeatSent = 0;
 
@@ -79,11 +78,6 @@ export const pollCache = async () => {
     const domain = chainIdToDomain(chain)!;
 
     const _provider = await chainservice.getProvider(domain);
-    const rpcProvider = await _provider.leadProvider;
-    if (!rpcProvider) {
-      logger.debug('Bad rpcs', _requestContext, methodContext, { domain, providers: config.chains[domain].providers });
-      continue;
-    }
 
     for (const task of tasksByChain[chain]) {
       // TODO: Sanity check: should have enough balance to pay for gas on the specified chain.
@@ -128,18 +122,18 @@ export const pollCache = async () => {
         logger.debug(`Got the gasLimit for domain: ${domain}`, requestContext, methodContext, {
           gasLimit: gasLimit.toString(),
         });
-        gasLimit = BigNumber.from(gasLimit).lt(MIN_GAS_LIMIT) ? MIN_GAS_LIMIT.toString() : gasLimit;
+        gasLimit = BigInt(gasLimit) < MIN_GAS_LIMIT ? MIN_GAS_LIMIT.toString() : gasLimit;
 
-        let bumpedGasPrice = BigNumber.from(gasPrice).mul(130).div(100);
-        const bumpedGasLimit = BigNumber.from(gasLimit).mul(120).div(100);
+        let bumpedGasPrice = (BigInt(gasPrice) * BigInt(130)) / BigInt(100);
+        const bumpedGasLimit = (BigInt(gasLimit) * BigInt(120)) / BigInt(100);
 
         const minGasPrice = config.chains[domain]?.minGasPrice;
         if (minGasPrice) {
-          bumpedGasPrice = bumpedGasPrice.lt(minGasPrice) ? BigNumber.from(minGasPrice) : bumpedGasPrice;
+          bumpedGasPrice = bumpedGasPrice < BigInt(minGasPrice) ? BigInt(minGasPrice) : bumpedGasPrice;
         }
 
         // Get Nonce
-        const nonce = await rpcProvider.getTransactionCount(await wallet.getAddress(), 'latest');
+        const nonce = await _provider.getTransactionCount('latest');
 
         // Execute the calldata.
         logger.info('Sending tx', requestContext, methodContext, {

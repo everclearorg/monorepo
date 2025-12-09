@@ -1,9 +1,8 @@
-import { Interface } from 'ethers/lib/utils';
-import { SinonStub, SinonStubbedInstance, stub, createStubInstance } from 'sinon';
-import { expect, HyperlaneMessageResponse, HyperlaneStatus, Message, mkHash } from '@chimera-monorepo/utils';
+import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { expect, HyperlaneMessageResponse, HyperlaneStatus, Message, mkHash, chainWrapper } from '@chimera-monorepo/utils';
 import * as Mockable from '../../src/mockable';
 
-import { getDispatchedMessage, getDispatchedMessageFromEvent, getMessageStatus } from './../../src/helpers';
+import { getDispatchedMessage, getDispatchedMessageFromEvent, getMessageStatus } from '../../src/helpers';
 import { NoDispatchEventOnMessage, NoGatewayConfigured } from '../../src/types';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { Database } from '@chimera-monorepo/database';
@@ -38,19 +37,13 @@ describe('Helpers:hyperlane', () => {
   let chainreader: SinonStubbedInstance<ChainReader>;
   let decodeStub: SinonStub;
   let database: SinonStubbedInstance<Database>;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
+  let encodeStub: SinonStub;
+  let decodeEventLogStub: SinonStub;
 
   describe('#getMessageStatus', () => {
     beforeEach(() => {
       getHyperlaneMsgDeliveredStub = stub(Mockable, 'getHyperlaneMsgDelivered').resolves(false);
       getHyperlaneMessageStatusStub = stub(Mockable, 'getHyperlaneMessageStatus').resolves(message);
-      stub(Mockable, 'getMailboxInterface').returns(createStubInstance(Interface, {
-        getEvent: stub().returns({} as any) as any,
-        getEventTopic: stub().returns(mkHash('0xtopic')) as any,
-        parseLog: stub().returns({ args: { message: message.body } } as any) as any,
-        encodeFunctionData: stub().returns('0x1234') as any,
-        getFunction: stub().returns(mockGetFunction) as any,
-      }));
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
 
       chainreader.readTx.resolves('0x1234');
@@ -60,12 +53,9 @@ describe('Helpers:hyperlane', () => {
         logs: [{ topics: [mkHash('0xtopic')] }],
       } as any);
 
-      stub(Interface.prototype, 'getEvent').returns({} as any);
-      stub(Interface.prototype, 'getEventTopic').returns(mkHash('0xtopic'));
-      stub(Interface.prototype, 'parseLog').returns({ args: { message: message.body } } as any);
-      stub(Interface.prototype, 'encodeFunctionData').returns('0x1234');
-      stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
-      decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns(['0x1234']);
+      encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0x1234' as `0x${string}`);
+      decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(['0x1234']);
+      decodeEventLogStub = stub(chainWrapper, 'decodeEventLog').returns({ args: { message: message.body } } as any);
 
       database = mock.instances.database() as SinonStubbedInstance<Database>;
     });
@@ -121,7 +111,7 @@ describe('Helpers:hyperlane', () => {
           domain: 1338,
           data: '0x1234',
           value: '0',
-          funcSig: 'foo()',
+          funcSig: 'process(bytes,bytes)',
         },
       });
     });
@@ -140,6 +130,14 @@ describe('Helpers:hyperlane', () => {
       getHyperlaneMsgDeliveredStub.resolves(false);
       database.getMessagesByIds.resolves([mock.message()]);
 
+      chainreader.getTransactionReceipt.resolves({
+        transactionHash: mkHash('0xtx'),
+        logs: [{ 
+          topics: ['0x3d0c9a00', mkHash('0xtopic')],
+          data: '0x1234'
+        }],
+      } as any);
+
       const ret = await getMessageStatus(id, true);
       expect(ret.status).to.be.eq('relayable');
       expect(ret.relayTransaction).to.be.deep.eq({
@@ -147,7 +145,7 @@ describe('Helpers:hyperlane', () => {
         data: '0x1234',
         domain: +mock.message().destinationDomain!,
         value: '0',
-        funcSig: 'foo()',
+        funcSig: 'process(bytes,bytes)',
       });
     });
   });
@@ -168,14 +166,13 @@ describe('Helpers:hyperlane', () => {
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
       chainreader.getTransactionReceipt.resolves({
         transactionHash: originMessage.transactionHash,
-        logs: [{ topics: [mkHash('0xtopic')] }],
+        logs: [{ 
+          topics: ['0x3d0c9a00', mkHash('0xtopic')],
+          data: '0x1234'
+        }],
       } as any);
-
-      stub(Mockable, 'getMailboxInterface').returns(createStubInstance(Interface, {
-        getEvent: stub().returns({} as any) as any,
-        getEventTopic: stub().returns(mkHash('0xtopic')) as any,
-        parseLog: stub().returns({ args: { message: message.body } } as any) as any,
-      }));
+      
+      decodeEventLogStub = stub(chainWrapper, 'decodeEventLog').returns({ args: { message: message.body } } as any);
     });
 
     it('should throw if cannot find Dispatch event', async () => {

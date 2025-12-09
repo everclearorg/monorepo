@@ -1,6 +1,5 @@
-import { Interface } from 'ethers/lib/utils';
 import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
-import { expect, mkBytes32 } from '@chimera-monorepo/utils';
+import { expect, mkBytes32, chainWrapper } from '@chimera-monorepo/utils';
 
 import { getCurrentEpoch, getIntentContextFromContract } from './../../src/helpers';
 import { ChainReader } from '@chimera-monorepo/chainservice';
@@ -16,6 +15,7 @@ describe('Helpers:intent', () => {
       fn: (...inputs: any[]) => Promise<any>;
       args: any[];
       method: string;
+      funcSig: string;
       inputs: any[];
       domain: number;
       to: string;
@@ -26,6 +26,7 @@ describe('Helpers:intent', () => {
         fn: getIntentContextFromContract,
         args: [intentId],
         method: 'contexts',
+        funcSig: 'contexts(bytes32)',
         inputs: [intentId],
         domain: +mock.config().hub.domain,
         to: mock.config().hub.deployments.everclear,
@@ -35,6 +36,7 @@ describe('Helpers:intent', () => {
         fn: getCurrentEpoch,
         args: [],
         method: 'getCurrentEpoch',
+        funcSig: 'getCurrentEpoch()',
         inputs: [],
         domain: +mock.config().hub.domain,
         to: mock.config().hub.deployments.everclear,
@@ -44,23 +46,21 @@ describe('Helpers:intent', () => {
     let chainreader: SinonStubbedInstance<ChainReader>;
     let decodeStub: SinonStub;
     let encodeStub: SinonStub;
-    const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
     beforeEach(() => {
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
 
       chainreader.readTx.resolves('0x1234');
-      encodeStub = stub(Interface.prototype, 'encodeFunctionData').returns('0x1234');
-      decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns(['0x1234']);
-      stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
+      encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0x1234' as `0x${string}`);
+      decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(['0x1234']);
     });
 
-    for (const { name, fn, args, method, inputs, domain, to } of cases) {
+    for (const { name, fn, args, method, funcSig, inputs, domain, to } of cases) {
       it(`${name} - should work`, async () => {
         await fn(...args);
-        expect(chainreader.readTx).to.be.calledWith({ to, domain, data: '0x1234', funcSig: 'foo()' }, 'latest');
-        expect(encodeStub).to.be.calledOnceWithExactly(method, inputs);
-        expect(decodeStub).to.be.calledOnceWithExactly(method, '0x1234');
+        expect(chainreader.readTx).to.be.calledWith({ to, domain, data: '0x1234', funcSig }, 'latest');
+        expect(encodeStub).to.be.calledOnceWithExactly({ abi: [], functionName: method, args: inputs });
+        expect(decodeStub).to.be.calledOnceWithExactly({ abi: [], functionName: method, data: '0x1234' });
       });
 
       it(`${name} - should fail if encoding errors`, async () => {
