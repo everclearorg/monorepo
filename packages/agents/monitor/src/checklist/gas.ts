@@ -1,7 +1,6 @@
-import { createLoggingContext } from '@chimera-monorepo/utils';
+import { createLoggingContext, chainWrapper } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { CheckGasResponse, Severity } from '../types';
-import { BigNumber, utils } from 'ethers';
 import axios from 'axios';
 import { resolveAlerts, sendAlerts } from '../mockable';
 
@@ -35,8 +34,8 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
       const gatewayThresholdValue = chainConfig.minGasOnGateway ?? config.thresholds.minGasOnGateway ?? 0;
 
       // Parse threshold values with appropriate decimal places
-      const relayerThreshold = utils.parseUnits(relayerThresholdValue.toString(), native?.decimals ?? 18);
-      const gatewayThreshold = utils.parseUnits(gatewayThresholdValue.toString(), native?.decimals ?? 18);
+      const relayerThreshold = chainWrapper.parseUnits(relayerThresholdValue.toString(), native?.decimals ?? 18);
+      const gatewayThreshold = chainWrapper.parseUnits(gatewayThresholdValue.toString(), native?.decimals ?? 18);
 
       const relayerUrl = config.relayers.find((relayer) => relayer.type === 'Everclear')?.url;
 
@@ -76,13 +75,15 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
       chainGas.push({
         domain: domainId,
         relayerAddress,
-        belowRelayerThreshold: relayerGas ? BigNumber.from(relayerGas).lt(relayerThreshold) : false,
+        belowRelayerThreshold: relayerGas ? BigInt(relayerGas) < BigInt(relayerThreshold) : false,
         relayerGas,
         gatewayAddress,
         gatewayGas,
-        belowGatewayThreshold: gatewayGas ? BigNumber.from(gatewayGas).lt(gatewayThreshold) : false,
+        belowGatewayThreshold: gatewayGas ? BigInt(gatewayGas) < BigInt(gatewayThreshold) : false,
         tokenomicsGatewayGas,
-        belowTokenomicsGatewayThreshold: tokenomicsGatewayGas ? BigNumber.from(gatewayGas).lt(gatewayThreshold) : false,
+        belowTokenomicsGatewayThreshold: tokenomicsGatewayGas
+          ? BigInt(tokenomicsGatewayGas) < BigInt(gatewayThreshold)
+          : false,
       });
 
       const relayerReport = {
@@ -94,7 +95,7 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
         logger: logger,
         env: config.environment,
       };
-      const relayerViolated = relayerAddress && BigNumber.from(relayerGas ?? '0').lt(relayerThreshold);
+      const relayerViolated = relayerAddress && BigInt(relayerGas ?? '0') < BigInt(relayerThreshold);
       if (shouldAlert && relayerViolated) {
         // Send relayer gas alerts
         logger.warn(`The relayer ${relayerAddress} of ${domainId} has low gas balance`, requestContext, methodContext, {
@@ -119,7 +120,7 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
         await resolveAlerts(relayerReport, logger, config, requestContext);
       }
 
-      const gatewayGasViolated = gatewayAddress && BigNumber.from(gatewayGas ?? '0').lt(gatewayThreshold);
+      const gatewayGasViolated = gatewayAddress && BigInt(gatewayGas ?? '0') < BigInt(gatewayThreshold);
       const gatewayReport = {
         severity: Severity.Warning,
         type: 'LowGasGateway',
@@ -154,7 +155,7 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
       }
 
       const tokenomicsGatewayGasViolated =
-        tokenonmicsGatewayAddress && BigNumber.from(tokenomicsGatewayGas ?? '0').lt(gatewayThreshold);
+        tokenonmicsGatewayAddress && BigInt(tokenomicsGatewayGas ?? '0') < BigInt(gatewayThreshold);
       const tokenomicsGatewayReport = {
         severity: Severity.Warning,
         type: 'LowGasTokenomicsGateway',

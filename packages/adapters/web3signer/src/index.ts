@@ -1,29 +1,28 @@
-import { Signer, providers, utils, Bytes, BigNumber } from 'ethers';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { type PublicClient, type Hex, chainWrapper } from '@chimera-monorepo/utils';
 import { getAddressFromPublicKey } from '@chimera-monorepo/utils';
-import { ITransactionRequest } from '@chimera-monorepo/chainservice';
+import { ITransactionRequest, ITransactionResponse, ISigner } from '@chimera-monorepo/chainservice';
 
 import { Web3SignerApi } from './api';
 
-export class Web3Signer extends Signer {
+export class Web3Signer implements ISigner {
   private static MESSAGE_PREFIX = '\x19Ethereum Signed Message:\n';
 
   private static getAddressFromPublicKey(publicKey: string): string {
     return getAddressFromPublicKey(publicKey);
   }
 
-  private static prepareEthereumSignedMessage(message: Bytes | string): Bytes {
-    if (typeof message === 'string') {
-      message = utils.toUtf8Bytes(message);
-    }
-    return utils.concat([
-      utils.toUtf8Bytes(Web3Signer.MESSAGE_PREFIX),
-      utils.toUtf8Bytes(message.length.toString()),
-      message,
-    ]);
+  private static prepareEthereumSignedMessage(message: Uint8Array | string): Hex {
+    const messageBytes = typeof message === 'string' ? chainWrapper.stringToBytes(message) : message;
+    const prefixBytes = chainWrapper.stringToBytes(Web3Signer.MESSAGE_PREFIX);
+    const lengthBytes = chainWrapper.stringToBytes(messageBytes.length.toString());
+    const ethMessage = chainWrapper.concat([prefixBytes, lengthBytes, messageBytes]) as Uint8Array;
+
+    return chainWrapper.toHex(ethMessage, { size: ethMessage.length });
   }
 
   public address?: string;
-  public provider?: providers.Provider;
+  public publicClient?: PublicClient;
   private readonly api: Web3SignerApi;
 
   public get signerApi(): Web3SignerApi {
@@ -32,17 +31,16 @@ export class Web3Signer extends Signer {
 
   constructor(
     public readonly web3SignerUrl: string,
-    provider?: providers.Provider,
+    publicClient?: PublicClient,
   ) {
-    super();
     this.web3SignerUrl = web3SignerUrl;
-    this.provider = provider;
+    this.publicClient = publicClient;
     this.api = new Web3SignerApi(web3SignerUrl);
   }
 
-  public connect(provider: providers.Provider): Web3Signer {
-    this.provider = provider;
-    return new Web3Signer(this.web3SignerUrl, provider);
+  public connect(publicClient: PublicClient): Web3Signer {
+    this.publicClient = publicClient;
+    return new Web3Signer(this.web3SignerUrl, publicClient);
   }
 
   public async getAddress(): Promise<string> {
@@ -52,49 +50,58 @@ export class Web3Signer extends Signer {
     return address;
   }
 
-  public async signMessage(message: Bytes | string): Promise<string> {
+  public async signMessage(message: Hex | string): Promise<Hex> {
     const identifier = await this.api.getPublicKey();
     const data = Web3Signer.prepareEthereumSignedMessage(message);
-    const digestBytes = utils.hexZeroPad(data, data.length);
 
-    return await this.api.sign(identifier, digestBytes);
+    return (await this.api.sign(identifier, data)) as Hex;
   }
 
-  public async signTransaction(transaction: providers.TransactionRequest): Promise<string> {
-    const tx = await utils.resolveProperties(transaction);
-    const baseTx: utils.UnsignedTransaction = Object.assign(
+  public async signTransaction(transaction: any): Promise<Hex> {
+    const baseTx = Object.assign(
       {
-        to: tx.to || undefined,
-        nonce: tx.nonce ? BigNumber.from(tx.nonce).toNumber() : undefined,
-        gasLimit: BigNumber.from(tx.gasLimit) || undefined,
-        data: tx.data || undefined,
-        value: BigNumber.from(tx.value) || undefined,
-        chainId: tx.chainId || undefined,
+        to: transaction.to || undefined,
+        nonce: transaction.nonce ? Number(BigInt(transaction.nonce)) : undefined,
+        gasLimit: BigInt(transaction.gasLimit) || undefined,
+        data: transaction.data || undefined,
+        value: BigInt(transaction.value) || undefined,
+        chainId: transaction.chainId || undefined,
       },
       // If an EIP-1559 transaction, use the EIP-1559 specific fields.
-      tx.type === 2
+      transaction.type === 2
         ? {
-            maxFeePerGas: BigNumber.from(tx.maxFeePerGas),
-            maxPriorityFeePerGas: BigNumber.from(tx.maxPriorityFeePerGas),
+            maxFeePerGas: BigInt(transaction.maxFeePerGas),
+            maxPriorityFeePerGas: BigInt(transaction.maxPriorityFeePerGas),
             type: 2,
           }
         : {
-            gasPrice: BigNumber.from(tx.gasPrice),
+            gasPrice: BigInt(transaction.gasPrice),
             type: 0,
           },
     );
 
     const identifier = await this.api.getPublicKey();
-    const digestBytes = utils.serializeTransaction(baseTx);
+    const digestBytes = chainWrapper.serializeTransaction(baseTx as any);
 
     const signature = await this.api.sign(identifier, digestBytes);
-    return utils.serializeTransaction(baseTx, signature);
+    return chainWrapper.serializeTransaction(baseTx as any, signature as any);
   }
 
-  public async sendTransaction(transaction: providers.TransactionRequest): Promise<providers.TransactionResponse> {
-    // exclude funcSig
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { funcSig, ...tx } = transaction as unknown as ITransactionRequest;
-    return await super.sendTransaction(tx);
+  public async sendTransaction(transaction: ITransactionRequest): Promise<ITransactionResponse> {
+    if (!this.publicClient) {
+      throw new Error('PublicClient is required to send transactions');
+    }
+
+    const hash = await this.publicClient.sendRawTransaction({
+      serializedTransaction: await this.signTransaction(transaction),
+    });
+
+    return {
+      hash,
+      confirmations: 0, // Will be updated by the chain service
+      nonce: transaction.nonce || 0,
+      gasPrice: transaction.gasPrice ? BigInt(transaction.gasPrice) : undefined,
+      gasLimit: BigInt(transaction.gasLimit || '0'),
+    };
   }
 }

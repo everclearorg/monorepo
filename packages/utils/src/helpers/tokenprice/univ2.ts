@@ -1,5 +1,5 @@
-import { Interface, formatUnits } from 'ethers/lib/utils';
-import { providers } from 'ethers';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { chainWrapper, type PublicClient } from '../chain';
 import { AssetConfig } from '../../types';
 export const univ2PairABI = [
   {
@@ -41,6 +41,7 @@ export const univ2PairABI = [
  * @param pair - The pair contract address.
  * @param token0 - The token0 asset.
  * @param token1 - The token1 asset
+ * @param client - The viem public client instance.
  * @returns The token0 price
  */
 export const getTokenPriceFromUniV2 = async (
@@ -48,24 +49,19 @@ export const getTokenPriceFromUniV2 = async (
   pair: string,
   token0: AssetConfig,
   token1: AssetConfig,
-  provier: providers.JsonRpcProvider,
+  client: PublicClient,
 ): Promise<number> => {
-  const univ2PairIface = new Interface(univ2PairABI);
-  const encodedDataForGetReserves = univ2PairIface.encodeFunctionData('getReserves');
+  const result = (await client.readContract({
+    address: pair as `0x${string}`,
+    abi: univ2PairABI,
+    functionName: 'getReserves',
+  })) as [bigint, bigint, number];
 
-  const encodedResultData = await provier.call(
-    {
-      to: pair,
-      chainId: +domain,
-      data: encodedDataForGetReserves,
-    },
-    'latest',
-  );
+  const reserve0 = result[0];
+  const reserve1 = result[1];
 
-  const [reserve0, reserve1] = univ2PairIface.decodeFunctionResult('getReserves', encodedResultData);
-
-  const readableReserve0 = formatUnits(reserve0, token0.decimals);
-  const readableReserve1 = formatUnits(reserve1, token1.decimals);
+  const readableReserve0 = chainWrapper.formatUnits(reserve0, token0.decimals);
+  const readableReserve1 = chainWrapper.formatUnits(reserve1, token1.decimals);
 
   return +readableReserve1 / +readableReserve0;
 };

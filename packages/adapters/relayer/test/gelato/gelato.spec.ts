@@ -1,4 +1,4 @@
-import { stub, SinonStub, SinonStubbedInstance, createStubInstance } from 'sinon';
+import { stub, SinonStub, SinonStubbedInstance, createStubInstance, restore } from 'sinon';
 import {
   mkAddress,
   expect,
@@ -60,6 +60,10 @@ describe('Adapters: Gelato', () => {
       getGasEstimateWithRevertCode: stub<[WriteTransaction]>().resolves('1231231231'),
     });
     axiosGetStub = stub(Mockable, 'axiosGet');
+  });
+
+  afterEach(() => {
+    restore();
   });
 
   describe('#isChainSupportedByGelato', () => {
