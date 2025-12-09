@@ -129,9 +129,9 @@ contract SpokeGatewayV2Test is Test, Mocker {
     assertEq(newGateway.EVERCLEAR_ID(), EVERCLEAR);
     assertEq(newGateway.EVERCLEAR_GATEWAY(), hubGateway);
     assertEq(address(newGateway.polymerProver()), polymerProver);
-    assertEq(newGateway.hyperlaneMailbox(), hyperlaneMailbox);
-    assertEq(newGateway.ccipMailbox(), ccipMailbox);
-    assertEq(newGateway.polymerMailbox(), polymerMailbox);
+    assertEq(address(newGateway.hyperlaneMailbox()), hyperlaneMailbox);
+    assertEq(address(newGateway.ccipMailbox()), ccipMailbox);
+    assertEq(address(newGateway.polymerMailbox()), polymerMailbox);
   }
 
   // ============ State Check Tests ============ //
@@ -143,9 +143,9 @@ contract SpokeGatewayV2Test is Test, Mocker {
     assertEq(gateway.EVERCLEAR_ID(), EVERCLEAR);
     assertEq(gateway.EVERCLEAR_GATEWAY(), hubGateway);
     assertEq(address(gateway.polymerProver()), polymerProver);
-    assertEq(gateway.hyperlaneMailbox(), hyperlaneMailbox);
-    assertEq(gateway.ccipMailbox(), ccipMailbox);
-    assertEq(gateway.polymerMailbox(), polymerMailbox);
+    assertEq(address(gateway.hyperlaneMailbox()), hyperlaneMailbox);
+    assertEq(address(gateway.ccipMailbox()), ccipMailbox);
+    assertEq(address(gateway.polymerMailbox()), polymerMailbox);
     assertEq(gateway.mailbox(), hyperlaneMailbox);
   }
 
@@ -177,7 +177,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
     vm.prank(owner);
     gateway.updateHyperlaneMailbox(newMailbox);
 
-    assertEq(gateway.hyperlaneMailbox(), newMailbox);
+    assertEq(address(gateway.hyperlaneMailbox()), newMailbox);
   }
 
   function testRevert_spokeGateway_updateHyperlaneMailbox_notOwner() public {
@@ -194,7 +194,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
     vm.prank(owner);
     gateway.updateCCIPMailbox(newMailbox);
 
-    assertEq(gateway.ccipMailbox(), newMailbox);
+    assertEq(address(gateway.ccipMailbox()), newMailbox);
   }
 
   function testRevert_spokeGateway_updateCCIPMailbox_notOwner() public {
@@ -211,7 +211,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
     vm.prank(owner);
     gateway.updatePolymerMailbox(newMailbox);
 
-    assertEq(gateway.polymerMailbox(), newMailbox);
+    assertEq(address(gateway.polymerMailbox()), newMailbox);
   }
 
   function testRevert_spokeGateway_updatePolymerMailbox_notOwner() public {

@@ -26,9 +26,6 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   using TypeCasts for address;
 
   address public constant POLYMER_EMIT_MAILBOX = address(0x1);
-  uint256 public constant POLYMER_ID = 1;
-  uint256 public constant HL_ID = 2;
-  uint256 public constant CCIP_ID = 3;
 
   // Tag to indicate a gas limit (or dest chain equivalent processing units) and Out Of Order Execution. This tag is
   // available for multiple chain families. If there is no chain family specific tag, this is the default available
@@ -44,11 +41,11 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   /// @inheritdoc ISpecifiesInterchainSecurityModule
   IInterchainSecurityModule public interchainSecurityModule;
 
-  address public hyperlaneMailbox;
+  IMailbox public hyperlaneMailbox;
 
-  address public ccipMailbox;
+  ICCIP public ccipMailbox;
 
-  address public polymerMailbox;
+  IMailbox public polymerMailbox;
 
   IPolymer public polymerProver;
 
@@ -91,24 +88,24 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   function updateHyperlaneMailbox(
     address _newMailbox
   ) external onlyOwner {
-    address oldMailbox = hyperlaneMailbox;
-    hyperlaneMailbox = _newMailbox;
+    address oldMailbox = address(hyperlaneMailbox);
+    hyperlaneMailbox = IMailbox(_newMailbox);
     emit HyperlaneMailboxUpdated(oldMailbox, _newMailbox);
   }
 
   function updateCCIPMailbox(
     address _newMailbox
   ) external onlyOwner {
-    address oldMailbox = ccipMailbox;
-    ccipMailbox = _newMailbox;
+    address oldMailbox = address(ccipMailbox);
+    ccipMailbox = ICCIP(_newMailbox);
     emit CCIPMailboxUpdated(oldMailbox, _newMailbox);
   }
 
   function updatePolymerMailbox(
     address _newMailbox
   ) external onlyOwner {
-    address oldMailbox = polymerMailbox;
-    polymerMailbox = _newMailbox;
+    address oldMailbox = address(polymerMailbox);
+    polymerMailbox = IMailbox(_newMailbox);
     emit PolymerMailboxUpdated(oldMailbox, _newMailbox);
   }
 
@@ -281,9 +278,9 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   ) internal {
     receiver = IMessageReceiver(_receiver);
     polymerProver = IPolymer(_polymerProver);
-    hyperlaneMailbox = _hyperlaneMailbox;
-    ccipMailbox = _ccipMailbox;
-    polymerMailbox = _polymerMailbox;
+    hyperlaneMailbox = IMailbox(_hyperlaneMailbox);
+    ccipMailbox = ICCIP(_ccipMailbox);
+    polymerMailbox = IMailbox(_polymerMailbox);
     interchainSecurityModule = IInterchainSecurityModule(_interchainSecurityModule);
     __initializeGasTank(_owner);
   }
@@ -328,13 +325,13 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
       return keccak256(abi.encode(block.chainid, address(this), _selectorHash, _destDomain, _destGateway, _message));
     } else {
       uint256 mailboxId;
-      if (_mailbox == hyperlaneMailbox && hyperlaneMailbox != address(0)) {
+      if (_mailbox == address(hyperlaneMailbox) && hyperlaneMailbox != IMailbox(address(0))) {
         bytes memory _metadata = StandardHookMetadata.formatMetadata(0, _gasLimit, address(this), '');
-        _messageId = IMailbox(hyperlaneMailbox).dispatch{value: _value}(_destDomain, _destGateway, _message, _metadata);
-      } else if (_mailbox == polymerMailbox && polymerMailbox != address(0)) {
+        _messageId = hyperlaneMailbox.dispatch{value: _value}(_destDomain, _destGateway, _message, _metadata);
+      } else if (_mailbox == address(polymerMailbox) && polymerMailbox != IMailbox(address(0))) {
         bytes memory _metadata = StandardHookMetadata.formatMetadata(0, _gasLimit, address(this), '');
-        _messageId = IMailbox(polymerMailbox).dispatch(_destDomain, _destGateway, _message, _metadata);
-      } else if (_mailbox == ccipMailbox && ccipMailbox != address(0)) {
+        _messageId = polymerMailbox.dispatch(_destDomain, _destGateway, _message, _metadata);
+      } else if (_mailbox == address(ccipMailbox) && ccipMailbox != ICCIP(address(0))) {
         uint64 _destDomainCCIP = _convertToCCIPChainId(_destDomain);
         ICCIP.EVM2AnyMessage memory _evm2AnyMessage = ICCIP.EVM2AnyMessage({
           receiver: abi.encode(_destGateway),
@@ -345,7 +342,7 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
             GENERIC_EXTRA_ARGS_V2_TAG, (ICCIP.GenericExtraArgsV2({gasLimit: _gasLimit, allowOutOfOrderExecution: true}))
           )
         });
-        _messageId = ICCIP(ccipMailbox).ccipSend{value: _value}(_destDomainCCIP, _evm2AnyMessage);
+        _messageId = ccipMailbox.ccipSend{value: _value}(_destDomainCCIP, _evm2AnyMessage);
       } else {
         revert GatewayV3_SendMessage_UnsupportedMailbox();
       }

@@ -162,9 +162,9 @@ contract HubGatewayV3Test is Test, Mocker {
     assertEq(address(newGateway.receiver()), receiver);
     assertEq(address(newGateway.interchainSecurityModule()), interchainSecurityModule);
     assertEq(address(newGateway.polymerProver()), polymerProver);
-    assertEq(newGateway.hyperlaneMailbox(), hyperlaneMailbox);
-    assertEq(newGateway.ccipMailbox(), ccipMailbox);
-    assertEq(newGateway.polymerMailbox(), polymerMailbox);
+    assertEq(address(newGateway.hyperlaneMailbox()), hyperlaneMailbox);
+    assertEq(address(newGateway.ccipMailbox()), ccipMailbox);
+    assertEq(address(newGateway.polymerMailbox()), polymerMailbox);
     assertEq(newGateway.mailboxes(ETHEREUM), hyperlaneMailbox);
     assertEq(newGateway.mailboxes(ARBITRUM), ccipMailbox);
   }
@@ -205,9 +205,9 @@ contract HubGatewayV3Test is Test, Mocker {
     assertEq(address(gateway.receiver()), receiver);
     assertEq(address(gateway.interchainSecurityModule()), interchainSecurityModule);
     assertEq(address(gateway.polymerProver()), polymerProver);
-    assertEq(gateway.hyperlaneMailbox(), hyperlaneMailbox);
-    assertEq(gateway.ccipMailbox(), ccipMailbox);
-    assertEq(gateway.polymerMailbox(), polymerMailbox);
+    assertEq(address(gateway.hyperlaneMailbox()), hyperlaneMailbox);
+    assertEq(address(gateway.ccipMailbox()), ccipMailbox);
+    assertEq(address(gateway.polymerMailbox()), polymerMailbox);
 
     // Check mailboxes
     assertEq(gateway.mailboxes(ETHEREUM), hyperlaneMailbox);
@@ -237,7 +237,7 @@ contract HubGatewayV3Test is Test, Mocker {
     vm.prank(owner);
     gateway.updateHyperlaneMailbox(newMailbox);
 
-    assertEq(gateway.hyperlaneMailbox(), newMailbox);
+    assertEq(address(gateway.hyperlaneMailbox()), newMailbox);
   }
 
   function testRevert_hubGateway_updateHyperlaneMailbox_notOwner() public {
@@ -254,7 +254,7 @@ contract HubGatewayV3Test is Test, Mocker {
     vm.prank(owner);
     gateway.updateCCIPMailbox(newMailbox);
 
-    assertEq(gateway.ccipMailbox(), newMailbox);
+    assertEq(address(gateway.ccipMailbox()), newMailbox);
   }
 
   function testRevert_hubGateway_updateCCIPMailbox_notOwner() public {
@@ -271,7 +271,7 @@ contract HubGatewayV3Test is Test, Mocker {
     vm.prank(owner);
     gateway.updatePolymerMailbox(newMailbox);
 
-    assertEq(gateway.polymerMailbox(), newMailbox);
+    assertEq(address(gateway.polymerMailbox()), newMailbox);
   }
 
   function testRevert_hubGateway_updatePolymerMailbox_notOwner() public {
