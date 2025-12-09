@@ -26,6 +26,7 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   using TypeCasts for address;
 
   address public constant POLYMER_EMIT_MAILBOX = address(0x1);
+  uint256 public constant SOLANA_CCIP_ID = 124_615_329_519_749_607;
 
   // Tag to indicate a gas limit (or dest chain equivalent processing units) and Out Of Order Execution. This tag is
   // available for multiple chain families. If there is no chain family specific tag, this is the default available
@@ -41,13 +42,23 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
   /// @inheritdoc ISpecifiesInterchainSecurityModule
   IInterchainSecurityModule public interchainSecurityModule;
 
+  /// @notice Hyperlane mailbox contract
   IMailbox public hyperlaneMailbox;
 
+  /// @notice CCIP mailbox contract
   ICCIP public ccipMailbox;
 
+  /// @notice Polymer mailbox contract
   IMailbox public polymerMailbox;
 
+  /// @notice Polymer prover contract
   IPolymer public polymerProver;
+
+  /// @notice Solana accounts used for CCIP messages
+  uint64 public solanaBitmap;
+
+  /// @notice Solana accounts used for CCIP messages
+  bytes32[] public solanaAccounts;
 
   mapping(uint256 => uint256) public ecToCCIPChainId;
 
@@ -115,6 +126,22 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
     address oldProver = address(polymerProver);
     polymerProver = IPolymer(_newProver);
     emit PolymerProverUpdated(oldProver, _newProver);
+  }
+
+  function updateSolanaAccounts(
+    bytes32[] calldata _accounts
+  ) external onlyOwner {
+    bytes32[] memory oldAccounts = solanaAccounts;
+    solanaAccounts = _accounts;
+    emit SolanaAccountsUpdated(oldAccounts, _accounts);
+  }
+
+  function updateSolanaBitmap(
+    uint64 _accountIsWritableBitmap
+  ) external onlyOwner {
+    uint64 oldBitmap = solanaBitmap;
+    solanaBitmap = _accountIsWritableBitmap;
+    emit SolanaBitmapUpdated(oldBitmap, _accountIsWritableBitmap);
   }
 
   function setCCIPChainIdMappings(
@@ -333,15 +360,41 @@ abstract contract GatewayV3 is GasTank, IGatewayV3, IMessageRecipient, ISpecifie
         _messageId = polymerMailbox.dispatch(_destDomain, _destGateway, _message, _metadata);
       } else if (_mailbox == address(ccipMailbox) && ccipMailbox != ICCIP(address(0))) {
         uint64 _destDomainCCIP = _convertToCCIPChainId(_destDomain);
-        ICCIP.EVM2AnyMessage memory _evm2AnyMessage = ICCIP.EVM2AnyMessage({
-          receiver: abi.encode(_destGateway),
-          data: _message,
-          tokenAmounts: new ICCIP.EVMTokenAmount[](0),
-          feeToken: address(0),
-          extraArgs: abi.encodeWithSelector(
-            GENERIC_EXTRA_ARGS_V2_TAG, (ICCIP.GenericExtraArgsV2({gasLimit: _gasLimit, allowOutOfOrderExecution: true}))
-          )
-        });
+        ICCIP.EVM2AnyMessage memory _evm2AnyMessage;
+
+        // checking if destination is Solana or EVM
+        if (_destDomainCCIP == SOLANA_CCIP_ID) {
+          // Solana messsage construction implementation
+          uint32 computeUnits = uint32(_gasLimit); // rough estimate
+          _evm2AnyMessage = ICCIP.EVM2AnyMessage({
+            receiver: abi.encode(_destGateway),
+            data: _message,
+            tokenAmounts: new ICCIP.EVMTokenAmount[](0),
+            feeToken: address(0),
+            extraArgs: abi.encodeWithSelector(
+              SVM_EXTRA_ARGS_V1_TAG,
+              (ICCIP.SVMExtraArgsV1({
+                  computeUnits: computeUnits,
+                  accountIsWritableBitmap: solanaBitmap,
+                  allowOutOfOrderExecution: true,
+                  tokenReceiver: 0,
+                  accounts: solanaAccounts
+                }))
+            )
+          });
+        } else {
+          // EVM message construction implementation
+          _evm2AnyMessage = ICCIP.EVM2AnyMessage({
+            receiver: abi.encode(_destGateway),
+            data: _message,
+            tokenAmounts: new ICCIP.EVMTokenAmount[](0),
+            feeToken: address(0),
+            extraArgs: abi.encodeWithSelector(
+              GENERIC_EXTRA_ARGS_V2_TAG,
+              (ICCIP.GenericExtraArgsV2({gasLimit: _gasLimit, allowOutOfOrderExecution: true}))
+            )
+          });
+        }
         _messageId = ccipMailbox.ccipSend{value: _value}(_destDomainCCIP, _evm2AnyMessage);
       } else {
         revert GatewayV3_SendMessage_UnsupportedMailbox();

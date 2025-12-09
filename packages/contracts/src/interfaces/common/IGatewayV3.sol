@@ -61,6 +61,20 @@ interface IGatewayV3 {
   event PolymerProverUpdated(address _oldProver, address _newProver);
 
   /**
+   * @notice Emitted when the Solana accounts are updated
+   * @param _oldAccounts The old list of Solana accounts
+   * @param _newAccounts The new list of Solana accounts
+   */
+  event SolanaAccountsUpdated(bytes32[] _oldAccounts, bytes32[] _newAccounts);
+
+  /**
+   * @notice Emitted when the Solana bitmap is updated
+   * @param _oldBitmap The old Solana bitmap
+   * @param _newBitmap The new Solana bitmap
+   */
+  event SolanaBitmapUpdated(uint64 _oldBitmap, uint64 _newBitmap);
+
+  /**
    * @notice Emitted when the CCIP mappings are updated
    * @param _everclearId The Everclear chain ids
    * @param _ccipChainId The CCIP chain ids
@@ -167,6 +181,23 @@ interface IGatewayV3 {
    */
   function updateSecurityModule(
     address _securityModule
+  ) external;
+
+  /**
+   * @notice updates the Solana accounts used for CCIP messages
+   * @param _accounts The new Solana accounts
+   */
+  function updateSolanaAccounts(
+    bytes32[] calldata _accounts
+  ) external;
+
+  /**
+   * @notice updates the Solana bitmap used for CCIP messages
+   * @dev bitmask marking which of those accounts are writable by the program - ensure correct ordering and encode the bitmap properly
+   * @param _bitmap The new Solana bitmap
+   */
+  function updateSolanaBitmap(
+    uint64 _bitmap
   ) external;
 
   /*///////////////////////////////////////////////////////////////

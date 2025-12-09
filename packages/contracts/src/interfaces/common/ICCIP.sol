@@ -25,6 +25,11 @@ interface ICCIP {
     bytes extraArgs; // Populate this with _argsToBytes(EVMExtraArgsV2).
   }
 
+  /// @param computeUnits: compute units allowed for claling the ccip_receive instruction on the receiver program on SVM
+  /// @param accounts: an array of 32-byte Solana public keys representing additional accounts required for execution
+  /// @param accountIsWritableBitmap: a bitmap indicating which accounts in the `accounts` array are writable
+  /// @param allowOutOfOrderExecution: must be set to true for SVM as a destination chain
+  /// @param tokenReceiver: the Solana account that will initially receive tokens
   struct SVMExtraArgsV1 {
     uint32 computeUnits;
     uint64 accountIsWritableBitmap;
