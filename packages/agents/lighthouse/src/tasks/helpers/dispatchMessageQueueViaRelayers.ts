@@ -277,6 +277,83 @@ export const dispatchMessageQueueViaRelayers = async (
     }
   }
 
+  // Read messageGasLimit from contract and adjust maxDequeue to respect it
+  if (type === QueueType.Fill || type === QueueType.Intent) {
+    try {
+      const encodedMessageGasLimit = await chainservice.readTx(
+        {
+          to: everclear,
+          data: chainWrapper.encodeFunctionData({
+            abi: everclearAbi,
+            functionName: 'messageGasLimit',
+            args: [],
+          }),
+          domain: +transactionDomain,
+          funcSig: 'messageGasLimit()',
+        },
+        blockTag,
+      );
+      const messageGasLimitResult = chainWrapper.decodeFunctionResult({
+        abi: everclearAbi,
+        functionName: 'messageGasLimit',
+        data: encodedMessageGasLimit as `0x${string}`,
+      }) as unknown as bigint;
+      const contractMessageGasLimit = Number(messageGasLimitResult);
+
+      logger.info('Read messageGasLimit from contract', requestContext, methodContext, {
+        transactionDomain,
+        contractMessageGasLimit,
+        currentMaxDequeue: maxDequeue,
+      });
+
+      // Calculate max intents based on messageGasLimit constraint
+      // Formula: dynamicGasLimit = base + (intentCount - 1) * extraIntent
+      // We need: dynamicGasLimit <= messageGasLimit
+      // So: intentCount <= (messageGasLimit - base) / extraIntent + 1
+      const defaultMessageGasLimit = {
+        base: DEFAULT_BASE_MESSAGE_GAS_LIMIT,
+        extraIntent: DEFAULT_EXTRA_INTENT_MESSAGE_GAS_LIMIT,
+      };
+      const chainMessageGasLimit = chains[transactionDomain]?.messageGasLimit ?? defaultMessageGasLimit;
+      const base = chainMessageGasLimit.base;
+      const extraIntent = chainMessageGasLimit.extraIntent;
+
+      if (contractMessageGasLimit >= base && extraIntent > 0) {
+        const maxIntentsByGasLimit = Math.floor((contractMessageGasLimit - base) / extraIntent) + 1;
+        maxDequeue = Math.min(maxDequeue, maxIntentsByGasLimit);
+
+        logger.info('Adjusted maxDequeue based on messageGasLimit', requestContext, methodContext, {
+          transactionDomain,
+          contractMessageGasLimit,
+          base,
+          extraIntent,
+          maxIntentsByGasLimit,
+          adjustedMaxDequeue: maxDequeue,
+        });
+      } else {
+        logger.warn('Low gas limit params, using original maxDequeue', requestContext, methodContext, {
+          transactionDomain,
+          contractMessageGasLimit,
+          base,
+          extraIntent,
+        });
+      }
+    } catch (error) {
+      // Continue with original maxDequeue if we can't read the limit
+      logger.error(
+        'Failed to read messageGasLimit from contract, using original maxDequeue',
+        requestContext,
+        methodContext,
+        jsonifyError(error as Error),
+        {
+          transactionDomain,
+          everclear,
+          maxDequeue,
+        },
+      );
+    }
+  }
+
   const taskIds: Record<number, string> = {};
   for (let i = 0; i < totalIntents; i += maxDequeue) {
     const toDequeue = Math.min(maxDequeue, totalIntents - i);
