@@ -71,7 +71,7 @@ export class EthWallet implements ISigner {
   public async signMessage(message: Uint8Array | string): Promise<string> {
     let messageBytes: Uint8Array;
     if (typeof message === 'string') {
-      // Convert to UTF-8 bytes
+      // Convert hex string/UTF-8 string to bytes
       messageBytes = chainWrapper.toBytes(message);
     } else {
       // If it's already Uint8Array, use it directly

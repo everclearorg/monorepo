@@ -13,7 +13,9 @@ export class Web3Signer implements ISigner {
   }
 
   private static prepareEthereumSignedMessage(message: Uint8Array | string): Hex {
-    const messageBytes = typeof message === 'string' ? chainWrapper.stringToBytes(message) : message;
+    // Convert message to bytes, conversion method depends on the type of message,
+    // whether it is a hex string or utf-8 string, or use as is if it is already a byte array.
+    const messageBytes = typeof message === 'string' ? chainWrapper.toBytes(message) : message;
     const prefixBytes = chainWrapper.stringToBytes(Web3Signer.MESSAGE_PREFIX);
     const lengthBytes = chainWrapper.stringToBytes(messageBytes.length.toString());
     const ethMessage = chainWrapper.concat([prefixBytes, lengthBytes, messageBytes]) as Uint8Array;
