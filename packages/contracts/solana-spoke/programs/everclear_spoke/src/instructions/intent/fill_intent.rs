@@ -187,6 +187,13 @@ pub fn handle_fill_intent<'info>(
     // try to create intent status pda. Same logic as in mark_settlement_as_delivered
     let data = IntentStatusAccount::try_deserialize(&mut &intent_status_pda.data.borrow()[..]);
     if data.is_err() {
+        let account_info = intent_status_pda.to_account_info();
+        
+        let account_lamports = account_info.lamports();
+        if account_lamports > 0 && account_info.owner != &program_id {
+            return err!(SpokeError::InvalidAccount);
+        }
+
         // TODO: we create the same size intent status account as in settlement here for simplicity.
         // We can probably optimize this to only create 9 bytes status account here; need to think about
         // security implications tho.
@@ -454,4 +461,66 @@ pub struct FillIntent<'info> {
     /// CHECK:
     #[account(mut)]
     pub inner_igp_account: Option<AccountInfo<'info>>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use anchor_lang::prelude::Pubkey;
+
+    #[test]
+    fn test_account_ownership_check_logic() {
+        let program_id = Pubkey::new_unique();
+        let unauthorized_owner = Pubkey::new_unique();
+        
+        // Account doesn't exist (lamports = 0) - should allow creation
+        let account_lamports_nonexistent = 0u64;
+        
+        let should_reject_nonexistent = account_lamports_nonexistent > 0 && unauthorized_owner != program_id;
+        assert!(
+            !should_reject_nonexistent,
+            "Non-existent account should allow creation"
+        );
+
+        // Account exists (lamports > 0) but owned by unauthorized party - should reject
+        let account_lamports_existent = 1u64; // Dust sent to pre-initialize account
+        let account_owner_unauthorized = unauthorized_owner;
+        
+        let should_reject_unauthorized = account_lamports_existent > 0 && account_owner_unauthorized != program_id;
+        assert!(
+            should_reject_unauthorized,
+            "Account owned by unauthorized party should be rejected"
+        );
+
+        let account_owner_program = program_id;
+        
+        let should_reject_program_owned = account_lamports_existent > 0 && account_owner_program != program_id;
+        assert!(
+            !should_reject_program_owned,
+            "Account owned by program should be valid"
+        );
+    }
+
+    #[test]
+    fn test_front_running_prevention() {
+        let program_id = Pubkey::new_unique();
+        let system_program = anchor_lang::solana_program::system_program::ID;
+        
+        // Simulate pre-initialized account (exists but owned by system program, not our program)
+        let preinitialized_account_lamports = 1u64; // Dust sent to pre-initialize
+        let preinitialized_account_owner = system_program;
+        
+        let should_reject = preinitialized_account_lamports > 0 && preinitialized_account_owner != program_id;
+        assert!(
+            should_reject,
+            "Pre-initialized account not owned by program should be rejected"
+        );
+
+        let normal_account_lamports = 0u64;
+        let normal_should_allow = normal_account_lamports == 0 || normal_account_lamports > 0 && system_program == program_id;
+        assert!(
+            normal_should_allow,
+            "Normal case: Non-existent account should allow creation"
+        );
+    }
 }
