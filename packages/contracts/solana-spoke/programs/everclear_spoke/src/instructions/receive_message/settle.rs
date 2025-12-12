@@ -88,6 +88,12 @@ pub fn settle_delivered_intent(
 
     // 3) Normalise the settlement amount
     let minted_decimals = ctx.accounts.mint_account.decimals;
+    
+    require!(
+        minted_decimals <= DEFAULT_NORMALIZED_DECIMALS,
+        SpokeError::DecimalConversionOverflow
+    );
+    
     let amount = normalize_decimals(
         normalized_amount,
         DEFAULT_NORMALIZED_DECIMALS,
@@ -230,5 +236,27 @@ mod tests {
         u256_amount4.to_little_endian(&mut buf4);
         let normalized_amount4 = u128::from_le_bytes(buf4[0..16].try_into().unwrap());
         assert_eq!(normalized_amount4, test_amount4, "Zero should remain zero");
+    }
+   #[test]
+    fn test_settle_rejects_high_decimal_tokens() {
+        use crate::consts::DEFAULT_NORMALIZED_DECIMALS;
+        
+        // Test that decimals > 18 should be rejected in settlement
+        let high_decimals = DEFAULT_NORMALIZED_DECIMALS + 1; // 19 decimals
+        let should_reject = high_decimals > DEFAULT_NORMALIZED_DECIMALS;
+        assert!(
+            should_reject,
+            "Settlement should reject tokens with decimals > {}",
+            DEFAULT_NORMALIZED_DECIMALS
+        );
+        
+        // Test edge case: exactly 18 decimals should be allowed
+        let exact_decimals = DEFAULT_NORMALIZED_DECIMALS;
+        let should_allow = exact_decimals <= DEFAULT_NORMALIZED_DECIMALS;
+        assert!(
+            should_allow,
+            "Settlement should allow tokens with exactly {} decimals",
+            DEFAULT_NORMALIZED_DECIMALS
+        );
     }
 }

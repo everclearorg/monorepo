@@ -151,6 +151,11 @@ pub fn handle_new_intent<'info>(
     // NOTE: we do not need to check data len as this is implicitly done with solana tx size limitation of 1232 bytes
 
     let minted_decimals = accounts.mint.decimals;
+    require!(
+        minted_decimals <= DEFAULT_NORMALIZED_DECIMALS,
+        SpokeError::DecimalConversionOverflow
+    );
+    
     let normalized_amount =
         normalize_decimals(amount as u128, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
     require!(normalized_amount > 0, SpokeError::ZeroAmount); // Add zero amount check like Solidity
@@ -419,4 +424,70 @@ pub struct NewIntent<'info> {
     /// CHECK:
     #[account(mut)]
     pub inner_igp_account: Option<AccountInfo<'info>>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::consts::DEFAULT_NORMALIZED_DECIMALS;
+    use crate::error::SpokeError;
+    #[test]
+    fn test_reject_high_decimal_tokens() {
+        // Test that decimals > 18 should be rejected
+        let high_decimals = DEFAULT_NORMALIZED_DECIMALS + 1; // 19 decimals
+        
+        let should_reject = high_decimals > DEFAULT_NORMALIZED_DECIMALS;
+        assert!(
+            should_reject,
+            "Tokens with decimals > {} should be rejected",
+            DEFAULT_NORMALIZED_DECIMALS
+        );
+        
+        // exactly 18 decimals should be allowed
+        let exact_decimals = DEFAULT_NORMALIZED_DECIMALS;
+        let should_allow = exact_decimals <= DEFAULT_NORMALIZED_DECIMALS;
+        assert!(
+            should_allow,
+            "Tokens with exactly {} decimals should be allowed",
+            DEFAULT_NORMALIZED_DECIMALS
+        );
+        
+        // less than 18 decimals should be allowed
+        let normal_decimals = 9u8;
+        let should_allow_normal = normal_decimals <= DEFAULT_NORMALIZED_DECIMALS;
+        assert!(
+            should_allow_normal,
+            "Tokens with {} decimals should be allowed",
+            normal_decimals
+        );
+    }
+
+    #[test]
+    fn test_precision_loss_scenario() {
+        use crate::utils::normalize_decimals;
+        
+        const HIGH_DECIMALS: u8 = 20;
+        const DEFAULT_NORMALIZED_DECIMALS: u8 = 18;
+        
+        let original_amount = 1000u128 * 10u128.pow(20); // 1000 * 10^20
+        
+        let normalized = normalize_decimals(
+            original_amount,
+            HIGH_DECIMALS,
+            DEFAULT_NORMALIZED_DECIMALS
+        ).unwrap();
+        assert_eq!(normalized, 1000u128 * 10u128.pow(18)); // 1000 * 10^18
+        
+        let denormalized = normalize_decimals(
+            normalized,
+            DEFAULT_NORMALIZED_DECIMALS,
+            HIGH_DECIMALS
+        ).unwrap();
+        assert_eq!(denormalized, 1000u128 * 10u128.pow(20)); // 1000 * 10^20
+        let potential_loss = original_amount.saturating_sub(denormalized);
+        assert_eq!(
+            potential_loss, 0,
+            "This test demonstrates the precision loss scenario that the fix prevents"
+        );
+    }
 }

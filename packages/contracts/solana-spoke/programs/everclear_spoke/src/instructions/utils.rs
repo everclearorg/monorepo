@@ -141,4 +141,38 @@ mod tests {
             "8200900c8aa6b771a0cc3a6936d9313bfb9721f2506d4e6b884813c7f50db86e"
         );
     }
+    #[test]
+    fn test_precision_loss_high_decimal_tokens() {
+        const DEFAULT_NORMALIZED_DECIMALS: u8 = 18;
+        
+        let minted_decimals = 20u8;
+        let original_amount = 1000u128 * 10u128.pow(20);
+        
+        let normalized = normalize_decimals(original_amount, minted_decimals, DEFAULT_NORMALIZED_DECIMALS).unwrap();
+        assert_eq!(normalized, 1000u128 * 10u128.pow(18));
+        
+        let denormalized = normalize_decimals(normalized, DEFAULT_NORMALIZED_DECIMALS, minted_decimals).unwrap();
+        assert_eq!(denormalized, 1000u128 * 10u128.pow(20));
+        let precision_loss = original_amount.saturating_sub(denormalized);
+        assert_eq!(precision_loss, 0, "With proper handling, there should be no precision loss");
+    }
+
+    #[test]
+    fn test_normalize_decimals_within_limit() {
+        const DEFAULT_NORMALIZED_DECIMALS: u8 = 18;
+        
+        // Test with 18 decimals (equal to limit)
+        let amount_18 = 1000_000_000_000_000_000_000u128; // 1000 tokens with 18 decimals
+        let normalized_18 = normalize_decimals(amount_18, 18, DEFAULT_NORMALIZED_DECIMALS).unwrap();
+        assert_eq!(normalized_18, amount_18, "18 decimals should normalize to itself");
+        
+        // Test with 9 decimals (less than limit)
+        let amount_9 = 1000_000_000_000u128; // 1000 tokens with 9 decimals
+        let normalized_9 = normalize_decimals(amount_9, 9, DEFAULT_NORMALIZED_DECIMALS).unwrap();
+        assert_eq!(normalized_9, 1000_000_000_000_000_000_000u128, "9 decimals should upscale to 18");
+        
+        // Denormalize back
+        let denormalized_9 = normalize_decimals(normalized_9, DEFAULT_NORMALIZED_DECIMALS, 9).unwrap();
+        assert_eq!(denormalized_9, amount_9, "Should round-trip correctly");
+    }
 }
