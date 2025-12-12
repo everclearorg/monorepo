@@ -177,15 +177,13 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
             + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
         let __anchor_rent = Rent::get()?;
-        let lamports = __anchor_rent.minimum_balance(space);
-        let inst = anchor_lang::solana_program::system_instruction::create_account(
-            &ctx.accounts.pda_payer.key(),
-            &intent_status_pda.key(),
-            lamports,
-            space as u64,
-            ctx.program_id,
-        );
-
+        let required_lamports = __anchor_rent.minimum_balance(space);
+        
+        let account_info = intent_status_pda.to_account_info();
+        let existing_lamports = account_info.lamports();
+        let account_owner = account_info.owner;
+        let system_program = anchor_lang::solana_program::system_program::ID;
+        
         let payer_seed = &[
             "everclear_spoke".as_bytes(),
             "-".as_bytes(),
@@ -193,17 +191,65 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
         ];
         let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
 
-        invoke_signed(
-            &inst,
-            &[
-                ctx.accounts.pda_payer.to_account_info(),
-                intent_status_pda.to_account_info(),
-            ],
-            &[
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
-            ],
-        )?;
+        if existing_lamports == 0 {
+            let create_transfer_ix = anchor_lang::solana_program::system_instruction::transfer(
+                &ctx.accounts.pda_payer.key(),
+                &intent_status_pda.key(),
+                1, // Minimum to create account
+            );
+            
+            anchor_lang::solana_program::program::invoke_signed(
+                &create_transfer_ix,
+                &[
+                    ctx.accounts.pda_payer.to_account_info(),
+                    intent_status_pda.to_account_info(),
+                ],
+                &[&[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]]],
+            )?;
+        }
+        
+        if account_owner == &system_program {
+            let allocate_ix = anchor_lang::solana_program::system_instruction::allocate(
+                &intent_status_pda.key(),
+                space as u64,
+            );
+            
+            invoke_signed(
+                &allocate_ix,
+                &[intent_status_pda.to_account_info()],
+                &[intent_status_pda_seeds!(settlement.intent_id, intent_status_bump)],
+            )?;
+
+            let assign_ix = anchor_lang::solana_program::system_instruction::assign(
+                &intent_status_pda.key(),
+                ctx.program_id,
+            );
+            
+            invoke_signed(
+                &assign_ix,
+                &[intent_status_pda.to_account_info()],
+                &[intent_status_pda_seeds!(settlement.intent_id, intent_status_bump)],
+            )?;
+        }
+
+        let current_lamports = intent_status_pda.to_account_info().lamports();
+        if current_lamports < required_lamports {
+            let transfer_lamports = required_lamports - current_lamports;
+            let transfer_ix = anchor_lang::solana_program::system_instruction::transfer(
+                &ctx.accounts.pda_payer.key(),
+                &intent_status_pda.key(),
+                transfer_lamports,
+            );
+            
+            invoke_signed(
+                &transfer_ix,
+                &[
+                    ctx.accounts.pda_payer.to_account_info(),
+                    intent_status_pda.to_account_info(),
+                ],
+                &[&[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]]],
+            )?;
+        }
     } else {
         // the account is created beforehand
         let pda_data = data.unwrap();

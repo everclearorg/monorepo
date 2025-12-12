@@ -187,13 +187,6 @@ pub fn handle_fill_intent<'info>(
     // try to create intent status pda. Same logic as in mark_settlement_as_delivered
     let data = IntentStatusAccount::try_deserialize(&mut &intent_status_pda.data.borrow()[..]);
     if data.is_err() {
-        let account_info = intent_status_pda.to_account_info();
-        
-        let account_lamports = account_info.lamports();
-        if account_lamports > 0 && account_info.owner != &program_id {
-            return err!(SpokeError::InvalidAccount);
-        }
-
         // TODO: we create the same size intent status account as in settlement here for simplicity.
         // We can probably optimize this to only create 9 bytes status account here; need to think about
         // security implications tho.
@@ -202,15 +195,12 @@ pub fn handle_fill_intent<'info>(
             + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
         let __anchor_rent = Rent::get()?;
-        let lamports = __anchor_rent.minimum_balance(space);
-        let inst = anchor_lang::solana_program::system_instruction::create_account(
-            &accounts.pda_payer.key(),
-            &intent_status_pda.key(),
-            lamports,
-            space as u64,
-            &program_id,
-        );
-
+        let required_lamports = __anchor_rent.minimum_balance(space);
+        
+        let account_info = intent_status_pda.to_account_info();
+        let existing_lamports = account_info.lamports();
+        let account_owner = account_info.owner;
+        let system_program = anchor_lang::solana_program::system_program::ID;
         let payer_seed = &[
             "everclear_spoke".as_bytes(),
             "-".as_bytes(),
@@ -218,17 +208,65 @@ pub fn handle_fill_intent<'info>(
         ];
         let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, &program_id);
 
-        invoke_signed(
-            &inst,
-            &[
-                accounts.pda_payer.clone(),
-                intent_status_pda.to_account_info(),
-            ],
-            &[
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                intent_status_pda_seeds!(intent_id, intent_status_bump),
-            ],
-        )?;
+        if existing_lamports == 0 {
+            let create_transfer_ix = anchor_lang::solana_program::system_instruction::transfer(
+                &accounts.pda_payer.key(),
+                &intent_status_pda.key(),
+                1, // Minimum to create account
+            );
+            
+            anchor_lang::solana_program::program::invoke_signed(
+                &create_transfer_ix,
+                &[
+                    accounts.pda_payer.clone(),
+                    intent_status_pda.to_account_info(),
+                ],
+                &[&[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]]],
+            )?;
+        }
+        
+        if account_owner == &system_program {
+            let allocate_ix = anchor_lang::solana_program::system_instruction::allocate(
+                &intent_status_pda.key(),
+                space as u64,
+            );
+            
+            invoke_signed(
+                &allocate_ix,
+                &[intent_status_pda.to_account_info()],
+                &[intent_status_pda_seeds!(intent_id, intent_status_bump)],
+            )?;
+
+            let assign_ix = anchor_lang::solana_program::system_instruction::assign(
+                &intent_status_pda.key(),
+                &program_id,
+            );
+            
+            invoke_signed(
+                &assign_ix,
+                &[intent_status_pda.to_account_info()],
+                &[intent_status_pda_seeds!(intent_id, intent_status_bump)],
+            )?;
+        }
+
+        let current_lamports = intent_status_pda.to_account_info().lamports();
+        if current_lamports < required_lamports {
+            let transfer_lamports = required_lamports - current_lamports;
+            let transfer_ix = anchor_lang::solana_program::system_instruction::transfer(
+                &accounts.pda_payer.key(),
+                &intent_status_pda.key(),
+                transfer_lamports,
+            );
+            
+            invoke_signed(
+                &transfer_ix,
+                &[
+                    accounts.pda_payer.clone(),
+                    intent_status_pda.to_account_info(),
+                ],
+                &[&[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]]],
+            )?;
+        }
     } else {
         // the account is created beforehand, need to check status
         let pda_data = data.unwrap();
@@ -469,58 +507,56 @@ mod tests {
     use anchor_lang::prelude::Pubkey;
 
     #[test]
-    fn test_account_ownership_check_logic() {
+    fn test_account_claim_logic() {
         let program_id = Pubkey::new_unique();
-        let unauthorized_owner = Pubkey::new_unique();
+        let system_program = anchor_lang::solana_program::system_program::ID;
         
-        // Account doesn't exist (lamports = 0) - should allow creation
+        // Account doesn't exist (lamports = 0) - should transfer 1 lamport first, then allocate + assign
         let account_lamports_nonexistent = 0u64;
-        
-        let should_reject_nonexistent = account_lamports_nonexistent > 0 && unauthorized_owner != program_id;
+        let should_transfer_first = account_lamports_nonexistent == 0;
         assert!(
-            !should_reject_nonexistent,
-            "Non-existent account should allow creation"
+            should_transfer_first,
+            "Non-existent account should trigger initial lamport transfer"
         );
 
-        // Account exists (lamports > 0) but owned by unauthorized party - should reject
-        let account_lamports_existent = 1u64; // Dust sent to pre-initialize account
-        let account_owner_unauthorized = unauthorized_owner;
-        
-        let should_reject_unauthorized = account_lamports_existent > 0 && account_owner_unauthorized != program_id;
+        // Account exists with dust (lamports > 0) and owned by system program - should allocate + assign (claim it)
+        let account_lamports_with_dust = 1u64; // Dust sent to pre-initialize
+        let account_owner_system = system_program;
+        let should_allocate_assign = account_lamports_with_dust > 0 && account_owner_system == system_program;
         assert!(
-            should_reject_unauthorized,
-            "Account owned by unauthorized party should be rejected"
+            should_allocate_assign,
+            "Account with dust owned by system program should be claimable via allocate + assign"
         );
 
+        // Account already owned by our program - should skip allocate/assign, just transfer lamports if needed
         let account_owner_program = program_id;
-        
-        let should_reject_program_owned = account_lamports_existent > 0 && account_owner_program != program_id;
+        let should_skip_allocate = account_owner_program == program_id;
         assert!(
-            !should_reject_program_owned,
-            "Account owned by program should be valid"
+            should_skip_allocate,
+            "Account already owned by program should skip allocate/assign"
         );
     }
 
     #[test]
-    fn test_front_running_prevention() {
+    fn test_front_running_mitigation() {
         let program_id = Pubkey::new_unique();
         let system_program = anchor_lang::solana_program::system_program::ID;
         
-        // Simulate pre-initialized account (exists but owned by system program, not our program)
+        // Simulate pre-initialized account (exists with dust, owned by system program)
         let preinitialized_account_lamports = 1u64; // Dust sent to pre-initialize
         let preinitialized_account_owner = system_program;
         
-        let should_reject = preinitialized_account_lamports > 0 && preinitialized_account_owner != program_id;
+        let can_claim = preinitialized_account_lamports > 0 && preinitialized_account_owner == system_program;
         assert!(
-            should_reject,
-            "Pre-initialized account not owned by program should be rejected"
+            can_claim,
+            "Pre-initialized account owned by system program should be claimable, not rejected"
         );
 
         let normal_account_lamports = 0u64;
-        let normal_should_allow = normal_account_lamports == 0 || normal_account_lamports > 0 && system_program == program_id;
+        let should_transfer_first = normal_account_lamports == 0;
         assert!(
-            normal_should_allow,
-            "Normal case: Non-existent account should allow creation"
+            should_transfer_first,
+            "Normal case: Non-existent account should trigger initial lamport transfer"
         );
     }
 }
