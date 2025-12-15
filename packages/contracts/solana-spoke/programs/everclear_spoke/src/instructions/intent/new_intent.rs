@@ -90,7 +90,7 @@ pub fn new_intent(
     };
 
     if !ctx.accounts.fee_adapter_state.paused {
-        handle_fees(fee_data, fee_param.signature, fee_accounts)?;
+        handle_fees(fee_data, fee_param.signature, fee_accounts, &program_id)?;
     }
 
     let event = handle_new_intent(

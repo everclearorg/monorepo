@@ -3,7 +3,7 @@ use anchor_spl::token;
 
 use crate::error::SpokeError;
 
-use super::signature::verify_signature;
+use super::signature::{verify_signature, FEE_DATA_TYPE_HASH_PREFIX, BATCH_FEE_DATA_TYPE_HASH_PREFIX};
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct FeeParams {
@@ -54,8 +54,19 @@ pub struct HandleFeeAccounts<'info> {
 }
 
 /// NOTE: the account is expected to be validated before the function invoke
-pub fn handle_fees(fee: FeeData, signature: Vec<u8>, accounts: HandleFeeAccounts) -> Result<()> {
-    verify_signature(&fee, signature, accounts.signature_accounts)?;
+pub fn handle_fees(
+    fee: FeeData,
+    signature: Vec<u8>,
+    accounts: HandleFeeAccounts,
+    program_id: &Pubkey,
+) -> Result<()> {
+    verify_signature(
+        &fee,
+        signature,
+        accounts.signature_accounts,
+        program_id,
+        FEE_DATA_TYPE_HASH_PREFIX,
+    )?;
 
     let clock = Clock::get()?;
     let current_timestamp = clock.unix_timestamp;
@@ -91,8 +102,20 @@ pub fn handle_fees(fee: FeeData, signature: Vec<u8>, accounts: HandleFeeAccounts
 
 
 /// NOTE: the account is expected to be validated before the function invoke
-pub fn handle_batch_fees(fee: BatchFeeData, signature: Vec<u8>, accounts: HandleFeeAccounts) -> Result<()> {
-    verify_signature(&fee, signature, accounts.signature_accounts)?;
+pub fn handle_batch_fees(
+    fee: BatchFeeData,
+    signature: Vec<u8>,
+    accounts: HandleFeeAccounts,
+    program_id: &Pubkey,
+) -> Result<()> {
+
+    verify_signature(
+        &fee,
+        signature,
+        accounts.signature_accounts,
+        program_id,
+        BATCH_FEE_DATA_TYPE_HASH_PREFIX,
+    )?;
 
     let clock = Clock::get()?;
     let current_timestamp = clock.unix_timestamp;

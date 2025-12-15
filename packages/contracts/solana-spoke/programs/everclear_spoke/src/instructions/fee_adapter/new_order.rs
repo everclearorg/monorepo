@@ -73,7 +73,7 @@ pub fn new_order(
         system_program: ctx.accounts.system_program.to_account_info(),
     };
 
-    handle_batch_fees(fee_data_for_signature, fee_param.signature, fee_accounts)?;
+    handle_batch_fees(fee_data_for_signature, fee_param.signature, fee_accounts, &program_id)?;
 
     let mut intent_ids: Vec<[u8; 32]> = Vec::with_capacity(params.len());
     for p in &params {

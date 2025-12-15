@@ -2,7 +2,7 @@ use anchor_lang::solana_program::sysvar::instructions::ID as SYSVAR_INSTRUCTIONS
 use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
-use crate::instructions::signature::verify_signature;
+use crate::instructions::fee_adapter::signature::{verify_signature, FILL_SIGN_PARAMS_TYPE_HASH_PREFIX};
 use crate::instructions::SignatureAccounts;
 use crate::intent::encode_full;
 use crate::{
@@ -113,7 +113,13 @@ pub fn fill_intent(
         signer: ctx.accounts.signer.clone(),
         instruction_sysvar: ctx.accounts.instruction_sysvar.clone(),
     };
-    verify_signature(&sign_params, signature, signature_accounts)?;
+    verify_signature(
+        &sign_params,
+        signature,
+        signature_accounts,
+        &program_id,
+        FILL_SIGN_PARAMS_TYPE_HASH_PREFIX,
+    )?;
 
     let event_data: IntentFilledEvent = handle_fill_intent(
         &mut accounts,
