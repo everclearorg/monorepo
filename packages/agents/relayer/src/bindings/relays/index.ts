@@ -6,14 +6,18 @@ import {
   RelayerTaskStatus,
   sendHeartbeat,
   getNtpTimeSeconds,
+  chainWrapper,
+  type PublicClient,
 } from '@chimera-monorepo/utils';
 import interval from 'interval-promise';
 import { CachedTaskData } from '@chimera-monorepo/adapters-cache';
 import { FastifyInstance, FastifyReply } from 'fastify';
 
 import { getContext } from '../../make';
-import { WriteTransaction } from '@chimera-monorepo/chainservice';
+import { getVmFromDomainId, WriteTransaction } from '@chimera-monorepo/chainservice';
 import { getFastifyInstance } from '../../mockable';
+import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
+import { SupportedVms } from '@chimera-monorepo/chainservice/src/shared/rpc';
 
 export const MIN_GAS_LIMIT = BigInt(4_000_000);
 export const MIN_HEART_INTERVAL_SECONDS = 60; // 1min
@@ -78,6 +82,25 @@ export const pollCache = async () => {
     const domain = chainIdToDomain(chain)!;
 
     const _provider = await chainservice.getProvider(domain);
+
+    if (getVmFromDomainId(domain) === SupportedVms.evm) {
+      // Set up Web3Signer for this chain.
+      const rpcUrls = config.chains[domain].providers;
+      const transport =
+        rpcUrls.length > 1
+          ? chainWrapper.fallback(
+              rpcUrls.map((url) => chainWrapper.http(url)),
+              { rank: true },
+            )
+          : chainWrapper.http(rpcUrls[0]);
+      const client = chainWrapper.createPublicClient({
+        transport,
+        batch: {
+          multicall: true,
+        },
+      }) as PublicClient;
+      (wallet as Web3Signer).connect(client);
+    }
 
     for (const task of tasksByChain[chain]) {
       // TODO: Sanity check: should have enough balance to pay for gas on the specified chain.
