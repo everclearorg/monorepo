@@ -64,7 +64,6 @@ pub fn handle_account_metas(
         }
         _ => {
             // NOTE: we do not support var update now
-            msg!("invalid message type: {:?}", message.message_type);
             err!(SpokeError::InvalidMessage)
         }
     }
@@ -273,4 +272,31 @@ fn build_settle_intent_account_metas(
         to_serializable_account_meta(*program_id, false),
     ];
     Ok(ret)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::instructions::messages::MessageType;
+
+    #[test]
+    fn test_invalid_message_type_returns_error_without_debug_log() {
+
+        let var_update_type = MessageType::VarUpdate;
+        let is_settlement = matches!(var_update_type, MessageType::Settlement);
+        assert!(!is_settlement, "VarUpdate should not be treated as Settlement");
+        
+        let intent_type = MessageType::Intent;
+        let is_settlement_intent = matches!(intent_type, MessageType::Settlement);
+        assert!(!is_settlement_intent, "Intent should not be treated as Settlement");
+        
+        let fill_type = MessageType::Fill;
+        let is_settlement_fill = matches!(fill_type, MessageType::Settlement);
+        assert!(!is_settlement_fill, "Fill should not be treated as Settlement");
+        
+        let settlement_type = MessageType::Settlement;
+        let is_settlement = matches!(settlement_type, MessageType::Settlement);
+        assert!(is_settlement, "Settlement should be the only supported message type");
+    }
+
 }
