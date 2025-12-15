@@ -9,7 +9,6 @@ import {
   expect,
   mkAddress,
 } from '../../src';
-import { utils } from 'ethers';
 
 const MOCK_CHAINS = {
   '1337': {
@@ -95,7 +94,7 @@ describe('Helpers:assets', () => {
       const tickers = [ticker];
       const hashes = getTickerHashes(tickers);
       expect(hashes.length).to.be.eq(tickers.length);
-      expect(utils.isHexString(hashes[0])).to.be.true;
+      expect(hashes[0]).to.match(/^0x[a-fA-F0-9]{64}$/);
     });
   });
 });

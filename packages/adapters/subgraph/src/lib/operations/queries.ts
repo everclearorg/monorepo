@@ -430,3 +430,89 @@ export const getOrdersByNonce = (
     }
   `;
 };
+
+export const ENVIO_INTENT_ENTITY = `
+  id
+  intentId
+  queueIdx
+  initiator
+  receiver
+  inputAsset
+  outputAsset
+  maxFee
+  amountOutMin
+  origin
+  nonce
+  timestamp
+  ttl
+  originAmount
+  destinations
+  data
+  chainId
+  blockNumber
+  blockTimestamp
+  transactionHash
+  sender
+  receiveBlockNumber
+  isFastPath
+  tokenFee
+  nativeFee
+  status
+  fills {
+    id
+    intentId
+    solver
+    totalFeeDBPS
+    queueIdx
+    initiator
+    receiver
+    inputAsset
+    outputAsset
+    maxFee
+    origin
+    nonce
+    timestamp
+    ttl
+    originAmount
+    fillAmount
+    destinations
+    data
+    chainId
+    blockNumber
+    blockTimestamp
+    transactionHash
+  }
+`;
+
+/**
+ * Get intents query for Envio
+ * @param orderBy - Field to order by (default: blockTimestamp)
+ * @param orderDirection - Order direction (default: desc)
+ */
+export const getEnvioIntentsQuery = (
+  orderBy: string = 'blockTimestamp',
+  orderDirection: 'asc' | 'desc' = 'desc',
+): string => {
+  return `
+    query GetIntents($where: Intent_bool_exp!, $limit: Int, $offset: Int, $orderBy: [Intent_order_by!]) {
+      Intent(
+        where: $where
+        order_by: $orderBy
+        limit: $limit
+        offset: $offset
+      ) {
+        ${ENVIO_INTENT_ENTITY}
+      }
+    }
+  `;
+};
+
+export const getEnvioIntentByIdQuery = (): string => {
+  return `
+    query GetIntentById($intentId: String!) {
+      Intent(where: { intentId: { _eq: $intentId } }) {
+        ${ENVIO_INTENT_ENTITY}
+      }
+    }
+  `;
+};

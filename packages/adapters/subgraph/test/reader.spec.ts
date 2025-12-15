@@ -1,443 +1,389 @@
-import { SinonStub, stub } from 'sinon';
-import { expect, mkAddress, mkBytes32, mkHash, TIntentStatus } from '@chimera-monorepo/utils';
-import { SubgraphQueryMetaParams, SubgraphReader } from '../src';
+import { stub, restore, createStubInstance, SinonStubbedInstance } from 'sinon';
+import { expect, mkBytes32, OriginIntent, DestinationIntent } from '@chimera-monorepo/utils';
+import { SubgraphReader, SubgraphQueryMetaParams } from '../src';
+import { GraphReader } from '../src/graph';
+import { EnvioReader } from '../src/envio';
 
-import * as Helpers from '../src/lib/helpers';
-import * as parser from '../src/lib/helpers/parse';
-import { DomainInvalid, RuntimeError } from '../src/lib/errors';
-import {
-  createDepositorEventEntity,
-  createMeta,
-  createSpokeAddIntentEventEntity,
-  createSpokeFillIntentEventEntity,
-  createTokensEntity,
-  createIntentSettlementEventEntity,
-  createHubAddIntentEventEntity,
-} from './mock';
-import {
-  DepositEnqueuedEventEntity,
-  DepositProcessedEventEntity,
-  DepositQueueEntity,
-  MessageEntity,
-  MessageType,
-  SettlementMessageEntity,
-  SettlementMessageType,
-  SettlementQueueEntity,
-  SpokeQueueEntity,
-} from '../src/lib/operations/entities';
-import { createHubIntent, createHubInvoice } from '@chimera-monorepo/database/test/mock';
-
-describe('SubgraphReader', () => {
+describe('SubgraphReader (Composite)', () => {
   const domain = '1337';
   const domains = [domain];
   const subgraphs = Object.fromEntries(
     domains.map((domain) => [domain, { endpoints: [`http://localhost:${domain}/graphql`], timeout: 1 }]),
   );
-  let execute: SinonStub;
+  const envioConfig = {
+    url: 'https://envio.example.com/graphql',
+    apiKey: 'test-key',
+    timeout: 10,
+  };
+  const config = {
+    subgraphs,
+    envio: envioConfig,
+  };
+
+  let graphReader: SinonStubbedInstance<GraphReader>;
+  let envioReader: SinonStubbedInstance<EnvioReader>;
   let reader: SubgraphReader;
 
   beforeEach(() => {
-    execute = stub();
-    stub(Helpers, 'getHelpers').returns({
-      execute,
-      parser,
-    });
+    // Restore any existing stubs to ensure a clean state
+    restore();
 
-    reader = SubgraphReader.create({ subgraphs });
+    // Create stub instances of both readers
+    graphReader = createStubInstance(GraphReader);
+    envioReader = createStubInstance(EnvioReader);
+
+    // Stub the create methods to return our stub instances
+    stub(GraphReader, 'create').returns(graphReader as any);
+    stub(EnvioReader, 'create').returns(envioReader as any);
+
+    reader = SubgraphReader.create(config);
+  });
+
+  afterEach(() => {
+    // Reset singleton instance
+    (SubgraphReader as any).instance = undefined;
   });
 
   describe('#create', () => {
     it('should create a new instance', () => {
       expect(reader).to.be.instanceOf(SubgraphReader);
     });
-  });
 
-  describe('#query', () => {
-    it('should throw if the domain is not configured', async () => {
-      await expect(reader.query('1339', ['query'])).to.be.rejectedWith(DomainInvalid);
+    it('should return the same instance on subsequent calls', () => {
+      const reader2 = SubgraphReader.create(config);
+      expect(reader).to.equal(reader2);
     });
 
-    it('should handle errors', async () => {
-      execute.rejects(new Error('error'));
-      await expect(reader.query(domain, ['query'])).to.be.rejectedWith(RuntimeError);
-    });
-
-    it('should work', async () => {
-      const data = 'data';
-      execute.resolves(data);
-      const result = await reader.query(domain, ['query']);
-      expect(result).to.be.deep.eq({ data, domain });
+    it('should create both GraphReader and EnvioReader instances', () => {
+      expect(GraphReader.create).to.have.been.calledOnce;
+      expect(EnvioReader.create).to.have.been.calledOnce;
     });
   });
 
   describe('#getLatestBlockNumber', () => {
-    beforeEach(() => {
-      execute.resolves(createMeta());
+    it('should merge results from both readers and prefer higher block numbers', async () => {
+      const graphMap = new Map<string, number>([['1337', 100]]);
+      const envioMap = new Map<string, number>([['1337', 150]]);
+
+      graphReader.getLatestBlockNumber.resolves(graphMap);
+      envioReader.getLatestBlockNumber.resolves(envioMap);
+
+      const result = await reader.getLatestBlockNumber(domains);
+      expect(result.get('1337')).to.be.eq(150); // Should prefer higher block number
+      expect(graphReader.getLatestBlockNumber).to.have.been.calledOnce;
+      expect(envioReader.getLatestBlockNumber).to.have.been.calledOnce;
     });
 
-    it('should work', async () => {
+    it('should handle errors gracefully and use available results', async () => {
+      const graphMap = new Map<string, number>([['1337', 100]]);
+      graphReader.getLatestBlockNumber.resolves(graphMap);
+      envioReader.getLatestBlockNumber.rejects(new Error('error'));
+
       const result = await reader.getLatestBlockNumber(domains);
-      expect(result.get(domain)).to.be.eq(123);
-      expect([...result.keys()]).to.be.deep.eq(domains);
+      expect(result.get('1337')).to.be.eq(100);
     });
 
-    it('should gracefully handle errors', async () => {
-      execute.rejects(new Error('error'));
+    it('should return empty map if both readers fail', async () => {
+      graphReader.getLatestBlockNumber.rejects(new Error('error'));
+      envioReader.getLatestBlockNumber.rejects(new Error('error'));
+
       const result = await reader.getLatestBlockNumber(domains);
-      expect(result.get(domain)).to.be.undefined;
-      expect([...result.keys()]).to.be.deep.eq([]);
+      expect(result.size).to.be.eq(0);
     });
   });
 
   describe('#getOriginIntentById', () => {
-    const intent = createSpokeAddIntentEventEntity();
+    it('should prefer GraphReader result over EnvioReader', async () => {
+      const graphIntent: OriginIntent = {
+        id: mkBytes32('0x1'),
+        origin: '1337',
+      } as OriginIntent;
+      const envioIntent: OriginIntent = {
+        id: mkBytes32('0x1'),
+        origin: '1337',
+      } as OriginIntent;
 
-    beforeEach(async () => {
-      execute.resolves({ ...createMeta(), intentAddEvents: [intent] });
+      graphReader.getOriginIntentById.resolves(graphIntent);
+      envioReader.getOriginIntentById.resolves(envioIntent);
+
+      const result = await reader.getOriginIntentById(domain, mkBytes32('0x1'));
+      expect(result).to.equal(graphIntent); // Should prefer GraphReader
+      expect(graphReader.getOriginIntentById).to.have.been.calledOnce;
+      expect(envioReader.getOriginIntentById).to.have.been.calledOnce;
     });
 
-    it('should work', async () => {
-      const result = await reader.getOriginIntentById('1337', intent.id);
-      expect(result).to.be.deep.eq(parser.originIntent(intent));
+    it('should fall back to EnvioReader if GraphReader returns undefined', async () => {
+      const envioIntent: OriginIntent = {
+        id: mkBytes32('0x1'),
+        origin: '1337',
+      } as OriginIntent;
+
+      graphReader.getOriginIntentById.resolves(undefined);
+      envioReader.getOriginIntentById.resolves(envioIntent);
+
+      const result = await reader.getOriginIntentById(domain, mkBytes32('0x1'));
+      expect(result).to.equal(envioIntent);
     });
 
-    it('should handle null cases', async () => {
-      execute.resolves(undefined);
-      const result = await reader.getOriginIntentById('1337', intent.id);
+    it('should handle errors gracefully', async () => {
+      graphReader.getOriginIntentById.rejects(new Error('error'));
+      envioReader.getOriginIntentById.resolves(undefined);
+
+      const result = await reader.getOriginIntentById(domain, mkBytes32('0x1'));
       expect(result).to.be.undefined;
-    });
-  });
-
-  describe('#getOriginIntentsByNonce', () => {
-    const intent = createSpokeAddIntentEventEntity();
-
-    beforeEach(async () => {
-      execute.resolves({ ...createMeta(), intentAddEvents: [intent] });
-    });
-
-    it('should work', async () => {
-      const queryMetaParams: Map<string, SubgraphQueryMetaParams> = new Map();
-      queryMetaParams.set('1337', {
-        maxBlockNumber: 100,
-        latestNonce: 0,
-      });
-      const result = await reader.getOriginIntentsByNonce(queryMetaParams);
-      expect(result[0]).to.be.deep.eq(parser.originIntent(intent));
     });
   });
 
   describe('#getDestinationIntentById', () => {
-    const intent = createSpokeFillIntentEventEntity();
+    it('should prefer GraphReader result over EnvioReader', async () => {
+      const graphIntent: DestinationIntent = {
+        id: mkBytes32('0x1'),
+        destination: '1338',
+      } as DestinationIntent;
+      const envioIntent: DestinationIntent = {
+        id: mkBytes32('0x1'),
+        destination: '1338',
+      } as DestinationIntent;
 
-    beforeEach(async () => {
-      execute.resolves({ ...createMeta(), intentFilledEvents: [intent] });
+      graphReader.getDestinationIntentById.resolves(graphIntent);
+      envioReader.getDestinationIntentById.resolves(envioIntent);
+
+      const result = await reader.getDestinationIntentById(domain, mkBytes32('0x1'));
+      expect(result).to.equal(graphIntent);
     });
 
-    it('should work', async () => {
-      const result = await reader.getDestinationIntentById('1337', intent.id);
-      expect(result).to.be.deep.eq(parser.destinationIntent('1337', intent));
-    });
+    it('should fall back to EnvioReader if GraphReader returns undefined', async () => {
+      const envioIntent: DestinationIntent = {
+        id: mkBytes32('0x1'),
+        destination: '1338',
+      } as DestinationIntent;
 
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), intentFilledEvents: [] });
-      const result = await reader.getDestinationIntentById('1337', intent.id);
-      expect(result).to.be.undefined;
-    });
-  });
+      graphReader.getDestinationIntentById.resolves(undefined);
+      envioReader.getDestinationIntentById.resolves(envioIntent);
 
-  describe('#getHubIntentById', () => {
-    const intent = createHubAddIntentEventEntity();
-
-    beforeEach(async () => {
-      execute.resolves({
-        ...createMeta(),
-        hubIntents: [{ addEvent: intent, id: intent.id, status: TIntentStatus.Added }],
-      });
-    });
-
-    it('should work', async () => {
-      const result = await reader.getHubIntentById('1337', intent.id);
-      expect(result).to.be.deep.eq(parser.hubIntentFromAdded('1337', intent));
-    });
-
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), hubIntents: [] });
-      const result = await reader.getHubIntentById('1337', intent.id);
-      expect(result).to.be.undefined;
+      const result = await reader.getDestinationIntentById(domain, mkBytes32('0x1'));
+      expect(result).to.equal(envioIntent);
     });
   });
 
-  describe('#getDepositorEvents', () => {
-    const event = createDepositorEventEntity();
+  describe('#getOriginIntentsByNonce', () => {
+    it('should merge results from both readers and deduplicate by intent ID', async () => {
+      const graphIntent1: OriginIntent = {
+        id: mkBytes32('0x1'),
+        origin: '1337',
+      } as OriginIntent;
+      const graphIntent2: OriginIntent = {
+        id: mkBytes32('0x2'),
+        origin: '1337',
+      } as OriginIntent;
+      const envioIntent2: OriginIntent = {
+        id: mkBytes32('0x2'), // Duplicate ID
+        origin: '1337',
+      } as OriginIntent;
+      const envioIntent3: OriginIntent = {
+        id: mkBytes32('0x3'),
+        origin: '1337',
+      } as OriginIntent;
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), depositorEvents: [event] });
+      graphReader.getOriginIntentsByNonce.resolves([graphIntent1, graphIntent2]);
+      envioReader.getOriginIntentsByNonce.resolves([envioIntent2, envioIntent3]);
+
+      const queryParams = new Map<string, SubgraphQueryMetaParams>([
+        ['1337', { latestNonce: 0, maxBlockNumber: 1000 }],
+      ]);
+
+      const result = await reader.getOriginIntentsByNonce(queryParams);
+      expect(result.length).to.be.eq(3); // Should have 3 unique intents
+      expect(result.find((i) => i.id === mkBytes32('0x1'))).to.not.be.undefined;
+      expect(result.find((i) => i.id === mkBytes32('0x2'))).to.not.be.undefined;
+      expect(result.find((i) => i.id === mkBytes32('0x3'))).to.not.be.undefined;
+      // Should prefer GraphReader result for duplicate ID
+      expect(result.find((i) => i.id === mkBytes32('0x2'))).to.equal(graphIntent2);
     });
 
-    it('should work', async () => {
-      const ret = await reader.getDepositorEvents(domain, 1);
-      expect(ret).to.be.deep.eq([parser.depositorEvents(event)]);
+    it('should handle errors gracefully', async () => {
+      graphReader.getOriginIntentsByNonce.rejects(new Error('error'));
+      envioReader.getOriginIntentsByNonce.resolves([]);
+
+      const queryParams = new Map<string, SubgraphQueryMetaParams>([
+        ['1337', { latestNonce: 0, maxBlockNumber: 1000 }],
+      ]);
+
+      const result = await reader.getOriginIntentsByNonce(queryParams);
+      expect(result).to.be.deep.eq([]);
+    });
+  });
+
+  describe('#getDestinationIntentsByNonce', () => {
+    it('should merge results from both readers and deduplicate by intent ID', async () => {
+      const graphIntent1: DestinationIntent = {
+        id: mkBytes32('0x1'),
+        destination: '1338',
+      } as DestinationIntent;
+      const envioIntent2: DestinationIntent = {
+        id: mkBytes32('0x2'),
+        destination: '1338',
+      } as DestinationIntent;
+
+      graphReader.getDestinationIntentsByNonce.resolves([graphIntent1]);
+      envioReader.getDestinationIntentsByNonce.resolves([envioIntent2]);
+
+      const queryParams = new Map<string, SubgraphQueryMetaParams>([
+        ['1338', { latestNonce: 0, maxBlockNumber: 1000 }],
+      ]);
+
+      const result = await reader.getDestinationIntentsByNonce(queryParams);
+      expect(result.length).to.be.eq(2);
+      expect(result.find((i) => i.id === mkBytes32('0x1'))).to.not.be.undefined;
+      expect(result.find((i) => i.id === mkBytes32('0x2'))).to.not.be.undefined;
     });
   });
 
   describe('#getTokens', () => {
-    const tokens = createTokensEntity();
+    it('should merge tokens and assets from both readers and deduplicate by ID', async () => {
+      const graphTokens = [{ id: 'token1' }, { id: 'token2' }] as any[];
+      const graphAssets = [{ id: 'asset1' }, { id: 'asset2' }] as any[];
+      const envioTokens = [{ id: 'token2' }, { id: 'token3' }] as any[]; // token2 is duplicate
+      const envioAssets = [{ id: 'asset2' }, { id: 'asset3' }] as any[]; // asset2 is duplicate
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), tokens: [tokens] });
-    });
+      graphReader.getTokens.resolves([graphTokens, graphAssets]);
+      envioReader.getTokens.resolves([envioTokens, envioAssets]);
 
-    it('should work', async () => {
-      const result = await reader.getTokens(domain);
-      const expectedT = [parser.token(tokens)];
-      const expectedA = tokens.assets.map((a) => parser.asset(tokens.id, a));
-      expect(result).to.be.deep.eq([expectedT, expectedA]);
+      const result = await reader.getTokens('1337');
+      expect(result[0].length).to.be.eq(3); // token1, token2, token3 (deduplicated)
+      expect(result[1].length).to.be.eq(3); // asset1, asset2, asset3 (deduplicated)
+      // Should prefer GraphReader results for duplicates
+      expect(result[0].find((t: any) => t.id === 'token2')).to.equal(graphTokens[1]);
     });
   });
 
   describe('#getSpokeQueues', () => {
-    const queue: SpokeQueueEntity = {
-      id: mkBytes32('0x1'),
-      type: 'FILL',
-      lastProcessed: Math.floor(Date.now() / 1000),
-      size: 10,
-      first: 1,
-      last: 11,
-    };
+    it('should merge queues from both readers and deduplicate by ID', async () => {
+      const graphQueues = [{ id: 'queue1' }, { id: 'queue2' }] as any[];
+      const envioQueues = [{ id: 'queue2' }, { id: 'queue3' }] as any[]; // queue2 is duplicate
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), queues: [queue] });
-    });
+      graphReader.getSpokeQueues.resolves(graphQueues);
+      envioReader.getSpokeQueues.resolves(envioQueues);
 
-    it('should work', async () => {
-      const ret = await reader.getSpokeQueues(domain);
-      expect(ret).to.be.deep.eq([parser.spokeQueue(domain, queue)]);
-    });
-
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), queues: undefined });
-      const ret = await reader.getSpokeQueues(domain);
-      expect(ret).to.be.deep.eq([]);
+      const result = await reader.getSpokeQueues(domain);
+      expect(result.length).to.be.eq(3); // queue1, queue2, queue3 (deduplicated)
+      // Should prefer GraphReader results for duplicates
+      expect(result.find((q: any) => q.id === 'queue2')).to.equal(graphQueues[1]);
     });
   });
 
-  describe('#getSettlementQueues', () => {
-    const queue: SettlementQueueEntity = {
-      id: mkBytes32('0x1'),
-      domain: '1337',
-      lastProcessed: Math.floor(Date.now() / 1000),
-      size: 10,
-      first: 1,
-      last: 11,
-    };
+  describe('#getDepositorEvents', () => {
+    it('should merge depositor events from both readers', async () => {
+      const graphEvents = [{ id: 'event1' }, { id: 'event2' }] as any[];
+      const envioEvents = [{ id: 'event3' }] as any[];
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), settlementQueues: [queue] });
-    });
+      graphReader.getDepositorEvents.resolves(graphEvents);
+      envioReader.getDepositorEvents.resolves(envioEvents);
 
-    it('should work', async () => {
-      const ret = await reader.getSettlementQueues(domain);
-      expect(ret).to.be.deep.eq([parser.settlementQueue(queue)]);
-    });
-
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), settlementQueues: undefined });
-      const ret = await reader.getSettlementQueues(domain);
-      expect(ret).to.be.deep.eq([]);
+      const result = await reader.getDepositorEvents(domain, 1);
+      expect(result.length).to.be.eq(3);
     });
   });
 
-  describe('#getDepositQueues', () => {
-    const queue: DepositQueueEntity = {
-      id: mkBytes32('0x1'),
-      domain: '1337',
-      lastProcessed: Math.floor(Date.now() / 1000),
-      size: 10,
-      first: 1,
-      last: 11,
-      epoch: 12321,
-      tickerHash: mkBytes32('0x1'),
-      blockNumber: 123,
-    };
-    queue.id = `${queue.epoch}-${queue.domain}-${queue.tickerHash}`;
+  describe('#getHubIntentsByNonce', () => {
+    it('should merge hub intents from both readers for each array', async () => {
+      const graphAdded = [{ id: 'intent1' }, { id: 'intent2' }] as any[];
+      const graphFilled = [{ id: 'intent3' }] as any[];
+      const graphEnqueued = [{ id: 'intent4' }] as any[];
+      const envioAdded = [{ id: 'intent2' }, { id: 'intent5' }] as any[]; // intent2 is duplicate
+      const envioFilled = [{ id: 'intent6' }] as any[];
+      const envioEnqueued = [{ id: 'intent7' }] as any[];
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), depositQueues: [queue] });
-    });
+      graphReader.getHubIntentsByNonce.resolves([graphAdded, graphFilled, graphEnqueued]);
+      envioReader.getHubIntentsByNonce.resolves([envioAdded, envioFilled, envioEnqueued]);
 
-    it('should work', async () => {
-      const ret = await reader.getDepositQueues(domain, queue.epoch - 1);
-      expect(ret).to.be.deep.eq([parser.depositQueue(queue)]);
-    });
-
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), depositQueues: undefined });
-      const ret = await reader.getDepositQueues(domain, queue.epoch - 1);
-      expect(ret).to.be.deep.eq([]);
+      const result = await reader.getHubIntentsByNonce('1337', 0, 0, 0, 1000);
+      expect(result[0].length).to.be.eq(3); // intent1, intent2, intent5 (deduplicated)
+      expect(result[1].length).to.be.eq(2); // intent3, intent6
+      expect(result[2].length).to.be.eq(2); // intent4, intent7
     });
   });
 
-  describe('#getDepositsEnqueuedByNonce', () => {
-    const entity: DepositEnqueuedEventEntity = {
-      id: mkBytes32('0x1'),
-      deposit: {
-        id: mkBytes32('0x1'),
-        amount: '1000',
-        epoch: 12321,
-        domain: '1337',
-        tickerHash: mkBytes32('0x16546'),
-      },
-      intent: {
-        ...createHubIntent(),
-      },
-      timestamp: Math.floor(Date.now() / 1000),
-      txOrigin: mkAddress('0x1'),
-      txNonce: 1,
-      transactionHash: mkHash('0x2'),
-      blockNumber: 123,
-      gasLimit: '10000',
-      gasPrice: '100000',
-    };
+  describe('#getHubInvoicesByNonce', () => {
+    it('should merge hub invoices and intents from both readers', async () => {
+      const graphInvoices = [{ id: 'invoice1' }, { id: 'invoice2' }] as any[];
+      const graphIntents = [{ id: 'intent1' }] as any[];
+      const envioInvoices = [{ id: 'invoice2' }, { id: 'invoice3' }] as any[]; // invoice2 is duplicate
+      const envioIntents = [{ id: 'intent2' }] as any[];
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), depositEnqueuedEvents: [entity] });
-    });
+      graphReader.getHubInvoicesByNonce.resolves([graphInvoices, graphIntents]);
+      envioReader.getHubInvoicesByNonce.resolves([envioInvoices, envioIntents]);
 
-    it('should work', async () => {
-      const ret = await reader.getDepositsEnqueuedByNonce(domain, 0, 100_000);
-      expect(ret).to.be.deep.eq([parser.hubDepositFromEnqueued(entity)]);
-    });
-
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), depositEnqueuedEvents: undefined });
-      const ret = await reader.getDepositsEnqueuedByNonce(domain, 0, 100_000);
-      expect(ret).to.be.deep.eq([]);
+      const result = await reader.getHubInvoicesByNonce('1337', 0, 1000);
+      expect(result[0].length).to.be.eq(3); // invoice1, invoice2, invoice3 (deduplicated)
+      expect(result[1].length).to.be.eq(2); // intent1, intent2
     });
   });
 
-  describe('#getDepositsProcessedByNonce', () => {
-    const entity: DepositProcessedEventEntity = {
-      id: mkBytes32('0x1'),
-      deposit: {
-        id: mkBytes32('0x1'),
-        amount: '1000',
-        epoch: 12321,
-        domain: '1337',
-        tickerHash: mkBytes32('0x16546'),
-        enqueuedEvent: {
-          timestamp: Math.floor(Date.now() / 1000),
-          txNonce: 1,
-        },
-      },
-      intent: {
-        ...createHubIntent(),
-      },
-      timestamp: Math.floor(Date.now() / 1000),
-      txOrigin: mkAddress('0x1'),
-      txNonce: 1,
-      transactionHash: mkHash('0x2'),
-      blockNumber: 123,
-      gasLimit: '10000',
-      gasPrice: '100000',
-    };
+  describe('#getOrdersByNonce', () => {
+    it('should merge orders from both readers and deduplicate by ID', async () => {
+      const graphOrders = [
+        { id: 'order1', domain: '1337' },
+        { id: 'order2', domain: '1337' },
+      ] as any[];
+      const envioOrders = [
+        { id: 'order2', domain: '1337' },
+        { id: 'order3', domain: '1337' },
+      ] as any[]; // order2 is duplicate
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), depositProcessedEvents: [entity] });
-    });
+      graphReader.getOrdersByNonce.resolves(graphOrders);
+      envioReader.getOrdersByNonce.resolves(envioOrders);
 
-    it('should work', async () => {
-      const ret = await reader.getDepositsProcessedByNonce(domain, 0, 100_000);
-      expect(ret).to.be.deep.eq([parser.hubDepositFromProcessed(entity)]);
-    });
+      const queryParams = new Map<string, SubgraphQueryMetaParams>([
+        ['1337', { latestNonce: 0, maxBlockNumber: 1000 }],
+      ]);
 
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), depositProcessedEvents: undefined });
-      const ret = await reader.getDepositsProcessedByNonce(domain, 0, 100_000);
-      expect(ret).to.be.deep.eq([]);
+      const result = await reader.getOrdersByNonce(queryParams);
+      expect(result.length).to.be.eq(3); // order1, order2, order3 (deduplicated)
+      // Should prefer GraphReader results for duplicates
+      expect(result.find((o: any) => o.id === 'order2')).to.equal(graphOrders[1]);
     });
   });
 
-  describe('#getSpokeMessages', () => {
-    const message: MessageEntity = {
-      id: mkBytes32('0x1'),
-      type: MessageType.FILL,
-      quote: '1000',
-      firstIdx: 1,
-      lastIdx: 10,
-      intentIds: [mkBytes32('0x1')],
-      transactionHash: mkHash('0x2'),
-      timestamp: Math.floor(Date.now() / 1000),
-      blockNumber: 123,
-      txOrigin: mkAddress('0x1'),
-      txNonce: 1,
-      gasLimit: '10000',
-      gasPrice: '100000',
-    };
+  describe('#query', () => {
+    it('should delegate to GraphReader for direct queries', async () => {
+      const response = { data: 'test', domain: '1337' };
+      graphReader.query.resolves(response);
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), messages: [message] });
-    });
-
-    it('should work', async () => {
-      const ret = await reader.getSpokeMessages(domain, 0);
-      expect(ret).to.be.deep.eq([parser.spokeMessage(domain, message)]);
-    });
-
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), messages: undefined });
-      const ret = await reader.getSpokeMessages(domain, 0);
-      expect(ret).to.be.deep.eq([]);
+      const result = await reader.query('1337', ['query']);
+      expect(result).to.equal(response);
+      expect(graphReader.query).to.have.been.calledOnceWith('1337', ['query']);
+      expect(envioReader.query).to.not.have.been.called;
     });
   });
 
-  describe('#getHubMessages', () => {
-    const message: SettlementMessageEntity = {
-      type: SettlementMessageType.SETTLED,
-      id: mkBytes32('0x1'),
-      quote: '1000',
-      domain,
-      intentIds: [mkBytes32('0x1')],
+  describe('Error handling', () => {
+    it('should handle partial failures gracefully', async () => {
+      // GraphReader succeeds, EnvioReader fails
+      graphReader.getOriginIntentsByNonce.resolves([
+        { id: mkBytes32('0x1'), origin: '1337' } as OriginIntent,
+      ]);
+      envioReader.getOriginIntentsByNonce.rejects(new Error('error'));
 
-      transactionHash: mkHash('0x2'),
-      timestamp: Math.floor(Date.now() / 1000),
-      blockNumber: 123,
-      txOrigin: mkAddress('0x1'),
-      txNonce: 1,
-      gasLimit: '10000',
-      gasPrice: '100000',
-    };
+      const queryParams = new Map<string, SubgraphQueryMetaParams>([
+        ['1337', { latestNonce: 0, maxBlockNumber: 1000 }],
+      ]);
 
-    beforeEach(() => {
-      execute.resolves({ ...createMeta(), settlementMessages: [message] });
+      const result = await reader.getOriginIntentsByNonce(queryParams);
+      expect(result.length).to.be.eq(1);
+      expect(result[0].id).to.be.eq(mkBytes32('0x1'));
     });
 
-    it('should work', async () => {
-      const ret = await reader.getHubMessages(domain, 0);
-      expect(ret).to.be.deep.eq([parser.settlementMessage(domain, message)]);
-    });
+    it('should handle both readers failing gracefully', async () => {
+      graphReader.getOriginIntentsByNonce.rejects(new Error('error'));
+      envioReader.getOriginIntentsByNonce.rejects(new Error('error'));
 
-    it('should handle null cases', async () => {
-      execute.resolves({ ...createMeta(), settlementMessages: undefined });
-      const ret = await reader.getHubMessages(domain, 0);
-      expect(ret).to.be.deep.eq([]);
-    });
-  });
+      const queryParams = new Map<string, SubgraphQueryMetaParams>([
+        ['1337', { latestNonce: 0, maxBlockNumber: 1000 }],
+      ]);
 
-  describe('#getSettlementIntentsByNonce', () => {
-    const intent = createIntentSettlementEventEntity();
-
-    beforeEach(async () => {
-      execute.resolves({ ...createMeta(), intentSettleEvents: [intent] });
-    });
-
-    it('should work', async () => {
-      const queryMetaParams: Map<string, SubgraphQueryMetaParams> = new Map();
-      queryMetaParams.set('1337', {
-        maxBlockNumber: 100,
-        latestNonce: 0,
-      });
-      const result = await reader.getSettlementIntentsByNonce(queryMetaParams);
-      expect(result[0]).to.be.deep.eq(parser.settlementIntent('1337', intent));
+      const result = await reader.getOriginIntentsByNonce(queryParams);
+      expect(result).to.be.deep.eq([]);
     });
   });
 });

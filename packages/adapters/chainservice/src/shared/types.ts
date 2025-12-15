@@ -1,5 +1,3 @@
-import { BigNumberish, Bytes, utils } from 'ethers';
-
 export type ReadTransaction = {
   domain: number;
   to: string;
@@ -14,8 +12,6 @@ export type WriteTransaction = {
   gasPrice?: string;
 } & ReadTransaction;
 
-export type MultireadTransaction = Omit<ReadTransaction, 'domain'> & { resultTypes: (string | utils.ParamType)[] };
-
 export type Gas = {
   limit: string;
   // v0
@@ -27,7 +23,7 @@ export type Gas = {
 
 export interface ISignerApi {
   getPublicKey: () => Promise<string>;
-  sign: (identifier: string, data: string | Bytes) => Promise<string>;
+  sign: (identifier: string, data: string | Uint8Array) => Promise<string>;
 }
 
 // Note: This is the minimum required fields for a block as used in the txservice
@@ -57,8 +53,8 @@ export interface ITransactionResponse {
   hash: string;
   confirmations: number;
   nonce: number;
-  gasPrice?: BigNumberish;
-  gasLimit: BigNumberish;
+  gasPrice?: bigint;
+  gasLimit: bigint;
 }
 
 export interface IContractLog {

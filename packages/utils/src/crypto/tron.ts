@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TronWeb } from 'tronweb';
 
 export interface TronKeyPair {
@@ -105,7 +106,7 @@ export async function signMessage(privateKey: string, message: string): Promise<
     },
   });
 
-  return await tronWeb.trx.signMessageV2(message);
+  return tronWeb.trx.signMessageV2(message);
 }
 
 /**
@@ -126,7 +127,7 @@ export async function verifyMessage(message: string, signature: string): Promise
  * Create a TronWeb instance with private key
  */
 export function createTronWeb(privateKey: string, fullHost: string = 'https://api.trongrid.io'): TronWeb {
-  const tronWeb = new TronWeb({
+  return new TronWeb({
     fullHost,
     privateKey,
     headers: {
@@ -137,5 +138,4 @@ export function createTronWeb(privateKey: string, fullHost: string = 'https://ap
         })(),
     },
   });
-  return tronWeb;
 }

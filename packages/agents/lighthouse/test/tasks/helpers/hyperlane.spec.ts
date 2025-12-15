@@ -1,5 +1,4 @@
-import { HyperlaneStatus, hexDataLength } from 'ethers/lib/utils';
-import { QueueType, expect } from '@chimera-monorepo/utils';
+import { QueueType, expect, chainWrapper } from '@chimera-monorepo/utils';
 
 import { getQueueMessageBody } from '../../../src/tasks/helpers';
 import { UnknownQueueType } from '../../../src/errors';
@@ -15,17 +14,6 @@ describe('Helpers:hyperlane', () => {
   const nonce = 740680;
   const origin = 11155111;
   const sender = '0xcb8eca4ab47c7dc89bc455271a0650f66e0dae6e';
-  const message = {
-    status: 'pending' as HyperlaneStatus,
-    destinationDomainId: destination,
-    body,
-    originDomainId: origin,
-    recipient,
-    sender,
-    nonce,
-  };
-  const expected =
-    '0x03000b4d4800aa36a7000000000000000000000000cb8eca4ab47c7dc89bc455271a0650f66e0dae6e00000061000000000000000000000000edc1a3edf87187085a3abb7a9a65e1e7ae370c0748656c6c6f2c20776f726c64';
 
   describe('#getQueueMessageBody', () => {
     it('should throw if unrecognized type', async () => {
@@ -34,7 +22,7 @@ describe('Helpers:hyperlane', () => {
 
     it('should work for settlements', async () => {
       const ret = getQueueMessageBody(QueueType.Settlement, size);
-      expect(hexDataLength(ret)).to.be.eq(1 + 128 * size);
+      expect(chainWrapper.hexToBytes(ret).length).to.be.eq(1 + 128 * size);
     });
   });
 });

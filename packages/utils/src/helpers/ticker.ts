@@ -1,6 +1,5 @@
-import { utils } from 'ethers';
-import { ChainConfig } from '../types/primitives';
-import { EverclearError } from '../types';
+import { chainWrapper } from './chain';
+import { ChainConfig, EverclearError } from '../types';
 
 export class NoTickersConfigured extends EverclearError {
   constructor(
@@ -81,5 +80,5 @@ export const getConfiguredTickerHashes = (chains: Record<string, ChainConfig>) =
 };
 
 export const getTickerHashes = (tickers: string[]) => {
-  return tickers.map((ticker) => utils.keccak256(utils.toUtf8Bytes(ticker)));
+  return tickers.map((ticker) => chainWrapper.keccak256(chainWrapper.stringToHex(ticker)) as string);
 };

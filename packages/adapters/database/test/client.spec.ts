@@ -233,6 +233,43 @@ describe('Database Adapter:Client', () => {
       const result = await getMessageQueueContents(QueueType.Fill, ['1338'], pool);
       expect([...result.entries()]).to.be.deep.eq([...new Map([intent].map((i) => [i.destination, [i]])).entries()]);
     });
+
+    it('should include all destination intents with null message_id regardless of status', async () => {
+      const regularIntent = createDestinationIntent({
+        id: mkBytes32('0x1'),
+        status: TIntentStatus.Added,
+        destination: '1338',
+        messageId: null,
+      });
+      const dispatchedIntent = createDestinationIntent({
+        id: mkBytes32('0x3'),
+        status: TIntentStatus.Settled,
+        destination: '1338',
+        messageId: mkBytes32('0x123'), // Already dispatched, should not be included
+      });
+      const filledIntent = createDestinationIntent({
+        id: mkBytes32('0x4'),
+        status: TIntentStatus.Filled,
+        destination: '1338',
+        messageId: null,
+      });
+      const settledIntent = createDestinationIntent({
+        id: mkBytes32('0x2'),
+        status: TIntentStatus.Settled,
+        destination: '1338',
+        messageId: null,
+      });
+
+      await saveDestinationIntents([regularIntent, dispatchedIntent, filledIntent, settledIntent], pool);
+
+      const result = await getMessageQueueContents(QueueType.Fill, ['1338'], pool);
+      const resultIntents = result.get('1338') || [];
+      expect(resultIntents.length).to.eq(3);
+      expect(resultIntents.map((i) => i.id)).to.include(regularIntent.id);
+      expect(resultIntents.map((i) => i.id)).to.include(settledIntent.id);
+      expect(resultIntents.map((i) => i.id)).to.include(filledIntent.id);
+      expect(resultIntents.map((i) => i.id)).to.not.include(dispatchedIntent.id);
+    });
   });
 
   describe('#saveHubIntents / #getHubIntents', () => {
@@ -981,26 +1018,26 @@ describe('Database Adapter:Client', () => {
 
   describe('#updateSettlementStatus', () => {
     const intents = createSettlementIntents(2, [
-      { intentId: mkBytes32('0x1'), status: TIntentStatus.SettledAndManuallyExecuted, domain: '1339' },
-      { intentId: mkBytes32('0x2'), status: TIntentStatus.SettledAndManuallyExecuted, domain: '1340' },
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1339' },
+      { intentId: mkBytes32('0x2'), status: TIntentStatus.Delivered, domain: '1340' },
     ]);
 
     const expectedIntents = createSettlementIntents(1, [
-      { intentId: mkBytes32('0x1'), status: TIntentStatus.Delivered, domain: '1339' },
+      { intentId: mkBytes32('0x1'), status: TIntentStatus.Settled, domain: '1339' },
     ]);
 
     it('should work', async () => {
       await saveSettlementIntents(intents, pool);
-      expect(await getSettlementIntentsByStatus(TIntentStatus.Delivered, pool)).to.be.empty;
-      await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Delivered, pool);
-      expect(await getSettlementIntentsByStatus(TIntentStatus.Delivered, pool)).to.be.deep.eq(expectedIntents);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.empty;
+      await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Settled, pool);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.deep.eq(expectedIntents);
     });
 
     it('should not work when attempt to downgrade status', async () => {
       await saveSettlementIntents(intents, pool);
-      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.empty;
-      await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Settled, pool);
-      expect(await getSettlementIntentsByStatus(TIntentStatus.Settled, pool)).to.be.empty;
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Added, pool)).to.be.empty;
+      await updateSettlementStatus(mkBytes32('0x1'), TIntentStatus.Added, pool);
+      expect(await getSettlementIntentsByStatus(TIntentStatus.Added, pool)).to.be.empty;
     });
   });
 

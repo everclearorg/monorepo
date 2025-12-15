@@ -1,4 +1,3 @@
-import { Interface } from 'ethers/lib/utils';
 import {
   createLoggingContext,
   domainToChainId,
@@ -7,16 +6,15 @@ import {
   mkBytes32,
 } from '@chimera-monorepo/utils';
 import { sendWithRelayerWithBackup } from '@chimera-monorepo/adapters-relayer';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 import { getContext } from '../../context';
-
-import { BigNumber } from 'ethers';
 
 export type InvoiceList = {
   head: string;
   tail: string;
-  nonce: BigNumber;
-  length: BigNumber;
+  nonce: bigint;
+  length: bigint;
   nodes: unknown;
 };
 
@@ -57,7 +55,6 @@ export const processDepositsAndInvoices = async () => {
   // Check that the assets exist in carto (i.e. have been registered)
   const configued = await database.getAssets(tickerHashes);
 
-  const iface = new Interface(abis.hub.everclear);
   for (const tickerHash of tickerHashes) {
     const registeredConfig = configued.find((a) => a.token === tickerHash.toLowerCase());
     // Check that ticker hash is configured onchain as well as in chaindata
@@ -65,74 +62,96 @@ export const processDepositsAndInvoices = async () => {
       logger.warn('Asset not registered', requestContext, methodContext, { tickerHash });
       continue;
     }
-    const encodedDataForInvoices = iface.encodeFunctionData('invoices', [tickerHash]);
+    const encodedDataForInvoices = chainWrapper.encodeFunctionData({
+      abi: abis.hub.everclear,
+      functionName: 'invoices',
+      args: [tickerHash],
+    });
     const encodedDataForInvoicesRes = await chainservice.readTx(
       {
         to: hub.deployments.everclear,
         domain: +hub.domain,
         data: encodedDataForInvoices,
-        funcSig: iface.getFunction('invoices').format(),
+        funcSig: 'invoices(bytes32)',
       },
       'latest',
     );
 
-    const invoices = iface.decodeFunctionResult('invoices', encodedDataForInvoicesRes) as unknown as InvoiceList;
+    const invoices = chainWrapper.decodeFunctionResult({
+      abi: abis.hub.everclear,
+      functionName: 'invoices',
+      data: encodedDataForInvoicesRes as `0x${string}`,
+    }) as unknown as InvoiceList;
 
-    const encodedDataForLastClosedEpoch = iface.encodeFunctionData('lastClosedEpochsProcessed', [tickerHash]);
+    const encodedDataForLastClosedEpoch = chainWrapper.encodeFunctionData({
+      abi: abis.hub.everclear,
+      functionName: 'lastClosedEpochsProcessed',
+      args: [tickerHash],
+    });
     const encodedDataForLastClosedEpochRes = await chainservice.readTx(
       {
         to: hub.deployments.everclear,
         domain: +hub.domain,
         data: encodedDataForLastClosedEpoch,
-        funcSig: iface.getFunction('lastClosedEpochsProcessed').format(),
+        funcSig: 'lastClosedEpochsProcessed(bytes32)',
       },
       'latest',
     );
-    const [lastClosedEpochsProcessed] = iface.decodeFunctionResult(
-      'lastClosedEpochsProcessed',
-      encodedDataForLastClosedEpochRes,
-    );
-    const lastClosedEpochProcessed = +lastClosedEpochsProcessed.toString();
+    const lastClosedEpochsProcessed = chainWrapper.decodeFunctionResult({
+      abi: abis.hub.everclear,
+      functionName: 'lastClosedEpochsProcessed',
+      data: encodedDataForLastClosedEpochRes as `0x${string}`,
+    }) as unknown as bigint;
+    const lastClosedEpochProcessed = lastClosedEpochsProcessed != null ? +lastClosedEpochsProcessed.toString() : 0;
 
-    const encodedDataForGetCurrentEpoch = iface.encodeFunctionData('getCurrentEpoch', []);
+    const encodedDataForGetCurrentEpoch = chainWrapper.encodeFunctionData({
+      abi: abis.hub.everclear,
+      functionName: 'getCurrentEpoch',
+      args: [],
+    });
     const encodedDataForGetCurrentEpochRes = await chainservice.readTx(
       {
         to: hub.deployments.everclear,
         domain: +hub.domain,
         data: encodedDataForGetCurrentEpoch,
-        funcSig: iface.getFunction('getCurrentEpoch').format(),
+        funcSig: 'getCurrentEpoch()',
       },
       'latest',
     );
-    const [currentEpoch] = iface.decodeFunctionResult('getCurrentEpoch', encodedDataForGetCurrentEpochRes);
+    const currentEpoch = chainWrapper.decodeFunctionResult({
+      abi: abis.hub.everclear,
+      functionName: 'getCurrentEpoch',
+      data: encodedDataForGetCurrentEpochRes as `0x${string}`,
+    });
 
-    const lastClosedEpoch = currentEpoch > 0 ? currentEpoch - 1 : 0;
+    const lastClosedEpoch = currentEpoch != null && Number(currentEpoch) > 0 ? Number(currentEpoch) - 1 : 0;
     // Check if there are deposits to process in unprocessed epochs across all spokes
     let hasDepositsToProcess = false;
     let unprocessedEpochsCount = 0;
     if (lastClosedEpoch > lastClosedEpochProcessed) {
       unprocessedEpochsCount = lastClosedEpoch - lastClosedEpochProcessed;
       for (const spokeDomain of spokes) {
-        for (let epoch = lastClosedEpochProcessed + 1; epoch <= lastClosedEpoch; epoch++) {
-          const encodedDataForDepositsAvailable = iface.encodeFunctionData('depositsAvailableInEpoch', [
-            epoch,
-            +spokeDomain,
-            tickerHash,
-          ]);
+        for (let epoch = +lastClosedEpochProcessed + 1; epoch <= lastClosedEpoch; epoch++) {
+          const encodedDataForDepositsAvailable = chainWrapper.encodeFunctionData({
+            abi: abis.hub.everclear,
+            functionName: 'depositsAvailableInEpoch',
+            args: [epoch, +spokeDomain, tickerHash],
+          });
           const encodedDataForDepositsAvailableRes = await chainservice.readTx(
             {
               to: hub.deployments.everclear,
               domain: +hub.domain,
               data: encodedDataForDepositsAvailable,
-              funcSig: iface.getFunction('depositsAvailableInEpoch').format(),
+              funcSig: 'depositsAvailableInEpoch(uint256,uint32,bytes32)',
             },
             'latest',
           );
-          const [depositsAvailable] = iface.decodeFunctionResult(
-            'depositsAvailableInEpoch',
-            encodedDataForDepositsAvailableRes,
-          );
-          if (+depositsAvailable.toString() > 0) {
+          const depositsAvailable = chainWrapper.decodeFunctionResult({
+            abi: abis.hub.everclear,
+            functionName: 'depositsAvailableInEpoch',
+            data: encodedDataForDepositsAvailableRes as `0x${string}`,
+          }) as unknown as bigint;
+          if (depositsAvailable > 0n) {
             hasDepositsToProcess = true;
             break;
           }
@@ -176,19 +195,18 @@ export const processDepositsAndInvoices = async () => {
       continue;
     }
 
-    const encodedDataToProcess = iface.encodeFunctionData('processDepositsAndInvoices', [
-      tickerHash,
-      MAX_EPOCHS_TO_PROCESS,
-      MAX_DEPOSITS_TO_PROCESS,
-      MAX_INVOICES_TO_PROCESS,
-    ]);
+    const encodedDataToProcess = chainWrapper.encodeFunctionData({
+      abi: abis.hub.everclear,
+      functionName: 'processDepositsAndInvoices',
+      args: [tickerHash, MAX_EPOCHS_TO_PROCESS, MAX_DEPOSITS_TO_PROCESS, MAX_INVOICES_TO_PROCESS],
+    });
     logger.info('Processing deposits and invoices', requestContext, methodContext, {
       tickerHash,
       maxEpochs: MAX_EPOCHS_TO_PROCESS,
       maxDeposits: MAX_DEPOSITS_TO_PROCESS,
       maxInvoices: MAX_INVOICES_TO_PROCESS,
       encodedDataToProcess,
-      invoicesCount: invoices.length.toString(),
+      invoicesCount: invoices?.length?.toString() ?? '0',
       unprocessedEpochsCount,
     });
 
@@ -199,7 +217,7 @@ export const processDepositsAndInvoices = async () => {
       hub.deployments.everclear,
       encodedDataToProcess,
       '0',
-      iface.getFunction('processDepositsAndInvoices').format(),
+      'processDepositsAndInvoices(bytes32,uint256,uint256,uint256)',
       relayers,
       chainservice,
       logger,

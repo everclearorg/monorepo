@@ -1,117 +1,117 @@
 import { expect } from 'chai';
-import { stub, SinonStub } from 'sinon';
-import { providers, utils, BigNumber, Wallet } from 'ethers';
+import { stub } from 'sinon';
 import { EthWallet, ITransactionRequest } from '../../../../../src';
 
 describe('EthWallet', () => {
   const privateKey = '0x1234567890123456789012345678901234567890123456789012345678901234';
-  const wallet = new EthWallet(privateKey);
+  const privateKeyWithoutPrefix = '1234567890123456789012345678901234567890123456789012345678901234';
 
   describe('constructor', () => {
     it('should create an EthWallet instance with private key', () => {
       const newWallet = new EthWallet(privateKey);
       expect(newWallet).to.be.instanceOf(EthWallet);
-      expect(newWallet.privateKey).to.equal(privateKey);
+      expect(newWallet.address).to.be.a('string');
+      expect(newWallet.address).to.have.length(42); // 0x + 40 hex chars
     });
 
-    it('should create an EthWallet instance from another wallet', () => {
-      const originalWallet = new EthWallet(privateKey);
-      const newWallet = new EthWallet(originalWallet);
-      expect(newWallet).to.be.instanceOf(EthWallet);
-      expect(newWallet.privateKey).to.equal(privateKey);
+    it('should automatically add 0x prefix to private key if not present', () => {
+      const wallet1 = new EthWallet(privateKey);
+      const wallet2 = new EthWallet(privateKeyWithoutPrefix);
+
+      // Both should generate the same address
+      expect(wallet1.address).to.equal(wallet2.address);
+      expect(wallet1.privateKey).to.equal(wallet2.privateKey);
     });
   });
 
   describe('fromMnemonic', () => {
-    it('should create an EthWallet from mnemonic', () => {
+    it('should create an EthWallet instance from mnemonic', () => {
       const mnemonic = 'test test test test test test test test test test test junk';
-      const newWallet = EthWallet.fromMnemonic(mnemonic);
+      const wallet = EthWallet.fromMnemonic(mnemonic);
       
-      expect(newWallet).to.be.instanceOf(EthWallet);
-      expect(newWallet.mnemonic?.phrase).to.equal(mnemonic);
+      expect(wallet).to.be.instanceOf(EthWallet);
+      expect(wallet.address).to.be.a('string');
+      expect(wallet.address).to.have.length(42);
     });
 
-    it('should create an EthWallet from mnemonic with custom path', () => {
+    it('should create an EthWallet instance from mnemonic with custom path', () => {
       const mnemonic = 'test test test test test test test test test test test junk';
-      const path = "m/44'/60'/0'/0/1";
-      const newWallet = EthWallet.fromMnemonic(mnemonic, path);
+      const customPath = "m/44'/60'/0'/0/1";
+      const wallet = EthWallet.fromMnemonic(mnemonic, customPath);
       
-      expect(newWallet).to.be.instanceOf(EthWallet);
-      expect(newWallet.mnemonic?.phrase).to.equal(mnemonic);
-      expect(newWallet.mnemonic?.path).to.equal(path);
-    });
-
-    it('should create an EthWallet from mnemonic with wordlist', () => {
-      const mnemonic = 'test test test test test test test test test test test junk';
-      const newWallet = EthWallet.fromMnemonic(mnemonic);
-      
-      expect(newWallet).to.be.instanceOf(EthWallet);
-      expect(newWallet.mnemonic?.phrase).to.equal(mnemonic);
+      expect(wallet).to.be.instanceOf(EthWallet);
+      expect(wallet.address).to.be.a('string');
+      expect(wallet.address).to.have.length(42);
     });
   });
 
   describe('createRandom', () => {
-    it('should create a random EthWallet', () => {
-      const newWallet = EthWallet.createRandom();
+    it('should create a random EthWallet instance', () => {
+      const wallet = EthWallet.createRandom();
+      
+      expect(wallet).to.be.instanceOf(EthWallet);
+      expect(wallet.address).to.be.a('string');
+      expect(wallet.address).to.have.length(42);
+      expect(wallet.privateKey).to.be.a('string');
+      expect(wallet.privateKey).to.match(/^0x[a-fA-F0-9]{64}$/);
+    });
+  });
 
-      expect(newWallet).to.be.instanceOf(EthWallet);
+  describe('getAddress', () => {
+    it('should return the wallet address', async () => {
+      const wallet = new EthWallet(privateKey);
+      const address = await wallet.getAddress();
+      
+      expect(address).to.equal(wallet.address);
+      expect(address).to.be.a('string');
+      expect(address).to.have.length(42);
+    });
+  });
+
+  describe('getPublicKey', () => {
+    it('should return the public key', async () => {
+      const wallet = new EthWallet(privateKey);
+      const publicKey = await wallet.getPublicKey();
+      
+      expect(publicKey).to.be.a('string');
+      expect(publicKey).to.have.length(132); // 0x + 130 hex chars
+    });
+  });
+
+  describe('signMessage', () => {
+    const expectedSignature = '0x285568c8924deb6930e4368ae6be0e2814cc4cb3c0e6671a760a8861a81ab182681adff40234bec60387646c31078418e85cab5da70dbb3829ce8daf05b773061b';
+
+    it('should sign a string message', async () => {
+      const wallet = new EthWallet(privateKey);
+      const message = 'Hello, World!';
+      const signature = await wallet.signMessage(message);
+      
+      expect(signature).to.be.equal(expectedSignature);
     });
 
-    it('should create a random EthWallet with options', () => {
-      const options = { extraEntropy: utils.toUtf8Bytes('test entropy') };
-      const newWallet = EthWallet.createRandom(options);
+    it('should sign a Uint8Array message', async () => {
+      const wallet = new EthWallet(privateKey);
+      const message = new Uint8Array([72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33]); // "Hello, World!" in utf8 bytes
+      const signature = await wallet.signMessage(message);
 
-      expect(newWallet).to.be.instanceOf(EthWallet);
+      expect(signature).to.be.equal(expectedSignature);
     });
   });
 
   describe('sendTransaction', () => {
     const to =   '0x1234567890123456789012345678901234567890';
-    const from = '0x0987654321098765432109876543210987654321';
     const data = '0xa9059cbb000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e';
     const value = '1000000000000000000';
     const gasLimit = '21000';
     const gasPrice = '20000000000';
-    const mockTransactionResponse = {
-      hash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-      confirmations: 0,
-      from,
-      nonce: 1,
-      gasLimit: BigNumber.from(21000),
-      gasPrice: BigNumber.from(20000000000),
-      data: '0x',
-      value: BigNumber.from(0),
-      chainId: 1,
-      wait: stub().resolves({
-        transactionHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-        blockNumber: 12345,
-        gasUsed: BigNumber.from(21000),
-        cumulativeGasUsed: BigNumber.from(21000),
-        effectiveGasPrice: BigNumber.from(20000000000),
-        status: 1,
-        logs: [],
-        to,
-        from,
-        contractAddress: null,
-        transactionIndex: 0,
-        blockHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-        logsBloom: '0x',
-        byzantium: true,
-        type: 0,
-      }),
-    } as providers.TransactionResponse;
-    let sendTransactionStub: SinonStub;
 
-    beforeEach(() => {
-      sendTransactionStub = stub(Wallet.prototype, 'sendTransaction');
-      sendTransactionStub.resolves(mockTransactionResponse);
-    });
-
-    afterEach(() => {
-      sendTransactionStub.restore();
-    });
-
-    it('should send transaction without funcSig', async () => {
+    it('should work', async () => {
+      const wallet = new EthWallet(privateKey, { rpcUrls: ['https://eth.llamarpc.com'] });
+      
+      // Stub the walletClient.sendTransaction method
+      const mockHash = '0x1234567890123456789012345678901234567890123456789012345678901234';
+      stub((wallet as any).walletClient, 'sendTransaction').resolves(mockHash);
+      
       const transaction: ITransactionRequest = {
         to,
         data,
@@ -122,47 +122,56 @@ describe('EthWallet', () => {
       };
 
       const result = await wallet.sendTransaction(transaction);
+      console.warn(result);
 
-      expect(result).to.equal(mockTransactionResponse);
-      expect(sendTransactionStub.calledOnce).to.be.true;
-
-      // Verify that funcSig was excluded from the transaction passed to super.sendTransaction
-      const callArgs = sendTransactionStub.firstCall.args[0];
-      expect(callArgs).to.not.have.property('funcSig');
-      expect(callArgs.to).to.equal(transaction.to);
-      expect(callArgs.data).to.equal(transaction.data);
-      expect(callArgs.value).to.equal(transaction.value);
-    });
-
-    it('should handle standard ethers TransactionRequest', async () => {
-      const transaction: providers.TransactionRequest = {
-        to,
-        data,
-        value,
-        gasLimit,
-        gasPrice,
-      };
-
-      const result = await wallet.sendTransaction(transaction);
-
-      expect(result).to.equal(mockTransactionResponse);
-      expect(sendTransactionStub.calledOnce).to.be.true;
-
-      const callArgs = sendTransactionStub.firstCall.args[0];
-      expect(callArgs).to.deep.equal(transaction);
+      expect(result.hash).to.equal(mockHash);
+      expect(result.confirmations).to.equal(0);
+      expect(result).to.have.property('confirmations');
+      expect(result).to.have.property('nonce');
+      expect(result).to.have.property('gasPrice');
+      expect(result).to.have.property('gasLimit');
+      expect(result.gasPrice).to.equal(BigInt(gasPrice));
+      expect(result.gasLimit).to.equal(BigInt(gasLimit));
     });
   });
 
   describe('connect', () => {
     it('should connect wallet to provider', () => {
-      // Use a real provider instance instead of a mock
-      const provider = new providers.JsonRpcProvider();
-      const connectedWallet = wallet.connect(provider);
+      const wallet = new EthWallet(privateKey);
+      const config = { rpcUrls: ['https://eth.llamarpc.com'] };
+      const connectedWallet = wallet.connect(config);
 
-      expect(connectedWallet).to.be.instanceOf(EthWallet);
+      expect((connectedWallet as any).walletClient).to.exist;
+      expect((connectedWallet as any).walletClient).to.be.an('object');
       expect(connectedWallet).to.not.equal(wallet);
-      expect(connectedWallet.privateKey).to.equal(wallet.privateKey);
-      expect(connectedWallet.provider).to.equal(provider);
+      expect(connectedWallet.address).to.equal(wallet.address);
+    });
+  });
+
+  describe('privateKey getter/setter', () => {
+    it('should get the private key', () => {
+      const wallet = new EthWallet(privateKey);
+      expect(wallet.privateKey).to.equal(privateKey);
+    });
+
+    it('should set the private key and update account', () => {
+      const wallet = new EthWallet(privateKey);
+      const originalAddress = wallet.address;
+      
+      const newPrivateKey = '0x9876543210987654321098765432109876543210987654321098765432109876';
+      wallet.privateKey = newPrivateKey;
+      
+      expect(wallet.privateKey).to.equal(newPrivateKey);
+      expect(wallet.address).to.not.equal(originalAddress);
+    });
+
+    it('should automatically add 0x prefix when setting private key', () => {
+      const wallet = new EthWallet(privateKey);
+      const newPrivateKeyWithoutPrefix = '9876543210987654321098765432109876543210987654321098765432109876';
+      
+      wallet.privateKey = newPrivateKeyWithoutPrefix;
+      
+      expect(wallet.privateKey).to.equal(`0x${newPrivateKeyWithoutPrefix}`);
     });
   });
 }); 

@@ -1,4 +1,4 @@
-import { stub, SinonStub } from 'sinon';
+import { stub, SinonStub, restore } from 'sinon';
 import { delay, expect } from '@chimera-monorepo/utils';
 
 import * as Mockable from '../../src/lib/helpers/mockable';
@@ -13,6 +13,9 @@ describe('Subgraph Adapter - execute', () => {
   let request: SinonStub;
 
   beforeEach(() => {
+    // Restore any existing stubs to ensure a clean state
+    restore();
+    
     request = stub(Mockable, 'gqlRequest');
     request.resolves({ data: 'data' });
   });

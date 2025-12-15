@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AssetConfig } from '../../types';
-import { Interface } from 'ethers/lib/utils';
-import { providers } from 'ethers';
+import { type PublicClient } from '../chain';
 
 export const univ3PoolABI = [
   {
@@ -40,6 +40,7 @@ export const univ3PoolABI = [
  * @param pool - The pool address.
  * @param token0 - The token0 config.
  * @param token1 - The token1 config.
+ * @param client - The viem public client instance.
  * @returns The token0 price
  */
 export const getTokenPriceFromUniV3 = async (
@@ -47,7 +48,7 @@ export const getTokenPriceFromUniV3 = async (
   pool: string,
   token0: AssetConfig,
   token1: AssetConfig,
-  provider: providers.JsonRpcProvider,
+  client: PublicClient,
 ) => {
   /**
    * How can derive price from a tick?
@@ -70,19 +71,15 @@ export const getTokenPriceFromUniV3 = async (
    *
    * For more info, refer to the uniswap docs: https://docs.uniswap.org/concepts/protocol/oracle#deriving-price-from-a-tick
    **/
-  const univ3PoolIface = new Interface(univ3PoolABI);
-  const encodedDataForSlot0 = univ3PoolIface.encodeFunctionData('slot0');
-  const encodedResultData = await provider.call(
-    {
-      to: pool,
-      chainId: +domain,
-      data: encodedDataForSlot0,
-    },
-    'latest',
-  );
-  const [, tick] = univ3PoolIface.decodeFunctionResult('slot0', encodedResultData);
+  const result = (await client.readContract({
+    address: pool as `0x${string}`,
+    abi: univ3PoolABI,
+    functionName: 'slot0',
+  })) as [bigint, number, number, number, number, number, boolean];
+
+  const tick = result[1];
 
   const P = 1.0001;
-  const price0 = Math.pow(P, +tick) / Math.pow(10, token1.decimals - token0.decimals);
-  return price0;
+
+  return Math.pow(P, +tick) / Math.pow(10, token1.decimals - token0.decimals);
 };

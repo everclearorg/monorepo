@@ -28,7 +28,6 @@
   "dependencies": {
     "@chimera-monorepo/utils": "workspace:*",
     "@typescript-eslint/eslint-plugin": "5.52.0",
-    "ethers": "5.7.2",
     "ioredis": "5.3.1",
     "ioredis-mock": "8.2.6"
   },
@@ -40,6 +39,6 @@
     "rimraf": "5.0.1",
     "ts-mocha": "10.0.0",
     "tslib": "2.5.0",
-    "typescript": "5.3.3"
+    "typescript": "5.9.2"
   }
 }

@@ -1,4 +1,4 @@
-import { SinonStub, stub } from 'sinon';
+import { SinonStub, stub, restore } from 'sinon';
 import { AxiosQueryError, axiosGet, axiosPost, delay, expect, formatUrl, jsonifyError, parseHostname } from '../../src';
 import Axios from 'axios';
 
@@ -13,6 +13,10 @@ describe('Helpers:Axios', () => {
     postMock.resolves({ data });
     getMock = stub(Axios, 'get');
     getMock.resolves({ data });
+  });
+
+  afterEach(() => {
+    restore();
   });
 
   describe('#delay', () => {

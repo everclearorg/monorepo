@@ -1188,12 +1188,12 @@ BEGIN
         WHEN 'DISPATCHED_HUB' THEN 51
         WHEN 'DISPATCHED_SPOKE' THEN 52
         WHEN 'DISPATCHED_UNSUPPORTED' THEN 53
-        WHEN 'SETTLED' THEN 60
-        WHEN 'SETTLED_AND_COMPLETED' THEN 61
-        WHEN 'SETTLED_AND_MANUALLY_EXECUTED' THEN 62
-        WHEN 'UNSUPPORTED' THEN 70
-        WHEN 'UNSUPPORTED_RETURNED' THEN 71
-        WHEN 'DELIVERED' THEN 80
+        WHEN 'DELIVERED' THEN 60
+        WHEN 'SETTLED' THEN 70
+        WHEN 'SETTLED_AND_COMPLETED' THEN 71
+        WHEN 'SETTLED_AND_MANUALLY_EXECUTED' THEN 72
+        WHEN 'UNSUPPORTED' THEN 80
+        WHEN 'UNSUPPORTED_RETURNED' THEN 81
         ELSE 0
     END;
 END;
@@ -1490,7 +1490,7 @@ BEGIN
     pos := pos + 64;
     solver := '0x' || SUBSTRING(hex_data, pos, 64);
     pos := pos + 64;
-    receiver := '0x' || SUBSTRING(hex_data, pos, 64);
+    -- Get receiver from the EVMIntent struct
     pos := pos + 64;
     amount_out := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
     pos := pos + 16;
@@ -1498,7 +1498,7 @@ BEGIN
     -- Parse EVMIntent struct fields
     initiator := '0x' || SUBSTRING(hex_data, pos, 64);
     pos := pos + 64;
-    -- Skip intent.receiver (we already have the receiver from IntentFilledEvent)
+	receiver := '0x' || SUBSTRING(hex_data, pos, 64);
     pos := pos + 64;
     input_asset := '0x' || SUBSTRING(hex_data, pos, 64);
     pos := pos + 64;
@@ -5568,4 +5568,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251127055400'),
     ('20251202011749'),
     ('20251202161540'),
-    ('20251202165553');
+    ('20251202165553'),
+    ('20251205153936'),
+    ('20251211224120');
