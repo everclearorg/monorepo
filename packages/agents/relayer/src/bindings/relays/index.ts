@@ -82,6 +82,10 @@ export const pollCache = async () => {
     const domain = chainIdToDomain(chain)!;
 
     const _provider = await chainservice.getProvider(domain);
+    if (!_provider) {
+      logger.warn('No provider found for domain', _requestContext, methodContext, { domain });
+      continue;
+    }
 
     if (getVmFromDomainId(domain) === SupportedVms.evm) {
       // Set up Web3Signer for this chain.
@@ -99,7 +103,13 @@ export const pollCache = async () => {
           multicall: true,
         },
       }) as PublicClient;
-      (wallet as Web3Signer).connect(client);
+      const connectedWallet = (wallet as Web3Signer).connect(client);
+      // Explicitly update the provider's signer with the connected wallet that has publicClient set
+      await _provider.setSigner(connectedWallet);
+      logger.debug('Updated relayer signer', _requestContext, methodContext, {
+        domain,
+        rpcUrls,
+      });
     }
 
     for (const task of tasksByChain[chain]) {
