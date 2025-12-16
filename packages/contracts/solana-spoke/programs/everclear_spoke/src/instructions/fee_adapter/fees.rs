@@ -28,7 +28,6 @@ pub struct FeeData {
     pub token_fee: u64,
     pub native_fee: u64,
     pub deadline: u64,
-    pub intent_hash: [u8; 32],
 }
 // For batch orders - only what's needed for signature
 #[derive(AnchorSerialize, AnchorDeserialize)]

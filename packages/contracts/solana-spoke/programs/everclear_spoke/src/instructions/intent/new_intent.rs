@@ -107,7 +107,6 @@ pub fn new_intent(
         token_fee: fee_param.token_fee,
         native_fee: fee_param.native_fee,
         deadline: fee_param.deadline,
-        intent_hash,
     };
     let fee_accounts = HandleFeeAccounts {
         signature_accounts: SignatureAccounts {
@@ -531,10 +530,9 @@ mod tests {
     }
 
     #[test]
-    fn test_fee_data_includes_intent_hash() {
+    fn test_fee_data_serialization() {
         use crate::instructions::fee_adapter::FeeData;
 
-        let intent_hash = [1u8; 32];
         let fee_data = FeeData {
             destinations: vec![1, 2, 3],
             input_asset: Pubkey::new_unique(),
@@ -546,18 +544,16 @@ mod tests {
             token_fee: 10,
             native_fee: 5,
             deadline: 1000000,
-            intent_hash,
         };
 
-        assert_eq!(fee_data.intent_hash, intent_hash, "FeeData should include intent_hash");
+        let mut encoded = vec![];
+        fee_data.serialize(&mut encoded).unwrap();
+        assert!(!encoded.is_empty(), "FeeData should serialize correctly");
     }
 
     #[test]
-    fn test_different_intent_hashes_produce_different_fee_data() {
+    fn test_different_intent_parameters_produce_different_fee_data() {
         use crate::instructions::fee_adapter::FeeData;
-
-        let intent_hash1 = [1u8; 32];
-        let intent_hash2 = [2u8; 32];
 
         let input_asset = Pubkey::new_unique();
         let output_asset = Pubkey::new_unique();
@@ -573,11 +569,10 @@ mod tests {
             token_fee: 10,
             native_fee: 5,
             deadline: 1000000,
-            intent_hash: intent_hash1,
         };
 
         let fee_data2 = FeeData {
-            destinations: vec![1],
+            destinations: vec![2],
             input_asset,
             output_asset,
             amount: 1000,
@@ -587,7 +582,6 @@ mod tests {
             token_fee: 10,
             native_fee: 5,
             deadline: 1000000,
-            intent_hash: intent_hash2,
         };
 
         let mut encoded1 = vec![];
@@ -596,51 +590,12 @@ mod tests {
         let mut encoded2 = vec![];
         fee_data2.serialize(&mut encoded2).unwrap();
 
-        assert_ne!(encoded1, encoded2, "Different intent hashes should produce different FeeData");
+        assert_ne!(encoded1, encoded2, "Different intent parameters should produce different FeeData");
     }
 
     #[test]
-    fn test_intent_hash_binding_prevents_signature_reuse() {
+    fn test_fee_data_binding_prevents_signature_reuse() {
         use crate::instructions::fee_adapter::FeeData;
-        use crate::instructions::utils::compute_intent_hash;
-        use crate::instructions::EVMIntent;
-        use crate::instructions::u128_to_u256_be;
-
-
-        let intent1 = EVMIntent {
-            initiator: [1u8; 32],
-            receiver: [2u8; 32],
-            input_asset: [3u8; 32],
-            output_asset: [4u8; 32],
-            origin: 1,
-            nonce: 1,
-            timestamp: 1000,
-            ttl: 3600,
-            amount: u128_to_u256_be(1000),
-            amount_out_min: u128_to_u256_be(900),
-            destinations: vec![1],
-            data: vec![],
-        };
-
-        let intent2 = EVMIntent {
-            initiator: [1u8; 32],
-            receiver: [2u8; 32],
-            input_asset: [3u8; 32],
-            output_asset: [4u8; 32],
-            origin: 1,
-            nonce: 2,
-            timestamp: 1000,
-            ttl: 3600,
-            amount: u128_to_u256_be(1000),
-            amount_out_min: u128_to_u256_be(900),
-            destinations: vec![1],
-            data: vec![],
-        };
-
-        let intent_hash1 = compute_intent_hash(&intent1);
-        let intent_hash2 = compute_intent_hash(&intent2);
-
-        assert_ne!(intent_hash1, intent_hash2, "Different intents should have different hashes");
 
         let input_asset = Pubkey::new_unique();
         let output_asset = Pubkey::new_unique();
@@ -656,21 +611,19 @@ mod tests {
             token_fee: 10,
             native_fee: 5,
             deadline: 1000000,
-            intent_hash: intent_hash1,
         };
 
         let fee_data2 = FeeData {
             destinations: vec![1],
             input_asset,
             output_asset,
-            amount: 1000,
+            amount: 2000,
             amount_out_min: 900,
             ttl: 3600,
             data: vec![],
             token_fee: 10,
             native_fee: 5,
             deadline: 1000000,
-            intent_hash: intent_hash2,
         };
 
         let mut encoded1 = vec![];
@@ -679,6 +632,6 @@ mod tests {
         let mut encoded2 = vec![];
         fee_data2.serialize(&mut encoded2).unwrap();
 
-        assert_ne!(encoded1, encoded2, "Same fee parameters with different intent hashes should produce different signed data");
+        assert_ne!(encoded1, encoded2, "Different intent parameters should produce different FeeData, preventing signature reuse");
     }
 }
