@@ -85,7 +85,38 @@ export class Web3Signer implements ISigner {
     const identifier = await this.api.getPublicKey();
     const digestBytes = chainWrapper.serializeTransaction(baseTx as any);
 
-    const signature = await this.api.sign(identifier, digestBytes);
+    const signatureHex = await this.api.sign(identifier, digestBytes);
+
+    // Parse the hex signature
+    // This may return { r, s, yParity } or { r, s, v, yParity } depending on the signature format
+    const parsedSignature = chainWrapper.parseSignature(signatureHex as Hex);
+
+    // Use v if present, otherwise calculate it from yParity based on the transaction type
+    let v: number;
+    if ('v' in parsedSignature && parsedSignature.v !== undefined) {
+      v = Number(parsedSignature.v);
+    } else if ('yParity' in parsedSignature && parsedSignature.yParity !== undefined) {
+      // Calculate v from yParity based on the transaction type
+      // For legacy transactions (type 0): v = yParity + 27
+      // For EIP-1559 transactions (type 2): v = chainId * 2 + 35 + yParity
+      if (baseTx.type === 0) {
+        v = parsedSignature.yParity + 27;
+      } else {
+        if (!baseTx.chainId) {
+          throw new Error('chainId is required for EIP-1559 transactions');
+        }
+        v = Number(baseTx.chainId) * 2 + 35 + parsedSignature.yParity;
+      }
+    } else {
+      throw new Error('Parsed signature must contain either v or yParity');
+    }
+
+    const signature = {
+      r: parsedSignature.r,
+      s: parsedSignature.s,
+      v,
+    };
+
     return chainWrapper.serializeTransaction(baseTx as any, signature as any);
   }
 
