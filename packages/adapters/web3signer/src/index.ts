@@ -64,9 +64,9 @@ export class Web3Signer implements ISigner {
       {
         to: transaction.to || undefined,
         nonce: transaction.nonce ? Number(BigInt(transaction.nonce)) : undefined,
-        gasLimit: BigInt(transaction.gasLimit) || undefined,
+        gas: transaction.gasLimit ? BigInt(transaction.gasLimit) : undefined,
         data: transaction.data || undefined,
-        value: BigInt(transaction.value) || undefined,
+        value: transaction.value ? BigInt(transaction.value) : undefined,
         chainId: transaction.chainId || undefined,
       },
       // If an EIP-1559 transaction, use the EIP-1559 specific fields.
