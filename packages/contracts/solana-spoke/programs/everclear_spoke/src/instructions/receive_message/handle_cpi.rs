@@ -15,7 +15,10 @@ use crate::{
         mailbox::HandleInstruction, to_serializable_account_meta, SerializableAccountMeta,
         SimulationReturnData,
     },
-    instructions::messages::{HyperlaneMessages, MessageType, Settlement, Settlements},
+    instructions::{
+        messages::{HyperlaneMessages, MessageType, Settlement, Settlements},
+        utils::create_or_claim_intent_status_pda,
+    },
     intent_status_pda_seeds, mailbox_process_authority_pda_seeds,
     state::{IntentStatus, IntentStatusAccount, SpokeState},
 };
@@ -175,33 +178,13 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
             + std::mem::size_of::<IntentStatusAccount>()
             + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
-        let __anchor_rent = Rent::get()?;
-        let lamports = __anchor_rent.minimum_balance(space);
-        let inst = anchor_lang::solana_program::system_instruction::create_account(
-            &ctx.accounts.pda_payer.key(),
-            &intent_status_pda.key(),
-            lamports,
-            space as u64,
+        create_or_claim_intent_status_pda(
+            &ctx.accounts.pda_payer,
+            &intent_status_pda,
             ctx.program_id,
-        );
-
-        let payer_seed = &[
-            "everclear_spoke".as_bytes(),
-            "-".as_bytes(),
-            "pda_payer".as_bytes(),
-        ];
-        let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
-
-        invoke_signed(
-            &inst,
-            &[
-                ctx.accounts.pda_payer.to_account_info(),
-                intent_status_pda.to_account_info(),
-            ],
-            &[
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
-            ],
+            space,
+            &settlement.intent_id,
+            intent_status_bump,
         )?;
     } else {
         // the account is created beforehand
