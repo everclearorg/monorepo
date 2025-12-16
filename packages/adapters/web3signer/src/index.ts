@@ -85,8 +85,9 @@ export class Web3Signer implements ISigner {
     const identifier = await this.api.getPublicKey();
     const digestBytes = chainWrapper.serializeTransaction(baseTx as any);
 
-    const signature = await this.api.sign(identifier, digestBytes);
-    return chainWrapper.serializeTransaction(baseTx as any, signature as any);
+    const signatureHex = await this.api.sign(identifier, digestBytes);
+    const signature = chainWrapper.parseSignature(signatureHex as Hex);
+    return chainWrapper.serializeTransaction(baseTx as any, signature);
   }
 
   public async sendTransaction(transaction: ITransactionRequest): Promise<ITransactionResponse> {
