@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::program::invoke_signed;
 
 use crate::error::SpokeError;
 
@@ -68,6 +69,98 @@ fn u256_to_32bytes(val: u128) -> [u8; 32] {
         word[31 - i] = (val >> (8 * i)) as u8;
     }
     word
+}
+
+pub fn create_or_claim_intent_status_pda<'info>(
+    pda_payer: &AccountInfo<'info>,
+    intent_status_pda: &AccountInfo<'info>,
+    program_id: &Pubkey,
+    space: usize,
+    intent_id: &[u8; 32],
+    intent_status_bump: u8,
+) -> Result<()> {
+    use anchor_lang::solana_program::{
+        rent::Rent,
+        system_instruction,
+        system_program,
+    };
+    use crate::intent_status_pda_seeds;
+
+    let rent = Rent::get()?;
+    let required_lamports = rent.minimum_balance(space);
+    
+    let existing_lamports = intent_status_pda.lamports();
+    let account_owner = intent_status_pda.owner;
+    let system_program_id = system_program::ID;
+    
+    let payer_seed = &[
+        "everclear_spoke".as_bytes(),
+        "-".as_bytes(),
+        "pda_payer".as_bytes(),
+    ];
+    let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, program_id);
+
+    if existing_lamports == 0 {
+        let create_transfer_ix = system_instruction::transfer(
+            &pda_payer.key(),
+            &intent_status_pda.key(),
+            1, // Minimum to create account
+        );
+        
+        invoke_signed(
+            &create_transfer_ix,
+            &[
+                pda_payer.clone(),
+                intent_status_pda.clone(),
+            ],
+            &[&["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes(), &[payer_pda_bump]]],
+        )?;
+    }
+    
+    if account_owner == &system_program_id {
+        let allocate_ix = system_instruction::allocate(
+            &intent_status_pda.key(),
+            space as u64,
+        );
+        
+        invoke_signed(
+            &allocate_ix,
+            &[intent_status_pda.clone()],
+            &[intent_status_pda_seeds!(intent_id, intent_status_bump)],
+        )?;
+
+        let assign_ix = system_instruction::assign(
+            &intent_status_pda.key(),
+            program_id,
+        );
+        
+        invoke_signed(
+            &assign_ix,
+            &[intent_status_pda.clone()],
+            &[intent_status_pda_seeds!(intent_id, intent_status_bump)],
+        )?;
+    }
+
+    let current_lamports = intent_status_pda.lamports();
+    if current_lamports < required_lamports {
+        let transfer_lamports = required_lamports - current_lamports;
+        let transfer_ix = system_instruction::transfer(
+            &pda_payer.key(),
+            &intent_status_pda.key(),
+            transfer_lamports,
+        );
+        
+        invoke_signed(
+            &transfer_ix,
+            &[
+                pda_payer.clone(),
+                intent_status_pda.clone(),
+            ],
+            &[&["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes(), &[payer_pda_bump]]],
+        )?;
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
