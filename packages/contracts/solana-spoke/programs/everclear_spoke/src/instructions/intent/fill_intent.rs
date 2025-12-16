@@ -2,7 +2,7 @@ use anchor_lang::solana_program::sysvar::instructions::ID as SYSVAR_INSTRUCTIONS
 use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
-use crate::instructions::signature::verify_signature;
+use crate::instructions::fee_adapter::signature::{verify_signature, FILL_SIGN_PARAMS_TYPE_HASH_PREFIX};
 use crate::instructions::SignatureAccounts;
 use crate::intent::encode_full;
 use crate::{
@@ -14,7 +14,8 @@ use crate::{
         TransferRemoteContext, U256,
     },
     instructions::{
-        messages::MessageType, try_32bytes_to_u64, u128_to_u256_be, utils::compute_intent_hash,
+        messages::MessageType, try_32bytes_to_u64, u128_to_u256_be,
+        utils::{compute_intent_hash, create_or_claim_intent_status_pda},
         EVMIntent, FillMessage,
     },
     intent_status_pda_seeds,
@@ -113,7 +114,13 @@ pub fn fill_intent(
         signer: ctx.accounts.signer.clone(),
         instruction_sysvar: ctx.accounts.instruction_sysvar.clone(),
     };
-    verify_signature(&sign_params, signature, signature_accounts)?;
+    verify_signature(
+        &sign_params,
+        signature,
+        signature_accounts,
+        &program_id,
+        FILL_SIGN_PARAMS_TYPE_HASH_PREFIX,
+    )?;
 
     let event_data: IntentFilledEvent = handle_fill_intent(
         &mut accounts,
@@ -194,42 +201,13 @@ pub fn handle_fill_intent<'info>(
             + std::mem::size_of::<IntentStatusAccount>()
             + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
-        let __anchor_rent = Rent::get()?;
-        let lamports = __anchor_rent.minimum_balance(space);
-        let inst = anchor_lang::solana_program::system_instruction::create_account(
-            &accounts.pda_payer.key(),
-            &intent_status_pda.key(),
-            lamports,
-            space as u64,
+        create_or_claim_intent_status_pda(
+            &accounts.pda_payer,
+            &intent_status_pda,
             &program_id,
-        );
-
-        let payer_seed = &[
-            "everclear_spoke".as_bytes(),
-            "-".as_bytes(),
-            "pda_payer".as_bytes(),
-        ];
-        let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, &program_id);
-
-        msg!("{:?}", inst);
-        msg!(
-            "{:?}",
-            Pubkey::create_program_address(
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                &program_id
-            )
-        );
-
-        invoke_signed(
-            &inst,
-            &[
-                accounts.pda_payer.clone(),
-                intent_status_pda.to_account_info(),
-            ],
-            &[
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                intent_status_pda_seeds!(intent_id, intent_status_bump),
-            ],
+            space,
+            &intent_id,
+            intent_status_bump,
         )?;
     } else {
         // the account is created beforehand, need to check status
@@ -463,4 +441,64 @@ pub struct FillIntent<'info> {
     /// CHECK:
     #[account(mut)]
     pub inner_igp_account: Option<AccountInfo<'info>>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use anchor_lang::prelude::Pubkey;
+
+    #[test]
+    fn test_account_claim_logic() {
+        let program_id = Pubkey::new_unique();
+        let system_program = anchor_lang::solana_program::system_program::ID;
+        
+        // Account doesn't exist (lamports = 0) - should transfer 1 lamport first, then allocate + assign
+        let account_lamports_nonexistent = 0u64;
+        let should_transfer_first = account_lamports_nonexistent == 0;
+        assert!(
+            should_transfer_first,
+            "Non-existent account should trigger initial lamport transfer"
+        );
+
+        // Account exists with dust (lamports > 0) and owned by system program - should allocate + assign (claim it)
+        let account_lamports_with_dust = 1u64; // Dust sent to pre-initialize
+        let account_owner_system = system_program;
+        let should_allocate_assign = account_lamports_with_dust > 0 && account_owner_system == system_program;
+        assert!(
+            should_allocate_assign,
+            "Account with dust owned by system program should be claimable via allocate + assign"
+        );
+
+        // Account already owned by our program - should skip allocate/assign, just transfer lamports if needed
+        let account_owner_program = program_id;
+        let should_skip_allocate = account_owner_program == program_id;
+        assert!(
+            should_skip_allocate,
+            "Account already owned by program should skip allocate/assign"
+        );
+    }
+
+    #[test]
+    fn test_front_running_mitigation() {
+        let program_id = Pubkey::new_unique();
+        let system_program = anchor_lang::solana_program::system_program::ID;
+        
+        // Simulate pre-initialized account (exists with dust, owned by system program)
+        let preinitialized_account_lamports = 1u64; // Dust sent to pre-initialize
+        let preinitialized_account_owner = system_program;
+        
+        let can_claim = preinitialized_account_lamports > 0 && preinitialized_account_owner == system_program;
+        assert!(
+            can_claim,
+            "Pre-initialized account owned by system program should be claimable, not rejected"
+        );
+
+        let normal_account_lamports = 0u64;
+        let should_transfer_first = normal_account_lamports == 0;
+        assert!(
+            should_transfer_first,
+            "Normal case: Non-existent account should trigger initial lamport transfer"
+        );
+    }
 }

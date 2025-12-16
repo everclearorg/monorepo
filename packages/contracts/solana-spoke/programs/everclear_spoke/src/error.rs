@@ -94,4 +94,6 @@ pub enum SpokeError {
     InvalidDestinationArray,
     #[msg("intent is already filled")]
     InvalidFillIntentStatus,
+    #[msg("Intent hash mismatch - signature not bound to this intent")]
+    InvalidIntentHash,
 }
