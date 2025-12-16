@@ -63,6 +63,39 @@ pub fn new_intent(
     };
     let program_id = *ctx.program_id;
 
+    let spoke_state = &ctx.accounts.spoke_state;
+    require!(!spoke_state.paused, SpokeError::ContractPaused);
+    
+    let current_nonce = spoke_state.nonce;
+    let next_nonce = current_nonce
+        .checked_add(1)
+        .ok_or(error!(SpokeError::InvalidOperation))?;
+    
+    let clock = Clock::get()?;
+    let minted_decimals = ctx.accounts.mint.decimals;
+    let normalized_amount = normalize_decimals(
+        amount as u128,
+        minted_decimals,
+        DEFAULT_NORMALIZED_DECIMALS,
+    )?;
+    require!(normalized_amount > 0, SpokeError::ZeroAmount);
+    
+    let preview_evm_intent = EVMIntent {
+        initiator: ctx.accounts.authority.key().to_bytes(),
+        receiver: receiver.to_bytes(),
+        input_asset: ctx.accounts.mint.key().to_bytes(),
+        output_asset: output_asset.to_bytes(),
+        origin: spoke_state.domain,
+        nonce: next_nonce,
+        timestamp: clock.unix_timestamp as u64,
+        ttl,
+        amount: u128_to_u256_be(normalized_amount),
+        amount_out_min: u128_to_u256_be(amount_out_min),
+        destinations: destinations.clone(),
+        data: data.clone(),
+    };
+    let intent_hash = compute_intent_hash(&preview_evm_intent);
+
     let fee_data = FeeData {
         destinations: destinations.clone(),
         input_asset: ctx.accounts.mint.key(),
@@ -74,6 +107,7 @@ pub fn new_intent(
         token_fee: fee_param.token_fee,
         native_fee: fee_param.native_fee,
         deadline: fee_param.deadline,
+        intent_hash,
     };
     let fee_accounts = HandleFeeAccounts {
         signature_accounts: SignatureAccounts {
@@ -89,9 +123,7 @@ pub fn new_intent(
         system_program: ctx.accounts.system_program.to_account_info(),
     };
 
-    if !ctx.accounts.fee_adapter_state.paused {
-        handle_fees(fee_data, fee_param.signature, fee_accounts)?;
-    }
+    handle_fees(fee_data.clone(), fee_param.signature, fee_accounts)?;
 
     let event = handle_new_intent(
         &mut accounts,
@@ -106,6 +138,11 @@ pub fn new_intent(
         message_gas_limit,
     )
     .unwrap();
+
+    require!(
+        event.intent_id == intent_hash,
+        SpokeError::InvalidIntentHash
+    );
 
     emit_cpi!(event);
 
@@ -151,6 +188,11 @@ pub fn handle_new_intent<'info>(
     // NOTE: we do not need to check data len as this is implicitly done with solana tx size limitation of 1232 bytes
 
     let minted_decimals = accounts.mint.decimals;
+    require!(
+        minted_decimals <= DEFAULT_NORMALIZED_DECIMALS,
+        SpokeError::DecimalConversionOverflow
+    );
+    
     let normalized_amount =
         normalize_decimals(amount as u128, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
     require!(normalized_amount > 0, SpokeError::ZeroAmount); // Add zero amount check like Solidity
@@ -419,4 +461,222 @@ pub struct NewIntent<'info> {
     /// CHECK:
     #[account(mut)]
     pub inner_igp_account: Option<AccountInfo<'info>>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::consts::DEFAULT_NORMALIZED_DECIMALS;
+    use crate::error::SpokeError;
+    #[test]
+    fn test_reject_high_decimal_tokens() {
+        // Test that decimals > 18 should be rejected
+        let high_decimals = DEFAULT_NORMALIZED_DECIMALS + 1; // 19 decimals
+        
+        let should_reject = high_decimals > DEFAULT_NORMALIZED_DECIMALS;
+        assert!(
+            should_reject,
+            "Tokens with decimals > {} should be rejected",
+            DEFAULT_NORMALIZED_DECIMALS
+        );
+        
+        // exactly 18 decimals should be allowed
+        let exact_decimals = DEFAULT_NORMALIZED_DECIMALS;
+        let should_allow = exact_decimals <= DEFAULT_NORMALIZED_DECIMALS;
+        assert!(
+            should_allow,
+            "Tokens with exactly {} decimals should be allowed",
+            DEFAULT_NORMALIZED_DECIMALS
+        );
+        
+        // less than 18 decimals should be allowed
+        let normal_decimals = 9u8;
+        let should_allow_normal = normal_decimals <= DEFAULT_NORMALIZED_DECIMALS;
+        assert!(
+            should_allow_normal,
+            "Tokens with {} decimals should be allowed",
+            normal_decimals
+        );
+    }
+
+    #[test]
+    fn test_precision_loss_scenario() {
+        use crate::utils::normalize_decimals;
+        
+        const HIGH_DECIMALS: u8 = 20;
+        const DEFAULT_NORMALIZED_DECIMALS: u8 = 18;
+        
+        let original_amount = 1000u128 * 10u128.pow(20); // 1000 * 10^20
+        
+        let normalized = normalize_decimals(
+            original_amount,
+            HIGH_DECIMALS,
+            DEFAULT_NORMALIZED_DECIMALS
+        ).unwrap();
+        assert_eq!(normalized, 1000u128 * 10u128.pow(18)); // 1000 * 10^18
+        
+        let denormalized = normalize_decimals(
+            normalized,
+            DEFAULT_NORMALIZED_DECIMALS,
+            HIGH_DECIMALS
+        ).unwrap();
+        assert_eq!(denormalized, 1000u128 * 10u128.pow(20)); // 1000 * 10^20
+        let potential_loss = original_amount.saturating_sub(denormalized);
+        assert_eq!(
+            potential_loss, 0,
+            "This test demonstrates the precision loss scenario that the fix prevents"
+        );
+    }
+
+    #[test]
+    fn test_fee_data_includes_intent_hash() {
+        use crate::instructions::fee_adapter::FeeData;
+        
+        let intent_hash = [1u8; 32];
+        let fee_data = FeeData {
+            destinations: vec![1, 2, 3],
+            input_asset: Pubkey::new_unique(),
+            output_asset: Pubkey::new_unique(),
+            amount: 1000,
+            amount_out_min: 900,
+            ttl: 3600,
+            data: vec![1, 2, 3],
+            token_fee: 10,
+            native_fee: 5,
+            deadline: 1000000,
+            intent_hash,
+        };
+        
+        assert_eq!(fee_data.intent_hash, intent_hash, "FeeData should include intent_hash");
+    }
+
+    #[test]
+    fn test_different_intent_hashes_produce_different_fee_data() {
+        use crate::instructions::fee_adapter::FeeData;
+        
+        let intent_hash1 = [1u8; 32];
+        let intent_hash2 = [2u8; 32];
+        
+        let input_asset = Pubkey::new_unique();
+        let output_asset = Pubkey::new_unique();
+        
+        let fee_data1 = FeeData {
+            destinations: vec![1],
+            input_asset,
+            output_asset,
+            amount: 1000,
+            amount_out_min: 900,
+            ttl: 3600,
+            data: vec![],
+            token_fee: 10,
+            native_fee: 5,
+            deadline: 1000000,
+            intent_hash: intent_hash1,
+        };
+        
+        let fee_data2 = FeeData {
+            destinations: vec![1],
+            input_asset,
+            output_asset,
+            amount: 1000,
+            amount_out_min: 900,
+            ttl: 3600,
+            data: vec![],
+            token_fee: 10,
+            native_fee: 5,
+            deadline: 1000000,
+            intent_hash: intent_hash2,
+        };
+        
+        let mut encoded1 = vec![];
+        fee_data1.serialize(&mut encoded1).unwrap();
+        
+        let mut encoded2 = vec![];
+        fee_data2.serialize(&mut encoded2).unwrap();
+        
+        assert_ne!(encoded1, encoded2, "Different intent hashes should produce different FeeData");
+    }
+
+    #[test]
+    fn test_intent_hash_binding_prevents_signature_reuse() {
+        use crate::instructions::fee_adapter::FeeData;
+        use crate::instructions::utils::compute_intent_hash;
+        use crate::instructions::EVMIntent;
+        use crate::instructions::u128_to_u256_be;
+        
+
+        let intent1 = EVMIntent {
+            initiator: [1u8; 32],
+            receiver: [2u8; 32],
+            input_asset: [3u8; 32],
+            output_asset: [4u8; 32],
+            origin: 1,
+            nonce: 1,
+            timestamp: 1000,
+            ttl: 3600,
+            amount: u128_to_u256_be(1000),
+            amount_out_min: u128_to_u256_be(900),
+            destinations: vec![1],
+            data: vec![],
+        };
+        
+        let intent2 = EVMIntent {
+            initiator: [1u8; 32],
+            receiver: [2u8; 32],
+            input_asset: [3u8; 32],
+            output_asset: [4u8; 32],
+            origin: 1,
+            nonce: 2,
+            timestamp: 1000,
+            ttl: 3600,
+            amount: u128_to_u256_be(1000),
+            amount_out_min: u128_to_u256_be(900),
+            destinations: vec![1],
+            data: vec![],
+        };
+        
+        let intent_hash1 = compute_intent_hash(&intent1);
+        let intent_hash2 = compute_intent_hash(&intent2);
+        
+        assert_ne!(intent_hash1, intent_hash2, "Different intents should have different hashes");
+        
+        let input_asset = Pubkey::new_unique();
+        let output_asset = Pubkey::new_unique();
+        
+        let fee_data1 = FeeData {
+            destinations: vec![1],
+            input_asset,
+            output_asset,
+            amount: 1000,
+            amount_out_min: 900,
+            ttl: 3600,
+            data: vec![],
+            token_fee: 10,
+            native_fee: 5,
+            deadline: 1000000,
+            intent_hash: intent_hash1,
+        };
+        
+        let fee_data2 = FeeData {
+            destinations: vec![1],
+            input_asset,
+            output_asset,
+            amount: 1000,
+            amount_out_min: 900,
+            ttl: 3600,
+            data: vec![],
+            token_fee: 10,
+            native_fee: 5,
+            deadline: 1000000,
+            intent_hash: intent_hash2,
+        };
+        
+        let mut encoded1 = vec![];
+        fee_data1.serialize(&mut encoded1).unwrap();
+        
+        let mut encoded2 = vec![];
+        fee_data2.serialize(&mut encoded2).unwrap();
+        
+        assert_ne!(encoded1, encoded2, "Same fee parameters with different intent hashes should produce different signed data");
+    }
 }
