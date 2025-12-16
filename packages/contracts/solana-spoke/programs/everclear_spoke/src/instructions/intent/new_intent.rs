@@ -65,12 +65,12 @@ pub fn new_intent(
 
     let spoke_state = &ctx.accounts.spoke_state;
     require!(!spoke_state.paused, SpokeError::ContractPaused);
-    
+
     let current_nonce = spoke_state.nonce;
     let next_nonce = current_nonce
         .checked_add(1)
         .ok_or(error!(SpokeError::InvalidOperation))?;
-    
+
     let clock = Clock::get()?;
     let minted_decimals = ctx.accounts.mint.decimals;
     let normalized_amount = normalize_decimals(
@@ -79,7 +79,7 @@ pub fn new_intent(
         DEFAULT_NORMALIZED_DECIMALS,
     )?;
     require!(normalized_amount > 0, SpokeError::ZeroAmount);
-    
+
     let preview_evm_intent = EVMIntent {
         initiator: ctx.accounts.authority.key().to_bytes(),
         receiver: receiver.to_bytes(),
@@ -123,7 +123,9 @@ pub fn new_intent(
         system_program: ctx.accounts.system_program.to_account_info(),
     };
 
-    handle_fees(fee_data.clone(), fee_param.signature, fee_accounts)?;
+    if !ctx.accounts.fee_adapter_state.paused {
+        handle_fees(fee_data, fee_param.signature, fee_accounts, &program_id)?;
+    }
 
     let event = handle_new_intent(
         &mut accounts,
@@ -531,7 +533,7 @@ mod tests {
     #[test]
     fn test_fee_data_includes_intent_hash() {
         use crate::instructions::fee_adapter::FeeData;
-        
+
         let intent_hash = [1u8; 32];
         let fee_data = FeeData {
             destinations: vec![1, 2, 3],
@@ -546,20 +548,20 @@ mod tests {
             deadline: 1000000,
             intent_hash,
         };
-        
+
         assert_eq!(fee_data.intent_hash, intent_hash, "FeeData should include intent_hash");
     }
 
     #[test]
     fn test_different_intent_hashes_produce_different_fee_data() {
         use crate::instructions::fee_adapter::FeeData;
-        
+
         let intent_hash1 = [1u8; 32];
         let intent_hash2 = [2u8; 32];
-        
+
         let input_asset = Pubkey::new_unique();
         let output_asset = Pubkey::new_unique();
-        
+
         let fee_data1 = FeeData {
             destinations: vec![1],
             input_asset,
@@ -573,7 +575,7 @@ mod tests {
             deadline: 1000000,
             intent_hash: intent_hash1,
         };
-        
+
         let fee_data2 = FeeData {
             destinations: vec![1],
             input_asset,
@@ -587,13 +589,13 @@ mod tests {
             deadline: 1000000,
             intent_hash: intent_hash2,
         };
-        
+
         let mut encoded1 = vec![];
         fee_data1.serialize(&mut encoded1).unwrap();
-        
+
         let mut encoded2 = vec![];
         fee_data2.serialize(&mut encoded2).unwrap();
-        
+
         assert_ne!(encoded1, encoded2, "Different intent hashes should produce different FeeData");
     }
 
@@ -603,7 +605,7 @@ mod tests {
         use crate::instructions::utils::compute_intent_hash;
         use crate::instructions::EVMIntent;
         use crate::instructions::u128_to_u256_be;
-        
+
 
         let intent1 = EVMIntent {
             initiator: [1u8; 32],
@@ -619,7 +621,7 @@ mod tests {
             destinations: vec![1],
             data: vec![],
         };
-        
+
         let intent2 = EVMIntent {
             initiator: [1u8; 32],
             receiver: [2u8; 32],
@@ -634,15 +636,15 @@ mod tests {
             destinations: vec![1],
             data: vec![],
         };
-        
+
         let intent_hash1 = compute_intent_hash(&intent1);
         let intent_hash2 = compute_intent_hash(&intent2);
-        
+
         assert_ne!(intent_hash1, intent_hash2, "Different intents should have different hashes");
-        
+
         let input_asset = Pubkey::new_unique();
         let output_asset = Pubkey::new_unique();
-        
+
         let fee_data1 = FeeData {
             destinations: vec![1],
             input_asset,
@@ -656,7 +658,7 @@ mod tests {
             deadline: 1000000,
             intent_hash: intent_hash1,
         };
-        
+
         let fee_data2 = FeeData {
             destinations: vec![1],
             input_asset,
@@ -670,13 +672,13 @@ mod tests {
             deadline: 1000000,
             intent_hash: intent_hash2,
         };
-        
+
         let mut encoded1 = vec![];
         fee_data1.serialize(&mut encoded1).unwrap();
-        
+
         let mut encoded2 = vec![];
         fee_data2.serialize(&mut encoded2).unwrap();
-        
+
         assert_ne!(encoded1, encoded2, "Same fee parameters with different intent hashes should produce different signed data");
     }
 }
