@@ -14,10 +14,9 @@ import { CachedTaskData } from '@chimera-monorepo/adapters-cache';
 import { FastifyInstance, FastifyReply } from 'fastify';
 
 import { getContext } from '../../make';
-import { getVmFromDomainId, WriteTransaction } from '@chimera-monorepo/chainservice';
+import { getVmFromDomainId, WriteTransaction, SupportedVms } from '@chimera-monorepo/chainservice';
 import { getFastifyInstance } from '../../mockable';
 import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
-import { SupportedVms } from '@chimera-monorepo/chainservice/src/shared/rpc';
 
 export const MIN_GAS_LIMIT = BigInt(4_000_000);
 export const MIN_HEART_INTERVAL_SECONDS = 60; // 1min
@@ -103,9 +102,7 @@ export const pollCache = async () => {
           multicall: true,
         },
       }) as PublicClient;
-      const connectedWallet = (wallet as Web3Signer).connect(client);
-      // Explicitly update the provider's signer with the connected wallet that has publicClient set
-      await _provider.setSigner(connectedWallet);
+      (wallet as Web3Signer).connect(client);
       logger.debug('Updated relayer signer', _requestContext, methodContext, {
         domain,
         rpcUrls,
