@@ -88,5 +88,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-mantle",
+    "domain": "5000",
+    "environment": "staging",
+    "network": "mantle",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]
