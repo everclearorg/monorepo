@@ -14,7 +14,7 @@ use hyperlane::{
     SimulationReturnData,
 };
 use instructions::fee_adapter::{
-    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter,
+    CloseFeeAdapter, FeeAdapterAdminState, FeeParams, InitializeFeeAdapter, MigrateFeeAdapter,
     __client_accounts_fee_adapter_admin_state, __client_accounts_initialize_fee_adapter,
 };
 
@@ -334,5 +334,28 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
         fee_adapter::unpause_fee_adapter(ctx)
+    }
+
+    pub fn close_fee_adapter(ctx: Context<CloseFeeAdapter>) -> Result<()> {
+        let state = &ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.payer.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::close_fee_adapter(ctx)
+    }
+
+    pub fn migrate_fee_adapter(
+        ctx: Context<MigrateFeeAdapter>,
+        fee_recipient: Pubkey,
+        fee_signer: Pubkey,
+        fill_signer: Pubkey,
+    ) -> Result<()> {
+        let state = &ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.payer.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::migrate_fee_adapter(ctx, fee_recipient, fee_signer, fill_signer)
     }
 }

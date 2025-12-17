@@ -19,6 +19,7 @@ import { assetDashboard } from './tasks/assetDashboard';
 import { logOwners } from './tasks/logOwners';
 import { createNewIntent } from './tasks/createNewIntent';
 import { fillIntent } from './tasks/fillIntent';
+import { migrateFeeAdapter } from './tasks/migrateFeeAdapter';
 
 async function main() {
   const mainTask = await select({
@@ -68,6 +69,10 @@ async function main() {
       {
         name: 'Fill Intent',
         value: 'fill_intent',
+      },
+      {
+        name: 'Migrate Fee Adapter (Solana)',
+        value: 'migrate_fee_adapter',
       },
       {
         name: 'Handle expired intents',
@@ -158,6 +163,9 @@ async function main() {
       break;
     case 'fill_intent':
       fillIntent();
+      break;
+    case 'migrate_fee_adapter':
+      migrateFeeAdapter();
       break;
     case 'cancel':
       return;

@@ -429,6 +429,7 @@ pub struct FillIntent<'info> {
     #[account(mut)]
     pub configured_igp_account: AccountInfo<'info>,
 
+    /// CHECK: The signer address is validated against fee_adapter_state.fill_signer
     #[account(address = fee_adapter_state.fill_signer)]
     pub signer: AccountInfo<'info>,
 

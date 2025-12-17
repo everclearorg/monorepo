@@ -413,7 +413,7 @@ pub struct NewIntent<'info> {
     #[account(mut)]
     pub dispatch_authority: AccountInfo<'info>,
 
-    // A unique message / gas payment account (signer)
+    /// CHECK: A unique message / gas payment account (signer)
     #[account(mut, signer)]
     pub unique_message_account: AccountInfo<'info>,
 
