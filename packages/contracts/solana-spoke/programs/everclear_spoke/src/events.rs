@@ -110,7 +110,6 @@ pub struct VaultAuthorityBumpUpdatedEvent {
 pub struct InitializedFeeAdapterEvent {
     pub fee_recipient: Pubkey,
     pub fee_signer: Pubkey,
-    pub fill_signer: Pubkey,
 }
 
 #[event]
@@ -123,12 +122,6 @@ pub struct FeeRecipientUpdatedEvent {
 pub struct FeeSignerUpdatedEvent {
     pub old_fee_signer: Pubkey,
     pub new_fee_signer: Pubkey,
-}
-
-#[event]
-pub struct FillSignerUpdatedEvent {
-    pub old_fill_signer: Pubkey,
-    pub new_fill_signer: Pubkey,
 }
 
 #[event]

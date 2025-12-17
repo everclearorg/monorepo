@@ -62,13 +62,12 @@ pub struct FeeAdapterState {
     pub paused: bool,
     pub fee_recipient: Pubkey,
     pub fee_signer: Pubkey,
-    pub fill_signer: Pubkey,
     pub bump: u8,
 }
 
 impl FeeAdapterState {
     pub const SIZE: usize = 2 // 2 bool
-        + 32 * 3 // 3 Pubkey (fee_recipient, fee_signer, fill_signer)
+        + 32 * 2 // 2 Pubkey
         + 1; // u8
 }
 

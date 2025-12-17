@@ -329,6 +329,8 @@ pub struct NewIntentAccounts<'info> {
     pub hyperlane_mailbox: Interface<'info, Mailbox>,
     pub mailbox_outbox: AccountInfo<'info>,
     pub dispatch_authority: AccountInfo<'info>,
+    /// A unique message / gas payment account
+    /// CHECK: Typically validated by IGP / mailbox, so we skip direct Anchor checks
     pub unique_message_account: AccountInfo<'info>,
     pub dispatched_message_pda: AccountInfo<'info>,
     pub igp_program: Interface<'info, Igp>,
@@ -413,7 +415,8 @@ pub struct NewIntent<'info> {
     #[account(mut)]
     pub dispatch_authority: AccountInfo<'info>,
 
-    // A unique message / gas payment account (signer)
+    /// A unique message / gas payment account (signer)
+    /// CHECK: Typically validated by IGP / mailbox, so we skip direct Anchor checks
     #[account(mut, signer)]
     pub unique_message_account: AccountInfo<'info>,
 
