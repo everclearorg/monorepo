@@ -122,9 +122,11 @@ pub fn new_intent(
         system_program: ctx.accounts.system_program.to_account_info(),
     };
 
-    if !ctx.accounts.fee_adapter_state.paused {
-        handle_fees(fee_data, fee_param.signature, fee_accounts, &program_id)?;
-    }
+    require!(
+        !ctx.accounts.fee_adapter_state.paused,
+        SpokeError::FeeAdapterPaused
+    );
+    handle_fees(fee_data, fee_param.signature, fee_accounts, &program_id)?;
 
     let event = handle_new_intent(
         &mut accounts,
