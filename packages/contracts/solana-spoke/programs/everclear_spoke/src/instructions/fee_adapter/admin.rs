@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::{
-    events::{FeeAdapterPausedEvent, FeeRecipientUpdatedEvent, FeeSignerUpdatedEvent},
+    events::{FeeAdapterPausedEvent, FeeRecipientUpdatedEvent, FeeSignerUpdatedEvent, FillSignerUpdatedEvent},
     state::{FeeAdapterState, SpokeState},
 };
 
@@ -42,6 +42,16 @@ pub fn update_fee_signer(ctx: Context<FeeAdapterAdminState>, new_fee_signer: Pub
     emit_cpi!(FeeSignerUpdatedEvent {
         old_fee_signer,
         new_fee_signer,
+    });
+    Ok(())
+}
+
+pub fn update_fill_signer(ctx: Context<FeeAdapterAdminState>, new_fill_signer: Pubkey) -> Result<()> {
+    let old_fill_signer = ctx.accounts.fee_adapter_state.fill_signer;
+    ctx.accounts.fee_adapter_state.fill_signer = new_fill_signer;
+    emit_cpi!(FillSignerUpdatedEvent {
+        old_fill_signer,
+        new_fill_signer,
     });
     Ok(())
 }
