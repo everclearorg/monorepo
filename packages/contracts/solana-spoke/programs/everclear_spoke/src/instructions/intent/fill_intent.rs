@@ -429,7 +429,8 @@ pub struct FillIntent<'info> {
     #[account(mut)]
     pub configured_igp_account: AccountInfo<'info>,
 
-    #[account(address = fee_adapter_state.fill_signer)]
+    /// CHECK: we verify this is consistent with fee_signer
+    #[account(address = fee_adapter_state.fee_signer)]
     pub signer: AccountInfo<'info>,
 
     /// CHECK: we verify this is consistent with SYSVAR_INSTRUCTIONS
@@ -446,48 +447,6 @@ pub struct FillIntent<'info> {
 mod tests {
     use super::*;
     use anchor_lang::prelude::Pubkey;
-    use crate::state::FeeAdapterState;
-
-    #[test]
-    fn test_update_fill_signer_independence() {
-        let original_fee_signer = Pubkey::new_unique();
-        let original_fill_signer = Pubkey::new_unique();
-        let new_fill_signer = Pubkey::new_unique();
-        
-        // Simulate initial state
-        let mut fee_adapter_state = FeeAdapterState {
-            initialized: true,
-            paused: false,
-            fee_recipient: Pubkey::new_unique(),
-            fee_signer: original_fee_signer,
-            fill_signer: original_fill_signer,
-            bump: 0,
-        };
-        
-        // Simulate update_fill_signer
-        let old_fill_signer = fee_adapter_state.fill_signer;
-        fee_adapter_state.fill_signer = new_fill_signer;
-        
-        // Verify fill_signer was updated
-        assert_eq!(
-            fee_adapter_state.fill_signer,
-            new_fill_signer,
-            "fill_signer should be updated to new_fill_signer"
-        );
-        assert_ne!(
-            fee_adapter_state.fill_signer,
-            old_fill_signer,
-            "fill_signer should be different from old value"
-        );
-        
-        // Verify fee_signer was NOT affected
-        assert_eq!(
-            fee_adapter_state.fee_signer,
-            original_fee_signer,
-            "fee_signer should remain unchanged when updating fill_signer"
-        );
-    }
-
 
     #[test]
     fn test_account_claim_logic() {

@@ -278,14 +278,13 @@ pub mod everclear_spoke {
         ctx: Context<InitializeFeeAdapter>,
         fee_recipient: Pubkey,
         fee_signer: Pubkey,
-        fill_signer: Pubkey,
     ) -> Result<()> {
         let state = &ctx.accounts.spoke_state;
         require!(
             state.owner == ctx.accounts.payer.key(),
             SpokeError::OnlyOwner
         );
-        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer, fill_signer)
+        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer)
     }
 
     pub fn update_fee_recipient(
@@ -307,15 +306,6 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
         fee_adapter::update_fee_signer(ctx, fee_signer)
-    }
-
-    pub fn update_fill_signer(ctx: Context<FeeAdapterAdminState>, fill_signer: Pubkey) -> Result<()> {
-        let state = &mut ctx.accounts.spoke_state;
-        require!(
-            state.owner == ctx.accounts.admin.key(),
-            SpokeError::OnlyOwner
-        );
-        fee_adapter::update_fill_signer(ctx, fill_signer)
     }
 
     pub fn pause_fee_adapter(ctx: Context<FeeAdapterAdminState>) -> Result<()> {
