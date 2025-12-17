@@ -80,23 +80,23 @@ where
     );
     require!(
         preinstruction.accounts.is_empty(),
-        SpokeError::InvalidFeeSignature
+        SpokeError::InvalidFeeSignatureAccountsNotEmpty
     );
     // NOTE: the data struct: 16 byte header (with all the offsets), 32 bytes (pubkey), 64 bytes (signature), msg
+    let expected_len = DATA_START
+        + PUBKEY_SERIALIZED_SIZE
+        + SIGNATURE_SERIALIZED_SIZE
+        + encoded_message.len();
     require!(
-        preinstruction.data.len()
-            == DATA_START
-                + PUBKEY_SERIALIZED_SIZE
-                + SIGNATURE_SERIALIZED_SIZE
-                + encoded_message.len(),
-        SpokeError::InvalidFeeSignature
+        preinstruction.data.len() == expected_len,
+        SpokeError::InvalidFeeSignatureDataLength
     );
 
     // check data
     // Byte 0: num of signatures
-    require!(preinstruction.data[0] == 1, SpokeError::InvalidFeeSignature);
+    require!(preinstruction.data[0] == 1, SpokeError::InvalidFeeSignatureNumSignatures);
     // Byte 1: padding byte
-    require!(preinstruction.data[1] == 0, SpokeError::InvalidFeeSignature);
+    require!(preinstruction.data[1] == 0, SpokeError::InvalidFeeSignaturePadding);
     // Byte 2-16: offsets
 
     let offsets = Ed25519SignatureOffsets {
@@ -110,28 +110,30 @@ where
     };
     require!(
         preinstruction.data[SIGNATURE_OFFSETS_START..DATA_START] == *bytes_of(&offsets),
-        SpokeError::InvalidFeeSignature
+        SpokeError::InvalidFeeSignatureOffsets
     );
 
     // signing key used in verify call
+    let preinstruction_pubkey = &preinstruction.data[PUBLIC_KEY_OFFSET..PUBLIC_KEY_OFFSET + PUBKEY_SERIALIZED_SIZE];
+    let signer_key = accounts.signer.key();
+    let expected_pubkey = signer_key.as_array();
     require!(
-        preinstruction.data[PUBLIC_KEY_OFFSET..PUBLIC_KEY_OFFSET + PUBKEY_SERIALIZED_SIZE]
-            == *accounts.signer.key().as_array(),
-        SpokeError::InvalidFeeSignature
+        preinstruction_pubkey == expected_pubkey,
+        SpokeError::InvalidFeeSignaturePubkeyMismatch
     );
 
     // signature used in verify call
     require!(
         preinstruction.data[SIGNATURE_OFFSET..SIGNATURE_OFFSET + SIGNATURE_SERIALIZED_SIZE]
             == signature,
-        SpokeError::InvalidFeeSignature
+        SpokeError::InvalidFeeSignatureDataMismatch
     );
 
     // message used in verify call
     require!(
         preinstruction.data[MESSAGE_DATA_OFFSET..MESSAGE_DATA_OFFSET + encoded_message.len()]
             == encoded_message,
-        SpokeError::InvalidFeeSignature
+        SpokeError::InvalidFeeSignatureMessageMismatch
     );
 
     // NOTE: if all preinstruction calldata is verify, the preinstruction must succeed, or else it will revert the whole tx.

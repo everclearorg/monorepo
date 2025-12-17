@@ -82,6 +82,22 @@ pub enum SpokeError {
     MissingEd25519Instruction,
     #[msg("Invalid fee signature")]
     InvalidFeeSignature,
+    #[msg("Invalid fee signature: preinstruction accounts not empty")]
+    InvalidFeeSignatureAccountsNotEmpty,
+    #[msg("Invalid fee signature: preinstruction data length mismatch")]
+    InvalidFeeSignatureDataLength,
+    #[msg("Invalid fee signature: number of signatures must be 1")]
+    InvalidFeeSignatureNumSignatures,
+    #[msg("Invalid fee signature: padding byte must be 0")]
+    InvalidFeeSignaturePadding,
+    #[msg("Invalid fee signature: offset mismatch")]
+    InvalidFeeSignatureOffsets,
+    #[msg("Invalid fee signature: public key mismatch with configured fee signer")]
+    InvalidFeeSignaturePubkeyMismatch,
+    #[msg("Invalid fee signature: signature data mismatch")]
+    InvalidFeeSignatureDataMismatch,
+    #[msg("Invalid fee signature: message data mismatch")]
+    InvalidFeeSignatureMessageMismatch,
     #[msg("Fee adapter paused")]
     FeeAdapterPaused,
     #[msg("Wrong destination for fill intent")]
