@@ -53,7 +53,7 @@ pub fn new_intent(
         hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.clone(),
         mailbox_outbox: ctx.accounts.mailbox_outbox.clone(),
         dispatch_authority: ctx.accounts.dispatch_authority.clone(),
-        unique_message_account: ctx.accounts.unique_message_account.to_account_info(),
+        unique_message_account: ctx.accounts.unique_message_account.clone(),
         dispatched_message_pda: ctx.accounts.dispatched_message_pda.clone(),
         igp_program: ctx.accounts.igp_program.clone(),
         igp_program_data: ctx.accounts.igp_program_data.clone(),
@@ -278,7 +278,7 @@ pub fn handle_new_intent<'info>(
         dispatch_authority: accounts.dispatch_authority.to_account_info(),
         // TODO: need to figure out how this is used for the IGP payer and whether this is correct
         sender_wallet: accounts.authority.to_account_info(),
-        unique_message_account: accounts.unique_message_account.clone(),
+        unique_message_account: accounts.unique_message_account.to_account_info(),
         dispatched_message_pda: accounts.dispatched_message_pda.to_account_info(),
         igp_program: accounts.igp_program.clone(),
         igp_program_data: accounts.igp_program_data.to_account_info(),
@@ -329,9 +329,7 @@ pub struct NewIntentAccounts<'info> {
     pub hyperlane_mailbox: Interface<'info, Mailbox>,
     pub mailbox_outbox: AccountInfo<'info>,
     pub dispatch_authority: AccountInfo<'info>,
-    /// A unique message / gas payment account
-    /// CHECK: Typically validated by IGP / mailbox, so we skip direct Anchor checks
-    pub unique_message_account: AccountInfo<'info>,
+    pub unique_message_account: Signer<'info>,
     pub dispatched_message_pda: AccountInfo<'info>,
     pub igp_program: Interface<'info, Igp>,
     pub igp_program_data: AccountInfo<'info>,
@@ -415,10 +413,9 @@ pub struct NewIntent<'info> {
     #[account(mut)]
     pub dispatch_authority: AccountInfo<'info>,
 
-    /// A unique message / gas payment account (signer)
-    /// CHECK: Typically validated by IGP / mailbox, so we skip direct Anchor checks
-    #[account(mut, signer)]
-    pub unique_message_account: AccountInfo<'info>,
+    // A unique message / gas payment account (signer)
+    #[account(mut)]
+    pub unique_message_account: Signer<'info>,
 
     /// CHECK: The message storage PDA
     #[account(mut)]
