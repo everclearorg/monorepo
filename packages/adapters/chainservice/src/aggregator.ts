@@ -201,7 +201,30 @@ export class RpcProviderAggregator {
         if (reverted.length > 0) {
           throw new TransactionReverted(TransactionReverted.reasons.CallException, reverted[0]!);
         } else if (errors.length > 0) {
-          throw errors[0];
+          // Check if all errors are TransactionReceiptNotFoundError - if so, verify the transaction exists
+          // before throwing. The transaction might be confirmed, but the RPC hasn't indexed it yet.
+          const allReceiptNotFoundErrors = errors.every(
+            (error: any) => error.name === 'TransactionReceiptNotFoundError' || error.shortMessage?.includes('could not be found'),
+          );
+          if (allReceiptNotFoundErrors && transaction.responses.length > 0) {
+            // Check if the transaction exists on-chain using getTransaction
+            try {
+              const txResponses = await this.getTransaction(transaction);
+              const txExists = txResponses.some((tx) => tx !== null && tx !== undefined);
+              if (txExists) {
+                // Transaction exists but receipt not available yet - continue waiting
+                // Don't throw, just continue the loop
+              } else {
+                // Transaction doesn't exist - throw the error
+                throw errors[0];
+              }
+            } catch {
+              // If getTransaction fails, throw the original error
+              throw errors[0];
+            }
+          } else {
+            throw errors[0];
+          }
         }
       }
 

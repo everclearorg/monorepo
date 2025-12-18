@@ -135,14 +135,23 @@ export class TransactionDispatch {
             this.minedBuffer.push(transaction);
             break;
           } catch (_error: unknown) {
-            const error = _error as TransactionReverted;
+            const error = _error as EverclearError & { name?: string; shortMessage?: string; reason?: string };
             this.logger.debug('Received error waiting for transaction to be mined.', requestContext, methodContext, {
               domain: this.domain,
               txsId: transaction.uuid,
               error,
             });
 
-            if (error.type === OperationTimeout.type || error.type === BadNonce.type) {
+            // Check if this is a TransactionReceiptNotFoundError (from viem) - handle it similarly to OperationTimeout
+            const isReceiptNotFoundError =
+              (error as any).name === 'TransactionReceiptNotFoundError' ||
+              (error as any).shortMessage?.includes('could not be found');
+
+            if (
+              error.type === OperationTimeout.type ||
+              error.type === BadNonce.type ||
+              isReceiptNotFoundError
+            ) {
               // Check to see if the transaction did indeed make it to chain.
               const responses = await this.rpcProvider.getTransaction(transaction);
               if (responses.every((response) => response === null)) {
@@ -177,6 +186,13 @@ export class TransactionDispatch {
                   meta.shouldBump = false;
                   continue;
                 }
+                // For TransactionReceiptNotFoundError, if the transaction exists, continue waiting
+                // as the receipt might just not be indexed yet by the RPC provider.
+                if (isReceiptNotFoundError) {
+                  meta.shouldResubmit = false;
+                  meta.shouldBump = false;
+                  continue;
+                }
                 // Transaction was found, but it's not going through. We should bump the gas and submit
                 // a replacement to speed things up.
                 meta.shouldResubmit = true;
@@ -184,7 +200,7 @@ export class TransactionDispatch {
               }
             } else if (
               error.type === TransactionReverted.type &&
-              error.reason === TransactionReverted.reasons.InsufficientFunds
+              (error as TransactionReverted).reason === TransactionReverted.reasons.InsufficientFunds
             ) {
               /**
                * If we get an insufficient funds error during a resubmit, we should log this critical
