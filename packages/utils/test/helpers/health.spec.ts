@@ -1,5 +1,5 @@
 import Axios from 'axios';
-import { SinonStub, SinonStubbedInstance, stub, createStubInstance } from 'sinon';
+import { SinonStub, SinonStubbedInstance, stub, createStubInstance, restore } from 'sinon';
 import { Logger, expect, sendHeartbeat } from '../../src';
 
 describe('Health', () => {
@@ -10,6 +10,10 @@ describe('Health', () => {
     postStub.resolves({ data: 'ok' });
 
     mockLogger = createStubInstance(Logger);
+  });
+
+  afterEach(() => {
+    restore();
   });
 
   describe('#sendHeartbeat', () => {

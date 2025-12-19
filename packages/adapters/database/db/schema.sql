@@ -1188,12 +1188,12 @@ BEGIN
         WHEN 'DISPATCHED_HUB' THEN 51
         WHEN 'DISPATCHED_SPOKE' THEN 52
         WHEN 'DISPATCHED_UNSUPPORTED' THEN 53
-        WHEN 'SETTLED' THEN 60
-        WHEN 'SETTLED_AND_COMPLETED' THEN 61
-        WHEN 'SETTLED_AND_MANUALLY_EXECUTED' THEN 62
-        WHEN 'UNSUPPORTED' THEN 70
-        WHEN 'UNSUPPORTED_RETURNED' THEN 71
-        WHEN 'DELIVERED' THEN 80
+        WHEN 'DELIVERED' THEN 60
+        WHEN 'SETTLED' THEN 70
+        WHEN 'SETTLED_AND_COMPLETED' THEN 71
+        WHEN 'SETTLED_AND_MANUALLY_EXECUTED' THEN 72
+        WHEN 'UNSUPPORTED' THEN 80
+        WHEN 'UNSUPPORTED_RETURNED' THEN 81
         ELSE 0
     END;
 END;
@@ -1490,7 +1490,7 @@ BEGIN
     pos := pos + 64;
     solver := '0x' || SUBSTRING(hex_data, pos, 64);
     pos := pos + 64;
-    receiver := '0x' || SUBSTRING(hex_data, pos, 64);
+    -- Get receiver from the EVMIntent struct
     pos := pos + 64;
     amount_out := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
     pos := pos + 16;
@@ -1498,7 +1498,7 @@ BEGIN
     -- Parse EVMIntent struct fields
     initiator := '0x' || SUBSTRING(hex_data, pos, 64);
     pos := pos + 64;
-    -- Skip intent.receiver (we already have the receiver from IntentFilledEvent)
+	receiver := '0x' || SUBSTRING(hex_data, pos, 64);
     pos := pos + 64;
     input_asset := '0x' || SUBSTRING(hex_data, pos, 64);
     pos := pos + 64;
@@ -1512,10 +1512,10 @@ BEGIN
     pos := pos + 16;
     ttl := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
     pos := pos + 16;
-    amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
-    pos := pos + 32;
-    amount_out_min := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
-    pos := pos + 32;
+    amount := to_numeric(SUBSTRING(hex_data, pos + 32, 32));
+    pos := pos + 64;
+    amount_out_min := to_numeric(SUBSTRING(hex_data, pos + 32, 32));
+    pos := pos + 64;
     destination_count := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
     pos := pos + 8;
 
@@ -1548,6 +1548,7 @@ BEGIN
         block_number,
         tx_origin,
         tx_nonce,
+        max_fee,
         gas_limit,
         gas_price,
         status,
@@ -1576,6 +1577,7 @@ BEGIN
         rec.block_slot,
         solver,
         0,
+        '0',
         rec.tx_fee,
         1,
         'FILLED',
@@ -1603,6 +1605,7 @@ BEGIN
         block_number = EXCLUDED.block_number,
         tx_origin = EXCLUDED.tx_origin,
         tx_nonce = EXCLUDED.tx_nonce,
+        max_fee = EXCLUDED.max_fee,
         gas_limit = EXCLUDED.gas_limit,
         gas_price = EXCLUDED.gas_price,
         status = EXCLUDED.status,
@@ -2168,7 +2171,7 @@ CREATE TABLE public.destination_intents (
     filled_domain character varying(66) NOT NULL,
     nonce bigint NOT NULL,
     data text,
-    transaction_hash character(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
     "timestamp" bigint NOT NULL,
     block_number bigint NOT NULL,
     tx_origin character varying(66) NOT NULL,
@@ -5563,4 +5566,8 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251110182740'),
     ('20251125175538'),
     ('20251127055400'),
-    ('20251202011749');
+    ('20251202011749'),
+    ('20251202161540'),
+    ('20251202165553'),
+    ('20251205153936'),
+    ('20251211224120');

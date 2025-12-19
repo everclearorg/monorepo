@@ -1,4 +1,4 @@
-import { Logger, expect, getNtpTimeSeconds } from '@chimera-monorepo/utils';
+import { Logger, expect, getNtpTimeSeconds, chainWrapper } from '@chimera-monorepo/utils';
 import { restore, reset, stub, SinonStub, SinonStubbedInstance } from 'sinon';
 import { checkInvoices, checkInvoiceAmount } from '../../src/checklist/queue';
 import { getContextStub, mock } from '../globalTestHook';
@@ -6,7 +6,6 @@ import { Database } from '@chimera-monorepo/database';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { createProcessEnv } from '../mock';
 import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
-import { Interface } from 'ethers/lib/utils';
 import * as intents from '../../src/helpers/intent';
 import * as asset from '../../src/helpers/asset';
 import * as Mockable from '../../src/mockable';
@@ -30,13 +29,13 @@ describe('checkInvoices', () => {
     subgraph = mock.instances.subgraph() as SinonStubbedInstance<SubgraphReader>;
     logger = mock.instances.logger() as SinonStubbedInstance<Logger>;
     database = mock.instances.database() as SinonStubbedInstance<Database>;
-    encode = stub(Interface.prototype, 'encodeFunctionData');
-    decode = stub(Interface.prototype, 'decodeFunctionResult');
+    encode = stub(chainWrapper, 'encodeFunctionData');
+    decode = stub(chainWrapper, 'decodeFunctionResult');
     getContextStub.returns({
       ...mock.context(),
       config: { ...mock.config() },
     });
-    encode.returns('0xencoded');
+    encode.returns('0xencoded' as `0x${string}`);
     decode.returns(['FILLED']);
 
     sendAlertsStub = stub(Mockable, 'sendAlerts');

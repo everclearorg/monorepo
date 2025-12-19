@@ -1,12 +1,10 @@
 /// This is only used to manually test RPC providers with getGasPrice method.
 
-import { Logger, expect } from '@chimera-monorepo/utils';
-import { BigNumber, Wallet } from 'ethers';
+import { Logger, expect, chainWrapper } from '@chimera-monorepo/utils';
 import { ChainService } from '../../src';
 import { TEST_REQUEST_CONTEXT } from '../utils';
 
 describe('ChainService.getGasPrice', () => {
-  const wallet = Wallet.createRandom();
   const logger = new Logger({ level: 'debug', name: 'ChainServiceGetGasPriceIntegrationTest' });
 
   it('should return a valid gas price for configured networks', async () => {
@@ -17,7 +15,8 @@ describe('ChainService.getGasPrice', () => {
           providers: ['https://ethereum-rpc.publicnode.com'],
         },
       },
-      process.env.PRIVATE_KEY ?? wallet._signingKey().privateKey,
+      process.env.PRIVATE_KEY ?? chainWrapper.generatePrivateKey(),
+      true,
     );
     expect(chainService).to.be.ok;
 
@@ -31,16 +30,16 @@ describe('ChainService.getGasPrice', () => {
         // Verify gas price is returned as a string
         expect(gasPrice).to.be.a('string');
         
-        // Verify gas price is a valid BigNumber
-        const gasPriceBN = BigNumber.from(gasPrice);
-        expect(gasPriceBN).to.be.instanceOf(BigNumber);
+        // Verify gas price is a valid bigint
+        const gasPriceBigInt = BigInt(gasPrice);
+        expect(typeof gasPriceBigInt).to.be.eq('bigint');
         
         // Verify gas price is greater than 0
-        expect(gasPriceBN.gt(0)).to.be.true;
+        expect(gasPriceBigInt > BigInt(0)).to.be.true;
         
         // Verify gas price is reasonable (should be less than 1000 gwei for testnet)
-        const maxReasonableGasPrice = BigNumber.from('1000000000000000000000'); // 1000 gwei
-        expect(gasPriceBN.lt(maxReasonableGasPrice)).to.be.true;
+        const maxReasonableGasPrice = BigInt('1000000000000000000000'); // 1000 gwei
+        expect(gasPriceBigInt < maxReasonableGasPrice).to.be.true;
         
         logger.debug(`Network ${networkId} gas price: ${gasPrice} wei`);
       } catch (error) {

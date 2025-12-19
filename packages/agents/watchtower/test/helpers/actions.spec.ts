@@ -7,7 +7,7 @@ import { mockAppContext } from '../globalTestHook';
 import { WatcherConfig } from '../../src/lib/entities';
 import { TEST_REPORT } from '../mock';
 import { ChainService, ITransactionReceipt, WriteTransaction, EthWallet } from '@chimera-monorepo/chainservice';
-import { utils } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 describe('Actions', () => {
@@ -197,11 +197,11 @@ describe('Actions', () => {
   describe('isDomainPaused', () => {
     const domainId = '1337';
     let everclear: string;
-    let everclearInterface: utils.Interface;
+    let everclearAbi: any[];
 
     beforeEach(() => {
       everclear = mockAppContext.config.chains[domainId].deployments!.everclear!;
-      everclearInterface = new utils.Interface([
+      everclearAbi = [
         {
           type: 'function',
           name: 'paused',
@@ -209,7 +209,7 @@ describe('Actions', () => {
           outputs: [{ name: '__paused', type: 'bool', internalType: 'bool' }],
           stateMutability: 'view',
         },
-      ]);
+      ];
     });
 
     it('Should return true if the domain is paused', async () => {
@@ -218,7 +218,7 @@ describe('Actions', () => {
       const readTxStub = chainService.readTx.resolves(result);
 
       // call
-      const isPaused: boolean = await MockActions.isDomainPaused(domainId, '0x123', everclearInterface);
+      const isPaused: boolean = await MockActions.isDomainPaused(domainId, '0x123', everclearAbi);
       expect(isPaused).to.be.true;
       expect(readTxStub.callCount).to.eq(1);
     });
@@ -229,7 +229,7 @@ describe('Actions', () => {
       const readTxStub = chainService.readTx.resolves(result);
 
       // call
-      const isPaused: boolean = await MockActions.isDomainPaused(domainId, '0x123', everclearInterface);
+      const isPaused: boolean = await MockActions.isDomainPaused(domainId, '0x123', everclearAbi);
       expect(isPaused).to.be.false;
       expect(readTxStub.callCount).to.eq(1);
     });
@@ -237,7 +237,7 @@ describe('Actions', () => {
 
   describe('sendPauseDomainTx', () => {
     let everclear: string;
-    let everclearInterface: utils.Interface;
+    let everclearAbi: any[];
     const gasMultiplier = 1;
     const domainId = '1337';
     const everclearAddress = '0x123';
@@ -245,9 +245,9 @@ describe('Actions', () => {
 
     beforeEach(() => {
       everclear = mockAppContext.config.chains[domainId].deployments!.everclear!;
-      everclearInterface = new utils.Interface([
+      everclearAbi = [
         { type: 'function', name: 'pause', inputs: [], outputs: [], stateMutability: 'nonpayable' },
-      ]);
+      ];
     });
 
     it('Should send a transaction to pause the domain', async () => {
@@ -261,7 +261,7 @@ describe('Actions', () => {
       } as ITransactionReceipt);
 
       const result = await MockActions.sendPauseDomainTx(
-        everclearInterface,
+        everclearAbi,
         everclearAddress,
         domainId,
         gasMultiplier,
@@ -270,7 +270,10 @@ describe('Actions', () => {
 
       expect(result.tx).to.be.deep.eq({
         to: everclearAddress,
-        data: everclearInterface.encodeFunctionData('pause'),
+        data: chainWrapper.encodeFunctionData({
+          abi: everclearAbi,
+          functionName: 'pause',
+        }),
         value: '0',
         domain: +domainId,
         from: from,
@@ -297,7 +300,7 @@ describe('Actions', () => {
       } as ITransactionReceipt);
 
       await expect(
-        MockActions.sendPauseDomainTx(everclearInterface, everclearAddress, domainId, gasMultiplier, requestContext),
+        MockActions.sendPauseDomainTx(everclearAbi, everclearAddress, domainId, gasMultiplier, requestContext),
       ).to.be.rejectedWith('Transaction failed with status: 0');
     });
 
@@ -305,7 +308,7 @@ describe('Actions', () => {
       chainService.getGasPrice.rejects();
 
       await expect(
-        MockActions.sendPauseDomainTx(everclearInterface, everclearAddress, domainId, gasMultiplier, requestContext),
+        MockActions.sendPauseDomainTx(everclearAbi, everclearAddress, domainId, gasMultiplier, requestContext),
       ).to.be.rejectedWith(`An error happened when executing sendPauseDomainTx(${domainId})`);
     });
 
@@ -314,7 +317,7 @@ describe('Actions', () => {
       chainService.getAddress.rejects();
 
       await expect(
-        MockActions.sendPauseDomainTx(everclearInterface, everclearAddress, domainId, gasMultiplier, requestContext),
+        MockActions.sendPauseDomainTx(everclearAbi, everclearAddress, domainId, gasMultiplier, requestContext),
       ).to.be.rejectedWith(`An error happened when executing sendPauseDomainTx(${domainId})`);
     });
   });

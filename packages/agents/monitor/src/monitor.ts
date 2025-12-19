@@ -1,8 +1,15 @@
-import { Logger, RelayerType, createLoggingContext, delay, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
+import {
+  Logger,
+  RelayerType,
+  createLoggingContext,
+  delay,
+  jsonifyError,
+  sendHeartbeat,
+  chainWrapper,
+} from '@chimera-monorepo/utils';
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
 import { setupCache, setupSubgraphReader } from './setup';
-import { providers } from 'ethers';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { SubgraphConfig } from '@chimera-monorepo/adapters-subgraph';
 import { setupEverclearRelayer, setupGelatoRelayer } from '@chimera-monorepo/adapters-relayer';
@@ -21,15 +28,28 @@ export type MonitorService = (typeof MonitorService)[keyof typeof MonitorService
 const DEFAULT_SUBGRAPH_TIMEOUT = 7500;
 /**
  * Helper to get subgraph reader config
- * @param chains Chain entry of monitor config
+ * @param chains Chain entry of monitor config (includes hub domain)
+ * @param hubConfig Optional hub config for Envio URL
  * @returns SubgraphConfig used to instantiate subgraph reader
  */
-export const getSubgraphReaderConfig = (chains: MonitorConfig['chains']): SubgraphConfig => {
+export const getSubgraphReaderConfig = (
+  chains: MonitorConfig['chains'],
+  hubConfig?: MonitorConfig['hub'],
+): SubgraphConfig => {
   const subgraphs: Record<string, { endpoints: string[]; timeout: number }> = {};
   Object.keys(chains).forEach((domainId) => {
     subgraphs[domainId] = { endpoints: chains[domainId].subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   });
-  return { subgraphs };
+
+  // Add Envio configuration if available from hub config
+  const envioConfig: SubgraphConfig['envio'] = hubConfig?.envioSubgraphUrl
+    ? {
+        url: hubConfig.envioSubgraphUrl,
+        timeout: DEFAULT_SUBGRAPH_TIMEOUT / 1000, // Convert to seconds
+      }
+    : undefined;
+
+  return { subgraphs, ...(envioConfig && { envio: envioConfig }) };
 };
 
 export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppContext['adapters']['blockMap']) => {
@@ -45,8 +65,11 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
           if (type !== 'evm') {
             return;
           }
-          const ethProvider = new providers.JsonRpcProvider(provider);
-          ethProvider.on('block', (blockNumber) => {
+          const client = chainWrapper.createPublicClient({
+            transport: chainWrapper.http(provider),
+          });
+
+          const handleBlockNumber = (blockNumber: bigint) => {
             if (!blockNumber) {
               return;
             }
@@ -54,7 +77,7 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
             // Create the entry
             const entry = {
               rpcOrigin: origin,
-              number: blockNumber,
+              number: Number(blockNumber),
               timestamp: Math.floor(Date.now() / 1_000),
             };
             // Add domain array if it exists
@@ -68,10 +91,14 @@ export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppCo
               return;
             }
             // Replace the entry IFF it is more recent
-            if (blockMap.get(domain)![idx].number >= blockNumber) {
+            if (blockMap.get(domain)![idx].number >= Number(blockNumber)) {
               return;
             }
             blockMap.get(domain)![idx] = entry;
+          };
+
+          client.watchBlockNumber({
+            onBlockNumber: handleBlockNumber,
           });
         }),
       );
@@ -123,7 +150,7 @@ export const makeMonitor = async (service: MonitorService) => {
 
     const { domain: hubDomain, ...remainder } = context.config.hub;
     context.adapters.subgraph = await setupSubgraphReader(
-      getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }),
+      getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }, context.config.hub),
       context.logger,
       requestContext,
     );
@@ -241,7 +268,7 @@ export const bindConfig = async () => {
       if (reloadSubgraph) {
         const { domain: hubDomain, ...remainder } = context.config.hub;
         context.adapters.subgraph = await setupSubgraphReader(
-          getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }),
+          getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }, context.config.hub),
           context.logger,
           requestContext,
         );

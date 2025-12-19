@@ -9,7 +9,7 @@ import {
   RequestContext,
 } from '@chimera-monorepo/utils';
 import { ChainReader } from '@chimera-monorepo/chainservice';
-import { constants } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import interval from 'interval-promise';
 
 import {
@@ -39,7 +39,7 @@ export const everclearRelayerSend = async (
   const params: RelayerApiPostTaskRequestParams = {
     apiKey,
     data: encodedData,
-    fee: { amount: value, chain: chainId, token: constants.AddressZero },
+    fee: { amount: value, chain: chainId, token: chainWrapper.zeroAddress },
     to: destinationAddress,
     funcSig,
   };

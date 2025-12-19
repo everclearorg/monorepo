@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { Logger } from '@chimera-monorepo/utils';
 import { ISigner, ITransactionRequest, ITransactionResponse } from '../../types';
 import { createTronWeb, getTestTronPrivateKey, getTestTronAddress } from '@chimera-monorepo/utils';
@@ -88,8 +87,8 @@ export class TronNativeSigner implements ISigner {
         hash: result.txid,
         confirmations,
         nonce: 0, // Tron doesn't use nonces
-        gasPrice: BigNumber.from(transaction.gasPrice || '1'),
-        gasLimit: transaction.gasLimit || '0',
+        gasPrice: BigInt(transaction.gasPrice || '1'),
+        gasLimit: BigInt(transaction.gasLimit || '0'),
       };
 
     } catch (error) {

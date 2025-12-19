@@ -1,30 +1,23 @@
 import {
   createLoggingContext,
-  createRequestContext,
   delay,
   jsonifyError,
   Logger,
   EverclearError,
   RequestContext,
 } from '@chimera-monorepo/utils';
-import { BigNumber, constants, utils, BigNumberish, providers } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 
 import { validateProviderConfig, ChainConfig } from './config';
 import {
   ConfigurationError,
   GasEstimateInvalid,
-  parseError,
-  RpcError,
-  ServerError,
   OperationTimeout,
   TransactionReadError,
   TransactionReverted,
-  ProviderCache,
   ReadTransaction,
   OnchainTransaction,
-  StallTimeout,
   WriteTransaction,
-  QuorumNotMet,
   RpcProvider,
   getRpcClient,
   ISigner,
@@ -34,47 +27,34 @@ import {
 } from './shared';
 import { axiosGet } from './mockable';
 
-// TODO: Move to config; alternatively, configure based on time, not blocks.
-// A provider must be within this many blocks of the "leading" provider (provider with the highest block) to be considered in-sync.
-const PROVIDER_MAX_LAG = 30;
 // Default value for block period time (in ms) if we're unable to attain that info from the providers for some reason.
 const DEFAULT_BLOCK_PERIOD = 2_000;
 
-type ChainRpcProviderCache = { gasPrice: BigNumber; transactionCount: number };
-
-// TODO: Multiton?
 /**
- * @classdesc An aggregator for all the providers that are used to make RPC calls on a specified chain. Only
- * 1 aggregator should exist per chain. Responsible for provider fallback capabilities, syncing, and caching.
+ * @classdesc An aggregator for RPC calls on a specified chain. Uses a single viem public client
+ * with multiple provider URLs for RPC rotation. Primarily serves as an RPC method execute wrapper.
  */
 export class RpcProviderAggregator {
-  // The array of underlying RpcProviders.
-  private readonly providers: RpcProvider[];
-  // The provider that's most in sync with the chain, and has an active block listener.
-  public leadProvider: RpcProvider | undefined;
+  // Single RPC provider with multiple URLs (handled by viem fallback transport)
+  private readonly provider: RpcProvider;
 
   private signer?: ISigner;
 
-  private lastUsedGasPrice: BigNumber | undefined = undefined;
+  private lastUsedGasPrice: bigint | undefined = undefined;
 
-  // Cached decimal values per asset. Saved separately from main cache as decimals obviously don't expire.
+  // Cached decimal values per asset. Saved separately as decimals don't expire.
   private cachedDecimals: Record<string, number> = {};
   // Cached block length in time (ms), used for optimizing waiting periods.
   private blockPeriod: number = DEFAULT_BLOCK_PERIOD;
 
-  // Cache of transient data (i.e. data that can change per block).
-  private cache: ProviderCache<ChainRpcProviderCache>;
-
   /**
-   * A class for managing the usage of an ethers FallbackProvider, and for wrapping calls in
-   * retries. Will ensure provider(s) are ready before any use case.
+   * A class for managing RPC calls on a specified chain. Uses a single viem public client
+   * with multiple provider URLs for RPC rotation.
    *
    * @param logger - Logger used for logging.
-   * @param signer - Signer instance or private key used for signing transactions.
-   * @param domain - The ID of the chain for which this class's providers will be servicing.
-   * @param chainConfig - Configuration for this specified chain, including the providers we'll
+   * @param domain - The ID of the chain for which this class's provider will be servicing.
+   * @param config - Configuration for this specified chain, including the providers we'll
    * be using for it.
-   * @param config - The shared ChainServiceConfig with general configuration.
    *
    * @throws ChainError.reasons.ProviderNotFound if no valid providers are found in the
    * configuration.
@@ -84,10 +64,9 @@ export class RpcProviderAggregator {
     public readonly domain: number,
     protected readonly config: ChainConfig,
   ) {
-    const { requestContext, methodContext } = createLoggingContext('ChainRpcProvider.constructor');
+    const { requestContext, methodContext } = createLoggingContext('RpcProviderAggregator.constructor');
 
-    // Register a provider for each url.
-    // Make sure all providers are ready()
+    // Collect all URLs from provider configs
     const providerConfigs = this.config.providers;
     const filteredConfigs = providerConfigs.filter((config) => {
       const valid = validateProviderConfig(config);
@@ -98,15 +77,8 @@ export class RpcProviderAggregator {
       }
       return valid;
     });
-    if (filteredConfigs.length > 0) {
-      const hydratedConfigs = filteredConfigs.map((config) => ({
-        provider: getRpcClient(this.domain, config.url),
-        priority: config.priority ?? 1,
-        weight: config.weight ?? 1,
-        stallTimeout: config.stallTimeout,
-      }));
-      this.providers = hydratedConfigs.map((p) => p.provider);
-    } else {
+
+    if (filteredConfigs.length === 0) {
       // Not enough valid providers were found in configuration.
       // We must throw here, as the consumer won't be able to support this chain without valid provider configs.
       throw new ConfigurationError(
@@ -123,21 +95,13 @@ export class RpcProviderAggregator {
       );
     }
 
-    // TODO: Make ttl/btl values below configurable ?
-    this.cache = new ProviderCache<ChainRpcProviderCache>(this.logger, {
-      gasPrice: {
-        ttl: 30_000,
-      },
-      transactionCount: {
-        ttl: 2_000,
-      },
-    });
+    // Collect all URLs from all provider configs
+    const urls = filteredConfigs.map((config) => config.url);
 
-    // This initial call of sync providers will start the first block listener (on the lead provider) and set up
-    // the cache with correct initial values (as well as establish which providers are out-of-sync).
-    this.syncProviders();
+    // Create a single provider with all URLs (viem will handle RPC rotation via fallback transport)
+    this.provider = getRpcClient(this.domain, urls);
 
-    // Set up the initial value for block period. Will run asyncronously, and update the value (from the default) when
+    // Set up the initial value for block period. Will run asynchronously, and update the value (from the default) when
     // it completes.
     this.setBlockPeriod();
   }
@@ -145,9 +109,9 @@ export class RpcProviderAggregator {
   public async setSigner(signer: ISigner | string) {
     // Use chain-specific private key if available, otherwise use the global signer
     if (this.config.privateKey) {
-      this.signer = await this.providers[0].getSigner(this.config.privateKey);
+      this.signer = await this.provider.getSigner(this.config.privateKey);
     } else if (signer) {
-      this.signer = await this.providers[0].getSigner(signer);
+      this.signer = await this.provider.getSigner(signer);
     } else {
       this.signer = undefined;
     }
@@ -159,25 +123,21 @@ export class RpcProviderAggregator {
    * @remarks This method is set to access protected since it should really only be used by the inheriting class,
    * TransactionDispatch, as of the time of writing this.
    *
-   * @param tx The transaction used for the request.
+   * @param transaction The transaction used for the request.
    *
-   * @returns The ethers TransactionResponse.
+   * @returns The TransactionResponse.
    */
-  protected async sendTransaction(transaction: OnchainTransaction) {
+  public async sendTransaction(transaction: OnchainTransaction) {
     console.log(`=== sendTransaction called with domain ${this.domain} ===`);
     this.checkSigner();
 
-    // NOTE: We do not use execute for this call as it should be delegated to fallback provider, who
-    // will call the method on all providers.
-    // TODO: We may want to adapt execute to take on this functionality as it's the last step towards
-    // making fallback provider obsolete (and making this class the real fallback provider).
     const toSend = {
       ...transaction.params,
-      gasLimit: transaction.params.gasLimit ? BigNumber.from(transaction.params.gasLimit) : undefined,
-      gasPrice: transaction.params.gasPrice ? BigNumber.from(transaction.params.gasPrice) : undefined,
-      value: BigNumber.from(transaction.params.value || 0),
+      gasLimit: transaction.params.gasLimit ? BigInt(transaction.params.gasLimit) : undefined,
+      gasPrice: transaction.params.gasPrice ? BigInt(transaction.params.gasPrice) : undefined,
+      value: BigInt(transaction.params.value || 0),
     };
-    const provider = await this.leadProvider!.connect(this.signer!);
+    const provider = await this.provider.connect(this.signer!);
     return provider.sendTransaction(toSend as unknown as ITransactionRequest);
   }
 
@@ -190,7 +150,7 @@ export class RpcProviderAggregator {
    * required to validate the receipt.
    * @param timeout - Optional timeout parameter in ms to override the configured parameter.
    *
-   * @returns The ethers TransactionReceipt, if mined, otherwise null.
+   * @returns The ITransactionReceipt, if mined, otherwise null.
    */
   public async confirmTransaction(
     transaction: OnchainTransaction,
@@ -220,7 +180,7 @@ export class RpcProviderAggregator {
       // Wait until all the 'receipts' (or errors) have been pushed to the list.
       const receipts = (await Promise.all(_receipts)).filter(
         (r) => r !== null && r !== undefined,
-      ) as providers.TransactionReceipt[];
+      ) as ITransactionReceipt[];
 
       for (const receipt of receipts) {
         if (receipt!.status === 1) {
@@ -241,7 +201,30 @@ export class RpcProviderAggregator {
         if (reverted.length > 0) {
           throw new TransactionReverted(TransactionReverted.reasons.CallException, reverted[0]!);
         } else if (errors.length > 0) {
-          throw errors[0];
+          // Check if all errors are TransactionReceiptNotFoundError - if so, verify the transaction exists
+          // before throwing. The transaction might be confirmed, but the RPC hasn't indexed it yet.
+          const allReceiptNotFoundErrors = errors.every(
+            (error: any) => error.name === 'TransactionReceiptNotFoundError' || error.shortMessage?.includes('could not be found'),
+          );
+          if (allReceiptNotFoundErrors && transaction.responses.length > 0) {
+            // Check if the transaction exists on-chain using getTransaction
+            try {
+              const txResponses = await this.getTransaction(transaction);
+              const txExists = txResponses.some((tx) => tx !== null && tx !== undefined);
+              if (txExists) {
+                // Transaction exists but receipt not available yet - continue waiting
+                // Don't throw, just continue the loop
+              } else {
+                // Transaction doesn't exist - throw the error
+                throw errors[0];
+              }
+            } catch {
+              // If getTransaction fails, throw the original error
+              throw errors[0];
+            }
+          } else {
+            throw errors[0];
+          }
         }
       }
 
@@ -275,13 +258,11 @@ export class RpcProviderAggregator {
    * to read from chain.
    */
   public async readContract(tx: ReadTransaction, blockTag: number | string): Promise<string> {
-    return this.execute<string>(false, async (provider: RpcProvider) => {
-      try {
-        return await provider.call(tx, blockTag);
-      } catch (error: unknown) {
-        throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { error });
-      }
-    });
+    try {
+      return await this.provider.call(tx, blockTag);
+    } catch (error: unknown) {
+      throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { error });
+    }
   }
 
   /**
@@ -294,17 +275,14 @@ export class RpcProviderAggregator {
    */
   public async getTransaction(tx: string | OnchainTransaction) {
     if (typeof tx === 'string') {
-      return this.execute(false, async (provider: RpcProvider) => {
-        return [await provider.getTransaction(tx)];
-      });
+      const transaction = await this.provider.getTransaction(tx);
+      return [transaction];
     }
     const errors: EverclearError[] = [];
     const txs = await Promise.all(
       tx.responses.map(async (response) => {
         try {
-          return this.execute(false, async (provider: RpcProvider) => {
-            return await provider.getTransaction(response.hash);
-          });
+          return await this.provider.getTransaction(response.hash);
         } catch (error: unknown) {
           errors.push(error as EverclearError);
           return undefined;
@@ -329,25 +307,21 @@ export class RpcProviderAggregator {
    * revert error code when it fails through its typical API, we had to implement our own
    * estimateGas call through RPC directly.
    *
-   * @param transaction - The ethers TransactionRequest data in question.
+   * @param transaction - The transaction data in question.
    *
    * @returns A BigNumber representing the estimated gas value.
    */
   public async estimateGas(transaction: WriteTransaction): Promise<string> {
     const { gasLimitInflation } = this.config;
 
-    return this.execute(false, async (provider: RpcProvider) => {
-      const result = await provider.estimateGas(transaction);
-      try {
-        return BigNumber.from(result)
-          .add(gasLimitInflation ? BigNumber.from(gasLimitInflation) : 0)
-          .toString();
-      } catch (error: unknown) {
-        throw new GasEstimateInvalid(result.toString(), {
-          error: (error as Error).message,
-        });
-      }
-    });
+    const result = await this.provider.estimateGas(transaction);
+    try {
+      return (BigInt(result) + (gasLimitInflation ? BigInt(gasLimitInflation) : BigInt(0))).toString();
+    } catch (error: unknown) {
+      throw new GasEstimateInvalid(result.toString(), {
+        error: (error as Error).message,
+      });
+    }
   }
 
   /**
@@ -373,13 +347,8 @@ export class RpcProviderAggregator {
       return hardcoded;
     }
 
-    // Check if there is a valid (non-expired) gas price available.
-    if (this.cache.data.gasPrice) {
-      return this.cache.data.gasPrice.toString();
-    }
-
     const { gasPriceInitialBoostPercent, gasPriceMinimum, gasPriceMaximum, gasPriceMaxIncreaseScalar } = this.config;
-    let gasPrice: BigNumber | undefined = undefined;
+    let gasPrice: bigint | undefined = undefined;
 
     // Use gas station APIs, if available.
     const gasStations = this.config.gasStations ?? [];
@@ -390,9 +359,9 @@ export class RpcProviderAggregator {
       try {
         response = await axiosGet(uri);
         if (response && response.data) {
-          const { fast } = response.data as unknown as { fast: BigNumberish };
+          const { fast } = response.data as unknown as { fast: string | number };
           if (fast) {
-            gasPrice = utils.parseUnits(fast.toString(), 'gwei');
+            gasPrice = chainWrapper.parseGwei(fast.toString());
             break;
           }
         }
@@ -411,13 +380,9 @@ export class RpcProviderAggregator {
 
     if (!gasPrice) {
       // If we did not have a gas station API to use, or the gas station failed, use the provider's getGasPrice method.
-      gasPrice = BigNumber.from(
-        await this.execute<string>(false, async (provider: RpcProvider) => {
-          return await provider.getGasPrice();
-        }),
-      );
+      gasPrice = BigInt(await this.provider.getGasPrice());
       if (useInitialBoost) {
-        gasPrice = gasPrice.add(gasPrice.mul(gasPriceInitialBoostPercent).div(100));
+        gasPrice = gasPrice + (gasPrice * BigInt(gasPriceInitialBoostPercent)) / BigInt(100);
       }
     }
 
@@ -429,14 +394,14 @@ export class RpcProviderAggregator {
       this.lastUsedGasPrice !== undefined
     ) {
       // If we have a configured cap scalar, and the gas price is greater than that cap, set it to the cap.
-      const curbedPrice = this.lastUsedGasPrice.mul(gasPriceMaxIncreaseScalar).div(100);
-      if (gasPrice.gt(curbedPrice)) {
+      const curbedPrice = (this.lastUsedGasPrice * BigInt(gasPriceMaxIncreaseScalar)) / BigInt(100);
+      if (gasPrice > curbedPrice) {
         this.logger.debug('Hit the gas price curbed maximum.', requestContext, methodContext, {
           domain: this.domain,
-          gasPrice: utils.formatUnits(gasPrice, 'gwei'),
-          curbedPrice: utils.formatUnits(curbedPrice, 'gwei'),
+          gasPrice: chainWrapper.formatGwei(gasPrice),
+          curbedPrice: chainWrapper.formatGwei(curbedPrice),
           gasPriceMaxIncreaseScalar,
-          lastUsedGasPrice: utils.formatUnits(this.lastUsedGasPrice, 'gwei'),
+          lastUsedGasPrice: chainWrapper.formatGwei(this.lastUsedGasPrice),
         });
         gasPrice = curbedPrice;
         hitMaximum = true;
@@ -446,17 +411,17 @@ export class RpcProviderAggregator {
     // Final step to ensure we remain within reasonable, configured bounds for gas price.
     // If the gas price is less than absolute gas minimum, bump it up to minimum.
     // If it's greater than (or equal to) the absolute maximum, set it to that maximum (and log).
-    const min = BigNumber.from(gasPriceMinimum);
-    const max = BigNumber.from(gasPriceMaximum);
+    const min = BigInt(gasPriceMinimum);
+    const max = BigInt(gasPriceMaximum);
     // TODO: Could use a more sustainable method of separating out gas price abs min for certain
     // chains (such as arbitrum or zksync here) in particular:
-    if (gasPrice.lt(min) && ![1634886255, 1734439522, 2053862243, 2053862260, 728126428].includes(this.domain)) {
+    if (gasPrice < min && ![1634886255, 1734439522, 2053862243, 2053862260, 728126428].includes(this.domain)) {
       gasPrice = min;
-    } else if (gasPrice.gte(max)) {
+    } else if (gasPrice >= max) {
       this.logger.warn('Hit the gas price absolute maximum.', requestContext, methodContext, {
         domain: this.domain,
-        gasPrice: utils.formatUnits(gasPrice, 'gwei'),
-        absoluteMax: utils.formatUnits(max, 'gwei'),
+        gasPrice: chainWrapper.formatGwei(gasPrice),
+        absoluteMax: chainWrapper.formatGwei(max),
       });
       gasPrice = max;
       hitMaximum = true;
@@ -465,11 +430,6 @@ export class RpcProviderAggregator {
     // Update our last used gas price with this tx's gas price. This may be used to determine the cap of
     // subsuquent tx's gas price.
     this.lastUsedGasPrice = gasPrice;
-
-    // We only want to cache the gas price if we didn't hit the maximum.
-    if (!hitMaximum) {
-      this.cache.set({ gasPrice });
-    }
 
     return gasPrice.toString();
   }
@@ -484,9 +444,7 @@ export class RpcProviderAggregator {
    * specified address.
    */
   public async getBalance(address: string, assetId: string): Promise<string> {
-    return this.execute<string>(false, async (provider: RpcProvider) => {
-      return await provider.getBalance(address, assetId);
-    });
+    return await this.provider.getBalance(address, assetId);
   }
 
   /**
@@ -497,21 +455,18 @@ export class RpcProviderAggregator {
    * @returns A number representing the current decimals.
    */
   public async getDecimalsForAsset(assetId: string): Promise<number> {
-    return this.execute<number>(false, async (provider: RpcProvider) => {
-      if (this.cachedDecimals[assetId]) {
-        return this.cachedDecimals[assetId];
-      }
+    if (this.cachedDecimals[assetId]) {
+      return this.cachedDecimals[assetId];
+    }
 
-      if (assetId === constants.AddressZero) {
-        this.cachedDecimals[assetId] = 18;
-        return 18;
-      }
+    if (assetId === chainWrapper.zeroAddress) {
+      this.cachedDecimals[assetId] = 18;
+      return 18;
+    }
 
-      // Get provider
-      const decimals = await provider.getDecimals(assetId);
-      this.cachedDecimals[assetId] = decimals;
-      return decimals;
-    });
+    const decimals = await this.provider.getDecimals(assetId);
+    this.cachedDecimals[assetId] = decimals;
+    return decimals;
   }
 
   /**
@@ -520,9 +475,7 @@ export class RpcProviderAggregator {
    * @returns A number representing the current block number.
    */
   public async getBlock(blockHashOrBlockTag: number | string) {
-    return this.execute(false, async (provider) => {
-      return await provider.getBlock(await blockHashOrBlockTag);
-    });
+    return await this.provider.getBlock(blockHashOrBlockTag);
   }
 
   /**
@@ -534,10 +487,8 @@ export class RpcProviderAggregator {
    * @returns A number representing the current blocktime.
    */
   public async getBlockTime(blockTag = 'latest'): Promise<number> {
-    return this.execute<number>(false, async (provider: RpcProvider) => {
-      const block = await provider.getBlock(blockTag);
-      return block.timestamp;
-    });
+    const block = await this.provider.getBlock(blockTag);
+    return block.timestamp;
   }
 
   /**
@@ -546,9 +497,7 @@ export class RpcProviderAggregator {
    * @returns A number representing the current block number.
    */
   public async getBlockNumber(): Promise<number> {
-    return this.execute<number>(false, async (provider: RpcProvider) => {
-      return await provider.getBlockNumber();
-    });
+    return await this.provider.getBlockNumber();
   }
 
   /**
@@ -569,10 +518,7 @@ export class RpcProviderAggregator {
    * @returns A TransactionReceipt instance.
    */
   public async getTransactionReceipt(hash: string) {
-    return this.execute(false, async (provider: RpcProvider) => {
-      const receipt = await provider.getTransactionReceipt(hash);
-      return receipt;
-    });
+    return await this.provider.getTransactionReceipt(hash);
   }
 
   /**
@@ -584,9 +530,7 @@ export class RpcProviderAggregator {
    * @returns Hexcode string representation of contract code.
    */
   public async getCode(address: string): Promise<string> {
-    return this.execute<string>(false, async (provider: RpcProvider) => {
-      return await provider.getCode(address);
-    });
+    return await this.provider.getCode(address);
   }
 
   /**
@@ -598,9 +542,7 @@ export class RpcProviderAggregator {
    * @throws Error if the transaction is invalid, or would be reverted onchain.
    */
   public async getGasEstimate(tx: ReadTransaction | WriteTransaction): Promise<string> {
-    return this.execute<string>(false, async (provider: RpcProvider) => {
-      return await provider.estimateGas(tx);
-    });
+    return await this.provider.estimateGas(tx);
   }
 
   /**
@@ -613,16 +555,8 @@ export class RpcProviderAggregator {
    * @returns Number of transactions sent AKA the current nonce.
    */
   public async getTransactionCount(blockTag = 'latest'): Promise<number> {
-    // TODO: Cache both latest and pending transaction counts separately?
-    if (this.cache.data.transactionCount && blockTag === 'latest') {
-      return this.cache.data.transactionCount;
-    }
-
-    return this.execute<number>(true, async (provider: RpcProvider) => {
-      const transactionCount = await provider.getTransactionCount(await this.signer!.getAddress(), blockTag);
-      this.cache.set({ transactionCount });
-      return transactionCount;
-    });
+    this.checkSigner();
+    return await this.provider.getTransactionCount(await this.signer!.getAddress(), blockTag);
   }
 
   /// HELPERS
@@ -639,224 +573,13 @@ export class RpcProviderAggregator {
   }
 
   /**
-   * The RPC method execute wrapper is used for wrapping and parsing errors, as well as ensuring that
-   * providers are ready before any call is made. Also used for executing multiple retries for RPC
-   * requests to providers. This is to circumvent any issues related to unreliable internet/network
-   * issues, whether locally, or externally (for the provider's network).
-   *
-   * @param method - The method callback to execute and wrap in retries.
-   * @returns The object of the specified generic type.
-   * @throws EverclearError if the method fails to execute.
-   */
-  private async execute<T>(needsSigner: boolean, method: (provider: RpcProvider) => Promise<T>): Promise<T> {
-    // If we need a signer, check to ensure we have one.
-    if (needsSigner) {
-      this.checkSigner();
-    }
-
-    const errors: EverclearError[] = [];
-    const handleError = (e: unknown) => {
-      // TODO: With the addition of RpcProvider, this parse call may be entirely redundant. Won't add any compute,
-      // however, as it will return instantly if the error is already a EverclearError.
-      const error = parseError(e);
-      if (error.type === ServerError.type || error.type === RpcError.type || error.type === StallTimeout.type) {
-        // If the method threw a StallTimeout, RpcError, or ServerError, that indicates a problem with the provider and not
-        // the call - so we'll retry the call with a different provider (if available).
-        errors.push(error);
-      } else {
-        // e.g. a TransactionReverted, TransactionReplaced, etc.
-        throw error;
-      }
-    };
-
-    const quorum = this.config.quorum ?? 1;
-    if (quorum > 1) {
-      // Consult ALL providers.
-      const results: (T | undefined)[] = await Promise.all(
-        this.providers.map(async (provider) => {
-          try {
-            return await method(provider);
-          } catch (e: unknown) {
-            handleError(e);
-            return undefined;
-          }
-        }),
-      );
-      // Filter out undefined results.
-      // NOTE: If there aren't any defined results, we'll proceed out of this code block and throw the
-      // RpcError at the end of this method.
-      const filteredResults: T[] = results.filter((item) => item !== undefined) as T[];
-      if (filteredResults.length > 0) {
-        // Pick the most common answer.
-        let counts: Map<string, number> = new Map();
-        counts = filteredResults.reduce((counts, item) => {
-          // Stringify the key. We'll convert it back before returning.
-          const key = JSON.stringify(item);
-          counts.set(key, (counts.get(key) ?? 0) + 1);
-          return counts;
-        }, counts);
-        const maxCount = Math.max(...Array.from(counts.values()));
-        if (maxCount < quorum) {
-          // Quorum is not met: we should toss this response as it could be unreliable.
-          throw new QuorumNotMet(maxCount, quorum, {
-            errors,
-            providersCount: this.providers.length,
-            responsesCount: filteredResults.length,
-          });
-        }
-        // Technically it could be multiple top responses...
-        const topResponses = Array.from(counts.keys()).filter((k) => counts.get(k)! === maxCount);
-        if (topResponses.length > 0) {
-          // Did we get multiple conflicting top responses? Worth logging.
-          this.logger.info(
-            'Received conflicting top responses from RPC providers.',
-            createRequestContext(this.execute.name),
-            undefined,
-            {
-              topResponses,
-              providersCount: this.providers.length,
-              responsesCount: filteredResults.length,
-              requiredQuorum: quorum,
-            },
-          );
-        }
-        // We've been using string keys and need to convert back to the OG item type T.
-        const stringifiedTopResponse = topResponses[0];
-        for (const item of filteredResults) {
-          if (JSON.stringify(item) === stringifiedTopResponse) {
-            return item;
-          }
-        }
-      }
-    } else {
-      // Shuffle the providers (with weighting towards better ones) and pick from the top.
-      const shuffledProviders = this.shuffleSyncedProviders();
-      for (const provider of shuffledProviders) {
-        try {
-          return await method(provider);
-        } catch (e: unknown) {
-          handleError(e);
-        }
-      }
-    }
-
-    throw new RpcError(RpcError.reasons.FailedToSend, { errors });
-  }
-
-  /**
-   * Callback method used for handling a block update from synchronized providers.
-   *
-   * @remarks
-   * Since being "in-sync" is actually a relative matter, it's possible to have all providers
-   * be out of sync (e.g. 100 blocks behind the current block in reality), but also have them
-   * be considered in-sync here, since we only use the highest block among our providers to determine
-   * the "true" current block.
-   *
-   *
-   * @param provider - RpcProvider instance this block update applies to.
-   * @param blockNumber - Current block number (according to the provider).
-   * @param url - URL of the provider.
-   * @returns boolean indicating whether the provider is in sync.
-   */
-  protected async syncProviders(): Promise<void> {
-    const { requestContext, methodContext } = createLoggingContext(this.syncProviders.name);
-
-    // Reset the current lead provider.
-    this.leadProvider = undefined;
-
-    // First, sync all providers simultaneously.
-    await Promise.all(
-      this.providers.map(async (p) => {
-        try {
-          await p.sync();
-        } catch (e: unknown) {
-          this.logger.debug("Couldn't sync provider.", requestContext, methodContext, {
-            error: jsonifyError(e as Error),
-            provider: p.name,
-          });
-        }
-      }),
-    );
-
-    // Find the provider with the highest block number and use that as source of truth.
-    const highestBlockNumber = Math.max(...this.providers.map((p) => p.syncedBlockNumber));
-    for (const provider of this.providers) {
-      const providerBlockNumber = provider.syncedBlockNumber;
-      provider.lag = highestBlockNumber - providerBlockNumber;
-
-      // Set synced property, log if the provider went out of sync.
-      const synced = provider.lag < PROVIDER_MAX_LAG;
-      if (!synced && provider.synced) {
-        // If the provider was previously synced but fell out of sync, debug log to notify.
-        this.logger.debug('Provider fell out of sync.', undefined, undefined, {
-          providerBlockNumber,
-          provider: provider.name,
-          lag: provider.lag,
-        });
-      }
-      provider.synced = synced;
-    }
-
-    // We want to pick the lead provider here at random from the list of 0-lag providers to ensure that we distribute
-    // our block listener RPC calls as evenly as possible across all providers.
-    const leadProviders = this.shuffleSyncedProviders();
-    this.leadProvider = leadProviders[0];
-
-    this.logger.debug('Synced provider(s).', requestContext, methodContext, {
-      highestBlockNumber,
-      leadProvider: this.leadProvider.name,
-      providers: this.providers.map((p) => ({
-        url: p.name,
-        blockNumber: p.syncedBlockNumber,
-        lag: p.lag,
-        synced: p.synced,
-        metrics: {
-          reliability: p.reliability,
-          latency: p.latency,
-          cps: p.cps,
-          priority: p.priority,
-        },
-      })),
-    });
-  }
-
-  /**
-   * Helper method to stall, possibly until we've surpassed a specified number of blocks. Only works
-   * with block number if we're running in synchronized mode.
+   * Helper method to stall, possibly until we've surpassed a specified number of blocks.
    *
    * @param numBlocks (default: 1) - the number of blocks to wait.
    */
   private async wait(numBlocks = 1): Promise<void> {
     const pollPeriod = numBlocks * (this.blockPeriod ?? 2_000);
     await delay(pollPeriod);
-  }
-
-  /**
-   * Helper method for getting tier-shuffled synced providers.
-   *
-   * @returns all in-sync providers in order of synchronicity with chain, with the lead provider
-   * in the first position and the rest shuffled by tier (lag).
-   */
-  private shuffleSyncedProviders(): RpcProvider[] {
-    // TODO: Should priority be a getter, and calculated internally?
-    // Tiered shuffling: providers that have the same lag value (e.g. 0) will be shuffled so as to distribute RPC calls
-    // as evenly as possible across all providers; at high load, this can translate to higher efficiency (each time we
-    // execute an RPC call, we'll be hitting different providers).
-    // Shuffle isn't applied to lead provider - instead, we just guarantee that it's in the first position.
-    this.providers.forEach((p) => {
-      p.priority =
-        p.lag -
-        (this.leadProvider && p.name === this.leadProvider.name ? 1 : Math.random()) -
-        p.cps / this.config.maxProviderCPS -
-        // Reliability factor reflects how often RPC errors are encountered, as well as timeouts.
-        p.reliability * 10 +
-        p.latency;
-    });
-    // Always start with the in-sync providers and then concat the out of sync subgraphs.
-    return this.providers
-      .filter((p) => p.synced)
-      .sort((a, b) => a.priority - b.priority)
-      .concat(this.providers.filter((p) => !p.synced).sort((a, b) => a.priority - b.priority));
   }
 
   private async setBlockPeriod(): Promise<void> {

@@ -1,8 +1,7 @@
-import { Interface } from 'ethers/lib/utils';
 import { ChainReader } from '@chimera-monorepo/chainservice';
-import { SinonStubbedInstance, reset, restore, createStubInstance, stub, SinonStub } from 'sinon';
+import { SinonStubbedInstance, reset, restore, stub, SinonStub } from 'sinon';
 import { getContextStub, mock } from '../globalTestHook';
-import { AssetConfig, expect, mkAddress, univ2PairABI } from '@chimera-monorepo/utils';
+import { AssetConfig, expect, mkAddress, chainWrapper } from '@chimera-monorepo/utils';
 import { createProcessEnv } from '../mock';
 import { getTokenPrice } from "../../src/libs";
 import * as MockableFns from "../../src/mockable";
@@ -27,7 +26,9 @@ const mockBaseAsset: AssetConfig = {
 }
 describe('price', () => {
   let chainreader: SinonStubbedInstance<ChainReader>;
-  let contractIface: SinonStubbedInstance<Interface>;
+  let encodeStub: SinonStub;
+  let decodeStub: SinonStub;
+  let encodeFunctionResultStub: SinonStub;
 
   let getBestProviderStub: SinonStub;
   let getTokenPriceFromChainlinkStub: SinonStub;
@@ -40,7 +41,9 @@ describe('price', () => {
       ...createProcessEnv(),
     });
     chainreader = mock.instances.chainreader() as SinonStubbedInstance<ChainReader>;
-    contractIface = createStubInstance(Interface);
+    encodeStub = stub(chainWrapper, 'encodeFunctionData');
+    decodeStub = stub(chainWrapper, 'decodeFunctionResult');
+    encodeFunctionResultStub = stub(chainWrapper, 'encodeFunctionResult');
     getContextStub.returns({
     ...mock.context(),
     config: { ...mock.config(), chains: {  
@@ -141,11 +144,12 @@ describe('price', () => {
         const mockPrice = 3000;
         getTokenPriceFromUniV2Stub.resolves(mockPrice);
 
-        const univ2PairIface = new Interface(univ2PairABI);
-        const mockEncodedResultOfToken0 = univ2PairIface.encodeFunctionResult('token0', [mockAsset.address]);
-        const mockEncodedResultOfToken1 = univ2PairIface.encodeFunctionResult('token1', [mockBaseAsset.address]);
-        chainreader.readTx.onFirstCall().resolves(mockEncodedResultOfToken0);
-        chainreader.readTx.onSecondCall().resolves(mockEncodedResultOfToken1);
+        encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
+        encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
+        decodeStub.onFirstCall().returns([mockAsset.address]);
+        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
+        chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 
         mockAsset.price.isStable = false;
         mockAsset.price.priceFeed = undefined;
@@ -160,11 +164,12 @@ describe('price', () => {
         const mockPrice = 3000;
         getTokenPriceFromUniV3Stub.resolves(mockPrice);
 
-        const univ2PairIface = new Interface(univ2PairABI);
-        const mockEncodedResultOfToken0 = univ2PairIface.encodeFunctionResult('token0', [mockAsset.address]);
-        const mockEncodedResultOfToken1 = univ2PairIface.encodeFunctionResult('token1', [mockBaseAsset.address]);
-        chainreader.readTx.onFirstCall().resolves(mockEncodedResultOfToken0);
-        chainreader.readTx.onSecondCall().resolves(mockEncodedResultOfToken1);
+        encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
+        encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
+        decodeStub.onFirstCall().returns([mockAsset.address]);
+        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
+        chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 
         mockAsset.price.isStable = false;
         mockAsset.price.priceFeed = undefined;
@@ -180,11 +185,12 @@ describe('price', () => {
         const mockPrice = 3000;
         getTokenPriceFromCoingeckoStub.resolves(mockPrice);
 
-        const univ2PairIface = new Interface(univ2PairABI);
-        const mockEncodedResultOfToken0 = univ2PairIface.encodeFunctionResult('token0', [mockAsset.address]);
-        const mockEncodedResultOfToken1 = univ2PairIface.encodeFunctionResult('token1', [mockBaseAsset.address]);
-        chainreader.readTx.onFirstCall().resolves(mockEncodedResultOfToken0);
-        chainreader.readTx.onSecondCall().resolves(mockEncodedResultOfToken1);
+        encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
+        encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
+        decodeStub.onFirstCall().returns([mockAsset.address]);
+        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
+        chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 
         mockAsset.price.isStable = false;
         mockAsset.price.priceFeed = undefined;

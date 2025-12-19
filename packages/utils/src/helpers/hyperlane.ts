@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { axiosGet } from './axios';
-import { Client, cacheExchange, fetchExchange } from '@urql/core';
-import { Interface } from 'ethers/lib/utils';
-import { ethers } from 'ethers';
+import { cacheExchange, Client, fetchExchange } from '@urql/core';
+import { chainWrapper } from './chain';
 import { getBestProvider } from './provider';
 
 export const HyperlaneStatus = {
@@ -65,9 +65,9 @@ query ($id: bytea!) {
   }
 }`;
 
-export const getMailboxInterface = (): Interface => {
+export const getMailboxInterface = () => {
   // Only need the `process` and `delivered` functions.
-  return new Interface([
+  return [
     {
       type: 'function',
       name: 'process',
@@ -136,11 +136,11 @@ export const getMailboxInterface = (): Interface => {
       name: 'Dispatch',
       type: 'event',
     },
-  ]);
+  ];
 };
 
-export const getGatewayInterface = (): Interface => {
-  return new Interface([
+export const getGatewayInterface = () => {
+  return [
     {
       inputs: [],
       name: 'mailbox',
@@ -154,7 +154,7 @@ export const getGatewayInterface = (): Interface => {
       stateMutability: 'view',
       type: 'function',
     },
-  ]);
+  ];
 };
 
 export const getHyperlaneMessageStatusViaGraphql = async (
@@ -235,18 +235,22 @@ export const getHyperlaneMsgDelivered = async (
   // If there's no working rpc url, returns `delivered` false.
   if (!bestProvider) return false;
 
-  const gatewayContract = new ethers.Contract(
-    gateway,
-    getGatewayInterface(),
-    new ethers.providers.JsonRpcProvider(bestProvider),
-  );
-  const mailbox = await gatewayContract.mailbox();
+  const client = chainWrapper.createPublicClient({
+    transport: chainWrapper.http(bestProvider),
+  });
 
-  const mailboxContract = new ethers.Contract(
-    mailbox,
-    getMailboxInterface(),
-    new ethers.providers.JsonRpcProvider(bestProvider),
-  );
+  const mailbox = await client.readContract({
+    address: gateway as `0x${string}`,
+    abi: getGatewayInterface(),
+    functionName: 'mailbox',
+  });
 
-  return await mailboxContract.delivered(messageId);
+  const delivered = await client.readContract({
+    address: mailbox as `0x${string}`,
+    abi: getMailboxInterface(),
+    functionName: 'delivered',
+    args: [messageId],
+  });
+
+  return delivered as boolean;
 };

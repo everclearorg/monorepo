@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import {
   chainIdToDomain,
   createLoggingContext,
@@ -7,16 +6,19 @@ import {
   RelayerTaskStatus,
   sendHeartbeat,
   getNtpTimeSeconds,
+  chainWrapper,
+  type PublicClient,
 } from '@chimera-monorepo/utils';
 import interval from 'interval-promise';
 import { CachedTaskData } from '@chimera-monorepo/adapters-cache';
 import { FastifyInstance, FastifyReply } from 'fastify';
 
 import { getContext } from '../../make';
-import { WriteTransaction } from '@chimera-monorepo/chainservice';
+import { getVmFromDomainId, WriteTransaction, SupportedVms } from '@chimera-monorepo/chainservice';
 import { getFastifyInstance } from '../../mockable';
+import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
 
-export const MIN_GAS_LIMIT = BigNumber.from(4_000_000);
+export const MIN_GAS_LIMIT = BigInt(4_000_000);
 export const MIN_HEART_INTERVAL_SECONDS = 60; // 1min
 let cachedHeartbeatSent = 0;
 
@@ -79,10 +81,32 @@ export const pollCache = async () => {
     const domain = chainIdToDomain(chain)!;
 
     const _provider = await chainservice.getProvider(domain);
-    const rpcProvider = await _provider.leadProvider;
-    if (!rpcProvider) {
-      logger.debug('Bad rpcs', _requestContext, methodContext, { domain, providers: config.chains[domain].providers });
+    if (!_provider) {
+      logger.warn('No provider found for domain', _requestContext, methodContext, { domain });
       continue;
+    }
+
+    if (getVmFromDomainId(domain) === SupportedVms.evm) {
+      // Set up Web3Signer for this chain.
+      const rpcUrls = config.chains[domain].providers;
+      const transport =
+        rpcUrls.length > 1
+          ? chainWrapper.fallback(
+              rpcUrls.map((url) => chainWrapper.http(url)),
+              { rank: true },
+            )
+          : chainWrapper.http(rpcUrls[0]);
+      const client = chainWrapper.createPublicClient({
+        transport,
+        batch: {
+          multicall: true,
+        },
+      }) as PublicClient;
+      (wallet as Web3Signer).connect(client);
+      logger.debug('Updated relayer signer', _requestContext, methodContext, {
+        domain,
+        rpcUrls,
+      });
     }
 
     for (const task of tasksByChain[chain]) {
@@ -128,18 +152,18 @@ export const pollCache = async () => {
         logger.debug(`Got the gasLimit for domain: ${domain}`, requestContext, methodContext, {
           gasLimit: gasLimit.toString(),
         });
-        gasLimit = BigNumber.from(gasLimit).lt(MIN_GAS_LIMIT) ? MIN_GAS_LIMIT.toString() : gasLimit;
+        gasLimit = BigInt(gasLimit) < MIN_GAS_LIMIT ? MIN_GAS_LIMIT.toString() : gasLimit;
 
-        let bumpedGasPrice = BigNumber.from(gasPrice).mul(130).div(100);
-        const bumpedGasLimit = BigNumber.from(gasLimit).mul(120).div(100);
+        let bumpedGasPrice = (BigInt(gasPrice) * BigInt(130)) / BigInt(100);
+        const bumpedGasLimit = (BigInt(gasLimit) * BigInt(120)) / BigInt(100);
 
         const minGasPrice = config.chains[domain]?.minGasPrice;
         if (minGasPrice) {
-          bumpedGasPrice = bumpedGasPrice.lt(minGasPrice) ? BigNumber.from(minGasPrice) : bumpedGasPrice;
+          bumpedGasPrice = bumpedGasPrice < BigInt(minGasPrice) ? BigInt(minGasPrice) : bumpedGasPrice;
         }
 
         // Get Nonce
-        const nonce = await rpcProvider.getTransactionCount(await wallet.getAddress(), 'latest');
+        const nonce = await _provider.getTransactionCount('latest');
 
         // Execute the calldata.
         logger.info('Sending tx', requestContext, methodContext, {

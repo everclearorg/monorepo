@@ -1,4 +1,4 @@
-import { providers } from 'ethers';
+import { chainWrapper } from './chain';
 /**
  * Gets the best RPC URL between several options by comparing latencies
  * @param rpcUrls - The source list
@@ -9,10 +9,13 @@ export const getBestProvider = async (rpcUrls: string[]): Promise<string | undef
   let bestLatency = Infinity;
 
   for (const url of rpcUrls) {
-    const provider = new providers.JsonRpcProvider(url);
     try {
+      const client = chainWrapper.createPublicClient({
+        transport: chainWrapper.http(url),
+      });
+
       const start = Date.now();
-      await provider.getBlockNumber();
+      await client.request({ method: 'eth_blockNumber' });
       const latency = Date.now() - start;
 
       if (latency < bestLatency) {
