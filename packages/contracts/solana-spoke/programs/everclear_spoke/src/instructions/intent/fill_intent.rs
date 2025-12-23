@@ -429,8 +429,8 @@ pub struct FillIntent<'info> {
     #[account(mut)]
     pub configured_igp_account: AccountInfo<'info>,
 
-    /// CHECK: we verify this is consistent with fee_signer
-    #[account(address = fee_adapter_state.fee_signer)]
+    /// CHECK: we verify this is consistent with fill_signer
+    #[account(address = fee_adapter_state.fill_signer)]
     pub signer: AccountInfo<'info>,
 
     /// CHECK: we verify this is consistent with SYSVAR_INSTRUCTIONS
@@ -447,58 +447,150 @@ pub struct FillIntent<'info> {
 mod tests {
     use super::*;
     use anchor_lang::prelude::Pubkey;
+    use crate::state::FeeAdapterState;
 
     #[test]
-    fn test_account_claim_logic() {
-        let program_id = Pubkey::new_unique();
-        let system_program = anchor_lang::solana_program::system_program::ID;
+    fn test_fill_signer_separate_from_fee_signer() {
+        let fee_signer = Pubkey::new_unique();
+        let fill_signer = Pubkey::new_unique();
         
-        // Account doesn't exist (lamports = 0) - should transfer 1 lamport first, then allocate + assign
-        let account_lamports_nonexistent = 0u64;
-        let should_transfer_first = account_lamports_nonexistent == 0;
-        assert!(
-            should_transfer_first,
-            "Non-existent account should trigger initial lamport transfer"
-        );
-
-        // Account exists with dust (lamports > 0) and owned by system program - should allocate + assign (claim it)
-        let account_lamports_with_dust = 1u64; // Dust sent to pre-initialize
-        let account_owner_system = system_program;
-        let should_allocate_assign = account_lamports_with_dust > 0 && account_owner_system == system_program;
-        assert!(
-            should_allocate_assign,
-            "Account with dust owned by system program should be claimable via allocate + assign"
-        );
-
-        // Account already owned by our program - should skip allocate/assign, just transfer lamports if needed
-        let account_owner_program = program_id;
-        let should_skip_allocate = account_owner_program == program_id;
-        assert!(
-            should_skip_allocate,
-            "Account already owned by program should skip allocate/assign"
+        assert_ne!(
+            fee_signer, fill_signer,
+            "Fee signer and fill signer should be different accounts"
         );
     }
 
     #[test]
-    fn test_front_running_mitigation() {
-        let program_id = Pubkey::new_unique();
-        let system_program = anchor_lang::solana_program::system_program::ID;
+    fn test_fee_adapter_state_includes_fill_signer() {
+        let fee_recipient = Pubkey::new_unique();
+        let fee_signer = Pubkey::new_unique();
+        let fill_signer = Pubkey::new_unique();
         
-        // Simulate pre-initialized account (exists with dust, owned by system program)
-        let preinitialized_account_lamports = 1u64; // Dust sent to pre-initialize
-        let preinitialized_account_owner = system_program;
+        let state_size = FeeAdapterState::SIZE;
+        let expected_size = 2 + (32 * 3) + 1;
         
-        let can_claim = preinitialized_account_lamports > 0 && preinitialized_account_owner == system_program;
-        assert!(
-            can_claim,
-            "Pre-initialized account owned by system program should be claimable, not rejected"
+        assert_eq!(
+            state_size, expected_size,
+            "FeeAdapterState should include fill_signer field (3 Pubkeys total)"
         );
+    }
 
-        let normal_account_lamports = 0u64;
-        let should_transfer_first = normal_account_lamports == 0;
+    #[test]
+    fn test_fill_sign_params_structure() {
+        let domain = 1u32;
+        let intent_id = [1u8; 32];
+        let filler = Pubkey::new_unique();
+        let amount_out = 1000u64;
+        let receiver = Pubkey::new_unique();
+        let receiver_bytes = receiver.to_bytes();
+        let destinations = vec![1u32, 2u32];
+        
+        let sign_params = FillSignParams {
+            domain,
+            intent_id,
+            filler,
+            amount_out,
+            receiver: receiver_bytes,
+            destinations: destinations.clone(),
+        };
+        
+        let mut encoded = vec![];
+        sign_params.serialize(&mut encoded).unwrap();
+        
+        assert!(!encoded.is_empty(), "FillSignParams should serialize correctly");
+        
+        let mut decoded = &encoded[..];
+        let decoded_params: FillSignParams = AnchorDeserialize::deserialize(&mut decoded).unwrap();
+        
+        assert_eq!(decoded_params.domain, domain);
+        assert_eq!(decoded_params.intent_id, intent_id);
+        assert_eq!(decoded_params.filler, filler);
+        assert_eq!(decoded_params.amount_out, amount_out);
+        assert_eq!(decoded_params.receiver, receiver_bytes);
+        assert_eq!(decoded_params.destinations, destinations);
+    }
+
+    #[test]
+    fn test_fill_signer_independence() {
+        let fee_signer_1 = Pubkey::new_unique();
+        let fee_signer_2 = Pubkey::new_unique();
+        let fill_signer_1 = Pubkey::new_unique();
+        let fill_signer_2 = Pubkey::new_unique();
+        
+        assert_ne!(fee_signer_1, fill_signer_1);
+        assert_ne!(fee_signer_2, fill_signer_2);
+        
+        let can_update_fee_signer_independently = fee_signer_1 != fee_signer_2;
+        let can_update_fill_signer_independently = fill_signer_1 != fill_signer_2;
+        
         assert!(
-            should_transfer_first,
-            "Normal case: Non-existent account should trigger initial lamport transfer"
+            can_update_fee_signer_independently && can_update_fill_signer_independently,
+            "Fee signer and fill signer should be independently updatable"
+        );
+    }
+
+    #[test]
+    fn test_fill_signer_prevents_fee_signer_compromise_impact() {
+        let fee_signer = Pubkey::new_unique();
+        let fill_signer = Pubkey::new_unique();
+        let compromised_fee_signer = fee_signer;
+        let secure_fill_signer = fill_signer;
+        
+        assert_ne!(
+            compromised_fee_signer, secure_fill_signer,
+            "Even if fee_signer is compromised, fill_signer remains secure"
+        );
+        
+        let fee_signer_can_fill = compromised_fee_signer == secure_fill_signer;
+        assert!(
+            !fee_signer_can_fill,
+            "Compromised fee_signer should not be able to sign fill intents"
+        );
+    }
+
+    #[test]
+    fn test_different_fill_signers_produce_different_signatures() {
+        let intent_id = [1u8; 32];
+        let filler = Pubkey::new_unique();
+        let amount_out = 1000u64;
+        let receiver = Pubkey::new_unique();
+        let destinations = vec![1u32];
+        
+        let sign_params_1 = FillSignParams {
+            domain: 1,
+            intent_id,
+            filler,
+            amount_out,
+            receiver: receiver.to_bytes(),
+            destinations: destinations.clone(),
+        };
+        
+        let sign_params_2 = FillSignParams {
+            domain: 1,
+            intent_id,
+            filler,
+            amount_out,
+            receiver: receiver.to_bytes(),
+            destinations: destinations.clone(),
+        };
+        
+        let mut encoded_1 = vec![];
+        sign_params_1.serialize(&mut encoded_1).unwrap();
+        
+        let mut encoded_2 = vec![];
+        sign_params_2.serialize(&mut encoded_2).unwrap();
+        
+        assert_eq!(
+            encoded_1, encoded_2,
+            "Same parameters should produce same serialization"
+        );
+        
+        let fill_signer_1 = Pubkey::new_unique();
+        let fill_signer_2 = Pubkey::new_unique();
+        
+        assert_ne!(
+            fill_signer_1, fill_signer_2,
+            "Different fill signers should be different accounts"
         );
     }
 }

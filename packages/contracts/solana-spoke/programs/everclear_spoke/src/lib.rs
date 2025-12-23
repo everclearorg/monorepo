@@ -14,8 +14,8 @@ use hyperlane::{
     SimulationReturnData,
 };
 use instructions::fee_adapter::{
-    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter,
-    __client_accounts_fee_adapter_admin_state, __client_accounts_initialize_fee_adapter,
+    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter, MigrateFeeAdapterState,
+    __client_accounts_initialize_fee_adapter,
 };
 
 use instructions::new_order::OrderParameters;
@@ -278,13 +278,14 @@ pub mod everclear_spoke {
         ctx: Context<InitializeFeeAdapter>,
         fee_recipient: Pubkey,
         fee_signer: Pubkey,
+        fill_signer: Pubkey,
     ) -> Result<()> {
         let state = &ctx.accounts.spoke_state;
         require!(
             state.owner == ctx.accounts.payer.key(),
             SpokeError::OnlyOwner
         );
-        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer)
+        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer, fill_signer)
     }
 
     pub fn update_fee_recipient(
@@ -324,5 +325,26 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
         fee_adapter::unpause_fee_adapter(ctx)
+    }
+
+    pub fn update_fill_signer(ctx: Context<FeeAdapterAdminState>, fill_signer: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::update_fill_signer(ctx, fill_signer)
+    }
+
+    pub fn migrate_fee_adapter_state(
+        ctx: Context<MigrateFeeAdapterState>,
+        fill_signer: Pubkey,
+    ) -> Result<()> {
+        let state = &ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::migrate_fee_adapter_state(ctx, fill_signer)
     }
 }
