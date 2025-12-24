@@ -341,7 +341,9 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
 
 // Overload to close the given pool as well
 export const closeDatabase = async (_pool?: Pool): Promise<void> => {
-  await pool.end();
+  if (pool) {
+    await pool.end();
+  }
   if (_pool) {
     await _pool.end();
   }
