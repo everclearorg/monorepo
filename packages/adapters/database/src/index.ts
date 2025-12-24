@@ -269,7 +269,23 @@ export type Database = {
 export let pool: Pool;
 
 export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<Database> => {
-  pool = new Pool({ connectionString: databaseUrl, idleTimeoutMillis: 3000, allowExitOnIdle: true });
+  // Close the existing pool to prevent connection leaks (important for Lambda reuse)
+  if (pool && typeof pool.end === 'function') {
+    try {
+      await pool.end();
+    } catch (e: unknown) {
+      logger.warn('Error closing existing pool', undefined, undefined, jsonifyError(e as Error));
+    }
+  }
+
+  // Create a new pool with appropriate limits for Lambda environments
+  // max: 2 connections is appropriate for Lambda (1-2 concurrent operations)
+  pool = new Pool({
+    connectionString: databaseUrl,
+    max: 2,
+    idleTimeoutMillis: 3000,
+    allowExitOnIdle: true,
+  });
 
   // don't let a pg restart kill your app
   pool.on('error', (err: Error) => logger.error('Database error', undefined, undefined, jsonifyError(err)));
