@@ -24,6 +24,8 @@ import {
   ITransactionReceipt,
   MissingSigner,
   ITransactionRequest,
+  getVmFromDomainId,
+  SupportedVms,
 } from './shared';
 import { axiosGet } from './mockable';
 
@@ -137,6 +139,12 @@ export class RpcProviderAggregator {
       gasPrice: transaction.params.gasPrice ? BigInt(transaction.params.gasPrice) : undefined,
       value: BigInt(transaction.params.value || 0),
     };
+    
+    // Add chainId for EVM chains to ensure EIP-155 compliance (replay protection)
+    if (getVmFromDomainId(this.domain) === SupportedVms.evm) {
+      (toSend as unknown as ITransactionRequest).chainId = this.domain;
+    }
+    
     const provider = await this.provider.connect(this.signer!);
     return provider.sendTransaction(toSend as unknown as ITransactionRequest);
   }
