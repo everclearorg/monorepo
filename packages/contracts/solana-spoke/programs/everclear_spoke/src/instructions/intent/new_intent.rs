@@ -116,8 +116,8 @@ pub fn new_intent(
         user_account: ctx.accounts.authority.to_account_info(),
         user_token_account: ctx.accounts.user_token_account.to_account_info(),
         user_authority_account: ctx.accounts.authority.to_account_info(),
-        fee_reciever_account: ctx.accounts.fee_recipient.to_account_info(),
-        fee_reciever_token_account: ctx.accounts.fee_recipient_token_account.to_account_info(),
+        fee_receiver_account: ctx.accounts.fee_recipient.to_account_info(),
+        fee_receiver_token_account: ctx.accounts.fee_recipient_token_account.to_account_info(),
         token_program: ctx.accounts.token_program.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
     };
