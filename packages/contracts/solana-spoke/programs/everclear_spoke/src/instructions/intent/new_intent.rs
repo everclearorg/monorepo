@@ -152,6 +152,24 @@ pub fn new_intent(
     Ok(())
 }
 
+fn validate_ttl_output_asset(
+    destinations_len: usize,
+    ttl: u64,
+    output_asset: Pubkey,
+) -> Result<()> {
+    if destinations_len == 1 {
+        if ttl != 0 && output_asset == Pubkey::default() {
+            return Err(error!(SpokeError::InvalidIntent));
+        }
+    } else {
+        require!(
+            ttl == 0 && output_asset == Pubkey::default(),
+            SpokeError::InvalidIntent
+        );
+    }
+    Ok(())
+}
+
 pub fn handle_new_intent<'info>(
     accounts: &mut NewIntentAccounts<'info>,
     program_id: Pubkey, // for ctx.programId
@@ -182,16 +200,7 @@ pub fn handle_new_intent<'info>(
         SpokeError::InvalidDestinationArray
     );
 
-    // If a single destination and ttl != 0, require output_asset is non-zero.
-    if destinations.len() == 1 {
-        require!(output_asset != Pubkey::default(), SpokeError::InvalidIntent);
-    } else {
-        // For multi-destination, ttl must be 0 and output_asset must be default.
-        require!(
-            ttl == 0 && output_asset == Pubkey::default(),
-            SpokeError::InvalidIntent
-        );
-    }
+    validate_ttl_output_asset(destinations.len(), ttl, output_asset)?;
 
     // NOTE: we do not need to check data len as this is implicitly done with solana tx size limitation of 1232 bytes
 
@@ -640,5 +649,58 @@ mod tests {
         fee_data2.serialize(&mut encoded2).unwrap();
 
         assert_ne!(encoded1, encoded2, "Different intent parameters should produce different FeeData, preventing signature reuse");
+    }
+
+    #[test]
+    fn test_validate_ttl_output_asset_single_destination_ttl_zero_allows_default() {
+        let result = validate_ttl_output_asset(1, 0, Pubkey::default());
+        assert!(result.is_ok(), "Single destination with ttl=0 should allow default output_asset");
+    }
+
+    #[test]
+    fn test_validate_ttl_output_asset_single_destination_ttl_nonzero_requires_nondefault() {
+        let result = validate_ttl_output_asset(1, 3600, Pubkey::default());
+        assert!(result.is_err(), "Single destination with ttl!=0 should reject default output_asset");
+        assert_eq!(result.unwrap_err(), error!(SpokeError::InvalidIntent));
+    }
+
+    #[test]
+    fn test_validate_ttl_output_asset_single_destination_ttl_nonzero_allows_nondefault() {
+        let non_default = Pubkey::new_unique();
+        let result = validate_ttl_output_asset(1, 3600, non_default);
+        assert!(result.is_ok(), "Single destination with ttl!=0 should allow non-default output_asset");
+    }
+
+    #[test]
+    fn test_validate_ttl_output_asset_single_destination_ttl_zero_allows_nondefault() {
+        let non_default = Pubkey::new_unique();
+        let result = validate_ttl_output_asset(1, 0, non_default);
+        assert!(result.is_ok(), "Single destination with ttl=0 should allow non-default output_asset");
+    }
+
+    #[test]
+    fn test_validate_ttl_output_asset_multi_destination_requires_zero_ttl_and_default() {
+        let result = validate_ttl_output_asset(2, 0, Pubkey::default());
+        assert!(result.is_ok(), "Multi-destination with ttl=0 and default output_asset should be valid");
+    }
+
+    #[test]
+    fn test_validate_ttl_output_asset_multi_destination_rejects_nonzero_ttl() {
+        let result = validate_ttl_output_asset(2, 3600, Pubkey::default());
+        assert!(result.is_err(), "Multi-destination with ttl!=0 should be rejected");
+    }
+
+    #[test]
+    fn test_validate_ttl_output_asset_multi_destination_rejects_nondefault_output() {
+        let non_default = Pubkey::new_unique();
+        let result = validate_ttl_output_asset(2, 0, non_default);
+        assert!(result.is_err(), "Multi-destination with non-default output_asset should be rejected");
+    }
+
+    #[test]
+    fn test_validate_ttl_output_asset_multi_destination_rejects_both_invalid() {
+        let non_default = Pubkey::new_unique();
+        let result = validate_ttl_output_asset(2, 3600, non_default);
+        assert!(result.is_err(), "Multi-destination with both ttl!=0 and non-default output_asset should be rejected");
     }
 }
