@@ -15,9 +15,6 @@ pub fn new_order(
     params: Vec<OrderParameters>,
     fee_param: FeeParams,
 ) -> Result<()> {
-    let state = &mut ctx.accounts.spoke_state;
-
-    require!(!state.paused, SpokeError::ContractPaused);
     require!(!params.is_empty(), SpokeError::EmptyParams);
     require!(
         !ctx.accounts.fee_adapter_state.paused,
