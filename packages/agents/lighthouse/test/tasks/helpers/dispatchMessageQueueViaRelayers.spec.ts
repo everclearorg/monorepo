@@ -147,7 +147,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
         mock.chains()[queue.domain].deployments?.everclear,
         '0xencoded', // encode stub value
         '0',
-        'processIntentQueueViaRelayer(uint32,tuple[],address,uint32,uint256,uint256,bytes)',
+        'processIntentQueueViaRelayer(uint32,tuple[],address,uint256,uint256,uint256,bytes)',
         [context.adapters.relayers[0]],
         context.adapters.chainservice,
         context.logger,
