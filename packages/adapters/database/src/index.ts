@@ -108,7 +108,7 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   saveSettlementIntents: (
-    setttlementIntents: SettlementIntent[],
+    settlementIntents: SettlementIntent[],
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   saveHubIntents: (
@@ -266,35 +266,38 @@ export type Database = {
   updateSolanaMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
 };
 
-export let pool: Pool;
+export let pool: Pool | undefined;
+let poolInitializationPromise: Promise<Pool> | undefined;
 
 export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<Database> => {
-  // Close the existing pool to prevent connection leaks (important for Lambda reuse)
-  if (pool && typeof pool.end === 'function') {
-    try {
-      await pool.end();
-    } catch (e: unknown) {
-      logger.warn('Error closing existing pool', undefined, undefined, jsonifyError(e as Error));
+  // Reuse the existing pool in warm Lambda invocations to avoid connection overhead
+  // Use a promise to prevent race conditions when multiple concurrent calls occur
+  if (!pool) {
+    // If initialization is already in progress, wait for it instead of creating a new pool
+    if (!poolInitializationPromise) {
+      poolInitializationPromise = (async () => {
+        const newPool = new Pool({ connectionString: databaseUrl, idleTimeoutMillis: 3000, allowExitOnIdle: true });
+
+        // don't let a pg restart kill your app
+        newPool.on('error', (err: Error) => logger.error('Database error', undefined, undefined, jsonifyError(err)));
+
+        try {
+          await newPool.query('SELECT NOW()');
+        } catch (e: unknown) {
+          logger.error('Database connection error', undefined, undefined, jsonifyError(e as Error));
+          // Reset the promise so retry is possible
+          poolInitializationPromise = undefined;
+          throw new Error('Database connection error');
+        }
+
+        // Only assign to the pool after successful initialization
+        pool = newPool;
+        return newPool;
+      })();
     }
-  }
 
-  // Create a new pool with appropriate limits for Lambda environments
-  // max: 2 connections is appropriate for Lambda (1-2 concurrent operations)
-  pool = new Pool({
-    connectionString: databaseUrl,
-    max: 2,
-    idleTimeoutMillis: 3000,
-    allowExitOnIdle: true,
-  });
-
-  // don't let a pg restart kill your app
-  pool.on('error', (err: Error) => logger.error('Database error', undefined, undefined, jsonifyError(err)));
-
-  try {
-    await pool.query('SELECT NOW()');
-  } catch (e: unknown) {
-    logger.error('Database connection error', undefined, undefined, jsonifyError(e as Error));
-    throw new Error('Database connection error');
+    // Wait for the initialization to complete (whether we started it or another call did)
+    await poolInitializationPromise;
   }
   return {
     saveOriginIntents,
@@ -353,14 +356,4 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     updateSettlementStatus,
     updateSolanaMessageStatuses,
   };
-};
-
-// Overload to close the given pool as well
-export const closeDatabase = async (_pool?: Pool): Promise<void> => {
-  if (pool) {
-    await pool.end();
-  }
-  if (_pool) {
-    await _pool.end();
-  }
 };
