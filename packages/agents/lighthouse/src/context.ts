@@ -3,7 +3,7 @@ import { Relayer, setupEverclearRelayer, setupGelatoRelayer } from '@chimera-mon
 import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
 import { LighthouseConfig, LighthouseService } from './config';
 import { ChainService, SafeService, EthWallet } from '@chimera-monorepo/chainservice';
-import { Database, getDatabase, closeDatabase } from '@chimera-monorepo/database';
+import { Database, getDatabase } from '@chimera-monorepo/database';
 import { HistoricPrice } from './tasks/reward/historicPrice';
 
 export type LighthouseContext = {
@@ -133,7 +133,6 @@ export const makeLighthouseTask = async (
       },
     );
   } finally {
-    await closeDatabase();
     if (context.config.healthUrls[service]) {
       await sendHeartbeat(context.config.healthUrls[service], context.logger);
     } else {
