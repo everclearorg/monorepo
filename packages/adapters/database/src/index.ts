@@ -277,14 +277,14 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     if (!poolInitializationPromise) {
       poolInitializationPromise = (async () => {
         // Lambda-friendly pool configuration:
-        // - max: 1-2 connections max for Lambda (default is 10, which can cause EMFILE errors)
+        // - max: 1 connection for Lambda (single-threaded, sequential queries)
         // - min: 0 to allow pool to shrink when idle
         // - idleTimeoutMillis: 3000ms to close idle connections quickly
         // - connectionTimeoutMillis: 10000ms to fail fast if DB is unreachable
         // - allowExitOnIdle: true to allow Lambda to exit cleanly
         const newPool = new Pool({
           connectionString: databaseUrl,
-          max: 2, // Limit max connections to prevent EMFILE errors in Lambda
+          max: 1, // Single connection for Lambda (sequential queries, reduces EMFILE risk)
           min: 0, // Allow pool to shrink to zero when idle
           idleTimeoutMillis: 3000,
           connectionTimeoutMillis: 10000, // Fail fast if DB is unreachable
