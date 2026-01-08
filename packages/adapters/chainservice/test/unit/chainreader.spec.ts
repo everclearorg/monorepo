@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { providers, utils } from 'ethers';
 import { stub, restore, reset, createStubInstance, SinonStubbedInstance } from 'sinon';
-import { mkBytes32, mkAddress, expect, Logger } from '@chimera-monorepo/utils';
-
+import { mkBytes32, mkAddress, expect, Logger, chainWrapper } from '@chimera-monorepo/utils';
 import { RpcProviderAggregator } from '../../src/aggregator';
 import { ConfigurationError, ProviderNotConfigured, RpcError, ChainReader, EthWallet } from '../../src';
 import {
@@ -13,7 +11,6 @@ import {
   TEST_SENDER_DOMAIN,
   TEST_REQUEST_CONTEXT,
 } from '../utils';
-import { parseUnits } from 'ethers/lib/utils';
 
 const logger = new Logger({
   level: process.env.LOG_LEVEL ?? 'silent',
@@ -29,10 +26,9 @@ let provider: SinonStubbedInstance<RpcProviderAggregator>;
 describe('ChainReader', () => {
   beforeEach(() => {
     provider = createStubInstance(RpcProviderAggregator);
-    const privateKey = EthWallet.createRandom().privateKey;
     signer = createStubInstance(EthWallet);
+    signer.privateKey = EthWallet.createRandom().privateKey;
     signer.connect.returns(signer);
-    signer._signingKey = () => privateKey;
 
     const chains = {
       [TEST_SENDER_DOMAIN.toString()]: {
@@ -78,7 +74,7 @@ describe('ChainReader', () => {
 
   describe('#getBalance', () => {
     it('happy', async () => {
-      const testBalance = utils.parseUnits('42', 'ether').toString();
+      const testBalance = chainWrapper.parseEther('42').toString();
       const testAddress = mkAddress();
       provider.getBalance.resolves(testBalance);
 
@@ -98,7 +94,7 @@ describe('ChainReader', () => {
 
   describe('#getGasPrice', () => {
     it('happy', async () => {
-      const testGasPrice = utils.parseUnits('5', 'gwei').toString();
+      const testGasPrice = chainWrapper.parseGwei('5').toString();
       provider.getGasPrice.resolves(testGasPrice);
 
       const gasPrice = await chainReader.getGasPrice(TEST_SENDER_DOMAIN, TEST_REQUEST_CONTEXT);
@@ -136,7 +132,7 @@ describe('ChainReader', () => {
 
   describe('#getBlock', () => {
     it('happy', async () => {
-      const mockBlock = { transactions: [mkBytes32()] } as providers.Block;
+      const mockBlock = { transactions: [mkBytes32()] } as any;
       provider.getBlock.resolves(mockBlock);
 
       const block = await chainReader.getBlock(TEST_SENDER_DOMAIN, 'block');
@@ -227,7 +223,7 @@ describe('ChainReader', () => {
 
   describe('#getGasEstimate', () => {
     it('happy', async () => {
-      const mockGasEstimation = parseUnits('1', 9).toString();
+      const mockGasEstimation = chainWrapper.parseGwei('1').toString();
       provider.getGasEstimate.resolves(mockGasEstimation);
 
       const gasEstimation = await chainReader.getGasEstimate(TEST_SENDER_DOMAIN, TEST_TX);

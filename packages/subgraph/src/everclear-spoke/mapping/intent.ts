@@ -228,8 +228,48 @@ export function handleIntentFilled(event: IntentFilled): void {
 export function handleExternalCalldataExecuted(event: ExternalCalldataExecuted): void {
   // Get the intent id
   const intentId = event.params._intentId;
-  // Create the event
+
+  let destinationIntent = DestinationIntent.load(intentId);
+  if (destinationIntent == null) {
+    // DestinationIntent doesn't exist yet, ExternalCalldataExecuted is emitted before IntentFilled.
+
+    // Create a placeholder IntentFillEvent that will be replaced when IntentFilled is processed.
+    const emptyFillEvent = new IntentFillEvent(generateIdFromTx(event));
+    emptyFillEvent.intent = intentId;
+    emptyFillEvent.solver = Bytes.empty();
+    emptyFillEvent.receiver = Bytes.empty();
+    emptyFillEvent.amountOut = BigInt.zero();
+    emptyFillEvent.blockNumber = BigInt.zero();
+    emptyFillEvent.timestamp = BigInt.zero();
+    emptyFillEvent.transactionHash = Bytes.empty();
+    emptyFillEvent.gasPrice = BigInt.zero();
+    emptyFillEvent.gasLimit = BigInt.zero();
+    emptyFillEvent.txOrigin = Bytes.empty();
+    emptyFillEvent.txNonce = BigInt.zero();
+    emptyFillEvent.save();
+
+    destinationIntent = new DestinationIntent(intentId);
+    destinationIntent.initiator = Bytes.empty();
+    destinationIntent.receiver = Bytes.empty();
+    destinationIntent.inputAsset = Bytes.empty();
+    destinationIntent.outputAsset = Bytes.empty();
+    destinationIntent.amountOutMin = BigInt.zero();
+    destinationIntent.origin = BigInt.zero();
+    destinationIntent.nonce = BigInt.zero();
+    destinationIntent.timestamp = BigInt.zero();
+    destinationIntent.ttl = BigInt.zero();
+    destinationIntent.amount = BigInt.zero();
+    destinationIntent.destinations = [];
+    destinationIntent.data = Bytes.empty();
+    destinationIntent.queueIdx = BigInt.zero();
+    destinationIntent.status = 'ADDED';
+    destinationIntent.fillEvent = emptyFillEvent.id;
+    destinationIntent.save();
+  }
+
+  // Use intentId as the ID so handleIntentFilled can find it
   const log = new ExternalCalldataExecutedEvent(intentId);
+  log.intent = intentId;
   log.returnData = event.params._returnData;
 
   log.blockNumber = event.block.number;

@@ -1,4 +1,3 @@
-import { Logger } from 'ethers/lib/utils';
 import { expect } from '@chimera-monorepo/utils';
 
 import {
@@ -21,7 +20,7 @@ describe('#parseError', () => {
 
   it('should handle server errors / bad response from providers', () => {
     const err = {
-      code: Logger.errors.SERVER_ERROR,
+      code: 'SERVER_ERROR',
       error: {
         message: 'fail',
       },
@@ -35,7 +34,7 @@ describe('#parseError', () => {
 
   it('should handle unpredictable gas limit error', () => {
     const err = {
-      code: Logger.errors.UNPREDICTABLE_GAS_LIMIT,
+      code: 'UNPREDICTABLE_GAS_LIMIT',
       error: {
         message: 'fail',
       },
@@ -70,7 +69,7 @@ describe('#parseError', () => {
     const errs = ['ECONNRESET', 'EADDRINUSE', 'ECONNREFUSED', 'EPIPE', 'ENOTFOUND', 'ENETUNREACH', 'EAI_AGAIN'];
     errs.forEach((err) => {
       const parsed = parseError({
-        code: Logger.errors.SERVER_ERROR,
+        code: 'SERVER_ERROR',
         otherdata: 'nonsense',
         error: { message: `<d12kegvzpwe1f${err}@!#!$%!@%<<>` },
       });
@@ -129,7 +128,7 @@ describe('#parseError', () => {
     for (const { msg, reason } of msgs) {
       it(`${msg}`, () => {
         const err = {
-          code: Logger.errors.CALL_EXCEPTION,
+          code: 'CALL_EXCEPTION',
           message: msg,
         };
 
@@ -176,7 +175,7 @@ describe('#parseError', () => {
     for (const { msg, reason } of msgs) {
       it(`${msg}`, () => {
         const err = {
-          code: Logger.errors.CALL_EXCEPTION,
+          code: 'CALL_EXCEPTION',
           message: msg,
         };
 
@@ -191,39 +190,39 @@ describe('#parseError', () => {
   describe('should handle error code', () => {
     const errors = [
       {
-        code: Logger.errors.TRANSACTION_REPLACED,
+        code: 'TRANSACTION_REPLACED',
         reason: 'Transaction replaced.',
       },
       {
-        code: Logger.errors.INSUFFICIENT_FUNDS,
+        code: 'INSUFFICIENT_FUNDS',
         reason: TransactionReverted.reasons.InsufficientFunds,
       },
       {
-        code: Logger.errors.CALL_EXCEPTION,
+        code: 'CALL_EXCEPTION',
         reason: TransactionReverted.reasons.CallException,
       },
       {
-        code: Logger.errors.NONCE_EXPIRED,
+        code: 'NONCE_EXPIRED',
         reason: BadNonce.reasons.NonceExpired,
       },
       {
-        code: Logger.errors.REPLACEMENT_UNDERPRICED,
+        code: 'REPLACEMENT_UNDERPRICED',
         reason: BadNonce.reasons.ReplacementUnderpriced,
       },
       {
-        code: Logger.errors.UNPREDICTABLE_GAS_LIMIT,
+        code: 'UNPREDICTABLE_GAS_LIMIT',
         reason: 'The gas estimate could not be determined.',
       },
       {
-        code: Logger.errors.TIMEOUT,
+        code: 'TIMEOUT',
         reason: 'Operation timed out.',
       },
       {
-        code: Logger.errors.NETWORK_ERROR,
+        code: 'NETWORK_ERROR',
         reason: RpcError.reasons.NetworkError,
       },
       {
-        code: Logger.errors.SERVER_ERROR,
+        code: 'SERVER_ERROR',
         reason: ServerError.reasons.BadResponse,
       },
     ];

@@ -1,7 +1,6 @@
-import { OriginIntent, RelayerType, expect, mkBytes32 } from '@chimera-monorepo/utils';
+import { OriginIntent, RelayerType, expect, mkBytes32, chainWrapper } from '@chimera-monorepo/utils';
 import { SinonStub, stub } from 'sinon';
 import { getContextStub, mock, createIntentQueues } from '../../globalTestHook';
-import { Interface } from 'ethers/lib/utils';
 import * as Relayer from '@chimera-monorepo/adapters-relayer';
 import { processMessageQueue } from '../../../src/tasks/helpers';
 
@@ -18,7 +17,6 @@ describe('Process Message Queue', () => {
   let getMessageQueueContentsStub: SinonStub;
   let encodeStub: SinonStub;
   let decodeStub: SinonStub;
-  const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
   beforeEach(() => {
     const config = {
@@ -46,8 +44,8 @@ describe('Process Message Queue', () => {
       config,
     });
     // Interface stubs
-    encodeStub = stub(Interface.prototype, 'encodeFunctionData').returns('0xencoded');
-    decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns([0]);
+    encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0xencoded');
+    decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(BigInt(0));
 
     // Context stubs
     getQueuesStub = stub().resolves(queues);
@@ -60,8 +58,6 @@ describe('Process Message Queue', () => {
       taskId: '123',
       relayerType: RelayerType.Everclear,
     });
-
-    stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
   });
 
   describe('#processMessageQueue', () => {

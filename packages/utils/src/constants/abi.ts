@@ -1,4 +1,5 @@
-import { JsonFragment } from '@ethersproject/abi';
+// Type alias for backward compatibility
+type JsonFragment = any;
 
 export const ERC20Abi = [
   // Read-Only Functions

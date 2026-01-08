@@ -1,4 +1,4 @@
-import { constants } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { createLoggingContext, Logger, RequestContext } from '@chimera-monorepo/utils';
 
 import { ChainServiceConfig, validateChainServiceConfig, ChainConfig } from './config';
@@ -72,9 +72,11 @@ export class ChainReader {
    * @returns BigNumber representing the current value held by the wallet at the
    * specified address.
    */
-  public async getBalance(domain: number, address: string, assetId = constants.AddressZero): Promise<string> {
+  public async getBalance(domain: number, address: string, assetId: string | undefined = chainWrapper.zeroAddress): Promise<string> {
     const provider = await this.getProvider(domain);
-    return await provider.getBalance(address, assetId);
+    // Handle undefined assetId or use the provided assetId
+    const actualAssetId = assetId ?? chainWrapper.zeroAddress;
+    return await provider.getBalance(address, actualAssetId);
   }
   /**
    * Get the current gas price for the chain for which this instance is servicing.
@@ -206,7 +208,7 @@ export class ChainReader {
    * @throws TransactionError.reasons.ProviderNotFound if provider is not configured for
    * that ID.
    */
-  protected async getProvider(domain: number): Promise<RpcProviderAggregator> {
+  public async getProvider(domain: number): Promise<RpcProviderAggregator> {
     await this.providerPromise;
     // Ensure that a signer, provider, etc are present to execute on this domain.
     if (!this.providers.has(domain)) {

@@ -1,4 +1,4 @@
-import { SinonStub, stub } from 'sinon';
+import { SinonStub, stub, restore } from 'sinon';
 import { expect, AssetConfig, getTokenPriceFromCoingecko, mkAddress } from '../../../src';
 import Axios from 'axios';
 
@@ -31,6 +31,10 @@ describe('Helpers:token price', () => {
     beforeEach(() => {
       getStub = stub(Axios, 'get');
       getStub.resolves({ data: response });
+    });
+
+    afterEach(() => {
+      restore();
     });
 
     it('should work if unauthed', async () => {

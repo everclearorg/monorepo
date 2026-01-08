@@ -55,7 +55,9 @@ export const getConfig = async (): Promise<WatcherConfig> => {
     ),
     deployments: configJson?.hub?.deployments || configFile?.hub?.deployments || everclearConfig?.hub.deployments,
     subgraphUrls:
-      configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub.subgraphUrls || [],
+      configJson?.hub?.subgraphUrls || configFile?.hub?.subgraphUrls || everclearConfig?.hub?.subgraphUrls || [],
+    envioSubgraphUrl:
+      configJson?.hub?.envioSubgraphUrl || configFile?.hub?.envioSubgraphUrl || everclearConfig?.hub?.envioSubgraphUrl,
     gasMultiplier: configJson?.hub?.gasMultiplier || configFile?.hub?.gasMultiplier || 2,
   };
 
@@ -203,13 +205,26 @@ export const shouldReloadEverclearConfig = async (): Promise<{ reloadConfig: boo
 
 /**
  * Helper to get subgraph reader config
- * @param chains Chain entry of monitor config
+ * @param chains Chain entry of watcher config (includes hub domain)
+ * @param hubConfig Optional hub config for Envio URL
  * @returns SubgraphConfig used to instantiate subgraph reader
  */
-export const getSubgraphReaderConfig = (chains: WatcherConfig['chains']): SubgraphConfig => {
+export const getSubgraphReaderConfig = (
+  chains: WatcherConfig['chains'],
+  hubConfig?: WatcherConfig['hub'],
+): SubgraphConfig => {
   const subgraphs: Record<string, { endpoints: string[]; timeout: number }> = {};
   Object.keys(chains).forEach((domainId) => {
     subgraphs[domainId] = { endpoints: chains[domainId].subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   });
-  return { subgraphs };
+  
+  // Add Envio configuration if available from hub config
+  const envioConfig: SubgraphConfig['envio'] = hubConfig?.envioSubgraphUrl
+    ? {
+        url: hubConfig.envioSubgraphUrl,
+        timeout: DEFAULT_SUBGRAPH_TIMEOUT / 1000, // Convert to seconds
+      }
+    : undefined;
+
+  return { subgraphs, ...(envioConfig && { envio: envioConfig }) };
 };

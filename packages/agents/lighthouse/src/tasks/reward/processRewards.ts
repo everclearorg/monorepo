@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getContext } from '../../context';
 import { createLoggingContext, MerkleTree, getNtpTimeSeconds } from '@chimera-monorepo/utils';
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree';
-import { ethers, BigNumber } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { InvalidAddressProof, InvalidState } from '../../errors/tasks/rewards';
-import { Interface } from 'ethers/lib/utils';
 import { processNewLockPositions } from '../helpers/mockable';
 import { processVolumeRewards } from './processVolumeRewards';
 import { REWARDS_EPOCH_CHECKPOINT } from './constants';
@@ -11,7 +11,7 @@ import { processStakingRewards } from './processStakingRewards';
 
 // RewardDistribution contains the rewards (aggregated) for each address
 type RewardDistribution = {
-  [address: string]: BigNumber;
+  [address: string]: bigint;
 };
 
 // RewardDistributions contains RewardDistribution for each reward asset.
@@ -24,20 +24,28 @@ export const getGenesisEpoch = async (): Promise<number> => {
     config: { abis, hub },
     adapters: { chainservice },
   } = getContext();
-  const iface = new Interface(abis.hub.gauge);
-  const encodedData = iface.encodeFunctionData('genesisEpoch', []);
+  const encodedData = chainWrapper.encodeFunctionData({
+    abi: abis.hub.gauge,
+    functionName: 'genesisEpoch',
+    args: [],
+  });
   const res = await chainservice.readTx(
     {
       to: hub.deployments.gauge,
       domain: +hub.domain,
       data: encodedData,
-      funcSig: iface.getFunction('genesisEpoch').format(),
+      funcSig: 'genesisEpoch()',
     },
     'latest',
   );
 
-  const [genesis] = iface.decodeFunctionResult('genesisEpoch', res);
-  return (genesis as BigNumber).toNumber();
+  const genesisResult = chainWrapper.decodeFunctionResult({
+    abi: abis.hub.gauge,
+    functionName: 'genesisEpoch',
+    data: res as `0x${string}`,
+  }) as unknown as bigint;
+
+  return Number(genesisResult);
 };
 
 export const getEpochDuration = async (): Promise<number> => {
@@ -45,20 +53,28 @@ export const getEpochDuration = async (): Promise<number> => {
     config: { abis, hub },
     adapters: { chainservice },
   } = getContext();
-  const iface = new Interface(abis.hub.gauge);
-  const encodedData = iface.encodeFunctionData('EPOCH_DURATION', []);
+  const encodedData = chainWrapper.encodeFunctionData({
+    abi: abis.hub.gauge,
+    functionName: 'EPOCH_DURATION',
+    args: [],
+  });
   const res = await chainservice.readTx(
     {
       to: hub.deployments.gauge,
       domain: +hub.domain,
       data: encodedData,
-      funcSig: iface.getFunction('EPOCH_DURATION').format(),
+      funcSig: 'EPOCH_DURATION()',
     },
     'latest',
   );
 
-  const [duration] = iface.decodeFunctionResult('EPOCH_DURATION', res);
-  return (duration as BigNumber).toNumber();
+  const durationResult = chainWrapper.decodeFunctionResult({
+    abi: abis.hub.gauge,
+    functionName: 'EPOCH_DURATION',
+    data: res as `0x${string}`,
+  }) as unknown as bigint;
+
+  return Number(durationResult);
 };
 
 export const getRewardDistributorUpdateCount = async (assetAddress: string) => {
@@ -66,26 +82,29 @@ export const getRewardDistributorUpdateCount = async (assetAddress: string) => {
     config: { abis, hub },
     adapters: { chainservice },
   } = getContext();
-  const iface = new Interface(abis.hub.rewardDistributor);
-  const encodedData = iface.encodeFunctionData('rewards', [assetAddress]);
+  const encodedData = chainWrapper.encodeFunctionData({
+    abi: abis.hub.rewardDistributor,
+    functionName: 'rewards',
+    args: [assetAddress],
+  });
   const res = await chainservice.readTx(
     {
       to: hub.deployments.rewardDistributor,
       domain: +hub.domain,
       data: encodedData,
-      funcSig: iface.getFunction('rewards').format(),
+      funcSig: 'rewards(address)',
     },
     'latest',
   );
 
-  type Reward = {
-    token: string;
-    merkleRoot: string;
-    proof: string;
-    updateCount: number;
-  };
-  const rewards = iface.decodeFunctionResult('rewards', res) as unknown as Reward;
-  return rewards.updateCount;
+  const rewards = chainWrapper.decodeFunctionResult({
+    abi: abis.hub.rewardDistributor,
+    functionName: 'rewards',
+    data: res as `0x${string}`,
+  });
+  // rewards returns [token, merkleRoot, proof, updateCount]
+  // updateCount is at index 3
+  return Number((rewards as any[])[3]);
 };
 
 export const mergeRewardWithPreviousTree = async (epoch: number, rewardDist: RewardDistributions) => {
@@ -114,9 +133,9 @@ export const mergeRewardWithPreviousTree = async (epoch: number, rewardDist: Rew
     }
     for (const [, [address, value]] of merkleTree.entries()) {
       if (!rewardDist[asset][address]) {
-        rewardDist[asset][address] = BigNumber.from(0);
+        rewardDist[asset][address] = BigInt(0);
       }
-      if (BigNumber.from(value).lt(0)) {
+      if (BigInt(value) < BigInt(0)) {
         const error = new InvalidState({
           address,
           asset,
@@ -127,7 +146,7 @@ export const mergeRewardWithPreviousTree = async (epoch: number, rewardDist: Rew
         });
         throw error;
       }
-      rewardDist[asset][address] = rewardDist[asset][address].add(value);
+      rewardDist[asset][address] = rewardDist[asset][address] + BigInt(value);
     }
   }
 };
@@ -200,7 +219,7 @@ export const processRewards = async () => {
   const rewardDistributions: MerkleTree[] = [];
   for (const [tokenAddress, tokenRewards] of Object.entries(rewardDist)) {
     const values = Object.entries(tokenRewards)
-      .filter(([, accountReward]) => accountReward.gt(0))
+      .filter(([, accountReward]) => accountReward > BigInt(0))
       .map(([account, reward]) => [account, reward.toString()]);
     if (values.length == 0) {
       logger.warn('no voting / staking activity in epoch, skip the tree computations', requestContext, methodContext, {
@@ -223,7 +242,7 @@ export const processRewards = async () => {
       updateCount: await getRewardDistributorUpdateCount(tokenAddress), // Update count from rewardDistributor
     };
     const combinedData = `${tokenAddress}${tokenTree.root}${JSON.stringify(metadata)}`;
-    const proof = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(combinedData));
+    const proof = chainWrapper.keccak256(chainWrapper.stringToBytes(combinedData)) as string;
 
     trees[tokenAddress] = tokenTree;
     rewardDistributions.push({
@@ -283,9 +302,9 @@ export const processRewards = async () => {
 
   for (const [assetAddress, assetRewardDist] of Object.entries(rewardDist)) {
     for (const user in assetRewardDist) {
-      const protocolRewards = volumeMetadata.userVolume[user]?.protocolRewards[assetAddress] ?? BigNumber.from(0);
-      const stakeRewards = stakeMetadata[assetAddress][user]?.stakeRewards ?? BigNumber.from(0);
-      const totalRewards = protocolRewards.add(stakeRewards);
+      const protocolRewards = volumeMetadata.userVolume[user]?.protocolRewards[assetAddress] ?? BigInt(0);
+      const stakeRewards = BigInt(stakeMetadata[assetAddress][user]?.stakeRewards?.toString() ?? '0');
+      const totalRewards = protocolRewards + stakeRewards;
       const proof = proofs[assetAddress][user];
       if (!proof) {
         const error = new InvalidState({

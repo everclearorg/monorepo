@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { constants } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import {
   RequestContext,
   createLoggingContext,
@@ -47,7 +47,7 @@ export const createTask = async (
 
   const { data, fee, to } = sanitized;
 
-  if (fee.token !== constants.AddressZero) {
+  if (fee.token !== chainWrapper.zeroAddress) {
     throw new UnsupportedFeeToken(fee.token, { chain, params: sanitized });
   }
 

@@ -1,5 +1,4 @@
-import { createLoggingContext, RequestContext, TIntentStatus } from '@chimera-monorepo/utils';
-import { BigNumber } from 'ethers';
+import { createLoggingContext, RequestContext, TIntentStatus, chainWrapper } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { getContract } from '../mockable';
 import { IntentLiquiditySummary, IntentStatusSummary, MissingDeployments } from '../types';
@@ -75,17 +74,25 @@ export const checkIntentStatus = async (
     methodArgs.map(async (methodArg) => {
       const { address, contract, domain, methodName } = methodArg;
 
-      const encodedIntentStatusData = contract.interface.encodeFunctionData(methodName, [intentId]);
+      const encodedIntentStatusData = chainWrapper.encodeFunctionData({
+        abi: contract.abi,
+        functionName: methodName,
+        args: [intentId],
+      });
       const encodedIntentStatusDataRes = await chainreader.readTx(
         {
           to: address,
           domain: +domain,
           data: encodedIntentStatusData,
-          funcSig: contract.interface.getFunction(methodName).format(),
+          funcSig: `${methodName}(bytes32)`,
         },
         'latest',
       );
-      const [decoded] = contract.interface.decodeFunctionResult(methodName, encodedIntentStatusDataRes);
+      const [decoded] = chainWrapper.decodeFunctionResult({
+        abi: contract.abi,
+        functionName: methodName,
+        data: encodedIntentStatusDataRes as `0x${string}`,
+      }) as [any];
       return {
         domain,
         status:
@@ -221,8 +228,8 @@ export const checkIntentLiquidity = async (
 
   // Calculate the original invoice amount from the context
   const invoiceValue = invoice?.amount
-    ? BigNumber.from(invoice.amount)
-    : BigNumber.from(context.amountAfterFees).add(context.pendingRewards);
+    ? BigInt(invoice.amount)
+    : BigInt(context.amountAfterFees) + BigInt(context.pendingRewards);
   const settlementValue = hubIntent?.settlementAmount ?? invoiceValue.toString();
   logger.debug('Calculated invoice and settlement value', requestContext, methodContext, {
     invoiceValue: invoiceValue.toString(),
@@ -241,16 +248,15 @@ export const checkIntentLiquidity = async (
 
   // Define the discount (take the configured max into consideration).
   const discount = Math.min(elapsedEpochs * tokenConfig.discountPerEpoch, tokenConfig.maxDiscountBps);
-  const discounted = invoiceValue.sub(invoiceValue.mul(discount).div(100_000));
+  const discounted = invoiceValue - (invoiceValue * BigInt(discount)) / BigInt(100_000);
 
   // Define unclaimed balances.
   const unclaimed = Object.fromEntries(
     unclaimedList.map(({ domain, custodied }) => {
-      const requiredWithFees = invoiceValue
-        .sub(custodied)
-        .mul(100_000)
-        .div(100_000 - tokenConfig.feeAmounts.reduce((acc, next) => acc + +next, 0));
-      return [domain, { custodied, required: invoiceValue.lte(custodied) ? '0' : requiredWithFees.toString() }];
+      const requiredWithFees =
+        ((invoiceValue - BigInt(custodied)) * BigInt(100_000)) /
+        BigInt(100_000 - tokenConfig.feeAmounts.reduce((acc, next) => acc + +next, 0));
+      return [domain, { custodied, required: invoiceValue <= BigInt(custodied) ? '0' : requiredWithFees.toString() }];
     }),
   );
 

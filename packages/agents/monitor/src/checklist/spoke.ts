@@ -1,6 +1,4 @@
-import { BigNumber } from 'ethers';
-import { formatUnits } from 'ethers/lib/utils';
-import { AssetConfig, createLoggingContext, RequestContext } from '@chimera-monorepo/utils';
+import { AssetConfig, createLoggingContext, RequestContext, chainWrapper } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { Severity } from '../types';
 import { getRegisteredAssetHashFromContract, getCustodiedAssetsFromHubContract } from '../helpers';
@@ -25,7 +23,7 @@ const checkAssetSpokeBalance = async (
   const getCustodiedAssetCalls = [];
   const spokeBalanceCalls = [];
 
-  let totalCustodiedBalance = BigNumber.from(0);
+  let totalCustodiedBalance = BigInt(0);
   const custodiedBalances: Record<string, string> = {};
   // spokeBalances stores a mapping of domains to (balance and representing decimals).
   const spokeBalances: Record<string, [string, number]> = {};
@@ -39,7 +37,7 @@ const checkAssetSpokeBalance = async (
 
     const hubCallback = async () => {
       const custodied = await getCustodiedAssetsFromHubContract(assetHash);
-      totalCustodiedBalance = totalCustodiedBalance.add(custodied);
+      totalCustodiedBalance = totalCustodiedBalance + BigInt(custodied);
       custodiedBalances[domainId] = custodied;
       logger.debug(`${assetName} to ${domainId} unclaimed on Hub: ${custodied}`);
     };
@@ -82,16 +80,16 @@ const checkAssetSpokeBalance = async (
   }
 
   // compute decimal normalized spoke balances for comparison
-  let totalSpokeBalance = BigNumber.from(0);
-  const normalizedSpokeBalances: Record<string, BigNumber> = {};
+  let totalSpokeBalance = BigInt(0);
+  const normalizedSpokeBalances: Record<string, bigint> = {};
   Object.entries(spokeBalances).forEach(([domain, [balance, decimals]]) => {
-    const multiplier = BigNumber.from(10).pow(18 - decimals);
-    normalizedSpokeBalances[domain] = BigNumber.from(balance).mul(multiplier);
-    totalSpokeBalance = totalSpokeBalance.add(normalizedSpokeBalances[domain]);
+    const multiplier = BigInt(10) ** BigInt(18 - decimals);
+    normalizedSpokeBalances[domain] = BigInt(balance) * multiplier;
+    totalSpokeBalance = totalSpokeBalance + normalizedSpokeBalances[domain];
   });
 
-  const formattedTotalCustodiedBalance = `${formatUnits(totalCustodiedBalance, highestDecimals)} ${assetName}`;
-  const formattedTotalSpokeBalance = `${formatUnits(totalSpokeBalance, highestDecimals)} ${assetName}`;
+  const formattedTotalCustodiedBalance = `${chainWrapper.formatUnits(totalCustodiedBalance, highestDecimals)} ${assetName}`;
+  const formattedTotalSpokeBalance = `${chainWrapper.formatUnits(totalSpokeBalance, highestDecimals)} ${assetName}`;
 
   logger.debug(`total Hub unclaimed: ${formattedTotalCustodiedBalance}`);
   logger.debug(`total Spoke Balance: ${formattedTotalSpokeBalance}`);
@@ -118,7 +116,7 @@ const checkAssetSpokeBalance = async (
     env: config.environment,
   };
 
-  if (totalSpokeBalance.lt(totalCustodiedBalance)) {
+  if (totalSpokeBalance < totalCustodiedBalance) {
     // critical error. liquidity missing as total spoke balance for the asset < custodied balance!
     await sendAlerts(report, logger, config, requestContext);
     logger.debug(

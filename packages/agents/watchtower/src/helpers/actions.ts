@@ -6,10 +6,10 @@ import {
   RequestContext,
   createMethodContext,
   jsonifyError,
+  chainWrapper,
 } from '@chimera-monorepo/utils';
 import { ActionStatus, Report, Severity } from '../lib/entities';
 import { getContext } from '../watcher';
-import { BigNumber, utils } from 'ethers';
 import { ITransactionReceipt, WriteTransaction } from '@chimera-monorepo/chainservice';
 import { sendAlerts } from './alerts';
 
@@ -73,14 +73,14 @@ export const pauseDomain = async (domainId: string, requestContext: RequestConte
       reason,
     };
   }
-  const everclearInterface = new utils.Interface(config.abis.spoke.everclear as string[]);
+  const everclearAbi = config.abis.spoke.everclear as any[];
 
   const logCtx = { domain: domainId, everclear: everclear };
 
   // check if protocol is already paused
   try {
     // if it is paused, return
-    const isPaused: boolean = await isDomainPaused(domainId, everclear, everclearInterface);
+    const isPaused: boolean = await isDomainPaused(domainId, everclear, everclearAbi);
     if (isPaused) {
       const reason = `Skipping domain(${domainId}) pause since it is already paused`;
       logger.info(reason, requestContext, methodContext, logCtx);
@@ -97,7 +97,7 @@ export const pauseDomain = async (domainId: string, requestContext: RequestConte
     try {
       // send pause tx and return the tx receipt
       pauseTx = await sendPauseDomainTx(
-        everclearInterface,
+        everclearAbi,
         everclear,
         domainId,
         domainId === config.hub.domain ? config.hub.gasMultiplier : config.chains[domainId].gasMultiplier,
@@ -134,7 +134,7 @@ export const pauseDomain = async (domainId: string, requestContext: RequestConte
       // if fetching paused status fails, try to pause
       // send pause tx and return the tx receipt
       const { tx, receipt } = await sendPauseDomainTx(
-        everclearInterface,
+        everclearAbi,
         everclear,
         domainId,
         config.chains[domainId].gasMultiplier,
@@ -179,7 +179,7 @@ export const pauseDomain = async (domainId: string, requestContext: RequestConte
 export const isDomainPaused = async (
   domain: string,
   everclearAddress: Address,
-  everclearInterface: utils.Interface,
+  everclearAbi: any[],
 ): Promise<boolean> => {
   const {
     adapters: { chainservice },
@@ -188,13 +188,20 @@ export const isDomainPaused = async (
     {
       domain: +domain,
       to: everclearAddress,
-      data: everclearInterface.encodeFunctionData('paused'),
-      funcSig: everclearInterface.getFunction('paused').format(),
+      data: chainWrapper.encodeFunctionData({
+        abi: everclearAbi,
+        functionName: 'paused',
+      }),
+      funcSig: 'paused()',
     },
     'latest',
   );
-  const [paused] = everclearInterface.decodeFunctionResult('paused', encoded);
-  return paused;
+  const paused = chainWrapper.decodeFunctionResult({
+    abi: everclearAbi,
+    functionName: 'paused',
+    data: encoded as `0x${string}`,
+  });
+  return paused as boolean;
 };
 
 /**
@@ -206,7 +213,7 @@ export const isDomainPaused = async (
  * @returns The tx and receipt of the pause tx
  */
 export const sendPauseDomainTx = async (
-  everclearInterface: utils.Interface,
+  everclearAbi: any[],
   everclearAddress: Address,
   domainId: string,
   gasMultiplier: number,
@@ -216,7 +223,10 @@ export const sendPauseDomainTx = async (
     const {
       adapters: { wallet, chainservice },
     } = getContext();
-    const pauseCalldata = everclearInterface.encodeFunctionData('pause');
+    const pauseCalldata = chainWrapper.encodeFunctionData({
+      abi: everclearAbi,
+      functionName: 'pause',
+    });
     const price = await chainservice.getGasPrice(+domainId, requestContext);
 
     const tx = {
@@ -225,9 +235,9 @@ export const sendPauseDomainTx = async (
       value: '0',
       domain: +domainId,
       from: await wallet.getAddress(),
-      gasPrice: BigNumber.from(price).mul(gasMultiplier).toString(),
-      gasLimit: BigNumber.from(100_000).toString(), // NOTE: fails on e2e tests without it, we can safely hardcode this since this function is not computationally expensive
-      funcSig: everclearInterface.getFunction('pause').format(),
+      gasPrice: (BigInt(price) * BigInt(gasMultiplier)).toString(),
+      gasLimit: BigInt(100_000).toString(), // NOTE: fails on e2e tests without it, we can safely hardcode this since this function is not computationally expensive
+      funcSig: 'pause()',
     };
     const receipt = await chainservice.sendTx(tx, requestContext);
     if (!receipt.status) throw new Error(`Transaction failed with status: ${receipt.status}`);

@@ -1,5 +1,5 @@
 import { EverclearError, axiosPost, axiosGet } from '@chimera-monorepo/utils';
-import { Bytes } from 'ethers';
+import { type Hex } from '@chimera-monorepo/utils';
 import { AxiosResponse } from 'axios';
 
 // TODO: This class might benefit from some error handling / logging and response sanitization logic.
@@ -15,10 +15,21 @@ export class Web3SignerApi {
 
   constructor(private readonly url: string) {}
 
-  public async sign(identifier: string, data: string | Bytes): Promise<string> {
+  public async sign(identifier: string, data: string | Hex | Uint8Array): Promise<string> {
     const endpoint = Web3SignerApi.ENDPOINTS.SIGN;
+
+    // Convert Uint8Array to hex string if needed
+    let dataToSend: string | Hex;
+    if (data instanceof Uint8Array) {
+      dataToSend = `0x${Array.from(data)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')}` as Hex;
+    } else {
+      dataToSend = data;
+    }
+
     const response = await axiosPost(this.formatUrl(endpoint, identifier), {
-      data,
+      data: dataToSend,
     });
     this.sanitizeResponse(response, endpoint);
     return response.data;
