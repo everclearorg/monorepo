@@ -26,5 +26,9 @@
   {
     "symbol": "WBTC",
     "contractName": "WBTC"
+  },
+  {
+    "symbol": "PTSUSDE",
+    "contractName": "PTSUSDE"
   }
 ]
