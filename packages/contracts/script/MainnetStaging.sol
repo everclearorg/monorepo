@@ -69,6 +69,9 @@ abstract contract MainnetAssets {
 
   //////////////////// PTSUSDE
   bytes32 public constant SOLANA_PTSUSDE = 0x05c0ad344d082fe99030a0414acc5726b24c89e1a511eac6e58d809145dd6503;
+
+  ///////////////////// METH -- Whitelisted
+  address public constant MANTLE_METH = 0xcDA86A272531e8640cD7F1a92c01839911B90bb0;
 }
 
 abstract contract Everclear {
