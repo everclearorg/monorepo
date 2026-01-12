@@ -137,6 +137,12 @@ locals {
         ]
         privateKey = var.relayer_web3_signer_private_key
       }
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://mantle.drpc.org"
+        ]
+      }
     }
     server = {
       port       = 8080
@@ -204,6 +210,12 @@ locals {
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
         privateKey = var.watchtower_web3_signer_private_key
+      }
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://mantle.drpc.org"
+        ]
       }
     }
     server = {
@@ -276,6 +288,12 @@ locals {
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
+        ]
+      }
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://mantle.drpc.org"
         ]
       }
     }
@@ -363,7 +381,8 @@ locals {
       239        = { maxAge = 60, size = 1 },
       25327      = { maxAge = 60, size = 1 },
       1399811149 = { maxAge = 60, size = 1 },
-      728126428  = { maxAge = 60, size = 1 }
+      728126428  = { maxAge = 60, size = 1 },
+      5000       = { maxAge = 60, size = 1 }
     }
     hub = {
       domain = "25327",
@@ -408,6 +427,12 @@ locals {
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
         privateKey = var.lighthouse_web3_signer_private_key
+      }
+      "5000" = {
+        providers = [
+          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          "https://mantle.drpc.org"
+        ]
       }
     }
     database = { url = local.default_db_url }
