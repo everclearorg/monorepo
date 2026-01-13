@@ -7,7 +7,8 @@ import {
   EverclearSpokeV5_IntentQueueProcessed_handler,
   FeeAdapter_IntentWithFeesAdded_handler,
   FeeAdapterV2_IntentWithFeesAdded_handler,
-  FeeAdapterV2_OrderCreated_handler
+  FeeAdapterV2_OrderCreated_handler,
+  EverclearHubV2_SettlementEnqueued_handler,
 } from '../generated/src/Handlers.gen';
 
 // Helper: Convert bytes32 to address (remove leading zeros)
@@ -1015,4 +1016,32 @@ EverclearSpokeV5_IntentQueueProcessed_handler(async ({ event, context }) => {
   context.log.info(
     `IntentQueueProcessed (V5): ${numProcessed} intents dispatched from queue indices ${_firstIdx} to ${_lastIdx} on chain ${chainId}`,
   );
+});
+
+/**
+ * Handler for SettlementEnqueued events from EverclearHub
+ * Updates Intent status to SETTLED when a settlement is enqueued on the hub
+ *
+ * Event signature: SettlementEnqueued(bytes32 indexed _intentId, uint32 indexed _domain, uint48 indexed _entryEpoch, bytes32 _asset, uint256 _amount, bool _updateVirtualBalance, bytes32 _owner)
+ */
+EverclearHubV2_SettlementEnqueued_handler(async ({ event, context }) => {
+  const { _intentId, _domain, _entryEpoch, _asset, _amount, _updateVirtualBalance, _owner } = event.params;
+
+  context.log.info(`Processing SettlementEnqueued: ${_intentId} on domain ${_domain}`);
+
+  // Get existing intent
+  const intent = await context.Intent.get(_intentId);
+
+  if (!intent) {
+    context.log.warn(`Intent ${_intentId} not found for SettlementEnqueued event`);
+    return;
+  }
+
+  // Update intent status to SETTLED
+  context.Intent.set({
+    ...intent,
+    status: 'SETTLED' as const,
+  });
+
+  context.log.info(`Intent ${_intentId} status updated to SETTLED`);
 });
