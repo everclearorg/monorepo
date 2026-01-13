@@ -43,7 +43,11 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
   address public constant MODE_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
   address public constant UNICHAIN_SPOKE_UPGRADE_IMPL = 0xd18C19169e7C87e7d84f27AD412a56C5D743D560;
   address public constant RONIN_SPOKE_UPGRADE_IMPL = 0xc192b47fD86C52d987FFf2579B64c28037Bf7567;
-  address public constant GNOSIS_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
+  address public constant GNOSIS_SPOKE_UPGRADE_IMPL = 0x39291a3118Db3644890Ff79fa0D15Dd3cb035927;
+  address public constant BERACHAIN_SPOKE_UPGRADE_IMPL = 0xDD88C7F9474c017E6Af23eb233CA6e3c887648a0;
+  address public constant SONIC_SPOKE_UPGRADE_IMPL = 0x15D54e449Ff6Fd32342eE667314a9f46f6eb86e3;
+  address public constant INK_SPOKE_UPGRADE_IMPL = 0xA3534bb14b32579096dfe4352b37FF67CC70B74A;
+  address public constant MANTLE_SPOKE_UPGRADE_IMPL = 0x39291a3118Db3644890Ff79fa0D15Dd3cb035927;
 
   function setUp() public {
     //// Arbitrum One
@@ -181,12 +185,44 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       spokeImpl: GNOSIS_SPOKE_IMPL,
       feeAdapter: GNOSIS_FEE_ADAPTER
     });
+
+    // Berachain
+    _deploymentParamsV4[BERACHAIN] = DeploymentParamsV4({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(BERACHAIN_SPOKE),
+      spokeImpl: BERACHAIN_SPOKE_IMPL,
+      feeAdapter: BERACHAIN_FEE_ADAPTER
+    });
+
+    // Ink
+    _deploymentParamsV4[INK] = DeploymentParamsV4({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(INK_SPOKE),
+      spokeImpl: INK_SPOKE_IMPL,
+      feeAdapter: INK_FEE_ADAPTER
+    });
+
+    // Sonic
+    _deploymentParamsV4[SONIC] = DeploymentParamsV4({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(SONIC_SPOKE),
+      spokeImpl: SONIC_SPOKE_IMPL,
+      feeAdapter: SONIC_FEE_ADAPTER
+    });
+
+    // Mantle
+    _deploymentParamsV4[MANTLE] = DeploymentParamsV4({ // set domain id as mapping key
+      owner: L2_MULTI_SIG,
+      spokeProxy: address(MANTLE_SPOKE),
+      spokeImpl: MANTLE_SPOKE_IMPL,
+      feeAdapter: MANTLE_FEE_ADAPTER
+    });
   }
 
   // ============ Upgrade ============ //
   function test_spokeUpgradeFeeAdapterSafe_upgradeMainnetProd() public {
     vm.createSelectFork(vm.envString('MAINNET_RPC'));
-    vm.rollFork(22_237_678);
+    vm.rollFork(22_373_942);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -229,6 +265,10 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
       _intent.data
     );
 
+    // Checking reinitialize attempt fails
+    vm.expectRevert();
+    _paramsV3.spokeProxy.call(upgradeCalldata);
+
     // Checking the cached state
     assertEq(state.permit, address(spokeProxyV4.PERMIT2()));
     assertEq(state.EVERCLEAR, spokeProxyV4.EVERCLEAR());
@@ -256,7 +296,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeArbitrumProd() public {
     vm.createSelectFork(vm.envString('ARBITRUM_RPC'));
-    vm.rollFork(324_862_689);
+    vm.rollFork(331_402_073);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -326,7 +366,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeOptimismProd() public {
     vm.createSelectFork(vm.envString('OPTIMISM_RPC'));
-    vm.rollFork(134_339_571);
+    vm.rollFork(135_160_883);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -387,7 +427,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
     string memory chainId = '10';
     _writeSafeTransactionInput(
-      'safeTransactionInputs/upgradeSpokeArray-optimismMainnetProd.json',
+      'safeTransactionInputs/upgradeSpokeFeeAdapter-optimismMainnetProd.json',
       'Spoke Upgrade - Fee Adapter | Optimism | Mainnet Prod',
       safeTransactions,
       chainId
@@ -396,7 +436,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeBaseProd() public {
     vm.createSelectFork(vm.envString('BASE_RPC'));
-    vm.rollFork(28_744_365);
+    vm.rollFork(29_565_655);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -466,7 +506,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeBNBProd() public {
     vm.createSelectFork(vm.envString('BNB_RPC'));
-    vm.rollFork(48_232_603);
+    vm.rollFork(48_785_166);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -536,7 +576,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeZircuitProd() public {
     vm.createSelectFork(vm.envString('ZIRCUIT_RPC'));
-    vm.rollFork(12_170_949);
+    vm.rollFork(12_992_283);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -606,7 +646,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeBlastProd() public {
     vm.createSelectFork(vm.envString('BLAST_RPC'));
-    vm.rollFork(17_734_173);
+    vm.rollFork(18_555_501);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -676,7 +716,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeLineaProd() public {
     vm.createSelectFork(vm.envString('LINEA_RPC'));
-    vm.rollFork(17_898_766);
+    vm.rollFork(18_506_313);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -746,7 +786,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradePolygonProd() public {
     vm.createSelectFork(vm.envString('POLYGON_RPC'));
-    vm.rollFork(70_123_994);
+    vm.rollFork(70_894_285);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -816,7 +856,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeAvalancheProd() public {
     vm.createSelectFork(vm.envString('AVALANCHE_RPC'));
-    vm.rollFork(60_012_245);
+    vm.rollFork(61_140_630);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -886,7 +926,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeScrollProd() public {
     vm.createSelectFork(vm.envString('SCROLL_RPC'));
-    vm.rollFork(14_606_748);
+    vm.rollFork(15_073_592);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -956,7 +996,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeApeProd() public {
     vm.createSelectFork(vm.envString('APE_RPC'));
-    vm.rollFork(12_953_177);
+    vm.rollFork(14_633_997);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1026,7 +1066,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeTaikoProd() public {
     vm.createSelectFork(vm.envString('TAIKO_RPC'));
-    vm.rollFork(1_061_261);
+    vm.rollFork(1_115_902);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1096,7 +1136,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeModeProd() public {
     vm.createSelectFork(vm.envString('MODE_RPC'));
-    vm.rollFork(22_055_397);
+    vm.rollFork(22_876_786);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1166,7 +1206,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeUniProd() public {
     vm.createSelectFork(vm.envString('UNI_RPC'));
-    vm.rollFork(13_530_235);
+    vm.rollFork(15_172_933);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1236,7 +1276,7 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
 
   function test_spokeUpgradeFeeAdapterSafe_upgradeRoninProd() public {
     vm.createSelectFork(vm.envString('RONIN_RPC'));
-    vm.rollFork(44_142_187);
+    vm.rollFork(44_689_419);
     _paramsV3 = _deploymentParamsV4[block.chainid];
     if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
@@ -1304,73 +1344,353 @@ contract SpokeUpgradeFeeAdapterProdSafeInput is MainnetProductionEnvironment, Up
     );
   }
 
-  //  function test_spokeUpgradeFeeAdapterSafe_upgradeGnosisProd() public {
-  //   vm.createSelectFork(vm.envString('GNOSIS_RPC'));
-  //   vm.rollFork(39_485_557);
-  //   _paramsV3 = _deploymentParamsV4[block.chainid];
-  //   if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
+  function test_spokeUpgradeFeeAdapterSafe_upgradeGnosisProd() public {
+    vm.createSelectFork(vm.envString('GNOSIS_RPC'));
+    vm.rollFork(39_807_125);
+    _paramsV3 = _deploymentParamsV4[block.chainid];
+    if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
 
-  //   // Checking implementation correct and caching the state variables
-  //   spokeProxyV4 = EverclearSpokeV4(_paramsV3.spokeProxy);
-  //   address oldImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
-  //   assertEq(oldImplementation, _paramsV3.spokeImpl);
+    // Checking implementation correct and caching the state variables
+    spokeProxyV4 = EverclearSpokeV4(_paramsV3.spokeProxy);
+    address oldImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _paramsV3.spokeImpl);
 
-  //   // Caching state variables
-  //   CachedSpokeState memory state = _cacheSpokeStateV4();
-  //   address newEverclearSpoke = GNOSIS_SPOKE_UPGRADE_IMPL;
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV4();
+    address newEverclearSpoke = GNOSIS_SPOKE_UPGRADE_IMPL;
 
-  //   // Deploying impl and upgrading the contract
-  //   bool success = false;
-  //   bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV4.initialize.selector, _paramsV3.feeAdapter);
-  //   bytes memory upgradeCalldata =
-  //     abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV4.initialize.selector, _paramsV3.feeAdapter);
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
-  //   vm.prank(_paramsV3.owner);
-  //   (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
-  //   if (!success) revert UpgradeFailed();
+    vm.prank(_paramsV3.owner);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
 
-  //   // Checking the implementation address has updated
-  //   address newImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
-  //   assertEq(newImplementation, newEverclearSpoke);
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
 
-  //   // Creating intent
-  //   IEverclear.Intent memory _intent;
+    // Creating intent
+    IEverclear.Intent memory _intent;
 
-  //   // Checking the new intent function reverts
-  //   vm.expectRevert(ISpokeStorageV4.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
-  //   spokeProxyV4.newIntent(
-  //     _intent.destinations,
-  //     _intent.receiver.toAddress(),
-  //     _intent.inputAsset.toAddress(),
-  //     address(0),
-  //     _intent.amount,
-  //     _intent.maxFee,
-  //     _intent.ttl,
-  //     _intent.data
-  //   );
+    // Checking the new intent function reverts
+    vm.expectRevert(ISpokeStorageV4.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
+    spokeProxyV4.newIntent(
+      _intent.destinations,
+      _intent.receiver.toAddress(),
+      _intent.inputAsset.toAddress(),
+      address(0),
+      _intent.amount,
+      _intent.maxFee,
+      _intent.ttl,
+      _intent.data
+    );
 
-  //   // Checking the cached state
-  //   assertEq(state.permit, address(spokeProxyV4.PERMIT2()));
-  //   assertEq(state.EVERCLEAR, spokeProxyV4.EVERCLEAR());
-  //   assertEq(state.DOMAIN, spokeProxyV4.DOMAIN());
-  //   assertEq(state.lighthouse, spokeProxyV4.lighthouse());
-  //   assertEq(state.watchtower, spokeProxyV4.watchtower());
-  //   assertEq(state.messageReceiver, spokeProxyV4.messageReceiver());
-  //   assertEq(state.gateway, address(spokeProxyV4.gateway()));
-  //   assertEq(state.callExecutor, address(spokeProxyV4.callExecutor()));
-  //   assertEq(state.paused, spokeProxyV4.paused());
-  //   assertEq(state.nonce, spokeProxyV4.nonce());
-  //   assertEq(state.messageGasLimit, spokeProxyV4.messageGasLimit());
-  //   assertEq(_paramsV3.feeAdapter, spokeProxyV4.feeAdapter());
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV4.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV4.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV4.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV4.lighthouse());
+    assertEq(state.watchtower, spokeProxyV4.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV4.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV4.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV4.callExecutor()));
+    assertEq(state.paused, spokeProxyV4.paused());
+    assertEq(state.nonce, spokeProxyV4.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV4.messageGasLimit());
+    assertEq(_paramsV3.feeAdapter, spokeProxyV4.feeAdapter());
 
-  //   // Pushing data to safe tx json //
-  //   safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
-  //   string memory chainId = '2020';
-  //   _writeSafeTransactionInput(
-  //     'safeTransactionInputs/upgradeSpokeFeeAdapter-gnosisMainnetProd.json',
-  //     'Spoke Upgrade - Fee Adapter | Gnosis | Mainnet Prod',
-  //     safeTransactions,
-  //     chainId
-  //   );
-  // }
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
+    string memory chainId = '100';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeFeeAdapter-gnosisMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Gnosis | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
+
+  function test_spokeUpgradeFeeAdapterSafe_upgradeBerachainProd() public {
+    vm.createSelectFork(vm.envString('BERACHAIN_RPC'));
+    vm.rollFork(4_341_582);
+    _paramsV3 = _deploymentParamsV4[block.chainid];
+    if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
+
+    // Checking implementation correct and caching the state variables
+    spokeProxyV4 = EverclearSpokeV4(_paramsV3.spokeProxy);
+    address oldImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _paramsV3.spokeImpl);
+
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV4();
+    address newEverclearSpoke = BERACHAIN_SPOKE_UPGRADE_IMPL;
+
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV4.initialize.selector, _paramsV3.feeAdapter);
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
+
+    vm.prank(_paramsV3.owner);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
+
+    // Creating intent
+    IEverclear.Intent memory _intent;
+
+    // Checking the new intent function reverts
+    vm.expectRevert(ISpokeStorageV4.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
+    spokeProxyV4.newIntent(
+      _intent.destinations,
+      _intent.receiver.toAddress(),
+      _intent.inputAsset.toAddress(),
+      address(0),
+      _intent.amount,
+      _intent.maxFee,
+      _intent.ttl,
+      _intent.data
+    );
+
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV4.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV4.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV4.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV4.lighthouse());
+    assertEq(state.watchtower, spokeProxyV4.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV4.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV4.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV4.callExecutor()));
+    assertEq(state.paused, spokeProxyV4.paused());
+    assertEq(state.nonce, spokeProxyV4.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV4.messageGasLimit());
+    assertEq(_paramsV3.feeAdapter, spokeProxyV4.feeAdapter());
+
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
+    string memory chainId = '80094';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeFeeAdapter-berachainMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Berachain | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
+
+  function test_spokeUpgradeFeeAdapterSafe_upgradeInkProd() public {
+    vm.createSelectFork(vm.envString('INK_RPC'));
+    vm.rollFork(12_419_088);
+    _paramsV3 = _deploymentParamsV4[block.chainid];
+    if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
+
+    // Checking implementation correct and caching the state variables
+    spokeProxyV4 = EverclearSpokeV4(_paramsV3.spokeProxy);
+    address oldImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _paramsV3.spokeImpl);
+
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV4();
+    address newEverclearSpoke = INK_SPOKE_UPGRADE_IMPL;
+
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV4.initialize.selector, _paramsV3.feeAdapter);
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
+
+    vm.prank(_paramsV3.owner);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
+
+    // Creating intent
+    IEverclear.Intent memory _intent;
+
+    // Checking the new intent function reverts
+    vm.expectRevert(ISpokeStorageV4.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
+    spokeProxyV4.newIntent(
+      _intent.destinations,
+      _intent.receiver.toAddress(),
+      _intent.inputAsset.toAddress(),
+      address(0),
+      _intent.amount,
+      _intent.maxFee,
+      _intent.ttl,
+      _intent.data
+    );
+
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV4.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV4.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV4.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV4.lighthouse());
+    assertEq(state.watchtower, spokeProxyV4.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV4.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV4.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV4.callExecutor()));
+    assertEq(state.paused, spokeProxyV4.paused());
+    assertEq(state.nonce, spokeProxyV4.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV4.messageGasLimit());
+    assertEq(_paramsV3.feeAdapter, spokeProxyV4.feeAdapter());
+
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
+    string memory chainId = '57073';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeFeeAdapter-inkMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Ink | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
+
+  function test_spokeUpgradeFeeAdapterSafe_upgradeSonicProd() public {
+    vm.createSelectFork(vm.envString('SONIC_RPC'));
+    vm.rollFork(23_041_399);
+    _paramsV3 = _deploymentParamsV4[block.chainid];
+    if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
+
+    // Checking implementation correct and caching the state variables
+    spokeProxyV4 = EverclearSpokeV4(_paramsV3.spokeProxy);
+    address oldImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _paramsV3.spokeImpl);
+
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV4();
+    address newEverclearSpoke = SONIC_SPOKE_UPGRADE_IMPL;
+
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV4.initialize.selector, _paramsV3.feeAdapter);
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
+
+    vm.prank(_paramsV3.owner);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
+
+    // Creating intent
+    IEverclear.Intent memory _intent;
+
+    // Checking the new intent function reverts
+    vm.expectRevert(ISpokeStorageV4.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
+    spokeProxyV4.newIntent(
+      _intent.destinations,
+      _intent.receiver.toAddress(),
+      _intent.inputAsset.toAddress(),
+      address(0),
+      _intent.amount,
+      _intent.maxFee,
+      _intent.ttl,
+      _intent.data
+    );
+
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV4.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV4.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV4.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV4.lighthouse());
+    assertEq(state.watchtower, spokeProxyV4.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV4.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV4.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV4.callExecutor()));
+    assertEq(state.paused, spokeProxyV4.paused());
+    assertEq(state.nonce, spokeProxyV4.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV4.messageGasLimit());
+    assertEq(_paramsV3.feeAdapter, spokeProxyV4.feeAdapter());
+
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
+    string memory chainId = '146';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeFeeAdapter-sonicMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Sonic | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
+
+  function test_spokeUpgradeFeeAdapterSafe_upgradeMantleProd() public {
+    vm.createSelectFork(vm.envString('MANTLE_RPC'));
+    vm.rollFork(78_894_157);
+    _paramsV3 = _deploymentParamsV4[block.chainid];
+    if (_paramsV3.feeAdapter == address(0)) revert NoFeeAdapter();
+
+    // Checking implementation correct and caching the state variables
+    spokeProxyV4 = EverclearSpokeV4(_paramsV3.spokeProxy);
+    address oldImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(oldImplementation, _paramsV3.spokeImpl);
+
+    // Caching state variables
+    CachedSpokeState memory state = _cacheSpokeStateV4();
+    address newEverclearSpoke = MANTLE_SPOKE_UPGRADE_IMPL;
+
+    // Deploying impl and upgrading the contract
+    bool success = false;
+    bytes memory initializeCalldata = abi.encodeWithSelector(EverclearSpokeV4.initialize.selector, _paramsV3.feeAdapter);
+    bytes memory upgradeCalldata =
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
+
+    vm.prank(_paramsV3.owner);
+    (success,) = _paramsV3.spokeProxy.call(upgradeCalldata);
+    if (!success) revert UpgradeFailed();
+
+    // Checking the implementation address has updated
+    address newImplementation = (vm.load(_paramsV3.spokeProxy, IMPLEMENTATION_SLOT)).toAddress();
+    assertEq(newImplementation, newEverclearSpoke);
+
+    // Creating intent
+    IEverclear.Intent memory _intent;
+
+    // Checking the new intent function reverts
+    vm.expectRevert(ISpokeStorageV4.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
+    spokeProxyV4.newIntent(
+      _intent.destinations,
+      _intent.receiver.toAddress(),
+      _intent.inputAsset.toAddress(),
+      address(0),
+      _intent.amount,
+      _intent.maxFee,
+      _intent.ttl,
+      _intent.data
+    );
+
+    // Checking the cached state
+    assertEq(state.permit, address(spokeProxyV4.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV4.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV4.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV4.lighthouse());
+    assertEq(state.watchtower, spokeProxyV4.watchtower());
+    assertEq(state.messageReceiver, spokeProxyV4.messageReceiver());
+    assertEq(state.gateway, address(spokeProxyV4.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV4.callExecutor()));
+    assertEq(state.paused, spokeProxyV4.paused());
+    assertEq(state.nonce, spokeProxyV4.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV4.messageGasLimit());
+    assertEq(_paramsV3.feeAdapter, spokeProxyV4.feeAdapter());
+
+    // Pushing data to safe tx json //
+    safeTransactions.push(_createTransaction(0, _paramsV3.spokeProxy, upgradeCalldata));
+    string memory chainId = '5000';
+    _writeSafeTransactionInput(
+      'safeTransactionInputs/upgradeSpokeFeeAdapter-mantleMainnetProd.json',
+      'Spoke Upgrade - Fee Adapter | Mantle | Mainnet Prod',
+      safeTransactions,
+      chainId
+    );
+  }
 }

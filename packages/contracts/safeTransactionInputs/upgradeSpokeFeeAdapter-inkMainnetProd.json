@@ -1,0 +1,19 @@
+{
+  "chainId": "57073",
+  "createdAt": "1745917499000",
+  "meta": {
+    "createdFromOwnerAddress": "",
+    "createdFromSafeAddress": "",
+    "description": "Spoke Upgrade - Fee Adapter | Ink | Mainnet Prod",
+    "name": "Transactions Batch",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+      "value": "0",
+      "data": "0x4f1ef286000000000000000000000000a3534bb14b32579096dfe4352b37ff67cc70b74a00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000024c4d66de80000000000000000000000006dea30929a575b8b29f459aae1b3b85e52a723f400000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "version": "1.0"
+}

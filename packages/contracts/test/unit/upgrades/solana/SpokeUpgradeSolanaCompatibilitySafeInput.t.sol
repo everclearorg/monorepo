@@ -29,6 +29,29 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
   address public constant L2_MULTI_SIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
   address public constant APECHAIN_MULTI_SIG = 0xAF986F36D0471002ff2A64bAF0653c9F6F3A925B;
 
+  // Deprecated implementation contracts
+  address public constant ETHEREUM_SPOKE_DEPRECATED_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+  address public constant ARBITRUM_SPOKE_DEPRECATED_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+  address public constant OPTIMISM_SPOKE_DEPRECATED_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+  address public constant BNB_SPOKE_DEPRECATED_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+  address public constant BASE_SPOKE_DEPRECATED_IMPL = 0x7e3667D4dE0B592c78cAa70faC8FE6d5853DfAAc;
+  address public constant ZIRCUIT_SPOKE_DEPRECATED_IMPL = 0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226;
+  address public constant BLAST_SPOKE_DEPRECATED_IMPL = 0xe0F010e465f15dcD42098dF9b99F1038c11B3056;
+  address public constant LINEA_SPOKE_DEPRECATED_IMPL = 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460;
+  address public constant POLYGON_SPOKE_DEPRECATED_IMPL = 0x5d81D204FbbC606526A73C11d02C127Ce46B488F;
+  address public constant AVALANCHE_SPOKE_DEPRECATED_IMPL = 0xD385Af1A209890AEE184BDf75f328aC396d52fB6;
+  address public constant SCROLL_SPOKE_DEPRECATED_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant APECHAIN_SPOKE_DEPRECATED_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant TAIKO_SPOKE_DEPRECATED_IMPL = 0xe0F010e465f15dcD42098dF9b99F1038c11B3056;
+  address public constant MODE_SPOKE_DEPRECATED_IMPL = 0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7;
+  address public constant UNICHAIN_SPOKE_DEPRECATED_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant RONIN_SPOKE_DEPRECATED_IMPL = 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa;
+  address public constant GNOSIS_SPOKE_DEPRECATED_IMPL = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+  address public constant BERACHAIN_SPOKE_DEPRECATED_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant SONIC_SPOKE_DEPRECATED_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant INK_SPOKE_DEPRECATED_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public constant MANTLE_SPOKE_DEPRECATED_IMPL = 0xa05A3380889115bf313f1Db9d5f335157Be4D816;
+
   // Deployed upgrade contracts //
   address public constant ETHEREUM_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
   address public constant ARB_SPOKE_UPGRADE_IMPL = 0xca6E4c424Fe12F989b6FEA2D9473515bE9b412b2;
@@ -60,84 +83,84 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     _deploymentParams[ARBITRUM_ONE] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(ARBITRUM_ONE_SPOKE),
-      spokeImpl: ARBITRUM_SPOKE_IMPL
+      spokeImpl: ARBITRUM_SPOKE_DEPRECATED_IMPL
     });
 
     //// Optimism
     _deploymentParams[OPTIMISM] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(OPTIMISM_SPOKE),
-      spokeImpl: OPTIMISM_SPOKE_IMPL
+      spokeImpl: OPTIMISM_SPOKE_DEPRECATED_IMPL
     });
 
     //// Base
     _deploymentParams[BASE] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(BASE_SPOKE),
-      spokeImpl: BASE_SPOKE_IMPL
+      spokeImpl: BASE_SPOKE_DEPRECATED_IMPL
     });
 
     //// Bnb
     _deploymentParams[BNB] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(BNB_SPOKE),
-      spokeImpl: BNB_SPOKE_IMPL
+      spokeImpl: BNB_SPOKE_DEPRECATED_IMPL
     });
 
     //// Ethereum
     _deploymentParams[ETHEREUM] = DeploymentParams({ // set domain id as mapping key
       owner: L1_MULTI_SIG,
       spokeProxy: address(ETHEREUM_SPOKE),
-      spokeImpl: ETHEREUM_SPOKE_IMPL
+      spokeImpl: ETHEREUM_SPOKE_DEPRECATED_IMPL
     });
 
     //// Zircuit
     _deploymentParams[ZIRCUIT] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(ZIRCUIT_SPOKE),
-      spokeImpl: ZIRCUIT_SPOKE_IMPL
+      spokeImpl: ZIRCUIT_SPOKE_DEPRECATED_IMPL
     });
 
     // Blast
     _deploymentParams[BLAST] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(BLAST_SPOKE),
-      spokeImpl: BLAST_SPOKE_IMPL
+      spokeImpl: BLAST_SPOKE_DEPRECATED_IMPL
     });
 
     // Linea
     _deploymentParams[LINEA] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(LINEA_SPOKE),
-      spokeImpl: LINEA_SPOKE_IMPL
+      spokeImpl: LINEA_SPOKE_DEPRECATED_IMPL
     });
 
     // Polygon
     _deploymentParams[POLYGON] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(POLYGON_SPOKE),
-      spokeImpl: POLYGON_SPOKE_IMPL
+      spokeImpl: POLYGON_SPOKE_DEPRECATED_IMPL
     });
 
     // Avalanche
     _deploymentParams[AVALANCHE] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(AVALANCHE_SPOKE),
-      spokeImpl: AVALANCHE_SPOKE_IMPL
+      spokeImpl: AVALANCHE_SPOKE_DEPRECATED_IMPL
     });
 
     // Scroll
     _deploymentParams[SCROLL] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(SCROLL_SPOKE),
-      spokeImpl: SCROLL_SPOKE_IMPL
+      spokeImpl: SCROLL_SPOKE_DEPRECATED_IMPL
     });
 
     // Ape
     _deploymentParams[APECHAIN] = DeploymentParams({ // set domain id as mapping key
       owner: APECHAIN_MULTI_SIG,
       spokeProxy: address(APECHAIN_SPOKE),
-      spokeImpl: APECHAIN_SPOKE_IMPL
+      spokeImpl: APECHAIN_SPOKE_DEPRECATED_IMPL
     });
 
     // Taiko
@@ -151,54 +174,54 @@ contract SpokeUpgradeSolanaCompatibilityProdSafeInput is MainnetProductionEnviro
     _deploymentParams[MODE] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(MODE_SPOKE),
-      spokeImpl: MODE_SPOKE_IMPL
+      spokeImpl: MODE_SPOKE_DEPRECATED_IMPL
     });
 
     // Uni
     _deploymentParams[UNICHAIN] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(UNICHAIN_SPOKE),
-      spokeImpl: UNICHAIN_SPOKE_IMPL
+      spokeImpl: UNICHAIN_SPOKE_DEPRECATED_IMPL
     });
 
     // Ronin
     _deploymentParams[RONIN] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(RONIN_SPOKE),
-      spokeImpl: RONIN_SPOKE_IMPL
+      spokeImpl: RONIN_SPOKE_DEPRECATED_IMPL
     });
 
     // Gnosis
     _deploymentParams[GNOSIS] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(GNOSIS_SPOKE),
-      spokeImpl: GNOSIS_SPOKE_IMPL
+      spokeImpl: GNOSIS_SPOKE_DEPRECATED_IMPL
     });
 
     // Berachain
     _deploymentParams[BERACHAIN] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(BERACHAIN_SPOKE),
-      spokeImpl: BERACHAIN_SPOKE_IMPL
+      spokeImpl: BERACHAIN_SPOKE_DEPRECATED_IMPL
     });
 
     // Sonic
     _deploymentParams[SONIC] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(SONIC_SPOKE),
-      spokeImpl: SONIC_SPOKE_IMPL
+      spokeImpl: SONIC_SPOKE_DEPRECATED_IMPL
     });
 
     // Mantle
     _deploymentParams[MANTLE] = DeploymentParams({ // set domain id as mapping key
       owner: L2_MULTI_SIG,
       spokeProxy: address(MANTLE_SPOKE),
-      spokeImpl: MANTLE_SPOKE_IMPL
+      spokeImpl: MANTLE_SPOKE_DEPRECATED_IMPL
     });
 
     // Ink
     _deploymentParams[INK] =
-      DeploymentParams({owner: L2_MULTI_SIG, spokeProxy: address(INK_SPOKE), spokeImpl: INK_SPOKE_IMPL});
+      DeploymentParams({owner: L2_MULTI_SIG, spokeProxy: address(INK_SPOKE), spokeImpl: INK_SPOKE_DEPRECATED_IMPL});
   }
 
   function _getDestinations(
