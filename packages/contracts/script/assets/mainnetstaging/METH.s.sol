@@ -22,7 +22,7 @@ contract METH is AddAssetBase, MainnetStagingEnvironment {
                              TICKER HASH
     //////////////////////////////////////////////////////////////*/
 
-    _symbol = 'METH';
+    _symbol = 'mETH';
     bytes32 _tickerHash = keccak256(bytes(_symbol));
 
     /*///////////////////////////////////////////////////////////////
