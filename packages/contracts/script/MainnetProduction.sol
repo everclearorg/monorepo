@@ -130,6 +130,10 @@ abstract contract MainnetAssets {
   //////////////////// PTSUSDE
   bytes32 public constant SOLANA_PTSUSDE = 0x05c0ad344d082fe99030a0414acc5726b24c89e1a511eac6e58d809145dd6503;
 
+  ///////////////////// METH
+  address public constant ETHEREUM_METH = 0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa;
+  address public constant MANTLE_METH = 0xcDA86A272531e8640cD7F1a92c01839911B90bb0;
+
   ///////////////////// FEE RECIPIENTS
   address public constant FEE_RECIPIENT = 0xac7599880cB5b5eCaF416BEE57C606f15DA5beB8;
 }
