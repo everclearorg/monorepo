@@ -103,16 +103,16 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
       ),
     ]);
 
-    const [token0] = chainWrapper.decodeFunctionResult({
+    const token0 = chainWrapper.decodeFunctionResult({
       abi: univ2PairABI,
       functionName: 'token0',
       data: encodedToken0Result as `0x${string}`,
-    }) as [`0x${string}`];
-    const [token1] = chainWrapper.decodeFunctionResult({
+    }) as `0x${string}`;
+    const token1 = chainWrapper.decodeFunctionResult({
       abi: univ2PairABI,
       functionName: 'token1',
       data: encodedToken1Result as `0x${string}`,
-    }) as [`0x${string}`];
+    }) as `0x${string}`;
     const token0Config = getAssetConfig(domain, token0);
     const token1Config = getAssetConfig(domain, token1);
 
@@ -172,16 +172,16 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
       ),
     ]);
 
-    const [token0] = chainWrapper.decodeFunctionResult({
+    const token0 = chainWrapper.decodeFunctionResult({
       abi: univ2PairABI,
       functionName: 'token0',
       data: encodedToken0Result as `0x${string}`,
-    }) as [`0x${string}`];
-    const [token1] = chainWrapper.decodeFunctionResult({
+    }) as `0x${string}`;
+    const token1 = chainWrapper.decodeFunctionResult({
       abi: univ2PairABI,
       functionName: 'token1',
       data: encodedToken1Result as `0x${string}`,
-    }) as [`0x${string}`];
+    }) as `0x${string}`;
 
     const token0Config = getAssetConfig(domain, token0);
     const token1Config = getAssetConfig(domain, token1);
