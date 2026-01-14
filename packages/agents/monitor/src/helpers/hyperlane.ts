@@ -69,11 +69,11 @@ export const getMessageStatus = async (
     },
     'latest',
   );
-  const [mailbox] = chainWrapper.decodeFunctionResult({
+  const mailbox = chainWrapper.decodeFunctionResult({
     abi: abis.spoke.gateway,
     functionName: 'mailbox',
     data: encodedMailbox as `0x${string}`,
-  }) as [`0x${string}`];
+  }) as `0x${string}`;
   logger.debug('Got mailbox from gateway', requestContext, methodContext, { mailbox, gateway });
   const iface = getMailboxInterface();
   const providers =
