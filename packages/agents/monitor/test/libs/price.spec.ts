@@ -146,8 +146,8 @@ describe('price', () => {
 
         encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
         encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
-        decodeStub.onFirstCall().returns([mockAsset.address]);
-        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        decodeStub.onFirstCall().returns(mockAsset.address as `0x${string}`);
+        decodeStub.onSecondCall().returns(mockBaseAsset.address as `0x${string}`);
         chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
         chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 
@@ -166,8 +166,8 @@ describe('price', () => {
 
         encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
         encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
-        decodeStub.onFirstCall().returns([mockAsset.address]);
-        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        decodeStub.onFirstCall().returns(mockAsset.address as `0x${string}`);
+        decodeStub.onSecondCall().returns(mockBaseAsset.address as `0x${string}`);
         chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
         chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 
@@ -187,8 +187,8 @@ describe('price', () => {
 
         encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
         encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
-        decodeStub.onFirstCall().returns([mockAsset.address]);
-        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        decodeStub.onFirstCall().returns(mockAsset.address as `0x${string}`);
+        decodeStub.onSecondCall().returns(mockBaseAsset.address as `0x${string}`);
         chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
         chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 

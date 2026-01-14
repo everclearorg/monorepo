@@ -33,13 +33,12 @@ export const getRegisteredAssetHashFromContract = async (tickerHash: string, dom
     },
     'latest',
   );
-  const [assetHash] = chainWrapper.decodeFunctionResult({
+
+  return chainWrapper.decodeFunctionResult({
     abi: hubEverclear.abi,
     functionName: 'assetHash',
     data: encodedAssetHash as `0x${string}`,
-  }) as [string];
-
-  return assetHash;
+  }) as string;
 };
 
 export const getAssetFromContract = async (address: string, domain: string): Promise<Asset> => {
@@ -152,11 +151,11 @@ export const getCustodiedAssetsFromHubContract = async (assetHash: string): Prom
     },
     'latest',
   );
-  const [custodied] = chainWrapper.decodeFunctionResult({
+  const custodied = chainWrapper.decodeFunctionResult({
     abi: hubEverclear.abi,
     functionName: 'custodiedAssets',
     data: encoded as `0x${string}`,
-  }) as [string];
+  }) as bigint;
 
-  return custodied;
+  return custodied.toString();
 };
