@@ -57,9 +57,15 @@
   },
   {
     "address": "0x91c40B4135eFea3c5A200388CfE316aa0B172b30",
-    "feeAdapterAddress": "0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89",
+    "feeAdapterAddress": "0x2944F6fEF163365A382E9397b582bfbeB7C4F300",
     "domainName": "Base",
     "domainId": 8453,
+    "environment": "MainnetStaging"
+  },
+    {
+    "address": "0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89",
+    "domainName": "Mantle",
+    "domainId": 5000,
     "environment": "MainnetStaging"
   },
   {

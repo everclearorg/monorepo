@@ -8,9 +8,9 @@ import {IHubStorage} from 'interfaces/hub/IHubStorage.sol';
 
 import {AddAssetBase} from '../AddAsset.s.sol';
 
-import {MainnetStagingEnvironment} from '../../MainnetStaging.sol';
+import {MainnetProductionEnvironment} from '../../MainnetProduction.sol';
 
-contract WETH is AddAssetBase, MainnetStagingEnvironment {
+contract METH is AddAssetBase, MainnetProductionEnvironment {
   using TypeCasts for address;
 
   function _fetchTokenSetup()
@@ -22,7 +22,7 @@ contract WETH is AddAssetBase, MainnetStagingEnvironment {
                              TICKER HASH
     //////////////////////////////////////////////////////////////*/
 
-    _symbol = 'WETH';
+    _symbol = 'mETH';
     bytes32 _tickerHash = keccak256(bytes(_symbol));
 
     /*///////////////////////////////////////////////////////////////
@@ -30,64 +30,27 @@ contract WETH is AddAssetBase, MainnetStagingEnvironment {
     //////////////////////////////////////////////////////////////*/
 
     IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](0);
-    // _fees[0] = IHubStorage.Fee({recipient: OWNER, fee: 100}); // 10 BPS
 
     /*///////////////////////////////////////////////////////////////
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](6);
-
-    ///// Optimism
-    _assetConfigs[0] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: OPTIMISM_WETH.toBytes32(),
-      domain: OPTIMISM,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    ///// Arbitrum
-    _assetConfigs[1] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: ARBITRUM_WETH.toBytes32(),
-      domain: ARBITRUM_ONE,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](2);
 
     ///// Ethereum
-    _assetConfigs[2] = IHubStorage.AssetConfig({
+    _assetConfigs[0] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: ETHEREUM_WETH.toBytes32(),
+      adopted: ETHEREUM_METH.toBytes32(),
       domain: ETHEREUM,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
 
-    //// Mantle
-    _assetConfigs[3] = IHubStorage.AssetConfig({
+    ///// Mantle
+    _assetConfigs[1] = IHubStorage.AssetConfig({
       tickerHash: _tickerHash,
-      adopted: MANTLE_WETH.toBytes32(),
+      adopted: MANTLE_METH.toBytes32(),
       domain: MANTLE,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    //// Base
-    _assetConfigs[4] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: BASE_WETH.toBytes32(),
-      domain: BASE,
-      approval: true,
-      strategy: IEverclear.Strategy.DEFAULT
-    });
-
-    //// Solana
-    _assetConfigs[5] = IHubStorage.AssetConfig({
-      tickerHash: _tickerHash,
-      adopted: SOLANA_WETH,
-      domain: SOLANA,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });
@@ -98,12 +61,20 @@ contract WETH is AddAssetBase, MainnetStagingEnvironment {
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: false,
-      prioritizedStrategy: IEverclear.Strategy.XERC20,
+      initLastClosedEpochProcessed: true,
+      prioritizedStrategy: IEverclear.Strategy.DEFAULT,
       maxDiscountDbps: 0,
       discountPerEpoch: 0,
       fees: _fees,
       adoptedForAssets: _assetConfigs
     });
+  }
+}
+
+contract METHDashboard is METH {
+  function run(
+    address _hub
+  ) public {
+    _logTokenSetup(_hub);
   }
 }

@@ -69,6 +69,9 @@ abstract contract MainnetAssets {
 
   //////////////////// PTSUSDE
   bytes32 public constant SOLANA_PTSUSDE = 0x05c0ad344d082fe99030a0414acc5726b24c89e1a511eac6e58d809145dd6503;
+
+  ///////////////////// METH -- Whitelisted
+  address public constant MANTLE_METH = 0xcDA86A272531e8640cD7F1a92c01839911B90bb0;
 }
 
 abstract contract Everclear {
@@ -185,15 +188,15 @@ abstract contract Mantle {
   uint32 public constant MANTLE = 5000;
   IMailbox public MANTLE_MAILBOX = IMailbox(0x398633D19f4371e1DB5a8EFE90468eB70B1176AA);
 
-  IEverclearSpoke public MANTLE_SPOKE = IEverclearSpoke(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
-  ISpokeGateway public MANTLE_SPOKE_GATEWAY = ISpokeGateway(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
-  ICallExecutor public MANTLE_EXECUTOR = ICallExecutor(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
-  IXERC20Module public MANTLE_XERC20_MODULE = IXERC20Module(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
-  address public MANTLE_SPOKE_IMPL = 0x0ce707eA5b30CD6907a0c9F5E0DD0b60Bf455f52;
+  IEverclearSpoke public MANTLE_SPOKE = IEverclearSpoke(0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89);
+  ISpokeGateway public MANTLE_SPOKE_GATEWAY = ISpokeGateway(0xC7CEb95E92EC7540023D3f6287E20AD97bE9a15D);
+  ICallExecutor public MANTLE_EXECUTOR = ICallExecutor(0x41CA65CFCe31065715998FEA8655aE1f98Bf3923);
+  IXERC20Module public MANTLE_XERC20_MODULE = IXERC20Module(0x3100059A6A90846318fa9162eC1E1cd0d5Ad8DEB);
+  address public MANTLE_SPOKE_IMPL = 0x02ea245B877A8A26F165A67Dcf4002F13fb0EB6A;
 
   // Fee adapter constants
-  address public constant MANTLE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
-  address public constant MANTLE_FEE_ADAPTER = 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e;
+  address public constant MANTLE_ENG_MULTISIG = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
+  address public constant MANTLE_FEE_ADAPTER = 0x9Edd9DF58F6edDE8a3641eaB2E04922471d3B169;
 }
 
 abstract contract Solana {
@@ -254,6 +257,10 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: MANTLE, blockGasLimit: 30_000_000, gateway: address(MANTLE_SPOKE_GATEWAY).toBytes32()})
+    );
   }
 }
 
@@ -263,7 +270,7 @@ abstract contract MainnetStagingEnvironment is
   MainnetAssets,
   MainnetStagingSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE];
+  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE, MANTLE];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed

@@ -178,7 +178,7 @@
     "name": "Mantle",
     "id": 5000,
     "rpc": "https://rpc.mantle.xyz",
-    "environments": ["MainnetProduction"],
+    "environments": ["MainnetProduction", "MainnetStaging"],
     "verifierUrl": "https://api.mantlescan.xyz/api",
     "realm": "spoke"
   },
