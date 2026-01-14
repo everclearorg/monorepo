@@ -12,3 +12,4 @@ export * from './provider';
 export * from './ssm';
 export * from './ticker';
 export * from './chain';
+export * from './fd';

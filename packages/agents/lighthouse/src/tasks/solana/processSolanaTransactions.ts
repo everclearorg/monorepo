@@ -1,14 +1,6 @@
-import {
-  createLoggingContext,
-  SOLANA_CHAINID,
-  EverclearSpoke,
-  TIntentStatus,
-  HyperlaneStatus,
-} from '@chimera-monorepo/utils';
+import { createLoggingContext, SOLANA_CHAINID, TIntentStatus, HyperlaneStatus } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import * as anchor from '@coral-xyz/anchor';
-import idlFile from '../../idl/everclear_spoke.json';
-import stagingIdlFile from '../../idl/everclear_spoke.staging.json';
 
 const MAX_RETRIES = 60;
 
@@ -16,12 +8,12 @@ const MAX_RETRIES = 60;
  * @notice Processes Solana settlements by collecting them from the database and submitting
  * them to the Solana network through chainservice.
  * @dev This service manages cross-chain communication with Solana.
+ * @dev Reuses Solana connection from context to prevent EMFILE errors
  */
 export const processSolanaTransactions = async () => {
   const {
-    config: { chains, solana, environment },
     logger,
-    adapters: { database },
+    adapters: { database, solana },
   } = getContext();
 
   // Create logging context
@@ -29,25 +21,6 @@ export const processSolanaTransactions = async () => {
 
   const updatedCount = await database.updateSolanaMessageStatuses();
   logger.info(`Bulk updated ${updatedCount} solana message statuses to delivered`, requestContext, methodContext);
-
-  // Check if Solana chain is configured
-  const chainConfig = chains[SOLANA_CHAINID];
-  let idl;
-  if (environment === 'production') {
-    idl = JSON.parse(JSON.stringify(idlFile));
-  } else {
-    idl = JSON.parse(JSON.stringify(stagingIdlFile));
-  }
-
-  if (!chainConfig) {
-    logger.warn('Solana chain not configured', requestContext, methodContext);
-    return;
-  }
-
-  if (!chainConfig.providers || !chainConfig.providers.length) {
-    logger.warn('Solana provider not configured', requestContext, methodContext);
-    return;
-  }
 
   // Get pending Solana settlements from database
   logger.info('Fetching pending Solana settlements', requestContext, methodContext);
@@ -57,35 +30,11 @@ export const processSolanaTransactions = async () => {
     return;
   }
 
-  // Set up Solana provider with mainnet connection
-  const connection = new anchor.web3.Connection(chainConfig.providers[0]);
-
-  if (!solana.signer) {
-    logger.info('Solana signer is not set', requestContext, methodContext);
+  if (!solana) {
+    logger.error('Solana adapter not initialized in context', requestContext, methodContext);
     return;
   }
-
-  const signer = anchor.web3.Keypair.fromSecretKey(
-    new Uint8Array(
-      solana.signer
-        .slice(1, solana.signer.length - 1)
-        .split(',')
-        .map(Number),
-    ),
-  );
-
-  // Create a wallet from the signer
-  const wallet = new anchor.Wallet(signer);
-
-  // Create a custom provider with the mainnet connection and wallet
-  const provider = new anchor.AnchorProvider(connection, wallet, { commitment: 'confirmed' });
-
-  const spokeProgramId = new anchor.web3.PublicKey(idl.address);
-  if (!spokeProgramId) {
-    throw new Error('solana.spokeProgramId not configured');
-  }
-
-  const spoke = new anchor.Program(idl, provider) as anchor.Program<EverclearSpoke>;
+  const { connection, spoke, signer } = solana;
 
   // Process settlements
   for (const settlement of settlements) {
@@ -94,7 +43,7 @@ export const processSolanaTransactions = async () => {
       const intentId = Buffer.from(settlement.intentId.slice(2), 'hex');
       const [intentStatusPda] = anchor.web3.PublicKey.findProgramAddressSync(
         [Buffer.from('everclear_spoke'), Buffer.from('-'), Buffer.from('intent_status'), intentId],
-        spokeProgramId,
+        spoke.programId,
       );
 
       const intentStatus = await spoke.account.intentStatusAccount.fetch(intentStatusPda);
