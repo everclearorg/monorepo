@@ -47,6 +47,7 @@ enum IntentStatus {
   ADDED
   DISPATCHED
   FILLED
+  SETTLED
 }
 
 type Fill @entity {

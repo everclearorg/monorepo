@@ -7,7 +7,8 @@ import {
   EverclearSpokeV5_IntentQueueProcessed_handler,
   FeeAdapter_IntentWithFeesAdded_handler,
   FeeAdapterV2_IntentWithFeesAdded_handler,
-  FeeAdapterV2_OrderCreated_handler
+  FeeAdapterV2_OrderCreated_handler,
+  EverclearHubV2_SettlementEnqueued_handler,
 } from '../generated/src/Handlers.gen';
 
 // Helper: Convert bytes32 to address (remove leading zeros)
@@ -182,7 +183,8 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
     tokenFee: existingIntent?.tokenFee,
     nativeFee: existingIntent?.nativeFee,
     orderId: existingIntent?.orderId, // Preserve orderId if set by OrderCreated event
-    status: 'ADDED' as const,
+    // Preserve SETTLED status if it was already set by SettlementEnqueued event (cross-chain ordering)
+    status: existingIntent?.status === 'SETTLED' ? 'SETTLED' as const : 'ADDED' as const,
   };
 
   context.Intent.set(intent);
@@ -244,7 +246,7 @@ EverclearSpoke_IntentAdded_handler(async ({ event, context }) => {
   }
 
   const isNettable = ttl === 0n;
-  context.log.info(`Successfully processed IntentAdded: ${_intentId} (${isNettable ? 'nettable' : 'fillable'})`);
+  context.log.info(`Successfully processed IntentAdded: ${_intentId} (${isNettable ? 'nettable' : 'fillable'})${existingIntent?.status === 'SETTLED' ? ' (preserved SETTLED status)' : ''}`);
 });
 
 /**
@@ -396,7 +398,8 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
     tokenFee: existingIntent?.tokenFee,
     nativeFee: existingIntent?.nativeFee,
     orderId: existingIntent?.orderId, // Preserve orderId if set by OrderCreated event
-    status: 'ADDED' as const,
+    // Preserve SETTLED status if it was already set by SettlementEnqueued event (cross-chain ordering)
+    status: existingIntent?.status === 'SETTLED' ? 'SETTLED' as const : 'ADDED' as const,
   };
 
   context.Intent.set(intent);
@@ -457,7 +460,7 @@ EverclearSpokeV5_IntentAdded_handler(async ({ event, context }) => {
   }
 
   const isNettable = ttl === 0n;
-  context.log.info(`Successfully processed IntentAdded (V5): ${_intentId} (${isNettable ? 'nettable' : 'fillable'})`);
+  context.log.info(`Successfully processed IntentAdded (V5): ${_intentId} (${isNettable ? 'nettable' : 'fillable'})${existingIntent?.status === 'SETTLED' ? ' (preserved SETTLED status)' : ''}`);
 });
 
 /**
@@ -537,10 +540,11 @@ EverclearSpoke_IntentFilled_handler(async ({ event, context }) => {
   context.Fill.set(fill);
 
   // Update Intent status and receiveBlockNumber
+  // Preserve SETTLED status if it was already set by SettlementEnqueued event (cross-chain ordering)
   context.Intent.set({
     ...intent,
     receiveBlockNumber: BigInt(event.block.number),
-    status: 'FILLED' as const,
+    status: intent.status === 'SETTLED' ? 'SETTLED' as const : 'FILLED' as const,
   });
 
   // Update global statistics - only increment fills for valid fills
@@ -662,10 +666,11 @@ EverclearSpokeV5_IntentFilled_handler(async ({ event, context }) => {
   context.Fill.set(fill);
 
   // Update Intent status and receiveBlockNumber
+  // Preserve SETTLED status if it was already set by SettlementEnqueued event (cross-chain ordering)
   context.Intent.set({
     ...intent,
     receiveBlockNumber: BigInt(event.block.number),
-    status: 'FILLED' as const,
+    status: intent.status === 'SETTLED' ? 'SETTLED' as const : 'FILLED' as const,
   });
 
   // Update global statistics - only increment fills for valid fills
@@ -1008,4 +1013,71 @@ EverclearSpokeV5_IntentQueueProcessed_handler(async ({ event, context }) => {
   context.log.info(
     `IntentQueueProcessed (V5): ${numProcessed} intents dispatched from queue indices ${_firstIdx} to ${_lastIdx} on chain ${chainId}`,
   );
+});
+
+/**
+ * Handler for SettlementEnqueued events from EverclearHub
+ * Updates Intent status to SETTLED when a settlement is enqueued on the hub
+ * Creates a placeholder intent if it doesn't exist yet (handles cross-chain event ordering)
+ *
+ * Event signature: SettlementEnqueued(bytes32 indexed _intentId, uint32 indexed _domain, uint48 indexed _entryEpoch, bytes32 _asset, uint256 _amount, bool _updateVirtualBalance, bytes32 _owner)
+ */
+EverclearHubV2_SettlementEnqueued_handler(async ({ event, context }) => {
+  const { _intentId, _domain, _entryEpoch, _asset, _amount, _updateVirtualBalance, _owner } = event.params;
+  const chainId = event.chainId;
+
+  context.log.info(`Processing SettlementEnqueued: ${_intentId} on domain ${_domain}`);
+
+  // Get existing intent
+  let intent = await context.Intent.get(_intentId);
+
+  if (!intent) {
+    // Intent doesn't exist yet - create a placeholder with SETTLED status
+    // This can happen when SettlementEnqueued is processed before IntentAdded from spoke chain
+    context.log.info(
+      `Intent ${_intentId} not found for SettlementEnqueued, creating placeholder with SETTLED status`,
+    );
+
+    intent = {
+      id: _intentId,
+      intentId: _intentId,
+      queueIdx: 0n, // Will be updated by IntentAdded
+      initiator: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
+      receiver: _owner, // Use owner from settlement
+      inputAsset: _asset, // Use asset from settlement
+      outputAsset: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
+      maxFee: 0, // Placeholder
+      amountOutMin: 0n, // Placeholder
+      origin: Number(_domain), // Use domain as origin
+      nonce: 0n, // Placeholder
+      timestamp: BigInt(event.block.timestamp),
+      ttl: 0n, // Placeholder
+      originAmount: _amount, // Use amount from settlement
+      destinations: [],
+      data: '0x',
+      chainId: Number(_domain), // Use domain as chainId
+      blockNumber: BigInt(event.block.number),
+      blockTimestamp: BigInt(event.block.timestamp),
+      transactionHash: event.transaction.hash,
+      sender: '0x0000000000000000000000000000000000000000000000000000000000000000', // Placeholder
+      receiveBlockNumber: undefined,
+      isFastPath: false, // Placeholder
+      tokenFee: undefined,
+      nativeFee: undefined,
+      orderId: undefined,
+      status: 'SETTLED' as const,
+    };
+
+    context.Intent.set(intent);
+    context.log.info(`Created placeholder intent ${_intentId} with SETTLED status`);
+    return;
+  }
+
+  // Update existing intent status to SETTLED
+  context.Intent.set({
+    ...intent,
+    status: 'SETTLED' as const,
+  });
+
+  context.log.info(`Intent ${_intentId} status updated to SETTLED`);
 });

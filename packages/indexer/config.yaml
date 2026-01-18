@@ -37,6 +37,12 @@ contracts:
       - event: IntentWithFeesAdded
       - event: OrderCreated
 
+  - name: EverclearHubV2
+    abi_file_path: ./abis/EverclearHubV2.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: SettlementEnqueued
+
 # Define all networks
 # NOTE: we are using reorg-safe values from hyperlane: https://docs.hyperlane.xyz/docs/reference/addresses/validators/latencies
 networks:
@@ -181,5 +187,14 @@ networks:
         address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa  # Same address as V1 (upgraded contract)
       - name: FeeAdapterV2
         address: 0xA388d644241A2185440EAf0ADd41C9Da30958ba5
+
+  - id: 25327 # Everclear Hub Chain
+    rpc_config:
+      url: https://rpc.everclear.raas.gelato.cloud
+    start_block: 0
+    confirmed_block_threshold: 10
+    contracts:
+      - name: EverclearHubV2
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
 
 rollback_on_reorg: true
