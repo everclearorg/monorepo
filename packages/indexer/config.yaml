@@ -175,18 +175,107 @@ networks:
         address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
 
 
-  # - id: 239
-  #   rpc_config:
-  #     url: https://rpc.ankr.com/tac
-  #   start_block: 0
-  #   confirmed_block_threshold: 5
-  #   contracts:
-  #     - name: EverclearSpoke
-  #       address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa
-  #     - name: EverclearSpokeV5
-  #       address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa  # Same address as V1 (upgraded contract)
-  #     - name: FeeAdapterV2
-  #       address: 0xA388d644241A2185440EAf0ADd41C9Da30958ba5
+  - id: 239
+    rpc_config:
+      url: https://rpc.ankr.com/tac
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpoke
+        address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa
+      - name: EverclearSpokeV5
+        address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa  # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0xA388d644241A2185440EAf0ADd41C9Da30958ba5
+
+  - id: 324 # zkSync
+    start_block: 0
+    confirmed_block_threshold: 0
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0x7F5e085981C93C579c865554B9b723B058AaE4D3
+      - name: FeeAdapterV2
+        address: 0xa537f0d027cBA1661dd1eB46fCd79030CD75A2cd
+
+  - id: 534352 # Scroll
+    start_block: 0
+    confirmed_block_threshold: 17
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapterV2
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
+
+  - id: 34443 # Mode
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99
+      - name: FeeAdapterV2
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
+
+  - id: 48900 # Zircuit
+    rpc_config:
+      url: https://zircuit-mainnet.drpc.org
+    start_block: 0
+    confirmed_block_threshold: 300
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe
+      - name: FeeAdapterV2
+        address: 0xe5F2F4afAd6211cfBD6a882D5a6a435530Ee3909
+
+  - id: 81457 # Blast
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7
+      - name: FeeAdapterV2
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
+
+  - id: 100 # Gnosis
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xe0F010e465f15dcD42098dF9b99F1038c11B3056
+      - name: FeeAdapterV2
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
+
+  - id: 80094 # Berachain
+    rpc_config:
+      url: https://rpc.berachain.com
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapterV2
+        address: 0x3c135048306b412Ad8F4375F6a8CBe94b5D56184
+
+  - id: 146 # Sonic
+    rpc_config:
+      url: https://rpc.soniclabs.com
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapterV2
+        address: 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e
+
+  - id: 57073 # Ink
+    rpc_config:
+      url: https://rpc-gel.inkonchain.com
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapterV2
+        address: 0x877Fd0A881B63eBE413124EeE6abbCD7E82cf10b
 
   - id: 25327 # Everclear Hub Chain
     rpc_config:

@@ -24,10 +24,13 @@ function isFeeAdapterAddress(address: string): boolean {
   const feeAdapterAddresses = [
     "0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75", // V1 Most chains
     "0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508", // V1 Linea
-    "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", // V1 Unizen
-    "0x000000000000000000000000d0185bfb8107c5b2336bc73ce3fdd9bfb504540e", // V2 Ethereum, Arbitrum, Optimism, Base, BNB, Polygon, Avalanche
+    "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", // V1 Unichain
+    "0x000000000000000000000000d0185bfb8107c5b2336bc73ce3fdd9bfb504540e", // V2 Most chains (Ethereum, Arbitrum, Optimism, Base, BNB, Polygon, Avalanche, Mantle, Gnosis, Sonic, Scroll, Mode, Blast)
     "0x000000000000000000000000aa7ee09f745a3c5de329eb0cd67878ba87b70ffe", // V2 Linea
-    "0x000000000000000000000000877fd0a881b63ebe413124eee6abbcd7e82cf10b", // V2 Unizen
+    "0x000000000000000000000000877fd0a881b63ebe413124eee6abbcd7e82cf10b", // V2 Unichain, Ink
+    "0x000000000000000000000000a537f0d027cba1661dd1eb46fcd79030cd75a2cd", // V2 zkSync
+    "0x000000000000000000000000e5f2f4afad6211cfbd6a882d5a6a435530ee3909", // V2 Zircuit
+    "0x0000000000000000000000003c135048306b412ad8f4375f6a8cbe94b5d56184", // V2 Berachain
   ];
   return feeAdapterAddresses.includes(address.toLowerCase());
 }
