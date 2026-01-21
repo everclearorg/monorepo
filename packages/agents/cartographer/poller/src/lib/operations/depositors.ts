@@ -36,7 +36,7 @@ export const updateDepositors = async () => {
 
   // Save the depositors
   const flat = depositors.flat();
-  const ids = Array.from(new Set(flat.map((f) => chainWrapper.toHex(canonizeId(f.depositor)))));
+  const ids = Array.from(new Set(flat.map((f) => canonizeId(f.depositor))));
   logger.debug('Saving depositors', requestContext, methodContext, { ids });
   await database.saveDepositors(ids.map((id) => ({ id })));
 
@@ -61,8 +61,8 @@ export const updateDepositors = async () => {
     return {
       ...f,
       id: f.assetHash,
-      asset: chainWrapper.toHex(canonizeId(f.asset)),
-      account: chainWrapper.toHex(canonizeId(f.depositor)),
+      asset: canonizeId(f.asset),
+      account: canonizeId(f.depositor),
     };
   });
   logger.debug('Saving balances', requestContext, methodContext, { balances });
