@@ -1,4 +1,5 @@
 name: everclear-indexer-prod
+unordered_multichain_mode: true
 description: Indexes IntentAdded and IntentFilled events from EverclearSpoke contracts across all mainnet chains
 
 # Configure which fields to include from events
