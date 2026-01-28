@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts';
+import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import {
   GatewayUpdated,
   LighthouseUpdated,
@@ -7,12 +7,41 @@ import {
   StrategySetForAsset,
   Paused as PausedEvent,
   Unpaused as UnpausedEvent,
+  FeeAdapterUpdated,
+  MessageGasLimitUpdated,
+  WatchtowerUpdated,
+  FillSignerUpdated,
 } from '../../../generated/EverclearSpoke/EverclearSpoke';
-import { FeeRecipientUpdated as FeeRecipientUpdatedEvent } from '../../../generated/FeeAdapter/FeeAdapter';
-import { Meta, ModuleForStrategy, StrategyForAsset, FeeRecipientUpdated } from '../../../generated/schema';
-import { BigIntToBytes, getChainId, generateIdFromTx, generateTxNonce } from '../../common';
+import {
+  FeeRecipientUpdated as FeeRecipientUpdatedEvent,
+  FeeSignerUpdated as FeeSignerUpdatedEvent,
+} from '../../../generated/FeeAdapter/FeeAdapter';
+import { Meta, ModuleForStrategy, SpokeMetaUpdate, StrategyForAsset } from '../../../generated/schema';
+import { BigIntToBytes, generateIdFromTx, generateTxNonce, getChainId } from '../../common';
 
 const SPOKE_META_ID = 'SPOKE_META_ID';
+
+function logSpokeMetaUpdate(
+  kind: string,
+  event: ethereum.Event,
+  key: string | null = null,
+  valueBytes: Bytes | null = null,
+  valueBigInt: BigInt | null = null,
+): void {
+  const log = new SpokeMetaUpdate(generateIdFromTx(event));
+  log.kind = kind;
+  log.key = key;
+  log.valueBytes = valueBytes;
+  log.valueBigInt = valueBigInt;
+  log.transactionHash = event.transaction.hash;
+  log.timestamp = event.block.timestamp;
+  log.blockNumber = event.block.number;
+  log.gasPrice = event.transaction.gasPrice;
+  log.gasLimit = event.transaction.gasLimit;
+  log.txOrigin = event.transaction.from;
+  log.txNonce = generateTxNonce(event);
+  log.save();
+}
 
 export function getOrCreateMeta(): Meta {
   const id = Bytes.fromUTF8(SPOKE_META_ID);
@@ -37,11 +66,12 @@ export function getOrCreateMeta(): Meta {
  *
  * @param event - The contract event used to create the subgraph record
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function handlePaused(_event: PausedEvent): void {
+export function handlePaused(event: PausedEvent): void {
   const meta = getOrCreateMeta();
   meta.paused = true;
   meta.save();
+
+  logSpokeMetaUpdate('PAUSED', event, 'paused', null, BigInt.fromI32(1));
 }
 
 /**
@@ -49,11 +79,12 @@ export function handlePaused(_event: PausedEvent): void {
  *
  * @param event - The contract event used to create the subgraph record
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function handleUnpaused(_event: UnpausedEvent): void {
+export function handleUnpaused(event: UnpausedEvent): void {
   const meta = getOrCreateMeta();
   meta.paused = false;
   meta.save();
+
+  logSpokeMetaUpdate('UNPAUSED', event, 'paused', null, BigInt.fromI32(0));
 }
 
 /**
@@ -65,6 +96,8 @@ export function handleGatewayUpdated(event: GatewayUpdated): void {
   const meta = getOrCreateMeta();
   meta.gateway = event.params._newGateway;
   meta.save();
+
+  logSpokeMetaUpdate('GATEWAY_UPDATED', event, 'gateway', event.params._newGateway, null);
 }
 
 /**
@@ -76,6 +109,8 @@ export function handleLighthouseUpdated(event: LighthouseUpdated): void {
   const meta = getOrCreateMeta();
   meta.lighthouse = event.params._newLightHouse;
   meta.save();
+
+  logSpokeMetaUpdate('LIGHTHOUSE_UPDATED', event, 'lighthouse', event.params._newLightHouse, null);
 }
 
 /**
@@ -87,6 +122,8 @@ export function handleMessageReceiverUpdated(event: MessageReceiverUpdated): voi
   const meta = getOrCreateMeta();
   meta.messageReceiver = event.params._newMessageReceiver;
   meta.save();
+
+  logSpokeMetaUpdate('MESSAGE_RECEIVER_UPDATED', event, 'messageReceiver', event.params._newMessageReceiver, null);
 }
 
 /**
@@ -104,6 +141,14 @@ export function handleStrategySetForAsset(event: StrategySetForAsset): void {
   entity.asset = event.params._asset;
   entity.strategy = BigInt.fromI32(event.params._strategy);
   entity.save();
+
+  logSpokeMetaUpdate(
+    'STRATEGY_SET_FOR_ASSET',
+    event,
+    'strategyForAsset',
+    event.params._asset,
+    BigInt.fromI32(event.params._strategy),
+  );
 }
 
 /**
@@ -112,15 +157,25 @@ export function handleStrategySetForAsset(event: StrategySetForAsset): void {
  * @param event - The contract event used to create the subgraph record
  */
 export function handleModuleSetForStrategy(event: ModuleSetForStrategy): void {
+  const meta = getOrCreateMeta();
   const strategyKey = BigIntToBytes(BigInt.fromI32(event.params._strategy));
   let entity = ModuleForStrategy.load(strategyKey);
   if (entity == null) {
     entity = new ModuleForStrategy(strategyKey);
   }
 
+  entity.meta = meta.id;
   entity.strategy = BigInt.fromI32(event.params._strategy);
   entity.module = event.params._module;
   entity.save();
+
+  logSpokeMetaUpdate(
+    'MODULE_SET_FOR_STRATEGY',
+    event,
+    'moduleForStrategy',
+    event.params._module,
+    BigInt.fromI32(event.params._strategy),
+  );
 }
 
 /**
@@ -129,25 +184,65 @@ export function handleModuleSetForStrategy(event: ModuleSetForStrategy): void {
  * @param event - The contract event used to create the subgraph record
  */
 export function handleFeeRecipientUpdated(event: FeeRecipientUpdatedEvent): void {
-  // Create the FeeRecipientUpdated entity
-  const log = new FeeRecipientUpdated(generateIdFromTx(event));
-
-  log.updated = event.params._updated;
-  log.previous = event.params._previous;
-
-  // Add transaction info
-  log.blockNumber = event.block.number;
-  log.timestamp = event.block.timestamp;
-  log.transactionHash = event.transaction.hash;
-  log.gasPrice = event.transaction.gasPrice;
-  log.gasLimit = event.transaction.gasLimit;
-  log.txOrigin = event.transaction.from;
-  log.txNonce = generateTxNonce(event);
-
-  log.save();
-
   // Update the Meta entity with the new fee adapter recipient
   const meta = getOrCreateMeta();
   meta.feeAdapterRecipient = event.params._updated;
   meta.save();
+
+  logSpokeMetaUpdate('FEE_RECIPIENT_UPDATED', event, 'feeAdapterRecipient', event.params._updated, null);
+}
+
+/**
+ * Creates subgraph records when FeeAdapterUpdated events are emitted (Spoke).
+ */
+export function handleFeeAdapterUpdated(event: FeeAdapterUpdated): void {
+  const meta = getOrCreateMeta();
+  meta.feeAdapter = event.params._newFeeAdapter;
+  meta.save();
+
+  logSpokeMetaUpdate('FEE_ADAPTER_UPDATED', event, 'feeAdapter', event.params._newFeeAdapter, null);
+}
+
+/**
+ * Creates subgraph records when MessageGasLimitUpdated events are emitted.
+ */
+export function handleMessageGasLimitUpdated(event: MessageGasLimitUpdated): void {
+  const meta = getOrCreateMeta();
+  meta.messageGasLimit = event.params._newGasLimit;
+  meta.save();
+
+  logSpokeMetaUpdate('MESSAGE_GAS_LIMIT_UPDATED', event, 'messageGasLimit', null, event.params._newGasLimit);
+}
+
+/**
+ * Creates subgraph records when WatchtowerUpdated events are emitted.
+ */
+export function handleWatchtowerUpdated(event: WatchtowerUpdated): void {
+  const meta = getOrCreateMeta();
+  meta.watchtower = event.params._newWatchtower;
+  meta.save();
+
+  logSpokeMetaUpdate('WATCHTOWER_UPDATED', event, 'watchtower', event.params._newWatchtower, null);
+}
+
+/**
+ * Creates subgraph records when FillSignerUpdated events are emitted (Spoke).
+ */
+export function handleFillSignerUpdated(event: FillSignerUpdated): void {
+  const meta = getOrCreateMeta();
+  meta.fillSigner = event.params._newFillSigner;
+  meta.save();
+
+  logSpokeMetaUpdate('FILL_SIGNER_UPDATED', event, 'fillSigner', event.params._newFillSigner, null);
+}
+
+/**
+ * Creates subgraph records when FeeSignerUpdated events are emitted (FeeAdapter).
+ */
+export function handleFeeSignerUpdated(event: FeeSignerUpdatedEvent): void {
+  const meta = getOrCreateMeta();
+  meta.feeSigner = event.params._updated;
+  meta.save();
+
+  logSpokeMetaUpdate('FEE_SIGNER_UPDATED', event, 'feeSigner', event.params._updated, null);
 }

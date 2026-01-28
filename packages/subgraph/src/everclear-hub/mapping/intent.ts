@@ -291,7 +291,10 @@ export function handleSettlementQueueProcessed(event: SettlementQueueProcessed):
     const mapping = SettlementQueueMapping.load(
       ConcatBigIntsToBytes(event.params._domain, queue.first.plus(BigInt.fromI32(idx))),
     );
-    const intentId = mapping!.intentId;
+    if (mapping == null) {
+      break;
+    }
+    const intentId = mapping.intentId;
     const intent = HubIntent.load(intentId);
     if (intent != null) {
       intent.message = messageId;
