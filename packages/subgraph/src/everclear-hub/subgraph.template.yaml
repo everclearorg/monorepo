@@ -126,4 +126,52 @@ dataSources:
         # event IncreaseVirtualBalanceSet(bytes32 indexed _user, bool _status);
         - event: IncreaseVirtualBalanceSet(indexed bytes32,bool)
           handler: handleIncreaseVirtualBalanceSet
+
+        # event ClosedEpochsProcessed(bytes32 indexed _tickerHash, uint48 _lastClosedEpochProcessed);
+        - event: ClosedEpochsProcessed(indexed bytes32,uint48)
+          handler: handleClosedEpochsProcessed
+        # event LastEpochProcessedSet(SetLastClosedEpochProcessedParams _params);
+        - event: LastEpochProcessedSet((uint48,bytes32[]))
+          handler: handleLastEpochProcessedSet
+        # event RoleAssigned(address indexed _account, IHubStorageV2.Role _role);
+        - event: RoleAssigned(indexed address,uint8)
+          handler: handleRoleAssigned
+        # event GasConfigUpdated(IHubStorageV2.GasConfig _oldGasConfig, IHubStorageV2.GasConfig _newGasConfig);
+        - event: GasConfigUpdated((uint256,uint256,uint256),(uint256,uint256,uint256))
+          handler: handleGasConfigUpdated
+        # event ModuleAddressUpdated(bytes32 _type, address _previousAddress, address _newAddress);
+        - event: ModuleAddressUpdated(bytes32,address,address)
+          handler: handleModuleAddressUpdated
+      file: ./src/everclear-hub/mapping/index.ts
+  # HUB GATEWAY storage events
+  - kind: ethereum/contract
+    name: HubGateway
+    network: '{{network}}'
+    source:
+      address: '{{address}}'
+      abi: HubGateway
+      # prettier-ignore
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: HubGateway
+          # prettier-ignore
+          file: {{filePath}}
+      eventHandlers:
+        # event ChainGatewayAdded(uint32 _chainId, bytes32 _gateway);
+        - event: ChainGatewayAdded(uint32,bytes32)
+          handler: handleChainGatewayAdded
+        # event ChainGatewayRemoved(uint32 _chainId, bytes32 _gateway);
+        - event: ChainGatewayRemoved(uint32,bytes32)
+          handler: handleChainGatewayRemoved
+        # event MailboxUpdated(address _oldMailbox, address _newMailbox);
+        - event: MailboxUpdated(address,address)
+          handler: handleHubGatewayMailboxUpdated
+        # event SecurityModuleUpdated(address _oldSecurityModule, address _newSecurityModule);
+        - event: SecurityModuleUpdated(address,address)
+          handler: handleHubGatewaySecurityModuleUpdated
       file: ./src/everclear-hub/mapping/index.ts
