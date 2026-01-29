@@ -245,6 +245,12 @@ type Domain @entity {
   blockGasLimit: BigInt!
 }
 
+type ChainGateway @entity {
+  id: Bytes! # chainId as bytes
+  chainId: BigInt!
+  gateway: Bytes!
+}
+
 type Meta @entity {
   id: Bytes!
   domain: BigInt
@@ -253,6 +259,7 @@ type Meta @entity {
   proposedOwner: Bytes
   proposedOwnershipTimestamp: BigInt
   supportedDomains: [Domain!]
+  chainGateways: [ChainGateway!]
   acceptanceDelay: BigInt
 
   gateway: Bytes

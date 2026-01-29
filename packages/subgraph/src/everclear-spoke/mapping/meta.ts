@@ -21,6 +21,16 @@ import { BigIntToBytes, generateIdFromTx, generateTxNonce, getChainId } from '..
 
 const SPOKE_META_ID = 'SPOKE_META_ID';
 
+/**
+ * Logs a meta update event for the spoke subgraph.
+ * Includes gas price and gas limit (unlike hub version).
+ *
+ * @param kind - High-level kind identifier (e.g., 'PAUSED', 'GATEWAY_UPDATED')
+ * @param event - The contract event
+ * @param key - Optional key being updated (e.g., 'gateway', 'lighthouse')
+ * @param valueBytes - Optional Bytes value snapshot
+ * @param valueBigInt - Optional BigInt value snapshot
+ */
 function logSpokeMetaUpdate(
   kind: string,
   event: ethereum.Event,
@@ -54,6 +64,14 @@ export function getOrCreateMeta(): Meta {
     meta.gateway = Address.zero();
     meta.lighthouse = Address.zero();
     meta.messageReceiver = Address.zero();
+    meta.watchtower = Address.zero();
+    meta.messageGasLimit = BigInt.fromI32(0);
+    meta.feeAdapter = Address.zero();
+    meta.feeAdapterRecipient = Address.zero();
+    meta.fillSigner = Address.zero();
+    meta.feeSigner = Address.zero();
+    meta.mailbox = Address.zero();
+    meta.securityModule = Address.zero();
 
     meta.save();
   }
