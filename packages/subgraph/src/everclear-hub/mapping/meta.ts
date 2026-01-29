@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, ByteArray, crypto, ethereum } from '@graphprotocol/graph-ts';
-import { Meta, Domain, HubMetaUpdate } from '../../../generated/schema';
+import { Meta, Domain, ChainGateway, HubMetaUpdate } from '../../../generated/schema';
 import {
   AcceptanceDelayUpdated,
   OwnershipProposed,
@@ -22,6 +22,30 @@ import { generateIdFromTx, generateTxNonce, getChainId } from '../../common';
 
 const HUB_META_ID = 'HUB_META_ID';
 
+/**
+ * Ensures an array field is initialized (not null).
+ * Returns the array if it exists, or a new empty array if null.
+ *
+ * @param array - The array field that may be null
+ * @returns A non-null array
+ */
+function ensureArrayInitialized<T>(array: Array<T> | null): Array<T> {
+  if (array == null) {
+    return new Array<T>();
+  }
+  return array;
+}
+
+/**
+ * Logs a meta update event with auto-generated ID from transaction hash and log index.
+ * Use this for single updates per transaction.
+ *
+ * @param kind - High-level kind identifier (e.g., 'PAUSED', 'GATEWAY_UPDATED')
+ * @param event - The contract event
+ * @param key - Optional key being updated (e.g., 'gateway', 'lighthouse')
+ * @param valueBytes - Optional Bytes value snapshot
+ * @param valueBigInt - Optional BigInt value snapshot
+ */
 export function logHubMetaUpdate(
   kind: string,
   event: ethereum.Event,
@@ -42,7 +66,17 @@ export function logHubMetaUpdate(
   log.save();
 }
 
-// Use this when you need a stable unique id for multiple logs in one tx
+/**
+ * Logs a meta update event with a custom ID.
+ * Use this when you need multiple logs in one transaction (e.g., batch operations).
+ *
+ * @param kind - High-level kind identifier (e.g., 'SUPPORTED_DOMAINS_ADDED')
+ * @param event - The contract event
+ * @param key - Optional key being updated
+ * @param valueBytes - Optional Bytes value snapshot
+ * @param valueBigInt - Optional BigInt value snapshot
+ * @param id - Custom unique ID for this log entry
+ */
 export function logHubMetaUpdateWithId(
   kind: string,
   event: ethereum.Event,
@@ -77,16 +111,20 @@ export function getOrCreateMeta(): Meta {
     meta.proposedOwnershipTimestamp = new BigInt(0);
 
     meta.gateway = Address.zero();
+    meta.watchtower = Address.zero();
+    meta.manager = Address.zero();
+    meta.settler = Address.zero();
     meta.acceptanceDelay = new BigInt(0);
     meta.minSolverSupportedDomains = new BigInt(0);
-    meta.discountPerEpoch = new BigInt(0);
     meta.expiryTimeBuffer = new BigInt(0);
+    meta.discountPerEpoch = new BigInt(0);
     meta.epochLength = new BigInt(0);
 
     meta.mailbox = Address.zero();
     meta.securityModule = Address.zero();
 
     meta.supportedDomains = [];
+    meta.chainGateways = [];
 
     meta.save();
   }
@@ -106,7 +144,13 @@ export function handleOwnershipProposed(event: OwnershipProposed): void {
   meta.proposedOwnershipTimestamp = event.params._timestamp;
   meta.save();
 
-  logHubMetaUpdate('OWNERSHIP_PROPOSED', event, 'proposedOwner', event.params._proposedOwner, event.params._timestamp);
+  logHubMetaUpdate(
+    'OWNERSHIP_PROPOSED',
+    event,
+    'proposedOwner',
+    event.params._proposedOwner,
+    event.params._timestamp,
+  );
 }
 
 /**
@@ -174,7 +218,13 @@ export function handleAcceptanceDelayUpdated(event: AcceptanceDelayUpdated): voi
   meta.acceptanceDelay = event.params._newAcceptanceDelay;
   meta.save();
 
-  logHubMetaUpdate('ACCEPTANCE_DELAY_UPDATED', event, 'acceptanceDelay', null, event.params._newAcceptanceDelay);
+  logHubMetaUpdate(
+    'ACCEPTANCE_DELAY_UPDATED',
+    event,
+    'acceptanceDelay',
+    null,
+    event.params._newAcceptanceDelay,
+  );
 }
 
 /**
@@ -208,7 +258,13 @@ export function handleEpochLengthUpdated(event: EpochLengthUpdated): void {
   meta.epochLength = event.params._newEpochLength;
   meta.save();
 
-  logHubMetaUpdate('EPOCH_LENGTH_UPDATED', event, 'epochLength', null, event.params._newEpochLength);
+  logHubMetaUpdate(
+    'EPOCH_LENGTH_UPDATED',
+    event,
+    'epochLength',
+    null,
+    event.params._newEpochLength,
+  );
 }
 
 /**
@@ -222,7 +278,13 @@ export function handleExpiryTimeBufferUpdated(event: ExpiryTimeBufferUpdated): v
   meta.expiryTimeBuffer = event.params._newExpiryTimeBuffer;
   meta.save();
 
-  logHubMetaUpdate('EXPIRY_TIME_BUFFER_UPDATED', event, 'expiryTimeBuffer', null, event.params._newExpiryTimeBuffer);
+  logHubMetaUpdate(
+    'EXPIRY_TIME_BUFFER_UPDATED',
+    event,
+    'expiryTimeBuffer',
+    null,
+    event.params._newExpiryTimeBuffer,
+  );
 }
 
 /**
@@ -233,24 +295,42 @@ export function handleExpiryTimeBufferUpdated(event: ExpiryTimeBufferUpdated): v
 export function handleSupportedDomainsAdded(event: SupportedDomainsAdded): void {
   const meta = getOrCreateMeta();
 
-  let domains = meta.supportedDomains;
-  if (domains == null) {
-    domains = new Array<Bytes>();
-  }
+  let domains = ensureArrayInitialized(meta.supportedDomains);
   const domainsToAdd = event.params._domains;
   for (let i = 0; i < domainsToAdd.length; i++) {
-    const entity = new Domain(Bytes.fromByteArray(Bytes.fromBigInt(domainsToAdd[i].id)));
-    entity.domain = domainsToAdd[i].id;
-    entity.blockGasLimit = domainsToAdd[i].blockGasLimit;
-    entity.save();
-    domains.push(entity.id);
+    const domainId = domainsToAdd[i].id;
+    const domainIdBytes = Bytes.fromByteArray(Bytes.fromBigInt(domainId));
+    
+    // Check if domain already exists
+    let exists = false;
+    for (let j = 0; j < domains.length; j++) {
+      if (domains[j].equals(domainIdBytes)) {
+        exists = true;
+        // Update existing domain entity
+        const existing = Domain.load(domainIdBytes);
+        if (existing != null) {
+          existing.blockGasLimit = domainsToAdd[i].blockGasLimit;
+          existing.save();
+        }
+        break;
+      }
+    }
+
+    if (!exists) {
+      // Create new Domain entity
+      const entity = new Domain(domainIdBytes);
+      entity.domain = domainId;
+      entity.blockGasLimit = domainsToAdd[i].blockGasLimit;
+      entity.save();
+      domains.push(entity.id);
+    }
 
     const id = generateIdFromTx(event).concatI32(i);
     logHubMetaUpdateWithId(
       'SUPPORTED_DOMAINS_ADDED',
       event,
       'supportedDomains',
-      Bytes.fromByteArray(Bytes.fromBigInt(domainsToAdd[i].id)),
+      domainIdBytes,
       domainsToAdd[i].blockGasLimit,
       id,
     );
@@ -268,25 +348,26 @@ export function handleSupportedDomainsAdded(event: SupportedDomainsAdded): void 
 export function handleSupportedDomainsRemoved(event: SupportedDomainsRemoved): void {
   const meta = getOrCreateMeta();
 
-  let domains = meta.supportedDomains;
-  if (domains == null) {
-    domains = new Array<Bytes>();
-  }
+  let domains = ensureArrayInitialized(meta.supportedDomains);
   // eslint-disable-next-line @typescript-eslint/ban-types
   const remain: Array<Bytes> = [];
   const domainsToRemove = event.params._domains;
+  let removedIndex = 0;
+  
   for (let i = 0; i < domains.length; i++) {
-    let exist = false;
+    let shouldRemove = false;
     for (let j = 0; j < domainsToRemove.length; j++) {
       if (domains[i].equals(Bytes.fromByteArray(Bytes.fromBigInt(domainsToRemove[j])))) {
-        exist = true;
+        shouldRemove = true;
+        // Log the removed domain
+        const id = generateIdFromTx(event).concatI32(removedIndex);
+        logHubMetaUpdateWithId('SUPPORTED_DOMAINS_REMOVED', event, 'supportedDomains', domains[i], null, id);
+        removedIndex++;
         break;
       }
     }
-    if (!exist) {
+    if (!shouldRemove) {
       remain.push(domains[i]);
-      const id = generateIdFromTx(event).concatI32(i);
-      logHubMetaUpdateWithId('SUPPORTED_DOMAINS_REMOVED', event, 'supportedDomains', domains[i], null, id);
     }
   }
 
@@ -296,6 +377,8 @@ export function handleSupportedDomainsRemoved(event: SupportedDomainsRemoved): v
 
 /**
  * Creates subgraph records when ClosedEpochsProcessed events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
  */
 export function handleClosedEpochsProcessed(event: ClosedEpochsProcessed): void {
   // Log as a generic meta update; this does not currently mutate Meta fields
@@ -310,6 +393,8 @@ export function handleClosedEpochsProcessed(event: ClosedEpochsProcessed): void 
 
 /**
  * Creates subgraph records when LastEpochProcessedSet events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
  */
 export function handleLastEpochProcessedSet(event: LastEpochProcessedSet): void {
   // Log as a generic meta update; this does not currently mutate Meta fields
@@ -324,6 +409,8 @@ export function handleLastEpochProcessedSet(event: LastEpochProcessedSet): void 
 
 /**
  * Creates subgraph records when RoleAssigned events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
  */
 export function handleRoleAssigned(event: RoleAssigned): void {
   // Log as a generic meta update; this does not currently mutate Meta fields
@@ -332,6 +419,8 @@ export function handleRoleAssigned(event: RoleAssigned): void {
 
 /**
  * Creates subgraph records when GasConfigUpdated events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
  */
 export function handleGasConfigUpdated(event: GasConfigUpdated): void {
   // Log as a generic meta update; this does not currently mutate Meta fields
@@ -341,22 +430,22 @@ export function handleGasConfigUpdated(event: GasConfigUpdated): void {
 
 /**
  * Creates subgraph records when ModuleAddressUpdated events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
  */
 export function handleModuleAddressUpdated(event: ModuleAddressUpdated): void {
   const SETTLEMENT_MODULE_TYPE = Bytes.fromByteArray(crypto.keccak256(ByteArray.fromUTF8('settlement_module')));
   const MANAGER_MODULE_TYPE = Bytes.fromByteArray(crypto.keccak256(ByteArray.fromUTF8('manager_module')));
-  
+
   const meta = getOrCreateMeta();
   const typeParam = event.params._type;
   const newAddress = event.params._newAddress;
 
   if (typeParam.equals(SETTLEMENT_MODULE_TYPE)) {
     meta.settler = newAddress;
-
     logHubMetaUpdate('SETTLEMENT_MODULE_UPDATED', event, 'settler', newAddress, null);
   } else if (typeParam.equals(MANAGER_MODULE_TYPE)) {
     meta.manager = newAddress;
-
     logHubMetaUpdate('MANAGER_MODULE_UPDATED', event, 'manager', newAddress, null);
   }
   meta.save();
