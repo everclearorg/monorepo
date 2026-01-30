@@ -270,6 +270,7 @@ pub fn handle_fill_intent<'info>(
         mailbox_program: accounts.hyperlane_mailbox.to_account_info(),
         mailbox_outbox: accounts.mailbox_outbox.to_account_info(),
         dispatch_authority: accounts.dispatch_authority.to_account_info(),
+        // TODO: need to figure out how this is used for the IGP payer and whether this is correct
         sender_wallet: accounts.authority.to_account_info(),
         unique_message_account: accounts.unique_message_account.to_account_info(),
         dispatched_message_pda: accounts.dispatched_message_pda.to_account_info(),
@@ -280,6 +281,7 @@ pub fn handle_fill_intent<'info>(
         inner_igp_account: accounts.inner_igp_account.clone(),
     });
 
+    // Now create the Anchor Context, referencing your local `transfer_remote_context`.
     let transfer_ctx = Context::new(
         &program_id,
         &mut *transfer_remote_context,
