@@ -5,6 +5,7 @@ pub mod error;
 pub mod events;
 pub mod hyperlane;
 pub mod instructions;
+pub mod messaging;
 pub mod state;
 
 use error::SpokeError;
@@ -14,8 +15,8 @@ use hyperlane::{
     SimulationReturnData,
 };
 use instructions::fee_adapter::{
-    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter,
-    __client_accounts_fee_adapter_admin_state, __client_accounts_initialize_fee_adapter,
+    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter, MigrateFeeAdapterState,
+    __client_accounts_initialize_fee_adapter,
 };
 
 use instructions::new_order::OrderParameters;
@@ -69,10 +70,9 @@ pub mod everclear_spoke {
     pub fn new_intent(
         ctx: Context<NewIntent>,
         receiver: Pubkey,
-        input_asset: Pubkey,
         output_asset: Pubkey,
         amount: u64,
-        max_fee: u32,
+        amount_out_min: u128,
         ttl: u64,
         destinations: Vec<u32>,
         data: Vec<u8>,
@@ -82,9 +82,9 @@ pub mod everclear_spoke {
         instructions::new_intent(
             ctx,
             receiver,
-            input_asset,
             output_asset,
             amount,
+            amount_out_min,
             ttl,
             destinations,
             data,
@@ -99,6 +99,55 @@ pub mod everclear_spoke {
         fee_param: FeeParams,
     ) -> Result<()> {
         instructions::new_order(ctx, params, fee_param)
+    }
+
+    /// Fills a new intent.
+    /// The user "locks" funds (previously deposited) and fills an intent.
+    /// NOTE: different from EVM, we do not support pullFunds, i.e. we requires funds to be sent during the tx
+    /// and not deposited prior in the spoke.
+    pub fn fill_intent(
+        ctx: Context<FillIntent>,
+        // origin intent, flattened
+        origin_initiator: [u8; 32],
+        // NOTE: origin_receiver is put in ctx for space saving using LUT
+        origin_input_asset: [u8; 32],
+        // NOTE: we do not need output_asset here as this woule be `ctx.mint`. This is removed for space saving using LUT.
+        intent_origin: u32,
+        origin_nonce: u64,
+        origin_timestamp: u64,           // actually uint48 in Solidity
+        origin_ttl: u64,                 // actually uint48 in Solidity
+        origin_amount: [u8; 32],         // big-endian, matching typical EVM usage
+        origin_amount_out_min: [u8; 32], // uint256
+        origin_destinations: Vec<u32>,
+        origin_data: Vec<u8>,
+
+        // data for fill intent
+        amount_out: u64,
+        receiver: Pubkey,
+        destinations: Vec<u32>,
+
+        // hyperlane params
+        message_gas_limit: u64,
+        signature: Vec<u8>,
+    ) -> Result<()> {
+        instructions::fill_intent(
+            ctx,
+            origin_initiator,
+            origin_input_asset,
+            intent_origin,
+            origin_nonce,
+            origin_timestamp,
+            origin_ttl,
+            origin_amount,
+            origin_amount_out_min,
+            origin_destinations,
+            origin_data,
+            amount_out,
+            receiver,
+            destinations,
+            message_gas_limit,
+            signature,
+        )
     }
 
     // Instruction relates to message receiving
@@ -133,6 +182,16 @@ pub mod everclear_spoke {
     // Admin functions, note this do not need to conform with hyperlane interfaces as this is manually triggered by admin.
     pub fn handle_as_admin(ctx: Context<HandleContext>, handle: HandleInstruction) -> Result<()> {
         instructions::handle_as_admin(ctx, handle)
+    }
+
+    /// Receive a cross-chain message via CCIP.
+    /// Called via CPI from CCIP OffRamp program.
+    #[instruction(discriminator = [0x0b, 0xf4, 0x09, 0xf9, 0x2c, 0x53, 0x2f, 0xf5])]
+    pub fn ccip_receive(
+        ctx: Context<CcipReceiveContext>,
+        message: messaging::ccip::message::Any2SVMMessage,
+    ) -> Result<()> {
+        instructions::receive_message::handle_ccip_receive(ctx, message)
     }
 
     // settle delivered message
@@ -224,19 +283,54 @@ pub mod everclear_spoke {
         instructions::update_vault_authority_bump(ctx, new_bump)
     }
 
+    pub fn switch_to_ccip(
+        ctx: Context<AdminState>,
+        ccip_router: Pubkey,
+        ccip_offramp: Pubkey,
+        ccip_chain_selector: u64,
+        everclear_ccip_chain_selector: u64,
+        everclear_gateway: [u8; 32],
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+
+        instructions::switch_to_ccip(
+            ctx,
+            ccip_router,
+            ccip_offramp,
+            ccip_chain_selector,
+            everclear_ccip_chain_selector,
+            everclear_gateway,
+        )
+    }
+
+    pub fn rollback_to_hyperlane(ctx: Context<AdminState>) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+
+        instructions::rollback_to_hyperlane(ctx)
+    }
+
     // Fee Adapter Functions
 
     pub fn initialize_fee_adapter(
         ctx: Context<InitializeFeeAdapter>,
         fee_recipient: Pubkey,
         fee_signer: Pubkey,
+        fill_signer: Pubkey,
     ) -> Result<()> {
         let state = &ctx.accounts.spoke_state;
         require!(
             state.owner == ctx.accounts.payer.key(),
             SpokeError::OnlyOwner
         );
-        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer)
+        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer, fill_signer)
     }
 
     pub fn update_fee_recipient(
@@ -276,5 +370,32 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
         fee_adapter::unpause_fee_adapter(ctx)
+    }
+
+    pub fn update_fill_signer(ctx: Context<FeeAdapterAdminState>, fill_signer: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::update_fill_signer(ctx, fill_signer)
+    }
+
+    pub fn migrate_fee_adapter_state(
+        ctx: Context<MigrateFeeAdapterState>,
+        fill_signer: Pubkey,
+    ) -> Result<()> {
+        let state = &ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::migrate_fee_adapter_state(ctx, fill_signer)
+    }
+
+    /// Migrate SpokeState PDA to new layout (adds CCIP fields). Call once per deployment after upgrade.
+    /// Only the owner can run this. Safe to run only on accounts that still have the old layout.
+    pub fn migrate_spoke_state(ctx: Context<MigrateSpokeState>) -> Result<()> {
+        instructions::state_migration::migrate_spoke_state(ctx)
     }
 }

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{
     error::SpokeError, events::InitializedEvent, hyperlane::InterchainGasPaymasterType,
-    state::SpokeState,
+    state::{MessagingProviderType, SpokeState},
 };
 
 pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> Result<()> {
@@ -27,7 +27,13 @@ pub fn initialize(ctx: Context<Initialize>, init: SpokeInitializationParams) -> 
     state.mailbox_dispatch_authority_bump = init.mailbox_dispatch_authority_bump;
     state.vault_authority_bump = init.vault_authority_bump;
 
-    // Set owner to the payer (deployer)
+    state.ccip_router = None;
+    state.ccip_offramp = None;
+    state.ccip_chain_selector = None;
+    state.everclear_ccip_chain_selector = None;
+    state.messaging_provider = MessagingProviderType::Hyperlane;
+    state.everclear_gateway = [0u8; 32];
+
     state.owner = init.owner;
     state.bump = ctx.bumps.spoke_state;
 

@@ -3,11 +3,11 @@ use anchor_lang::prelude::*;
 use crate::{
     events::{
         IgpUpdatedEvent, LighthouseUpdatedEvent, MailboxDispatchAuthorityBumpUpdatedEvent,
-        MailboxUpdatedEvent, MessageGasLimitUpdatedEvent, VaultAuthorityBumpUpdatedEvent,
-        WatchtowerUpdatedEvent,
+        MailboxUpdatedEvent, MessageGasLimitUpdatedEvent, MessagingProviderSwitchedEvent,
+        VaultAuthorityBumpUpdatedEvent, WatchtowerUpdatedEvent,
     },
     hyperlane::InterchainGasPaymasterType,
-    state::SpokeState,
+    state::{MessagingProviderType, SpokeState},
 };
 
 #[event_cpi]
@@ -94,5 +94,33 @@ pub fn update_vault_authority_bump(ctx: Context<AdminState>, new_bump: u8) -> Re
     let old_bump: u8 = ctx.accounts.spoke_state.vault_authority_bump;
     ctx.accounts.spoke_state.vault_authority_bump = new_bump;
     emit_cpi!(VaultAuthorityBumpUpdatedEvent { old_bump, new_bump });
+    Ok(())
+}
+
+pub fn switch_to_ccip(
+    ctx: Context<AdminState>,
+    ccip_router: Pubkey,
+    ccip_offramp: Pubkey,
+    ccip_chain_selector: u64,
+    everclear_ccip_chain_selector: u64,
+    everclear_gateway: [u8; 32],
+) -> Result<()> {
+    ctx.accounts.spoke_state.ccip_router = Some(ccip_router);
+    ctx.accounts.spoke_state.ccip_offramp = Some(ccip_offramp);
+    ctx.accounts.spoke_state.ccip_chain_selector = Some(ccip_chain_selector);
+    ctx.accounts.spoke_state.everclear_ccip_chain_selector = Some(everclear_ccip_chain_selector);
+    ctx.accounts.spoke_state.everclear_gateway = everclear_gateway;
+    ctx.accounts.spoke_state.messaging_provider = MessagingProviderType::CCIP;
+    emit_cpi!(MessagingProviderSwitchedEvent {
+        provider: MessagingProviderType::CCIP as u8,
+    });
+    Ok(())
+}
+
+pub fn rollback_to_hyperlane(ctx: Context<AdminState>) -> Result<()> {
+    ctx.accounts.spoke_state.messaging_provider = MessagingProviderType::Hyperlane;
+    emit_cpi!(MessagingProviderSwitchedEvent {
+        provider: MessagingProviderType::Hyperlane as u8,
+    });
     Ok(())
 }

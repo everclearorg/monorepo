@@ -24,10 +24,9 @@ impl AnchorDeserialize for Settlement {
         reader.read_exact(&mut recipient)?;
         let mut buf: [u8; 32] = [0; 32];
         reader.read_exact(&mut buf)?;
-        // SAFE: buf len always > 1 and can be unwarpped
         let settlement = Settlement {
             intent_id,
-            amount: U256::from_big_endian(&amount),
+            amount: U256::from_little_endian(&amount),
             asset: Pubkey::new_from_array(asset),
             recipient: Pubkey::new_from_array(recipient),
             update_virtual_balance: buf[31] == 1,
@@ -66,7 +65,27 @@ impl AnchorDeserialize for Settlements {
         let size = u32::from_be_bytes(*size);
         let mut settlements = vec![];
         for _ in 0..size {
-            let settlement = Settlement::deserialize_reader(reader)?;
+            let mut intent_id: [u8; 32] = [0; 32];
+            let mut amount_be: [u8; 32] = [0; 32];
+            let mut asset: [u8; 32] = [0; 32];
+            let mut recipient: [u8; 32] = [0; 32];
+            let mut update_virtual_balance_buf: [u8; 32] = [0; 32];
+            
+            reader.read_exact(&mut intent_id)?;
+            reader.read_exact(&mut amount_be)?;
+            reader.read_exact(&mut asset)?;
+            reader.read_exact(&mut recipient)?;
+            reader.read_exact(&mut update_virtual_balance_buf)?;
+            
+            let amount = U256::from_big_endian(&amount_be);
+            
+            let settlement = Settlement {
+                intent_id,
+                amount,
+                asset: Pubkey::new_from_array(asset),
+                recipient: Pubkey::new_from_array(recipient),
+                update_virtual_balance: update_virtual_balance_buf[31] == 1,
+            };
             settlements.push(settlement);
         }
         Ok(Settlements { settlements })
@@ -147,5 +166,64 @@ mod tests {
                 update_virtual_balance: false,
             }
         )
+    }
+
+    #[test]
+    fn test_settlement_round_trip_serialization() {
+
+        let test_amount = U256::from(999000000000000000u64);
+        let original_settlement = Settlement {
+            intent_id: [1u8; 32],
+            amount: test_amount,
+            asset: Pubkey::new_unique(),
+            recipient: Pubkey::new_unique(),
+            update_virtual_balance: true,
+        };
+        
+        let mut amount_buf = [0u8; 32];
+        original_settlement.amount.to_little_endian(&mut amount_buf);
+        
+        let deserialized_amount = U256::from_little_endian(&amount_buf);
+        
+        assert_eq!(
+            test_amount, deserialized_amount,
+            "Settlement amount should match after round-trip (serialize little-endian, deserialize little-endian)"
+        );
+        
+        let wrong_amount = U256::from_big_endian(&amount_buf);
+        assert_ne!(
+            test_amount, wrong_amount,
+            "Using big-endian deserialization would give wrong value, breaking round-trip"
+        );
+    }
+
+    #[test]
+    fn test_settlement_endianness_consistency() {
+
+        let test_amount = U256::from(1234567890123456789u64);
+        
+        let mut serialized = Vec::new();
+        let settlement = Settlement {
+            intent_id: [0u8; 32],
+            amount: test_amount,
+            asset: Pubkey::default(),
+            recipient: Pubkey::default(),
+            update_virtual_balance: false,
+        };
+        settlement.serialize(&mut serialized).unwrap();
+        
+        let amount_bytes = &serialized[32..64];
+        
+        let deserialized_amount = U256::from_little_endian(amount_bytes);
+        assert_eq!(
+            test_amount, deserialized_amount,
+            "Amount should deserialize correctly from little-endian bytes (matching AnchorSerialize)"
+        );
+        
+        let wrong_amount = U256::from_big_endian(amount_bytes);
+        assert_ne!(
+            test_amount, wrong_amount,
+            "Deserializing as big-endian should give different (wrong) value"
+        );
     }
 }
