@@ -127,11 +127,6 @@ pub fn new_order(
         intent_ids.push(event_data.intent_id);
     }
 
-    require!(
-        remaining_accounts_iter.next().is_none(),
-        SpokeError::InvalidArgument
-    );
-
     // For Hyperlane, remaining_accounts has exactly 2*(n-1) (unique, dispatched) pairs.
     // For CCIP, remaining_accounts has 2*(n-1) pairs plus CCIP router/accounts; those extras
     // are passed via remaining_accounts_slice to handle_new_intent. Do not require iterator

@@ -6,8 +6,9 @@ use anchor_lang::prelude::*;
 
 use crate::{error::SpokeError, state::SpokeState};
 
-/// Old SpokeState size (before CCIP fields). Must match pre-CCIP layout.
-const OLD_SPOKE_STATE_SIZE: usize = 230;
+/// Old SpokeState body size (before CCIP fields). Must match pre-CCIP layout.
+/// Sum of: 1+1+4+4+32*2+8+8+32+1+32+1+32+33+1 = 222.
+const OLD_SPOKE_STATE_SIZE: usize = 222;
 /// New fields appended: Option::None (1) x4 + MessagingProviderType::Hyperlane (1) + [0u8;32] (32) = 37
 const NEW_FIELDS_LEN: usize = 37;
 
