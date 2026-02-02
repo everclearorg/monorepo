@@ -8,11 +8,11 @@ export const bindMonitor = async (context: AppContext) => {
   const { requestContext, methodContext } = createLoggingContext(bindMonitor.name);
   try {
     logger.debug('Bind monitor polling loop start', requestContext, methodContext);
-    //await updateMessages();
-    //await updateQueues();
+    await updateMessages();
+    await updateQueues();
     await updateHubSpokeMeta();
     await updateProtocolUpdateLogs();
-    //await updateMessageStatus();
+    await updateMessageStatus();
     logger.debug('Bind monitor polling loop complete', requestContext, methodContext);
   } catch (err: unknown) {
     logger.error(
