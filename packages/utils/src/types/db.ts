@@ -461,3 +461,63 @@ export const ProtocolUpdateLogSchema = Type.Object({
   txNonce: Type.Number(),
 });
 export type ProtocolUpdateLog = Static<typeof ProtocolUpdateLogSchema>;
+
+export const HubSupportedDomainSchema = Type.Object({
+  domain: TDomainId,
+  blockGasLimit: TIntegerString,
+});
+export type HubSupportedDomain = Static<typeof HubSupportedDomainSchema>;
+
+export const HubChainGatewaySchema = Type.Object({
+  chainId: TIntegerString,
+  gateway: TAddress,
+});
+export type HubChainGateway = Static<typeof HubChainGatewaySchema>;
+
+export const SpokeModuleForStrategySchema = Type.Object({
+  strategy: TIntegerString,
+  module: TAddress,
+});
+export type SpokeModuleForStrategy = Static<typeof SpokeModuleForStrategySchema>;
+
+export const HubMetaSchema = Type.Object({
+  id: Type.String({ maxLength: 66 }),
+  domain: TDomainId,
+  paused: Type.Optional(Type.Boolean()),
+  owner: Type.Optional(TAddress),
+  proposedOwner: Type.Optional(TAddress),
+  proposedOwnershipTimestamp: Type.Optional(TIntegerString),
+  gateway: Type.Optional(TAddress),
+  watchtower: Type.Optional(TAddress),
+  manager: Type.Optional(TAddress),
+  settler: Type.Optional(TAddress),
+  minSolverSupportedDomains: Type.Optional(TIntegerString),
+  expiryTimeBuffer: Type.Optional(TIntegerString),
+  discountPerEpoch: Type.Optional(TIntegerString),
+  epochLength: Type.Optional(TIntegerString),
+  mailbox: Type.Optional(TAddress),
+  securityModule: Type.Optional(TAddress),
+  acceptanceDelay: Type.Optional(TIntegerString),
+  supportedDomains: Type.Optional(Type.Array(HubSupportedDomainSchema)),
+  chainGateways: Type.Optional(Type.Array(HubChainGatewaySchema)),
+});
+export type HubMeta = Static<typeof HubMetaSchema>;
+
+export const SpokeMetaSchema = Type.Object({
+  id: Type.String({ maxLength: 66 }),
+  domain: TDomainId,
+  paused: Type.Optional(Type.Boolean()),
+  gateway: Type.Optional(TAddress),
+  lighthouse: Type.Optional(TAddress),
+  messageReceiver: Type.Optional(TAddress),
+  watchtower: Type.Optional(TAddress),
+  messageGasLimit: Type.Optional(TIntegerString),
+  feeAdapter: Type.Optional(TAddress),
+  feeAdapterRecipient: Type.Optional(TAddress),
+  fillSigner: Type.Optional(TAddress),
+  feeSigner: Type.Optional(TAddress),
+  mailbox: Type.Optional(TAddress),
+  securityModule: Type.Optional(TAddress),
+  moduleForStrategies: Type.Optional(Type.Array(SpokeModuleForStrategySchema)),
+});
+export type SpokeMeta = Static<typeof SpokeMetaSchema>;

@@ -8,6 +8,7 @@ import {
   HubIntent,
   HubInvoice,
   HubMessage,
+  HubMeta,
   jsonifyError,
   Message,
   Order,
@@ -15,6 +16,7 @@ import {
   ProtocolUpdateLog,
   Queue,
   SettlementIntent,
+  SpokeMeta,
   TIntentStatus,
   Token,
 } from '@chimera-monorepo/utils';
@@ -196,6 +198,16 @@ export class EnvioReader implements ISubgraphReader {
   public async getHubMessages(_domain: string, _latestNonce: number): Promise<HubMessage[]> {
     // Envio doesn't track hub messages
     return [];
+  }
+
+  public async getHubMeta(_domain: string): Promise<HubMeta | undefined> {
+    // Envio doesn't track hub meta
+    return undefined;
+  }
+
+  public async getSpokeMeta(_domain: string): Promise<SpokeMeta | undefined> {
+    // Envio doesn't track spoke meta
+    return undefined;
   }
 
   public async getHubMetaUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {

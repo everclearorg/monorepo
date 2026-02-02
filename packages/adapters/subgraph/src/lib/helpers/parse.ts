@@ -19,6 +19,8 @@ import {
   HyperlaneStatus,
   Order,
   ProtocolUpdateLog,
+  HubMeta,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 import {
   SettlementQueueEntity,
@@ -42,6 +44,8 @@ import {
   IntentStatus,
   OrderEntity,
   MetaUpdateEntity,
+  HubMetaEntity,
+  SpokeMetaEntity,
 } from '../operations/entities';
 
 export const StringToNumber = (num: number | string): number => {
@@ -367,6 +371,59 @@ export const protocolUpdateLog = (domain: string, entity: MetaUpdateEntity): Pro
     txOrigin: entity.txOrigin,
     txNonce: StringToNumber(entity.txNonce),
   };
+};
+
+export const hubMeta = (entity: HubMetaEntity): HubMeta => {
+  return {
+    id: entity.id,
+    domain: entity.domain,
+    paused: entity.paused ?? undefined,
+    owner: entity.owner ?? undefined,
+    proposedOwner: entity.proposedOwner ?? undefined,
+    proposedOwnershipTimestamp: entity.proposedOwnershipTimestamp ?? undefined,
+    gateway: entity.gateway ?? undefined,
+    watchtower: entity.watchtower ?? undefined,
+    manager: entity.manager ?? undefined,
+    settler: entity.settler ?? undefined,
+    minSolverSupportedDomains: entity.minSolverSupportedDomains ?? undefined,
+    expiryTimeBuffer: entity.expiryTimeBuffer ?? undefined,
+    discountPerEpoch: entity.discountPerEpoch ?? undefined,
+    epochLength: entity.epochLength ?? undefined,
+    mailbox: entity.mailbox ?? undefined,
+    securityModule: entity.securityModule ?? undefined,
+    acceptanceDelay: entity.acceptanceDelay ?? undefined,
+    supportedDomains: entity.supportedDomains?.map((domain) => ({
+      domain: domain.domain,
+      blockGasLimit: domain.blockGasLimit,
+    })),
+    chainGateways: entity.chainGateways?.map((gateway) => ({
+      chainId: gateway.chainId,
+      gateway: gateway.gateway,
+    })),
+  } as HubMeta;
+};
+
+export const spokeMeta = (entity: SpokeMetaEntity): SpokeMeta => {
+  return {
+    id: entity.id,
+    domain: entity.domain,
+    paused: entity.paused ?? undefined,
+    gateway: entity.gateway ?? undefined,
+    lighthouse: entity.lighthouse ?? undefined,
+    messageReceiver: entity.messageReceiver ?? undefined,
+    watchtower: entity.watchtower ?? undefined,
+    messageGasLimit: entity.messageGasLimit ?? undefined,
+    feeAdapter: entity.feeAdapter ?? undefined,
+    feeAdapterRecipient: entity.feeAdapterRecipient ?? undefined,
+    fillSigner: entity.fillSigner ?? undefined,
+    feeSigner: entity.feeSigner ?? undefined,
+    mailbox: entity.mailbox ?? undefined,
+    securityModule: entity.securityModule ?? undefined,
+    moduleForStrategies: entity.moduleForStrategies?.map((module) => ({
+      strategy: module.strategy,
+      module: module.module,
+    })),
+  } as SpokeMeta;
 };
 
 export const token = (entity: TokensEntity): Token => {

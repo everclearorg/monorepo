@@ -33,6 +33,8 @@ export const createMockDatabase = (): Database => {
     saveHubIntents: stub().resolves(),
     saveMessages: stub().resolves(),
     saveProtocolUpdateLogs: stub().resolves(),
+    saveHubMeta: stub().resolves(),
+    saveSpokeMeta: stub().resolves(),
     saveQueues: stub().resolves(),
     saveAssets: stub().resolves(),
     saveTokens: stub().resolves(),
