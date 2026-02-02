@@ -23,7 +23,6 @@ const SPOKE_META_ID = 'SPOKE_META_ID';
 
 /**
  * Logs a meta update event for the spoke subgraph.
- * Includes gas price and gas limit (unlike hub version).
  *
  * @param kind - High-level kind identifier (e.g., 'PAUSED', 'GATEWAY_UPDATED')
  * @param event - The contract event
@@ -46,8 +45,6 @@ function logSpokeMetaUpdate(
   log.transactionHash = event.transaction.hash;
   log.timestamp = event.block.timestamp;
   log.blockNumber = event.block.number;
-  log.gasPrice = event.transaction.gasPrice;
-  log.gasLimit = event.transaction.gasLimit;
   log.txOrigin = event.transaction.from;
   log.txNonce = generateTxNonce(event);
   log.save();

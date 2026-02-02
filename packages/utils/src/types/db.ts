@@ -446,3 +446,18 @@ export const OrderSchema = Type.Intersect([
   }),
 ]);
 export type Order = Static<typeof OrderSchema>;
+
+export const ProtocolUpdateLogSchema = Type.Object({
+  id: Type.String({ maxLength: 66 }),
+  domain: TDomainId,
+  chainId: Type.String({ maxLength: 20 }),
+  event: Type.String(),
+  key: Type.String(),
+  updated: Type.String(),
+  transactionHash: Type.String({ maxLength: 66 }),
+  timestamp: Type.Number(),
+  blockNumber: Type.Number(),
+  txOrigin: TAddress,
+  txNonce: Type.Number(),
+});
+export type ProtocolUpdateLog = Static<typeof ProtocolUpdateLogSchema>;

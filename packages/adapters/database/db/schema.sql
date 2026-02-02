@@ -1,7 +1,7 @@
-\restrict cZInaaWNXHJxHzU89H9PAd1E1yyhu49WDdq8q68x05QaVOa4epd1cuJQufgVe13
+\restrict yePolQ87NmrhhVa01aegek8iHEbupD5jJEXCPgukwRihoB9IAgCJ2IYKyaOfVjb
 
--- Dumped from database version 16.3 (Debian 16.3-1.pgdg120+1)
--- Dumped by pg_dump version 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)
+-- Dumped from database version 14.12 (Debian 14.12-1.pgdg120+1)
+-- Dumped by pg_dump version 16.11 (Ubuntu 16.11-1.pgdg22.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -33,6 +33,13 @@ COMMENT ON EXTENSION pg_cron IS 'Job scheduler for PostgreSQL';
 --
 
 CREATE SCHEMA crypto;
+
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+-- *not* creating schema, since initdb creates it
 
 
 --
@@ -2234,6 +2241,32 @@ CREATE TABLE public.hub_invoices (
 
 
 --
+-- Name: messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.messages (
+    id character varying(255) NOT NULL,
+    domain character varying(66) NOT NULL,
+    type public.message_type NOT NULL,
+    quote character varying(255),
+    first bigint NOT NULL,
+    last bigint NOT NULL,
+    intent_ids character varying(66)[] NOT NULL,
+    tx_origin character varying(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
+    "timestamp" bigint NOT NULL,
+    block_number bigint NOT NULL,
+    tx_nonce bigint NOT NULL,
+    auto_id bigint NOT NULL,
+    gas_price bigint NOT NULL,
+    gas_limit bigint NOT NULL,
+    message_status public.message_status DEFAULT 'none'::public.message_status NOT NULL,
+    origin_domain character varying(66),
+    destination_domain character varying(66)
+);
+
+
+--
 -- Name: origin_intents; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2298,99 +2331,99 @@ CREATE TABLE public.settlement_intents (
 --
 
 CREATE MATERIALIZED VIEW public.intents AS
- SELECT id,
-    origin_queue_idx,
-    origin_message_id,
-    origin_status,
-    origin_initiator,
-    origin_receiver,
-    origin_input_asset,
-    origin_output_asset,
-    origin_amount,
-    origin_max_fee,
-    origin_origin,
-    origin_destinations,
-    origin_ttl,
-    origin_nonce,
-    origin_data,
-    origin_transaction_hash,
-    origin_timestamp,
-    origin_block_number,
-    origin_gas_limit,
-    origin_gas_price,
-    origin_tx_origin,
-    origin_tx_nonce,
-    origin_auto_id,
-    origin_native_fee,
-    origin_token_fee,
-    origin_fee_adapter_initiator,
-    origin_order_id,
-    origin_amount_out_min,
-    origin_is_swap,
-    destination_queue_idx,
-    destination_message_id,
-    destination_status,
-    destination_initiator,
-    destination_receiver,
-    destination_solver,
-    destination_input_asset,
-    destination_output_asset,
-    destination_amount,
-    destination_fee,
-    destination_origin,
-    destination_destinations,
-    destination_ttl,
-    destination_filled,
-    destination_nonce,
-    destination_data,
-    destination_transaction_hash,
-    destination_timestamp,
-    destination_block_number,
-    destination_gas_limit,
-    destination_gas_price,
-    destination_tx_origin,
-    destination_tx_nonce,
-    destination_auto_id,
-    settlement_amount_out_min,
-    destination_amount_out,
-    settlement_amount,
-    settlement_asset,
-    settlement_recipient,
-    settlement_domain,
-    settlement_status,
-    destination_return_data,
-    settlement_transaction_hash,
-    settlement_timestamp,
-    settlement_block_number,
-    settlement_gas_limit,
-    settlement_gas_price,
-    settlement_tx_origin,
-    settlement_tx_nonce,
-    settlement_auto_id,
-    hub_domain,
-    hub_queue_idx,
-    hub_message_id,
-    hub_status,
-    hub_settlement_domain,
-    hub_settlement_amount,
-    hub_added_tx_nonce,
-    hub_added_timestamp,
-    hub_filled_tx_nonce,
-    hub_filled_timestamp,
-    hub_settlement_enqueued_tx_nonce,
-    hub_settlement_enqueued_block_number,
-    hub_settlement_enqueued_timestamp,
-    hub_settlement_epoch,
-    hub_update_virtual_balance,
-    intent_queue_processed_tx_hash,
-    intent_queue_processed_timestamp,
-    fill_queue_processed_tx_hash,
-    fill_queue_processed_timestamp,
-    settlement_queue_processed_tx_hash,
-    settlement_queue_processed_timestamp,
-    status,
-    has_calldata,
-    hub_auto_id
+ SELECT t.id,
+    t.origin_queue_idx,
+    t.origin_message_id,
+    t.origin_status,
+    t.origin_initiator,
+    t.origin_receiver,
+    t.origin_input_asset,
+    t.origin_output_asset,
+    t.origin_amount,
+    t.origin_max_fee,
+    t.origin_origin,
+    t.origin_destinations,
+    t.origin_ttl,
+    t.origin_nonce,
+    t.origin_data,
+    t.origin_transaction_hash,
+    t.origin_timestamp,
+    t.origin_block_number,
+    t.origin_gas_limit,
+    t.origin_gas_price,
+    t.origin_tx_origin,
+    t.origin_tx_nonce,
+    t.origin_auto_id,
+    t.origin_native_fee,
+    t.origin_token_fee,
+    t.origin_fee_adapter_initiator,
+    t.origin_order_id,
+    t.origin_amount_out_min,
+    t.origin_is_swap,
+    t.destination_queue_idx,
+    t.destination_message_id,
+    t.destination_status,
+    t.destination_initiator,
+    t.destination_receiver,
+    t.destination_solver,
+    t.destination_input_asset,
+    t.destination_output_asset,
+    t.destination_amount,
+    t.destination_fee,
+    t.destination_origin,
+    t.destination_destinations,
+    t.destination_ttl,
+    t.destination_filled,
+    t.destination_nonce,
+    t.destination_data,
+    t.destination_transaction_hash,
+    t.destination_timestamp,
+    t.destination_block_number,
+    t.destination_gas_limit,
+    t.destination_gas_price,
+    t.destination_tx_origin,
+    t.destination_tx_nonce,
+    t.destination_auto_id,
+    t.settlement_amount_out_min,
+    t.destination_amount_out,
+    t.settlement_amount,
+    t.settlement_asset,
+    t.settlement_recipient,
+    t.settlement_domain,
+    t.settlement_status,
+    t.destination_return_data,
+    t.settlement_transaction_hash,
+    t.settlement_timestamp,
+    t.settlement_block_number,
+    t.settlement_gas_limit,
+    t.settlement_gas_price,
+    t.settlement_tx_origin,
+    t.settlement_tx_nonce,
+    t.settlement_auto_id,
+    t.hub_domain,
+    t.hub_queue_idx,
+    t.hub_message_id,
+    t.hub_status,
+    t.hub_settlement_domain,
+    t.hub_settlement_amount,
+    t.hub_added_tx_nonce,
+    t.hub_added_timestamp,
+    t.hub_filled_tx_nonce,
+    t.hub_filled_timestamp,
+    t.hub_settlement_enqueued_tx_nonce,
+    t.hub_settlement_enqueued_block_number,
+    t.hub_settlement_enqueued_timestamp,
+    t.hub_settlement_epoch,
+    t.hub_update_virtual_balance,
+    t.intent_queue_processed_tx_hash,
+    t.intent_queue_processed_timestamp,
+    t.fill_queue_processed_tx_hash,
+    t.fill_queue_processed_timestamp,
+    t.settlement_queue_processed_tx_hash,
+    t.settlement_queue_processed_timestamp,
+    t.status,
+    t.has_calldata,
+    t.hub_auto_id
    FROM ( SELECT origin_intents.id,
             origin_intents.queue_idx AS origin_queue_idx,
             origin_intents.message_id AS origin_message_id,
@@ -2499,46 +2532,46 @@ CREATE MATERIALIZED VIEW public.intents AS
 --
 
 CREATE MATERIALIZED VIEW public.invoices AS
- SELECT id,
-    origin_queue_idx,
-    origin_message_id,
-    origin_status,
-    origin_initiator,
-    origin_receiver,
-    origin_input_asset,
-    origin_output_asset,
-    origin_amount,
-    origin_max_fee,
-    origin_origin,
-    origin_destinations,
-    origin_ttl,
-    origin_nonce,
-    origin_data,
-    origin_transaction_hash,
-    origin_timestamp,
-    origin_block_number,
-    origin_gas_limit,
-    origin_gas_price,
-    origin_tx_origin,
-    origin_tx_nonce,
-    origin_auto_id,
-    origin_native_fee,
-    origin_token_fee,
-    origin_fee_adapter_initiator,
-    origin_order_id,
-    origin_amount_out_min,
-    origin_is_swap,
-    hub_invoice_id,
-    hub_invoice_intent_id,
-    hub_invoice_amount,
-    hub_invoice_ticker_hash,
-    hub_invoice_owner,
-    hub_invoice_entry_epoch,
-    hub_invoice_enqueued_tx_nonce,
-    hub_invoice_enqueued_timestamp,
-    hub_invoice_auto_id,
-    hub_status,
-    hub_settlement_epoch
+ SELECT t.id,
+    t.origin_queue_idx,
+    t.origin_message_id,
+    t.origin_status,
+    t.origin_initiator,
+    t.origin_receiver,
+    t.origin_input_asset,
+    t.origin_output_asset,
+    t.origin_amount,
+    t.origin_max_fee,
+    t.origin_origin,
+    t.origin_destinations,
+    t.origin_ttl,
+    t.origin_nonce,
+    t.origin_data,
+    t.origin_transaction_hash,
+    t.origin_timestamp,
+    t.origin_block_number,
+    t.origin_gas_limit,
+    t.origin_gas_price,
+    t.origin_tx_origin,
+    t.origin_tx_nonce,
+    t.origin_auto_id,
+    t.origin_native_fee,
+    t.origin_token_fee,
+    t.origin_fee_adapter_initiator,
+    t.origin_order_id,
+    t.origin_amount_out_min,
+    t.origin_is_swap,
+    t.hub_invoice_id,
+    t.hub_invoice_intent_id,
+    t.hub_invoice_amount,
+    t.hub_invoice_ticker_hash,
+    t.hub_invoice_owner,
+    t.hub_invoice_entry_epoch,
+    t.hub_invoice_enqueued_tx_nonce,
+    t.hub_invoice_enqueued_timestamp,
+    t.hub_invoice_auto_id,
+    t.hub_status,
+    t.hub_settlement_epoch
    FROM ( SELECT origin_intents.id,
             origin_intents.queue_idx AS origin_queue_idx,
             origin_intents.message_id AS origin_message_id,
@@ -2701,31 +2734,31 @@ CREATE MATERIALIZED VIEW public.daily_metrics_by_chains_tokens AS
            FROM (netted_final n
              FULL JOIN settled_final s ON (((n.day = s.day) AND (n.from_chain_id = s.from_chain_id) AND (n.to_chain_id = s.to_chain_id) AND ((n.from_asset_address)::text = (s.from_asset_address)::text) AND ((n.to_asset_address)::text = (s.to_asset_address)::text))))
         )
- SELECT day,
-    from_chain_id,
-    from_asset_address,
-    from_asset_symbol,
-    to_chain_id,
-    to_asset_address,
-    to_asset_symbol,
-    netting_volume,
-    netting_avg_intent_size,
-    netting_protocol_revenue,
-    netting_total_intents,
-    netting_avg_time_in_hrs,
-    volume_settled_by_mm,
-    total_intents_by_mm,
-    discounts_by_mm,
-    avg_discounts_by_mm,
-    rewards_for_invoices,
-    avg_rewards_by_invoice,
-    avg_settlement_time_in_hrs_by_mm,
-    apy,
-    avg_discount_epoch_by_mm,
-    total_volume,
-    total_intents,
-    total_protocol_revenue,
-    total_rebalancing_fee
+ SELECT combined.day,
+    combined.from_chain_id,
+    combined.from_asset_address,
+    combined.from_asset_symbol,
+    combined.to_chain_id,
+    combined.to_asset_address,
+    combined.to_asset_symbol,
+    combined.netting_volume,
+    combined.netting_avg_intent_size,
+    combined.netting_protocol_revenue,
+    combined.netting_total_intents,
+    combined.netting_avg_time_in_hrs,
+    combined.volume_settled_by_mm,
+    combined.total_intents_by_mm,
+    combined.discounts_by_mm,
+    combined.avg_discounts_by_mm,
+    combined.rewards_for_invoices,
+    combined.avg_rewards_by_invoice,
+    combined.avg_settlement_time_in_hrs_by_mm,
+    combined.apy,
+    combined.avg_discount_epoch_by_mm,
+    combined.total_volume,
+    combined.total_intents,
+    combined.total_protocol_revenue,
+    combined.total_rebalancing_fee
    FROM combined
   WITH NO DATA;
 
@@ -3071,32 +3104,6 @@ ALTER SEQUENCE public.merkle_trees_id_seq OWNED BY public.merkle_trees.id;
 
 
 --
--- Name: messages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.messages (
-    id character varying(255) NOT NULL,
-    domain character varying(66) NOT NULL,
-    type public.message_type NOT NULL,
-    quote character varying(255),
-    first bigint NOT NULL,
-    last bigint NOT NULL,
-    intent_ids character varying(66)[] NOT NULL,
-    tx_origin character varying(66) NOT NULL,
-    transaction_hash character(130) NOT NULL,
-    "timestamp" bigint NOT NULL,
-    block_number bigint NOT NULL,
-    tx_nonce bigint NOT NULL,
-    auto_id bigint NOT NULL,
-    gas_price bigint NOT NULL,
-    gas_limit bigint NOT NULL,
-    message_status public.message_status DEFAULT 'none'::public.message_status NOT NULL,
-    origin_domain character varying(66),
-    destination_domain character varying(66)
-);
-
-
---
 -- Name: messages_auto_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -3226,6 +3233,25 @@ CREATE TABLE public.otc_sale_table (
 
 
 --
+-- Name: protocol_update_logs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.protocol_update_logs (
+    id character(120) NOT NULL,
+    domain character varying NOT NULL,
+    event character varying NOT NULL,
+    key character varying NOT NULL,
+    updated text NOT NULL,
+    chain_id character varying(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
+    "timestamp" bigint NOT NULL,
+    block_number bigint NOT NULL,
+    tx_origin character varying(66) NOT NULL,
+    tx_nonce bigint NOT NULL
+);
+
+
+--
 -- Name: queues; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3319,7 +3345,7 @@ ALTER SEQUENCE public.rewards_id_seq OWNED BY public.rewards.id;
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying(128) NOT NULL
+    version character varying NOT NULL
 );
 
 
@@ -4596,6 +4622,14 @@ ALTER TABLE ONLY public.otc_sale_table
 
 
 --
+-- Name: protocol_update_logs protocol_update_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.protocol_update_logs
+    ADD CONSTRAINT protocol_update_logs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: queues queues_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5307,6 +5341,20 @@ CREATE INDEX origin_intents_tx_nonce_idx ON public.origin_intents USING btree (t
 
 
 --
+-- Name: protocol_update_logs_block_number_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX protocol_update_logs_block_number_idx ON public.protocol_update_logs USING btree (block_number);
+
+
+--
+-- Name: protocol_update_logs_timestamp_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX protocol_update_logs_timestamp_idx ON public.protocol_update_logs USING btree ("timestamp");
+
+
+--
 -- Name: queues_domain_type_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5453,7 +5501,7 @@ ALTER TABLE ONLY public.swap_fills
 -- PostgreSQL database dump complete
 --
 
-\unrestrict cZInaaWNXHJxHzU89H9PAd1E1yyhu49WDdq8q68x05QaVOa4epd1cuJQufgVe13
+\unrestrict yePolQ87NmrhhVa01aegek8iHEbupD5jJEXCPgukwRihoB9IAgCJ2IYKyaOfVjb
 
 
 --
@@ -5586,4 +5634,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251202165553'),
     ('20251205153936'),
     ('20251211224120'),
-    ('20260112150248');
+    ('20260112150248'),
+    ('20260128120000');

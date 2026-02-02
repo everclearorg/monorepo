@@ -24,6 +24,7 @@ import {
   NewLockPositionEvent,
   LockPosition,
   Order,
+  ProtocolUpdateLog,
 } from '@chimera-monorepo/utils';
 import { toDate } from 'zapatos/db';
 import {
@@ -47,6 +48,7 @@ import {
   tokenomics,
   lock_positions,
   orders,
+  protocol_update_logs,
 } from 'zapatos/schema';
 import { db } from '..';
 
@@ -710,4 +712,36 @@ export function fromOrders(order: orders.JSONSelectable): Order {
     txOrigin: order.tx_origin,
     txNonce: +order.tx_nonce,
   };
+}
+
+export function toProtocolUpdateLog(log: ProtocolUpdateLog): protocol_update_logs.Insertable {
+  return {
+    id: log.id,
+    domain: log.domain,
+    event: log.event,
+    key: log.key,
+    updated: log.updated,
+    chain_id: log?.chainId ?? log.domain,
+    transaction_hash: log.transactionHash,
+    timestamp: log.timestamp,
+    block_number: log.blockNumber,
+    tx_origin: log.txOrigin,
+    tx_nonce: log.txNonce,
+  };
+};
+
+export function fromProtocolUpdateLogs(log: protocol_update_logs.JSONSelectable): ProtocolUpdateLog {
+  return {
+    id: log.id,
+    domain: log.domain,
+    event: log.event,
+    key: log.key,
+    updated: log.updated,
+    chainId: log.chain_id,
+    transactionHash: log.transaction_hash.trim(),
+    timestamp: +log.timestamp,
+    blockNumber: +log.block_number,
+    txOrigin: log.tx_origin,
+    txNonce: +log.tx_nonce,
+  }
 }

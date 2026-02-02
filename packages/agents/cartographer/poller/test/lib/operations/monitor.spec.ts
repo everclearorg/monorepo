@@ -2,12 +2,14 @@ import { SinonStub, stub } from 'sinon';
 
 import { updateMessages, updateMessageStatus, updateQueues } from '../../../src/lib/operations';
 import {
+  HubMetaUpdate,
   Message,
+  SpokeMetaUpdate,
   TIntentStatus,
   TMessageType,
   TSettlementMessageType,
   expect,
-  HyperlaneStatus
+  HyperlaneStatus,
 } from '@chimera-monorepo/utils';
 import { mockAppContext } from '../../globalTestHook';
 import * as mockable from '../../../src/mockable';
@@ -118,4 +120,84 @@ describe('Monitor operations', () => {
       expect(mockAppContext.adapters.database.updateMessageStatus as SinonStub).callCount(5);
     })
   })
+
+  describe('#updateProtocolUpdateLogs', () => {
+    it('saves hub and spoke meta updates', async () => {
+      const spokeUpdate: SpokeMetaUpdate = {
+        id: 'spoke-log-1',
+        domain: '1337',
+        kind: 'GATEWAY_UPDATED',
+        key: 'gateway',
+        valueBytes: '0x1234',
+        valueBigInt: '0',
+        transactionHash: '0xabc',
+        timestamp: 1,
+        blockNumber: 100,
+        txOrigin: '0x1',
+        txNonce: 1,
+      };
+      const hubUpdate: HubMetaUpdate = {
+        id: 'hub-log-1',
+        domain: mockAppContext.config.hub.domain,
+        kind: 'PAUSED',
+        key: 'paused',
+        valueBigInt: '1',
+        transactionHash: '0xdef',
+        timestamp: 2,
+        blockNumber: 200,
+        txOrigin: '0x2',
+        txNonce: 2,
+      };
+      const getSpokeMetaUpdates = mockAppContext.adapters.subgraph.getSpokeMetaUpdates as SinonStub;
+      getSpokeMetaUpdates.onCall(0).resolves([spokeUpdate]);
+      getSpokeMetaUpdates.onCall(1).resolves([]);
+      (mockAppContext.adapters.subgraph.getHubMetaUpdates as SinonStub).resolves([hubUpdate]);
+
+      await updateProtocolUpdateLogs();
+
+      const saveProtocolLogs = mockAppContext.adapters.database.saveProtocolUpdateLogs as SinonStub;
+      expect(saveProtocolLogs.callCount).to.equal(2);
+
+      expect(saveProtocolLogs.getCall(0).args[0]).to.deep.equal([
+        {
+          id: spokeUpdate.id,
+          domain: spokeUpdate.domain,
+          chain_id: spokeUpdate.domain,
+          event: spokeUpdate.kind,
+          key: spokeUpdate.key,
+          updated: spokeUpdate.valueBytes,
+          transaction_hash: spokeUpdate.transactionHash,
+          timestamp: spokeUpdate.timestamp,
+          block_number: spokeUpdate.blockNumber,
+          tx_origin: spokeUpdate.txOrigin,
+          tx_nonce: spokeUpdate.txNonce,
+        },
+      ]);
+
+      expect(saveProtocolLogs.getCall(1).args[0]).to.deep.equal([
+        {
+          id: hubUpdate.id,
+          domain: hubUpdate.domain,
+          chain_id: hubUpdate.domain,
+          event: hubUpdate.kind,
+          key: hubUpdate.key,
+          updated: hubUpdate.valueBigInt,
+          transaction_hash: hubUpdate.transactionHash,
+          timestamp: hubUpdate.timestamp,
+          block_number: hubUpdate.blockNumber,
+          tx_origin: hubUpdate.txOrigin,
+          tx_nonce: hubUpdate.txNonce,
+        },
+      ]);
+
+      expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).calledWith(
+        'spoke_meta_log_block_1337',
+        spokeUpdate.blockNumber,
+      );
+      expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).calledWith(
+        'hub_meta_log_block',
+        hubUpdate.blockNumber,
+      );
+    });
+  });
 });

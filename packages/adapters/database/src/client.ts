@@ -22,6 +22,7 @@ import {
   EpochResult,
   LockPosition,
   Order,
+  ProtocolUpdateLog,
 } from '@chimera-monorepo/utils';
 
 import * as pg from 'pg';
@@ -165,6 +166,19 @@ export const saveMessages = async (
         .run(poolToUse);
     }),
   );
+};
+
+export const saveProtocolUpdateLogs = async (
+  _logs: ProtocolUpdateLog[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? pool;
+  const logs = _logs.map(converters.toProtocolUpdateLog);
+  await db
+    .upsert('protocol_update_logs', logs, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
 };
 
 export const saveQueues = async (_queues: Queue[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<void> => {
