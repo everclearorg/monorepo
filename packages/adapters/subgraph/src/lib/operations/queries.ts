@@ -164,8 +164,9 @@ export const getSpokeQueueQuery = (type?: string): string => {
 };
 
 export const getSpokeMetaQuery = (): string => {
+  // SPOKE_META_ID is a bytes32 value, so we need to convert it to a string
   return `
-    meta(id: "SPOKE_META_ID"){
+    meta(id: "0x53504f4b455f4d4554415f4944"){
       ${SPOKE_META_ENTITY}
     }
   `;
@@ -442,8 +443,9 @@ export const getSpokeMetaUpdatesQuery = (
 };
 
 export const getHubMetaQuery = (): string => {
+  // HUB_META_ID is a bytes32 value, so we need to convert it to a string
   return `
-    meta (id: "HUB_META_ID"){
+    meta (id: "0x4855425f4d4554415f4944"){
       ${HUB_META_ENTITY}
     }
   `;

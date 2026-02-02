@@ -8,6 +8,7 @@ import {
   getMaxBlockNumber,
   getMaxTxNonce,
   SOLANA_CHAINID,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 
 import { getContext } from '../../shared';
@@ -202,6 +203,38 @@ export const updateProtocolUpdateLogs = async () => {
       count: updates.length,
       latestBlock,
     });
+  }
+};
+
+export const updateHubSpokeMeta = async () => {
+  const {
+    adapters: { subgraph, database },
+    logger,
+    config,
+  } = getContext();
+  const { requestContext, methodContext } = createLoggingContext(updateHubSpokeMeta.name);
+
+  const spokeDomains = getSubgraphSupportedDomains(config);
+  const hubDomain = config.hub.domain;
+
+  const hubMeta = await subgraph.getHubMeta(hubDomain);
+  if (hubMeta) {
+    await database.saveHubMeta([hubMeta]);
+    logger.debug('Saved hub meta', requestContext, methodContext, { domain: hubDomain });
+  } else {
+    logger.debug('No hub meta found', requestContext, methodContext, { domain: hubDomain });
+  }
+
+  const spokeMetas: (SpokeMeta | undefined)[] = await Promise.all(
+    spokeDomains.map(async (domain) => subgraph.getSpokeMeta(domain)),
+  );
+  const validSpokeMetas = spokeMetas.filter((meta): meta is SpokeMeta => Boolean(meta));
+
+  if (validSpokeMetas.length > 0) {
+    await database.saveSpokeMeta(validSpokeMetas);
+    logger.debug('Saved spoke meta', requestContext, methodContext, { count: validSpokeMetas.length });
+  } else {
+    logger.debug('No spoke meta found', requestContext, methodContext, { count: 0 });
   }
 };
 

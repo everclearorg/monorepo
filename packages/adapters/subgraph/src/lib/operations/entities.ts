@@ -353,6 +353,16 @@ export type SpokeMetaEntity = {
   paused: boolean;
   gateway: string;
   lighthouse: string;
+  messageReceiver: string;
+  watchtower: string;
+  messageGasLimit: string;
+  feeAdapter: string;
+  feeAdapterRecipient: string;
+  fillSigner: string;
+  feeSigner: string;
+  mailbox: string;
+  securityModule: string;
+  moduleForStrategies: { strategy: string; module: string }[];
 };
 export const SPOKE_META_ENTITY = `
     id
@@ -360,6 +370,19 @@ export const SPOKE_META_ENTITY = `
     paused
     gateway
     lighthouse
+    messageReceiver
+    watchtower
+    messageGasLimit
+    feeAdapter
+    feeAdapterRecipient
+    fillSigner
+    feeSigner
+    mailbox
+    securityModule
+    moduleForStrategies {
+      strategy
+      module
+    }
 `;
 
 export type SettlementQueueEntity = {
@@ -777,10 +800,20 @@ export type HubMetaEntity = {
   paused: boolean;
   owner: string;
   proposedOwner: string;
-  maxFee: string;
-  lighthouse: string;
+  proposedOwnershipTimestamp: string;
+  gateway: string;
+  watchtower: string;
+  manager: string;
+  settler: string;
+  minSolverSupportedDomains: string;
+  expiryTimeBuffer: string;
+  discountPerEpoch: string;
+  epochLength: string;
+  mailbox: string;
+  securityModule: string;
   supportedDomains: { domain: string; blockGasLimit: string }[];
-  acceptanceDelay: number;
+  chainGateways: { chainId: string; gateway: string }[];
+  acceptanceDelay: string;
 };
 export const HUB_META_ENTITY = `
     id
@@ -788,12 +821,26 @@ export const HUB_META_ENTITY = `
     paused
     owner
     proposedOwner
-    maxFee
-    lighthouse
+    proposedOwnershipTimestamp
+    gateway
+    watchtower
+    manager
+    settler
+    minSolverSupportedDomains
+    expiryTimeBuffer
+    discountPerEpoch
+    epochLength
+    mailbox
+    securityModule
     supportedDomains {
       domain
       blockGasLimit
     }
+    chainGateways {
+      chainId
+      gateway
+    }
+    acceptanceDelay
 `;
 
 export type SettlementIntentEntity = {

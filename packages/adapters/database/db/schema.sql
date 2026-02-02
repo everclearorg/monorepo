@@ -1,4 +1,4 @@
-\restrict yePolQ87NmrhhVa01aegek8iHEbupD5jJEXCPgukwRihoB9IAgCJ2IYKyaOfVjb
+\restrict cSDVpD7BcjJt9eekri1bS4xFKOLNc8e7yRjGpIC29hXUgzDGaFV48Cs8eBRmXCU
 
 -- Dumped from database version 14.12 (Debian 14.12-1.pgdg120+1)
 -- Dumped by pg_dump version 16.11 (Ubuntu 16.11-1.pgdg22.04+1)
@@ -3057,6 +3057,33 @@ ALTER SEQUENCE public.hub_invoices_auto_id_seq OWNED BY public.hub_invoices.auto
 
 
 --
+-- Name: hub_meta; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.hub_meta (
+    id character(120) NOT NULL,
+    domain character varying NOT NULL,
+    paused boolean,
+    owner character varying(66),
+    proposed_owner character varying(66),
+    proposed_ownership_timestamp bigint,
+    gateway character varying(66),
+    watchtower character varying(66),
+    manager character varying(66),
+    settler character varying(66),
+    min_solver_supported_domains bigint,
+    expiry_time_buffer bigint,
+    discount_per_epoch bigint,
+    epoch_length bigint,
+    mailbox character varying(66),
+    security_module character varying(66),
+    acceptance_delay bigint,
+    supported_domains jsonb,
+    chain_gateways jsonb
+);
+
+
+--
 -- Name: lock_positions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3382,6 +3409,29 @@ CREATE TABLE public.solana_lookup_tables (
     created_at timestamp without time zone DEFAULT now(),
     chain_id integer NOT NULL,
     slot integer NOT NULL
+);
+
+
+--
+-- Name: spoke_meta; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.spoke_meta (
+    id character(120) NOT NULL,
+    domain character varying NOT NULL,
+    paused boolean,
+    gateway character varying(66),
+    lighthouse character varying(66),
+    message_receiver character varying(66),
+    watchtower character varying(66),
+    message_gas_limit bigint,
+    fee_adapter character varying(66),
+    fee_adapter_recipient character varying(66),
+    fill_signer character varying(66),
+    fee_signer character varying(66),
+    mailbox character varying(66),
+    security_module character varying(66),
+    module_for_strategies jsonb
 );
 
 
@@ -4566,6 +4616,14 @@ ALTER TABLE ONLY public.hub_invoices
 
 
 --
+-- Name: hub_meta hub_meta_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.hub_meta
+    ADD CONSTRAINT hub_meta_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: lock_positions lock_positions_user_start_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4683,6 +4741,14 @@ ALTER TABLE ONLY public.solana_lookup_tables
 
 ALTER TABLE ONLY public.solana_lookup_tables
     ADD CONSTRAINT solana_lookup_tables_user_address_mint_address_key UNIQUE (user_address, mint_address);
+
+
+--
+-- Name: spoke_meta spoke_meta_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.spoke_meta
+    ADD CONSTRAINT spoke_meta_pkey PRIMARY KEY (id);
 
 
 --
@@ -5166,6 +5232,13 @@ CREATE INDEX hub_invoices_domain_status_queue_id_idx ON public.hub_invoices USIN
 
 
 --
+-- Name: hub_meta_domain_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_meta_domain_idx ON public.hub_meta USING btree (domain);
+
+
+--
 -- Name: idx_epoch_results_account_domain; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5376,6 +5449,13 @@ CREATE INDEX settlement_intents_id_domain_index ON public.settlement_intents USI
 
 
 --
+-- Name: spoke_meta_domain_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX spoke_meta_domain_idx ON public.spoke_meta USING btree (domain);
+
+
+--
 -- Name: new_lock_position_timestamp_idx; Type: INDEX; Schema: tokenomics; Owner: -
 --
 
@@ -5501,7 +5581,7 @@ ALTER TABLE ONLY public.swap_fills
 -- PostgreSQL database dump complete
 --
 
-\unrestrict yePolQ87NmrhhVa01aegek8iHEbupD5jJEXCPgukwRihoB9IAgCJ2IYKyaOfVjb
+\unrestrict cSDVpD7BcjJt9eekri1bS4xFKOLNc8e7yRjGpIC29hXUgzDGaFV48Cs8eBRmXCU
 
 
 --
@@ -5635,4 +5715,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251205153936'),
     ('20251211224120'),
     ('20260112150248'),
-    ('20260128120000');
+    ('20260128120000'),
+    ('20260203002000');

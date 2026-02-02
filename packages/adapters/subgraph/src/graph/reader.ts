@@ -9,6 +9,7 @@ import {
   getHubIntentAddedQuery,
   getHubIntentByIdQuery,
   getHubIntentFilledQuery,
+  getHubMetaQuery,
   getHubMetaUpdatesQuery,
   getInvoiceEnqueuedByIntentId,
   getInvoiceEnqueuedQuery,
@@ -19,6 +20,7 @@ import {
   getSettlementIntentEventQuery,
   getSettlementMessagesQuery,
   getSettlementQueuesQuery,
+  getSpokeMetaQuery,
   getSpokeMetaUpdatesQuery,
   getSpokeMessagesQuery,
   getSpokeQueueQuery,
@@ -37,6 +39,7 @@ import {
   HubIntent,
   HubInvoice,
   HubMessage,
+  HubMeta,
   jsonifyError,
   Message,
   Order,
@@ -44,6 +47,7 @@ import {
   ProtocolUpdateLog,
   Queue,
   SettlementIntent,
+  SpokeMeta,
   TIntentStatus,
   Token,
 } from '@chimera-monorepo/utils';
@@ -58,6 +62,7 @@ import {
   DepositQueueEntity,
   HubAddIntentEventEntity,
   HubFillIntentEventEntity,
+  HubMetaEntity,
   IntentSettlementEventEntity,
   IntentStatus,
   InvoiceEnqueuedEventEntity,
@@ -69,6 +74,7 @@ import {
   SettlementQueueEntity,
   SpokeAddIntentEventEntity,
   SpokeFillIntentEventEntity,
+  SpokeMetaEntity,
   SpokeQueueEntity,
   TokensEntity,
   MetaUpdateEntity,
@@ -293,6 +299,18 @@ export class GraphReader implements ISubgraphReader {
     ]);
 
     return (response?.data.settlementMessages ?? []).map((e) => parser.settlementMessage(domain, e));
+  }
+
+  public async getHubMeta(domain: string): Promise<HubMeta | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ meta: HubMetaEntity; _meta: MetaEntity }>(domain, [getHubMetaQuery()]);
+    return response?.data?.meta ? parser.hubMeta(response.data.meta) : undefined;
+  }
+
+  public async getSpokeMeta(domain: string): Promise<SpokeMeta | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ meta: SpokeMetaEntity; _meta: MetaEntity }>(domain, [getSpokeMetaQuery()]);
+    return response?.data?.meta ? parser.spokeMeta(response.data.meta) : undefined;
   }
 
   public async getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
