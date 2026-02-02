@@ -5,6 +5,7 @@ import {
   HUB_META_ENTITY,
   MESSAGE_ENTITY,
   META_ENTITY,
+  META_UPDATE_ENTITY,
   SPOKE_QUEUE_ENTITY,
   SPOKE_ADD_INTENT_EVENT_ENTITY,
   SPOKE_FILL_INTENT_EVENT_ENTITY,
@@ -398,6 +399,44 @@ export const getSettlementMessagesQuery = (
       orderDirection: ${orderDirection}
     ){
       ${SETTLEMENT_MESSAGE_ENTITY}
+    }
+  `;
+};
+
+export const getHubMetaUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
+  return `
+    hubMetaUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${META_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getSpokeMetaUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
+  return `
+    spokeMetaUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${META_UPDATE_ENTITY}
     }
   `;
 };

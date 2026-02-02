@@ -1,7 +1,7 @@
 import { createLoggingContext, jsonifyError, EverclearError } from '@chimera-monorepo/utils';
 
 import { AppContext } from '../../shared';
-import { updateMessages, updateQueues, updateMessageStatus } from '../../lib/operations';
+import { updateMessages, updateQueues, updateMessageStatus, updateProtocolUpdateLogs } from '../../lib/operations';
 
 export const bindMonitor = async (context: AppContext) => {
   const { logger } = context;
@@ -10,6 +10,7 @@ export const bindMonitor = async (context: AppContext) => {
     logger.debug('Bind monitor polling loop start', requestContext, methodContext);
     await updateMessages();
     await updateQueues();
+    await updateProtocolUpdateLogs();
     await updateMessageStatus();
     logger.debug('Bind monitor polling loop complete', requestContext, methodContext);
   } catch (err: unknown) {

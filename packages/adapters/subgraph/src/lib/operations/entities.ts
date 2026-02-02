@@ -500,6 +500,33 @@ export const HUB_ADD_INTENT_EVENT_ENTITY = `
     txNonce
 `;
 
+export type MetaUpdateEntity = {
+  id: string;
+  kind: string;
+  key: string;
+  valueBytes?: string;
+  valueBigInt?: string;
+  transactionHash: string;
+  timestamp: string;
+  blockNumber: string;
+  txOrigin: string;
+  txNonce: string;
+};
+export const META_UPDATE_ENTITY = `
+    id
+    kind
+
+    key
+    valueBytes
+    valueBigInt
+
+    transactionHash
+    timestamp
+    blockNumber
+    txOrigin
+    txNonce
+`;
+
 export type HubFillIntentEventEntity = {
   id: string;
   intent: HubIntentEntity;

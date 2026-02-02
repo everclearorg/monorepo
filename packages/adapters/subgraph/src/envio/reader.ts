@@ -12,6 +12,7 @@ import {
   Message,
   Order,
   OriginIntent,
+  ProtocolUpdateLog,
   Queue,
   SettlementIntent,
   TIntentStatus,
@@ -194,6 +195,14 @@ export class EnvioReader implements ISubgraphReader {
 
   public async getHubMessages(_domain: string, _latestNonce: number): Promise<HubMessage[]> {
     // Envio doesn't track hub messages
+    return [];
+  }
+
+  public async getHubMetaUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    return [];
+  }
+
+  public async getSpokeMetaUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {
     return [];
   }
 

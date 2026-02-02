@@ -9,6 +9,7 @@ import {
   getHubIntentAddedQuery,
   getHubIntentByIdQuery,
   getHubIntentFilledQuery,
+  getHubMetaUpdatesQuery,
   getInvoiceEnqueuedByIntentId,
   getInvoiceEnqueuedQuery,
   getOrdersByNonce,
@@ -18,6 +19,7 @@ import {
   getSettlementIntentEventQuery,
   getSettlementMessagesQuery,
   getSettlementQueuesQuery,
+  getSpokeMetaUpdatesQuery,
   getSpokeMessagesQuery,
   getSpokeQueueQuery,
   getTokensQuery,
@@ -39,6 +41,7 @@ import {
   Message,
   Order,
   OriginIntent,
+  ProtocolUpdateLog,
   Queue,
   SettlementIntent,
   TIntentStatus,
@@ -68,6 +71,7 @@ import {
   SpokeFillIntentEventEntity,
   SpokeQueueEntity,
   TokensEntity,
+  MetaUpdateEntity,
 } from '../lib/operations/entities';
 
 let context: { config: SubgraphConfig };
@@ -289,6 +293,23 @@ export class GraphReader implements ISubgraphReader {
     ]);
 
     return (response?.data.settlementMessages ?? []).map((e) => parser.settlementMessage(domain, e));
+  }
+
+  public async getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ hubMetaUpdates: MetaUpdateEntity[]; _meta: MetaEntity }>(domain, [
+      getHubMetaUpdatesQuery(fromBlock),
+    ]);
+    return (response?.data.hubMetaUpdates ?? []).map((entity) => parser.protocolUpdateLog(domain, entity));
+  }
+
+  public async getSpokeMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ spokeMetaUpdates: MetaUpdateEntity[]; _meta: MetaEntity }>(domain, [
+      getSpokeMetaUpdatesQuery(fromBlock),
+    ]);
+
+    return (response?.data.spokeMetaUpdates ?? []).map((entity) => parser.protocolUpdateLog(domain, entity));
   }
 
   public async getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]> {

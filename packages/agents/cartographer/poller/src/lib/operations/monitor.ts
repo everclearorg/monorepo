@@ -12,6 +12,7 @@ import {
 
 import { getContext } from '../../shared';
 import { getHyperlaneMsgDelivered } from '../../mockable';
+import { getSubgraphSupportedDomains } from './helper';
 import { CartographerConfig } from '../../config';
 
 const getChainConfig = (domain: string, config: CartographerConfig) => {
@@ -164,6 +165,44 @@ export const updateQueues = async () => {
   logger.debug('Method complete', requestContext, methodContext, {
     queues: queues.map((q) => ({ id: q.id, domain: q.domain, size: q.size, lastProcessed: q.lastProcessed })),
   });
+};
+
+export const updateProtocolUpdateLogs = async () => {
+  const {
+    adapters: { subgraph, database },
+    logger,
+    config,
+  } = getContext();
+  const { requestContext, methodContext } = createLoggingContext(updateProtocolUpdateLogs.name);
+
+  const spokeDomains = getSubgraphSupportedDomains(config);
+  const domains = [...spokeDomains, config.hub.domain];
+  for (const domain of domains) {
+    const isHub = domain === config.hub.domain;
+    const checkpointKey = isHub ? 'hub_meta_log_block' : `spoke_meta_log_block_${domain}`;
+    const lastBlock = await database.getCheckPoint(checkpointKey);
+    const updates = isHub
+      ? await subgraph.getHubMetaUpdates(domain, lastBlock)
+      : await subgraph.getSpokeMetaUpdates(domain, lastBlock);
+
+    if (updates.length === 0) {
+      logger.debug('No meta updates found', requestContext, methodContext, {
+        domain,
+        checkpoint: lastBlock,
+      });
+      continue;
+    }
+
+    const latestBlock = Math.max(lastBlock, getMaxBlockNumber(updates));
+    await database.saveProtocolUpdateLogs(updates);
+
+    await database.saveCheckPoint(checkpointKey, latestBlock);
+    logger.debug('Saved protocol update logs', requestContext, methodContext, {
+      domain,
+      count: updates.length,
+      latestBlock,
+    });
+  }
 };
 
 export const updateMessageStatus = async () => {

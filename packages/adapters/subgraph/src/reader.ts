@@ -14,6 +14,7 @@ import {
   SettlementIntent,
   TIntentStatus,
   Order,
+  ProtocolUpdateLog,
 } from '@chimera-monorepo/utils';
 import { QueryResponse, SubgraphQueryMetaParams, SubgraphConfig } from './lib';
 import { GraphReader } from './graph';
@@ -46,6 +47,8 @@ export interface ISubgraphReader {
   ): Promise<(HubDeposit & { status: TIntentStatus })[]>;
   getSpokeMessages(domain: string, latestNonce: number): Promise<Message[]>;
   getHubMessages(domain: string, latestNonce: number): Promise<HubMessage[]>;
+  getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]>;
+  getSpokeMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]>;
   getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]>;
   getSettlementIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<SettlementIntent[]>;
   getDestinationIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<DestinationIntent[]>;
@@ -369,6 +372,38 @@ export class SubgraphReader implements ISubgraphReader {
     }
 
     return Array.from(messageMap.values());
+  }
+
+  public async getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const [graphResults, envioResults] = await Promise.all([
+      this.graphReader.getHubMetaUpdates(domain, fromBlock).catch(() => []),
+      this.envioReader.getHubMetaUpdates(domain, fromBlock).catch(() => []),
+    ]);
+
+    const updateMap = new Map<string, ProtocolUpdateLog>();
+    for (const update of [...graphResults, ...envioResults]) {
+      if (!updateMap.has(update.id)) {
+        updateMap.set(update.id, update);
+      }
+    }
+
+    return Array.from(updateMap.values());
+  }
+
+  public async getSpokeMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const [graphResults, envioResults] = await Promise.all([
+      this.graphReader.getSpokeMetaUpdates(domain, fromBlock).catch(() => []),
+      this.envioReader.getSpokeMetaUpdates(domain, fromBlock).catch(() => []),
+    ]);
+
+    const updateMap = new Map<string, ProtocolUpdateLog>();
+    for (const update of [...graphResults, ...envioResults]) {
+      if (!updateMap.has(update.id)) {
+        updateMap.set(update.id, update);
+      }
+    }
+
+    return Array.from(updateMap.values());
   }
 
   /**
