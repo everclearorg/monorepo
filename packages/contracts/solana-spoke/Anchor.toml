@@ -16,7 +16,7 @@ everclear_spoke = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
 ccip_poc = "5Zc7TGwbhy91LvuXWgKTBfsArY9gxVXYdYYG2SLzzPMy"
 
 [programs.devnet]
-everclear_spoke = "5Bq6DindWdcrNoYXjrEw1kc4j1KQN8c1odcZJfh82Joc"
+everclear_spoke = "6S2JxnZESFsNiLNTwhxzC3Amv9ACEgVkNT3ZksEjcKqp"
 ccip_poc = "CTYK59jTDbqL8HQ9A6eyg2vNDTb6Bd5muDeugPL5n1Dd"
 
 [registry]
