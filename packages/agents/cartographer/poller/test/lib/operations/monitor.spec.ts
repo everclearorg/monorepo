@@ -23,6 +23,10 @@ import * as mockable from '../../../src/mockable';
 import { createHubMessages, createMessages, createQueues } from '@chimera-monorepo/database/test/mock';
 
 describe('Monitor operations', () => {
+  beforeEach(() => {
+    stub(mockable, 'getHyperlaneMsgDelivered').resolves(true);
+  });
+
   describe('#updateMessages', () => {
     it('should work', async () => {
       const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
@@ -60,9 +64,6 @@ describe('Monitor operations', () => {
     });
 
     it('saves messages with updated status', async () => {
-      const getHyperlaneMsgDelivered = stub(mockable, 'getHyperlaneMsgDelivered');
-      getHyperlaneMsgDelivered.resolves(true);
-
       const hubMessages = createHubMessages(5);
       const spokeMessages = createMessages(5);
       (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
@@ -108,13 +109,6 @@ describe('Monitor operations', () => {
   });
 
   describe('#updateMessageStatus', () => {
-    let getHyperlaneMsgDelivered: SinonStub;
-
-    beforeEach(() => {
-      getHyperlaneMsgDelivered = stub(mockable, 'getHyperlaneMsgDelivered');
-      getHyperlaneMsgDelivered.resolves(true);
-    });
-
     it('should work', async () => {
       const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
       // should work for both hub and spoke destination domain
