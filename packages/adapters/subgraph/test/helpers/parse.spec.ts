@@ -21,6 +21,8 @@ import {
   token,
   hubIntentFromSettleEnqueued,
   protocolUpdateLog,
+  envioToOriginIntent,
+  envioToDestinationIntent,
   StringToNumber,
 } from '../../src/lib/helpers/parse';
 import {
@@ -416,7 +418,6 @@ describe('Subgraph Adapter - parse', () => {
       expect(parsed).to.be.deep.eq(expected);
     });
   });
-
   describe('#protocolUpdateLog', () => {
     it('should parse GATEWAY_UPDATED with valueBytes to address', () => {
       const entity: MetaUpdateEntity = {
@@ -490,6 +491,197 @@ describe('Subgraph Adapter - parse', () => {
 
       expect(result.chainId).to.equal('1338');
       expect(result.event).to.equal('HUB_CHAIN_GATEWAY_ADDED');
+    });
+
+    it('should parse LIGHTHOUSE_UPDATED using bytes32 address', () => {
+      const entity: MetaUpdateEntity = {
+        id: '0xlog4',
+        kind: 'LIGHTHOUSE_UPDATED',
+        key: 'lighthouse',
+        valueBytes: '0x000000000000000000000000abcdefabcdefabcdefabcdefabcdefabcdefabcd',
+        transactionHash: '0xjkl',
+        timestamp: '4000',
+        blockNumber: '500',
+        txOrigin: '0xorigin4',
+        txNonce: '8',
+      };
+
+      const result = protocolUpdateLog(domain, entity);
+
+      expect(result.event).to.equal('LIGHTHOUSE_UPDATED');
+      expect(result.key).to.equal('lighthouse');
+      expect(result.updated).to.equal('0xabcdefabcdefabcdefabcdefabcdefabcdefabcd');
+    });
+
+    it('should parse MESSAGE_GAS_LIMIT_UPDATED using valueBigInt', () => {
+      const entity: MetaUpdateEntity = {
+        id: '0xlog5',
+        kind: 'MESSAGE_GAS_LIMIT_UPDATED',
+        key: 'messageGasLimit',
+        valueBigInt: '12345',
+        transactionHash: '0xmn0',
+        timestamp: '5000',
+        blockNumber: '600',
+        txOrigin: '0xorigin5',
+        txNonce: '9',
+      };
+
+      const result = protocolUpdateLog(domain, entity);
+
+      expect(result.updated).to.equal('12345');
+      expect(result.event).to.equal('MESSAGE_GAS_LIMIT_UPDATED');
+    });
+  });
+
+  describe('#envioToOriginIntent', () => {
+    it('should parse FILLED intent to settled origin intent', () => {
+      const entity: any = {
+        intentId: '0xintent',
+        queueIdx: '1',
+        status: 'FILLED',
+        receiver: '0xreceiver',
+        inputAsset: '0xinput',
+        outputAsset: '0xoutput',
+        originAmount: '100',
+        amountOutMin: '90',
+        destinations: [1338],
+        origin: 1337,
+        nonce: '5',
+        data: '0x',
+        ttl: '1000',
+        transactionHash: '0xtx',
+        timestamp: '1700000000',
+        blockNumber: '123',
+        sender: '0xsender',
+        tokenFee: '1',
+        nativeFee: '2',
+        initiator: '0xinitiator',
+      };
+
+      const result = envioToOriginIntent(entity, '1339');
+
+      expect(result.status).to.equal(TIntentStatus.Settled);
+      expect(result.origin).to.equal('1339');
+      expect(result.id).to.equal('0xintent');
+      expect(result.queueIdx).to.equal(1);
+      expect(result.amount).to.equal('100');
+      expect(result.tokenFee).to.equal('1');
+      expect(result.nativeFee).to.equal('2');
+    });
+
+    it('should default origin domain from entity when not provided', () => {
+      const entity: any = {
+        intentId: '0xintent',
+        queueIdx: '1',
+        status: 'ADDED',
+        receiver: '0xreceiver',
+        inputAsset: '0xinput',
+        outputAsset: '0xoutput',
+        originAmount: '100',
+        amountOutMin: '90',
+        destinations: [1338],
+        origin: 1337,
+        nonce: '5',
+        data: '0x',
+        ttl: '1000',
+        transactionHash: '0xtx',
+        timestamp: '1700000000',
+        blockNumber: '123',
+        sender: '0xsender',
+        initiator: '0xinitiator',
+      };
+
+      const result = envioToOriginIntent(entity);
+
+      expect(result.status).to.equal(TIntentStatus.Added);
+      expect(result.origin).to.equal('1337');
+    });
+  });
+
+  describe('#envioToDestinationIntent', () => {
+    it('should return undefined when there are no fills', () => {
+      const entity: any = {
+        intentId: '0xintent',
+        queueIdx: '1',
+        status: 'FILLED',
+        receiver: '0xreceiver',
+        inputAsset: '0xinput',
+        outputAsset: '0xoutput',
+        originAmount: '100',
+        amountOutMin: '90',
+        destinations: [1338],
+        origin: 1337,
+        nonce: '5',
+        data: '0x',
+        ttl: '1000',
+        fills: [],
+      };
+
+      const result = envioToDestinationIntent(entity, '1338');
+      expect(result).to.be.undefined;
+    });
+
+    it('should return undefined when no fill matches destination domain', () => {
+      const entity: any = {
+        intentId: '0xintent',
+        queueIdx: '1',
+        status: 'FILLED',
+        receiver: '0xreceiver',
+        inputAsset: '0xinput',
+        outputAsset: '0xoutput',
+        originAmount: '100',
+        amountOutMin: '90',
+        destinations: [1338],
+        origin: 1337,
+        nonce: '5',
+        data: '0x',
+        ttl: '1000',
+        fills: [
+          {
+            chainId: 9999,
+          },
+        ],
+      };
+
+      const result = envioToDestinationIntent(entity, '1338');
+      expect(result).to.be.undefined;
+    });
+
+    it('should parse fill into destination intent when matching destination domain', () => {
+      const entity: any = {
+        intentId: '0xintent',
+        queueIdx: '1',
+        status: 'FILLED',
+        receiver: '0xreceiver',
+        inputAsset: '0xinput',
+        outputAsset: '0xoutput',
+        originAmount: '100',
+        amountOutMin: '90',
+        destinations: [1338],
+        origin: 1337,
+        nonce: '5',
+        data: '0x',
+        ttl: '1000',
+        initiator: '0xinitiator',
+        fills: [
+          {
+            chainId: 1338,
+            fillAmount: '80',
+            transactionHash: '0xfill',
+            timestamp: '1700000100',
+            blockNumber: '124',
+            nonce: '6',
+            solver: '0xsolver',
+          },
+        ],
+      };
+
+      const result = envioToDestinationIntent(entity, '1338');
+      expect(result).to.not.be.undefined;
+      expect(result!.id).to.equal('0xintent');
+      expect(result!.destination).to.equal('1338');
+      expect(result!.amountOut).to.equal('80');
+      expect(result!.transactionHash).to.equal('0xfill');
     });
   });
 });
