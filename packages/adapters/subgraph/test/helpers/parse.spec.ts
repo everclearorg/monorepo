@@ -3,6 +3,7 @@ import {
   HubIntent,
   HyperlaneStatus,
   OriginIntent,
+  ProtocolUpdateLog,
   TIntentStatus,
   TMessageType,
   Token,
@@ -19,6 +20,7 @@ import {
   settlementMessage,
   token,
   hubIntentFromSettleEnqueued,
+  protocolUpdateLog,
   StringToNumber,
 } from '../../src/lib/helpers/parse';
 import {
@@ -31,7 +33,12 @@ import {
   createSpokeFillIntentEventEntity,
   createTokenEntity,
 } from '../mock';
-import { SettlementMessageType, FeesEntity, OrderEntity } from '../../src/lib/operations/entities';
+import {
+  MetaUpdateEntity,
+  SettlementMessageType,
+  FeesEntity,
+  OrderEntity,
+} from '../../src/lib/operations/entities';
 
 describe('Subgraph Adapter - parse', () => {
   const domain = '1337';
@@ -407,6 +414,82 @@ describe('Subgraph Adapter - parse', () => {
     it('should work', async () => {
       const parsed = asset(tokenId, entity);
       expect(parsed).to.be.deep.eq(expected);
+    });
+  });
+
+  describe('#protocolUpdateLog', () => {
+    it('should parse GATEWAY_UPDATED with valueBytes to address', () => {
+      const entity: MetaUpdateEntity = {
+        id: '0xlog1',
+        kind: 'GATEWAY_UPDATED',
+        key: 'gateway',
+        valueBytes: '0x0000000000000000000000001234567890123456789012345678901234567890',
+        transactionHash: '0xabc',
+        timestamp: '1000',
+        blockNumber: '200',
+        txOrigin: '0xorigin',
+        txNonce: '5',
+      };
+
+      const result = protocolUpdateLog(domain, entity);
+
+      const expected: ProtocolUpdateLog = {
+        id: entity.id,
+        domain,
+        chainId: domain,
+        event: 'GATEWAY_UPDATED',
+        key: 'gateway',
+        updated: '0x1234567890123456789012345678901234567890',
+        transactionHash: entity.transactionHash,
+        timestamp: 1000,
+        blockNumber: 200,
+        txOrigin: entity.txOrigin,
+        txNonce: 5,
+      };
+      expect(result).to.deep.equal(expected);
+    });
+
+    it('should parse PAUSED with updated "True"', () => {
+      const entity: MetaUpdateEntity = {
+        id: '0xlog2',
+        kind: 'PAUSED',
+        key: 'paused',
+        valueBigInt: '1',
+        transactionHash: '0xdef',
+        timestamp: '2000',
+        blockNumber: '300',
+        txOrigin: '0xorigin2',
+        txNonce: '6',
+      };
+
+      const result = protocolUpdateLog(domain, entity);
+
+      expect(result.event).to.equal('PAUSED');
+      expect(result.key).to.equal('paused');
+      expect(result.updated).to.equal('True');
+      expect(result.timestamp).to.equal(2000);
+      expect(result.blockNumber).to.equal(300);
+      expect(result.txNonce).to.equal(6);
+    });
+
+    it('should use valueBigInt for chainId on HUB_CHAIN_GATEWAY_ADDED', () => {
+      const entity: MetaUpdateEntity = {
+        id: '0xlog3',
+        kind: 'HUB_CHAIN_GATEWAY_ADDED',
+        key: 'chainGateway',
+        valueBytes: '0xgateway',
+        valueBigInt: '1338',
+        transactionHash: '0xghi',
+        timestamp: '3000',
+        blockNumber: '400',
+        txOrigin: '0xorigin3',
+        txNonce: '7',
+      };
+
+      const result = protocolUpdateLog(domain, entity);
+
+      expect(result.chainId).to.equal('1338');
+      expect(result.event).to.equal('HUB_CHAIN_GATEWAY_ADDED');
     });
   });
 });
