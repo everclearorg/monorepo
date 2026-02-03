@@ -363,7 +363,7 @@ export const protocolUpdateLog = (domain: string, entity: MetaUpdateEntity): Pro
     domain,
     event: entity.kind,
     key: entity.key,
-    chainId: domain,
+    chainId,
     updated,
     transactionHash: entity.transactionHash,
     timestamp: StringToNumber(entity.timestamp),
