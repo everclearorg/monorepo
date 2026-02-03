@@ -1,10 +1,17 @@
 import { SinonStub, stub } from 'sinon';
 
-import { updateMessages, updateMessageStatus, updateQueues } from '../../../src/lib/operations';
 import {
-  HubMetaUpdate,
+  updateMessages,
+  updateMessageStatus,
+  updateQueues,
+  updateProtocolUpdateLogs,
+  updateHubSpokeMeta,
+} from '../../../src/lib/operations';
+import {
+  HubMeta,
   Message,
-  SpokeMetaUpdate,
+  ProtocolUpdateLog,
+  SpokeMeta,
   TIntentStatus,
   TMessageType,
   TSettlementMessageType,
@@ -123,25 +130,26 @@ describe('Monitor operations', () => {
 
   describe('#updateProtocolUpdateLogs', () => {
     it('saves hub and spoke meta updates', async () => {
-      const spokeUpdate: SpokeMetaUpdate = {
+      const spokeUpdate: ProtocolUpdateLog = {
         id: 'spoke-log-1',
         domain: '1337',
-        kind: 'GATEWAY_UPDATED',
+        chainId: '1337',
+        event: 'GATEWAY_UPDATED',
         key: 'gateway',
-        valueBytes: '0x1234',
-        valueBigInt: '0',
+        updated: '0x1234',
         transactionHash: '0xabc',
         timestamp: 1,
         blockNumber: 100,
         txOrigin: '0x1',
         txNonce: 1,
       };
-      const hubUpdate: HubMetaUpdate = {
+      const hubUpdate: ProtocolUpdateLog = {
         id: 'hub-log-1',
         domain: mockAppContext.config.hub.domain,
-        kind: 'PAUSED',
+        chainId: mockAppContext.config.hub.domain,
+        event: 'PAUSED',
         key: 'paused',
-        valueBigInt: '1',
+        updated: '1',
         transactionHash: '0xdef',
         timestamp: 2,
         blockNumber: 200,
@@ -158,37 +166,8 @@ describe('Monitor operations', () => {
       const saveProtocolLogs = mockAppContext.adapters.database.saveProtocolUpdateLogs as SinonStub;
       expect(saveProtocolLogs.callCount).to.equal(2);
 
-      expect(saveProtocolLogs.getCall(0).args[0]).to.deep.equal([
-        {
-          id: spokeUpdate.id,
-          domain: spokeUpdate.domain,
-          chain_id: spokeUpdate.domain,
-          event: spokeUpdate.kind,
-          key: spokeUpdate.key,
-          updated: spokeUpdate.valueBytes,
-          transaction_hash: spokeUpdate.transactionHash,
-          timestamp: spokeUpdate.timestamp,
-          block_number: spokeUpdate.blockNumber,
-          tx_origin: spokeUpdate.txOrigin,
-          tx_nonce: spokeUpdate.txNonce,
-        },
-      ]);
-
-      expect(saveProtocolLogs.getCall(1).args[0]).to.deep.equal([
-        {
-          id: hubUpdate.id,
-          domain: hubUpdate.domain,
-          chain_id: hubUpdate.domain,
-          event: hubUpdate.kind,
-          key: hubUpdate.key,
-          updated: hubUpdate.valueBigInt,
-          transaction_hash: hubUpdate.transactionHash,
-          timestamp: hubUpdate.timestamp,
-          block_number: hubUpdate.blockNumber,
-          tx_origin: hubUpdate.txOrigin,
-          tx_nonce: hubUpdate.txNonce,
-        },
-      ]);
+      expect(saveProtocolLogs.getCall(0).args[0]).to.deep.equal([spokeUpdate]);
+      expect(saveProtocolLogs.getCall(1).args[0]).to.deep.equal([hubUpdate]);
 
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).calledWith(
         'spoke_meta_log_block_1337',
@@ -198,6 +177,155 @@ describe('Monitor operations', () => {
         'hub_meta_log_block',
         hubUpdate.blockNumber,
       );
+    });
+
+    it('does not call saveProtocolUpdateLogs when no domains have updates', async () => {
+      const getSpokeMetaUpdates = mockAppContext.adapters.subgraph.getSpokeMetaUpdates as SinonStub;
+      getSpokeMetaUpdates.resolves([]);
+      (mockAppContext.adapters.subgraph.getHubMetaUpdates as SinonStub).resolves([]);
+
+      await updateProtocolUpdateLogs();
+
+      expect(mockAppContext.adapters.database.saveProtocolUpdateLogs as SinonStub).to.not.have.been.called;
+    });
+
+    it('updates checkpoint to max block when multiple updates in one domain', async () => {
+      const updates: ProtocolUpdateLog[] = [
+        {
+          id: 'log-1',
+          domain: '1337',
+          chainId: '1337',
+          event: 'GATEWAY_UPDATED',
+          key: 'gateway',
+          updated: '0xa',
+          transactionHash: '0x1',
+          timestamp: 1,
+          blockNumber: 100,
+          txOrigin: '0x1',
+          txNonce: 1,
+        },
+        {
+          id: 'log-2',
+          domain: '1337',
+          chainId: '1337',
+          event: 'PAUSED',
+          key: 'paused',
+          updated: '1',
+          transactionHash: '0x2',
+          timestamp: 2,
+          blockNumber: 200,
+          txOrigin: '0x2',
+          txNonce: 2,
+        },
+      ];
+      (mockAppContext.adapters.subgraph.getSpokeMetaUpdates as SinonStub).onCall(0).resolves(updates);
+      (mockAppContext.adapters.subgraph.getSpokeMetaUpdates as SinonStub).onCall(1).resolves([]);
+      (mockAppContext.adapters.subgraph.getHubMetaUpdates as SinonStub).resolves([]);
+
+      await updateProtocolUpdateLogs();
+
+      expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).to.have.been.calledWith(
+        'spoke_meta_log_block_1337',
+        200,
+      );
+    });
+  });
+
+  describe('#updateHubSpokeMeta', () => {
+    it('saves hub meta when present', async () => {
+      const hubMeta: HubMeta = {
+        id: '1339',
+        domain: mockAppContext.config.hub.domain,
+        acceptanceDelay: '1',
+        gateway: '0xgateway',
+        watchtower: '0xwatchtower',
+        manager: '0xmanager',
+        settler: '0xsettler',
+        proposedOwnershipTimestamp: '0',
+        mailbox: '0xmailbox',
+        securityModule: '0xsecurity',
+        minSolverSupportedDomains: '1',
+        expiryTimeBuffer: '0',
+        discountPerEpoch: '0',
+        epochLength: '1',
+        supportedDomains: [],
+        chainGateways: [],
+      };
+      (mockAppContext.adapters.subgraph.getHubMeta as SinonStub).resolves(hubMeta);
+      (mockAppContext.adapters.subgraph.getSpokeMeta as SinonStub).resolves(undefined);
+
+      await updateHubSpokeMeta();
+
+      expect(mockAppContext.adapters.database.saveHubMeta as SinonStub).to.have.been.calledOnceWith([hubMeta]);
+      expect(mockAppContext.adapters.database.saveSpokeMeta as SinonStub).to.not.have.been.called;
+    });
+
+    it('saves spoke meta when present', async () => {
+      const spokeMeta: SpokeMeta = {
+        id: '1337',
+        domain: '1337',
+        messageReceiver: '0xreceiver',
+        watchtower: '0xwatchtower',
+        messageGasLimit: '100000',
+        feeAdapter: '0xfeeAdapter',
+        feeAdapterRecipient: '0xrecipient',
+        fillSigner: '0xfillSigner',
+        feeSigner: '0xfeeSigner',
+        mailbox: '0xmailbox',
+        securityModule: '0xsecurity',
+        moduleForStrategies: [],
+      };
+      (mockAppContext.adapters.subgraph.getHubMeta as SinonStub).resolves(undefined);
+      (mockAppContext.adapters.subgraph.getSpokeMeta as SinonStub)
+        .onFirstCall()
+        .resolves(spokeMeta)
+        .onSecondCall()
+        .resolves(undefined);
+
+      await updateHubSpokeMeta();
+
+      expect(mockAppContext.adapters.database.saveHubMeta as SinonStub).to.not.have.been.called;
+      expect(mockAppContext.adapters.database.saveSpokeMeta as SinonStub).to.have.been.calledOnce;
+      expect((mockAppContext.adapters.database.saveSpokeMeta as SinonStub).firstCall.args[0]).to.deep.equal([
+        spokeMeta,
+      ]);
+    });
+
+    it('does not save when no meta found', async () => {
+      (mockAppContext.adapters.subgraph.getHubMeta as SinonStub).resolves(undefined);
+      (mockAppContext.adapters.subgraph.getSpokeMeta as SinonStub).resolves(undefined);
+
+      await updateHubSpokeMeta();
+
+      expect(mockAppContext.adapters.database.saveHubMeta as SinonStub).to.not.have.been.called;
+      expect(mockAppContext.adapters.database.saveSpokeMeta as SinonStub).to.not.have.been.called;
+    });
+
+    it('saves both hub and spoke meta when both present', async () => {
+      const hubMeta: HubMeta = {
+        id: '1339',
+        domain: mockAppContext.config.hub.domain,
+        gateway: '0xgateway',
+      };
+      const spokeMeta: SpokeMeta = {
+        id: '1337',
+        domain: '1337',
+        messageReceiver: '0xreceiver',
+      };
+      (mockAppContext.adapters.subgraph.getHubMeta as SinonStub).resolves(hubMeta);
+      (mockAppContext.adapters.subgraph.getSpokeMeta as SinonStub)
+        .onFirstCall()
+        .resolves(spokeMeta)
+        .onSecondCall()
+        .resolves(undefined);
+
+      await updateHubSpokeMeta();
+
+      expect(mockAppContext.adapters.database.saveHubMeta as SinonStub).to.have.been.calledOnceWith([hubMeta]);
+      expect(mockAppContext.adapters.database.saveSpokeMeta as SinonStub).to.have.been.calledOnce;
+      expect((mockAppContext.adapters.database.saveSpokeMeta as SinonStub).firstCall.args[0]).to.deep.equal([
+        spokeMeta,
+      ]);
     });
   });
 });
