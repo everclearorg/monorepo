@@ -207,7 +207,7 @@ mod tests {
         let intent_id = compute_intent_hash(&intent);
         assert_eq!(
             hex::encode(intent_id),
-            "d6db7d3cefc524dc4717361e8b77c7cdca1f700971ae36c61823c17a38a7472a"
+            "06d8cd5d1101a0e06b545682c72713e215c38c9c69bc7c6be323df989a28ac58"
         );
 
         // NOTE: this is a made-up solana intent
@@ -231,7 +231,7 @@ mod tests {
         let intent_id = compute_intent_hash(&solana_intent);
         assert_eq!(
             hex::encode(intent_id),
-            "8200900c8aa6b771a0cc3a6936d9313bfb9721f2506d4e6b884813c7f50db86e"
+            "7f26f041eb42cacfbc832ec0efea50f037366f1086b1726fe4edbae49fb72b21"
         );
     }
     #[test]

@@ -96,7 +96,8 @@ impl EVMEncode for EVMIntent {
     fn encode(&self) -> Vec<u8> {
         let mut out = Vec::new();
 
-        out.extend_from_slice(&u256_to_32bytes(32u64 as u128));
+        // No leading offset here: when used inside [&T;1].encode(), the array layout is
+        // [array_offset][length][elem0...]; the single element is directly struct head + tail.
 
         let mut head = Vec::new();
 
@@ -148,7 +149,7 @@ impl EVMEncode for EVMIntent {
         // word11: offset to data
         head.extend_from_slice(&u256_to_32bytes(data_offset as u128));
 
-        // Finally, we put the entire head (384 bytes) after the initial 32 bytes for array offset:
+        // Finally, we put the entire head (384 bytes) then the tail.
         out.extend_from_slice(&head);
 
         // Then we append the tail:
@@ -235,7 +236,7 @@ impl EVMEncode for FillMessage {
     fn encode(&self) -> Vec<u8> {
         let mut out = Vec::new();
 
-        out.extend_from_slice(&u256_to_32bytes(32u64 as u128));
+        // No leading offset: when used inside [&T;1].encode(), the single element is directly struct head + tail.
 
         let mut head = Vec::new();
 
@@ -271,7 +272,7 @@ impl EVMEncode for FillMessage {
         // word6: executionTimestamp (uint48 => we store in 32 bytes, last 6 bytes used)
         head.extend_from_slice(&u256_to_32bytes(self.execution_timestamp as u128));
 
-        // Finally, we put the entire head (224 bytes) after the initial 32 bytes for array length:
+        // Finally, we put the entire head (224 bytes) then the tail.
         out.extend_from_slice(&head);
 
         // Then we append the tail:
@@ -289,14 +290,11 @@ where
     /// to avoid complexity in interleaving tails and offsets.
     fn encode(&self) -> Vec<u8> {
         //
-        // The layout for abi.encode(EVMIntent[]) with length=1 is:
+        // The layout for abi.encode(T[]) with length=1 is:
         //
-        // OFFSET 0:   32 bytes = "head" of the array which is offset to the array length (=32)
+        // OFFSET 0:   32 bytes = offset to array contents (=32)
         // OFFSET 32:  32 bytes = length of the array => 1
-        // OFFSET 64:  32 bytes = "head" of the first (and single) element in the array
-        //             which is offset to the first element of the array (=32)
-        // OFFSET 96:  "head" of struct #0, which is 12 * 32 = 384 bytes
-        // OFFSET 480: "tail" data for dynamic fields (destinations, data), appended sequentially
+        // OFFSET 64:  first element encoding = struct head + tail (no extra offset word)
         //
         // Inside that "head" (struct #0):
         //   word0: initiator (bytes32)
