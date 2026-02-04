@@ -531,6 +531,52 @@ describe('Subgraph Adapter - parse', () => {
       expect(result.updated).to.equal('12345');
       expect(result.event).to.equal('MESSAGE_GAS_LIMIT_UPDATED');
     });
+
+    it('should parse SPOKE_GATEWAY_MAILBOX_UPDATED using bytes32 address', () => {
+      const entity: MetaUpdateEntity = {
+        id: '0xlog6',
+        kind: 'SPOKE_GATEWAY_MAILBOX_UPDATED',
+        key: 'mailbox',
+        valueBytes: '0x0000000000000000000000001111111111111111111111111111111111111111',
+        transactionHash: '0xmailbox',
+        timestamp: '6000',
+        blockNumber: '700',
+        txOrigin: '0xorigin6',
+        txNonce: '10',
+      };
+
+      const result = protocolUpdateLog(domain, entity);
+
+      expect(result.event).to.equal('SPOKE_GATEWAY_MAILBOX_UPDATED');
+      expect(result.key).to.equal('mailbox');
+      expect(result.updated).to.equal('0x1111111111111111111111111111111111111111');
+      expect(result.timestamp).to.equal(6000);
+      expect(result.blockNumber).to.equal(700);
+      expect(result.txNonce).to.equal(10);
+    });
+
+    it('should parse SPOKE_GATEWAY_SECURITY_MODULE_UPDATED using bytes32 address', () => {
+      const entity: MetaUpdateEntity = {
+        id: '0xlog7',
+        kind: 'SPOKE_GATEWAY_SECURITY_MODULE_UPDATED',
+        key: 'securityModule',
+        valueBytes: '0x0000000000000000000000002222222222222222222222222222222222222222',
+        transactionHash: '0xsecurity',
+        timestamp: '7000',
+        blockNumber: '800',
+        txOrigin: '0xorigin7',
+        txNonce: '11',
+      };
+
+      const result = protocolUpdateLog(domain, entity);
+
+      expect(result.event).to.equal('SPOKE_GATEWAY_SECURITY_MODULE_UPDATED');
+      expect(result.key).to.equal('securityModule');
+      expect(result.updated).to.equal('0x2222222222222222222222222222222222222222');
+      expect(result.timestamp).to.equal(7000);
+      expect(result.blockNumber).to.equal(800);
+      expect(result.txNonce).to.equal(11);
+    });
   });
 
   describe('#envioToOriginIntent', () => {

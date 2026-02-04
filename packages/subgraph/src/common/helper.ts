@@ -24,3 +24,23 @@ export function Bytes32ToAddress(bytes32: Bytes): Address {
   }
   return Address.fromBytes(addressBytes);
 }
+
+/**
+ * Safely gets gasPrice from a transaction, handling EIP-1559 transactions where gasPrice may be null.
+ * For EIP-1559 transactions where gasPrice is null, uses BigInt.zero() as fallback.
+ * Note: In practice, The Graph's indexer should provide gasPrice for all transactions,
+ * but this handles edge cases where it might be null.
+ *
+ * @param transaction - The transaction object
+ * @returns The gas price as BigInt (never null)
+ */
+export function getGasPrice(transaction: ethereum.Transaction): BigInt {
+  // For legacy transactions, gasPrice is always set
+  // For EIP-1559 transactions, gasPrice may be null, so we provide a fallback
+  // AssemblyScript requires explicit handling of nullable types - use changetype after null check
+  const gasPriceValue = transaction.gasPrice;
+  if (gasPriceValue === null) {
+    return BigInt.zero();
+  }
+  return changetype<BigInt>(gasPriceValue);
+}
