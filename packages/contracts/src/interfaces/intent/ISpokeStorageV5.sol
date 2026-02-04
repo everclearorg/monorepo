@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {IPermit2} from 'interfaces/common/IPermit2.sol';
 
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
@@ -12,13 +12,13 @@ import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
  * @title ISpokeStorageV5
  * @notice Interface for the SpokeStorage contract
  */
-interface ISpokeStorageV5 is IEverclearV2 {
+interface ISpokeStorageV5 is IEverclear {
   /*///////////////////////////////////////////////////////////////
                               STRUCTS
   //////////////////////////////////////////////////////////////*/
 
   /**
-   * @notice Parameters needed to initiliaze `EverclearSpoke`
+   * @notice Parameters needed to initialize `EverclearSpoke`
    * @param gateway The local `SpokeGateway`
    * @param callExecutor The local `CallExecutor`
    * @param messageReceiver The address for the `SpokeMessageReceiver` module
@@ -91,14 +91,14 @@ interface ISpokeStorageV5 is IEverclearV2 {
    * @param _asset The address of the asset being configured
    * @param _strategy The id for the strategy (see `enum Strategy`)
    */
-  event StrategySetForAsset(address _asset, IEverclearV2.Strategy _strategy);
+  event StrategySetForAsset(address _asset, IEverclear.Strategy _strategy);
 
   /**
    * @notice emitted when the module is set for a strategy
    * @param _strategy The id for the strategy (see `enum Strategy`)
    * @param _module The settlement module
    */
-  event ModuleSetForStrategy(IEverclearV2.Strategy _strategy, ISettlementModule _module);
+  event ModuleSetForStrategy(IEverclear.Strategy _strategy, ISettlementModule _module);
 
   /**
    * @notice emitted when the EverclearSpoke processes a settlement
@@ -118,7 +118,7 @@ interface ISpokeStorageV5 is IEverclearV2 {
   event AssetTransferFailed(address indexed _asset, address indexed _recipient, uint256 _amount);
 
   /**
-   * @notice emitted when `_handleSettlement` fails to mint the non-default stategy asset
+   * @notice emitted when `_handleSettlement` fails to mint the non-default strategy asset
    * @param _asset The address of the asset
    * @param _recipient The address of the recipient
    * @param _amount The amount of the asset
@@ -204,20 +204,6 @@ interface ISpokeStorageV5 is IEverclearV2 {
    * @return _typeHash The `processFillQueueViaRelayer` type hash
    */
   function PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH() external view returns (bytes32 _typeHash);
-
-  /**
-   * @notice returns the typehash for `fillIntentSolver
-   * @dev used to verify the destinations array is valid with off-chain API
-   * @return _typeHash The `fillIntentSolver` type hash
-   */
-  function FILL_INTENT_TYPEHASH() external view returns (bytes32 _typeHash);
-
-  /**
-   * @notice returns the typehash for `batchFillIntentSolver
-   * @dev used to verify the destinations array is valid with off-chain API
-   * @return _typeHash The `batchFillIntentSolver` type hash
-   */
-  function BATCH_FILL_INTENT_TYPEHASH() external view returns (bytes32 _typeHash);
 
   /**
    * @notice returns the permit2 contract
@@ -318,7 +304,7 @@ interface ISpokeStorageV5 is IEverclearV2 {
    */
   function strategies(
     address _asset
-  ) external view returns (IEverclearV2.Strategy _strategy);
+  ) external view returns (IEverclear.Strategy _strategy);
 
   /**
    * @notice returns the module address for a strategy
@@ -326,6 +312,6 @@ interface ISpokeStorageV5 is IEverclearV2 {
    * @return _module The strategy module
    */
   function modules(
-    IEverclearV2.Strategy _strategy
+    IEverclear.Strategy _strategy
   ) external view returns (ISettlementModule _module);
 }

@@ -116,7 +116,7 @@ contract USDT is AddAssetBase, MainnetStagingEnvironment {
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: true,
+      initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
       maxDiscountDbps: 0,
       discountPerEpoch: 0,
