@@ -342,6 +342,8 @@ export const mockSubgraph = () =>
     getDepositQueues: Promise.resolve(mockHubQueues),
     getSpokeMessages: Promise.resolve(mockSpokeMessages),
     getHubMessages: Promise.resolve(mockHubMessages),
+    getHubMeta: Promise.resolve(undefined),
+    getSpokeMeta: Promise.resolve(undefined),
     getOriginIntentsByNonce: Promise.resolve(mockOriginIntents),
     getDestinationIntentsByNonce: Promise.resolve(mockDestinationIntents),
     getHubIntentsByNonce: Promise.resolve(mockHubIntents),

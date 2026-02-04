@@ -25,6 +25,9 @@ import {
   NewLockPositionEvent,
   LockPosition,
   Order,
+  ProtocolUpdateLog,
+  HubMeta,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 import { Pool } from 'pg';
 import { TxnClientForRepeatableRead } from 'zapatos/db';
@@ -85,6 +88,9 @@ import {
   getDeliveredSettlements,
   updateSettlementStatus,
   updateSolanaMessageStatuses,
+  saveProtocolUpdateLogs,
+  saveHubMeta,
+  saveSpokeMeta,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
@@ -126,6 +132,9 @@ export type Database = {
     hubUpdates: (IntentMessageUpdate & { settlementDomain: string })[],
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
+  saveProtocolUpdateLogs: (protocolLogs: ProtocolUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveHubMeta: (meta: HubMeta[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveSpokeMeta: (meta: SpokeMeta[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveQueues: (queues: Queue[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveAssets: (assets: Asset[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveTokens: (tokens: Token[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
@@ -288,6 +297,9 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     saveDepositors,
     saveBalances,
     saveMessages,
+    saveProtocolUpdateLogs,
+    saveHubMeta,
+    saveSpokeMeta,
     saveQueues,
     saveCheckPoint,
     saveAssets,
