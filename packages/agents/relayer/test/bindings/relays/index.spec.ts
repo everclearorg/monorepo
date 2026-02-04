@@ -38,6 +38,7 @@ describe('Relayer:Relays', () => {
       provider = {
         getGasPrice: stub().resolves(gasPrice),
         getTransactionCount: stub().resolves(1),
+        setSigner: stub().resolves(),
       };
 
       // wallet.address = '0x1234';

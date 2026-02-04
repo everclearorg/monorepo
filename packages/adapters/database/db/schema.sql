@@ -2382,6 +2382,12 @@ CREATE MATERIALIZED VIEW public.intents AS
     hub_settlement_enqueued_timestamp,
     hub_settlement_epoch,
     hub_update_virtual_balance,
+    intent_queue_processed_tx_hash,
+    intent_queue_processed_timestamp,
+    fill_queue_processed_tx_hash,
+    fill_queue_processed_timestamp,
+    settlement_queue_processed_tx_hash,
+    settlement_queue_processed_timestamp,
     status,
     has_calldata,
     hub_auto_id
@@ -2469,13 +2475,22 @@ CREATE MATERIALIZED VIEW public.intents AS
             hub_intents.settlement_enqueued_timestamp AS hub_settlement_enqueued_timestamp,
             hub_intents.settlement_epoch AS hub_settlement_epoch,
             hub_intents.update_virtual_balance AS hub_update_virtual_balance,
+            intent_msg.transaction_hash AS intent_queue_processed_tx_hash,
+            intent_msg."timestamp" AS intent_queue_processed_timestamp,
+            fill_msg.transaction_hash AS fill_queue_processed_tx_hash,
+            fill_msg."timestamp" AS fill_queue_processed_timestamp,
+            settlement_msg.transaction_hash AS settlement_queue_processed_tx_hash,
+            settlement_msg."timestamp" AS settlement_queue_processed_timestamp,
             public.genstatus(origin_intents.status, hub_intents.status, settlement_intents.status, public.hascalldata(origin_intents.data)) AS status,
             public.hascalldata(origin_intents.data) AS has_calldata,
             hub_intents.auto_id AS hub_auto_id
-           FROM (((public.origin_intents
+           FROM ((((((public.origin_intents
              LEFT JOIN public.destination_intents ON ((origin_intents.id = destination_intents.id)))
              LEFT JOIN public.settlement_intents ON ((origin_intents.id = settlement_intents.id)))
-             LEFT JOIN public.hub_intents ON ((origin_intents.id = hub_intents.id)))) t
+             LEFT JOIN public.hub_intents ON ((origin_intents.id = hub_intents.id)))
+             LEFT JOIN public.messages intent_msg ON (((origin_intents.message_id = (intent_msg.id)::bpchar) AND (intent_msg.type = 'INTENT'::public.message_type))))
+             LEFT JOIN public.messages fill_msg ON (((destination_intents.message_id = (fill_msg.id)::bpchar) AND (fill_msg.type = 'FILL'::public.message_type))))
+             LEFT JOIN public.messages settlement_msg ON (((hub_intents.message_id = (settlement_msg.id)::bpchar) AND (settlement_msg.type = 'SETTLEMENT'::public.message_type))))) t
   WITH NO DATA;
 
 
@@ -5570,4 +5585,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251202161540'),
     ('20251202165553'),
     ('20251205153936'),
-    ('20251211224120');
+    ('20251211224120'),
+    ('20260112150248');

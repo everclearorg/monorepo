@@ -64,9 +64,9 @@ export class Web3Signer implements ISigner {
       {
         to: transaction.to || undefined,
         nonce: transaction.nonce ? Number(BigInt(transaction.nonce)) : undefined,
-        gasLimit: BigInt(transaction.gasLimit) || undefined,
+        gas: transaction.gasLimit ? BigInt(transaction.gasLimit) : undefined,
         data: transaction.data || undefined,
-        value: BigInt(transaction.value) || undefined,
+        value: transaction.value ? BigInt(transaction.value) : undefined,
         chainId: transaction.chainId || undefined,
       },
       // If an EIP-1559 transaction, use the EIP-1559 specific fields.
@@ -85,8 +85,9 @@ export class Web3Signer implements ISigner {
     const identifier = await this.api.getPublicKey();
     const digestBytes = chainWrapper.serializeTransaction(baseTx as any);
 
-    const signature = await this.api.sign(identifier, digestBytes);
-    return chainWrapper.serializeTransaction(baseTx as any, signature as any);
+    const signatureHex = await this.api.sign(identifier, digestBytes);
+    const signature = chainWrapper.parseSignature(signatureHex as Hex);
+    return chainWrapper.serializeTransaction(baseTx as any, signature);
   }
 
   public async sendTransaction(transaction: ITransactionRequest): Promise<ITransactionResponse> {

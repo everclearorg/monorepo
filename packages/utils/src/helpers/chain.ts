@@ -37,6 +37,7 @@ export const chainWrapper = {
   stringToBytes: (...args: Parameters<typeof viem.stringToBytes>) => viem.stringToBytes(...args),
   serializeTransaction: (...args: Parameters<typeof viem.serializeTransaction>) => viem.serializeTransaction(...args),
   parseTransaction: (...args: Parameters<typeof viem.parseTransaction>) => viem.parseTransaction(...args),
+  parseSignature: (...args: Parameters<typeof viem.parseSignature>) => viem.parseSignature(...args),
   createWalletClient: (...args: Parameters<typeof viem.createWalletClient>) => viem.createWalletClient(...args),
   createPublicClient: (...args: Parameters<typeof viem.createPublicClient>) => viem.createPublicClient(...args),
   http: viem.http,
