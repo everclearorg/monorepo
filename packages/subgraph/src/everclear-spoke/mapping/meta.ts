@@ -16,8 +16,12 @@ import {
   FeeRecipientUpdated as FeeRecipientUpdatedEvent,
   FeeSignerUpdated as FeeSignerUpdatedEvent,
 } from '../../../generated/FeeAdapter/FeeAdapter';
+import {
+  MailboxUpdated as SpokeGatewayMailboxUpdated,
+  SecurityModuleUpdated as SpokeGatewaySecurityModuleUpdated,
+} from '../../../generated/SpokeGateway/SpokeGateway';
 import { Meta, ModuleForStrategy, SpokeMetaUpdate, StrategyForAsset } from '../../../generated/schema';
-import { BigIntToBytes, generateIdFromTx, generateTxNonce, getChainId } from '../../common';
+import { BigIntToBytes, generateIdFromTx, generateTxNonce, getChainId, getGasPrice } from '../../common';
 
 const SPOKE_META_ID = 'SPOKE_META_ID';
 
@@ -44,6 +48,8 @@ function logSpokeMetaUpdate(
   log.valueBigInt = valueBigInt;
   log.transactionHash = event.transaction.hash;
   log.timestamp = event.block.timestamp;
+  log.gasPrice = getGasPrice(event.transaction);
+  log.gasLimit = event.transaction.gasLimit;
   log.blockNumber = event.block.number;
   log.txOrigin = event.transaction.from;
   log.txNonce = generateTxNonce(event);
@@ -260,4 +266,36 @@ export function handleFeeSignerUpdated(event: FeeSignerUpdatedEvent): void {
   meta.save();
 
   logSpokeMetaUpdate('FEE_SIGNER_UPDATED', event, 'feeSigner', event.params._updated, null);
+}
+
+/**
+ * Creates subgraph records when SpokeGateway MailboxUpdated events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
+ */
+export function handleSpokeGatewayMailboxUpdated(event: SpokeGatewayMailboxUpdated): void {
+  const meta = getOrCreateMeta();
+  meta.mailbox = event.params._newMailbox;
+  meta.save();
+
+  logSpokeMetaUpdate('SPOKE_GATEWAY_MAILBOX_UPDATED', event, 'mailbox', event.params._newMailbox, null);
+}
+
+/**
+ * Creates subgraph records when SpokeGateway SecurityModuleUpdated events are emitted.
+ *
+ * @param event - The contract event used to create the subgraph record
+ */
+export function handleSpokeGatewaySecurityModuleUpdated(event: SpokeGatewaySecurityModuleUpdated): void {
+  const meta = getOrCreateMeta();
+  meta.securityModule = event.params._newSecurityModule;
+  meta.save();
+
+  logSpokeMetaUpdate(
+    'SPOKE_GATEWAY_SECURITY_MODULE_UPDATED',
+    event,
+    'securityModule',
+    event.params._newSecurityModule,
+    null,
+  );
 }
