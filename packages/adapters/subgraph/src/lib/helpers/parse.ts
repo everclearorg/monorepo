@@ -348,6 +348,8 @@ export const protocolUpdateLog = (domain: string, entity: MetaUpdateEntity): Pro
     case "WATCHTOWER_UPDATED":
     case "FILL_SIGNER_UPDATED":
     case "FEE_SIGNER_UPDATED":
+    case "SPOKE_GATEWAY_MAILBOX_UPDATED":
+    case "SPOKE_GATEWAY_SECURITY_MODULE_UPDATED":
       updated = entity.valueBytes ? bytes32ToAddress(entity.valueBytes) : "";
       break;
     case "STRATEGY_SET_FOR_ASSET":
