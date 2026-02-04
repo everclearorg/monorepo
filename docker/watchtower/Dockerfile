@@ -1,20 +1,23 @@
-FROM node:18-alpine as node
+FROM node:18-slim AS node
 
 # ----------------------------------------
 # Builds Docker container for watchtower package.
 
 # ----------------------------------------
 
-FROM node as build
-RUN apk update
-RUN apk add git
-# Install Python and other dependencies
-RUN apk add --update python3 py3-pip make gcc g++ python3-dev
-# Install Forge CLI
-RUN npm install -g node-gyp @arcblock/forge-cli
+FROM node AS build
+RUN apt-get update && apt-get install -y \
+    git curl bash \
+    python3 python3-pip make gcc g++ python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+# Install node-gyp (needed for native dependencies)
+RUN npm install -g node-gyp
+# Install Foundry (needed for Solidity contract builds)
+RUN curl -L https://foundry.paradigm.xyz | bash && \
+    /root/.foundry/bin/foundryup
 
 ENV HOME=/tmp/build \
-    PATH=/tmp/build/node_modules/.bin:./node_modules/.bin:${PATH}
+    PATH=/root/.foundry/bin:/tmp/build/node_modules/.bin:./node_modules/.bin:${PATH}
 
 WORKDIR /tmp/build
 
@@ -59,12 +62,12 @@ RUN yarn build
 # Copy files to the deployment image.
 # ----------------------------------------
 
-FROM node as runtime
+FROM node AS runtime
 
 ENV NODE_ENV=production 
 
 ARG COMMIT_HASH
-ENV COMMIT_HASH ${COMMIT_HASH:-unknown}
+ENV COMMIT_HASH=${COMMIT_HASH:-unknown}
 
 # ----- Copy files required at runtime by the app -----
 COPY --from=build --chown=node:node /tmp/build /home/node

@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/nodejs:18 as node
+FROM public.ecr.aws/lambda/nodejs:18 AS node
 
 # ----------------------------------------
 # Builds Docker container for cartographer services.
@@ -6,17 +6,18 @@ FROM public.ecr.aws/lambda/nodejs:18 as node
 
 # ----------------------------------------
 
-FROM node as build
+FROM node AS build
 RUN yum update -y 
-RUN yum install -y git curl
+RUN yum install -y git curl bash tar
 
 RUN curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 && \
         chmod +x /usr/local/bin/dbmate
 
 # Install Python and other dependencies
 RUN yum install -y python3 python3-pip make gcc gcc-c++ python3-devel
-# Install Forge CLI
-RUN npm install -g node-gyp @arcblock/forge-cli
+# Install node-gyp (needed for native dependencies)
+RUN npm install -g node-gyp
+# Note: Foundry not installed - contracts package excluded from Lambda builds due to GLIBC compatibility
 RUN npm install --global yarn@1.22.5 
 
 ENV HOME=/tmp/build \
@@ -55,19 +56,24 @@ COPY .eslintignore /tmp/build/
 COPY .eslintrc.js /tmp/build/
 
 # ----- Lint, test and build -----
-RUN yarn build
+# Build contracts TypeScript only (skip Solidity build - Foundry requires newer GLIBC than Lambda provides)
+# Temporarily override contracts build script to skip Solidity, then build all packages
+RUN cd packages/contracts && \
+    npm pkg set scripts.build="tsc --build ./tsconfig.build.json" && \
+    cd /tmp/build && \
+    yarn build
 
 # ----------------------------------------
 # Copy files to the deployment image.
 # ----------------------------------------
 
 
-FROM node as runtime
+FROM node AS runtime
 
 ENV NODE_ENV=production
 
 ARG COMMIT_HASH
-ENV COMMIT_HASH ${COMMIT_HASH:-unknown}
+ENV COMMIT_HASH=${COMMIT_HASH:-unknown}
 
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=build /tmp/build ${LAMBDA_TASK_ROOT}
