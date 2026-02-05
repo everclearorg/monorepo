@@ -1,4 +1,4 @@
-import { BigNumber, utils } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { mock, mkAddress } from '@chimera-monorepo/utils';
 import { stub } from 'sinon';
 import { OnchainTransaction, ReadTransaction, WriteTransaction } from '../src/shared';
@@ -6,7 +6,7 @@ import { OnchainTransaction, ReadTransaction, WriteTransaction } from '../src/sh
 export const TEST_SENDER_CHAIN_ID = 1337;
 export const TEST_SENDER_DOMAIN = 1337;
 export const TRON_DOMAIN = 728126428;
-export const DEFAULT_GAS_LIMIT = BigNumber.from('21004');
+export const DEFAULT_GAS_LIMIT = BigInt('21004');
 
 export const TEST_REQUEST_CONTEXT = mock.log.requestContext();
 export const TEST_ERROR = new Error('test');
@@ -28,7 +28,7 @@ export const {
   receipt: TEST_TX_RECEIPT,
 } = mock.ethers.transactions({
   ...TEST_TX,
-  value: BigNumber.from(TEST_TX.value),
+  value: BigInt(TEST_TX.value),
   chainId: TEST_SENDER_CHAIN_ID,
   gasLimit: DEFAULT_GAS_LIMIT,
 });
@@ -52,7 +52,7 @@ export const getMockOnchainTransaction = (
     nonce,
     {
       limit: '24007',
-      price: utils.parseUnits('5', 'gwei').toString(),
+      price: chainWrapper.parseGwei('5').toString(),
     },
     {
       confirmationTimeout: 1,
@@ -81,8 +81,8 @@ export const getMockOnchainTransaction = (
 export const makeChaiReadable = (obj: any) => {
   const result = {};
   Object.keys(obj).forEach((key) => {
-    if (BigNumber.isBigNumber(obj[key])) {
-      result[key] = BigNumber.from(obj[key]).toString();
+    if (typeof obj[key] === 'bigint') {
+      result[key] = obj[key].toString();
     } else {
       result[key] = obj[key];
     }

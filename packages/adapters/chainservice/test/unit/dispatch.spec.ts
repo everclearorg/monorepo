@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber, utils } from 'ethers';
 import { reset, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
-import { mkBytes32, Logger, mkAddress, mock, expect } from '@chimera-monorepo/utils';
+import { mkBytes32, Logger, mock, expect, chainWrapper, delay } from '@chimera-monorepo/utils';
 
 import { TransactionDispatch } from '../../src/dispatch';
 import { RpcProviderAggregator } from '../../src/aggregator';
@@ -18,6 +17,7 @@ import {
   ChainConfig,
   DEFAULT_CHAIN_CONFIG,
   EthWallet,
+  InitialSubmitFailure,
 } from '../../src';
 import {
   makeChaiReadable,
@@ -29,14 +29,12 @@ import {
   TEST_TX_RECEIPT,
   TEST_TX_RESPONSE,
   getMockOnchainTransaction,
-  TEST_SENDER_CHAIN_ID,
 } from '../utils';
 
 const logger = new Logger({
   level: process.env.LOG_LEVEL ?? 'silent',
   name: 'DispatchTest',
 });
-const ADDRESS = mkAddress('0xaaa');
 const OG_MAX_INFLIGHT_TRANSACTIONS = (TransactionDispatch as any).MAX_INFLIGHT_TRANSACTIONS;
 const txReceiptMock = mock.ethers.receipt();
 
@@ -61,17 +59,19 @@ const stubAllDispatchMethods = (): void => {
     const nonce = TEST_TX_RESPONSE.nonce;
     return { nonce, backfill: false, transactionCount: nonce };
   });
-  sendTransactionStub = stub(txDispatch as any, 'sendTransaction').returns(TEST_TX_RESPONSE);
-  getTransactionStub = stub(txDispatch as any, 'getTransaction').resolves([TEST_TX_RESPONSE]);
-  getTransactionCountStub = stub(txDispatch as any, 'getTransactionCount').resolves(TEST_TX_RESPONSE.nonce);
-  getGasPriceStub = stub(txDispatch as any, 'getGasPrice').resolves(TEST_FULL_TX.gasPrice);
-  estimateGasStub = stub(txDispatch as any, 'estimateGas').resolves(TEST_FULL_TX.gasLimit);
   submitStub = stub(txDispatch as any, 'submit').resolves();
   mineStub = stub(txDispatch as any, 'mine').resolves();
   confirmStub = stub(txDispatch as any, 'confirm').resolves();
   bumpStub = stub(txDispatch as any, 'bump').resolves();
   failStub = stub(txDispatch as any, 'fail').resolves();
-  confirmTransactionStub = stub(txDispatch, 'confirmTransaction').resolves(txReceiptMock);
+
+  const rpcProvider = (txDispatch as any).rpcProvider;
+  sendTransactionStub = stub(rpcProvider, 'sendTransaction').resolves(TEST_TX_RESPONSE);
+  getTransactionStub = stub(rpcProvider, 'getTransaction').resolves([TEST_TX_RESPONSE]);
+  getTransactionCountStub = stub(rpcProvider, 'getTransactionCount').resolves(TEST_TX_RESPONSE.nonce);
+  getGasPriceStub = stub(rpcProvider, 'getGasPrice').resolves(TEST_FULL_TX.gasPrice);
+  estimateGasStub = stub(rpcProvider, 'estimateGas').resolves(TEST_FULL_TX.gasLimit);
+  confirmTransactionStub = stub(rpcProvider, 'confirmTransaction').resolves(txReceiptMock);
 };
 
 let mockTransactionState: MockOnchainTransactionState;
@@ -88,7 +88,6 @@ describe('TransactionDispatch', () => {
     const wallet = EthWallet.createRandom();
     signer = stub(EthWallet.prototype);
     signer.sendTransaction.resolves(TEST_TX_RESPONSE);
-    signer.getTransactionCount.resolves(TEST_TX_RESPONSE.nonce);
     signer.connect.returns(signer);
     (signer as any)._signingKey = () => wallet.privateKey;
     (signer as any).address = wallet.address;
@@ -105,11 +104,11 @@ describe('TransactionDispatch', () => {
       confirmationTimeout: 10_000,
     };
 
-    stub(RpcProviderAggregator.prototype as any, 'syncProviders').resolves();
     stub(RpcProviderAggregator.prototype as any, 'setBlockPeriod').resolves();
+    const rpcProvider = new RpcProviderAggregator(logger, TEST_SENDER_DOMAIN, chainConfig);
 
     // NOTE: This will start dispatch with NO loops running. We will start the loops manually in unit tests below.
-    txDispatch = new TransactionDispatch(logger, TEST_SENDER_DOMAIN, chainConfig, signer.privateKey, false);
+    txDispatch = new TransactionDispatch(logger, TEST_SENDER_DOMAIN, chainConfig, rpcProvider, false);
 
     // This will stub all dispatch methods. Methods below should be restored manually as needed.
     stubAllDispatchMethods();
@@ -132,7 +131,7 @@ describe('TransactionDispatch', () => {
         TEST_TX_RESPONSE.nonce,
         {
           limit: '24007',
-          price: utils.parseUnits('5', 'gwei').toString(),
+          price: chainWrapper.parseGwei('5').toString(),
         },
         {
           confirmationTimeout: 1,
@@ -344,8 +343,6 @@ describe('TransactionDispatch', () => {
     beforeEach(() => {
       (txDispatch as any).nonce = 0;
       (txDispatch as any).lastReceivedTxCount = -1;
-      getTransactionCountStub = stub().resolves(TEST_TX_RESPONSE.nonce);
-      (txDispatch as any).getTransactionCount = getTransactionCountStub;
       attemptedNonces = [];
       // Restore related method.
       determineNonceStub.restore();
@@ -577,9 +574,76 @@ describe('TransactionDispatch', () => {
       await expect(txDispatch.send(TEST_TX, context)).to.be.rejectedWith('fail');
     });
 
-    it.skip('should eventually hit a maximum retry on initial submit', async () => {});
+    it('should eventually hit a maximum retry on initial submit', async () => {
+      // Make submit keep failing with BadNonce errors until we exceed max iterations
+      const badNonceError = new BadNonce(BadNonce.reasons.NonceExpired);
+      const maxIterations = TransactionDispatch.MAX_INFLIGHT_TRANSACTIONS + 2;
+      
+      // Make submit fail for all iterations (need enough for the loop)
+      for (let i = 0; i < maxIterations + 10; i++) {
+        submitStub.onCall(i).rejects(badNonceError);
+      }
 
-    it.skip('should wait until transaction is mined/confirmed', async () => {});
+      // Make determineNonce return different nonces each time to simulate retries
+      let callCount = 0;
+      determineNonceStub.callsFake((attemptedNonces: number[]) => {
+        const nonce = callCount;
+        attemptedNonces.push(nonce);
+        callCount++;
+        return { nonce, backfill: false, transactionCount: nonce };
+      });
+
+      // Should throw InitialSubmitFailure after max iterations
+      await expect(txDispatch.send(TEST_TX, context)).to.be.rejectedWith(InitialSubmitFailure);
+      
+      // Verify we attempted at least the maximum number of iterations
+      // Note: determineNonce is called once before the loop, then once per loop iteration with BadNonce
+      // So total determineNonce calls = 1 (before loop) + maxIterations (in loop) = maxIterations + 1,
+      // submit is called once per loop iteration = maxIterations
+      expect(submitStub.callCount).to.be.at.least(maxIterations);
+      expect(determineNonceStub.callCount).to.be.at.least(maxIterations + 1);
+    });
+
+    it('should wait until transaction is mined/confirmed', async () => {
+      // Set up the transaction state to initially not be finished
+      mockTransactionState.didSubmit = true;
+      mockTransactionState.didFinish = false;
+      
+      let transactionRef: OnchainTransaction | undefined;
+      
+      submitStub.callsFake(async (transaction: OnchainTransaction) => {
+        transactionRef = transaction;
+        stub(transaction, 'didSubmit').get(() => mockTransactionState.didSubmit);
+        // Stub didFinish to return the current state, which we'll update later
+        stub(transaction, 'didFinish').get(() => mockTransactionState.didFinish);
+        transaction.responses = [TEST_TX_RESPONSE];
+        // Set the receipt with insufficient confirmations initially
+        transaction.receipt = { ...TEST_TX_RECEIPT, confirmations: 0 };
+      });
+
+      // Start the send operation (it will wait for didFinish to become true)
+      const sendPromise = txDispatch.send(TEST_TX, context);
+
+      // Wait a bit to ensure the waiting loop has started
+      await delay(100);
+
+      // Verify transaction is submitted but not finished yet
+      expect(transactionRef).to.exist;
+      expect(transactionRef!.didSubmit).to.be.true;
+      expect(transactionRef!.didFinish).to.be.false;
+
+      // Simulate the mine/confirm loops completing by updating the state
+      mockTransactionState.didFinish = true;
+      // Update receipt to have sufficient confirmations
+      if (transactionRef) {
+        transactionRef.receipt = { ...TEST_TX_RECEIPT, confirmations: (transactionRef as any).config.confirmationsRequired };
+      }
+      
+      // Now the send should complete
+      const receipt = await sendPromise;
+      expect(makeChaiReadable(receipt)).to.deep.eq(makeChaiReadable(TEST_TX_RECEIPT));
+      expect(submitStub.callCount).to.eq(1);
+    });
 
     it('should throw if the transaction has an error after mine or confirm', async () => {
       submitStub.callsFake(async (transaction: OnchainTransaction) => {
@@ -769,7 +833,7 @@ describe('TransactionDispatch', () => {
 
     it("shouldn't bump if we've reached maximum gas price", async () => {
       const max = (txDispatch as any).config.gasPriceMaximum;
-      transaction.gas.price = BigNumber.from(max).toString();
+      transaction.gas.price = BigInt(max).toString();
       // Valid state: we've sent off 2 transactions and bumped once.
       (transaction as any).responses = [TEST_TX_RESPONSE, TEST_TX_RESPONSE];
       transaction.bumps = 1;
@@ -790,7 +854,7 @@ describe('TransactionDispatch', () => {
       // (there should be a second hash present in the transaction if the "resubmit" was successful).
       (transaction as any).responses = [TEST_TX_RESPONSE];
       transaction.bumps = 1;
-      const testCurrentGasPrice = BigNumber.from(1234567).toString();
+      const testCurrentGasPrice = BigInt(1234567).toString();
       transaction.gas.price = testCurrentGasPrice;
       // Should return without bumping.
       await txDispatch.bump(transaction);
@@ -800,17 +864,17 @@ describe('TransactionDispatch', () => {
     });
 
     it('happy: should bump updated price', async () => {
-      const initial = BigNumber.from(10);
-      (transaction as any).gas.price = BigNumber.from(5).toString();
-      getGasPriceStub.resolves(initial);
+      const initial = BigInt(10);
+      (transaction as any).gas.price = BigInt(5).toString();
+      getGasPriceStub.resolves(initial.toString());
       await txDispatch.bump(transaction);
       expect(+transaction.gas.price!).to.be.eq(13);
     });
 
     it('happy: should bump previous price if previous price > updated price', async () => {
-      const initial = BigNumber.from(10);
-      (transaction as any).gas.price = initial;
-      getGasPriceStub.resolves(BigNumber.from(5)).toString();
+      const initial = BigInt(10);
+      (transaction as any).gas.price = initial.toString();
+      getGasPriceStub.resolves(BigInt(5).toString());
       await txDispatch.bump(transaction);
       expect(+transaction.gas.price!).to.be.eq(13);
     });

@@ -35,25 +35,40 @@ abstract contract DefaultValues {
 abstract contract MainnetAssets {
   ///////////////////// WETH -- Not whitelisted
   address public constant ZIRCUIT_WETH = 0x4200000000000000000000000000000000000006;
-  address public constant ETHEREUM_WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
   ///////////////////// WETH -- Whitelisted ✅
   address public constant ARBITRUM_WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
   address public constant OPTIMISM_WETH = 0x4200000000000000000000000000000000000006;
-  address public constant BLAST_WETH = 0x4300000000000000000000000000000000000004;
+  address public constant ETHEREUM_WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+  address public constant MANTLE_WETH = 0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111;
+  address public constant BASE_WETH = 0x4200000000000000000000000000000000000006;
+  bytes32 public constant SOLANA_WETH = 0x66e5188a1308a1db90b6d31f3fbdca8c3df2678c8112dfdd3d192c5a3cc457a8;
 
-  ///////////////////// USDT -- Not whitelisted
+  ///////////////////// USDT -- Whitelisted ✅
   // NOTE: USDT is not supported on Base
   address public constant ARBITRUM_USDT = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9;
   address public constant OPTIMISM_USDT = 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58;
+  address public constant TAC_USDT = 0xAF988C3f7CB2AceAbB15f96b19388a259b6C438f;
+  address public constant TRON_USDT = 0xa614f803B6FD780986A42c78Ec9c7f77e6DeD13C;
+  address public constant ETHEREUM_USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+  address public constant BASE_USDT = 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2;
+  bytes32 public constant SOLANA_USDT = 0xce010e60afedb22717bd63192f54145a3f965a33bb82d2c7029eb2ce1e208264;
+  address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
 
-  ///////////////////// USDC -- Not whitelisted
+  ///////////////////// USDC --Whitelisted ✅
   address public constant ARBITRUM_USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831; // NOT USDC.e
   address public constant OPTIMISM_USDC = 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85; // NOT USDC.e
+  address public constant BASE_USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+  address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+  bytes32 public constant SOLANA_USDC = 0xc6fa7af3bedbad3a3d65f36aabc97431b1bbe4c2d2f6e0e47ca60203452f5d61;
+  address public constant MANTLE_USDC = 0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9;
 
   ///////////////////// xTEST (xERC20) -- Whitelisted ✅
   address public constant ARBITRUM_XTEST = 0xCDFAb2b2fA913385056E713D104c1b268e4898A5;
   address public constant ZIRCUIT_XTEST = 0xad560465f00fCcf3F10Ad3474cb8440A143b16Df;
+
+  //////////////////// PTSUSDE
+  bytes32 public constant SOLANA_PTSUSDE = 0x05c0ad344d082fe99030a0414acc5726b24c89e1a511eac6e58d809145dd6503;
 }
 
 abstract contract Everclear {
@@ -81,7 +96,7 @@ abstract contract Ethereum {
   ICallExecutor public ETHEREUM_EXECUTOR = ICallExecutor(0xcA48aCE7387574a6120392722eB6f2018C60eF3B);
   address public ETHEREUM_SPOKE_IMPL = 0x24a26B463a59EBB88FDe49363C6c8f44351E8524;
   address public ETHEREUM_XERC20_MODULE = 0xDEe6fD45a585fa890BA12262AFc2312adE23e41e;
-
+  address public constant ETHEREUM_ENG_MULTISIG = 0xa02a88F0bbD47045001Bd460Ad186C30F9a974d6;
   address public constant ETHEREUM_FEE_ADAPTER = 0x7621D1085559Ab35513E2a41EC948a8524F619D9;
 }
 
@@ -90,11 +105,12 @@ abstract contract ArbitrumOne {
   IMailbox public ARBITRUM_ONE_MAILBOX = IMailbox(0x979Ca5202784112f4738403dBec5D0F3B9daabB9); // https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/cfb890dc6bf66c62e7d3176cc01197f334ba96cf/rust/config/mainnet_config.json#L98
 
   IEverclearSpoke public ARBITRUM_ONE_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
-  ISpokeGateway public ARBITRUM_ONE_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
+  ISpokeGateway public ARBITRUM_ONE_SPOKE_GATEWAY = ISpokeGateway(0x47916bE64DdA1ad8fCd4aa0395193257655ADd81);
   ICallExecutor public ARBITRUM_ONE_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
   IXERC20Module public ARBITRUM_ONE_XERC20_MODULE = IXERC20Module(0x315bCf956e887378836f6E57bC735F0cf7022352);
-  address public ARBITRUM_SPOKE_IMPL = 0x172A786fA844A3fa0aEE2031D7955F82f7a8a984;
+  address public ARBITRUM_SPOKE_IMPL = 0xD0D219d4BF62F299d825D24ff389445681f280A8;
   address public constant ARBITRUM_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant ARBITRUM_FEE_ADAPTER = 0x77C40c70D152dc3BCB473C16677A58b0b905511E;
 }
 
 abstract contract Optimism {
@@ -102,7 +118,7 @@ abstract contract Optimism {
   IMailbox public OPTIMISM_MAILBOX = IMailbox(0xd4C1905BB1D26BC93DAC913e13CaCC278CdCC80D); // https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/cfb890dc6bf66c62e7d3176cc01197f334ba96cf/rust/config/mainnet_config.json#L1383C19-L1383C61
 
   IEverclearSpoke public OPTIMISM_SPOKE = IEverclearSpoke(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
-  ISpokeGateway public OPTIMISM_SPOKE_GATEWAY = ISpokeGateway(0xe051C7AdB6F24Ee8c9d94DD23106C51D94858d12);
+  ISpokeGateway public OPTIMISM_SPOKE_GATEWAY = ISpokeGateway(0x1D93B833baa7907bf385dAda4cf64dd8e04939BB);
   ICallExecutor public OPTIMISM_EXECUTOR = ICallExecutor(0x81fFF6085F4A77a2e1E6fd31d0F5b972fE869226);
   IXERC20Module public OPTIMISM_XERC20_MODULE = IXERC20Module(0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541);
   address public OPTIMISM_SPOKE_IMPL = 0x3404e2F93ebE912a0C2b8315f7eD1c6eC5686873;
@@ -144,7 +160,63 @@ abstract contract Base {
   address public BASE_FEE_ADAPTER = 0x4F35c530D3C023717E2BBafdfEacEeE79C4c1e89;
 }
 
-abstract contract MainnetStagingDomains is Everclear, ArbitrumOne, Optimism, Zircuit, Blast, Ethereum, Base {}
+abstract contract Tac {
+  uint32 public constant TAC = 239;
+  IMailbox public TAC_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public TAC_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public TAC_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public TAC_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public TAC_XERC20_MODULE = IXERC20Module(0x91c40B4135eFea3c5A200388CfE316aa0B172b30);
+  address public TAC_SPOKE_IMPL = 0xc192b47fD86C52d987FFf2579B64c28037Bf7567;
+
+  // Fee adapter constants
+  address public constant TAC_ENG_MULTISIG = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
+  address public constant TAC_FEE_ADAPTER = 0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe;
+}
+
+abstract contract Tron {
+  uint32 public constant TRON = 728_126_428;
+  IEverclearSpoke public TRON_SPOKE = IEverclearSpoke(0xD84173290E0E486B12B973F704CdDEF6E46A308E);
+  ISpokeGateway public TRON_SPOKE_GATEWAY = ISpokeGateway(0x1F7c443b1793e2223541ee90814FE2a1F8b8778f);
+  IXERC20Module public TRON_XERC20_MODULE = IXERC20Module(0xD84173290E0E486B12B973F704CdDEF6E46A308E);
+}
+
+abstract contract Mantle {
+  uint32 public constant MANTLE = 5000;
+  IMailbox public MANTLE_MAILBOX = IMailbox(0x398633D19f4371e1DB5a8EFE90468eB70B1176AA);
+
+  IEverclearSpoke public MANTLE_SPOKE = IEverclearSpoke(0xe0F010e465f15dcD42098dF9b99F1038c11B3056);
+  ISpokeGateway public MANTLE_SPOKE_GATEWAY = ISpokeGateway(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  ICallExecutor public MANTLE_EXECUTOR = ICallExecutor(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
+  IXERC20Module public MANTLE_XERC20_MODULE = IXERC20Module(0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa);
+  address public MANTLE_SPOKE_IMPL = 0x0ce707eA5b30CD6907a0c9F5E0DD0b60Bf455f52;
+
+  // Fee adapter constants
+  address public constant MANTLE_ENG_MULTISIG = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
+  address public constant MANTLE_FEE_ADAPTER = 0xd0185bfb8107c5b2336bC73cE3fdd9Bfb504540e;
+}
+
+abstract contract Solana {
+  uint32 public constant SOLANA = 1_399_811_149;
+
+  bytes32 public SOLANA_SPOKE = 0x93958783d0fe999eb6cbf34416e40974ebf1d0a3896f698e13d02447a0919fac;
+  bytes32 public SOLANA_SPOKE_GATEWAY = 0x93958783d0fe999eb6cbf34416e40974ebf1d0a3896f698e13d02447a0919fac;
+}
+
+abstract contract MainnetStagingDomains is
+  Everclear,
+  ArbitrumOne,
+  Optimism,
+  Zircuit,
+  Blast,
+  Ethereum,
+  Base,
+  Tac,
+  Tron,
+  Solana,
+  Mantle
+{}
 
 abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDomains {
   using TypeCasts for address;
@@ -183,6 +255,10 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: TAC, blockGasLimit: 30_000_000, gateway: address(TAC_SPOKE_GATEWAY).toBytes32()})
+    );
   }
 }
 
@@ -192,7 +268,7 @@ abstract contract MainnetStagingEnvironment is
   MainnetAssets,
   MainnetStagingSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE];
+  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE, TAC];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed

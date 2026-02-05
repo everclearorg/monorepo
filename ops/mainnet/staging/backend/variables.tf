@@ -110,6 +110,11 @@ variable "alchemy_key" {
   default   = "neverclear"
 }
 
+variable "ankr_key" {
+  type      = string
+  sensitive = true
+}
+
 variable "helius_key" {
   type      = string
   sensitive = true

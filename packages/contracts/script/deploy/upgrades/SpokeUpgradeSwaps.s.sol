@@ -9,7 +9,7 @@ import {console} from 'forge-std/console.sol';
 
 import {UUPSUpgradeable} from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
 
-import {EverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
+import {EverclearSpokeV6} from 'contracts/intent/EverclearSpokeV6.sol';
 import {FeeAdapterV2} from 'contracts/intent/FeeAdapterV2.sol';
 import {SpokeMessageReceiverV2} from 'contracts/intent/modules/SpokeMessageReceiverV2.sol';
 
@@ -30,7 +30,9 @@ contract DeploySpokeSwapsUpgrade is Script, ScriptUtils {
 
   error EmptyConfig();
   error InvalidConfig();
+  error UpgradeFailed();
 
+  bool public staging = true;
   // TODO: Need to populate this
   address public constant FILL_SIGNER = address(0x123);
 
@@ -51,14 +53,12 @@ contract DeploySpokeSwapsUpgrade is Script, ScriptUtils {
 
     // 1 - SpokeMessageReceiverV2
     address spokeMessageReceiver = address(new SpokeMessageReceiverV2());
-    // 2 - EverclearSpokeV5
-    address handlerV2 = address(new EverclearSpokeV5());
+    // 2 - EverclearSpokeV6
+    address everclearSpokeV6 = address(new EverclearSpokeV6());
     // 3 - FeeAdapterV2
     address feeAdapterV2 = address(
       new FeeAdapterV2(_params.everclearSpoke, _params.owner, _params.fillSigner, _params.xerc20Module, _params.owner)
     );
-    // 4 - Deploying Spoke
-    address everclearSpokeV5 = address(new EverclearSpokeV5());
 
     // asserting expectations for the upgrade
     address oldImplementation = (vm.load(_params.everclearSpoke, IMPLEMENTATION_SLOT)).toAddress();
@@ -66,18 +66,26 @@ contract DeploySpokeSwapsUpgrade is Script, ScriptUtils {
 
     // logging
     console.log('SpokeMessageReceiverV2 deployed at:', spokeMessageReceiver);
-    console.log('EverclearSpokeV5 deployed at:', handlerV2);
     console.log('FeeAdapterV2 deployed at:', feeAdapterV2);
-    console.log('EverclearSpokeV5 deployed at:', everclearSpokeV5);
+    console.log('EverclearSpokeV6 deployed at:', everclearSpokeV6);
 
     // NOTE: The upgrade would call
     bytes memory initializeCalldata = abi.encodeWithSelector(
-      EverclearSpokeV5.initialize.selector, feeAdapterV2, spokeMessageReceiver, _params.fillSigner
+      EverclearSpokeV6.initialize.selector, feeAdapterV2, spokeMessageReceiver, _params.fillSigner
     );
     bytes memory upgradeCalldata =
-      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, everclearSpokeV5, initializeCalldata);
+      abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, everclearSpokeV6, initializeCalldata);
     console.log('---- Upgrade data for multi-sig ----');
     console.logBytes(upgradeCalldata);
+
+    if (staging) {
+      console.log('Staging upgrade calldata (for testing):');
+      // executing the upgrade directly for staging
+      (bool success,) = _params.everclearSpoke.call(upgradeCalldata);
+      if (!success) revert UpgradeFailed();
+      console.log('Upgrade executed successfully on staging');
+    }
+
     console.log('---- End of upgrade data ----');
   }
 }
@@ -109,6 +117,24 @@ contract MainnetStaging is DeploySpokeSwapsUpgrade, MainnetStagingEnvironment {
       fillSigner: address(FILL_SIGNER),
       xerc20Module: address(OPTIMISM_XERC20_MODULE),
       spokeImpl: OPTIMISM_SPOKE_IMPL
+    }); // set domain id as mapping key
+
+    /// Arbitrum - staging config
+    _deploymentParams[ARBITRUM_ONE] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(ARBITRUM_ONE_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(ARBITRUM_ONE_XERC20_MODULE),
+      spokeImpl: ARBITRUM_SPOKE_IMPL
+    }); // set domain id as mapping key
+
+    // Tac - staging config
+    _deploymentParams[TAC] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(TAC_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(TAC_XERC20_MODULE),
+      spokeImpl: TAC_SPOKE_IMPL
     }); // set domain id as mapping key
   }
 }
@@ -149,6 +175,15 @@ contract MainnetProduction is DeploySpokeSwapsUpgrade, MainnetProductionEnvironm
       fillSigner: address(FILL_SIGNER),
       xerc20Module: address(ARBITRUM_ONE_XERC20_MODULE),
       spokeImpl: address(0)
+    }); // set domain id as mapping key
+
+    // Tac
+    _deploymentParams[TAC] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(TAC_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(TAC_XERC20_MODULE),
+      spokeImpl: TAC_SPOKE_IMPL
     }); // set domain id as mapping key
   }
 }

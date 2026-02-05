@@ -1,6 +1,6 @@
 import { getRandomBytes32, expect, canonizeId, evmId } from '../../src';
 
-import { utils } from 'ethers';
+import { toHex, fromHex } from '@chimera-monorepo/utils';
 
 describe('Helpers:Hex', () => {
   const address = '0x0100546f2cd4c9d97f798ffc9755e47865ff7ee6';
@@ -8,7 +8,7 @@ describe('Helpers:Hex', () => {
   describe('#getRandomBytes32', () => {
     it('happy case: should generate random bytes32 string', () => {
       const random = getRandomBytes32();
-      expect(utils.hexDataLength(random)).to.be.eq(32);
+      expect(random).to.match(/^0x[a-fA-F0-9]{64}$/);
     });
   });
 
@@ -26,7 +26,7 @@ describe('Helpers:Hex', () => {
     });
 
     it('should work', () => {
-      expect(canonizeId(utils.hexlify(address))).to.be.eq(bytes32);
+      expect(canonizeId(address)).to.be.eq(bytes32);
     });
   });
 

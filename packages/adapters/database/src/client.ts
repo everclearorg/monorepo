@@ -24,8 +24,6 @@ import {
   Order,
 } from '@chimera-monorepo/utils';
 
-import { BigNumber } from 'ethers';
-
 import * as pg from 'pg';
 import { Pool } from 'pg';
 import * as db from 'zapatos/db';
@@ -265,7 +263,7 @@ export const getCheckPoint = async (
   const poolToUse = _pool ?? pool;
 
   const result = await db.selectOne('checkpoints', { check_name }).run(poolToUse);
-  return BigNumber.from(result?.check_point ?? 0).toNumber();
+  return Number(BigInt(result?.check_point ?? 0));
 };
 
 export const getMessageQueues = async (
@@ -286,10 +284,12 @@ export const getMessageQueueContents = async <T extends QueueType>(
   const poolToUse = _pool ?? pool;
   let intents: { spoke: string }[] = [];
   if (type === 'FILL') {
+    // Return all intents where message_id is null (the fill queue not yet dispatched)
+    // regardless of status. This includes both regular flow and fast path intents.
     const results = await db
       .select('destination_intents', {
         filled_domain: db.conditions.isIn(domains),
-        status: TIntentStatus.Added,
+        message_id: db.conditions.isNull,
       })
       .run(poolToUse);
     intents = results.map((r) => ({
@@ -779,10 +779,10 @@ export const saveLockPositions = async (
 ) => {
   const poolToUse = _pool ?? pool;
   const toRemove = lockPositions.filter((lockPosition) => {
-    return BigNumber.from(lockPosition.amountLocked).eq(BigNumber.from(0));
+    return BigInt(lockPosition.amountLocked) === BigInt(0);
   });
   const toAdd = lockPositions.filter((lockPosition) => {
-    return BigNumber.from(lockPosition.amountLocked).gt(BigNumber.from(0));
+    return BigInt(lockPosition.amountLocked) > BigInt(0);
   });
   await db.transaction(poolToUse, db.IsolationLevel.Serializable, async (client) => {
     await saveCheckPoint(check, point, client);

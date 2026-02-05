@@ -43,5 +43,59 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-mainnet",
+    "domain": "1",
+    "environment": "staging",
+    "network": "mainnet",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-base",
+    "domain": "8453",
+    "environment": "staging",
+    "network": "base",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-optimism",
+    "domain": "10",
+    "environment": "staging",
+    "network": "optimism",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-arbitrum",
+    "domain": "42161",
+    "environment": "staging",
+    "network": "arbitrum-one",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-tac",
+    "domain": "239",
+    "environment": "staging",
+    "network": "tac",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-mantle",
+    "domain": "5000",
+    "environment": "staging",
+    "network": "mantle",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]

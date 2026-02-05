@@ -1,5 +1,5 @@
-import { QueueType } from '@chimera-monorepo/utils';
-import { hexlify, randomBytes } from 'ethers/lib/utils';
+import { QueueType, chainWrapper } from '@chimera-monorepo/utils';
+import { randomBytes } from 'crypto';
 import { UnknownQueueType } from '../../errors';
 
 const MESSAGE_IDENTIFIER_LENGTH = 1; // length of `MessageType` enum in bytes
@@ -20,5 +20,5 @@ export const getQueueMessageBody = (type: QueueType, size: number) => {
  * @returns Length of message
  */
 const getSettlementQueueMessageBody = (settlements: number) => {
-  return hexlify(randomBytes(MESSAGE_IDENTIFIER_LENGTH + SETTLEMENT_MESSAGE_LENGTH * settlements));
+  return chainWrapper.toHex(randomBytes(MESSAGE_IDENTIFIER_LENGTH + SETTLEMENT_MESSAGE_LENGTH * settlements));
 };

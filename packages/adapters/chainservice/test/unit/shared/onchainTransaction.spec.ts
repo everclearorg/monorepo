@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { chainWrapper } from '@chimera-monorepo/utils';
 import { reset, restore, stub } from 'sinon';
 import { mkBytes32, mkHash, expect } from '@chimera-monorepo/utils';
 import { OnchainTransaction } from '../../../src/shared';
@@ -19,9 +19,9 @@ describe('OnChainTransaction', () => {
       TEST_TX_RESPONSE.nonce,
       {
         limit: '24007',
-        price: utils.parseUnits('5', 'gwei').toString(),
-        maxPriorityFeePerGas: utils.parseUnits('6', 'gwei').toString(),
-        maxFeePerGas: utils.parseUnits('7', 'gwei').toString(),
+        price: chainWrapper.parseGwei('5').toString(),
+        maxPriorityFeePerGas: chainWrapper.parseGwei('6').toString(),
+        maxFeePerGas: chainWrapper.parseGwei('7').toString(),
       },
       {
         confirmationTimeout: 1,

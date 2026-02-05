@@ -124,6 +124,12 @@ locals {
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac/${var.ankr_key}",
+          "https://rpc.tac.build"
+        ]
+      }
       "48900" = {
         providers = [
           "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
@@ -278,6 +284,12 @@ locals {
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac/${var.ankr_key}",
+          "https://rpc.tac.build"
+        ]
+      }
       "48900" = {
         providers = [
           "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
@@ -406,6 +418,12 @@ locals {
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac/${var.ankr_key}",
+          "https://rpc.tac.build"
         ]
       }
       "48900" = {
@@ -600,6 +618,7 @@ locals {
       42161 = { maxAge = 60, size = 1 },
       10 = { maxAge = 60, size = 1 },
       8453 = { maxAge = 60, size = 1 },
+      239 = { maxAge = 60, size = 1 },
       48900 = { maxAge = 60, size = 1 },
       25327 = { maxAge = 60, size = 1 },
       81457 = { maxAge = 60, size = 1 },
@@ -650,6 +669,12 @@ locals {
       "8453" = {
         providers = [
           "https://base-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
+        ]
+      }
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac/${var.ankr_key}",
+          "https://rpc.tac.build"
         ]
       }
       "48900" = {

@@ -86,8 +86,8 @@ describe('SolanaProvider', () => {
         hash: 'sig-123',
         confirmations: 1000,
         nonce: 0,
-        gasPrice: '1',
-        gasLimit: '5000',
+        gasPrice: 1n,
+        gasLimit: 5000n,
       });
     });
   });

@@ -29,14 +29,14 @@ contract USDT is AddAssetBase, MainnetStagingEnvironment {
                               TOKEN FEES
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](1);
-    _fees[0] = IHubStorage.Fee({recipient: OWNER, fee: 100}); // 10 BPS
+    IHubStorage.Fee[] memory _fees = new IHubStorage.Fee[](0);
+    // _fees[0] = IHubStorage.Fee({recipient: OWNER, fee: 100}); // 10 BPS
 
     /*///////////////////////////////////////////////////////////////
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](2);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](8);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -56,16 +56,70 @@ contract USDT is AddAssetBase, MainnetStagingEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    ///// TAC
+    _assetConfigs[2] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: TAC_USDT.toBytes32(),
+      domain: TAC,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    ///// Tron
+    _assetConfigs[3] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: TRON_USDT.toBytes32(),
+      domain: TRON,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    /// Ethereum
+    _assetConfigs[4] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: ETHEREUM_USDT.toBytes32(),
+      domain: ETHEREUM,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    //// Base
+    _assetConfigs[5] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BASE_USDT.toBytes32(),
+      domain: BASE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    //// Solana
+    _assetConfigs[6] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: SOLANA_USDT,
+      domain: SOLANA,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    //// Mantle
+    _assetConfigs[7] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MANTLE_USDT.toBytes32(),
+      domain: MANTLE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
                           TOKEN SETUP
     //////////////////////////////////////////////////////////////*/
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: true,
+      initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
-      maxDiscountDbps: 10_000,
-      discountPerEpoch: 8,
+      maxDiscountDbps: 0,
+      discountPerEpoch: 0,
       fees: _fees,
       adoptedForAssets: _assetConfigs
     });

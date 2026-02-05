@@ -29,13 +29,13 @@ import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/Messa
 
 import {AssetUtils} from 'contracts/common/AssetUtils.sol';
 import {Constants as Common} from 'contracts/common/Constants.sol';
-import {MessageLibV2} from 'contracts/common/MessageLibV2.sol';
-import {QueueLibV2} from 'contracts/common/QueueLibV2.sol';
+import {MessageLib} from 'contracts/common/MessageLib.sol';
+import {QueueLib} from 'contracts/common/QueueLib.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 
 import {Constants} from 'contracts/intent/lib/Constants.sol';
 
-import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
+import {IEverclear} from 'interfaces/common/IEverclear.sol';
 
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
 import {IPermit2} from 'interfaces/common/IPermit2.sol';
@@ -44,11 +44,11 @@ import {IEverclearSpokeV5} from 'interfaces/intent/IEverclearSpokeV5.sol';
 import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
 
 import {SpokeStorageV5} from 'contracts/intent/SpokeStorageV5.sol';
-
 /**
  * @title EverclearSpoke
  * @notice Spoke contract for Everclear
  */
+
 contract EverclearSpokeV5 is
   SpokeStorageV5,
   UUPSUpgradeable,
@@ -57,8 +57,8 @@ contract EverclearSpokeV5 is
   IEverclearSpokeV5,
   IMessageReceiver
 {
-  using QueueLibV2 for QueueLibV2.IntentQueue;
-  using QueueLibV2 for QueueLibV2.FillQueue;
+  using QueueLib for QueueLib.IntentQueue;
+  using QueueLib for QueueLib.FillQueue;
   using SafeERC20 for IERC20;
   using TypeCasts for address;
   using TypeCasts for bytes32;
@@ -86,7 +86,7 @@ contract EverclearSpokeV5 is
   /// @inheritdoc IEverclearSpokeV5
   function setStrategyForAsset(
     address _asset,
-    IEverclearV2.Strategy _strategy
+    IEverclear.Strategy _strategy
   ) external onlyOwner {
     strategies[_asset] = _strategy;
     emit StrategySetForAsset(_asset, _strategy);
@@ -94,7 +94,7 @@ contract EverclearSpokeV5 is
 
   /// @inheritdoc IEverclearSpokeV5
   function setModuleForStrategy(
-    IEverclearV2.Strategy _strategy,
+    IEverclear.Strategy _strategy,
     ISettlementModule _module
   ) external onlyOwner {
     modules[_strategy] = _module;
@@ -130,7 +130,7 @@ contract EverclearSpokeV5 is
     address _inputAsset,
     bytes32 _outputAsset,
     uint256 _amount,
-    uint256 _amountOutMin,
+    uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data
   ) external whenNotPaused onlyFeeAdapter returns (bytes32 _intentId, Intent memory _intent) {
@@ -141,7 +141,7 @@ contract EverclearSpokeV5 is
       _inputAsset: _inputAsset,
       _outputAsset: _outputAsset,
       _amount: _amount,
-      _amountOutMin: _amountOutMin,
+      _maxFee: _maxFee,
       _ttl: _ttl,
       _data: _data,
       _usesPermit2: false
@@ -155,7 +155,7 @@ contract EverclearSpokeV5 is
     address _inputAsset,
     address _outputAsset,
     uint256 _amount,
-    uint256 _amountOutMin,
+    uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data
   ) external whenNotPaused onlyFeeAdapter returns (bytes32 _intentId, Intent memory _intent) {
@@ -166,7 +166,7 @@ contract EverclearSpokeV5 is
       _inputAsset: _inputAsset,
       _outputAsset: _outputAsset.toBytes32(),
       _amount: _amount,
-      _amountOutMin: _amountOutMin,
+      _maxFee: _maxFee,
       _ttl: _ttl,
       _data: _data,
       _usesPermit2: false
@@ -174,76 +174,88 @@ contract EverclearSpokeV5 is
   }
 
   /// @inheritdoc IEverclearSpokeV5
-  function batchFillIntent(
-    Intent[] calldata _intents,
-    uint256[] calldata _amountOut,
-    bytes32[] calldata _receivers,
-    uint32[][] calldata _destinations,
-    bytes calldata _signature,
-    bool _pullFunds
-  ) external whenNotPaused returns (FillMessage[] memory _fillMessages) {
-    if (
-      _intents.length != _amountOut.length || _intents.length != _receivers.length
-        || _intents.length != _destinations.length
-    ) {
-      revert EverclearSpoke_FillIntent_InvalidArrayLengths();
-    }
-
-    bytes memory _data = abi.encode(
-      BATCH_FILL_INTENT_TYPEHASH,
-      keccak256(abi.encode(block.chainid, address(this))),
+  function newIntent(
+    uint32[] memory _destinations,
+    address _receiver,
+    address _inputAsset,
+    address _outputAsset,
+    uint256 _amount,
+    uint24 _maxFee,
+    uint48 _ttl,
+    bytes calldata _data,
+    Permit2Params calldata _permit2Params
+  ) external whenNotPaused onlyFeeAdapter returns (bytes32 _intentId, Intent memory _intent) {
+    if (_destinations.length > 10) revert EverclearSpoke_NewIntent_InvalidIntent();
+    PERMIT2.permitTransferFrom(
+      IPermit2.PermitTransferFrom({
+        permitted: IPermit2.TokenPermissions({token: IERC20(_inputAsset), amount: _amount}),
+        nonce: _permit2Params.nonce,
+        deadline: _permit2Params.deadline
+      }),
+      IPermit2.SignatureTransferDetails({to: address(this), requestedAmount: _amount}),
       msg.sender,
-      _intents,
-      _amountOut,
-      _receivers,
-      _destinations
+      _permit2Params.signature
     );
-    _verifySignature(fillSigner, _data, _signature);
 
-    _fillMessages = new FillMessage[](_intents.length);
-    for (uint256 i; i < _intents.length; i++) {
-      _fillMessages[i] =
-        _fillIntent(_intents[i], msg.sender, _receivers[i], _amountOut[i], _destinations[i], _pullFunds);
-    }
+    (_intentId, _intent) = _newIntent({
+      _destinations: _destinations,
+      _receiver: _receiver.toBytes32(),
+      _inputAsset: _inputAsset,
+      _outputAsset: _outputAsset.toBytes32(),
+      _amount: _amount,
+      _maxFee: _maxFee,
+      _ttl: _ttl,
+      _data: _data,
+      _usesPermit2: true
+    });
   }
 
   /// @inheritdoc IEverclearSpokeV5
   function fillIntent(
     Intent calldata _intent,
-    uint256 _amountOut,
-    bytes32 _receiver,
-    uint32[] memory _destinations,
-    bytes calldata _signature,
-    bool _pullFunds
+    uint24 _fee
   ) external whenNotPaused returns (FillMessage memory _fillMessage) {
-    bytes32 _domain = keccak256(abi.encode(block.chainid, address(this)));
-    bytes memory _data =
-      abi.encode(FILL_INTENT_TYPEHASH, _domain, msg.sender, _intent, _amountOut, _receiver, _destinations);
-    _verifySignature(fillSigner, _data, _signature);
+    _fillMessage = _fillIntent(_intent, msg.sender, _fee);
+  }
 
-    _fillMessage = _fillIntent(_intent, msg.sender, _receiver, _amountOut, _destinations, _pullFunds);
+  /// @inheritdoc IEverclearSpokeV5
+  function fillIntentForSolver(
+    address _solver,
+    Intent calldata _intent,
+    uint256 _nonce,
+    uint24 _fee,
+    bytes calldata _signature
+  ) external whenNotPaused returns (FillMessage memory _fillMessage) {
+    bytes memory _data = abi.encode(FILL_INTENT_FOR_SOLVER_TYPEHASH, _intent, _nonce, _fee);
+    _verifySignature(_solver, _data, _nonce, _signature);
+
+    _fillMessage = _fillIntent(_intent, _solver, _fee);
   }
 
   /// @inheritdoc IEverclearSpokeV5
   function processIntentQueue(
-    Intent[] calldata _intents
+    Intent[] calldata _intents,
+    uint256 _dynamicGasLimit
   ) external payable whenNotPaused {
+    _checkDynamicGasLimit(_dynamicGasLimit);
     (bytes memory _batchIntentmessage, uint256 _firstIdx) = _processIntentQueue(_intents);
 
     (bytes32 _messageId, uint256 _feeSpent) =
-      gateway.sendMessage{value: msg.value}(EVERCLEAR, _batchIntentmessage, messageGasLimit);
+      gateway.sendMessage{value: msg.value}(EVERCLEAR, _batchIntentmessage, _dynamicGasLimit);
 
     emit IntentQueueProcessed(_messageId, _firstIdx, _firstIdx + _intents.length, _feeSpent);
   }
 
   /// @inheritdoc IEverclearSpokeV5
   function processFillQueue(
-    uint32 _amount
+    uint32 _amount,
+    uint256 _dynamicGasLimit
   ) external payable whenNotPaused {
+    _checkDynamicGasLimit(_dynamicGasLimit);
     (bytes memory _batchFillMessage, uint256 _firstIdx) = _processFillQueue(_amount);
 
     (bytes32 _messageId, uint256 _feeSpent) =
-      gateway.sendMessage{value: msg.value}(EVERCLEAR, _batchFillMessage, messageGasLimit);
+      gateway.sendMessage{value: msg.value}(EVERCLEAR, _batchFillMessage, _dynamicGasLimit);
 
     emit FillQueueProcessed(_messageId, _firstIdx, _firstIdx + _amount, _feeSpent);
   }
@@ -255,22 +267,23 @@ contract EverclearSpokeV5 is
     address _relayer,
     uint256 _ttl,
     uint256 _nonce,
-    uint256 _bufferDBPS,
+    uint256 _dynamicGasLimit,
     bytes calldata _signature
   ) external whenNotPaused {
+    _checkDynamicGasLimit(_dynamicGasLimit);
+
     uint32 _amount = uint32(_intents.length);
     bytes memory _data =
-      abi.encode(PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH, _domain, _amount, _relayer, _ttl, _nonce, _bufferDBPS);
+      abi.encode(PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH, _domain, _amount, _relayer, _ttl, _nonce, _dynamicGasLimit);
     _verifySignature(lighthouse, _data, _nonce, _signature);
     _processQueueChecks(_domain, _relayer, _ttl);
 
     (bytes memory _batchIntentmessage, uint256 _firstIdx) = _processIntentQueue(_intents);
 
-    uint256 _fee = gateway.quoteMessage(EVERCLEAR, _batchIntentmessage, messageGasLimit);
+    uint256 _fee = gateway.quoteMessage(EVERCLEAR, _batchIntentmessage, _dynamicGasLimit);
 
-    (bytes32 _messageId, uint256 _feeSpent) = gateway.sendMessage(
-      EVERCLEAR, _batchIntentmessage, _fee + ((_fee * _bufferDBPS) / Common.DBPS_DENOMINATOR), messageGasLimit
-    );
+    (bytes32 _messageId, uint256 _feeSpent) =
+      gateway.sendMessage(EVERCLEAR, _batchIntentmessage, _fee, _dynamicGasLimit);
 
     emit IntentQueueProcessed(_messageId, _firstIdx, _firstIdx + _amount, _feeSpent);
   }
@@ -282,21 +295,21 @@ contract EverclearSpokeV5 is
     address _relayer,
     uint256 _ttl,
     uint256 _nonce,
-    uint256 _bufferDBPS,
+    uint256 _dynamicGasLimit,
     bytes calldata _signature
   ) external whenNotPaused {
+    _checkDynamicGasLimit(_dynamicGasLimit);
+
     bytes memory _data =
-      abi.encode(PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH, _domain, _amount, _relayer, _ttl, _nonce, _bufferDBPS);
+      abi.encode(PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH, _domain, _amount, _relayer, _ttl, _nonce, _dynamicGasLimit);
     _verifySignature(lighthouse, _data, _nonce, _signature);
     _processQueueChecks(_domain, _relayer, _ttl);
 
     (bytes memory _batchFillMessage, uint256 _firstIdx) = _processFillQueue(_amount);
 
-    uint256 _fee = gateway.quoteMessage(EVERCLEAR, _batchFillMessage, messageGasLimit);
+    uint256 _fee = gateway.quoteMessage(EVERCLEAR, _batchFillMessage, _dynamicGasLimit);
 
-    (bytes32 _messageId, uint256 _feeSpent) = gateway.sendMessage(
-      EVERCLEAR, _batchFillMessage, _fee + ((_fee * _bufferDBPS) / Common.DBPS_DENOMINATOR), messageGasLimit
-    );
+    (bytes32 _messageId, uint256 _feeSpent) = gateway.sendMessage(EVERCLEAR, _batchFillMessage, _fee, _dynamicGasLimit);
 
     emit FillQueueProcessed(_messageId, _firstIdx, _firstIdx + _amount, _feeSpent);
   }
@@ -350,15 +363,6 @@ contract EverclearSpokeV5 is
     messageGasLimit = _newGasLimit;
     emit MessageGasLimitUpdated(_oldGasLimit, _newGasLimit);
   }
-  /// @inheritdoc IEverclearSpokeV5
-
-  function updateFillSigner(
-    address _feeSigner
-  ) external onlyOwner {
-    address _oldFillSigner = fillSigner;
-    fillSigner = _feeSigner;
-    emit FillSignerUpdated(_oldFillSigner, _feeSigner);
-  }
 
   /// @inheritdoc IEverclearSpokeV5
   function executeIntentCalldata(
@@ -381,27 +385,6 @@ contract EverclearSpokeV5 is
   //////////////////////////////////////////////////////////////*/
 
   /// @inheritdoc IEverclearSpokeV5
-  function initialize(
-    address _feeAdapter,
-    address _messageReceiver,
-    address _fillSigner
-  ) public reinitializer(4) {
-    if (!_isEmpty(deprecated_intentQueue.first, deprecated_intentQueue.last)) {
-      revert EverclearSpoke_Initialize_IntentQueueNotEmpty();
-    }
-    if (!_isEmpty(deprecated_fillQueue.first, deprecated_fillQueue.last)) {
-      revert EverclearSpoke_Initialize_FillQueueNotEmpty();
-    }
-
-    // Intialize the queues for new storage vars
-    intentQueue.first = 1;
-    fillQueue.first = 1;
-
-    // Updating to feeAdapterV2 and messageReceiverV2
-    feeAdapter = _feeAdapter;
-    messageReceiver = _messageReceiver;
-    fillSigner = _fillSigner;
-  }
 
   /*///////////////////////////////////////////////////////////////
                        INTERNAL FUNCTIONS
@@ -410,11 +393,11 @@ contract EverclearSpokeV5 is
   /**
    * @notice Creates a new intent
    * @param _destinations The destination chains of the intent
-   * @param _receiver The destination address of the intent
+   * @param _receiver The destinantion address of the intent
    * @param _inputAsset The asset address on origin
    * @param _outputAsset The asset address on destination
    * @param _amount The amount of the asset
-   * @param _amountOutMin The minimum amount out expected from the solver
+   * @param _maxFee The maximum fee that can be taken by solvers
    * @param _ttl The time to live of the intent
    * @param _data The data of the intent
    * @param _usesPermit2 If the intent uses permit2
@@ -427,18 +410,22 @@ contract EverclearSpokeV5 is
     address _inputAsset,
     bytes32 _outputAsset,
     uint256 _amount,
-    uint256 _amountOutMin,
+    uint24 _maxFee,
     uint48 _ttl,
     bytes calldata _data,
     bool _usesPermit2
   ) internal returns (bytes32 _intentId, Intent memory _intent) {
     if (_destinations.length == 1) {
       // output asset should not be null if the intent has a single destination and ttl != 0
-      if (_ttl != 0 && _outputAsset == 0) revert EverclearSpoke_NewIntent_OutputAssetNull();
+      if (_ttl != 0 && _outputAsset == 0) revert EverclearSpoke_NewIntent_InvalidIntent();
     } else {
       // output asset should be null if the intent has multiple destinations
       // ttl should be 0 if the intent has multiple destinations
-      if (_ttl != 0 || _outputAsset != 0) revert EverclearSpoke_NewIntent_OutputAssetNotNull();
+      if (_ttl != 0 || _outputAsset != 0) revert EverclearSpoke_NewIntent_InvalidIntent();
+    }
+
+    if (_maxFee > Common.DBPS_DENOMINATOR) {
+      revert EverclearSpoke_NewIntent_MaxFeeExceeded(_maxFee, Common.DBPS_DENOMINATOR);
     }
 
     if (_data.length > Common.MAX_CALLDATA_SIZE) {
@@ -468,12 +455,12 @@ contract EverclearSpokeV5 is
       receiver: _receiver,
       inputAsset: _inputAsset.toBytes32(),
       outputAsset: _outputAsset,
+      maxFee: _maxFee,
       origin: DOMAIN,
       nonce: ++nonce,
       timestamp: uint48(block.timestamp),
       ttl: _ttl,
       amount: _normalizedAmount,
-      amountOutMin: _amountOutMin,
       destinations: _destinations,
       data: _data
     });
@@ -491,51 +478,45 @@ contract EverclearSpokeV5 is
    * @notice Fills an intent
    * @param _intent The intent structure
    * @param _solver The solver address
-   * @param _amountOut The amount out being sent
-   * @param _pull Should pull from wallet or use deposited balance
+   * @param _fee The total fee, expressed in dbps, represents the solver fee plus the sum of protocol fees for the token
    * @return _fillMessage The fill message
    */
   function _fillIntent(
     Intent calldata _intent,
     address _solver,
-    bytes32 _receiver,
-    uint256 _amountOut,
-    uint32[] memory _destinations,
-    bool _pull
+    uint24 _fee
   ) internal validDestination(_intent) returns (FillMessage memory _fillMessage) {
     bytes32 _intentId = keccak256(abi.encode(_intent));
     if (block.timestamp >= _intent.timestamp + _intent.ttl) {
       revert EverclearSpoke_FillIntent_IntentExpired(_intentId);
     }
 
-    if (_amountOut < _intent.amountOutMin) {
-      revert EverclearSpoke_FillIntent_AmountOutInvalid(_amountOut, _intent.amountOutMin);
+    if (_fee > _intent.maxFee) {
+      revert EverclearSpoke_FillIntent_MaxFeeExceeded(_fee, _intent.maxFee);
     }
 
-    if (_destinations.length == 0 || _destinations.length > 10) {
-      revert EverclearSpoke_FillIntent_InvalidDestinationArray();
-    }
-
-    if (status[_intentId] != IntentStatus.NONE && status[_intentId] != IntentStatus.ADDED) {
+    if (status[_intentId] != IntentStatus.NONE) {
       revert EverclearSpoke_FillIntent_InvalidStatus(_intentId);
     }
 
-    if (!_pull) {
-      if (balances[_intent.outputAsset][_solver.toBytes32()] < _amountOut) {
-        revert EverclearSpoke_FillIntent_InsufficientFunds(
-          _amountOut, balances[_intent.outputAsset][_solver.toBytes32()]
-        );
-      }
+    uint256 _amount = AssetUtils.normalizeDecimals(
+      Common.DEFAULT_NORMALIZED_DECIMALS, ERC20(_intent.outputAsset.toAddress()).decimals(), _intent.amount
+    );
 
-      balances[_intent.outputAsset][_solver.toBytes32()] -= _amountOut;
+    uint256 _feeDeduction = _amount * _fee / Common.DBPS_DENOMINATOR;
+    uint256 _finalAmount = _amount - _feeDeduction;
+
+    if (balances[_intent.outputAsset][_solver.toBytes32()] < _finalAmount) {
+      revert EverclearSpoke_FillIntent_InsufficientFunds(
+        _finalAmount, balances[_intent.outputAsset][_solver.toBytes32()]
+      );
     }
 
+    balances[_intent.outputAsset][_solver.toBytes32()] -= _finalAmount;
     status[_intentId] = IntentStatus.FILLED;
 
-    if (_intent.receiver != 0 && _intent.outputAsset != 0 && _amountOut != 0) {
-      _pull
-        ? IERC20(_intent.outputAsset.toAddress()).safeTransferFrom(_solver, _intent.receiver.toAddress(), _amountOut)
-        : _pushTokens(_intent.receiver.toAddress(), _intent.outputAsset.toAddress(), _amountOut);
+    if (_intent.receiver != 0 && _intent.outputAsset != 0 && _amount != 0) {
+      _pushTokens(_intent.receiver.toAddress(), _intent.outputAsset.toAddress(), _finalAmount);
     }
 
     if (keccak256(_intent.data) != Constants.EMPTY_HASH) {
@@ -544,17 +525,15 @@ contract EverclearSpokeV5 is
 
     _fillMessage = FillMessage({
       intentId: _intentId,
-      receiver: _receiver,
-      intentInputAsset: _intent.inputAsset,
-      intentOrigin: _intent.origin,
-      amountOut: _amountOut,
-      destinations: _destinations,
-      executionTimestamp: uint48(block.timestamp)
+      initiator: _intent.initiator,
+      solver: _solver.toBytes32(),
+      executionTimestamp: uint48(block.timestamp),
+      fee: _fee
     });
 
     fillQueue.enqueueFill(_fillMessage);
 
-    emit IntentFilled(_intentId, _solver, _receiver, _amountOut, fillQueue.last, _intent);
+    emit IntentFilled(_intentId, _solver, _fee, fillQueue.last, _intent);
   }
 
   /**
@@ -577,24 +556,6 @@ contract EverclearSpokeV5 is
     }
 
     _useCheckedNonce(_recoveredSigner, _nonce);
-  }
-
-  /**
-   * @notice Verifies a signature
-   * @param _signer The signer of the message
-   * @param _data The data of the message
-   * @param _signature The signature of the message
-   */
-  function _verifySignature(
-    address _signer,
-    bytes memory _data,
-    bytes calldata _signature
-  ) internal {
-    bytes32 _hash = keccak256(_data);
-    address _recoveredSigner = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(_hash), _signature);
-    if (_recoveredSigner != _signer) {
-      revert EverclearSpoke_InvalidFillSignature();
-    }
   }
 
   /**
@@ -621,7 +582,7 @@ contract EverclearSpokeV5 is
       }
     }
 
-    _batchIntentmessage = MessageLibV2.formatIntentMessageBatch(_intents);
+    _batchIntentmessage = MessageLib.formatIntentMessageBatch(_intents);
   }
 
   /**
@@ -644,7 +605,7 @@ contract EverclearSpokeV5 is
       _fillMessages[_i] = fillQueue.dequeueFill();
     }
 
-    _batchFillMessage = MessageLibV2.formatFillMessageBatch(_fillMessages);
+    _batchFillMessage = MessageLib.formatFillMessageBatch(_fillMessages);
   }
 
   /**
@@ -755,10 +716,15 @@ contract EverclearSpokeV5 is
     }
   }
 
-  function _isEmpty(
-    uint256 first,
-    uint256 last
-  ) internal pure returns (bool) {
-    return (last < first) || (first == 0 && last == 0);
+  /**
+   * @notice Checks the dynamic gas limit does not exceed the maxGasLimit (messageGasLimit) when processing queues
+   * @param _dynamicGasLimit The dynamic gas limit to check
+   */
+  function _checkDynamicGasLimit(
+    uint256 _dynamicGasLimit
+  ) internal view {
+    if (_dynamicGasLimit > messageGasLimit) {
+      revert EverclearSpoke_ProcessQueue_ExceedsGasLimit(_dynamicGasLimit);
+    }
   }
 }

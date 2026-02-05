@@ -31,7 +31,7 @@
     "sinon": "17.0.1",
     "ts-mocha": "10.0.0",
     "ts-node": "10.9.2",
-    "typescript": "5.7.2"
+    "typescript": "5.9.2"
   },
   "dependencies": {
     "@chimera-monorepo/utils": "workspace:*",
@@ -42,7 +42,6 @@
     "@solana-program/system": "^0.7.0",
     "@solana/kit": "^2.1.1",
     "ajv": "8.17.1",
-    "ethers": "5.7.2",
     "interval-promise": "1.4.0",
     "p-queue": "6.6.2",
     "tronweb": "^6.0.3"

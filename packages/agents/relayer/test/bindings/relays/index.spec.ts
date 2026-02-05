@@ -1,7 +1,6 @@
 import { ChainService, EthWallet } from '@chimera-monorepo/chainservice';
 import { TasksCache } from '@chimera-monorepo/adapters-cache';
-import { RelayerTaskStatus, delay, expect, mkAddress, mkBytes32, mock } from '@chimera-monorepo/utils';
-import { BigNumber } from 'ethers';
+import { RelayerTaskStatus, delay, expect, mkAddress, mkBytes32, mock, chainWrapper, type PublicClient } from '@chimera-monorepo/utils';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { FastifyInstance } from 'fastify';
 
@@ -10,28 +9,37 @@ import * as Relays from '../../../src/bindings/relays';
 
 import { createTask } from '../../mock';
 import { mockAppContext } from '../../globalTestHook';
-import { JsonRpcProvider } from '@ethersproject/providers';
 
 describe('Relayer:Relays', () => {
   describe('#pollCache', () => {
     let cache: { tasks: SinonStubbedInstance<TasksCache> };
     let wallet: SinonStubbedInstance<EthWallet>;
     let chainservice: SinonStubbedInstance<ChainService>;
-    let provider: SinonStubbedInstance<JsonRpcProvider>;
+    let provider: any;
 
     const task = createTask();
     const id = mkBytes32('0x1234');
-    const gasPrice = BigNumber.from('100000');
+    const gasPrice = BigInt('100000');
     const gasLimit = 3000000;
     const walletAddr = mkAddress('0x121212');
 
-    const receipt = mock.ethers.receipt();
+    const receipt = {
+      transactionHash: mkBytes32('0xdef'),
+      blockNumber: 123,
+      status: 1,
+      confirmations: 1,
+      logs: [],
+    };
 
     beforeEach(() => {
       cache = mockAppContext.adapters.cache as unknown as { tasks: SinonStubbedInstance<TasksCache> };
       wallet = mockAppContext.adapters.wallet as SinonStubbedInstance<EthWallet>;
       chainservice = mockAppContext.adapters.chainservice as SinonStubbedInstance<ChainService>;
-      provider = createStubInstance(JsonRpcProvider);
+      provider = {
+        getGasPrice: stub().resolves(gasPrice),
+        getTransactionCount: stub().resolves(1),
+        setSigner: stub().resolves(),
+      };
 
       // wallet.address = '0x1234';
       wallet.getAddress.resolves(walletAddr);
@@ -40,13 +48,10 @@ describe('Relayer:Relays', () => {
       cache.tasks.getTask.resolves(task);
       cache.tasks.getStatus.resolves(RelayerTaskStatus.ExecPending);
 
-      chainservice.getProvider.returns({ leadProvider: provider } as any);
+      chainservice.getProvider.resolves(provider as any);
       chainservice.sendTx.resolves(receipt);
-      chainservice.getGasPrice.resolves("10");
-      chainservice.getGasEstimate.resolves("100000");
-
-      provider.getGasPrice.resolves(gasPrice);
-      provider.getTransactionCount.resolves(1);
+      chainservice.getGasPrice.resolves('10');
+      chainservice.getGasEstimate.resolves('100000');
     });
 
     it('should handle when no pending tasks retrieved', async () => {
@@ -65,7 +70,7 @@ describe('Relayer:Relays', () => {
     });
 
     it('should skip if bad RPCs', async () => {
-      chainservice.getProvider.returns({ leadProvider: undefined } as any);
+      chainservice.getProvider.resolves(undefined as any);
       await Relays.pollCache();
       expect(chainservice.getProvider.calledOnceWithExactly(task.chain)).to.be.true;
       expect(chainservice.sendTx.callCount).to.equal(0);
@@ -103,16 +108,22 @@ describe('Relayer:Relays', () => {
       const error = new Error('fail');
       chainservice.sendTx.rejects(error);
       await expect(Relays.pollCache()).to.be.fulfilled;
-      chainservice.sendTx.calledOnceWith({
+      expect(chainservice.sendTx.calledOnce).to.be.true;
+      // MIN_GAS_LIMIT is 4,000,000, and since getGasEstimate returns '100000' which is less than MIN_GAS_LIMIT,
+      // it uses MIN_GAS_LIMIT, then bumps by 120%: 4,000,000 * 120 / 100 = 4,800,000
+      const expectedGasLimit = ((BigInt(4_000_000) * BigInt(120)) / BigInt(100)).toString();
+      // getGasPrice returns '10', bumped by 130%: 10 * 130 / 100 = 13
+      const expectedGasPrice = ((BigInt('10') * BigInt(130)) / BigInt(100)).toString();
+      expect(chainservice.sendTx.getCall(0).args[0]).to.deep.include({
         domain: task.chain,
         data: task.data,
         to: task.to,
         from: walletAddr,
         value: task.fee.amount,
-        gasLimit: BigNumber.from(gasLimit).mul(120).div(100).toString(),
-        gasPrice: gasPrice.mul(130).div(100).toString(),
-      }),
-      cache.tasks.setError.calledOnceWithExactly(id, JSON.stringify(error));
+        gasLimit: expectedGasLimit,
+        gasPrice: expectedGasPrice,
+      });
+      expect(cache.tasks.setError.calledOnceWithExactly(id, JSON.stringify(error))).to.be.true;
     });
 
     it('should fail if setting hash fails', async () => {
@@ -125,15 +136,21 @@ describe('Relayer:Relays', () => {
 
     it('should work', async () => {
       await expect(Relays.pollCache()).to.be.fulfilled;
-      chainservice.sendTx.calledOnceWith({
+      expect(chainservice.sendTx.calledOnce).to.be.true;
+      // MIN_GAS_LIMIT is 4,000,000, and since getGasEstimate returns '100000' which is less than MIN_GAS_LIMIT,
+      // it uses MIN_GAS_LIMIT, then bumps by 120%: 4,000,000 * 120 / 100 = 4,800,000
+      const expectedGasLimit = ((BigInt(4_000_000) * BigInt(120)) / BigInt(100)).toString();
+      // getGasPrice returns '10', bumped by 130%: 10 * 130 / 100 = 13
+      const expectedGasPrice = ((BigInt('10') * BigInt(130)) / BigInt(100)).toString();
+      expect(chainservice.sendTx.getCall(0).args[0]).to.deep.include({
         domain: task.chain,
         data: task.data,
         to: task.to,
         from: walletAddr,
         value: task.fee.amount,
-        gasLimit: BigNumber.from(gasLimit).mul(120).div(100).toString(),
-        gasPrice: gasPrice.mul(130).div(100).toString(),
-      }),
+        gasLimit: expectedGasLimit,
+        gasPrice: expectedGasPrice,
+      });
       expect(cache.tasks.setHash.calledOnceWithExactly(id, receipt.transactionHash)).to.be.true;
       expect(cache.tasks.setError.callCount).to.equal(0);
     });

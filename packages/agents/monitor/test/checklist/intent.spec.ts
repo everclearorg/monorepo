@@ -1,9 +1,7 @@
-import { Asset, TIntentStatus, expect, mkBytes32 } from '@chimera-monorepo/utils';
+import { Asset, TIntentStatus, expect, mkBytes32, chainWrapper } from '@chimera-monorepo/utils';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
 import { SinonStub, stub, SinonStubbedInstance } from 'sinon';
-import { Interface } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers';
 
 import * as AssetHelpers from '../../src/helpers/asset';
 import * as IntentHelpers from '../../src/helpers/intent';
@@ -17,14 +15,12 @@ describe('Checklist:intent', () => {
     let subgraph: SinonStubbedInstance<SubgraphReader>;
     let decodeStub: SinonStub;
     let encodeStub: SinonStub;
-    const mockGetFunction = new Interface(['function foo()']).getFunction('foo');
 
     beforeEach(() => {
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
       subgraph = mock.context().adapters.subgraph as SinonStubbedInstance<SubgraphReader>;
-      encodeStub = stub(Interface.prototype, 'encodeFunctionData').returns('0x1234');
-      decodeStub = stub(Interface.prototype, 'decodeFunctionResult').returns(['0x1234']);
-      stub(Interface.prototype, 'getFunction').returns(mockGetFunction);
+      encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0x1234');
+      decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(['0x1234']);
 
       encodeStub.returns('0x1234');
       decodeStub.returns(['0x1234']);
@@ -253,17 +249,17 @@ describe('Checklist:intent', () => {
         tickerHash,
         elapsedEpochs: 0,
         discount: 0,
-        invoiceValue: BigNumber.from(custodied).mul(2).toString(),
+        invoiceValue: (BigInt(custodied) * BigInt(2)).toString(),
         unclaimed: { '1338': { custodied, required: custodied } },
-        settlementValue: BigNumber.from(custodied).mul(2).toString(),
+        settlementValue: (BigInt(custodied) * BigInt(2)).toString(),
       });
     });
 
     it('should work', async () => {
       const res = await checkIntentLiquidity('1337', mkBytes32('0x1234'));
-      const invoiceValue = BigNumber.from(custodied).mul(2);
+      const invoiceValue = BigInt(custodied) * BigInt(2);
       const discount = Math.min(2 * discountPerEpoch, maxDiscountBps);
-      const discounted = invoiceValue.sub(BigNumber.from(invoiceValue).mul(discount).div(100_000));
+      const discounted = invoiceValue - (invoiceValue * BigInt(discount)) / BigInt(100_000);
       expect(res).to.be.deep.eq({
         notice: 'Invoice waiting for settlement.',
         tickerHash,
@@ -272,7 +268,7 @@ describe('Checklist:intent', () => {
         invoiceValue: discounted.toString(),
         settlementValue: '0',
         unclaimed: {
-          '1338': { custodied, required: discounted.lte(custodied) ? '0' : invoiceValue.sub(custodied).toString() },
+          '1338': { custodied, required: discounted <= BigInt(custodied) ? '0' : (invoiceValue - BigInt(custodied)).toString() },
         },
       });
     });

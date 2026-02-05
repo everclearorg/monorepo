@@ -521,6 +521,7 @@ contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, 
   address public constant OPTIMISM_SPOKE_OWNER = 0xf20d5277aD2f301E2F18e2948fF3e72Ad0A6dfF9;
 
   // V1 contracts impl //
+  address public constant ETHEREUM_SPOKE_IMPL_AT_UPGRADE_TIME = 0x8B5401516fBf40621fec17A3b8D15D5E16754107;
   address public constant ARBITRUM_ONE_SPOKE_IMPL_V1 = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
   address public constant OPTIMISM_SPOKE_IMPL_V1 = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
   address public constant ETHEREUM_SPOKE_IMPL_V1 = 0xdC30374790080dA7AFc5b2dFc300029eDE9BfE71;
@@ -549,7 +550,7 @@ contract SpokeArrayUpgradeMainnetStagingSafeInput is MainnetStagingEnvironment, 
     _deploymentParams[ETHEREUM] = DeploymentParams({ // set domain id as mapping key
       owner: ETHEREUM_SPOKE_OWNER,
       spokeProxy: address(ETHEREUM_SPOKE),
-      spokeImpl: ETHEREUM_SPOKE_IMPL
+      spokeImpl: ETHEREUM_SPOKE_IMPL_AT_UPGRADE_TIME
     });
   }
 

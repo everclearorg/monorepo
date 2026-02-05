@@ -32,6 +32,7 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [80094, 80094], // Berachain
   [146, 146], // Sonic
   [57073, 57073], // Ink
+  [239, 239], // TAC
   [1399811149, 1399811149], // Solana
   [728126428, 728126428], // Tron
 ]);
@@ -69,7 +70,7 @@ export const SOLANA_CHAINID = '1399811149';
 export const TRON_CHAINID = '728126428';
 
 // Hex domains calculated using `getHexDomainFromString`
-// alternative: ethers.BigNumber.from(ethers.utils.toUtf8Bytes("some string")).toNumber()
+// alternative: BigInt(viem.stringToHex("some string"))
 export const chainIdToDomainMapping: Map<number, number> = new Map([
   ...MAINNET_CHAINID_TO_DOMAIN_MAPPING.entries(),
   ...TESTNET_CHAINID_TO_DOMAIN_MAPPING.entries(),

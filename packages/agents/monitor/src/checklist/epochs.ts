@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { createLoggingContext, getConfiguredTickerHashes, RequestContext } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { getCurrentEpoch } from '../helpers';
@@ -73,12 +72,12 @@ export const checkElapsedEpochsByTickerHash = async (
     const filteredInvoices = existingInvoices.filter((i) => {
       // as origin might have different decimals, have to resolve the corresponding configs for correctly compare amount to threshold
       const assetConfig = getAssetConfigByTickerHash(tickerHash, i.originIntent.origin);
-      const amount = BigNumber.from(i.originIntent.amount);
-      const amountInUSD = amount.mul(weightedAssetPrice);
+      const amount = BigInt(i.originIntent.amount);
+      const amountInUSD = amount * BigInt(weightedAssetPrice);
       const totalDecimals = (assetConfig.decimals + assetPriceDecimals).toFixed(0);
-      const multiplier = BigNumber.from(10).pow(totalDecimals);
-      const multipliedAmountThreshold = multiplier.mul(Math.round(amountThreshold));
-      return amountInUSD.gte(multipliedAmountThreshold);
+      const multiplier = BigInt(10) ** BigInt(totalDecimals);
+      const multipliedAmountThreshold = multiplier * BigInt(Math.round(amountThreshold));
+      return amountInUSD >= multipliedAmountThreshold;
     });
 
     const averageElapsed =
