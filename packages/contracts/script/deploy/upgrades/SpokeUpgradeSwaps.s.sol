@@ -33,8 +33,7 @@ contract DeploySpokeSwapsUpgrade is Script, ScriptUtils {
   error UpgradeFailed();
 
   bool public staging = true;
-  // TODO: Need to populate this
-  address public constant FILL_SIGNER = address(0x123);
+  address public constant FILL_SIGNER = 0xd148C7f37b346a4bD8e14f8c1f181f5f640481C8;
 
   bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
@@ -135,6 +134,15 @@ contract MainnetStaging is DeploySpokeSwapsUpgrade, MainnetStagingEnvironment {
       fillSigner: address(FILL_SIGNER),
       xerc20Module: address(TAC_XERC20_MODULE),
       spokeImpl: TAC_SPOKE_IMPL
+    }); // set domain id as mapping key
+
+    // Plasma - staging config
+    _deploymentParams[PLASMA] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(PLASMA_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(PLASMA_XERC20_MODULE),
+      spokeImpl: PLASMA_SPOKE_IMPL
     }); // set domain id as mapping key
   }
 }

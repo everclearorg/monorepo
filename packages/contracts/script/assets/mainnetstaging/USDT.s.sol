@@ -36,7 +36,7 @@ contract USDT is AddAssetBase, MainnetStagingEnvironment {
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](8);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](9);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -106,6 +106,15 @@ contract USDT is AddAssetBase, MainnetStagingEnvironment {
       tickerHash: _tickerHash,
       adopted: MANTLE_USDT.toBytes32(),
       domain: MANTLE,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    //// Plasma
+    _assetConfigs[8] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: PLASMA_USDT.toBytes32(),
+      domain: PLASMA,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });

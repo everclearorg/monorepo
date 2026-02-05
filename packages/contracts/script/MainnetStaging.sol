@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {TypeCasts} from 'contracts/common/TypeCasts.sol';
+import { TypeCasts } from 'contracts/common/TypeCasts.sol';
 
-import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
+import { IMailbox } from '@hyperlane/interfaces/IMailbox.sol';
 
-import {IEverclearHub} from 'interfaces/hub/IEverclearHub.sol';
-import {IHubGateway} from 'interfaces/hub/IHubGateway.sol';
-import {ICallExecutor} from 'interfaces/intent/ICallExecutor.sol';
-import {IEverclearSpoke} from 'interfaces/intent/IEverclearSpoke.sol';
-import {ISpokeGateway} from 'interfaces/intent/ISpokeGateway.sol';
-import {IXERC20Module} from 'interfaces/intent/modules/IXERC20Module.sol';
+import { IEverclearHub } from 'interfaces/hub/IEverclearHub.sol';
+import { IHubGateway } from 'interfaces/hub/IHubGateway.sol';
+import { ICallExecutor } from 'interfaces/intent/ICallExecutor.sol';
+import { IEverclearSpoke } from 'interfaces/intent/IEverclearSpoke.sol';
+import { ISpokeGateway } from 'interfaces/intent/ISpokeGateway.sol';
+import { IXERC20Module } from 'interfaces/intent/modules/IXERC20Module.sol';
 
 abstract contract DefaultValues {
   ///////////////////// HUB ARGUMENTS /////////////////////////
@@ -43,6 +43,7 @@ abstract contract MainnetAssets {
   address public constant MANTLE_WETH = 0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111;
   address public constant BASE_WETH = 0x4200000000000000000000000000000000000006;
   bytes32 public constant SOLANA_WETH = 0x66e5188a1308a1db90b6d31f3fbdca8c3df2678c8112dfdd3d192c5a3cc457a8;
+  address public constant PLASMA_WETH = 0x9895D81bB462A195b4922ED7De0e3ACD007c32CB;
 
   ///////////////////// USDT -- Whitelisted ✅
   // NOTE: USDT is not supported on Base
@@ -54,6 +55,7 @@ abstract contract MainnetAssets {
   address public constant BASE_USDT = 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2;
   bytes32 public constant SOLANA_USDT = 0xce010e60afedb22717bd63192f54145a3f965a33bb82d2c7029eb2ce1e208264;
   address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
+  address public constant PLASMA_USDT = 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb;
 
   ///////////////////// USDC --Whitelisted ✅
   address public constant ARBITRUM_USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831; // NOT USDC.e
@@ -83,7 +85,7 @@ abstract contract Everclear {
   address public SETTLER = address(0xcebcc29F32C5f23251Dd218e28485e3a02e83bED);
   address public HANDLER = address(0x4faba0EB79E710C58C568090c08157D34b4367ED);
   address public MESSAGE_RECEIVER = address(0xd66338f1DEc85f7012c4B31F02b22bb01a9EAC3f);
-  address public EVERCLEAR_ISM = address(0); // using default ISM
+  address public EVERCLEAR_ISM = 0x6B84aCd5cf97833360deFf7D9406d0736c332a9B; // using Polymer ISM
   address public L2_FEE_SIGNER = 0xd148C7f37b346a4bD8e14f8c1f181f5f640481C8;
 }
 
@@ -204,6 +206,22 @@ abstract contract Solana {
   bytes32 public SOLANA_SPOKE_GATEWAY = 0x93958783d0fe999eb6cbf34416e40974ebf1d0a3896f698e13d02447a0919fac;
 }
 
+abstract contract Plasma {
+  uint32 public constant PLASMA = 9745;
+  IMailbox public PLASMA_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public PLASMA_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public PLASMA_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public PLASMA_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public PLASMA_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public PLASMA_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public PLASMA_SPOKE_IMPL_V6 = 0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64;
+
+  // Fee adapter constants
+  address public constant PLASMA_ENG_MULTISIG = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
+  address public constant PLASMA_FEE_ADAPTER = 0x7B435CCF350DBC773e077410e8FEFcd46A1cDfAA;
+}
+
 abstract contract MainnetStagingDomains is
   Everclear,
   ArbitrumOne,
@@ -215,7 +233,8 @@ abstract contract MainnetStagingDomains is
   Tac,
   Tron,
   Solana,
-  Mantle
+  Mantle,
+  Plasma
 {}
 
 abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDomains {
@@ -230,34 +249,51 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
   DomainAndGateway[] public SUPPORTED_DOMAINS_AND_GATEWAYS;
 
   constructor() {
+    // NOTE: Commented out for hub registration — these domains are already registered.
+    // Uncomment after running `npm run cli` > Setup hub domains and gateways.
+
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: OPTIMISM, blockGasLimit: 30_000_000, gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
+        chainId: OPTIMISM,
+        blockGasLimit: 30_000_000,
+        gateway: address(OPTIMISM_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ARBITRUM_ONE, blockGasLimit: 30_000_000, gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
+        chainId: ARBITRUM_ONE,
+        blockGasLimit: 30_000_000,
+        gateway: address(ARBITRUM_ONE_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({
-        chainId: ZIRCUIT, blockGasLimit: 30_000_000, gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
+        chainId: ZIRCUIT,
+        blockGasLimit: 30_000_000,
+        gateway: address(ZIRCUIT_SPOKE_GATEWAY).toBytes32()
       })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: BLAST, blockGasLimit: 30_000_000, gateway: address(BLAST_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: BLAST, blockGasLimit: 30_000_000, gateway: address(BLAST_SPOKE_GATEWAY).toBytes32() })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: BASE, blockGasLimit: 30_000_000, gateway: address(BASE_SPOKE_GATEWAY).toBytes32() })
     );
 
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
-      DomainAndGateway({chainId: TAC, blockGasLimit: 30_000_000, gateway: address(TAC_SPOKE_GATEWAY).toBytes32()})
+      DomainAndGateway({ chainId: TAC, blockGasLimit: 30_000_000, gateway: address(TAC_SPOKE_GATEWAY).toBytes32() })
+    );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({
+        chainId: PLASMA,
+        blockGasLimit: 30_000_000,
+        gateway: address(PLASMA_SPOKE_GATEWAY).toBytes32()
+      })
     );
   }
 }
@@ -268,29 +304,30 @@ abstract contract MainnetStagingEnvironment is
   MainnetAssets,
   MainnetStagingSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE, TAC];
+  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE, TAC, PLASMA];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed
    * in the same batch as the `EverclearSpoke`. `discountPerEpoch` is
    * not being used anymore on the Hub as it's now set per asset.
    */
-  IEverclearHub.HubInitializationParams hubParams = IEverclearHub.HubInitializationParams({
-    owner: OWNER,
-    admin: ADMIN,
-    manager: address(0), // to be deployed
-    settler: address(0), // to be deployed
-    handler: address(0), // to be deployed
-    messageReceiver: address(0), // to be deployed
-    lighthouse: LIGHTHOUSE,
-    hubGateway: IHubGateway(address(0)), // to be deployed
-    acceptanceDelay: ACCEPTANCE_DELAY,
-    expiryTimeBuffer: EXPIRY_TIME_BUFFER,
-    epochLength: EPOCH_LENGTH_BLOCKS,
-    discountPerEpoch: 0, // not being used
-    minSolverSupportedDomains: MIN_ROUTER_SUPPORTED_DOMAINS,
-    settlementBaseGasUnits: SETTLEMENT_BASE_GAS_UNITS,
-    averageGasUnitsPerSettlement: AVG_GAS_UNITS_PER_SETTLEMENT,
-    bufferDBPS: BUFFER_DBPS
-  });
+  IEverclearHub.HubInitializationParams hubParams =
+    IEverclearHub.HubInitializationParams({
+      owner: OWNER,
+      admin: ADMIN,
+      manager: address(0), // to be deployed
+      settler: address(0), // to be deployed
+      handler: address(0), // to be deployed
+      messageReceiver: address(0), // to be deployed
+      lighthouse: LIGHTHOUSE,
+      hubGateway: IHubGateway(address(0)), // to be deployed
+      acceptanceDelay: ACCEPTANCE_DELAY,
+      expiryTimeBuffer: EXPIRY_TIME_BUFFER,
+      epochLength: EPOCH_LENGTH_BLOCKS,
+      discountPerEpoch: 0, // not being used
+      minSolverSupportedDomains: MIN_ROUTER_SUPPORTED_DOMAINS,
+      settlementBaseGasUnits: SETTLEMENT_BASE_GAS_UNITS,
+      averageGasUnitsPerSettlement: AVG_GAS_UNITS_PER_SETTLEMENT,
+      bufferDBPS: BUFFER_DBPS
+    });
 }

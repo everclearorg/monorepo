@@ -36,7 +36,7 @@ contract WETH is AddAssetBase, MainnetStagingEnvironment {
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](3);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](7);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -88,6 +88,15 @@ contract WETH is AddAssetBase, MainnetStagingEnvironment {
       tickerHash: _tickerHash,
       adopted: SOLANA_WETH,
       domain: SOLANA,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
+    //// Plasma
+    _assetConfigs[6] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: PLASMA_WETH.toBytes32(),
+      domain: PLASMA,
       approval: true,
       strategy: IEverclear.Strategy.DEFAULT
     });

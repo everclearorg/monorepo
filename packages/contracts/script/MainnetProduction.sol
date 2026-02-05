@@ -146,7 +146,7 @@ abstract contract Everclear {
   address public SETTLER = address(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
   address public HANDLER = address(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
   address public MESSAGE_RECEIVER = address(0x4e2bbbFb10058E0D248a78fe2F469562f4eDbe66);
-  address public EVERCLEAR_ISM = address(0); // using default ISM
+  address public EVERCLEAR_ISM = 0xcdBE2995Af304e9c14dF5B0c3d7C9CCc63D7b8B3;
 }
 
 abstract contract Ethereum {

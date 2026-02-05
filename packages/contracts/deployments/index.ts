@@ -57,6 +57,9 @@ import StagingSpokeGatewayEthereum from './staging/1/SpokeGateway.json';
 import StagingEverclearSpokeBase from './staging/8453/EverclearSpoke.json';
 import StagingSpokeGatewayBase from './staging/8453/SpokeGateway.json';
 
+import StagingEverclearSpokePlasma from './staging/9745/EverclearSpoke.json';
+import StagingSpokeGatewayPlasma from './staging/9745/SpokeGateway.json';
+
 //////// Mainnet Production Deployments ////////
 
 import ProductionEverclearHubEverclearMainnet from './production/25327/EverclearHub.json';
@@ -324,6 +327,10 @@ export const Deployments = {
     8453: {
       everclear: StagingEverclearSpokeBase,
       gateway: StagingSpokeGatewayBase,
+    },
+    9745: {
+      everclear: StagingEverclearSpokePlasma,
+      gateway: StagingSpokeGatewayPlasma,
     },
   },
 };

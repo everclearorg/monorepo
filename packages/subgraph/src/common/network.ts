@@ -95,6 +95,8 @@ export function getChainId(): BigInt {
     chainId = BigInt.fromI32(57073);
   } else if (network == 'tac') {
     chainId = BigInt.fromI32(239);
+  } else if (network == 'plasma-mainnet') {
+    chainId = BigInt.fromI32(9745);
   } else {
     throw new Error(`No chainName for network ${network}`);
   }
