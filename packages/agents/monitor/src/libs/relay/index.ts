@@ -64,6 +64,11 @@ export const selfRelayHyperlaneMessages = async (
   for (const { id: messageId } of messages) {
     const { status, relayTransaction } = await getMessageStatus(messageId, true);
     if (status !== 'relayable' || !messageId || !relayTransaction) {
+      logger.debug('Cannot self-relay hyperlane message', requestContext, methodContext, {
+        messageId,
+        status,
+        relayTransaction,
+      });
       // Cant self-relay, continue
       continue;
     }
