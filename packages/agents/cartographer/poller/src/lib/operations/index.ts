@@ -7,7 +7,7 @@ export {
 } from './intents';
 export { updateHubInvoices, updateHubDeposits } from './invoices';
 export { updateAssets, updateDepositors } from './depositors';
-export { updateMessages, updateQueues, updateMessageStatus } from './monitor';
+export { updateMessages, updateQueues, updateMessageStatus, updateProtocolUpdateLogs, updateHubSpokeMeta } from './monitor';
 export { runMigration } from './migrations';
 
 export const DEFAULT_BATCH_SIZE = 3000;

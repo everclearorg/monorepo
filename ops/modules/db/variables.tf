@@ -110,3 +110,9 @@ variable "max_slot_wal_keep_size" {
   type = string
   default = "102400"
 }
+
+variable "engine_version" {
+  description = "The PostgreSQL engine version to use"
+  type        = string
+  default     = "16.10"
+}
