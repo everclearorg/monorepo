@@ -23,12 +23,11 @@ import * as mockable from '../../../src/mockable';
 import { createHubMessages, createMessages, createQueues } from '@chimera-monorepo/database/test/mock';
 
 describe('Monitor operations', () => {
-  beforeEach(() => {
-    stub(mockable, 'getHyperlaneMsgDelivered').resolves(true);
-  });
-
   describe('#updateMessages', () => {
     it('should work', async () => {
+      const getHyperlaneMsgDelivered = stub(mockable, 'getHyperlaneMsgDelivered');
+      getHyperlaneMsgDelivered.resolves(false);
+      
       const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
       const spokeMessages = createMessages(5);
       const hubMessages = createHubMessages(5);
@@ -64,6 +63,7 @@ describe('Monitor operations', () => {
     });
 
     it('saves messages with updated status', async () => {
+      stub(mockable, 'getHyperlaneMsgDelivered').resolves(true);
       const hubMessages = createHubMessages(5);
       const spokeMessages = createMessages(5);
       (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
@@ -77,6 +77,9 @@ describe('Monitor operations', () => {
     });
 
     it('should not save checkpoint if empty', async () => {
+      const getHyperlaneMsgDelivered = stub(mockable, 'getHyperlaneMsgDelivered');
+      getHyperlaneMsgDelivered.resolves(false);
+      
       const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
       const hubMessages = createHubMessages(5);
       (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves([]);
@@ -110,6 +113,7 @@ describe('Monitor operations', () => {
 
   describe('#updateMessageStatus', () => {
     it('should work', async () => {
+      stub(mockable, 'getHyperlaneMsgDelivered').resolves(true);
       const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
       // should work for both hub and spoke destination domain
       const messages = createMessages(5, [{ destinationDomain: mockAppContext.config.hub.domain }]);

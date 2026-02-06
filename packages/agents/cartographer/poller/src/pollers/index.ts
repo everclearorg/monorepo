@@ -7,6 +7,7 @@ import {
   Logger,
   sendHeartbeat,
 } from '@chimera-monorepo/utils';
+import { ChainReader } from '@chimera-monorepo/chainservice';
 import { getDatabase } from '@chimera-monorepo/database';
 
 import { bind } from '../bindings';
@@ -39,6 +40,12 @@ export const makePoller = async (_configOverride?: CartographerConfig) => {
   context.logger.info('Config generated', requestContext, methodContext, { config: context.config });
 
   /// MARK - Adapters
+
+  // ChainReader setup
+  context.adapters.chainreader = new ChainReader(context.logger.child({ module: 'ChainReader' }), {
+    ...context.config.chains,
+    [context.config.hub.domain]: context.config.hub,
+  });
 
   // Subgraph reader setup
   context.logger.info('Subgraph reader setup in progress...', requestContext, methodContext, {});

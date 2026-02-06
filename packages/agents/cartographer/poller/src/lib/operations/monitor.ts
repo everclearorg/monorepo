@@ -27,11 +27,19 @@ const getChainConfig = (domain: string, config: CartographerConfig) => {
 };
 
 const getMessageStatus = async (messageId: string, config: CartographerConfig, destinationDomain?: string) => {
+  const {
+    adapters: { chainreader },
+  } = getContext();
   const chainConfig = getChainConfig(destinationDomain!, config);
   const gateway = chainConfig.deployments?.gateway;
   let status: HyperlaneStatus = HyperlaneStatus.pending;
   if (gateway) {
-    const messageDelivered = await getHyperlaneMsgDelivered(messageId, chainConfig.providers, gateway);
+    const messageDelivered = await getHyperlaneMsgDelivered(
+      messageId,
+      gateway,
+      (params) => chainreader.readTx(params, 'latest'),
+      +destinationDomain!,
+    );
     if (messageDelivered) {
       status = HyperlaneStatus.delivered;
     }

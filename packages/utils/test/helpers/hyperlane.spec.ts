@@ -350,137 +350,148 @@ describe('Hyperlane Helper Functions', () => {
   describe('getHyperlaneMsgDelivered', () => {
     it('should return true when message is delivered', async () => {
       const messageId = '0x1234567890abcdef';
-      const rpcUrls = ['https://rpc.example.com'];
       const gateway = '0x1234567890123456789012345678901234567890';
-      
-      // Mock the GraphQL client
-      const mockClient = {
-        query: stub().resolves({
-          data: {
-            message_view: [{
-              is_delivered: true,
-            }],
-          },
-        }),
-      };
-      
-      // Stub the Client import
-      const clientStub = stub().returns(mockClient);
-      stub(require('@urql/core'), 'Client').callsFake(clientStub);
-      
-      // Mock getBestProvider to return a valid provider
-      const getBestProviderStub = stub().resolves('https://rpc.example.com');
-      stub(require('../../src/helpers/provider'), 'getBestProvider').callsFake(getBestProviderStub);
+      const mailbox = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
+      const domain = 1337;
       
       // Mock chainWrapper functions
-      const createPublicClientStub = stub().returns({
-        readContract: stub()
-          .onFirstCall().resolves('0x1234567890123456789012345678901234567890') // mailbox call
-          .onSecondCall().resolves(true), // delivered call
-      });
+      const encodeFunctionDataStub = stub();
+      const decodeFunctionResultStub = stub();
+      
       stub(require('../../src/helpers/chain'), 'chainWrapper').value({
         ...require('../../src/helpers/chain').chainWrapper,
-        createPublicClient: createPublicClientStub,
-        http: stub().returns({}),
+        encodeFunctionData: encodeFunctionDataStub,
+        decodeFunctionResult: decodeFunctionResultStub,
       });
       
-      const result = await getHyperlaneMsgDelivered(messageId, rpcUrls, gateway);
+      // Mock chainReaderReadTx
+      const chainReaderReadTxStub = stub();
+      chainReaderReadTxStub
+        .onFirstCall()
+        .resolves('0x' + mailbox.slice(2)); // mailbox call returns encoded mailbox address
+      chainReaderReadTxStub
+        .onSecondCall()
+        .resolves('0x0000000000000000000000000000000000000000000000000000000000000001'); // delivered call returns true (encoded)
+      
+      encodeFunctionDataStub
+        .onFirstCall()
+        .returns('0xmailboxdata'); // mailbox() encoding
+      encodeFunctionDataStub
+        .onSecondCall()
+        .returns('0xdelivereddata'); // delivered() encoding
+      
+      decodeFunctionResultStub
+        .onFirstCall()
+        .returns(mailbox); // decode mailbox result
+      decodeFunctionResultStub
+        .onSecondCall()
+        .returns(true); // decode delivered result
+      
+      const result = await getHyperlaneMsgDelivered(
+        messageId,
+        gateway,
+        chainReaderReadTxStub,
+        domain,
+      );
       
       expect(result).to.be.true;
+      expect(chainReaderReadTxStub).to.have.been.calledTwice;
+      expect(encodeFunctionDataStub).to.have.been.calledTwice;
+      expect(decodeFunctionResultStub).to.have.been.calledTwice;
     });
 
     it('should return false when message is not delivered', async () => {
       const messageId = '0x1234567890abcdef';
-      const rpcUrls = ['https://rpc.example.com'];
       const gateway = '0x1234567890123456789012345678901234567890';
-      
-      // Mock the GraphQL client
-      const mockClient = {
-        query: stub().resolves({
-          data: {
-            message_view: [{
-              is_delivered: false,
-            }],
-          },
-        }),
-      };
-      
-      // Stub the Client import
-      const clientStub = stub().returns(mockClient);
-      stub(require('@urql/core'), 'Client').callsFake(clientStub);
-      
-      // Mock getBestProvider to return a valid provider
-      const getBestProviderStub = stub().resolves('https://rpc.example.com');
-      stub(require('../../src/helpers/provider'), 'getBestProvider').callsFake(getBestProviderStub);
+      const mailbox = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
+      const domain = 1337;
       
       // Mock chainWrapper functions
-      const createPublicClientStub = stub().returns({
-        readContract: stub()
-          .onFirstCall().resolves('0x1234567890123456789012345678901234567890') // mailbox call
-          .onSecondCall().resolves(false), // delivered call
-      });
+      const encodeFunctionDataStub = stub();
+      const decodeFunctionResultStub = stub();
+      
       stub(require('../../src/helpers/chain'), 'chainWrapper').value({
         ...require('../../src/helpers/chain').chainWrapper,
-        createPublicClient: createPublicClientStub,
-        http: stub().returns({}),
+        encodeFunctionData: encodeFunctionDataStub,
+        decodeFunctionResult: decodeFunctionResultStub,
       });
       
-      const result = await getHyperlaneMsgDelivered(messageId, rpcUrls, gateway);
+      // Mock chainReaderReadTx
+      const chainReaderReadTxStub = stub();
+      chainReaderReadTxStub
+        .onFirstCall()
+        .resolves('0x' + mailbox.slice(2)); // mailbox call returns encoded mailbox address
+      chainReaderReadTxStub
+        .onSecondCall()
+        .resolves('0x0000000000000000000000000000000000000000000000000000000000000000'); // delivered call returns false (encoded)
+      
+      encodeFunctionDataStub
+        .onFirstCall()
+        .returns('0xmailboxdata'); // mailbox() encoding
+      encodeFunctionDataStub
+        .onSecondCall()
+        .returns('0xdelivereddata'); // delivered() encoding
+      
+      decodeFunctionResultStub
+        .onFirstCall()
+        .returns(mailbox); // decode mailbox result
+      decodeFunctionResultStub
+        .onSecondCall()
+        .returns(false); // decode delivered result
+      
+      const result = await getHyperlaneMsgDelivered(
+        messageId,
+        gateway,
+        chainReaderReadTxStub,
+        domain,
+      );
       
       expect(result).to.be.false;
+      expect(chainReaderReadTxStub).to.have.been.calledTwice;
     });
 
-    it('should return false when message not found', async () => {
+    it('should skip mailbox call when mailboxAddress is provided', async () => {
       const messageId = '0x1234567890abcdef';
-      const rpcUrls = ['https://rpc.example.com'];
       const gateway = '0x1234567890123456789012345678901234567890';
-      
-      // Mock the GraphQL client
-      const mockClient = {
-        query: stub().resolves({
-          data: {
-            message_view: [],
-          },
-        }),
-      };
-      
-      // Stub the Client import
-      const clientStub = stub().returns(mockClient);
-      stub(require('@urql/core'), 'Client').callsFake(clientStub);
-      
-      // Mock getBestProvider to return a valid provider
-      const getBestProviderStub = stub().resolves('https://rpc.example.com');
-      stub(require('../../src/helpers/provider'), 'getBestProvider').callsFake(getBestProviderStub);
+      const mailbox = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
+      const domain = 1337;
       
       // Mock chainWrapper functions
-      const createPublicClientStub = stub().returns({
-        readContract: stub()
-          .onFirstCall().resolves('0x1234567890123456789012345678901234567890') // mailbox call
-          .onSecondCall().resolves(false), // delivered call
-      });
+      const encodeFunctionDataStub = stub();
+      const decodeFunctionResultStub = stub();
+      
       stub(require('../../src/helpers/chain'), 'chainWrapper').value({
         ...require('../../src/helpers/chain').chainWrapper,
-        createPublicClient: createPublicClientStub,
-        http: stub().returns({}),
+        encodeFunctionData: encodeFunctionDataStub,
+        decodeFunctionResult: decodeFunctionResultStub,
       });
       
-      const result = await getHyperlaneMsgDelivered(messageId, rpcUrls, gateway);
+      // Mock chainReaderReadTx
+      const chainReaderReadTxStub = stub();
+      chainReaderReadTxStub
+        .onFirstCall()
+        .resolves('0x0000000000000000000000000000000000000000000000000000000000000001'); // delivered call returns true (encoded)
       
-      expect(result).to.be.false;
-    });
-
-    it('should return false when no provider is available', async () => {
-      const messageId = '0x1234567890abcdef';
-      const rpcUrls = ['https://rpc.example.com'];
-      const gateway = '0x1234567890123456789012345678901234567890';
+      encodeFunctionDataStub
+        .onFirstCall()
+        .returns('0xdelivereddata'); // delivered() encoding
       
-      // Mock getBestProvider to return undefined (no working provider)
-      const getBestProviderStub = stub().resolves(undefined);
-      stub(require('../../src/helpers/provider'), 'getBestProvider').callsFake(getBestProviderStub);
+      decodeFunctionResultStub
+        .onFirstCall()
+        .returns(true); // decode delivered result
       
-      const result = await getHyperlaneMsgDelivered(messageId, rpcUrls, gateway);
+      const result = await getHyperlaneMsgDelivered(
+        messageId,
+        gateway,
+        chainReaderReadTxStub,
+        domain,
+        mailbox, // Provide mailbox to skip mailbox() call
+      );
       
-      expect(result).to.be.false;
+      expect(result).to.be.true;
+      expect(chainReaderReadTxStub).to.have.been.calledOnce; // Only delivered() call
+      expect(encodeFunctionDataStub).to.have.been.calledOnce; // Only delivered() encoding
+      expect(decodeFunctionResultStub).to.have.been.calledOnce; // Only delivered() decoding
     });
   });
 
