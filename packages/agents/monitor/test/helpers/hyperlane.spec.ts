@@ -32,7 +32,6 @@ describe('Helpers:hyperlane', () => {
   const expected =
     '0x03000b4d4800aa36a7000000000000000000000000cb8eca4ab47c7dc89bc455271a0650f66e0dae6e00000061000000000000000000000000edc1a3edf87187085a3abb7a9a65e1e7ae370c0748656c6c6f2c20776f726c64';
 
-  let getHyperlaneMsgDeliveredStub: SinonStub;
   let getHyperlaneMessageStatusStub: SinonStub;
   let chainreader: SinonStubbedInstance<ChainReader>;
   let decodeStub: SinonStub;
@@ -42,11 +41,13 @@ describe('Helpers:hyperlane', () => {
 
   describe('#getMessageStatus', () => {
     beforeEach(() => {
-      getHyperlaneMsgDeliveredStub = stub(Mockable, 'getHyperlaneMsgDelivered').resolves(false);
       getHyperlaneMessageStatusStub = stub(Mockable, 'getHyperlaneMessageStatus').resolves(message);
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
 
-      chainreader.readTx.resolves('0x1234');
+      // Mock readTx for mailbox call (first call) and delivered call (second call)
+      chainreader.readTx
+        .onFirstCall().resolves('0x1234') // mailbox call
+        .onSecondCall().resolves('0x0000000000000000000000000000000000000000000000000000000000000000'); // delivered call (false)
       chainreader.getGasEstimateWithRevertCode.resolves('0');
       chainreader.getTransactionReceipt.resolves({
         transactionHash: mkHash('0xtx'),
@@ -54,54 +55,60 @@ describe('Helpers:hyperlane', () => {
       } as any);
 
       encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0x1234' as `0x${string}`);
-      decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns('0x1234' as `0x${string}`);
+      // Mock decodeFunctionResult: first call returns mailbox address, second call returns delivered boolean
+      decodeStub = stub(chainWrapper, 'decodeFunctionResult')
+        .onFirstCall().returns('0x1234' as `0x${string}`) // mailbox address
+        .onSecondCall().returns(false); // delivered boolean
       decodeEventLogStub = stub(chainWrapper, 'decodeEventLog').returns({ args: { message: message.body } } as any);
 
       database = mock.instances.database() as SinonStubbedInstance<Database>;
     });
 
     it('should handle fail if axios fails', async () => {
-      getHyperlaneMsgDeliveredStub.resolves(undefined);
+      // If readTx fails, it will throw and status will be 'none' if no messages
+      chainreader.readTx.rejects(new Error('RPC error'));
       expect(await getMessageStatus(id)).to.be.deep.eq({ status: 'none' });
     });
 
     it('should handle when no messages returned', async () => {
-      getHyperlaneMsgDeliveredStub.resolves(true);
+      database.getMessagesByIds.resolves([]);
       expect(await getMessageStatus(id)).to.be.deep.eq({ status: 'none' });
     });
 
     it('should handle when message is delivered', async () => {
-      getHyperlaneMsgDeliveredStub.resolves(true);
       database.getMessagesByIds.resolves([mock.message()]);
+      // Mock delivered call to return true
+      chainreader.readTx
+        .onFirstCall().resolves('0x1234') // mailbox call
+        .onSecondCall().resolves('0x0000000000000000000000000000000000000000000000000000000000000001'); // delivered call (true)
+      decodeStub
+        .onFirstCall().returns('0x1234' as `0x${string}`) // mailbox address
+        .onSecondCall().returns(true); // delivered boolean
       expect(await getMessageStatus(id)).to.be.deep.eq({ status: 'delivered' });
     });
 
     it('should fail if no gateway found for domains', async () => {
-      getHyperlaneMsgDeliveredStub.resolves(false);
       database.getMessagesByIds.resolves([mock.message({ destinationDomain: '1111' })]);
       await expect(getMessageStatus(id)).to.be.rejectedWith(NoGatewayConfigured);
     });
 
     it('should fail if getting mailbox fails', async () => {
-      getHyperlaneMsgDeliveredStub.resolves(false);
-      database.getMessagesByIds.resolves([mock.message()]);
+      database.getMessagesByIds.resolves([mock.message({ destinationDomain: '1111' })]);
       chainreader.readTx.rejects(new Error('fail'));
       await expect(getMessageStatus(id)).to.be.rejected;
     });
 
     it('should return pending if no destination domain', async () => {
-      getHyperlaneMsgDeliveredStub.resolves(false);
       database.getMessagesByIds.resolves([mock.message({ destinationDomain: undefined })]);
-      decodeStub.returns('0x1234' as `0x${string}`);
       chainreader.getGasEstimateWithRevertCode.rejects(new Error('fail'));
       expect(await getMessageStatus(id)).to.be.deep.eq({ status: 'pending' });
     });
 
     it('should work if tx is not delivered but is relayable', async () => {
-      getHyperlaneMsgDeliveredStub.resolves(false);
       database.getMessagesByIds.resolves([mock.message()]);
-      decodeStub.onFirstCall().returns('0x1234' as `0x${string}`);
-      decodeStub.onSecondCall().returns([false]);
+      decodeStub
+        .onFirstCall().returns('0x1234' as `0x${string}`) // mailbox address
+        .onSecondCall().returns(false); // delivered boolean
 
       const ret = await getMessageStatus(id, true);
       expect(ret).to.be.deep.eq({
@@ -117,8 +124,14 @@ describe('Helpers:hyperlane', () => {
     });
 
     it('should work if tx is delivered', async () => {
-      getHyperlaneMsgDeliveredStub.resolves(true);
       database.getMessagesByIds.resolves([mock.message()]);
+      // Mock delivered call to return true
+      chainreader.readTx
+        .onFirstCall().resolves('0x1234') // mailbox call
+        .onSecondCall().resolves('0x0000000000000000000000000000000000000000000000000000000000000001'); // delivered call (true)
+      decodeStub
+        .onFirstCall().returns('0x1234' as `0x${string}`) // mailbox address
+        .onSecondCall().returns(true); // delivered boolean
       const ret = await getMessageStatus(id);
       expect(ret).to.be.deep.eq({
         status: 'delivered',
@@ -127,9 +140,7 @@ describe('Helpers:hyperlane', () => {
 
     it('should work if hyperlane api fails (derives from chain)', async () => {
       getHyperlaneMessageStatusStub.resolves(undefined);
-      getHyperlaneMsgDeliveredStub.resolves(false);
       database.getMessagesByIds.resolves([mock.message()]);
-      decodeStub.returns('0x1234' as `0x${string}`);
 
       chainreader.getTransactionReceipt.resolves({
         transactionHash: mkHash('0xtx'),

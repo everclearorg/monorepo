@@ -76,10 +76,14 @@ export const getMessageStatus = async (
   }) as `0x${string}`;
   logger.debug('Got mailbox from gateway', requestContext, methodContext, { mailbox, gateway });
   const iface = getMailboxInterface();
-  const providers =
-    +message.destinationDomain === +hub.domain ? hub.providers : chains[message.destinationDomain]?.providers;
 
-  const delivered = await getHyperlaneMsgDelivered(id, providers, gateway);
+  const delivered = await getHyperlaneMsgDelivered(
+    id,
+    gateway,
+    (params) => chainreader.readTx(params, 'latest'), // Wrap ChainReader.readTx
+    +message.destinationDomain,
+    mailbox, // Pass mailbox to avoid redundant call
+  );
 
   logger.debug('Queried destination mailbox', requestContext, methodContext, {
     delivered,
