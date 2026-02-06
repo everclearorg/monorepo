@@ -14,14 +14,6 @@ export type AppContext = {
     subgraph: SubgraphReader;
     database: Database;
     relayers: { instance: Relayer; apiKey: string; type: RelayerType }[];
-    blockMap: Map<
-      string,
-      {
-        number: number;
-        timestamp: number;
-        rpcOrigin: string;
-      }[]
-    >;
   };
   config: MonitorConfig;
 };
