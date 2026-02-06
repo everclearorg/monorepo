@@ -123,6 +123,9 @@ export const makeMonitor = async (service: MonitorService) => {
     }
     context.logger.debug('Relayers setup', requestContext, methodContext);
 
+    // Initialize the block data map for sharing block data between checks
+    context.adapters.blockMap = new Map<string, { number: number; timestamp: number }>();
+
     /// MARK - Bindings
     if (service == MonitorService.SERVER) {
       await bindServer();
