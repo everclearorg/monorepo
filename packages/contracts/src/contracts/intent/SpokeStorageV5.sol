@@ -2,7 +2,6 @@
 pragma solidity 0.8.25;
 
 import {QueueLib} from 'contracts/common/QueueLib.sol';
-import {QueueLibV2} from 'contracts/common/QueueLibV2.sol';
 
 import {IPermit2} from 'interfaces/common/IPermit2.sol';
 
@@ -18,31 +17,21 @@ import {ISpokeStorageV5} from 'interfaces/intent/ISpokeStorageV5.sol';
 abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant FILL_INTENT_FOR_SOLVER_TYPEHASH = keccak256(
-    'function fillIntentForSolver(bytes32 _domain, address _solver, bytes32 _receiver, Intent calldata _intent, uint256 _nonce, uint256 _amountOut, uint32[] memory _destinations)'
+    'function fillIntentForSolver(address _solver, Intent calldata _intent, uint256 _nonce, uint24 _fee, bytes memory _signature)'
   );
 
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
-    'function processIntentQueueViaRelayer(uint32 _domain, Intent[] memory _intents, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS)'
+    'function processIntentQueueViaRelayer(uint32 _domain, Intent[] memory _intents, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _dynamicGasLimit, bytes memory _signature)'
   );
 
   /// @inheritdoc ISpokeStorageV5
   bytes32 public constant PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH = keccak256(
-    'function processFillQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _bufferDBPS)'
+    'function processFillQueueViaRelayer(uint32 _domain, uint32 _amount, address _relayer, uint256 _ttl, uint256 _nonce, uint256 _dynamicGasLimit, bytes memory _signature)'
   );
 
   /// @inheritdoc ISpokeStorageV5
   IPermit2 public constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
-
-  /// @inheritdoc ISpokeStorageV5
-  bytes32 public constant FILL_INTENT_TYPEHASH = keccak256(
-    'function fillIntent(bytes32 _domain, address _sender, Intent calldata _intent, uint256 _amountOut, address _receiver, uint32[] memory _destinations)'
-  );
-
-  /// @inheritdoc ISpokeStorageV5
-  bytes32 public constant BATCH_FILL_INTENT_TYPEHASH = keccak256(
-    'function batchFillIntent(bytes32 _domain, address _sender, Intent[] calldata _intents, uint256[] _amountOut, address[] _receivers, uint32[][] memory _destinations)'
-  );
 
   /// @inheritdoc ISpokeStorageV5
   uint32 public EVERCLEAR;
@@ -86,33 +75,20 @@ abstract contract SpokeStorageV5 is ISpokeStorageV5 {
   /// @inheritdoc ISpokeStorageV5
   mapping(Strategy _strategy => ISettlementModule _module) public modules;
 
-  /// @notice The deprecated intent queue with previous Intent struct
-  QueueLib.IntentQueue public deprecated_intentQueue;
+  /**
+   * @notice The intent queue
+   */
+  QueueLib.IntentQueue public intentQueue;
 
-  /// @notice The deprecated fill queue with previous FillMessage struct
-  QueueLib.FillQueue public deprecated_fillQueue;
+  /**
+   * @notice The fill queue
+   */
+  QueueLib.FillQueue public fillQueue;
 
   /**
    * **********************  FeeAdapter Upgrade  **********************
    */
   address public feeAdapter;
-
-  /**
-   * **********************  Swap Upgrade  **********************
-   */
-  /**
-   * @notice The intent queue
-   */
-  QueueLibV2.IntentQueue public intentQueue;
-  /**
-   * @notice The fill queue
-   */
-  QueueLibV2.FillQueue public fillQueue;
-
-  /**
-   * @notice Address for the fillSigner
-   */
-  address public fillSigner;
 
   /**
    * @notice Checks that the address is valid

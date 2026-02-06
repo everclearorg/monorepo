@@ -1,4 +1,4 @@
-import { BigInt, Bytes } from '@graphprotocol/graph-ts';
+import { Bytes } from '@graphprotocol/graph-ts';
 import {
   ChainGatewayAdded,
   ChainGatewayRemoved,
@@ -28,11 +28,11 @@ function ensureArrayInitialized<T>(array: Array<T> | null): Array<T> {
 export function handleChainGatewayAdded(event: ChainGatewayAdded): void {
   const meta = getOrCreateMeta();
 
-  let chainGateways = ensureArrayInitialized(meta.chainGateways);
+  const chainGateways = ensureArrayInitialized(meta.chainGateways);
 
   const chainId = event.params._chainId;
   const chainIdBytes = Bytes.fromByteArray(Bytes.fromBigInt(chainId));
-  
+
   // Check if chain gateway already exists
   let exists = false;
   for (let i = 0; i < chainGateways.length; i++) {
@@ -67,7 +67,7 @@ export function handleChainGatewayAdded(event: ChainGatewayAdded): void {
 export function handleChainGatewayRemoved(event: ChainGatewayRemoved): void {
   const meta = getOrCreateMeta();
 
-  let chainGateways = ensureArrayInitialized(meta.chainGateways);
+  const chainGateways = ensureArrayInitialized(meta.chainGateways);
 
   const chainId = event.params._chainId;
   const remain: Array<Bytes> = [];

@@ -18,7 +18,7 @@ interface ISpokeStorageV4 is IEverclear {
   //////////////////////////////////////////////////////////////*/
 
   /**
-   * @notice Parameters needed to initiliaze `EverclearSpoke`
+   * @notice Parameters needed to initialize `EverclearSpoke`
    * @param gateway The local `SpokeGateway`
    * @param callExecutor The local `CallExecutor`
    * @param messageReceiver The address for the `SpokeMessageReceiver` module
@@ -118,7 +118,7 @@ interface ISpokeStorageV4 is IEverclear {
   event AssetTransferFailed(address indexed _asset, address indexed _recipient, uint256 _amount);
 
   /**
-   * @notice emitted when `_handleSettlement` fails to mint the non-default stategy asset
+   * @notice emitted when `_handleSettlement` fails to mint the non-default strategy asset
    * @param _asset The address of the asset
    * @param _recipient The address of the recipient
    * @param _amount The amount of the asset

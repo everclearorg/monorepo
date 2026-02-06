@@ -21,6 +21,7 @@ import { getContext } from '../context';
 import { checkSpokeBalance } from './spoke';
 import { checkTokenomicsExportLatency, checkTokenomicsExportStatus } from './tokenomics';
 import { checkSolanaPipelineStatus } from './solana';
+import { getBlocks } from '../helpers';
 
 export const runChecks = async (_requestContext?: RequestContext) => {
   const { methodContext, requestContext } = createLoggingContext(runChecks.name, _requestContext);
@@ -50,6 +51,10 @@ export const runChecks = async (_requestContext?: RequestContext) => {
   ];
 
   const { logger } = getContext();
+
+  // Fetch blocks for all chains before running checks to avoid redundant RPC calls
+  await getBlocks();
+
   logger.info(`Running checks... fns: ${checklist.map((it) => it.name).join(',')}`, requestContext, methodContext);
   const error = [];
   for (const checkFn of checklist) {
@@ -81,6 +86,12 @@ export const runChecks = async (_requestContext?: RequestContext) => {
         check: checkFn.name,
       });
     }
+  }
+  if (error.length !== 0) {
+    throw error;
+  }
+  if (error.length !== 0) {
+    throw error;
   }
   if (error.length !== 0) {
     throw error;
