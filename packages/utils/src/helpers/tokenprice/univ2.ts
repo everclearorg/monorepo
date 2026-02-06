@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { chainWrapper, type PublicClient } from '../chain';
+import { chainWrapper } from '../chain';
 import { AssetConfig } from '../../types';
 export const univ2PairABI = [
   {
@@ -41,7 +41,8 @@ export const univ2PairABI = [
  * @param pair - The pair contract address.
  * @param token0 - The token0 asset.
  * @param token1 - The token1 asset
- * @param client - The viem public client instance.
+ * @param chainReaderReadTx - Function wrapper for ChainReader.readTx.
+ * @param chainReaderDomain - Domain ID.
  * @returns The token0 price
  */
 export const getTokenPriceFromUniV2 = async (
@@ -49,13 +50,24 @@ export const getTokenPriceFromUniV2 = async (
   pair: string,
   token0: AssetConfig,
   token1: AssetConfig,
-  client: PublicClient,
+  chainReaderReadTx: (params: { to: string; domain: number; data: `0x${string}`; funcSig: string }) => Promise<string>,
+  chainReaderDomain: number,
 ): Promise<number> => {
-  const result = (await client.readContract({
-    address: pair as `0x${string}`,
+  const encodedResult = await chainReaderReadTx({
+    to: pair,
+    domain: chainReaderDomain,
+    data: chainWrapper.encodeFunctionData({
+      abi: univ2PairABI,
+      functionName: 'getReserves',
+    }),
+    funcSig: 'getReserves()',
+  });
+
+  const result = chainWrapper.decodeFunctionResult({
     abi: univ2PairABI,
     functionName: 'getReserves',
-  })) as [bigint, bigint, number];
+    data: encodedResult as `0x${string}`,
+  }) as [bigint, bigint, number];
 
   const reserve0 = result[0];
   const reserve1 = result[1];

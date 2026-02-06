@@ -1,8 +1,7 @@
-import { createLoggingContext, delay, Logger, Severity, SOLANA_CHAINID, chainWrapper } from '@chimera-monorepo/utils';
+import { createLoggingContext, delay, Logger, Severity, SOLANA_CHAINID } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
-import { Connection } from '@solana/web3.js';
 
 interface RpcError {
   rpcOrigin: string;
@@ -22,7 +21,11 @@ const makeReport = (e: RpcError, logger: Logger, env: string): Report => ({
 });
 
 export const checkRpcs = async (timeoutMs: number = 5000) => {
-  const { config, logger } = getContext();
+  const {
+    config,
+    logger,
+    adapters: { chainreader },
+  } = getContext();
 
   const { requestContext, methodContext } = createLoggingContext(checkRpcs.name);
   const badRpcs: RpcError[] = [];
@@ -31,54 +34,88 @@ export const checkRpcs = async (timeoutMs: number = 5000) => {
     Object.keys(config.chains).map(async (domainId) => {
       const chainConfig = config.chains[domainId];
       const rpcUrls = chainConfig.providers;
-      await Promise.all(
-        rpcUrls.map(async (rpcUrl) => {
-          const rpcOrigin = URL.canParse(rpcUrl) ? new URL(rpcUrl).origin : 'malformed URL';
+
+      // For Solana, only check the first provider URL since ChainService only uses urls[0]
+      // For other chains, check all providers
+      const urlsToCheck = chainConfig.network === 'svm' ? (rpcUrls.length > 0 ? [rpcUrls[0]] : []) : rpcUrls;
+
+      // Filter valid URLs and report malformed URLs as bad RPCs
+      const validUrls = urlsToCheck.filter((rpcUrl) => {
+        if (!URL.canParse(rpcUrl)) {
+          // Extract origin if possible, otherwise use a safe placeholder
+          // Don't expose full URL as it may contain secrets
+          let rpcOrigin = 'malformed URL';
           try {
-            let blockNumber: number | undefined = undefined;
-            const start = Date.now();
-            await Promise.race([
-              (async () => {
-                if (chainConfig.network === 'svm') {
-                  const connection = new Connection(rpcUrl);
-                  blockNumber = await connection.getBlockHeight();
-                } else {
-                  const client = chainWrapper.createPublicClient({
-                    transport: chainWrapper.http(rpcUrl),
-                  });
-                  blockNumber = Number(await client.getBlockNumber());
-                }
-                return blockNumber;
-              })().then((ret) => {
-                logger.debug('Retrieved block number for rpc', requestContext, methodContext, {
-                  number: ret,
-                  rpcOrigin,
-                  chain: domainId,
-                  elapsed: Date.now() - start,
-                });
-                return ret;
-              }),
-              (async () => {
-                await delay(timeoutMs);
-                logger.warn('Getting block number timed out for rpc', requestContext, methodContext, {
-                  rpcOrigin,
-                  chain: domainId,
-                  delay: timeoutMs,
-                });
-                throw new Error('Request timed out');
-              })(),
-            ]);
-            if (!blockNumber) {
-              throw new Error(`Could not get block number for ${domainId} using ${rpcOrigin}`);
+            // Try to extract just the hostname/origin if it's partially valid
+            // Only extract if it looks like it has a protocol or valid hostname structure
+            const match = rpcUrl.match(/^(https?:\/\/)([^\/\?#@]+)/);
+            if (match && match[2]) {
+              // Extract hostname (part after @ if present, otherwise the matched part)
+              rpcOrigin = match[2].split('@').pop() || 'malformed URL';
+            } else {
+              // For truly malformed URLs without protocol, use placeholder
+              rpcOrigin = 'malformed URL';
             }
-            goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
-          } catch (error: unknown) {
-            (error as Error).message = (error as Error).message.replace(rpcUrl, rpcOrigin);
-            badRpcs.push({ rpcOrigin, error: (error as Error).message, domain: domainId });
-            logger.debug(`Error connecting to provider at ${rpcOrigin}: ${error}`, requestContext, methodContext);
+          } catch {
+            // If extraction fails, use placeholder
+            rpcOrigin = 'malformed URL';
           }
-        }),
-      );
+
+          badRpcs.push({
+            rpcOrigin,
+            error: 'Invalid URL format',
+            domain: domainId,
+          });
+          logger.debug(`Malformed URL detected`, requestContext, methodContext, {
+            chain: domainId,
+            origin: rpcOrigin,
+          });
+          return false;
+        }
+        return true;
+      });
+
+      // Skip RPC check if all URLs are malformed
+      if (validUrls.length === 0) {
+        return;
+      }
+
+      try {
+        const start = Date.now();
+        const blockNumber = await Promise.race([
+          chainreader.getBlockNumber(+domainId),
+          (async () => {
+            await delay(timeoutMs);
+            logger.warn('Getting block number timed out', requestContext, methodContext, {
+              chain: domainId,
+              delay: timeoutMs,
+            });
+            throw new Error('Request timed out');
+          })(),
+        ]);
+
+        logger.debug('Retrieved block number for chain', requestContext, methodContext, {
+          number: blockNumber,
+          chain: domainId,
+          elapsed: Date.now() - start,
+        });
+
+        // Mark valid providers as good
+        // For Solana, only report the first provider
+        // For EVM/Tron, report all valid providers
+        validUrls.forEach((rpcUrl) => {
+          const rpcOrigin = new URL(rpcUrl).origin;
+          goodRpcs.push({ rpcOrigin, blockNumber, domain: domainId });
+        });
+      } catch (error: unknown) {
+        // If ChainService fails, mark valid providers as bad
+        validUrls.forEach((rpcUrl) => {
+          const rpcOrigin = new URL(rpcUrl).origin;
+          const errorMessage = (error as Error).message.replace(rpcUrl, rpcOrigin);
+          badRpcs.push({ rpcOrigin, error: errorMessage, domain: domainId });
+          logger.debug(`Error connecting to provider at ${rpcOrigin}: ${error}`, requestContext, methodContext);
+        });
+      }
     }),
   );
 

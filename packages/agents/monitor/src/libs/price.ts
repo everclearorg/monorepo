@@ -1,33 +1,12 @@
-import { AssetConfig, createLoggingContext, univ2PairABI, chainWrapper, PublicClient } from '@chimera-monorepo/utils';
+import { AssetConfig, createLoggingContext, univ2PairABI, chainWrapper } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import {
   getTokenPriceFromCoingecko,
   getTokenPriceFromChainlink,
   getTokenPriceFromUniV2,
   getTokenPriceFromUniV3,
-  getBestProvider,
 } from '../mockable';
 import { MissingAssetConfig, MissingTokenPrice } from '../types';
-
-/**
- * Create a PublicClient from an RPC URL
- * @param rpcUrl - The RPC URL
- * @returns PublicClient instance
- */
-const createClientFromRpcUrl = (rpcUrl: string): PublicClient => {
-  return chainWrapper.createPublicClient({
-    chain: {
-      id: 1,
-      name: 'Ethereum',
-      nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-      rpcUrls: {
-        default: { http: [rpcUrl] },
-        public: { http: [rpcUrl] },
-      },
-    },
-    transport: chainWrapper.http(rpcUrl),
-  }) as PublicClient;
-};
 
 /**
  * Get the token price for a specified asset on a given domain.
@@ -38,7 +17,6 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
   const {
     adapters: { chainreader },
     logger,
-    config,
   } = getContext();
 
   const { requestContext, methodContext } = createLoggingContext(getTokenPrice.name);
@@ -46,12 +24,14 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
   // 1. Return 1 if the specified asset is the stable token.
   if (asset.price.isStable) return 1;
 
-  const bestRpcUrlForDomain = await getBestProvider(config.chains[domain].providers);
-
   // 2. If a chainlink price feed is configured for the asset, retrieve the token price from the data feed.
-  if (asset.price.priceFeed && bestRpcUrlForDomain) {
-    const client = createClientFromRpcUrl(bestRpcUrlForDomain);
-    const chainlinkPrice = await getTokenPriceFromChainlink(domain, asset.price.priceFeed, client);
+  if (asset.price.priceFeed) {
+    const chainlinkPrice = await getTokenPriceFromChainlink(
+      domain,
+      asset.price.priceFeed,
+      (params) => chainreader.readTx(params, 'latest'), // Wrap ChainReader.readTx
+      +domain,
+    );
     logger.debug('Got the token price from the chainlink', requestContext, methodContext, {
       asset: asset.address.toLowerCase(),
       price: chainlinkPrice,
@@ -73,7 +53,7 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
   }
 
   // 4. If a univ2 pair is configured, calculate token price from reserves by calling `getReserves` method from the pair contract.
-  if (asset.price.univ2 && bestRpcUrlForDomain) {
+  if (asset.price.univ2) {
     const encodedDataForToken0 = chainWrapper.encodeFunctionData({
       abi: univ2PairABI,
       functionName: 'token0',
@@ -119,13 +99,13 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
     const baseAsset = token0.toLowerCase() == asset.address.toLowerCase() ? token1 : token0;
     const baseAssetConfig = getAssetConfig(domain, baseAsset);
     const baseTokenPrice = await getTokenPrice(domain, baseAssetConfig);
-    const client = createClientFromRpcUrl(bestRpcUrlForDomain);
     const token0Price = await getTokenPriceFromUniV2(
       domain,
       asset.price.univ2.pair,
       token0Config,
       token1Config,
-      client,
+      (params) => chainreader.readTx(params, 'latest'), // Wrap ChainReader.readTx
+      +domain,
     );
     const assetPrice =
       token0.toLowerCase() == asset.address.toLowerCase()
@@ -141,7 +121,7 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
   }
 
   // 5. If a univ3 pool is configured, calculate the token price using the tick returned from the `slot0` method call of the univ3 pool.
-  if (asset.price.univ3 && bestRpcUrlForDomain) {
+  if (asset.price.univ3) {
     const encodedDataForToken0 = chainWrapper.encodeFunctionData({
       abi: univ2PairABI,
       functionName: 'token0',
@@ -189,13 +169,13 @@ export const getTokenPrice = async (domain: string, asset: AssetConfig): Promise
     const baseAsset = token0.toLowerCase() == asset.address.toLowerCase() ? token1 : token0;
     const baseAssetConfig = getAssetConfig(domain, baseAsset);
     const baseTokenPrice = await getTokenPrice(domain, baseAssetConfig);
-    const client = createClientFromRpcUrl(bestRpcUrlForDomain);
     const token0Price = await getTokenPriceFromUniV3(
       domain,
       asset.price.univ3.pool,
       token0Config,
       token1Config,
-      client,
+      (params) => chainreader.readTx(params, 'latest'), // Wrap ChainReader.readTx
+      +domain,
     );
     const assetPrice =
       token0.toLowerCase() == asset.address.toLowerCase()
