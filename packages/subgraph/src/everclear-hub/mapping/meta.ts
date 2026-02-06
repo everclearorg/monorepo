@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, ByteArray, crypto, ethereum } from '@graphprotocol/graph-ts';
-import { Meta, Domain, ChainGateway, HubMetaUpdate } from '../../../generated/schema';
+import { Meta, Domain, HubMetaUpdate } from '../../../generated/schema';
 import {
   AcceptanceDelayUpdated,
   OwnershipProposed,
@@ -144,13 +144,7 @@ export function handleOwnershipProposed(event: OwnershipProposed): void {
   meta.proposedOwnershipTimestamp = event.params._timestamp;
   meta.save();
 
-  logHubMetaUpdate(
-    'OWNERSHIP_PROPOSED',
-    event,
-    'proposedOwner',
-    event.params._proposedOwner,
-    event.params._timestamp,
-  );
+  logHubMetaUpdate('OWNERSHIP_PROPOSED', event, 'proposedOwner', event.params._proposedOwner, event.params._timestamp);
 }
 
 /**
@@ -218,13 +212,7 @@ export function handleAcceptanceDelayUpdated(event: AcceptanceDelayUpdated): voi
   meta.acceptanceDelay = event.params._newAcceptanceDelay;
   meta.save();
 
-  logHubMetaUpdate(
-    'ACCEPTANCE_DELAY_UPDATED',
-    event,
-    'acceptanceDelay',
-    null,
-    event.params._newAcceptanceDelay,
-  );
+  logHubMetaUpdate('ACCEPTANCE_DELAY_UPDATED', event, 'acceptanceDelay', null, event.params._newAcceptanceDelay);
 }
 
 /**
@@ -258,13 +246,7 @@ export function handleEpochLengthUpdated(event: EpochLengthUpdated): void {
   meta.epochLength = event.params._newEpochLength;
   meta.save();
 
-  logHubMetaUpdate(
-    'EPOCH_LENGTH_UPDATED',
-    event,
-    'epochLength',
-    null,
-    event.params._newEpochLength,
-  );
+  logHubMetaUpdate('EPOCH_LENGTH_UPDATED', event, 'epochLength', null, event.params._newEpochLength);
 }
 
 /**
@@ -278,13 +260,7 @@ export function handleExpiryTimeBufferUpdated(event: ExpiryTimeBufferUpdated): v
   meta.expiryTimeBuffer = event.params._newExpiryTimeBuffer;
   meta.save();
 
-  logHubMetaUpdate(
-    'EXPIRY_TIME_BUFFER_UPDATED',
-    event,
-    'expiryTimeBuffer',
-    null,
-    event.params._newExpiryTimeBuffer,
-  );
+  logHubMetaUpdate('EXPIRY_TIME_BUFFER_UPDATED', event, 'expiryTimeBuffer', null, event.params._newExpiryTimeBuffer);
 }
 
 /**
@@ -295,12 +271,12 @@ export function handleExpiryTimeBufferUpdated(event: ExpiryTimeBufferUpdated): v
 export function handleSupportedDomainsAdded(event: SupportedDomainsAdded): void {
   const meta = getOrCreateMeta();
 
-  let domains = ensureArrayInitialized(meta.supportedDomains);
+  const domains = ensureArrayInitialized(meta.supportedDomains);
   const domainsToAdd = event.params._domains;
   for (let i = 0; i < domainsToAdd.length; i++) {
     const domainId = domainsToAdd[i].id;
     const domainIdBytes = Bytes.fromByteArray(Bytes.fromBigInt(domainId));
-    
+
     // Check if domain already exists
     let exists = false;
     for (let j = 0; j < domains.length; j++) {
@@ -348,12 +324,12 @@ export function handleSupportedDomainsAdded(event: SupportedDomainsAdded): void 
 export function handleSupportedDomainsRemoved(event: SupportedDomainsRemoved): void {
   const meta = getOrCreateMeta();
 
-  let domains = ensureArrayInitialized(meta.supportedDomains);
+  const domains = ensureArrayInitialized(meta.supportedDomains);
   // eslint-disable-next-line @typescript-eslint/ban-types
   const remain: Array<Bytes> = [];
   const domainsToRemove = event.params._domains;
   let removedIndex = 0;
-  
+
   for (let i = 0; i < domains.length; i++) {
     let shouldRemove = false;
     for (let j = 0; j < domainsToRemove.length; j++) {
