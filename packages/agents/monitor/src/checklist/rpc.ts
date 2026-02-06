@@ -1,4 +1,4 @@
-import { createLoggingContext, delay, Logger, Severity, SOLANA_CHAINID } from '@chimera-monorepo/utils';
+import { createLoggingContext, Logger, Severity, SOLANA_CHAINID } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
@@ -24,7 +24,7 @@ export const checkRpcs = async (timeoutMs: number = 5000) => {
   const {
     config,
     logger,
-    adapters: { chainreader },
+    adapters: { blockMap },
   } = getContext();
 
   const { requestContext, methodContext } = createLoggingContext(checkRpcs.name);
@@ -81,23 +81,17 @@ export const checkRpcs = async (timeoutMs: number = 5000) => {
       }
 
       try {
-        const start = Date.now();
-        const blockNumber = await Promise.race([
-          chainreader.getBlockNumber(+domainId),
-          (async () => {
-            await delay(timeoutMs);
-            logger.warn('Getting block number timed out', requestContext, methodContext, {
-              chain: domainId,
-              delay: timeoutMs,
-            });
-            throw new Error('Request timed out');
-          })(),
-        ]);
+        if (!blockMap.has(domainId)) {
+          logger.warn('Block data not found for chain', requestContext, methodContext, {
+            domain: domainId,
+          });
+          throw new Error('Block data not found');
+        }
 
+        const blockNumber = blockMap.get(domainId)!.number;
         logger.debug('Retrieved block number for chain', requestContext, methodContext, {
           number: blockNumber,
           chain: domainId,
-          elapsed: Date.now() - start,
         });
 
         // Mark valid providers as good
