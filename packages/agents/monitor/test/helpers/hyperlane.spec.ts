@@ -54,7 +54,7 @@ describe('Helpers:hyperlane', () => {
       } as any);
 
       encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0x1234' as `0x${string}`);
-      decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(['0x1234']);
+      decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns('0x1234' as `0x${string}`);
       decodeEventLogStub = stub(chainWrapper, 'decodeEventLog').returns({ args: { message: message.body } } as any);
 
       database = mock.instances.database() as SinonStubbedInstance<Database>;
@@ -92,7 +92,7 @@ describe('Helpers:hyperlane', () => {
     it('should return pending if no destination domain', async () => {
       getHyperlaneMsgDeliveredStub.resolves(false);
       database.getMessagesByIds.resolves([mock.message({ destinationDomain: undefined })]);
-      decodeStub.returns([false]);
+      decodeStub.returns('0x1234' as `0x${string}`);
       chainreader.getGasEstimateWithRevertCode.rejects(new Error('fail'));
       expect(await getMessageStatus(id)).to.be.deep.eq({ status: 'pending' });
     });
@@ -100,7 +100,7 @@ describe('Helpers:hyperlane', () => {
     it('should work if tx is not delivered but is relayable', async () => {
       getHyperlaneMsgDeliveredStub.resolves(false);
       database.getMessagesByIds.resolves([mock.message()]);
-      decodeStub.onFirstCall().returns(['0x1234']);
+      decodeStub.onFirstCall().returns('0x1234' as `0x${string}`);
       decodeStub.onSecondCall().returns([false]);
 
       const ret = await getMessageStatus(id, true);
@@ -129,6 +129,7 @@ describe('Helpers:hyperlane', () => {
       getHyperlaneMessageStatusStub.resolves(undefined);
       getHyperlaneMsgDeliveredStub.resolves(false);
       database.getMessagesByIds.resolves([mock.message()]);
+      decodeStub.returns('0x1234' as `0x${string}`);
 
       chainreader.getTransactionReceipt.resolves({
         transactionHash: mkHash('0xtx'),

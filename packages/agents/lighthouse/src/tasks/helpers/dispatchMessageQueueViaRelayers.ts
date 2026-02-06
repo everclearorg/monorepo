@@ -536,7 +536,7 @@ export const dispatchMessageQueueViaRelayers = async (
           signer: walletAddr,
         });
 
-        const funcSig = `${queueMethodName}(uint32,${type === 'INTENT' ? 'tuple[]' : 'uint256'},address,uint32,uint256,uint256,bytes)`;
+        const funcSig = `${queueMethodName}(uint32,${type === 'INTENT' ? '(bytes32,bytes32,bytes32,bytes32,uint32,uint64,uint48,uint48,uint256,uint256,uint32[],bytes)[]' : 'uint256'},address,uint256,uint256,uint256,bytes)`;
 
         logger.info('Generating transaction', requestContext, methodContext, {
           queueDomain: queue.domain,

@@ -21,7 +21,7 @@
     "add-domains:staging": "bash -c 'source .env && forge script script/hub/AddDomains.s.sol:TestnetStaging $0 $1 $2'",
     "add-liquidity:staging": "bash -c 'source .env && forge script script/spoke/AddLiquidity.s.sol:TestnetStaging --rpc-url $0 $1'",
     "assign-role:staging": "bash -c 'source .env && forge script script/hub/AssignRole.s.sol:TestnetStaging $0'",
-    "build": "yarn build:ts && yarn build:sol",
+    "build": "yarn build:ts && bash -c 'if [ \"${SKIP_SOLIDITY_BUILD:-}\" != \"true\" ]; then yarn build:sol; fi'",
     "build:optimized": "FOUNDRY_PROFILE=optimized forge build",
     "build:sol": "forge build",
     "build:ts": "tsc --build ./tsconfig.build.json",
