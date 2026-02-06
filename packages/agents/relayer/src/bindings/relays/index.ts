@@ -98,9 +98,7 @@ export const pollCache = async () => {
           : chainWrapper.http(rpcUrls[0]);
       const client = chainWrapper.createPublicClient({
         transport,
-        batch: {
-          multicall: true,
-        },
+        ...chainWrapper.getDefaultMulticallParams(),
       }) as PublicClient;
       (wallet as Web3Signer).connect(client);
       logger.debug('Updated relayer signer', _requestContext, methodContext, {
