@@ -2,7 +2,6 @@ import { createLoggingContext, delay, jsonifyError } from '@chimera-monorepo/uti
 import { getContext } from '../context';
 import { ChainStatusResponse, Severity } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
-import { getLatestBlockFromBlockMap } from '../helpers/chain';
 
 export const checkChains = async (shouldAlert = true, timeoutMs: number = 15000): Promise<ChainStatusResponse> => {
   const {
@@ -55,37 +54,34 @@ export const checkChains = async (shouldAlert = true, timeoutMs: number = 15000)
 
       const subgraphBlockNumber = subgraphBlockNumbers.has(domainId) ? subgraphBlockNumbers.get(domainId)! : 0;
       const rpcStart = Date.now();
-      const cached = getLatestBlockFromBlockMap(domainId);
-      const rpcBlock =
-        cached ??
-        (await Promise.race([
-          chainreader
-            .getBlock(+domainId, 'latest')
-            .then((ret) => {
-              logger.info('Getting block from chain complete', requestContext, methodContext, {
-                chain: +domainId,
-                elapsed: Date.now() - rpcStart,
-                ret,
-              });
-              return ret;
-            })
-            .catch((e) => {
-              logger.warn('Failed to get block from chain', requestContext, methodContext, {
-                chain: +domainId,
-                elapsed: Date.now() - rpcStart,
-                error: jsonifyError(e),
-              });
-              throw e;
-            }),
-          (async () => {
-            await delay(timeoutMs);
-            logger.warn('Chain took longer than tolerated to resolve latest block', requestContext, methodContext, {
+      const rpcBlock = await Promise.race([
+        chainreader
+          .getBlock(+domainId, 'latest')
+          .then((ret) => {
+            logger.info('Getting block from chain complete', requestContext, methodContext, {
               chain: +domainId,
-              delay: timeoutMs,
+              elapsed: Date.now() - rpcStart,
+              ret,
             });
-            return { number: 0, timestamp: Math.floor(Date.now() / 1000) };
-          })(),
-        ]));
+            return ret;
+          })
+          .catch((e) => {
+            logger.warn('Failed to get block from chain', requestContext, methodContext, {
+              chain: +domainId,
+              elapsed: Date.now() - rpcStart,
+              error: jsonifyError(e),
+            });
+            throw e;
+          }),
+        (async () => {
+          await delay(timeoutMs);
+          logger.warn('Chain took longer than tolerated to resolve latest block', requestContext, methodContext, {
+            chain: +domainId,
+            delay: timeoutMs,
+          });
+          return { number: 0, timestamp: Math.floor(Date.now() / 1000) };
+        })(),
+      ]);
 
       // Automatically increase the diff to size of threshold + 10
       const diff =

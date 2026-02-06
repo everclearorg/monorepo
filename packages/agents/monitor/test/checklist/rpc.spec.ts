@@ -4,7 +4,6 @@ import { checkRpcs } from '../../src/checklist/rpc';
 import { getContextStub, mock } from '../globalTestHook';
 import { createProcessEnv } from '../mock';
 import * as Mockable from '../../src/mockable';
-import * as ChainHelpers from '../../src/helpers/chain';
 
 describe('checkRpcs', () => {
   let sendAlertsStub: SinonStub;
@@ -12,7 +11,6 @@ describe('checkRpcs', () => {
   let createPublicClientStub: SinonStub;
   let httpStub: SinonStub;
   let getBlockNumberStub: SinonStub;
-  let getLatestBlockFromBlockMapStub: SinonStub;
 
   beforeEach(() => {
     stub(process, 'env').value({
@@ -39,10 +37,6 @@ describe('checkRpcs', () => {
     };
     createPublicClientStub.returns(mockClient);
     getBlockNumberStub = mockClient.getBlockNumber;
-
-    // Mock getLatestBlockFromBlockMap to return null so we test the RPC path
-    getLatestBlockFromBlockMapStub = stub(ChainHelpers, 'getLatestBlockFromBlockMap');
-    getLatestBlockFromBlockMapStub.returns(null);
   });
 
   afterEach(() => {
@@ -65,18 +59,15 @@ describe('checkRpcs', () => {
       expect((sendAlertsStub.getCall(0).args[0] as any).reason).to.not.contain("mock_api_key");
     });
 
-    it('should handle cached block numbers', async () => {
-      getLatestBlockFromBlockMapStub.returns({ number: 12345 });
-
+    it('should always fetch block numbers from RPC', async () => {
       await checkRpcs(1000);
 
-      // Should call getLatestBlockFromBlockMap for each provider (4 calls)
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(4);
-      // Should resolve alerts for cached blocks (4 calls)
+      // Should create EVM clients for EVM chains (4 calls)
+      expect(createPublicClientStub.callCount).to.equal(4);
+      // Should call getBlockNumber for each provider (4 calls)
+      expect(getBlockNumberStub.callCount).to.equal(4);
+      // Should resolve alerts for successful RPC calls (4 calls)
       expect(resolveAlertsStub.callCount).to.equal(4);
-      // Should not create any RPC clients since we're using cached data
-      expect(createPublicClientStub.callCount).to.equal(0);
-      expect(getBlockNumberStub.callCount).to.equal(0);
       // Should not send any error alerts
       expect(sendAlertsStub.callCount).to.equal(0);
     });
@@ -96,9 +87,7 @@ describe('checkRpcs', () => {
       });
 
       await checkRpcs(1000);
-      
-      // Should call getLatestBlockFromBlockMap once for the single provider
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(1);
+
       // Should not create EVM clients for Solana
       expect(createPublicClientStub.callCount).to.equal(0);
       expect(getBlockNumberStub.callCount).to.equal(0);
@@ -122,9 +111,7 @@ describe('checkRpcs', () => {
       });
 
       await checkRpcs(1000);
-      
-      // Should call getLatestBlockFromBlockMap once for the single provider
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(1);
+
       // Should create one EVM client for the single provider
       expect(createPublicClientStub.callCount).to.equal(1);
       // Should call getBlockNumber once
@@ -140,8 +127,6 @@ describe('checkRpcs', () => {
 
       await checkRpcs(1000);
 
-      // Should call getLatestBlockFromBlockMap for each provider (4 calls)
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(4);
       // Should create EVM clients for EVM chains (4 calls)
       expect(createPublicClientStub.callCount).to.equal(4);
       // Should attempt to call getBlockNumber for each EVM provider (4 calls)
@@ -167,9 +152,7 @@ describe('checkRpcs', () => {
       });
 
       await checkRpcs(1000);
-      
-      // Should call getLatestBlockFromBlockMap once for the single provider
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(1);
+
       // Should not create EVM clients for Solana
       expect(createPublicClientStub.callCount).to.equal(0);
       expect(getBlockNumberStub.callCount).to.equal(0);
@@ -183,8 +166,6 @@ describe('checkRpcs', () => {
 
       await checkRpcs(1000);
 
-      // Should call getLatestBlockFromBlockMap for each provider (4 calls)
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(4);
       // Should create EVM clients for EVM chains (4 calls)
       expect(createPublicClientStub.callCount).to.equal(4);
       // Should attempt to call getBlockNumber for each EVM provider (4 calls)
@@ -200,8 +181,6 @@ describe('checkRpcs', () => {
 
       await checkRpcs(1000);
 
-      // Should call getLatestBlockFromBlockMap for each provider (4 calls)
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(4);
       // Should create EVM clients for EVM chains (4 calls)
       expect(createPublicClientStub.callCount).to.equal(4);
       // Should attempt to call getBlockNumber for each EVM provider (4 calls)
@@ -227,9 +206,7 @@ describe('checkRpcs', () => {
       });
 
       await checkRpcs(1000);
-      
-      // Should call getLatestBlockFromBlockMap once for the single provider
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(1);
+
       // Should not create EVM clients for Solana
       expect(createPublicClientStub.callCount).to.equal(0);
       expect(getBlockNumberStub.callCount).to.equal(0);
@@ -253,9 +230,7 @@ describe('checkRpcs', () => {
       });
 
       await checkRpcs(1000);
-      
-      // Should call getLatestBlockFromBlockMap once for the single provider
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(1);
+
       // Should create one EVM client for the single provider
       expect(createPublicClientStub.callCount).to.equal(1);
       // Should attempt to call getBlockNumber once
@@ -267,9 +242,7 @@ describe('checkRpcs', () => {
 
     it('should handle successful RPC calls', async () => {
       await checkRpcs(1000);
-      
-      // Should call getLatestBlockFromBlockMap for each provider (4 calls)
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(4);
+
       // Should create EVM clients for EVM chains (4 calls)
       expect(createPublicClientStub.callCount).to.equal(4);
       // Should call getBlockNumber for each EVM provider (4 calls)
@@ -299,9 +272,7 @@ describe('checkRpcs', () => {
       getBlockNumberStub.onSecondCall().rejects(new Error('Connection failed'));
       
       await checkRpcs(1000);
-      
-      // Should call getLatestBlockFromBlockMap twice (once per provider)
-      expect(getLatestBlockFromBlockMapStub.callCount).to.equal(2);
+
       // Should create two EVM clients (one per provider)
       expect(createPublicClientStub.callCount).to.equal(2);
       // Should call getBlockNumber twice (once per provider)
