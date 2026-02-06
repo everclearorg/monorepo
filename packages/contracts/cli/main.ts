@@ -2,6 +2,7 @@ import { select } from '@inquirer/prompts';
 
 import { deployContracts } from './tasks/deploy';
 import { deployAdapters } from './tasks/deployAdapters';
+import { deployAdaptersV2 } from './tasks/deployAdaptersV2';
 
 import { returnUnsupportedIntent } from './tasks/returnUnsupportedIntent';
 import { handleExpiredIntents } from './tasks/handleExpiredIntents';
@@ -36,6 +37,10 @@ async function main() {
       {
         name: 'Deploy Adapters',
         value: 'deploy_adapters',
+      },
+      {
+        name: 'Deploy Adapters V2',
+        value: 'deploy_adapters_v2',
       },
       {
         name: 'Setup hub domains and gateways',
@@ -110,6 +115,9 @@ async function main() {
       break;
     case 'deploy_adapters':
       deployAdapters();
+      break;
+    case 'deploy_adapters_v2':
+      deployAdaptersV2();
       break;
     case 'setup_hub_domains_and_gateways':
       setupDomainsAndGateways();

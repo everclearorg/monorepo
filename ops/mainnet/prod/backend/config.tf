@@ -174,6 +174,12 @@ locals {
           "https://gnosis-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
       },
+      "239" = {
+        providers = [
+          "https://rpc.ankr.com/tac",
+          "https://rpc.tac.build"
+        ]
+      },
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"

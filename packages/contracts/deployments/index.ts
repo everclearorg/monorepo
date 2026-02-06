@@ -134,6 +134,9 @@ import ProductionSpokeGatewaySonic from './production/146/SpokeGateway.json';
 import ProductionEverclearSpokeInk from './production/57073/EverclearSpoke.json';
 import ProductionSpokeGatewayInk from './production/57073/SpokeGateway.json';
 
+import ProductionEverclearSpokeTac from './production/239/EverclearSpoke.json';
+import ProductionSpokeGatewayTac from './production/239/SpokeGateway.json';
+
 export const Deployments = {
   local: {},
   production: {
@@ -256,6 +259,10 @@ export const Deployments = {
     57073: {
       everclear: ProductionEverclearSpokeInk,
       gateway: ProductionSpokeGatewayInk,
+    },
+    239: {
+      everclear: ProductionEverclearSpokeTac,
+      gateway: ProductionSpokeGatewayTac,
     },
   },
   staging: {

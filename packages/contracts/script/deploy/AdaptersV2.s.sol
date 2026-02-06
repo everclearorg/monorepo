@@ -6,14 +6,13 @@ import {ScriptUtils} from '../utils/Utils.sol';
 import {Script} from 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
 
-import {FeeAdapter} from 'contracts/intent/FeeAdapter.sol';
+import {FeeAdapterV2} from 'contracts/intent/FeeAdapterV2.sol';
 
 import {MainnetProductionEnvironment} from '../MainnetProduction.sol';
 import {MainnetStagingEnvironment} from '../MainnetStaging.sol';
+import {ICREATE3} from './upgrades/ICREATE3.sol';
 
 contract DeployAdapterBase is Script, ScriptUtils {
-  mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
-
   struct DeploymentParams {
     address spoke;
     address xerc20Module;
@@ -22,14 +21,22 @@ contract DeployAdapterBase is Script, ScriptUtils {
     address owner;
   }
 
-  FeeAdapter internal _feeAdapter;
-
+  error Create3DeploymentFailed();
   error WrongChainId();
   error FeeAdapterMismatch();
   error OwnerMismatch();
   error FeeRecipientMismatch();
   error FeeSignerMismatch();
   error SpokeMismatch();
+
+  // CREATE3 addresses
+  address public constant LIFI_CREATE3 = 0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1;
+  address public constant LIFI_CREATE3_2 = 0xeBbbaC35500713C4AD49929e1bE4225c7efF6510;
+  address public constant LIFI_LONDON_CREATE3 = 0x8437A5fE47A4Df14700c96DF1870824e72FA8499;
+  address public constant LIFI_CREATE3_BERACHAIN = 0x5f63A2d7850776465b84Bc0fe6284BBC8188dbC7;
+  FeeAdapterV2 internal _feeAdapter;
+
+  mapping(uint256 _chainId => DeploymentParams _params) internal _deploymentParams;
 
   function run(
     string memory _account
@@ -43,18 +50,31 @@ contract DeployAdapterBase is Script, ScriptUtils {
     }
 
     uint256 _deployerPk = vm.envUint(_account);
-    address _deployer = vm.addr(_deployerPk);
-    uint64 _nonce = vm.getNonce(_deployer);
 
     vm.startBroadcast(_deployerPk);
 
-    address _expectedFeeAdapter = _addressFrom(_deployer, _nonce);
+    // Selecting CREATE3 address based on chain
+    address create3Used = address(0);
+
+    // Generating the inputs for CREATE3
+    if (create3Used == address(0)) {
+      _feeAdapter =
+        new FeeAdapterV2(_params.spoke, _params.owner, _params.feeSigner, _params.xerc20Module, _params.feeRecipient);
+    } else {
+      bytes32 _salt = keccak256(abi.encodePacked('FeeAdapterV2 implementation'));
+      bytes memory initCode = abi.encodePacked(
+        type(FeeAdapterV2).creationCode,
+        abi.encode(_params.spoke, _params.feeRecipient, _params.feeSigner, _params.xerc20Module, _params.owner)
+      );
+
+      // Deploying the new implementation via CREATE3
+      bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _salt, initCode);
+      (bool success, bytes memory returnData) = create3Used.call(create3Calldata);
+      if (!success) revert Create3DeploymentFailed();
+      _feeAdapter = FeeAdapterV2(abi.decode(returnData, (address)));
+    }
 
     // deploy feeAdapter
-    _feeAdapter =
-      new FeeAdapter(_params.spoke, _params.feeRecipient, _params.feeSigner, _params.xerc20Module, _params.owner);
-    if (address(_feeAdapter) != _expectedFeeAdapter) revert FeeAdapterMismatch();
-
     if (_feeAdapter.owner() != _params.owner) {
       revert OwnerMismatch();
     }
@@ -279,6 +299,15 @@ contract MainnetProduction is DeployAdapterBase, MainnetProductionEnvironment {
       feeSigner: L2_FEE_SIGNER,
       owner: GNOSIS_ENG_MULTISIG
     });
+
+    // TAC
+    _deploymentParams[TAC] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(TAC_SPOKE),
+      xerc20Module: address(TAC_XERC20_MODULE),
+      feeRecipient: TAC_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: TAC_ENG_MULTISIG
+    });
   }
 }
 
@@ -318,6 +347,15 @@ contract MainnetStaging is DeployAdapterBase, MainnetStagingEnvironment {
       feeRecipient: ARBITRUM_ENG_MULTISIG,
       feeSigner: L2_FEE_SIGNER,
       owner: ARBITRUM_ENG_MULTISIG
+    });
+
+    // TAC
+    _deploymentParams[TAC] = DeploymentParams({ // set domain id as mapping key
+      spoke: address(TAC_SPOKE),
+      xerc20Module: address(TAC_XERC20_MODULE),
+      feeRecipient: TAC_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: TAC_ENG_MULTISIG
     });
   }
 }
