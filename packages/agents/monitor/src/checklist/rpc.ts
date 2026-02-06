@@ -1,4 +1,4 @@
-import { createLoggingContext, delay, Logger, Severity, SOLANA_CHAINID } from '@chimera-monorepo/utils';
+import { createLoggingContext, Logger, Severity, SOLANA_CHAINID } from '@chimera-monorepo/utils';
 import { getContext } from '../context';
 import { Report } from '../types';
 import { resolveAlerts, sendAlerts } from '../mockable';
@@ -20,11 +20,11 @@ const makeReport = (e: RpcError, logger: Logger, env: string): Report => ({
   env,
 });
 
-export const checkRpcs = async (timeoutMs: number = 5000) => {
+export const checkRpcs = async () => {
   const {
     config,
     logger,
-    adapters: { chainreader },
+    adapters: { blockMap },
   } = getContext();
 
   const { requestContext, methodContext } = createLoggingContext(checkRpcs.name);
@@ -44,7 +44,7 @@ export const checkRpcs = async (timeoutMs: number = 5000) => {
         if (!URL.canParse(rpcUrl)) {
           // Extract origin if possible, otherwise use a safe placeholder
           // Don't expose full URL as it may contain secrets
-          let rpcOrigin = 'malformed URL';
+          let rpcOrigin: string;
           try {
             // Try to extract just the hostname/origin if it's partially valid
             // Only extract if it looks like it has a protocol or valid hostname structure
@@ -81,24 +81,23 @@ export const checkRpcs = async (timeoutMs: number = 5000) => {
       }
 
       try {
-        const start = Date.now();
-        const blockNumber = await Promise.race([
-          chainreader.getBlockNumber(+domainId),
-          (async () => {
-            await delay(timeoutMs);
-            logger.warn('Getting block number timed out', requestContext, methodContext, {
-              chain: domainId,
-              delay: timeoutMs,
-            });
-            throw new Error('Request timed out');
-          })(),
-        ]);
+        if (!blockMap.has(domainId)) {
+          logger.warn('Block data not found for chain', requestContext, methodContext, {
+            domain: domainId,
+          });
+          throw new Error('Block data not found');
+        }
 
+        const blockNumber = blockMap.get(domainId)!.number;
         logger.debug('Retrieved block number for chain', requestContext, methodContext, {
           number: blockNumber,
           chain: domainId,
-          elapsed: Date.now() - start,
         });
+
+        // Check if block fetching failed (blockNumber <= 0 indicates error state from getBlocks)
+        if (blockNumber <= 0) {
+          throw new Error('Block fetching failed or timed out');
+        }
 
         // Mark valid providers as good
         // For Solana, only report the first provider

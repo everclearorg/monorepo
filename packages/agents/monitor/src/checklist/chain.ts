@@ -7,7 +7,7 @@ export const checkChains = async (shouldAlert = true, timeoutMs: number = 15000)
   const {
     config,
     logger,
-    adapters: { subgraph, chainreader },
+    adapters: { subgraph, blockMap },
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(checkChains.name);
 
@@ -53,35 +53,21 @@ export const checkChains = async (shouldAlert = true, timeoutMs: number = 15000)
       const threshold = chainConfig.maxDelayedSubgraphBlock ?? config.thresholds.maxDelayedSubgraphBlock ?? 0;
 
       const subgraphBlockNumber = subgraphBlockNumbers.has(domainId) ? subgraphBlockNumbers.get(domainId)! : 0;
-      const rpcStart = Date.now();
-      const rpcBlock = await Promise.race([
-        chainreader
-          .getBlock(+domainId, 'latest')
-          .then((ret) => {
-            logger.info('Getting block from chain complete', requestContext, methodContext, {
-              chain: +domainId,
-              elapsed: Date.now() - rpcStart,
-              ret,
-            });
-            return ret;
-          })
-          .catch((e) => {
-            logger.warn('Failed to get block from chain', requestContext, methodContext, {
-              chain: +domainId,
-              elapsed: Date.now() - rpcStart,
-              error: jsonifyError(e),
-            });
-            throw e;
-          }),
-        (async () => {
-          await delay(timeoutMs);
-          logger.warn('Chain took longer than tolerated to resolve latest block', requestContext, methodContext, {
-            chain: +domainId,
-            delay: timeoutMs,
-          });
-          return { number: 0, timestamp: Math.floor(Date.now() / 1000) };
-        })(),
-      ]);
+
+      let rpcBlock: { number: number; timestamp: number };
+      if (!blockMap.has(domainId)) {
+        logger.warn('Block data not found for domain', requestContext, methodContext, {
+          domain: domainId,
+        });
+        rpcBlock = { number: 0, timestamp: Math.floor(Date.now() / 1000) };
+      } else {
+        rpcBlock = blockMap.get(domainId)!;
+        logger.debug('Found block data', requestContext, methodContext, {
+          chain: +domainId,
+          number: rpcBlock.number,
+          timestamp: rpcBlock.timestamp,
+        });
+      }
 
       // Automatically increase the diff to size of threshold + 10
       const diff =

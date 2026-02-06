@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   axiosGet as _axiosGet,
-  axiosPost as _axiosPost,
   getDefaultABIConfig as _getDefaultABIConfig,
   getTokenPriceFromCoingecko as _getTokenPriceFromCoingecko,
   getEverclearConfig as _getEverclearConfig,
