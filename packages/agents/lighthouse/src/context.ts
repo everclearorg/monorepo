@@ -1,10 +1,23 @@
-import { Logger, RelayerType, createLoggingContext, jsonifyError, sendHeartbeat } from '@chimera-monorepo/utils';
+import {
+  Logger,
+  RelayerType,
+  createLoggingContext,
+  jsonifyError,
+  sendHeartbeat,
+  logFileDescriptorUsage,
+  shouldExitForFileDescriptors,
+  EverclearSpoke,
+  SOLANA_CHAINID,
+} from '@chimera-monorepo/utils';
 import { Relayer, setupEverclearRelayer, setupGelatoRelayer } from '@chimera-monorepo/adapters-relayer';
 import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
 import { LighthouseConfig, LighthouseService } from './config';
 import { ChainService, SafeService, EthWallet } from '@chimera-monorepo/chainservice';
 import { Database, getDatabase } from '@chimera-monorepo/database';
 import { HistoricPrice } from './tasks/reward/historicPrice';
+import * as anchor from '@coral-xyz/anchor';
+import idlFile from './idl/everclear_spoke.json';
+import stagingIdlFile from './idl/everclear_spoke.staging.json';
 
 export type LighthouseContext = {
   logger: Logger;
@@ -16,6 +29,11 @@ export type LighthouseContext = {
     chainservice: ChainService;
     safeservice: SafeService;
     relayers: { instance: Relayer; apiKey: string; type: RelayerType }[];
+    solana?: {
+      connection: anchor.web3.Connection;
+      spoke: anchor.Program<EverclearSpoke>;
+      signer: anchor.web3.Keypair;
+    };
   };
 };
 
@@ -29,6 +47,26 @@ export const makeLighthouseTask = async (
   service: LighthouseService,
 ): Promise<void> => {
   const { requestContext, methodContext } = createLoggingContext(makeLighthouseTask.name);
+
+  // Log file descriptor usage at the start of invocation
+  let logger: Logger | undefined;
+  try {
+    // Create a temporary logger for file descriptor logging before context is fully initialized
+    logger = new Logger({
+      level: config.logLevel || 'info',
+      name: 'lighthouse',
+    });
+    logFileDescriptorUsage(logger);
+
+    // Exit early if the file descriptor usage is too high, otherwise it will fail with EMFILE error later on.
+    if (shouldExitForFileDescriptors()) {
+      logger.error('Exiting due to high file descriptor usage', requestContext, methodContext);
+      return;
+    }
+  } catch (e: unknown) {
+    // If logging fails, continue anyway (don't block execution)
+    console.warn('Failed to log file descriptor usage:', e);
+  }
 
   try {
     // Store the config
@@ -105,6 +143,36 @@ export const makeLighthouseTask = async (
       });
     }
 
+    // Adapters - Solana (only for solana service, reuse connection to avoid EMFILE errors)
+    const chainConfig = context.config.chains[SOLANA_CHAINID];
+    if (service === 'solana' && chainConfig) {
+      if (chainConfig.providers && chainConfig.providers.length > 0 && context.config.solana?.signer) {
+        const idl =
+          context.config.environment === 'production'
+            ? JSON.parse(JSON.stringify(idlFile))
+            : JSON.parse(JSON.stringify(stagingIdlFile));
+
+        const connection = new anchor.web3.Connection(chainConfig.providers[0]);
+        const signer = anchor.web3.Keypair.fromSecretKey(
+          new Uint8Array(
+            context.config.solana.signer
+              .slice(1, context.config.solana.signer.length - 1)
+              .split(',')
+              .map(Number),
+          ),
+        );
+        const wallet = new anchor.Wallet(signer);
+        const provider = new anchor.AnchorProvider(connection, wallet, { commitment: 'confirmed' });
+        const spoke = new anchor.Program(idl, provider) as anchor.Program<EverclearSpoke>;
+
+        context.adapters.solana = {
+          connection,
+          spoke,
+          signer,
+        };
+      }
+    }
+
     context.logger.info('Lighthouse context setup complete!', requestContext, methodContext, {
       chains: [...Object.keys(context.config.chains)],
     });
@@ -118,8 +186,14 @@ export const makeLighthouseTask = async (
        `,
     );
 
+    // Log file descriptor usage after context setup (before task execution)
+    logFileDescriptorUsage(context.logger);
+
     // Start the lighthouse task
     await task();
+
+    // Log file descriptor usage after task completion
+    logFileDescriptorUsage(context.logger);
   } catch (e: unknown) {
     console.error('Error creating lighthouse context. Sad! :(', e);
     context.logger.error(

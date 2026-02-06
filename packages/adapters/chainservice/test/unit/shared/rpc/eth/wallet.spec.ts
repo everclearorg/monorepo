@@ -110,7 +110,7 @@ describe('EthWallet', () => {
       
       // Stub the walletClient.sendTransaction method
       const mockHash = '0x1234567890123456789012345678901234567890123456789012345678901234';
-      stub((wallet as any).walletClient, 'sendTransaction').resolves(mockHash);
+      const sendTransactionStub = stub((wallet as any).walletClient, 'sendTransaction').resolves(mockHash);
       
       const transaction: ITransactionRequest = {
         to,
@@ -132,6 +132,44 @@ describe('EthWallet', () => {
       expect(result).to.have.property('gasLimit');
       expect(result.gasPrice).to.equal(BigInt(gasPrice));
       expect(result.gasLimit).to.equal(BigInt(gasLimit));
+
+      // Verify sendTransaction was called with correct parameters
+      expect(sendTransactionStub.calledOnce).to.be.true;
+      const callArgs = sendTransactionStub.getCall(0).args[0];
+      expect(callArgs).to.have.property('to', to);
+      expect(callArgs).to.have.property('data', data);
+      expect(callArgs).to.have.property('value', BigInt(value));
+    });
+
+    it('should include chainId when provided for EIP-155 compliance', async () => {
+      const wallet = new EthWallet(privateKey, { rpcUrls: ['https://eth.llamarpc.com'] });
+
+      // Stub the walletClient.sendTransaction method
+      const mockHash = '0x1234567890123456789012345678901234567890123456789012345678901234';
+      const sendTransactionStub = stub((wallet as any).walletClient, 'sendTransaction').resolves(mockHash);
+
+      const chainId = 1; // Ethereum mainnet
+      const transaction: ITransactionRequest = {
+        to,
+        data,
+        value,
+        gasLimit,
+        gasPrice,
+        funcSig: 'transfer(address,uint256)',
+        chainId,
+      };
+
+      const result = await wallet.sendTransaction(transaction);
+
+      expect(result.hash).to.equal(mockHash);
+
+      // Verify chainId was included in the transaction sent to walletClient
+      expect(sendTransactionStub.calledOnce).to.be.true;
+      const callArgs = sendTransactionStub.getCall(0).args[0];
+      expect(callArgs).to.have.property('chainId', chainId);
+      expect(callArgs).to.have.property('to', to);
+      expect(callArgs).to.have.property('data', data);
+      expect(callArgs).to.have.property('value', BigInt(value));
     });
   });
 

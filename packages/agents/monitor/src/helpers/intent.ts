@@ -72,10 +72,10 @@ export const getCurrentEpoch = async (): Promise<number> => {
     },
     'latest',
   );
-  const [epoch] = chainWrapper.decodeFunctionResult({
+
+  return chainWrapper.decodeFunctionResult({
     abi: hubEverclear.abi,
     functionName: 'getCurrentEpoch',
     data: encoded as `0x${string}`,
-  }) as [number];
-  return epoch;
+  }) as number;
 };

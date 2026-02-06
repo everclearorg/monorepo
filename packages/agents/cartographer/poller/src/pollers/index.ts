@@ -7,12 +7,12 @@ import {
   Logger,
   sendHeartbeat,
 } from '@chimera-monorepo/utils';
-import { closeDatabase, getDatabase } from '@chimera-monorepo/database';
+import { getDatabase } from '@chimera-monorepo/database';
 
 import { bind } from '../bindings';
 import { CartographerConfig, getConfig } from '../config';
 import { context } from '../shared';
-import { runMigration } from '../lib/operations';
+// import { runMigration } from '../lib/operations';
 import { getSubgraphReaderConfig } from '../lib/operations/helper';
 
 export const makePoller = async (_configOverride?: CartographerConfig) => {
@@ -67,7 +67,6 @@ export const makePoller = async (_configOverride?: CartographerConfig) => {
   // Temporary disabled migrations for cross chain swap launch
   // await runMigration(context);
   await bind(context);
-  await closeDatabase();
   if (context.config.healthUrls[context.config.service] !== undefined) {
     const url = context.config.healthUrls[context.config.service]!;
     await sendHeartbeat(url, context.logger);
