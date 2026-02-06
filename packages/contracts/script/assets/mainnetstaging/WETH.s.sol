@@ -36,7 +36,7 @@ contract WETH is AddAssetBase, MainnetStagingEnvironment {
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](7);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](8);
 
     ///// Optimism
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -101,13 +101,22 @@ contract WETH is AddAssetBase, MainnetStagingEnvironment {
       strategy: IEverclear.Strategy.DEFAULT
     });
 
+    //// MegaETH
+    _assetConfigs[7] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: MEGAETH_WETH.toBytes32(),
+      domain: MEGAETH,
+      approval: true,
+      strategy: IEverclear.Strategy.DEFAULT
+    });
+
     /*///////////////////////////////////////////////////////////////
                           TOKEN SETUP
     //////////////////////////////////////////////////////////////*/
 
     _setup = IHubStorage.TokenSetup({
       tickerHash: _tickerHash,
-      initLastClosedEpochProcessed: true,
+      initLastClosedEpochProcessed: false,
       prioritizedStrategy: IEverclear.Strategy.XERC20,
       maxDiscountDbps: 0,
       discountPerEpoch: 0,

@@ -72,6 +72,7 @@
 - [ ] Add {{CHAIN_NAME}} abstract contract to `packages/contracts/script/Mainnet{{ENVIRONMENT}}.sol` with placeholder addresses
 - [ ] Add {{CHAIN_NAME}} to `Mainnet{{ENVIRONMENT}}Domains` inheritance list
 - [ ] Add {{CHAIN_NAME}} to `SUPPORTED_DOMAINS` array
+- [ ] Add `_deploymentParams[{{CHAIN_NAME_UPPER}}]` to `MainnetStaging` setUp() in `packages/contracts/script/deploy/Spoke.s.sol` (maps chain ID → mailbox, lighthouse, etc.)
 - [ ] Verify contracts compile: `forge build`
 
 ---
@@ -90,6 +91,21 @@ npm run cli
 - [ ] Record SPOKE_ADDRESS:
 - [ ] Record GATEWAY_ADDRESS:
 - [ ] Record EXECUTOR_ADDRESS:
+
+### Step 1b: Add to spoke.json (required before XERC20 deploy)
+
+> **IMPORTANT**: The XERC20 deploy CLI resolves the spoke address from `spoke.json`. This entry must exist before Step 2.
+
+- [ ] Add entry to `packages/contracts/cli/config/spoke.json`:
+```json
+{
+  "address": "<SPOKE_ADDRESS>",
+  "feeAdapterAddress": "",
+  "domainName": "{{CHAIN_NAME}}",
+  "domainId": {{CHAIN_ID}},
+  "environment": "Mainnet{{ENVIRONMENT}}"
+}
+```
 
 ### Step 2: Deploy XERC20 Module
 
@@ -110,6 +126,8 @@ cast storage <SPOKE_ADDRESS> 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a92
 - [ ] Record SPOKE_IMPL_ADDRESS:
 
 ### Step 4: Update Mainnet{{ENVIRONMENT}}.sol
+
+> **IMPORTANT**: Always use checksummed addresses. Run `cast to-check-sum-address <addr>` to convert raw hex to EIP-55 checksum format.
 
 - [ ] Fill in all deployed addresses in the {{CHAIN_NAME}} abstract contract
 - [ ] Set `{{CHAIN_NAME_UPPER}}_ENG_MULTISIG` to `{{ENG_MULTISIG}}`
@@ -176,18 +194,11 @@ forge verify-contract --chain-id {{CHAIN_ID}} --num-of-optimizations 10000 --wat
 
 ## Post-Deployment Config
 
-### Step 9: Update spoke.json
+### Step 9: Update spoke.json with FeeAdapter
 
-- [ ] Add entry to `packages/contracts/cli/config/spoke.json`:
-```json
-{
-  "address": "<SPOKE_ADDRESS>",
-  "feeAdapterAddress": "<FEE_ADAPTER_ADDRESS>",
-  "domainName": "{{CHAIN_NAME}}",
-  "domainId": {{CHAIN_ID}},
-  "environment": "Mainnet{{ENVIRONMENT}}"
-}
-```
+> spoke.json was initially added in Step 1b. After the V6 upgrade, update the `feeAdapterAddress` field.
+
+- [ ] Update `feeAdapterAddress` in `packages/contracts/cli/config/spoke.json` with `<FEE_ADAPTER_ADDRESS>`
 
 ### Step 10: Create Deployment Artifacts
 
@@ -336,7 +347,14 @@ _assetConfigs[N] = IHubStorage.AssetConfig({
 - [ ] Update `cli/config/tokenInfo.json` — add `"{{CHAIN_ID}}": "<TOKEN_ADDRESS>"` to each token's `addresses`
 
 - [ ] Run CLI to execute `setTokenConfigs`: `npm run cli` > Add asset > Mainnet {{ENVIRONMENT}} > select each asset
-  - Set `initLastClosedEpochProcessed: false` for tokens after their first init
+
+> **CRITICAL — `initLastClosedEpochProcessed`**: When adding a new chain to an **existing** token, this MUST be `false`.
+> Setting it to `true` resets the token's `lastClosedEpochsProcessed` counter to 0, which forces the hub to re-process
+> all historical epochs — effectively breaking epoch processing. Only use `true` when configuring a brand-new token
+> for the very first time.
+>
+> Verify before running: `cast call <HUB> "lastClosedEpochsProcessed(bytes32)(uint48)" <TICKER_HASH> --rpc-url <RPC>`
+> If the value is > 0, the token already exists and you MUST use `false`.
 
 ### Asset Verification
 

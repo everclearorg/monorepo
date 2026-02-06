@@ -144,6 +144,15 @@ contract MainnetStaging is DeploySpokeSwapsUpgrade, MainnetStagingEnvironment {
       xerc20Module: address(PLASMA_XERC20_MODULE),
       spokeImpl: PLASMA_SPOKE_IMPL
     }); // set domain id as mapping key
+
+    // MegaETH - staging config
+    _deploymentParams[MEGAETH] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(MEGAETH_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(MEGAETH_XERC20_MODULE),
+      spokeImpl: MEGAETH_SPOKE_IMPL
+    }); // set domain id as mapping key
   }
 }
 

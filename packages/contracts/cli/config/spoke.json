@@ -78,6 +78,13 @@
   },
   {
     "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
+    "feeAdapterAddress": "0x7B435CCF350DBC773e077410e8FEFcd46A1cDfAA",
+    "domainName": "megaETH",
+    "domainId": 4326,
+    "environment": "MainnetStaging"
+  },
+  {
+    "address": "0xa05A3380889115bf313f1Db9d5f335157Be4D816",
     "domainName": "Optimism",
     "domainId": 10,
     "environment": "MainnetProduction"

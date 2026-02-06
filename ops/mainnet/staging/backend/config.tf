@@ -100,6 +100,11 @@ locals {
           "https://rpc.plasma.to"
         ]
       }
+      "4326" = {
+        providers = [
+          "https://mainnet.megaeth.com/rpc"
+        ]
+      }
     }
   })
 }

@@ -60,28 +60,29 @@ USDT: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb
 1. **Git Setup**: Checkout dev, pull latest, create feature branch
 2. **Update MainnetStaging.sol**: Add chain contract block with placeholder addresses (SPOKE, SPOKE_GATEWAY, EXECUTOR, XERC20_MODULE, SPOKE_IMPL, ENG_MULTISIG, FEE_ADAPTER). Add to MainnetStagingDomains and SUPPORTED_DOMAINS.
 3. **Update domains.json**: Add chain entry with `verifierUrl` if available
-4. **Deploy Spoke Contracts** (via CLI): `npm run cli` > Deploy contracts > Mainnet Staging > spoke
-5. **Deploy XERC20 Module** (via CLI): `npm run cli` > Deploy XERC20 module > Mainnet Staging
-6. **Read Spoke Impl Address**: `cast storage <SPOKE_PROXY> 0x360894...bbc` — record SPOKE_IMPL
-7. **Update MainnetStaging.sol**: Fill in deployed addresses from steps 4-6
-8. **Add to SpokeUpgradeSwaps.s.sol**: Add `DeploymentParams` entry to `MainnetStaging` setUp()
-9. **Execute Spoke Upgrade** (via CLI): `npm run cli` > Upgrade Spoke to V6 > Mainnet Staging
-10. **Verify Upgrade**: Re-read implementation slot, confirm change. Update FEE_ADAPTER in config.
-11. **Verify Contracts on Block Explorer**: `source .env && forge verify-contract ...` for all deployed contracts
-12. **Hub Registration**: Four operations in two groups — (a) via CLI, then (b) and (c) manually:
+4. **Update Spoke.s.sol**: Add `_deploymentParams[<CHAIN>]` to `MainnetStaging` setUp() — maps chain ID to mailbox, lighthouse, watchtower, etc. Without this, the deploy script reverts with `WrongChainId()`.
+5. **Deploy Spoke Contracts** (via CLI): `npm run cli` > Deploy contracts > Mainnet Staging > spoke
+6. **Deploy XERC20 Module** (via CLI): `npm run cli` > Deploy XERC20 module > Mainnet Staging
+7. **Read Spoke Impl Address**: `cast storage <SPOKE_PROXY> 0x360894...bbc` — record SPOKE_IMPL
+8. **Update MainnetStaging.sol**: Fill in deployed addresses from steps 5-7
+9. **Add to SpokeUpgradeSwaps.s.sol**: Add `DeploymentParams` entry to `MainnetStaging` setUp()
+10. **Execute Spoke Upgrade** (via CLI): `npm run cli` > Upgrade Spoke to V6 > Mainnet Staging
+11. **Verify Upgrade**: Re-read implementation slot, confirm change. Update FEE_ADAPTER in config.
+12. **Verify Contracts on Block Explorer**: `source .env && forge verify-contract ...` for all deployed contracts
+13. **Hub Registration**: Four operations in two groups — (a) via CLI, then (b) and (c) manually:
     - **(a) CLI — `addSupportedDomains` + `updateChainGateway`**: The script **reverts** if any domain is already registered. Before running: comment out already-registered entries in `SUPPORTED_DOMAINS_AND_GATEWAYS` constructor, replace `SUPPORTED_DOMAINS` with only the new chain, comment out assertions in `SetupDomainsAndGateways.s.sol`. Run `npm run cli` > Setup hub domains and gateways > Mainnet Staging. Uncomment everything back after success.
     - **(b) Manual — `updateActiveMailbox` on HubGateway**: `cast send <HUB_GATEWAY> "updateActiveMailbox(uint32,address)" <CHAIN_ID> <EVERCLEAR_MAILBOX> --rpc-url $EVERCLEAR_RPC --private-key $KEY`. The second parameter is the Everclear chain's Hyperlane mailbox (default HL mailbox, unless Polymer is used). The CLI does NOT handle this.
     - **(c) Manual — `set` on EVERCLEAR_ISM**: `cast send <EVERCLEAR_ISM> "set(uint32,address)" <CHAIN_ID> <EVERCLEAR_MAILBOX> --rpc-url $EVERCLEAR_RPC --private-key $KEY`. Same as (b) — uses the Everclear chain's HL mailbox. The ISM address is in `MainnetStaging.sol` (`EVERCLEAR_ISM`). The CLI does NOT handle this.
-13. **Asset Setup**: For each asset the new chain supports:
-    - **(a)** Add token address constant to `MainnetAssets` in `MainnetStaging.sol` (e.g., `address public constant PLASMA_WETH = 0x...;`)
+14. **Asset Setup**: For each asset the new chain supports:
+    - **(a)** Add token address constant to `MainnetAssets` in `MainnetStaging.sol` (e.g., `address public constant MEGAETH_WETH = 0x...;`)
     - **(b)** Update the asset script in `script/assets/mainnetstaging/<SYMBOL>.s.sol`: increment `_assetConfigs` array size by 1, add new `AssetConfig` entry with `adopted: <CHAIN>_<SYMBOL>.toBytes32()`, `domain: <CHAIN>`, `approval: true`, `strategy: IEverclear.Strategy.DEFAULT`
     - **(c)** Update `cli/config/tokenInfo.json`: add `"<CHAIN_ID>": "<TOKEN_ADDRESS>"` to the token's `addresses` object
     - **(d)** Run CLI to execute `setTokenConfigs` on Hub: `npm run cli` > Add asset > Mainnet Staging > select asset. Set `initLastClosedEpochProcessed: false` for tokens after their first init.
-14. **Update Subgraph Config**: Add entry to spoke staging config
-15. **Deploy Subgraph**: Goldsky deployment
-16. **Update Chaindata Repo**: PR with new chain entry. The `assets` object must include each token's `symbol`, `address`, `decimals`, `tickerHash`, `isNative`, and `price` (with `isStable`, `coingeckoId`). Ticker hashes are in CLAUDE.md or computed via `keccak256(symbol)`.
-17. **Update API Repo**: PR with new chain support
-18. **Create Monorepo PR**: PR to dev branch
+15. **Update Subgraph Config**: Add entry to spoke staging config
+16. **Deploy Subgraph**: Goldsky deployment
+17. **Update Chaindata Repo**: PR with new chain entry. The `assets` object must include each token's `symbol`, `address`, `decimals`, `tickerHash`, `isNative`, and `price` (with `isStable`, `coingeckoId`). Ticker hashes are in CLAUDE.md or computed via `keccak256(symbol)`.
+18. **Update API Repo**: PR with new chain support
+19. **Create Monorepo PR**: PR to dev branch
 
 ### Production Mode
 

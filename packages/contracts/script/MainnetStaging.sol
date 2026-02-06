@@ -44,6 +44,7 @@ abstract contract MainnetAssets {
   address public constant BASE_WETH = 0x4200000000000000000000000000000000000006;
   bytes32 public constant SOLANA_WETH = 0x66e5188a1308a1db90b6d31f3fbdca8c3df2678c8112dfdd3d192c5a3cc457a8;
   address public constant PLASMA_WETH = 0x9895D81bB462A195b4922ED7De0e3ACD007c32CB;
+  address public constant MEGAETH_WETH = 0x4200000000000000000000000000000000000006;
 
   ///////////////////// USDT -- Whitelisted ✅
   // NOTE: USDT is not supported on Base
@@ -56,6 +57,7 @@ abstract contract MainnetAssets {
   bytes32 public constant SOLANA_USDT = 0xce010e60afedb22717bd63192f54145a3f965a33bb82d2c7029eb2ce1e208264;
   address public constant MANTLE_USDT = 0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE;
   address public constant PLASMA_USDT = 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb;
+  address public constant MEGAETH_USDT = 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb;
 
   ///////////////////// USDC --Whitelisted ✅
   address public constant ARBITRUM_USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831; // NOT USDC.e
@@ -222,6 +224,22 @@ abstract contract Plasma {
   address public constant PLASMA_FEE_ADAPTER = 0x7B435CCF350DBC773e077410e8FEFcd46A1cDfAA;
 }
 
+abstract contract MegaEth {
+  uint32 public constant MEGAETH = 4326;
+  IMailbox public MEGAETH_MAILBOX = IMailbox(0xE2ee936bEa8e42671c400aC96dE198E06F2bA2A6);
+
+  IEverclearSpoke public MEGAETH_SPOKE = IEverclearSpoke(0xa05A3380889115bf313f1Db9d5f335157Be4D816);
+  ISpokeGateway public MEGAETH_SPOKE_GATEWAY = ISpokeGateway(0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7);
+  ICallExecutor public MEGAETH_EXECUTOR = ICallExecutor(0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99);
+  IXERC20Module public MEGAETH_XERC20_MODULE = IXERC20Module(0xD1daF260951B8d350a4AeD5C80d74Fd7298C93F4);
+  address public MEGAETH_SPOKE_IMPL = 0x255aba6E7f08d40B19872D11313688c2ED65d1C9;
+  address public MEGAETH_SPOKE_IMPL_V6 = 0xdCA40903E271Cc76AECd62dF8d6c19f3Ac873E64;
+
+  // Fee adapter constants
+  address public constant MEGAETH_ENG_MULTISIG = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
+  address public constant MEGAETH_FEE_ADAPTER = 0x7B435CCF350DBC773e077410e8FEFcd46A1cDfAA;
+}
+
 abstract contract MainnetStagingDomains is
   Everclear,
   ArbitrumOne,
@@ -234,7 +252,8 @@ abstract contract MainnetStagingDomains is
   Tron,
   Solana,
   Mantle,
-  Plasma
+  Plasma,
+  MegaEth
 {}
 
 abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDomains {
@@ -295,6 +314,14 @@ abstract contract MainnetStagingSupportedDomainsAndGateways is MainnetStagingDom
         gateway: address(PLASMA_SPOKE_GATEWAY).toBytes32()
       })
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({
+        chainId: MEGAETH,
+        blockGasLimit: 10_000_000_000,
+        gateway: address(MEGAETH_SPOKE_GATEWAY).toBytes32()
+      })
+    );
   }
 }
 
@@ -304,7 +331,7 @@ abstract contract MainnetStagingEnvironment is
   MainnetAssets,
   MainnetStagingSupportedDomainsAndGateways
 {
-  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE, TAC, PLASMA];
+  uint32[] public SUPPORTED_DOMAINS = [ARBITRUM_ONE, OPTIMISM, ZIRCUIT, BLAST, BASE, TAC, PLASMA, MEGAETH];
   /**
    * @notice `EverclearHub` initialization parameters
    * @dev Some values are set as `address(0)` as they are deployed
