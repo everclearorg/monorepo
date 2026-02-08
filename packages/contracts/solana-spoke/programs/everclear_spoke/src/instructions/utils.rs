@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::program::invoke_signed;
 
 use crate::error::SpokeError;
-
-use crate::intent::EVMIntent;
+use crate::instructions::intent::{EVMEncode, EVMIntent};
 
 pub(crate) fn normalize_decimals(
     amount: u128,
@@ -48,7 +48,7 @@ fn keccak_256(data: &[u8]) -> [u8; 32] {
 }
 
 pub fn compute_intent_hash(intent: &EVMIntent) -> [u8; 32] {
-    let encoded = encode_single_intent(intent);
+    let encoded = intent.encode();
     keccak_256(&encoded)
 }
 
@@ -60,147 +60,61 @@ pub fn hash_intent_id_array(intent_ids: &[[u8; 32]]) -> [u8; 32] {
     keccak_256(&bytes)
 }
 
-pub(crate) fn encode_single_intent(intent: &EVMIntent) -> Vec<u8> {
-    let mut out = Vec::new();
+pub fn create_or_claim_intent_status_pda<'info>(
+    pda_payer: &AccountInfo<'info>,
+    intent_status_pda: &AccountInfo<'info>,
+    program_id: &Pubkey,
+    space: usize,
+    intent_id: &[u8; 32],
+    intent_status_bump: u8,
+) -> Result<()> {
+    use anchor_lang::solana_program::{rent::Rent, system_instruction, system_program};
+    use crate::intent_status_pda_seeds;
 
-    out.extend_from_slice(&u256_to_32bytes(32u64 as u128));
+    let rent = Rent::get()?;
+    let required_lamports = rent.minimum_balance(space);
+    let existing_lamports = intent_status_pda.lamports();
+    let account_owner = intent_status_pda.owner;
+    let system_program_id = system_program::ID;
+    let payer_seed = &["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()];
+    let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, program_id);
 
-    let mut head = Vec::new();
-
-    // Now we write the struct #0 "head," which is 13 * 32 bytes
-
-    // word0: initiator (bytes32)
-    head.extend_from_slice(&intent.initiator);
-
-    // word1: receiver (bytes32)
-    head.extend_from_slice(&intent.receiver);
-
-    // word2: input_asset (bytes32)
-    head.extend_from_slice(&intent.input_asset);
-
-    // word3: output_asset (bytes32)
-    head.extend_from_slice(&intent.output_asset);
-
-    // word4: origin (uint32 => 4 bytes used, the other 28 are zero)
-    head.extend_from_slice(&u256_to_32bytes(u128::from(intent.origin)));
-
-    // word5: nonce (uint64)
-    head.extend_from_slice(&u256_to_32bytes(intent.nonce as u128));
-
-    // word6: timestamp (uint48 => we store in 32 bytes, last 6 bytes used)
-    head.extend_from_slice(&u256_to_32bytes(intent.timestamp as u128));
-
-    // word7: ttl (uint48 => same reasoning)
-    head.extend_from_slice(&u256_to_32bytes(intent.ttl as u128));
-
-    // word8: amount (uint256 => already 32 bytes big-endian).
-    // In typical abi.encode, we just place it as-is, but ensure it's 32 bytes big-endian
-    head.extend_from_slice(&intent.amount);
-
-    // word9: amountOutMin (uint256 => already 32 bytes big-endian)
-    // In typical abi.encode, we just place it as-is, but ensure it's 32 bytes big-endian
-    head.extend_from_slice(&intent.amount_out_min);
-
-    // We have 2 dynamic fields => destinations[] and data
-    // They each get a 32-byte "offset" word. The offset is from the start of struct #0 head (i.e. offset=0 there)
-    // We know the struct head is 384 bytes total => that means the "tail" starts at offset 384
-    // But we must figure out how big "destinations" is to know where "data" begins in that tail.
-
-    // We'll build the tail in a separate buffer, so we can figure out lengths
-    let (tail, destinations_offset, data_offset) = encode_struct_tail(intent);
-
-    // word10: offset to destinations
-    head.extend_from_slice(&u256_to_32bytes(destinations_offset as u128));
-
-    // word11: offset to data
-    head.extend_from_slice(&u256_to_32bytes(data_offset as u128));
-
-    // Finally, we put the entire head (384 bytes) after the initial 32 bytes for array length:
-    out.extend_from_slice(&head);
-
-    // Then we append the tail:
-    out.extend_from_slice(&tail);
-
-    out
-}
-
-/// Helper that encodes the "tail" portion for the dynamic fields (destinations and data)
-/// and returns:
-///   - the tail bytes
-///   - the offset (in bytes) from the start of the struct's head to the destinations data
-///   - the offset (in bytes) from the start of the struct's head to the data field
-///
-/// We know:
-///   - The struct "head" is 12 words = 384 bytes.
-///   - So the tail region physically begins at offset = 384 from the start of the struct head.
-///   - The offset we store in word10 is the distance from 0.. to where destinations data starts in the tail.
-///   - The offset we store in word11 is the distance from 0.. to where data starts in the tail.
-///
-fn encode_struct_tail(intent: &EVMIntent) -> (Vec<u8>, u64, u64) {
-    let mut tail = Vec::new();
-    // The tail offset starts right after the struct's 384-byte head,
-    // but the offsets *within* the struct are measured from the start of that head (i.e. 0).
-    // So the first dynamic field (destinations) will be at offset = 384 - 384 = 0?
-    // Actually, in the ABI spec, the offset stored in the struct’s head is measured
-    // *relative to the start of that struct’s head*. So if the tail is appended
-    // immediately after 384 bytes, then the first dynamic field is at offset = 384 - 384 = 0 from the tail’s start.
-    //
-    // However, we typically store just the numeric offset "384" in the top-level array encoding,
-    // then plus the struct's index. But because we have an array of length=1, we measure from the
-    // start of that single struct's head, so it is indeed 384. But inside that single struct,
-    // it is "0" to the first tail chunk. The EVM looks at (headStart + offset).
-    //
-    // In practice, to keep consistent with the standard approach:
-    //   - For the first dynamic field, we store offset=384 in the struct’s head.
-    //   - Then for the second dynamic field, offset=384 + [size of the first], etc.
-    //
-    // Because there's only one struct, that "384" is the distance from the struct start
-    // up to the tail. So let's do this carefully:
-    //
-    // We'll figure out the size of the destinations chunk, then we know where data begins.
-    // Then we know the offsets to store in the head are (384) for destinations, (384 + size_of_destinations_chunk) for data.
-
-    // 1) Encode destinations
-    let mut destinations_bytes = Vec::new();
-    //  - first 32 bytes => length of array
-    destinations_bytes.extend_from_slice(&u256_to_32bytes(u128::from(
-        intent.destinations.len() as u64
-    )));
-
-    //  - then each element is a uint32 => in abi.encode, each element is still a full 32-byte word,
-    //    with the value in the last 4 bytes (big-endian).
-    for &val in intent.destinations.iter() {
-        destinations_bytes.extend_from_slice(&u256_to_32bytes(u128::from(val)));
+    if existing_lamports == 0 {
+        let create_transfer_ix =
+            system_instruction::transfer(&pda_payer.key(), &intent_status_pda.key(), 1);
+        invoke_signed(
+            &create_transfer_ix,
+            &[pda_payer.clone(), intent_status_pda.clone()],
+            &[&["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes(), &[payer_pda_bump]]],
+        )?;
     }
-
-    // 2) Encode data (bytes)
-    let mut data_bytes = Vec::new();
-    data_bytes.extend_from_slice(&u256_to_32bytes(u128::from(intent.data.len() as u64)));
-    // the raw bytes, then pad to multiple of 32
-    data_bytes.extend_from_slice(&intent.data);
-    // pad
-    let padding = (32 - (intent.data.len() % 32)) % 32;
-    data_bytes.extend(std::iter::repeat(0u8).take(padding));
-
-    // We place "destinations_bytes" first, then "data_bytes" in the tail
-    let destinations_offset = 384; // from start of struct #0
-    let data_offset = destinations_offset + destinations_bytes.len() as u64; // from start of struct #0
-
-    tail.extend_from_slice(&destinations_bytes);
-    tail.extend_from_slice(&data_bytes);
-
-    (tail, destinations_offset, data_offset)
-}
-
-fn u256_to_32bytes(val: u128) -> [u8; 32] {
-    let mut word = [0u8; 32];
-    // big-endian => fill from the right
-    for i in 0..16 {
-        word[31 - i] = (val >> (8 * i)) as u8;
+    if account_owner == &system_program_id {
+        let allocate_ix = system_instruction::allocate(&intent_status_pda.key(), space as u64);
+        invoke_signed(
+            &allocate_ix,
+            &[intent_status_pda.clone()],
+            &[intent_status_pda_seeds!(intent_id, intent_status_bump)],
+        )?;
+        let assign_ix = system_instruction::assign(&intent_status_pda.key(), program_id);
+        invoke_signed(
+            &assign_ix,
+            &[intent_status_pda.clone()],
+            &[intent_status_pda_seeds!(intent_id, intent_status_bump)],
+        )?;
     }
-    word
+    let current_lamports = intent_status_pda.lamports();
+    if current_lamports < required_lamports {
+        let transfer_lamports = required_lamports - current_lamports;
+        let transfer_ix =
+            system_instruction::transfer(&pda_payer.key(), &intent_status_pda.key(), transfer_lamports);
+        invoke_signed(
+            &transfer_ix,
+            &[pda_payer.clone(), intent_status_pda.clone()],
+            &[&["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes(), &[payer_pda_bump]]],
+        )?;
+    }
+    Ok(())
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;

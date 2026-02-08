@@ -1,60 +1,31 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::keccak;
 
 use crate::error::SpokeError;
-use crate::events::{IntentAddedEvent, OrderCreated};
+use crate::events::OrderCreated;
 use crate::instructions::fee_adapter::{
-    handle_fees, FeeData, FeeParams, HandleFeeAccounts, SignatureAccounts,
+    handle_batch_fees, BatchFeeData, FeeParams, HandleFeeAccounts, SignatureAccounts,
 };
 use crate::instructions::{handle_new_intent, NewIntent, NewIntentAccounts};
 use crate::utils::hash_intent_id_array;
 
-/// Batch-create multiple intents and handle fees.
 pub fn new_order(
     ctx: Context<NewIntent>,
     params: Vec<OrderParameters>,
     fee_param: FeeParams,
 ) -> Result<()> {
-    let state = &mut ctx.accounts.spoke_state;
-
-    require!(!state.paused, SpokeError::ContractPaused);
     require!(!params.is_empty(), SpokeError::EmptyParams);
     require!(
         !ctx.accounts.fee_adapter_state.paused,
         SpokeError::FeeAdapterPaused
     );
 
-    let asset = params[0].input_asset;
-    for p in &params {
-        require!(p.input_asset == asset, SpokeError::MultipleOrderAssets);
-    }
-
-    let mut accounts = NewIntentAccounts {
-        spoke_state: ctx.accounts.spoke_state.as_ref().clone(),
-        mint: ctx.accounts.mint.clone(),
-        token_program: ctx.accounts.token_program.clone(),
-        program_vault_account: ctx.accounts.program_vault_account.clone(),
-        user_token_account: ctx.accounts.user_token_account.clone(),
-        authority: ctx.accounts.authority.clone(),
-        system_program: ctx.accounts.system_program.clone(),
-        spl_noop_program: ctx.accounts.spl_noop_program.clone(),
-        hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.clone(),
-        mailbox_outbox: ctx.accounts.mailbox_outbox.clone(),
-        dispatch_authority: ctx.accounts.dispatch_authority.clone(),
-        unique_message_account: ctx.accounts.unique_message_account.clone(),
-        dispatched_message_pda: ctx.accounts.dispatched_message_pda.clone(),
-        igp_program: ctx.accounts.igp_program.clone(),
-        igp_program_data: ctx.accounts.igp_program_data.clone(),
-        igp_payment_pda: ctx.accounts.igp_payment_pda.clone(),
-        configured_igp_account: ctx.accounts.configured_igp_account.clone(),
-        inner_igp_account: ctx.accounts.inner_igp_account.clone(),
-    };
-
     let program_id = *ctx.program_id;
-
-    let fee_data = FeeData {
-        token_fee: fee_param.token_fee,
+    let params_hash = keccak::hash(&params.try_to_vec()?);
+    let fee_data_for_signature = BatchFeeData {
         native_fee: fee_param.native_fee,
-        input_asset: asset,
+        params_hash: params_hash.to_bytes(),
+        token_fee: fee_param.token_fee,
         deadline: fee_param.deadline,
     };
     let fee_accounts = HandleFeeAccounts {
@@ -65,51 +36,83 @@ pub fn new_order(
         user_account: ctx.accounts.authority.to_account_info(),
         user_token_account: ctx.accounts.user_token_account.to_account_info(),
         user_authority_account: ctx.accounts.authority.to_account_info(),
-        fee_reciever_account: ctx.accounts.fee_recipient.to_account_info(),
-        fee_reciever_token_account: ctx.accounts.fee_recipient_token_account.to_account_info(),
+        fee_receiver_account: ctx.accounts.fee_recipient.to_account_info(),
+        fee_receiver_token_account: ctx.accounts.fee_recipient_token_account.to_account_info(),
         token_program: ctx.accounts.token_program.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
     };
 
-    handle_fees(fee_data, fee_param.signature, fee_accounts)?;
+    handle_batch_fees(fee_data_for_signature, fee_param.signature, fee_accounts, &program_id)?;
 
+    let mut remaining_accounts_iter = ctx.remaining_accounts.iter();
     let mut intent_ids: Vec<[u8; 32]> = Vec::with_capacity(params.len());
-    for p in &params {
+
+    for (idx, p) in params.iter().enumerate() {
+        let (unique_message_account, dispatched_message_pda) = if idx == 0 {
+            (
+                ctx.accounts.unique_message_account.to_account_info(),
+                ctx.accounts.dispatched_message_pda.clone(),
+            )
+        } else {
+            let unique_msg_info = remaining_accounts_iter
+                .next()
+                .ok_or(SpokeError::InvalidArgument)?;
+            let dispatched_pda_info = remaining_accounts_iter
+                .next()
+                .ok_or(SpokeError::InvalidArgument)?;
+            require!(unique_msg_info.is_signer, SpokeError::InvalidArgument);
+            unsafe {
+                (
+                    std::mem::transmute::<AccountInfo, AccountInfo>(unique_msg_info.clone()),
+                    std::mem::transmute::<AccountInfo, AccountInfo>(dispatched_pda_info.clone()),
+                )
+            }
+        };
+
+        let mut accounts = NewIntentAccounts {
+            spoke_state: ctx.accounts.spoke_state.as_ref().clone(),
+            mint: ctx.accounts.mint.clone(),
+            token_program: ctx.accounts.token_program.clone(),
+            program_vault_account: ctx.accounts.program_vault_account.clone(),
+            user_token_account: ctx.accounts.user_token_account.clone(),
+            authority: ctx.accounts.authority.clone(),
+            system_program: ctx.accounts.system_program.clone(),
+            spl_noop_program: ctx.accounts.spl_noop_program.clone(),
+            hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.clone(),
+            mailbox_outbox: ctx.accounts.mailbox_outbox.clone(),
+            dispatch_authority: ctx.accounts.dispatch_authority.clone(),
+            unique_message_account,
+            dispatched_message_pda,
+            igp_program: ctx.accounts.igp_program.clone(),
+            igp_program_data: ctx.accounts.igp_program_data.clone(),
+            igp_payment_pda: ctx.accounts.igp_payment_pda.clone(),
+            configured_igp_account: ctx.accounts.configured_igp_account.clone(),
+            inner_igp_account: ctx.accounts.inner_igp_account.clone(),
+        };
+
         let event_data = handle_new_intent(
             &mut accounts,
             program_id,
             p.receiver,
-            p.input_asset,
             p.output_asset,
             p.amount,
+            p.amount_out_min,
             p.ttl,
             p.destinations.clone(),
             p.data.clone(),
             p.message_gas_limit,
         )?;
 
-        emit_cpi!(IntentAddedEvent {
-            intent_id: event_data.intent_id,
-            message_id: event_data.message_id,
-            initiator: event_data.initiator,
-            receiver: event_data.receiver,
-            input_asset: event_data.input_asset,
-            output_asset: event_data.output_asset,
-            normalized_amount: event_data.normalized_amount,
-            max_fee: event_data.max_fee,
-            origin_domain: event_data.origin_domain,
-            nonce: event_data.nonce,
-            ttl: event_data.ttl,
-            timestamp: event_data.timestamp,
-            destinations: event_data.destinations,
-            data: event_data.data,
-        });
-
+        emit_cpi!(event_data);
         intent_ids.push(event_data.intent_id);
     }
 
-    let order_id = hash_intent_id_array(&intent_ids);
+    require!(
+        remaining_accounts_iter.next().is_none(),
+        SpokeError::InvalidArgument
+    );
 
+    let order_id = hash_intent_id_array(&intent_ids);
     emit_cpi!(OrderCreated {
         order_id,
         user: ctx.accounts.authority.key(),
@@ -125,11 +128,46 @@ pub fn new_order(
 pub struct OrderParameters {
     pub destinations: Vec<u32>,
     pub receiver: Pubkey,
-    pub input_asset: Pubkey,
     pub output_asset: Pubkey,
     pub amount: u64,
+    pub amount_out_min: u128,
     pub max_fee: u32,
     pub ttl: u64,
     pub data: Vec<u8>,
     pub message_gas_limit: u64,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_batch_requires_remaining_accounts() {
+        let params = vec![
+            OrderParameters {
+                destinations: vec![1],
+                receiver: Pubkey::new_unique(),
+                output_asset: Pubkey::new_unique(),
+                amount: 1000,
+                amount_out_min: 900,
+                max_fee: 100,
+                ttl: 3600,
+                data: vec![],
+                message_gas_limit: 10000,
+            },
+            OrderParameters {
+                destinations: vec![1],
+                receiver: Pubkey::new_unique(),
+                output_asset: Pubkey::new_unique(),
+                amount: 2000,
+                amount_out_min: 1800,
+                max_fee: 100,
+                ttl: 3600,
+                data: vec![],
+                message_gas_limit: 10000,
+            },
+        ];
+        assert_eq!(params.len(), 2);
+        assert_eq!((params.len() - 1) * 2, 2);
+    }
 }

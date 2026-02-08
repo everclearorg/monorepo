@@ -1,7 +1,8 @@
+use super::evm_encode::{encode_full, u128_to_u256_be, EVMIntent};
 use crate::instructions::fee_adapter::{
     handle_fees, FeeData, FeeParams, HandleFeeAccounts, SignatureAccounts,
 };
-use crate::messages::MessageType;
+use crate::instructions::messages::MessageType;
 use crate::state::FeeAdapterState;
 use crate::{
     consts::everclear_gateway,
@@ -21,20 +22,17 @@ use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::IntentAddedEvent,
-    intent::{encode_full, u128_to_u256_be, EVMIntent},
     state::SpokeState,
     utils::{compute_intent_hash, normalize_decimals},
 };
 
 /// Create a new intent.
-/// The user "locks" funds (previously deposited) and creates an intent.
-/// For simplicity, we assume full deposit has been made before.
 pub fn new_intent(
     ctx: Context<NewIntent>,
     receiver: Pubkey,
-    input_asset: Pubkey,
     output_asset: Pubkey,
     amount: u64,
+    amount_out_min: u128,
     ttl: u64,
     destinations: Vec<u32>,
     data: Vec<u8>,
@@ -53,7 +51,7 @@ pub fn new_intent(
         hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.clone(),
         mailbox_outbox: ctx.accounts.mailbox_outbox.clone(),
         dispatch_authority: ctx.accounts.dispatch_authority.clone(),
-        unique_message_account: ctx.accounts.unique_message_account.clone(),
+        unique_message_account: ctx.accounts.unique_message_account.to_account_info(),
         dispatched_message_pda: ctx.accounts.dispatched_message_pda.clone(),
         igp_program: ctx.accounts.igp_program.clone(),
         igp_program_data: ctx.accounts.igp_program_data.clone(),
@@ -63,10 +61,44 @@ pub fn new_intent(
     };
     let program_id = *ctx.program_id;
 
+    let spoke_state = &ctx.accounts.spoke_state;
+    require!(!spoke_state.paused, SpokeError::ContractPaused);
+    let current_nonce = spoke_state.nonce;
+    let next_nonce = current_nonce.checked_add(1).ok_or(error!(SpokeError::InvalidOperation))?;
+    let clock = Clock::get()?;
+    let minted_decimals = ctx.accounts.mint.decimals;
+    let normalized_amount = normalize_decimals(
+        amount as u128,
+        minted_decimals,
+        DEFAULT_NORMALIZED_DECIMALS,
+    )?;
+    require!(normalized_amount > 0, SpokeError::ZeroAmount);
+    let preview_evm_intent = EVMIntent {
+        initiator: ctx.accounts.authority.key().to_bytes(),
+        receiver: receiver.to_bytes(),
+        input_asset: ctx.accounts.mint.key().to_bytes(),
+        output_asset: output_asset.to_bytes(),
+        origin: spoke_state.domain,
+        nonce: next_nonce,
+        timestamp: clock.unix_timestamp as u64,
+        ttl,
+        amount: u128_to_u256_be(normalized_amount),
+        amount_out_min: u128_to_u256_be(amount_out_min),
+        destinations: destinations.clone(),
+        data: data.clone(),
+    };
+    let intent_hash = compute_intent_hash(&preview_evm_intent);
+
     let fee_data = FeeData {
+        destinations: destinations.clone(),
+        input_asset: ctx.accounts.mint.key(),
+        output_asset: output_asset,
+        amount: amount,
+        amount_out_min: amount_out_min,
+        ttl: ttl,
+        data: data.clone(),
         token_fee: fee_param.token_fee,
         native_fee: fee_param.native_fee,
-        input_asset,
         deadline: fee_param.deadline,
     };
     let fee_accounts = HandleFeeAccounts {
@@ -77,23 +109,24 @@ pub fn new_intent(
         user_account: ctx.accounts.authority.to_account_info(),
         user_token_account: ctx.accounts.user_token_account.to_account_info(),
         user_authority_account: ctx.accounts.authority.to_account_info(),
-        fee_reciever_account: ctx.accounts.fee_recipient.to_account_info(),
-        fee_reciever_token_account: ctx.accounts.fee_recipient_token_account.to_account_info(),
+        fee_receiver_account: ctx.accounts.fee_recipient.to_account_info(),
+        fee_receiver_token_account: ctx.accounts.fee_recipient_token_account.to_account_info(),
         token_program: ctx.accounts.token_program.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
     };
+    require!(
+        !ctx.accounts.fee_adapter_state.paused,
+        SpokeError::FeeAdapterPaused
+    );
+    handle_fees(fee_data, fee_param.signature, fee_accounts, &program_id)?;
 
-    if !ctx.accounts.fee_adapter_state.paused {
-        handle_fees(fee_data, fee_param.signature, fee_accounts)?;
-    }
-
-    let event_data = handle_new_intent(
+    let event = handle_new_intent(
         &mut accounts,
         program_id,
         receiver,
-        input_asset,
         output_asset,
         amount,
+        amount_out_min,
         ttl,
         destinations,
         data,
@@ -101,59 +134,59 @@ pub fn new_intent(
     )
     .unwrap();
 
-    emit_cpi!(IntentAddedEvent {
-        intent_id: event_data.intent_id,
-        message_id: event_data.message_id,
-        initiator: event_data.initiator,
-        receiver: event_data.receiver,
-        input_asset: event_data.input_asset,
-        output_asset: event_data.output_asset,
-        normalized_amount: event_data.normalized_amount,
-        max_fee: event_data.max_fee,
-        origin_domain: event_data.origin_domain,
-        nonce: event_data.nonce,
-        ttl: event_data.ttl,
-        timestamp: event_data.timestamp,
-        destinations: event_data.destinations,
-        data: event_data.data,
-    });
+    require!(event.intent_id == intent_hash, SpokeError::InvalidIntentHash);
+    emit_cpi!(event);
 
     Ok(())
 }
 
-pub fn handle_new_intent<'info>(
-    accounts: &mut NewIntentAccounts<'info>,
-    program_id: Pubkey, // for ctx.programId
-    receiver: Pubkey,
-    input_asset: Pubkey,
-    output_asset: Pubkey,
-    amount: u64,
+fn validate_ttl_output_asset(
+    destinations_len: usize,
     ttl: u64,
-    destinations: Vec<u32>,
-    data: Vec<u8>,
-    message_gas_limit: u64,
-) -> Result<EventData> {
-    let spoke_state = accounts.spoke_state.clone();
-
-    let state = &mut accounts.spoke_state;
-    require!(!state.paused, SpokeError::ContractPaused);
-    require!(!destinations.is_empty(), SpokeError::InvalidOperation);
-    require!(destinations.len() <= 10, SpokeError::InvalidIntent);
-
-    // If a single destination and ttl != 0, require output_asset is non-zero.
-    if destinations.len() == 1 {
-        require!(output_asset != Pubkey::default(), SpokeError::InvalidIntent);
+    output_asset: Pubkey,
+) -> Result<()> {
+    if destinations_len == 1 {
+        if ttl != 0 && output_asset == Pubkey::default() {
+            return Err(error!(SpokeError::InvalidIntent));
+        }
     } else {
-        // For multi-destination, ttl must be 0 and output_asset must be default.
         require!(
             ttl == 0 && output_asset == Pubkey::default(),
             SpokeError::InvalidIntent
         );
     }
-    
-    // NOTE: we do not need to check data len as this is implicitly done with solana tx size limitation of 1232 bytes
+    Ok(())
+}
+
+pub fn handle_new_intent<'info>(
+    accounts: &mut NewIntentAccounts<'info>,
+    program_id: Pubkey,
+    receiver: Pubkey,
+    output_asset: Pubkey,
+    amount: u64,
+    amount_out_min: u128,
+    ttl: u64,
+    destinations: Vec<u32>,
+    data: Vec<u8>,
+    message_gas_limit: u64,
+) -> Result<IntentAddedEvent> {
+    require!(
+        accounts.unique_message_account.is_signer,
+        SpokeError::InvalidArgument
+    );
+    let spoke_state = accounts.spoke_state.clone();
+
+    let state = &mut accounts.spoke_state;
+    require!(!state.paused, SpokeError::ContractPaused);
+    require!(!destinations.is_empty(), SpokeError::InvalidDestinationArray);
+    require!(destinations.len() <= 10, SpokeError::InvalidDestinationArray);
+    validate_ttl_output_asset(destinations.len(), ttl, output_asset)?;
 
     let minted_decimals = accounts.mint.decimals;
+    require!(
+        minted_decimals <= DEFAULT_NORMALIZED_DECIMALS,
+        SpokeError::DecimalConversionOverflow
+    );
     let normalized_amount =
         normalize_decimals(amount as u128, minted_decimals, DEFAULT_NORMALIZED_DECIMALS)?;
     require!(normalized_amount > 0, SpokeError::ZeroAmount); // Add zero amount check like Solidity
@@ -202,8 +235,7 @@ pub fn handle_new_intent<'info>(
         timestamp: clock.unix_timestamp as u64,
         ttl,
         amount: u128_to_u256_be(normalized_amount),
-        // NOTE: we dont support swap flow from solana now and hardcode amountOutMin to 0
-        amount_out_min: u128_to_u256_be(0),
+        amount_out_min: u128_to_u256_be(amount_out_min),
         destinations: destinations.clone(),
         data: data.clone(),
     };
@@ -219,6 +251,7 @@ pub fn handle_new_intent<'info>(
     let xfer = TransferRemote {
         destination_domain: EVERCLEAR_DOMAIN,
         recipient: everclear_gateway(),
+        // TODO: set this to 0, this is not used.
         amount_or_id: U256::from(normalized_amount),
         gas_amount: message_gas_limit,
         message_body: evm_encoded_message, // now in EVM ABI format
@@ -235,7 +268,7 @@ pub fn handle_new_intent<'info>(
         dispatch_authority: accounts.dispatch_authority.to_account_info(),
         // TODO: need to figure out how this is used for the IGP payer and whether this is correct
         sender_wallet: accounts.authority.to_account_info(),
-        unique_message_account: accounts.unique_message_account.to_account_info(),
+        unique_message_account: accounts.unique_message_account.clone(),
         dispatched_message_pda: accounts.dispatched_message_pda.to_account_info(),
         igp_program: accounts.igp_program.clone(),
         igp_program_data: accounts.igp_program_data.to_account_info(),
@@ -255,8 +288,7 @@ pub fn handle_new_intent<'info>(
     // 3) Use `transfer_ctx` safely
     let message_id = transfer_remote(transfer_ctx, xfer)?;
 
-    // Emit an event with full intent details.
-    Ok(EventData {
+    Ok(IntentAddedEvent {
         intent_id,
         message_id: message_id.into(),
         initiator: accounts.authority.key(),
@@ -264,7 +296,7 @@ pub fn handle_new_intent<'info>(
         input_asset: accounts.mint.key(),
         output_asset,
         normalized_amount,
-        max_fee: u32::MAX,
+        amount_out_min,
         origin_domain: state.domain,
         nonce: new_nonce,
         ttl,
@@ -286,33 +318,13 @@ pub struct NewIntentAccounts<'info> {
     pub hyperlane_mailbox: Interface<'info, Mailbox>,
     pub mailbox_outbox: AccountInfo<'info>,
     pub dispatch_authority: AccountInfo<'info>,
-    pub unique_message_account: Signer<'info>,
+    pub unique_message_account: AccountInfo<'info>,
     pub dispatched_message_pda: AccountInfo<'info>,
     pub igp_program: Interface<'info, Igp>,
     pub igp_program_data: AccountInfo<'info>,
     pub igp_payment_pda: AccountInfo<'info>,
     pub configured_igp_account: AccountInfo<'info>,
     pub inner_igp_account: Option<AccountInfo<'info>>,
-}
-
-pub struct EventData {
-    pub intent_id: [u8; 32],
-    pub message_id: [u8; 32],
-    pub initiator: Pubkey,
-    pub receiver: Pubkey,
-    pub input_asset: Pubkey,
-    pub output_asset: Pubkey,
-    pub normalized_amount: u128,
-    /// NOTE: max_fee is now irrelevant and not used in V2 spoke
-    /// 
-    /// This is kept here only for not changing the event data structure
-    pub max_fee: u32,
-    pub origin_domain: u32,
-    pub nonce: u64,
-    pub ttl: u64,
-    pub timestamp: u64,
-    pub destinations: Vec<u32>,
-    pub data: Vec<u8>,
 }
 
 #[event_cpi]

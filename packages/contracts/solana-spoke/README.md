@@ -1,6 +1,6 @@
 ## prerequisties
 
-- `anchor 0.31.0`
+- `anchor 0.31.1`
 
 ## build
 
@@ -10,13 +10,6 @@ Build the contract code locally to ebpf using:
 
 If you need a verifiable build (for crosschecking and contract verification), use:
 `anchor build --verifiable`
-
-NOTE:
-The upstream image is not pushed yet (it will be updated to `solanafoundation/anchor:v0.31.1`) and this is blocked (due to some perm issue  and docker org/image changes from the anchor side).
-
-To temporary resolve this, the `docker/` in `anchor@v0.31.0` git is copied here.
-
-Go to the `docker/` and run `make build`. This will create a local build for `backpackapp/build:v0.31.0` which is used in the verifiable build commands.
 
 ## deploy
 `Anchor.toml` was set to be deployed on devnet.
