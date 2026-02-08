@@ -52,60 +52,6 @@ export const getSubgraphReaderConfig = (
   return { subgraphs, ...(envioConfig && { envio: envioConfig }) };
 };
 
-export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppContext['adapters']['blockMap']) => {
-  const domains = [...new Set([config.hub.domain, ...Object.keys(config.chains)])];
-  await Promise.all(
-    domains.map(async (domain) => {
-      const chainConfig = domain === config.hub.domain ? config.hub : config.chains[domain];
-      const providerUrls = chainConfig.providers ?? [];
-      const type = domain === config.hub.domain ? 'evm' : (chainConfig as { network?: string })?.network ?? 'evm';
-      await Promise.all(
-        providerUrls.map(async (provider) => {
-          const origin = URL.canParse(provider) ? new URL(provider).origin : provider;
-          if (type !== 'evm') {
-            return;
-          }
-          const client = chainWrapper.createPublicClient({
-            transport: chainWrapper.http(provider),
-          });
-
-          const handleBlockNumber = (blockNumber: bigint) => {
-            if (!blockNumber) {
-              return;
-            }
-
-            // Create the entry
-            const entry = {
-              rpcOrigin: origin,
-              number: Number(blockNumber),
-              timestamp: Math.floor(Date.now() / 1_000),
-            };
-            // Add domain array if it exists
-            if (!blockMap.has(domain)) blockMap.set(domain, []);
-
-            // Replace idx for provider if more recent
-            const idx = blockMap.get(domain)!.findIndex((a) => a.rpcOrigin.toLowerCase() === origin.toLowerCase());
-            if (idx === -1) {
-              // no entry for origin, push
-              blockMap.get(domain)!.push(entry);
-              return;
-            }
-            // Replace the entry IFF it is more recent
-            if (blockMap.get(domain)![idx].number >= Number(blockNumber)) {
-              return;
-            }
-            blockMap.get(domain)![idx] = entry;
-          };
-
-          client.watchBlockNumber({
-            onBlockNumber: handleBlockNumber,
-          });
-        }),
-      );
-    }),
-  );
-};
-
 export const makeMonitor = async (service: MonitorService) => {
   /// Load necessary configs
   const { requestContext, methodContext } = createLoggingContext(makeMonitor.name);
@@ -145,9 +91,6 @@ export const makeMonitor = async (service: MonitorService) => {
       [context.config.hub.domain]: context.config.hub,
     });
 
-    context.adapters.blockMap = new Map();
-    await startBlockMapPoller(context.config, context.adapters.blockMap);
-
     const { domain: hubDomain, ...remainder } = context.config.hub;
     context.adapters.subgraph = await setupSubgraphReader(
       getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }, context.config.hub),
@@ -179,6 +122,9 @@ export const makeMonitor = async (service: MonitorService) => {
       });
     }
     context.logger.debug('Relayers setup', requestContext, methodContext);
+
+    // Initialize the block data map for sharing block data between checks
+    context.adapters.blockMap = new Map<string, { number: number; timestamp: number }>();
 
     /// MARK - Bindings
     if (service == MonitorService.SERVER) {

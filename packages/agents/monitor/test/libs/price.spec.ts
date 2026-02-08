@@ -30,7 +30,6 @@ describe('price', () => {
   let decodeStub: SinonStub;
   let encodeFunctionResultStub: SinonStub;
 
-  let getBestProviderStub: SinonStub;
   let getTokenPriceFromChainlinkStub: SinonStub;
   let getTokenPriceFromUniV2Stub: SinonStub;
   let getTokenPriceFromUniV3Stub: SinonStub;
@@ -85,7 +84,6 @@ describe('price', () => {
         }},
     });
 
-    getBestProviderStub = stub(MockableFns, 'getBestProvider');
     getTokenPriceFromChainlinkStub = stub(MockableFns, 'getTokenPriceFromChainlink');
     getTokenPriceFromUniV2Stub = stub(MockableFns, "getTokenPriceFromUniV2");
     getTokenPriceFromUniV3Stub = stub(MockableFns, "getTokenPriceFromUniV3");
@@ -121,7 +119,6 @@ describe('price', () => {
     });
 
     it('happy: should return chainlink price', async () => {
-        getBestProviderStub.resolves("rpc");
         getTokenPriceFromChainlinkStub.resolves(100);
         mockAsset.price.isStable = false;
         const tokenPrice = await getTokenPrice('1337', mockAsset);
@@ -129,7 +126,6 @@ describe('price', () => {
     });   
 
     it('happy: should return mainnetEquivalent price', async () => {
-        getBestProviderStub.resolves("rpc");
         getTokenPriceFromChainlinkStub.resolves(100);
         mockAsset.price.isStable = false;
         mockAsset.price.priceFeed = undefined;
@@ -139,15 +135,13 @@ describe('price', () => {
     });    
 
     it('happy: should return univ2 price', async () => {
-        getBestProviderStub.resolves("rpc");
-
         const mockPrice = 3000;
         getTokenPriceFromUniV2Stub.resolves(mockPrice);
 
         encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
         encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
-        decodeStub.onFirstCall().returns([mockAsset.address]);
-        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        decodeStub.onFirstCall().returns(mockAsset.address as `0x${string}`);
+        decodeStub.onSecondCall().returns(mockBaseAsset.address as `0x${string}`);
         chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
         chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 
@@ -159,15 +153,13 @@ describe('price', () => {
     });    
     
     it('happy: should return univ3 price', async () => {
-        getBestProviderStub.resolves("rpc");
-
         const mockPrice = 3000;
         getTokenPriceFromUniV3Stub.resolves(mockPrice);
 
         encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
         encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
-        decodeStub.onFirstCall().returns([mockAsset.address]);
-        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        decodeStub.onFirstCall().returns(mockAsset.address as `0x${string}`);
+        decodeStub.onSecondCall().returns(mockBaseAsset.address as `0x${string}`);
         chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
         chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 
@@ -180,15 +172,13 @@ describe('price', () => {
     });    
     
     it('happy: should return coingecko price', async () => {
-        getBestProviderStub.resolves("rpc");
-
         const mockPrice = 3000;
         getTokenPriceFromCoingeckoStub.resolves(mockPrice);
 
         encodeFunctionResultStub.onFirstCall().returns('0xencodedToken0' as `0x${string}`);
         encodeFunctionResultStub.onSecondCall().returns('0xencodedToken1' as `0x${string}`);
-        decodeStub.onFirstCall().returns([mockAsset.address]);
-        decodeStub.onSecondCall().returns([mockBaseAsset.address]);
+        decodeStub.onFirstCall().returns(mockAsset.address as `0x${string}`);
+        decodeStub.onSecondCall().returns(mockBaseAsset.address as `0x${string}`);
         chainreader.readTx.onFirstCall().resolves('0xencodedToken0');
         chainreader.readTx.onSecondCall().resolves('0xencodedToken1');
 

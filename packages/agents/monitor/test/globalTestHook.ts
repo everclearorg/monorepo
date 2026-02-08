@@ -272,6 +272,7 @@ export const mock = {
         subgraph: mockSubgraph as unknown as SubgraphReader,
         cache: mockCache as unknown as StoreManager,
         relayers: mockRelayers,
+        blockMap: new Map<string, { number: number; timestamp: number }>(),
       },
       config: mock.config(config),
       ...remainder,

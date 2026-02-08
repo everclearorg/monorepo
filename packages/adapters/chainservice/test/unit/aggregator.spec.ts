@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { chainWrapper } from '@chimera-monorepo/utils';
+import { chainWrapper, domainToChainId } from '@chimera-monorepo/utils';
 import { stub, restore, reset, createStubInstance, SinonStubbedInstance, SinonStub } from 'sinon';
 import { mkAddress, mkBytes32, expect, Logger, EverclearError, mock } from '@chimera-monorepo/utils';
 
@@ -18,6 +18,8 @@ import {
   ChainConfig,
   DEFAULT_CHAIN_CONFIG,
   EthWallet,
+  getVmFromDomainId,
+  SupportedVms,
 } from '../../src';
 import {
   makeChaiReadable,
@@ -164,6 +166,30 @@ describe('RpcProviderAggregator', () => {
           data: TEST_TX.data,
           value: TEST_TX.value,
           domain: TEST_TX.domain,
+        }),
+      );
+      expect(makeChaiReadable(result)).to.be.deep.eq(makeChaiReadable(TEST_TX_RESPONSE));
+    });
+
+    it('should include chainId for EVM transactions to ensure EIP-155 compliance', async () => {
+      // Verify that the domain is an EVM chain
+      expect(getVmFromDomainId(TEST_SENDER_DOMAIN)).to.equal(SupportedVms.evm);
+
+      const result = await (chainProvider as any).sendTransaction(transaction);
+
+      expect(providerStub.sendTransaction.callCount).to.equal(1);
+      const sentTransaction = providerStub.sendTransaction.getCall(0).args[0];
+
+      // Verify chainId is included in the transaction
+      expect(sentTransaction).to.have.property('chainId');
+      expect(sentTransaction.chainId).to.equal(domainToChainId(TEST_SENDER_DOMAIN));
+
+      // Verify other transaction fields are still present
+      expect(makeChaiReadable(sentTransaction)).to.containSubset(
+        makeChaiReadable({
+          to: TEST_TX.to,
+          data: TEST_TX.data,
+          value: TEST_TX.value,
         }),
       );
       expect(makeChaiReadable(result)).to.be.deep.eq(makeChaiReadable(TEST_TX_RESPONSE));

@@ -29,6 +29,12 @@ import {
   fromMerkleTree,
   toLockPosition,
   fromLockPosition,
+  toProtocolUpdateLog,
+  fromProtocolUpdateLogs,
+  toHubMeta,
+  fromHubMeta,
+  toSpokeMeta,
+  fromSpokeMeta,
 } from '../src/lib/converters';
 import {
   createOriginIntent,
@@ -1179,6 +1185,210 @@ describe('Database Converters', () => {
         start: 1733405000,
         expiry: 1735990000,
       });
+    });
+  });
+
+  describe('toProtocolUpdateLog', () => {
+    it('should convert protocol update log to database format', () => {
+      const log = {
+        id: '0xlog1',
+        domain: '1337',
+        chainId: '1337',
+        event: 'GATEWAY_UPDATED',
+        key: 'gateway',
+        updated: '0x1234',
+        transactionHash: '0xabc',
+        timestamp: 1000,
+        blockNumber: 200,
+        txOrigin: '0x1',
+        txNonce: 5,
+      };
+
+      const result = toProtocolUpdateLog(log);
+
+      expect(result).to.deep.equal({
+        id: '0xlog1',
+        domain: '1337',
+        event: 'GATEWAY_UPDATED',
+        key: 'gateway',
+        updated: '0x1234',
+        chain_id: '1337',
+        transaction_hash: '0xabc',
+        timestamp: 1000,
+        block_number: 200,
+        tx_origin: '0x1',
+        tx_nonce: 5,
+      });
+    });
+
+    it('should use domain as chain_id when chainId is missing', () => {
+      const log = {
+        id: '0xlog2',
+        domain: '1338',
+        event: 'PAUSED',
+        key: 'paused',
+        updated: '1',
+        transactionHash: '0xdef',
+        timestamp: 2000,
+        blockNumber: 300,
+        txOrigin: '0x2',
+        txNonce: 6,
+      };
+
+      const result = toProtocolUpdateLog(log as Parameters<typeof toProtocolUpdateLog>[0]);
+
+      expect(result.chain_id).to.equal('1338');
+    });
+  });
+
+  describe('fromProtocolUpdateLogs', () => {
+    it('should convert database record to protocol update log', () => {
+      const dbRecord = {
+        id: '0xlog1',
+        domain: '1337',
+        chain_id: '1337',
+        event: 'GATEWAY_UPDATED',
+        key: 'gateway',
+        updated: '0x1234',
+        transaction_hash: '0xabc ',
+        timestamp: 1000,
+        block_number: 200,
+        tx_origin: '0x1',
+        tx_nonce: 5,
+      };
+
+      const result = fromProtocolUpdateLogs(dbRecord);
+
+      expect(result).to.deep.include({
+        id: '0xlog1',
+        domain: '1337',
+        chainId: '1337',
+        event: 'GATEWAY_UPDATED',
+        key: 'gateway',
+        updated: '0x1234',
+        transactionHash: '0xabc',
+        timestamp: 1000,
+        blockNumber: 200,
+        txOrigin: '0x1',
+        txNonce: 5,
+      });
+    });
+  });
+
+  describe('toHubMeta', () => {
+    it('should convert hub meta to database format', () => {
+      const meta = {
+        id: '1339',
+        domain: '1339',
+        acceptanceDelay: '1',
+        gateway: '0xgateway',
+        watchtower: '0xwatchtower',
+        manager: '0xmanager',
+        settler: '0xsettler',
+        proposedOwnershipTimestamp: '0',
+        mailbox: '0xmailbox',
+        securityModule: '0xsecurity',
+        minSolverSupportedDomains: '1',
+        expiryTimeBuffer: '0',
+        discountPerEpoch: '0',
+        epochLength: '1',
+        supportedDomains: [{ domain: '1337', blockGasLimit: '10000000' }],
+        chainGateways: [{ chainId: '1337', gateway: '0xg' }],
+      };
+
+      const result = toHubMeta(meta);
+
+      expect(result.id).to.equal('1339');
+      expect(result.domain).to.equal('1339');
+      expect(result.gateway).to.equal('0xgateway');
+      expect(result.supported_domains).to.equal(JSON.stringify(meta.supportedDomains));
+      expect(result.chain_gateways).to.equal(JSON.stringify(meta.chainGateways));
+    });
+
+    it('should set optional fields to null when missing', () => {
+      const meta = {
+        id: '1339',
+        domain: '1339',
+      };
+
+      const result = toHubMeta(meta as Parameters<typeof toHubMeta>[0]);
+
+      expect(result.gateway).to.be.null;
+      expect(result.supported_domains).to.be.null;
+      expect(result.chain_gateways).to.be.null;
+    });
+  });
+
+  describe('fromHubMeta', () => {
+    it('should convert database record to hub meta', () => {
+      const supportedDomains = [{ domain: '1337', blockGasLimit: '10000000' }];
+      const chainGateways = [{ chainId: '1337', gateway: '0xg' }];
+      const dbRecord = {
+        id: '1339',
+        domain: '1339',
+        gateway: '0xgateway',
+        supported_domains: JSON.stringify(supportedDomains),
+        chain_gateways: JSON.stringify(chainGateways),
+      };
+
+      const result = fromHubMeta(dbRecord);
+
+      expect(result.id).to.equal('1339');
+      expect(result.domain).to.equal('1339');
+      expect(result.gateway).to.equal('0xgateway');
+      expect(result.supportedDomains).to.deep.equal(supportedDomains);
+      expect(result.chainGateways).to.deep.equal(chainGateways);
+    });
+  });
+
+  describe('toSpokeMeta', () => {
+    it('should convert spoke meta to database format', () => {
+      const meta = {
+        id: '1337',
+        domain: '1337',
+        messageReceiver: '0xreceiver',
+        messageGasLimit: '100000',
+        feeAdapter: '0xfeeAdapter',
+        moduleForStrategies: [{ strategy: '1', module: '0xm' }],
+      };
+
+      const result = toSpokeMeta(meta);
+
+      expect(result.id).to.equal('1337');
+      expect(result.domain).to.equal('1337');
+      expect(result.message_receiver).to.equal('0xreceiver');
+      expect(result.module_for_strategies).to.equal(JSON.stringify(meta.moduleForStrategies));
+    });
+
+    it('should set optional fields to null when missing', () => {
+      const meta = {
+        id: '1337',
+        domain: '1337',
+      };
+
+      const result = toSpokeMeta(meta as Parameters<typeof toSpokeMeta>[0]);
+
+      expect(result.message_receiver).to.be.null;
+      expect(result.module_for_strategies).to.be.null;
+    });
+  });
+
+  describe('fromSpokeMeta', () => {
+    it('should convert database record to spoke meta', () => {
+      const moduleForStrategies = [{ strategy: '1', module: '0xm' }];
+      const dbRecord = {
+        id: '1337',
+        domain: '1337',
+        message_receiver: '0xreceiver',
+        module_for_strategies: JSON.stringify(moduleForStrategies),
+      };
+
+      const result = fromSpokeMeta(dbRecord);
+
+      expect(result.id).to.equal('1337');
+      expect(result.domain).to.equal('1337');
+      expect(result.messageReceiver).to.equal('0xreceiver');
+      expect(result.moduleForStrategies).to.deep.equal(moduleForStrategies);
     });
   });
 });

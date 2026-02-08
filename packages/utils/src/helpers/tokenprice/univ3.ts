@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AssetConfig } from '../../types';
-import { type PublicClient } from '../chain';
+import { chainWrapper } from '../chain';
 
 export const univ3PoolABI = [
   {
@@ -40,7 +40,8 @@ export const univ3PoolABI = [
  * @param pool - The pool address.
  * @param token0 - The token0 config.
  * @param token1 - The token1 config.
- * @param client - The viem public client instance.
+ * @param chainReaderReadTx - Function wrapper for ChainReader.readTx.
+ * @param chainReaderDomain - Domain ID.
  * @returns The token0 price
  */
 export const getTokenPriceFromUniV3 = async (
@@ -48,7 +49,8 @@ export const getTokenPriceFromUniV3 = async (
   pool: string,
   token0: AssetConfig,
   token1: AssetConfig,
-  client: PublicClient,
+  chainReaderReadTx: (params: { to: string; domain: number; data: `0x${string}`; funcSig: string }) => Promise<string>,
+  chainReaderDomain: number,
 ) => {
   /**
    * How can derive price from a tick?
@@ -71,11 +73,21 @@ export const getTokenPriceFromUniV3 = async (
    *
    * For more info, refer to the uniswap docs: https://docs.uniswap.org/concepts/protocol/oracle#deriving-price-from-a-tick
    **/
-  const result = (await client.readContract({
-    address: pool as `0x${string}`,
+  const encodedResult = await chainReaderReadTx({
+    to: pool,
+    domain: chainReaderDomain,
+    data: chainWrapper.encodeFunctionData({
+      abi: univ3PoolABI,
+      functionName: 'slot0',
+    }),
+    funcSig: 'slot0()',
+  });
+
+  const result = chainWrapper.decodeFunctionResult({
     abi: univ3PoolABI,
     functionName: 'slot0',
-  })) as [bigint, number, number, number, number, number, boolean];
+    data: encodedResult as `0x${string}`,
+  }) as [bigint, number, number, number, number, number, boolean];
 
   const tick = result[1];
 
