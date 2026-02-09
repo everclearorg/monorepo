@@ -45,7 +45,7 @@ export const selfRelayHyperlaneMessages = async (
     ]);
     // Get unique hyperlane message ids
     const ids = [...new Set([..._intents, ..._fills].map((i) => i.id.toLowerCase()).filter((x) => !!x))] as string[];
-    messages.concat(await database.getMessagesByIntentIds(ids));
+    messages.push(...(await database.getMessagesByIntentIds(ids)));
   } else {
     // Get messages by the message id alone
     const stored = await database.getMessagesByIds(messageIds);
@@ -63,7 +63,7 @@ export const selfRelayHyperlaneMessages = async (
 
   for (const { id: messageId } of messages) {
     const { status, relayTransaction } = await getMessageStatus(messageId, true);
-    if (status !== 'relayable' || !messageId) {
+    if (status !== 'relayable' || !messageId || !relayTransaction) {
       // Cant self-relay, continue
       continue;
     }
@@ -73,12 +73,12 @@ export const selfRelayHyperlaneMessages = async (
     // Process the message via relayers
     try {
       const { taskId, relayerType } = await sendWithRelayerWithBackup(
-        domainToChainId(relayTransaction!.domain),
-        relayTransaction!.domain.toString(),
-        relayTransaction!.to,
-        relayTransaction!.data,
-        relayTransaction!.value,
-        relayTransaction!.funcSig,
+        domainToChainId(relayTransaction.domain),
+        relayTransaction.domain.toString(),
+        relayTransaction.to,
+        relayTransaction.data,
+        relayTransaction.value,
+        relayTransaction.funcSig,
         relayers,
         chainreader,
         logger,
