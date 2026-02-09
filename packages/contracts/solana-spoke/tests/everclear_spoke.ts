@@ -145,11 +145,17 @@ describe('#everclear_spoke', () => {
     });
   });
 
+  const fillSigner = nacl.sign.keyPair();
+  const fillSignerAnchor = anchor.web3.Keypair.fromSecretKey(fillSigner.secretKey);
+
   describe('#initialize_fee_adapter', () => {
     it('should work', async () => {
-      const tx = await program.methods.initializeFeeAdapter(feeRecipient.publicKey, feeSignerAnchor.publicKey).accounts({
-        program: program.programId,
-      }).rpc();
+      const tx = await program.methods
+        .initializeFeeAdapter(feeRecipient.publicKey, feeSignerAnchor.publicKey, fillSignerAnchor.publicKey)
+        .accounts({
+          program: program.programId,
+        })
+        .rpc();
 
       // Assert
       const feeAdapterState = await program.account.feeAdapterState.fetch(feeAdapterStateAddress);
@@ -157,6 +163,7 @@ describe('#everclear_spoke', () => {
       expect(feeAdapterState.paused).to.be.equal(false);
       expect(feeAdapterState.feeRecipient.toBase58()).to.be.equal(feeRecipient.publicKey.toBase58());
       expect(feeAdapterState.feeSigner.toBase58()).to.be.equal(feeSignerAnchor.publicKey.toBase58());
+      expect(feeAdapterState.fillSigner.toBase58()).to.be.equal(fillSignerAnchor.publicKey.toBase58());
       expect(feeAdapterState.bump).to.be.equal(feeAdapterStateBump);
     });
   });
@@ -211,10 +218,21 @@ describe('#everclear_spoke', () => {
       );
 
       const time = Date.now() / 1000;
+      const receiver = anchor.web3.Keypair.generate().publicKey;
+      const outputAsset = anchor.web3.Keypair.generate().publicKey;
+      const amountOutMin = new anchor.BN(0);
+      const destinations = [1];
+      const data = Buffer.from('');
       const feeData = {
+        destinations,
+        input_asset: mintPubkey,
+        output_asset: outputAsset,
+        amount: outgoingIntentAmount,
+        amount_out_min: amountOutMin,
+        ttl: new anchor.BN(0),
+        data,
         token_fee: new anchor.BN(1000),
         native_fee: new anchor.BN(0),
-        input_asset: mint.publicKey,
         deadline: new anchor.BN(time),
       };
 
@@ -226,19 +244,17 @@ describe('#everclear_spoke', () => {
         message: buf,
         signature: signature,
       });
-      
 
       // Act
       await program.methods
         .newIntent(
-          anchor.web3.Keypair.generate().publicKey, // receiver
-          anchor.web3.Keypair.generate().publicKey, // input_asset
-          anchor.web3.Keypair.generate().publicKey, // output_asset
-          outgoingIntentAmount, // amount
-          123, // max_fee
+          receiver,
+          outputAsset,
+          outgoingIntentAmount,
+          amountOutMin,
           new anchor.BN(0), // ttl
-          [1], // destinations
-          Buffer.from(''), // data
+          destinations,
+          data,
           new anchor.BN(4321), // message_gas_limit
           {
             tokenFee: feeData.token_fee,
@@ -274,6 +290,119 @@ describe('#everclear_spoke', () => {
       // Assert
       const vaultBalance = await connection.getTokenAccountBalance(programVault.address);
       expect(vaultBalance.value.amount).to.be.equal(outgoingIntentAmount.toString());
+    });
+
+    it('should revert when fee adapter is paused (EVER1-8 fix)', async () => {
+      const mintPubkey = await token.createMint(
+        connection,
+        user,
+        mint.publicKey,
+        mint.publicKey,
+        TOKEN_DECIMALS,
+      );
+      const feeRecipientTokenAccount = await token.createAssociatedTokenAccount(
+        connection,
+        user,
+        mintPubkey,
+        feeRecipient.publicKey,
+      );
+      const userTokenAccount = await token.createAssociatedTokenAccount(
+        connection,
+        user,
+        mintPubkey,
+        user.publicKey,
+      );
+      await token.mintToChecked(
+        connection,
+        user,
+        mintPubkey,
+        userTokenAccount,
+        mint,
+        5e8,
+        TOKEN_DECIMALS,
+      );
+      const programVault = await token.getOrCreateAssociatedTokenAccount(
+        connection,
+        user,
+        mintPubkey,
+        vaultAuthority,
+        true,
+      );
+      await program.methods.pauseFeeAdapter().accounts({ admin: user.publicKey }).rpc();
+
+      const feeAdapterState = await program.account.feeAdapterState.fetch(feeAdapterStateAddress);
+      expect(feeAdapterState.paused).to.be.equal(true);
+
+      const time = Date.now() / 1000;
+      const feeData = {
+        destinations: [1],
+        input_asset: mintPubkey,
+        output_asset: anchor.web3.Keypair.generate().publicKey,
+        amount: outgoingIntentAmount,
+        amount_out_min: new anchor.BN(0),
+        ttl: new anchor.BN(0),
+        data: Buffer.from(''),
+        token_fee: new anchor.BN(1000),
+        native_fee: new anchor.BN(0),
+        deadline: new anchor.BN(time),
+      };
+      const buf = program.coder.types.encode('feeData', feeData);
+      const signature = nacl.sign.detached(buf, feeSigner.secretKey);
+      const signVerifyIx = anchor.web3.Ed25519Program.createInstructionWithPublicKey({
+        publicKey: feeSigner.publicKey,
+        message: buf,
+        signature: signature,
+      });
+
+      try {
+        await program.methods
+          .newIntent(
+            anchor.web3.Keypair.generate().publicKey,
+            anchor.web3.Keypair.generate().publicKey,
+            outgoingIntentAmount,
+            new anchor.BN(0),
+            new anchor.BN(0),
+            [1],
+            Buffer.from(''),
+            new anchor.BN(4321),
+            {
+              tokenFee: feeData.token_fee,
+              nativeFee: feeData.native_fee,
+              deadline: feeData.deadline,
+              signature: Buffer.from(signature),
+            },
+          )
+          .accounts({
+            authority: user.publicKey,
+            mint: mintPubkey,
+            userTokenAccount,
+            programVaultAccount: programVault.address,
+            hyperlaneMailbox,
+            mailboxOutbox,
+            dispatchAuthority,
+            uniqueMessageAccount: uniqueMessageAccountKeypair.publicKey,
+            dispatchedMessagePda,
+            igpProgram,
+            igpProgramData,
+            igpPaymentPda,
+            configuredIgpAccount,
+            innerIgpAccount,
+            feeRecipient: feeRecipient.publicKey,
+            feeSigner: feeSignerAnchor.publicKey,
+            feeRecipientTokenAccount: feeRecipientTokenAccount,
+            program: program.programId,
+          })
+          .preInstructions([signVerifyIx])
+          .signers([uniqueMessageAccountKeypair])
+          .rpc();
+        expect.fail('new_intent should have reverted when fee adapter is paused');
+      } catch (err: unknown) {
+        const e = err as { error?: { errorCode?: { code?: string; name?: string } } };
+        expect(e.error?.errorCode?.code).to.be.equal('FeeAdapterPaused');
+        expect(e.error?.errorCode?.name).to.be.equal('FeeAdapterPaused');
+      }
+
+      await program.methods.unpauseFeeAdapter().accounts({ admin: user.publicKey }).rpc();
     });
   });
 

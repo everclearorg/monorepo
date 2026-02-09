@@ -344,6 +344,7 @@ pub struct FillIntent<'info> {
     #[account(mut)]
     pub intent_status_pda: UncheckedAccount<'info>,
 
+    /// CHECK: This is an empty account pda that only store funds to create intent status pda.
     #[account(
         mut,
         seeds = ["everclear_spoke".as_bytes(), "-".as_bytes(), "pda_payer".as_bytes()],
@@ -358,36 +359,45 @@ pub struct FillIntent<'info> {
 
     pub spl_noop_program: Program<'info, SplNoop>,
 
+    /// CHECK: Outbox data account – the Mailbox will check this
     #[account(mut)]
     pub mailbox_outbox: AccountInfo<'info>,
 
+    /// CHECK: Dispatch authority (PDA)
     #[account(mut)]
     pub dispatch_authority: AccountInfo<'info>,
 
     #[account(mut)]
     pub unique_message_account: Signer<'info>,
 
+    /// CHECK: The message storage PDA
     #[account(mut)]
     pub dispatched_message_pda: AccountInfo<'info>,
 
     #[account(executable)]
     pub igp_program: Interface<'info, Igp>,
 
+    /// CHECK:
     #[account(mut)]
     pub igp_program_data: AccountInfo<'info>,
 
+    /// CHECK:
     #[account(mut)]
     pub igp_payment_pda: AccountInfo<'info>,
 
+    /// CHECK:
     #[account(mut)]
     pub configured_igp_account: AccountInfo<'info>,
 
+    /// CHECK: we verify this is consistent with fill_signer
     #[account(address = fee_adapter_state.fill_signer)]
     pub signer: AccountInfo<'info>,
 
+    /// CHECK: we verify this is consistent with SYSVAR_INSTRUCTIONS
     #[account(address = SYSVAR_INSTRUCTIONS_ID)]
     pub instruction_sysvar: AccountInfo<'info>,
 
+    /// CHECK:
     #[account(mut)]
     pub inner_igp_account: Option<AccountInfo<'info>>,
 }
