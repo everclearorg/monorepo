@@ -33,6 +33,8 @@ const MAINNET_CHAINID_TO_DOMAIN_MAPPING: Map<number, number> = new Map([
   [146, 146], // Sonic
   [57073, 57073], // Ink
   [239, 239], // TAC
+  [4326, 4326], // megaETH
+  [9745, 9745], // Plasma
   [1399811149, 1399811149], // Solana
   [728126428, 728126428], // Tron
 ]);
