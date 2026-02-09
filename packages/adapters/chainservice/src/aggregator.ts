@@ -5,6 +5,7 @@ import {
   Logger,
   EverclearError,
   RequestContext,
+  domainToChainId,
 } from '@chimera-monorepo/utils';
 import { chainWrapper } from '@chimera-monorepo/utils';
 
@@ -24,6 +25,8 @@ import {
   ITransactionReceipt,
   MissingSigner,
   ITransactionRequest,
+  getVmFromDomainId,
+  SupportedVms,
 } from './shared';
 import { axiosGet } from './mockable';
 
@@ -136,9 +139,15 @@ export class RpcProviderAggregator {
       gasLimit: transaction.params.gasLimit ? BigInt(transaction.params.gasLimit) : undefined,
       gasPrice: transaction.params.gasPrice ? BigInt(transaction.params.gasPrice) : undefined,
       value: BigInt(transaction.params.value || 0),
-    };
+    } as unknown as ITransactionRequest;
+
+    // Add chainId for EVM chains to ensure EIP-155 compliance (replay protection)
+    if (getVmFromDomainId(this.domain) === SupportedVms.evm) {
+      toSend.chainId = domainToChainId(this.domain);
+    }
+
     const provider = await this.provider.connect(this.signer!);
-    return provider.sendTransaction(toSend as unknown as ITransactionRequest);
+    return provider.sendTransaction(toSend);
   }
 
   /**

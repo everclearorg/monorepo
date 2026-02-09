@@ -110,6 +110,7 @@ export class EthWallet implements ISigner {
       nonce: tx.nonce,
       type: tx.type as any,
       maxFeePerGas: tx.maxFeePerGas ? BigInt(tx.maxFeePerGas) : undefined,
+      chainId: tx.chainId,
     };
 
     const hash = await (this.walletClient as any).sendTransaction(transaction);

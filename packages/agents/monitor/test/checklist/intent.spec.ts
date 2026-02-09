@@ -20,18 +20,18 @@ describe('Checklist:intent', () => {
       chainreader = mock.context().adapters.chainreader as SinonStubbedInstance<ChainReader>;
       subgraph = mock.context().adapters.subgraph as SinonStubbedInstance<SubgraphReader>;
       encodeStub = stub(chainWrapper, 'encodeFunctionData').returns('0x1234');
-      decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(['0x1234']);
+      // Default return for decodeFunctionResult - will be overridden by onFirstCall, etc.
+      decodeStub = stub(chainWrapper, 'decodeFunctionResult').returns(0);
 
       encodeStub.returns('0x1234');
-      decodeStub.returns(['0x1234']);
       chainreader.readTx.resolves('0x1234');
 
       // origin intent status
-      decodeStub.onFirstCall().returns([0]); // none
+      decodeStub.onFirstCall().returns(0); // none
       // hub intent status
       decodeStub.onSecondCall().returns([{ status: 4 }]); // added and filled
       // destination intent statuses
-      decodeStub.onThirdCall().returns([1]); // added
+      decodeStub.onThirdCall().returns(1); // added
     });
 
     it('should throw if missing origin everclear', async () => {

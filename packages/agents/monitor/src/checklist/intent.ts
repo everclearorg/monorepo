@@ -88,11 +88,20 @@ export const checkIntentStatus = async (
         },
         'latest',
       );
-      const [decoded] = chainWrapper.decodeFunctionResult({
+      const decodedResult = chainWrapper.decodeFunctionResult({
         abi: contract.abi,
         functionName: methodName,
         data: encodedIntentStatusDataRes as `0x${string}`,
-      }) as [any];
+      });
+      // status() returns a single enum value (number), contexts() returns a tuple (array)
+      let decoded: any;
+      if (methodName === 'status') {
+        // Single return value - use directly
+        decoded = decodedResult;
+      } else {
+        // Tuple return value - destructure first element
+        decoded = Array.isArray(decodedResult) ? decodedResult[0] : decodedResult;
+      }
       return {
         domain,
         status:

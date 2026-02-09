@@ -100,9 +100,7 @@ class BaseSyncProvider {
         },
       },
       transport,
-      batch: {
-        multicall: true,
-      },
+      ...chainWrapper.getDefaultMulticallParams(),
     }) as PublicClient;
   }
 

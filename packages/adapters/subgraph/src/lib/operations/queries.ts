@@ -5,6 +5,7 @@ import {
   HUB_META_ENTITY,
   MESSAGE_ENTITY,
   META_ENTITY,
+  META_UPDATE_ENTITY,
   SPOKE_QUEUE_ENTITY,
   SPOKE_ADD_INTENT_EVENT_ENTITY,
   SPOKE_FILL_INTENT_EVENT_ENTITY,
@@ -163,8 +164,9 @@ export const getSpokeQueueQuery = (type?: string): string => {
 };
 
 export const getSpokeMetaQuery = (): string => {
+  // SPOKE_META_ID is a bytes32 value, so we need to convert it to a string
   return `
-    meta(id: "SPOKE_META_ID"){
+    meta(id: "0x53504f4b455f4d4554415f4944"){
       ${SPOKE_META_ENTITY}
     }
   `;
@@ -402,9 +404,48 @@ export const getSettlementMessagesQuery = (
   `;
 };
 
-export const getHubMetaQuery = (): string => {
+export const getHubMetaUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
   return `
-    meta (id: "HUB_META_ID"){
+    hubMetaUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${META_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getSpokeMetaUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
+  return `
+    spokeMetaUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${META_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getHubMetaQuery = (): string => {
+  // HUB_META_ID is a bytes32 value, so we need to convert it to a string
+  return `
+    meta (id: "0x4855425f4d4554415f4944"){
       ${HUB_META_ENTITY}
     }
   `;
