@@ -8,10 +8,12 @@ import {
   getMaxBlockNumber,
   getMaxTxNonce,
   SOLANA_CHAINID,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 
 import { getContext } from '../../shared';
 import { getHyperlaneMsgDelivered } from '../../mockable';
+import { getSubgraphSupportedDomains } from './helper';
 import { CartographerConfig } from '../../config';
 
 const getChainConfig = (domain: string, config: CartographerConfig) => {
@@ -25,11 +27,19 @@ const getChainConfig = (domain: string, config: CartographerConfig) => {
 };
 
 const getMessageStatus = async (messageId: string, config: CartographerConfig, destinationDomain?: string) => {
+  const {
+    adapters: { chainreader },
+  } = getContext();
   const chainConfig = getChainConfig(destinationDomain!, config);
   const gateway = chainConfig.deployments?.gateway;
   let status: HyperlaneStatus = HyperlaneStatus.pending;
   if (gateway) {
-    const messageDelivered = await getHyperlaneMsgDelivered(messageId, chainConfig.providers, gateway);
+    const messageDelivered = await getHyperlaneMsgDelivered(
+      messageId,
+      gateway,
+      (params) => chainreader.readTx(params, 'latest'),
+      +destinationDomain!,
+    );
     if (messageDelivered) {
       status = HyperlaneStatus.delivered;
     }
@@ -164,6 +174,76 @@ export const updateQueues = async () => {
   logger.debug('Method complete', requestContext, methodContext, {
     queues: queues.map((q) => ({ id: q.id, domain: q.domain, size: q.size, lastProcessed: q.lastProcessed })),
   });
+};
+
+export const updateProtocolUpdateLogs = async () => {
+  const {
+    adapters: { subgraph, database },
+    logger,
+    config,
+  } = getContext();
+  const { requestContext, methodContext } = createLoggingContext(updateProtocolUpdateLogs.name);
+
+  const spokeDomains = getSubgraphSupportedDomains(config);
+  const domains = [...spokeDomains, config.hub.domain];
+  for (const domain of domains) {
+    const isHub = domain === config.hub.domain;
+    const checkpointKey = isHub ? 'hub_meta_log_block' : `spoke_meta_log_block_${domain}`;
+    const lastBlock = await database.getCheckPoint(checkpointKey);
+    const updates = isHub
+      ? await subgraph.getHubMetaUpdates(domain, lastBlock)
+      : await subgraph.getSpokeMetaUpdates(domain, lastBlock);
+
+    if (updates.length === 0) {
+      logger.debug('No meta updates found', requestContext, methodContext, {
+        domain,
+        checkpoint: lastBlock,
+      });
+      continue;
+    }
+
+    const latestBlock = Math.max(lastBlock, getMaxBlockNumber(updates));
+    await database.saveProtocolUpdateLogs(updates);
+
+    await database.saveCheckPoint(checkpointKey, latestBlock);
+    logger.debug('Saved protocol update logs', requestContext, methodContext, {
+      domain,
+      count: updates.length,
+      latestBlock,
+    });
+  }
+};
+
+export const updateHubSpokeMeta = async () => {
+  const {
+    adapters: { subgraph, database },
+    logger,
+    config,
+  } = getContext();
+  const { requestContext, methodContext } = createLoggingContext(updateHubSpokeMeta.name);
+
+  const spokeDomains = getSubgraphSupportedDomains(config);
+  const hubDomain = config.hub.domain;
+
+  const hubMeta = await subgraph.getHubMeta(hubDomain);
+  if (hubMeta) {
+    await database.saveHubMeta([hubMeta]);
+    logger.debug('Saved hub meta', requestContext, methodContext, { domain: hubDomain });
+  } else {
+    logger.debug('No hub meta found', requestContext, methodContext, { domain: hubDomain });
+  }
+
+  const spokeMetas: (SpokeMeta | undefined)[] = await Promise.all(
+    spokeDomains.map(async (domain) => subgraph.getSpokeMeta(domain)),
+  );
+  const validSpokeMetas = spokeMetas.filter((meta): meta is SpokeMeta => Boolean(meta));
+
+  if (validSpokeMetas.length > 0) {
+    await database.saveSpokeMeta(validSpokeMetas);
+    logger.debug('Saved spoke meta', requestContext, methodContext, { count: validSpokeMetas.length });
+  } else {
+    logger.debug('No spoke meta found', requestContext, methodContext, { count: 0 });
+  }
 };
 
 export const updateMessageStatus = async () => {

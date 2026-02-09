@@ -19,8 +19,7 @@ export type AppContext = {
       {
         number: number;
         timestamp: number;
-        rpcOrigin: string;
-      }[]
+      }
     >;
   };
   config: MonitorConfig;

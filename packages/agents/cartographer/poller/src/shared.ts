@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChainData, Logger } from '@chimera-monorepo/utils';
 import { SubgraphReader as _SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
+import { ChainReader } from '@chimera-monorepo/chainservice';
 import { Database } from '@chimera-monorepo/database';
 
 import { CartographerConfig } from './config';
@@ -11,6 +12,7 @@ export type AppContext = {
   logger: Logger;
   adapters: {
     subgraph: _SubgraphReader; // Subgraph adapter.
+    chainreader: ChainReader; // ChainReader adapter.
     database: Database; // Database adapter.
   };
   config: CartographerConfig;

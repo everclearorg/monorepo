@@ -7,12 +7,13 @@ import {
   Logger,
   sendHeartbeat,
 } from '@chimera-monorepo/utils';
-import { closeDatabase, getDatabase } from '@chimera-monorepo/database';
+import { ChainReader } from '@chimera-monorepo/chainservice';
+import { getDatabase } from '@chimera-monorepo/database';
 
 import { bind } from '../bindings';
 import { CartographerConfig, getConfig } from '../config';
 import { context } from '../shared';
-import { runMigration } from '../lib/operations';
+// import { runMigration } from '../lib/operations';
 import { getSubgraphReaderConfig } from '../lib/operations/helper';
 
 export const makePoller = async (_configOverride?: CartographerConfig) => {
@@ -39,6 +40,12 @@ export const makePoller = async (_configOverride?: CartographerConfig) => {
   context.logger.info('Config generated', requestContext, methodContext, { config: context.config });
 
   /// MARK - Adapters
+
+  // ChainReader setup
+  context.adapters.chainreader = new ChainReader(context.logger.child({ module: 'ChainReader' }), {
+    ...context.config.chains,
+    [context.config.hub.domain]: context.config.hub,
+  });
 
   // Subgraph reader setup
   context.logger.info('Subgraph reader setup in progress...', requestContext, methodContext, {});
@@ -67,7 +74,6 @@ export const makePoller = async (_configOverride?: CartographerConfig) => {
   // Temporary disabled migrations for cross chain swap launch
   // await runMigration(context);
   await bind(context);
-  await closeDatabase();
   if (context.config.healthUrls[context.config.service] !== undefined) {
     const url = context.config.healthUrls[context.config.service]!;
     await sendHeartbeat(url, context.logger);

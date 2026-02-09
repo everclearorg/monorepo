@@ -2,7 +2,6 @@
 import { axiosGet } from './axios';
 import { cacheExchange, Client, fetchExchange } from '@urql/core';
 import { chainWrapper } from './chain';
-import { getBestProvider } from './provider';
 
 export const HyperlaneStatus = {
   none: 'none',
@@ -220,37 +219,53 @@ export const getHyperlaneMessageStatus = async (messageId: string): Promise<Hype
  * Check the delivered status of hyperlane message on the destination.
  *
  * @param messageId - The given hyperlane message Id.
- * @param rpcUrls - The list of rpc endpoint.
  * @param gateway - The gateway contract on the target domain.
+ * @param chainReaderReadTx - Function wrapper for ChainReader.readTx.
+ * @param domain - Domain ID.
+ * @param mailboxAddress - Optional mailbox address to skip the mailbox() call.
  *
  * @returns - If it's delivered, returns true. If not, returns false.
  */
 export const getHyperlaneMsgDelivered = async (
   messageId: string,
-  rpcUrls: string[],
   gateway: string,
+  chainReaderReadTx: (params: { to: string; domain: number; data: `0x${string}`; funcSig: string }) => Promise<string>,
+  domain: number,
+  mailboxAddress?: string,
 ): Promise<boolean> => {
-  const bestProvider = await getBestProvider(rpcUrls);
+  let mailbox = mailboxAddress;
+  if (!mailbox) {
+    const encodedMailbox = await chainReaderReadTx({
+      to: gateway,
+      domain,
+      data: chainWrapper.encodeFunctionData({
+        abi: getGatewayInterface(),
+        functionName: 'mailbox',
+      }),
+      funcSig: 'mailbox()',
+    });
 
-  // If there's no working rpc url, returns `delivered` false.
-  if (!bestProvider) return false;
+    mailbox = chainWrapper.decodeFunctionResult({
+      abi: getGatewayInterface(),
+      functionName: 'mailbox',
+      data: encodedMailbox as `0x${string}`,
+    }) as `0x${string}`;
+  }
 
-  const client = chainWrapper.createPublicClient({
-    transport: chainWrapper.http(bestProvider),
+  const encodedDelivered = await chainReaderReadTx({
+    to: mailbox as `0x${string}`,
+    domain,
+    data: chainWrapper.encodeFunctionData({
+      abi: getMailboxInterface(),
+      functionName: 'delivered',
+      args: [messageId],
+    }),
+    funcSig: 'delivered(bytes32)',
   });
 
-  const mailbox = await client.readContract({
-    address: gateway as `0x${string}`,
-    abi: getGatewayInterface(),
-    functionName: 'mailbox',
-  });
-
-  const delivered = await client.readContract({
-    address: mailbox as `0x${string}`,
+  return chainWrapper.decodeFunctionResult({
     abi: getMailboxInterface(),
     functionName: 'delivered',
-    args: [messageId],
-  });
-
-  return delivered as boolean;
+    data: encodedDelivered as `0x${string}`,
+  }) as boolean;
 };

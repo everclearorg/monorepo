@@ -48,6 +48,7 @@ export interface ITransactionRequest {
   gasPrice?: string;
   maxFeePerGas?: string;
   funcSig: string;
+  chainId?: number; // Required for EIP-155 transactions (replay protection)
 }
 export interface ITransactionResponse {
   hash: string;
