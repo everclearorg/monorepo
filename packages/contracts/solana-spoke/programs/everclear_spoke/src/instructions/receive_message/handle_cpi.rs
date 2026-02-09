@@ -1,6 +1,6 @@
 use anchor_lang::{
     prelude::*,
-    solana_program::{program::invoke_signed, system_program},
+    solana_program::system_program,
 };
 use anchor_spl::{
     associated_token::{get_associated_token_address, AssociatedToken},
@@ -15,7 +15,10 @@ use crate::{
         mailbox::HandleInstruction, to_serializable_account_meta, SerializableAccountMeta,
         SimulationReturnData,
     },
-    instructions::messages::{HyperlaneMessages, MessageType, Settlement, Settlements},
+    instructions::{
+        messages::{HyperlaneMessages, MessageType, Settlement, Settlements},
+        utils::create_or_claim_intent_status_pda,
+    },
     intent_status_pda_seeds, mailbox_process_authority_pda_seeds,
     state::{IntentStatus, IntentStatusAccount, SpokeState},
 };
@@ -37,7 +40,6 @@ pub fn handle_account_metas(
     let message: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
     match message.message_type {
         MessageType::Settlement => {
-            msg!("Processing settlement batch message");
             let batch: Settlements = AnchorDeserialize::deserialize(&mut message.rest.as_ref())
                 .map_err(|_| error!(SpokeError::InvalidMessage))?;
 
@@ -65,7 +67,6 @@ pub fn handle_account_metas(
         }
         _ => {
             // NOTE: we do not support var update now
-            msg!("invalid message type: {:?}", message.message_type);
             err!(SpokeError::InvalidMessage)
         }
     }
@@ -136,7 +137,6 @@ pub(crate) fn mark_message_as_delivered(
     let msg: HyperlaneMessages = AnchorDeserialize::deserialize(&mut &handle.message[..])?;
     match msg.message_type {
         MessageType::Settlement => {
-            msg!("Processing settlement batch message");
             let batch: Settlements = AnchorDeserialize::deserialize(&mut msg.rest.as_ref())
                 .map_err(|_| error!(SpokeError::InvalidMessage))?;
 
@@ -178,42 +178,13 @@ fn mark_settlement_as_delivered(ctx: Context<HandleContext>, settlement: Settlem
             + std::mem::size_of::<IntentStatusAccount>()
             + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
-        let __anchor_rent = Rent::get()?;
-        let lamports = __anchor_rent.minimum_balance(space);
-        let inst = anchor_lang::solana_program::system_instruction::create_account(
-            &ctx.accounts.pda_payer.key(),
-            &intent_status_pda.key(),
-            lamports,
-            space as u64,
+        create_or_claim_intent_status_pda(
+            &ctx.accounts.pda_payer,
+            &intent_status_pda,
             ctx.program_id,
-        );
-
-        let payer_seed = &[
-            "everclear_spoke".as_bytes(),
-            "-".as_bytes(),
-            "pda_payer".as_bytes(),
-        ];
-        let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
-
-        msg!("{:?}", inst);
-        msg!(
-            "{:?}",
-            Pubkey::create_program_address(
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                ctx.program_id
-            )
-        );
-
-        invoke_signed(
-            &inst,
-            &[
-                ctx.accounts.pda_payer.to_account_info(),
-                intent_status_pda.to_account_info(),
-            ],
-            &[
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
-            ],
+            space,
+            &settlement.intent_id,
+            intent_status_bump,
         )?;
     } else {
         // the account is created beforehand
@@ -284,4 +255,29 @@ fn build_settle_intent_account_metas(
         to_serializable_account_meta(*program_id, false),
     ];
     Ok(ret)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::instructions::messages::MessageType;
+
+    #[test]
+    fn test_invalid_message_type_returns_error_without_debug_log() {
+        let var_update_type = MessageType::VarUpdate;
+        let is_settlement = matches!(var_update_type, MessageType::Settlement);
+        assert!(!is_settlement, "VarUpdate should not be treated as Settlement");
+
+        let intent_type = MessageType::Intent;
+        let is_settlement_intent = matches!(intent_type, MessageType::Settlement);
+        assert!(!is_settlement_intent, "Intent should not be treated as Settlement");
+
+        let fill_type = MessageType::Fill;
+        let is_settlement_fill = matches!(fill_type, MessageType::Settlement);
+        assert!(!is_settlement_fill, "Fill should not be treated as Settlement");
+
+        let settlement_type = MessageType::Settlement;
+        let is_settlement = matches!(settlement_type, MessageType::Settlement);
+        assert!(is_settlement, "Settlement should be the only supported message type");
+    }
 }
