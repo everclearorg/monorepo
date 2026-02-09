@@ -20,6 +20,10 @@ export abstract class Cache {
         maxRetriesPerRequest: 4,
         retryStrategy: (times) => Math.min(times * 30, 1000),
       });
+      // Handle Redis connection errors to prevent unhandled exceptions
+      this.data.on('error', (err) => {
+        console.error('Redis connection error:', err);
+      });
     }
   }
 
