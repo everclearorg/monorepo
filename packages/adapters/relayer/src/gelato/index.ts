@@ -1,15 +1,17 @@
-import { GELATO_SERVER } from '@chimera-monorepo/utils';
-import { GelatoRelay } from '@gelatonetwork/relay-sdk';
+import {
+  createGelatoEvmRelayerClient,
+  GelatoEvmRelayerClient,
+} from "@gelatocloud/gasless";
 
 import { Relayer } from '..';
 
 import { getRelayerAddress, getTaskStatus, send, waitForTaskCompletion, isChainSupportedByGelato } from './gelato';
-export let url: string;
-export let gelatoRelay: GelatoRelay;
+export let gelatoRelay: GelatoEvmRelayerClient;
 
-export const setupRelayer = async (_url?: string): Promise<Relayer> => {
-  gelatoRelay = new GelatoRelay();
-  url = _url ?? GELATO_SERVER;
+export const setupRelayer = async (apiKey: string): Promise<Relayer> => {
+  gelatoRelay = createGelatoEvmRelayerClient({
+    apiKey,
+  });
   return {
     getRelayerAddress,
     send,
