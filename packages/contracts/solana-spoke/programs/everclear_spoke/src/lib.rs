@@ -14,8 +14,8 @@ use hyperlane::{
     SimulationReturnData,
 };
 use instructions::fee_adapter::{
-    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter,
-    __client_accounts_fee_adapter_admin_state, __client_accounts_initialize_fee_adapter,
+    FeeAdapterAdminState, FeeParams, InitializeFeeAdapter, MigrateFeeAdapterState,
+    __client_accounts_initialize_fee_adapter,
 };
 
 use instructions::new_order::OrderParameters;
@@ -69,10 +69,9 @@ pub mod everclear_spoke {
     pub fn new_intent(
         ctx: Context<NewIntent>,
         receiver: Pubkey,
-        input_asset: Pubkey,
         output_asset: Pubkey,
         amount: u64,
-        max_fee: u32,
+        amount_out_min: u128,
         ttl: u64,
         destinations: Vec<u32>,
         data: Vec<u8>,
@@ -82,9 +81,9 @@ pub mod everclear_spoke {
         instructions::new_intent(
             ctx,
             receiver,
-            input_asset,
             output_asset,
             amount,
+            amount_out_min,
             ttl,
             destinations,
             data,
@@ -99,6 +98,55 @@ pub mod everclear_spoke {
         fee_param: FeeParams,
     ) -> Result<()> {
         instructions::new_order(ctx, params, fee_param)
+    }
+
+    /// Fills a new intent.
+    /// The user "locks" funds (previously deposited) and fills an intent.
+    /// NOTE: different from EVM, we do not support pullFunds, i.e. we requires funds to be sent during the tx
+    /// and not deposited prior in the spoke.
+    pub fn fill_intent(
+        ctx: Context<FillIntent>,
+        // origin intent, flattened
+        origin_initiator: [u8; 32],
+        // NOTE: origin_receiver is put in ctx for space saving using LUT
+        origin_input_asset: [u8; 32],
+        // NOTE: we do not need output_asset here as this woule be `ctx.mint`. This is removed for space saving using LUT.
+        intent_origin: u32,
+        origin_nonce: u64,
+        origin_timestamp: u64,           // actually uint48 in Solidity
+        origin_ttl: u64,                 // actually uint48 in Solidity
+        origin_amount: [u8; 32],         // big-endian, matching typical EVM usage
+        origin_amount_out_min: [u8; 32], // uint256
+        origin_destinations: Vec<u32>,
+        origin_data: Vec<u8>,
+
+        // data for fill intent
+        amount_out: u64,
+        receiver: Pubkey,
+        destinations: Vec<u32>,
+
+        // hyperlane params
+        message_gas_limit: u64,
+        signature: Vec<u8>,
+    ) -> Result<()> {
+        instructions::fill_intent(
+            ctx,
+            origin_initiator,
+            origin_input_asset,
+            intent_origin,
+            origin_nonce,
+            origin_timestamp,
+            origin_ttl,
+            origin_amount,
+            origin_amount_out_min,
+            origin_destinations,
+            origin_data,
+            amount_out,
+            receiver,
+            destinations,
+            message_gas_limit,
+            signature,
+        )
     }
 
     // Instruction relates to message receiving
@@ -230,13 +278,14 @@ pub mod everclear_spoke {
         ctx: Context<InitializeFeeAdapter>,
         fee_recipient: Pubkey,
         fee_signer: Pubkey,
+        fill_signer: Pubkey,
     ) -> Result<()> {
         let state = &ctx.accounts.spoke_state;
         require!(
             state.owner == ctx.accounts.payer.key(),
             SpokeError::OnlyOwner
         );
-        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer)
+        fee_adapter::initialize_fee_adapter(ctx, fee_recipient, fee_signer, fill_signer)
     }
 
     pub fn update_fee_recipient(
@@ -276,5 +325,26 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
         fee_adapter::unpause_fee_adapter(ctx)
+    }
+
+    pub fn update_fill_signer(ctx: Context<FeeAdapterAdminState>, fill_signer: Pubkey) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::update_fill_signer(ctx, fill_signer)
+    }
+
+    pub fn migrate_fee_adapter_state(
+        ctx: Context<MigrateFeeAdapterState>,
+        fill_signer: Pubkey,
+    ) -> Result<()> {
+        let state = &ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+        fee_adapter::migrate_fee_adapter_state(ctx, fill_signer)
     }
 }

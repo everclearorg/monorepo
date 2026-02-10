@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{
     hyperlane::{InterchainGasPaymasterType, SerializableAccountMeta},
-    instructions::messages::Settlement,
+    instructions::{messages::Settlement, EVMIntent},
 };
 
 // =====================================================================
@@ -31,7 +31,7 @@ pub struct IntentAddedEvent {
     pub input_asset: Pubkey,
     pub output_asset: Pubkey,
     pub normalized_amount: u128,
-    pub max_fee: u32,
+    pub amount_out_min: u128,
     pub origin_domain: u32,
     pub nonce: u64,
     pub ttl: u64,
@@ -110,6 +110,7 @@ pub struct VaultAuthorityBumpUpdatedEvent {
 pub struct InitializedFeeAdapterEvent {
     pub fee_recipient: Pubkey,
     pub fee_signer: Pubkey,
+    pub fill_signer: Pubkey,
 }
 
 #[event]
@@ -122,6 +123,12 @@ pub struct FeeRecipientUpdatedEvent {
 pub struct FeeSignerUpdatedEvent {
     pub old_fee_signer: Pubkey,
     pub new_fee_signer: Pubkey,
+}
+
+#[event]
+pub struct FillSignerUpdatedEvent {
+    pub old_fill_signer: Pubkey,
+    pub new_fill_signer: Pubkey,
 }
 
 #[event]
@@ -148,4 +155,14 @@ pub struct IntentWithFeesAddedEvent {
     pub amount: u64,
     /// native amount in Solana
     pub fee: u64,
+}
+
+#[event]
+pub struct IntentFilledEvent {
+    pub intent_id: [u8; 32],
+    pub message_id: [u8; 32],
+    pub solver: Pubkey,
+    pub receiver: [u8; 32],
+    pub amount_out: u64,
+    pub intent: EVMIntent,
 }
