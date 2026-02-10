@@ -143,6 +143,16 @@ locals {
           "https://mantle.drpc.org"
         ]
       }
+      "4326" = {
+        providers = [
+          "https://mainnet.megaeth.com/rpc"
+        ]
+      }
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
+        ]
+      }
     }
     server = {
       port       = 8080
@@ -215,6 +225,16 @@ locals {
         providers = [
           "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://mantle.drpc.org"
+        ]
+      }
+      "4326" = {
+        providers = [
+          "https://mainnet.megaeth.com/rpc"
+        ]
+      }
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
         ]
       }
     }
@@ -294,6 +314,16 @@ locals {
         providers = [
           "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://mantle.drpc.org"
+        ]
+      }
+      "4326" = {
+        providers = [
+          "https://mainnet.megaeth.com/rpc"
+        ]
+      }
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
         ]
       }
     }
@@ -382,7 +412,9 @@ locals {
       25327      = { maxAge = 60, size = 1 },
       1399811149 = { maxAge = 60, size = 1 },
       728126428  = { maxAge = 60, size = 1 },
-      5000       = { maxAge = 60, size = 1 }
+      5000       = { maxAge = 60, size = 1 },
+      4326       = { maxAge = 60, size = 1 },
+      9745       = { maxAge = 60, size = 1 }
     }
     hub = {
       domain = "25327",
@@ -432,6 +464,16 @@ locals {
         providers = [
           "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
           "https://mantle.drpc.org"
+        ]
+      }
+      "4326" = {
+        providers = [
+          "https://mainnet.megaeth.com/rpc"
+        ]
+      }
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
         ]
       }
     }

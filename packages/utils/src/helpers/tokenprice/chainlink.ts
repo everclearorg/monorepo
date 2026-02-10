@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { chainWrapper, type PublicClient } from '../chain';
+import { chainWrapper } from '../chain';
 
 export const aggregatorV3InterfaceABI = [
   {
@@ -55,18 +55,30 @@ export const aggregatorV3InterfaceABI = [
  * Get the token price from the chainlink price feed.
  * @param domain - The domain id.
  * @param priceFeed - The data feed contract address.
- * @param client - The viem public client instance.
+ * @param chainReaderReadTx - Function wrapper for ChainReader.readTx.
+ * @param chainReaderDomain - Domain ID.
  */
 export const getTokenPriceFromChainlink = async (
   domain: string,
   priceFeed: string,
-  client: PublicClient,
+  chainReaderReadTx: (params: { to: string; domain: number; data: `0x${string}`; funcSig: string }) => Promise<string>,
+  chainReaderDomain: number,
 ): Promise<number> => {
-  const result = (await client.readContract({
-    address: priceFeed as `0x${string}`,
+  const encodedResult = await chainReaderReadTx({
+    to: priceFeed,
+    domain: chainReaderDomain,
+    data: chainWrapper.encodeFunctionData({
+      abi: aggregatorV3InterfaceABI,
+      functionName: 'latestRoundData',
+    }),
+    funcSig: 'latestRoundData()',
+  });
+
+  const result = chainWrapper.decodeFunctionResult({
     abi: aggregatorV3InterfaceABI,
     functionName: 'latestRoundData',
-  })) as [bigint, bigint, bigint, bigint, bigint];
+    data: encodedResult as `0x${string}`,
+  }) as [bigint, bigint, bigint, bigint, bigint];
 
   const answer = result[1];
   return +chainWrapper.formatUnits(answer, 8);

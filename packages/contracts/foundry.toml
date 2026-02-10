@@ -65,6 +65,7 @@ berachain = "${BERACHAIN_RPC}"
 mantle = "${MANTLE_RPC}"
 sonic = "${SONIC_RPC}"
 ink = "${INK_RPC}"
+tac = "${TAC_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
@@ -90,3 +91,4 @@ berachain = { key = "${BERACHAIN_API_KEY}", chain = "80094", url = "${BERACHAIN_
 mantle = { key = "${MANTLE_API_KEY}", chain = "5000", url = "${MANTLE_VERIFIER_API_URL}" }
 sonic = { key = "${SONIC_API_KEY}", chain = "146", url = "${SONIC_VERIFIER_API_URL}" }
 ink = { key = "${INK_API_KEY}", chain = "57073", url = "${INK_VERIFIER_API_URL}" }
+tac = { key = "${TACSCAN_API_KEY}", chain = "239", url = "${TAC_VERIFIER_API_URL}" }

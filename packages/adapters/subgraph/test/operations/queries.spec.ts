@@ -109,7 +109,7 @@ describe('Subgraph Adapter - queries', () => {
   describe('getSpokeMetaQuery', () => {
     it('should work', async () => {
       const ret = getSpokeMetaQuery();
-      expect(ret).to.contain(`meta(id: "SPOKE_META_ID"){`);
+      expect(ret).to.contain(`meta(id: "0x53504f4b455f4d4554415f4944"){`);
       expect(ret).to.contain(`${SPOKE_META_ENTITY}`);
     });
   });

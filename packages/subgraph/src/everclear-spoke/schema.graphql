@@ -282,7 +282,42 @@ type Meta @entity {
   gateway: Bytes
   lighthouse: Bytes
   messageReceiver: Bytes
+  watchtower: Bytes
+  messageGasLimit: BigInt
+  feeAdapter: Bytes
   feeAdapterRecipient: Bytes
+  fillSigner: Bytes
+  feeSigner: Bytes
+  # SpokeGateway storage
+  mailbox: Bytes
+  securityModule: Bytes
+
+  # Derived views over meta-managed configuration mappings
+  moduleForStrategies: [ModuleForStrategy!]! @derivedFrom(field: "meta")
+}
+
+# Generic tx log for any Meta-updating event on the spoke
+type SpokeMetaUpdate @entity(immutable: true) {
+  id: Bytes!
+
+  # High-level kind identifier, e.g. PAUSED, UNPAUSED, GATEWAY_UPDATED
+  kind: String!
+
+  # Optional key being updated (e.g. \"gateway\", \"lighthouse\")
+  key: String
+
+  # Optional value snapshots
+  valueBytes: Bytes
+  valueBigInt: BigInt
+
+  # Transaction info
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  gasPrice: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
 }
 
 type StrategyForAsset @entity {
@@ -293,6 +328,7 @@ type StrategyForAsset @entity {
 
 type ModuleForStrategy @entity {
   id: Bytes!
+  meta: Meta!
   strategy: BigInt!
   module: Bytes!
 }
@@ -305,23 +341,6 @@ type IntentFeesAdded @entity(immutable: true) {
 
   nativeFee: BigInt!
   tokenFee: BigInt!
-
-  # Transaction info
-  transactionHash: Bytes!
-  timestamp: BigInt!
-  gasPrice: BigInt!
-  gasLimit: BigInt!
-  blockNumber: BigInt!
-  txOrigin: Bytes!
-
-  txNonce: BigInt!
-}
-
-type FeeRecipientUpdated @entity(immutable: true) {
-  id: Bytes!
-
-  updated: Bytes!
-  previous: Bytes!
 
   # Transaction info
   transactionHash: Bytes!

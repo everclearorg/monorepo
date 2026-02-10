@@ -6,6 +6,7 @@ import { createProcessEnv } from '../mock';
 import { Database } from '@chimera-monorepo/database';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { SubgraphReader } from '@chimera-monorepo/adapters-subgraph';
+import { getContext } from '../../src/context';
 
 describe('checkChains', () => {
   let database: SinonStubbedInstance<Database>;
@@ -36,6 +37,13 @@ describe('checkChains', () => {
   });
 
   describe('#checkChains', () => {
+    beforeEach(() => {
+      chainreader.getBlock.resolves({
+        number: 1,
+        timestamp: Math.floor(Date.now() / 1000),
+      } as any);
+    });
+
     it('should work', async () => {
       subgraph.getLatestBlockNumber.resolves(
         new Map<string, number>([
@@ -43,7 +51,11 @@ describe('checkChains', () => {
           ['1338', 1],
         ]),
       );
-      expect(checkChains()).to.not.throw;
+      const result = await checkChains();
+      expect(result).to.be.an('array');
+      // Verify block data was stored in adapters.blockMap
+      const { adapters } = getContext();
+      expect(adapters.blockMap).to.be.instanceOf(Map);
     });
     it('should work with the default block number', async () => {
       subgraph.getLatestBlockNumber.resolves(
@@ -52,7 +64,11 @@ describe('checkChains', () => {
           ['1336', 1],
         ]),
       );
-      expect(checkChains()).to.not.throw;
+      const result = await checkChains();
+      expect(result).to.be.an('array');
+      // Verify block data was stored in adapters.blockMap
+      const { adapters } = getContext();
+      expect(adapters.blockMap).to.be.instanceOf(Map);
     });
   });
 });

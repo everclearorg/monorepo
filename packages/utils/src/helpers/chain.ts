@@ -40,6 +40,23 @@ export const chainWrapper = {
   parseSignature: (...args: Parameters<typeof viem.parseSignature>) => viem.parseSignature(...args),
   createWalletClient: (...args: Parameters<typeof viem.createWalletClient>) => viem.createWalletClient(...args),
   createPublicClient: (...args: Parameters<typeof viem.createPublicClient>) => viem.createPublicClient(...args),
+  getDefaultMulticallParams: () => {
+    return {
+      batch: {
+        // Optimize batch settings to reduce RPC requests for all providers:
+        // - wait: Time to wait before sending batch (ms). Allows more calls to be batched together
+        // - batchSize: Max calldata size per batch. Larger batches = fewer requests
+        // - multicall: Enable multicall to batch multiple eth_call requests
+        multicall: {
+          batchSize: 8192, // 8KB batch size (larger batches = fewer RPC requests)
+          wait: 50, // 50ms wait to batch more calls together
+        },
+      },
+      // Use viem's built-in caching to reduce RPC requests
+      // Cache time: 5 seconds (balances can change quickly, but this reduces redundant requests)
+      cacheTime: 5_000,
+    };
+  },
   http: viem.http,
   fallback: viem.fallback,
   pad: (...args: Parameters<typeof viem.pad>) => viem.pad(...args),

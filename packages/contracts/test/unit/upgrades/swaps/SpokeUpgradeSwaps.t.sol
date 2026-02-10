@@ -9,12 +9,12 @@ import {SpokeMessageReceiverV2} from 'contracts/intent/modules/SpokeMessageRecei
 
 import {ISpecifiesInterchainSecurityModule} from '@hyperlane/interfaces/IInterchainSecurityModule.sol';
 import {EverclearSpokeV4, IEverclearSpokeV4} from 'contracts/intent/EverclearSpokeV4.sol';
-import {EverclearSpokeV5, IEverclearSpokeV5} from 'contracts/intent/EverclearSpokeV5.sol';
+import {EverclearSpokeV6, IEverclearSpokeV6} from 'contracts/intent/EverclearSpokeV6.sol';
 import {ISpokeGateway} from 'contracts/intent/SpokeGateway.sol';
 
 import {IEverclear} from 'interfaces/common/IEverclear.sol';
 import {IEverclearV2} from 'interfaces/common/IEverclearV2.sol';
-import {ISpokeStorageV5} from 'interfaces/intent/ISpokeStorageV5.sol';
+import {ISpokeStorageV6} from 'interfaces/intent/ISpokeStorageV6.sol';
 
 import {ISettlementModule} from 'interfaces/common/ISettlementModule.sol';
 
@@ -24,7 +24,7 @@ import {Constants} from 'test/utils/Constants.sol';
 
 import {StandardHookMetadata} from '@hyperlane/hooks/libs/StandardHookMetadata.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import {ICREATE3, TestEverclearSpokeV5, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
+import {ICREATE3, TestEverclearSpokeV6, UpgradeHelper} from 'test//utils/UpgradeHelper.sol';
 
 import 'forge-std/StdStorage.sol';
 import 'forge-std/console2.sol';
@@ -60,7 +60,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     messageReceiverV2 = new SpokeMessageReceiverV2();
 
     // Checking implementation correct and caching the state variables
-    spokeProxyV5 = EverclearSpokeV5(SPOKE_PROXY_MAINNET);
+    spokeProxyV6 = EverclearSpokeV6(SPOKE_PROXY_MAINNET);
     address oldImplementation = (vm.load(SPOKE_PROXY_MAINNET, IMPLEMENTATION_SLOT)).toAddress();
     assertEq(oldImplementation, SPOKE_IMPL_MAINNET_V4);
 
@@ -71,7 +71,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint8 version = 5;
     bytes32 _salt = keccak256(abi.encodePacked(SPOKE_PROXY_MAINNET, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
-    bytes memory _creation = type(EverclearSpokeV5).creationCode;
+    bytes memory _creation = type(EverclearSpokeV6).creationCode;
 
     // Deploying the new implementation
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
@@ -81,74 +81,74 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // Initializing with new feeAdapter and upgrading
     bytes memory initializeCalldata = abi.encodeWithSelector(
-      EverclearSpokeV5.initialize.selector, address(feeAdapterV2), address(messageReceiverV2), FILL_SIGNER
+      EverclearSpokeV6.initialize.selector, address(feeAdapterV2), address(messageReceiverV2), FILL_SIGNER
     );
     success = false;
     bytes memory upgradeCalldata =
       abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(SPOKE_PROXY_MAINNET_OWNER);
-    (success,) = address(spokeProxyV5).call(upgradeCalldata);
+    (success,) = address(spokeProxyV6).call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
     address newImplementation = (vm.load(SPOKE_PROXY_MAINNET, IMPLEMENTATION_SLOT)).toAddress();
     assertEq(newImplementation, newEverclearSpoke);
-    assertEq(spokeProxyV5.feeAdapter(), address(feeAdapterV2));
+    assertEq(spokeProxyV6.feeAdapter(), address(feeAdapterV2));
 
     // Testing sending new intent
     _sendIntent();
 
     // Checking the cached state
-    assertEq(state.permit, address(spokeProxyV5.PERMIT2()));
-    assertEq(state.EVERCLEAR, spokeProxyV5.EVERCLEAR());
-    assertEq(state.DOMAIN, spokeProxyV5.DOMAIN());
-    assertEq(state.lighthouse, spokeProxyV5.lighthouse());
-    assertEq(state.watchtower, spokeProxyV5.watchtower());
-    assertEq(state.gateway, address(spokeProxyV5.gateway()));
-    assertEq(state.callExecutor, address(spokeProxyV5.callExecutor()));
-    assertEq(state.paused, spokeProxyV5.paused());
-    assertEq(state.nonce + 1, spokeProxyV5.nonce());
-    assertEq(state.messageGasLimit, spokeProxyV5.messageGasLimit());
-    assertEq(address(feeAdapterV2), spokeProxyV5.feeAdapter());
-    assertEq(address(messageReceiverV2), spokeProxyV5.messageReceiver());
+    assertEq(state.permit, address(spokeProxyV6.PERMIT2()));
+    assertEq(state.EVERCLEAR, spokeProxyV6.EVERCLEAR());
+    assertEq(state.DOMAIN, spokeProxyV6.DOMAIN());
+    assertEq(state.lighthouse, spokeProxyV6.lighthouse());
+    assertEq(state.watchtower, spokeProxyV6.watchtower());
+    assertEq(state.gateway, address(spokeProxyV6.gateway()));
+    assertEq(state.callExecutor, address(spokeProxyV6.callExecutor()));
+    assertEq(state.paused, spokeProxyV6.paused());
+    assertEq(state.nonce + 1, spokeProxyV6.nonce());
+    assertEq(state.messageGasLimit, spokeProxyV6.messageGasLimit());
+    assertEq(address(feeAdapterV2), spokeProxyV6.feeAdapter());
+    assertEq(address(messageReceiverV2), spokeProxyV6.messageReceiver());
   }
 
   // ============ Admin Unit ============ //
   function test_spokeUpgradeSwaps_pause() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.lighthouse());
-    spokeProxyV5.pause();
-    assertEq(spokeProxyV5.paused(), true);
+    vm.prank(spokeProxyV6.lighthouse());
+    spokeProxyV6.pause();
+    assertEq(spokeProxyV6.paused(), true);
 
-    vm.prank(spokeProxyV5.watchtower());
-    spokeProxyV5.unpause();
-    assertEq(spokeProxyV5.paused(), false);
+    vm.prank(spokeProxyV6.watchtower());
+    spokeProxyV6.unpause();
+    assertEq(spokeProxyV6.paused(), false);
   }
 
   function test_spokeUpgradeSwaps_setStrategyForAsset() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.setStrategyForAsset(address(0x123), IEverclearV2.Strategy.XERC20);
-    assertEq(uint8(spokeProxyV5.strategies(address(0x123))), uint8(IEverclearV2.Strategy.XERC20));
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.setStrategyForAsset(address(0x123), IEverclearV2.Strategy.XERC20);
+    assertEq(uint8(spokeProxyV6.strategies(address(0x123))), uint8(IEverclearV2.Strategy.XERC20));
   }
 
   function test_spokeUpgradeSwaps_setModuleForStrategy() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.setModuleForStrategy(IEverclearV2.Strategy.XERC20, ISettlementModule(address(0x123)));
-    assertEq(address(spokeProxyV5.modules(IEverclearV2.Strategy.XERC20)), address(0x123));
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.setModuleForStrategy(IEverclearV2.Strategy.XERC20, ISettlementModule(address(0x123)));
+    assertEq(address(spokeProxyV6.modules(IEverclearV2.Strategy.XERC20)), address(0x123));
   }
 
   function test_spokeUpgradeSwaps_updateSecurityModule() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.updateSecurityModule(address(0x123));
-    address gateway = address(spokeProxyV5.gateway());
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.updateSecurityModule(address(0x123));
+    address gateway = address(spokeProxyV6.gateway());
     address updatedModule = address(ISpecifiesInterchainSecurityModule(gateway).interchainSecurityModule());
     assertEq(updatedModule, address(0x123));
   }
@@ -160,41 +160,41 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
   function test_spokeUpgradeSwaps_updateFeeAdapter() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.updateFeeAdapter(address(0x123));
-    assertEq(spokeProxyV5.feeAdapter(), address(0x123));
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.updateFeeAdapter(address(0x123));
+    assertEq(spokeProxyV6.feeAdapter(), address(0x123));
   }
 
   function test_spokeUpgradeSwaps_updateGateway() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.updateGateway(address(0x123));
-    assertEq(address(spokeProxyV5.gateway()), address(0x123));
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.updateGateway(address(0x123));
+    assertEq(address(spokeProxyV6.gateway()), address(0x123));
   }
 
   function test_spokeUpgradeSwaps_updateMessageReceiver() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.updateMessageReceiver(address(0x123));
-    assertEq(spokeProxyV5.messageReceiver(), address(0x123));
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.updateMessageReceiver(address(0x123));
+    assertEq(spokeProxyV6.messageReceiver(), address(0x123));
   }
 
   function test_spokeUpgradeSwaps_updateMessageGasLimit() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.updateMessageGasLimit(1000);
-    assertEq(spokeProxyV5.messageGasLimit(), 1000);
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.updateMessageGasLimit(1000);
+    assertEq(spokeProxyV6.messageGasLimit(), 1000);
   }
 
   function test_spokeUpgradeSwaps_updateFillSigner() public {
     _upgradeSpoke();
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.updateFillSigner(address(0x123));
-    assertEq(spokeProxyV5.fillSigner(), address(0x123));
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.updateFillSigner(address(0x123));
+    assertEq(spokeProxyV6.fillSigner(), address(0x123));
   }
 
   // ============ Public ============ //
@@ -209,9 +209,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     deal(USDC_MAINNET, address(this), amount);
 
     // Approving and depositing
-    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), amount);
-    spokeProxyV5.deposit(USDC_MAINNET, amount);
-    assertEq(spokeProxyV5.balances(USDC_MAINNET.toBytes32(), address(this).toBytes32()), amount);
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV6), amount);
+    spokeProxyV6.deposit(USDC_MAINNET, amount);
+    assertEq(spokeProxyV6.balances(USDC_MAINNET.toBytes32(), address(this).toBytes32()), amount);
   }
 
   /**
@@ -225,13 +225,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     deal(USDC_MAINNET, address(this), amount);
 
     // Approving and depositing
-    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), amount);
-    spokeProxyV5.deposit(USDC_MAINNET, amount);
-    assertEq(spokeProxyV5.balances(USDC_MAINNET.toBytes32(), address(this).toBytes32()), amount);
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV6), amount);
+    spokeProxyV6.deposit(USDC_MAINNET, amount);
+    assertEq(spokeProxyV6.balances(USDC_MAINNET.toBytes32(), address(this).toBytes32()), amount);
 
     // Withdrawing
-    spokeProxyV5.withdraw(USDC_MAINNET, amount);
-    assertEq(spokeProxyV5.balances(USDC_MAINNET.toBytes32(), address(this).toBytes32()), 0);
+    spokeProxyV6.withdraw(USDC_MAINNET, amount);
+    assertEq(spokeProxyV6.balances(USDC_MAINNET.toBytes32(), address(this).toBytes32()), 0);
     assertEq(IERC20(USDC_MAINNET).balanceOf(address(this)), amount);
   }
 
@@ -265,11 +265,20 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // generating signature after asset is created
     bytes32 _sigData = keccak256(
       abi.encode(
-        0, destinations, _inputAsset, _outputAsset, _amount, 0, 0, hex'00', _feeParams.fee, _feeParams.deadline
+        0,
+        destinations,
+        _receiver,
+        _inputAsset,
+        _outputAsset.toBytes32(),
+        _amount,
+        0,
+        0,
+        hex'00',
+        _feeParams.fee,
+        _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -278,7 +287,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00', _feeParams
     );
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     vm.stopPrank();
   }
@@ -312,6 +321,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encode(
         0,
         destinations,
+        _receiver,
         _inputAsset,
         _outputAsset,
         _amount,
@@ -322,8 +332,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
         _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -340,7 +349,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       _feeParams
     );
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     vm.stopPrank();
   }
@@ -377,6 +386,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encode(
         0,
         destinations,
+        _receiver,
         _inputAsset,
         _outputAsset.toBytes32(),
         _amount,
@@ -387,8 +397,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
         _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -397,7 +406,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00', _feeParams
     );
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     vm.stopPrank();
   }
@@ -431,6 +440,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encode(
         0,
         destinations,
+        _receiver,
         _inputAsset,
         _outputAsset,
         _amount,
@@ -441,8 +451,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
         _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -459,7 +468,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       _feeParams
     );
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     vm.stopPrank();
   }
@@ -499,14 +508,14 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     vm.startPrank(_solver);
     // approving the amount and depositing to spoke
-    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
-    spokeProxyV5.deposit(USDC_MAINNET, _amountOut);
-    assertTrue(spokeProxyV5.balances(USDC_MAINNET.toBytes32(), _solver.toBytes32()) == _amountOut);
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV6), _amountOut);
+    spokeProxyV6.deposit(USDC_MAINNET, _amountOut);
+    assertTrue(spokeProxyV6.balances(USDC_MAINNET.toBytes32(), _solver.toBytes32()) == _amountOut);
     vm.stopPrank();
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(),
+      spokeProxyV6.FILL_INTENT_TYPEHASH(),
       _domain,
       _solver,
       _intent,
@@ -518,12 +527,12 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // filling the user intent
     vm.startPrank(_solver);
-    spokeProxyV5.fillIntent(_intent, _amountOut, _solver.toBytes32(), _solverDestinations, _fillSignature, false);
+    spokeProxyV6.fillIntent(_intent, _amountOut, _solver.toBytes32(), _solverDestinations, _fillSignature, false);
     bytes32 _intentId = keccak256(abi.encode(_intent));
     vm.stopPrank();
 
     // asserting changes in state
-    assertTrue(spokeProxyV5.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_solver), _startingBalanceSolver - _amountOut);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_receiver), _startingBalanceReceiver + _amountOut);
   }
@@ -531,7 +540,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
   function _updateLighthouseWithStorage(
     address _solver
   ) internal {
-    address _target = address(spokeProxyV5);
+    address _target = address(spokeProxyV6);
     stdstore.target(_target).sig('lighthouse()').checked_write(_solver);
   }
 
@@ -570,11 +579,11 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     vm.prank(_solver);
     // approving the amount and depositing to spoke
-    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV6), _amountOut);
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(),
+      spokeProxyV6.FILL_INTENT_TYPEHASH(),
       _domain,
       _solver,
       _intent,
@@ -586,11 +595,11 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // filling the user intent
     vm.prank(_solver);
-    spokeProxyV5.fillIntent(_intent, _amountOut, _solver.toBytes32(), _solverDestinations, _fillSignature, true);
+    spokeProxyV6.fillIntent(_intent, _amountOut, _solver.toBytes32(), _solverDestinations, _fillSignature, true);
     bytes32 _intentId = keccak256(abi.encode(_intent));
 
     // asserting changes in state
-    assertTrue(spokeProxyV5.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_solver), _startingBalanceSolver - _amountOut);
     assertEq(IERC20(USDC_MAINNET).balanceOf(RECEIVER), _startingBalanceReceiver + _amountOut);
   }
@@ -622,8 +631,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     vm.startPrank(solverAddr);
     // approving the amount and depositing to spoke
-    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _totalAmount);
-    spokeProxyV5.deposit(USDC_MAINNET, _totalAmount);
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV6), _totalAmount);
+    spokeProxyV6.deposit(USDC_MAINNET, _totalAmount);
     vm.stopPrank();
 
     // filling the user intent
@@ -631,8 +640,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint32[][] memory _solverDestinations = _getBatchDestinations(42_161, _intents.length);
     bytes32[] memory _solvers = _constructSolverArray(solverAddr.toBytes32(), _intents.length);
     bytes memory _payload = abi.encode(
-      spokeProxyV5.BATCH_FILL_INTENT_TYPEHASH(),
-      keccak256(abi.encode(1, address(spokeProxyV5))),
+      spokeProxyV6.BATCH_FILL_INTENT_TYPEHASH(),
+      keccak256(abi.encode(1, address(spokeProxyV6))),
       solverAddr,
       _intents,
       _amountOuts,
@@ -641,7 +650,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
-    spokeProxyV5.batchFillIntent(_intents, _amountOuts, _solvers, _solverDestinations, _fillSignature, false);
+    spokeProxyV6.batchFillIntent(_intents, _amountOuts, _solvers, _solverDestinations, _fillSignature, false);
 
     // generating ids
     bytes32[] memory _intentIds = new bytes32[](5);
@@ -652,12 +661,12 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _intentIds[4] = keccak256(abi.encode(_intents[4]));
 
     // asserting changes in state
-    assertTrue(spokeProxyV5.status(_intentIds[0]) == IEverclearV2.IntentStatus.FILLED);
-    assertTrue(spokeProxyV5.status(_intentIds[1]) == IEverclearV2.IntentStatus.FILLED);
-    assertTrue(spokeProxyV5.status(_intentIds[2]) == IEverclearV2.IntentStatus.FILLED);
-    assertTrue(spokeProxyV5.status(_intentIds[3]) == IEverclearV2.IntentStatus.FILLED);
-    assertTrue(spokeProxyV5.status(_intentIds[4]) == IEverclearV2.IntentStatus.FILLED);
-    assertEq(spokeProxyV5.balances(USDC_MAINNET.toBytes32(), solverAddr.toBytes32()), 0, 'Solver balance incorrect');
+    assertTrue(spokeProxyV6.status(_intentIds[0]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[1]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[2]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[3]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[4]) == IEverclearV2.IntentStatus.FILLED);
+    assertEq(spokeProxyV6.balances(USDC_MAINNET.toBytes32(), solverAddr.toBytes32()), 0, 'Solver balance incorrect');
     uint256[] memory _endingBalanceReceiver = _fetchBalances(_intents);
     for (uint256 i = 0; i < _intents.length; i++) {
       assertEq(
@@ -687,15 +696,15 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     vm.prank(_solver);
     // approving the amount and depositing to spoke
-    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _totalAmount);
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV6), _totalAmount);
 
     // filling the user intent
     vm.startPrank(_solver);
     uint32[][] memory _solverDestinations = _getBatchDestinations(42_161, _intents.length);
     bytes32[] memory _solvers = _constructSolverArray(_solver.toBytes32(), _intents.length);
     bytes memory _payload = abi.encode(
-      spokeProxyV5.BATCH_FILL_INTENT_TYPEHASH(),
-      keccak256(abi.encode(1, address(spokeProxyV5))),
+      spokeProxyV6.BATCH_FILL_INTENT_TYPEHASH(),
+      keccak256(abi.encode(1, address(spokeProxyV6))),
       _solver,
       _intents,
       _amountOuts,
@@ -704,7 +713,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
-    spokeProxyV5.batchFillIntent(_intents, _amountOuts, _solvers, _solverDestinations, _fillSignature, true);
+    spokeProxyV6.batchFillIntent(_intents, _amountOuts, _solvers, _solverDestinations, _fillSignature, true);
     vm.stopPrank();
 
     // generating ids
@@ -716,11 +725,11 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _intentIds[4] = keccak256(abi.encode(_intents[4]));
 
     // asserting changes in state
-    assertTrue(spokeProxyV5.status(_intentIds[0]) == IEverclearV2.IntentStatus.FILLED);
-    assertTrue(spokeProxyV5.status(_intentIds[1]) == IEverclearV2.IntentStatus.FILLED);
-    assertTrue(spokeProxyV5.status(_intentIds[2]) == IEverclearV2.IntentStatus.FILLED);
-    assertTrue(spokeProxyV5.status(_intentIds[3]) == IEverclearV2.IntentStatus.FILLED);
-    assertTrue(spokeProxyV5.status(_intentIds[4]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[0]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[1]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[2]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[3]) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentIds[4]) == IEverclearV2.IntentStatus.FILLED);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_solver), _startingBalanceSolver - _totalAmount, 'Solver balance incorrect');
     uint256[] memory _endingBalanceReceiver = _fetchBalances(_intents);
     for (uint256 i = 0; i < _intents.length; i++) {
@@ -767,11 +776,11 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     vm.prank(_solver);
     // approving the amount and depositing to spoke
-    IERC20(USDC_MAINNET).approve(address(spokeProxyV5), _amountOut);
+    IERC20(USDC_MAINNET).approve(address(spokeProxyV6), _amountOut);
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(),
+      spokeProxyV6.FILL_INTENT_TYPEHASH(),
       _domain,
       _solver,
       _intent,
@@ -783,12 +792,12 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // filling the user intent
     vm.startPrank(_solver);
-    spokeProxyV5.fillIntent(_intent, _amountOut, _solver.toBytes32(), _solverDestinations, _fillSignature, true);
+    spokeProxyV6.fillIntent(_intent, _amountOut, _solver.toBytes32(), _solverDestinations, _fillSignature, true);
     bytes32 _intentId = keccak256(abi.encode(_intent));
     vm.stopPrank();
 
     // asserting changes in state
-    assertTrue(spokeProxyV5.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
+    assertTrue(spokeProxyV6.status(_intentId) == IEverclearV2.IntentStatus.FILLED);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_solver), _startingBalanceSolver - _amountOut);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_receiver), _startingBalanceReceiver + _amountOut);
   }
@@ -804,7 +813,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _messageFee
   ) public validDestination(_destination) {
     _upgradeSpoke();
-    address lightHouse = spokeProxyV5.lighthouse();
+    address lightHouse = spokeProxyV6.lighthouse();
 
     _messageFee = bound(_messageFee, 1, 10 ether);
     deal(lightHouse, _messageFee);
@@ -818,7 +827,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     }
 
     bytes memory _batchIntentmessage = MessageLibV2.formatIntentMessageBatch(_intentsToProcess);
-    metadata = StandardHookMetadata.formatMetadata(0, MESSAGE_GAS_LIMIT, SPOKE_GATEWAY_MAINNET, '');
+    metadata = StandardHookMetadata.formatMetadata(0, DEFAULT_GAS_LIMIT, SPOKE_GATEWAY_MAINNET, '');
 
     vm.expectCall(
       address(MAILBOX_MAINNET),
@@ -828,7 +837,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     );
 
     vm.startPrank(lightHouse);
-    spokeProxyV5.processIntentQueue{value: _messageFee}(_intentsToProcess);
+    spokeProxyV6.processIntentQueue{value: _messageFee}(_intentsToProcess, DEFAULT_GAS_LIMIT);
     assertEq(lightHouse.balance, 0);
   }
 
@@ -837,7 +846,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _messageFee
   ) public {
     _upgradeSpoke();
-    address lightHouse = spokeProxyV5.lighthouse();
+    address lightHouse = spokeProxyV6.lighthouse();
     address _solver = address(0x456);
     uint32[] memory _solverDestinations = _getDestinations(42_161);
 
@@ -863,12 +872,12 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // processing the fillQueue
     vm.expectCall(
-      address(spokeProxyV5.gateway()),
-      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', HUB_ID, _batchFillMessage, MESSAGE_GAS_LIMIT)
+      address(spokeProxyV6.gateway()),
+      abi.encodeWithSignature('sendMessage(uint32,bytes,uint256)', HUB_ID, _batchFillMessage, DEFAULT_GAS_LIMIT)
     );
 
     vm.startPrank(lightHouse);
-    spokeProxyV5.processFillQueue{value: _messageFee}(uint32(_fillsToProcess.length));
+    spokeProxyV6.processFillQueue{value: _messageFee}(uint32(_fillsToProcess.length), DEFAULT_GAS_LIMIT);
   }
 
   function test_spokeUpgradeSwaps_processIntentQueueViaRelayer(
@@ -887,7 +896,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     }
 
     bytes memory _batchIntentmessage = MessageLibV2.formatIntentMessageBatch(_intentsToProcess);
-    metadata = StandardHookMetadata.formatMetadata(0, MESSAGE_GAS_LIMIT, SPOKE_GATEWAY_MAINNET, '');
+    metadata = StandardHookMetadata.formatMetadata(0, DEFAULT_GAS_LIMIT, SPOKE_GATEWAY_MAINNET, '');
 
     vm.expectCall(
       address(MAILBOX_MAINNET),
@@ -903,18 +912,20 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _sig = _generateSignature(
       FEE_SIGNER_PK,
       abi.encode(
-        spokeProxyV5.PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH(),
+        spokeProxyV6.PROCESS_INTENT_QUEUE_VIA_RELAYER_TYPEHASH(),
         block.chainid,
         _intentsToProcess.length,
         _relayer,
         _ttl,
         _nonce,
-        0
+        DEFAULT_GAS_LIMIT
       )
     );
 
     vm.startPrank(_relayer);
-    spokeProxyV5.processIntentQueueViaRelayer(uint32(block.chainid), _intentsToProcess, _relayer, _ttl, _nonce, 0, _sig);
+    spokeProxyV6.processIntentQueueViaRelayer(
+      uint32(block.chainid), _intentsToProcess, _relayer, _ttl, _nonce, DEFAULT_GAS_LIMIT, _sig
+    );
   }
 
   function test_spokeUpgradeSwaps_processFillQueueViaRelayer(
@@ -924,7 +935,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _upgradeSpoke();
     address _relayer = address(0x123);
 
-    address lightHouse = spokeProxyV5.lighthouse();
+    address lightHouse = spokeProxyV6.lighthouse();
     address _solver = address(0x456);
     uint32[] memory _solverDestinations = _getDestinations(42_161);
 
@@ -956,28 +967,36 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _sig = _generateSignature(
       FEE_SIGNER_PK,
       abi.encode(
-        spokeProxyV5.PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH(), block.chainid, _amount, _relayer, _ttl, _nonce, 0
+        spokeProxyV6.PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH(),
+        block.chainid,
+        _amount,
+        _relayer,
+        _ttl,
+        _nonce,
+        DEFAULT_GAS_LIMIT
       )
     );
 
     // processing the fillQueue
-    uint256 _fee = ISpokeGateway(spokeProxyV5.gateway()).quoteMessage(HUB_ID, _batchFillMessage, MESSAGE_GAS_LIMIT);
+    uint256 _fee = ISpokeGateway(spokeProxyV6.gateway()).quoteMessage(HUB_ID, _batchFillMessage, DEFAULT_GAS_LIMIT);
     vm.expectCall(
-      address(spokeProxyV5.gateway()),
+      address(spokeProxyV6.gateway()),
       abi.encodeWithSignature(
-        'sendMessage(uint32,bytes,uint256,uint256)', HUB_ID, _batchFillMessage, _fee, MESSAGE_GAS_LIMIT
+        'sendMessage(uint32,bytes,uint256,uint256)', HUB_ID, _batchFillMessage, _fee, DEFAULT_GAS_LIMIT
       )
     );
 
     vm.startPrank(_relayer);
-    spokeProxyV5.processFillQueueViaRelayer(uint32(block.chainid), _amount, _relayer, _ttl, _nonce, 0, _sig);
+    spokeProxyV6.processFillQueueViaRelayer(
+      uint32(block.chainid), _amount, _relayer, _ttl, _nonce, DEFAULT_GAS_LIMIT, _sig
+    );
   }
 
   function test_spokeUpgradeSwaps_executeIntentCalldata() public {
     _upgradeSpoke();
 
     // configuring the input and mocking the storage to return SETTLED
-    address _target = address(spokeProxyV5);
+    address _target = address(spokeProxyV6);
     IEverclearV2.Intent memory _intent;
     _intent.destinations = new uint32[](1);
     _intent.destinations[0] = 1;
@@ -990,7 +1009,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 v = abi.decode(ret, (uint256));
     assertEq(v, 6);
 
-    spokeProxyV5.executeIntentCalldata(_intent);
+    spokeProxyV6.executeIntentCalldata(_intent);
   }
 
   // ============ Same-chain Swap ============ //
@@ -1015,18 +1034,27 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // generating signature after asset is created
     bytes32 _sigData = keccak256(
       abi.encode(
-        0, destinations, _inputAsset, _outputAsset, _amount, 0, 0, hex'00', _feeParams.fee, _feeParams.deadline
+        0,
+        destinations,
+        _receiver,
+        _inputAsset,
+        _outputAsset,
+        _amount,
+        0,
+        0,
+        hex'00',
+        _feeParams.fee,
+        _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
 
     (bytes32 _intentId,) =
       feeAdapterV2.newIntent(destinations, _receiver, _inputAsset, _outputAsset, _amount, 0, 0, hex'00', _feeParams);
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     vm.stopPrank();
   }
@@ -1055,6 +1083,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encode(
         0,
         destinations,
+        _receiver,
         _inputAsset,
         _outputAsset,
         _amount,
@@ -1065,8 +1094,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
         _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, SENDER, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(SENDER);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -1074,7 +1102,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     (bytes32 _intentId,) = feeAdapterV2.newIntent(
       destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, hex'00', _feeParams
     );
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     vm.stopPrank();
   }
@@ -1102,6 +1130,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encode(
         0,
         destinations,
+        RECEIVER,
         _inputAsset,
         _outputAsset,
         _amount,
@@ -1112,8 +1141,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
         _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, SENDER, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(SENDER);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -1121,7 +1149,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     (bytes32 _intentId, IEverclearV2.Intent memory _intent) = feeAdapterV2.newIntent(
       destinations, RECEIVER, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '', _feeParams
     );
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     vm.stopPrank();
 
@@ -1138,7 +1166,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _upgradeSpoke();
 
     // configuring the inputs
-    address _target = address(spokeProxyV5);
+    address _target = address(spokeProxyV6);
     bytes32 _intentId = keccak256(abi.encode('SETTLED'));
     IEverclearV2.Settlement memory _settlement;
     _settlement.intentId = _intentId;
@@ -1156,10 +1184,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     assertEq(v, 6);
 
     // sending message
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), 6);
+    assertEq(uint8(spokeProxyV6.status(_intentId)), 6);
   }
 
   function test_spokeUpgradeSwaps_receiveMessage_handleSettlement_XERC20() public {
@@ -1181,10 +1209,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // sending message
     uint256 balance = IERC20(CLEAR_MAINNET).balanceOf(_settlement.recipient.toAddress());
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), 6);
+    assertEq(uint8(spokeProxyV6.status(_intentId)), 6);
     assertEq(IERC20(CLEAR_MAINNET).balanceOf(_settlement.recipient.toAddress()), balance + _amount);
   }
 
@@ -1208,14 +1236,14 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // transferring USDC to the contract
     deal(USDC_MAINNET, address(this), _amount);
-    IERC20(USDC_MAINNET).transfer(address(spokeProxyV5), _amount);
+    IERC20(USDC_MAINNET).transfer(address(spokeProxyV6), _amount);
 
     // sending message
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), 6);
-    assertEq(spokeProxyV5.balances(USDC_MAINNET.toBytes32(), _settlement.recipient), _amount);
+    assertEq(uint8(spokeProxyV6.status(_intentId)), 6);
+    assertEq(spokeProxyV6.balances(USDC_MAINNET.toBytes32(), _settlement.recipient), _amount);
   }
 
   function test_spokeUpgradeSwaps_receiveMessage_handleSettlement_ERC20_transferSuccess() public {
@@ -1237,14 +1265,14 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // transferring USDC to the contract
     deal(USDC_MAINNET, address(this), _amount);
-    IERC20(USDC_MAINNET).transfer(address(spokeProxyV5), _amount);
+    IERC20(USDC_MAINNET).transfer(address(spokeProxyV6), _amount);
 
     // sending message
     uint256 balance = IERC20(USDC_MAINNET).balanceOf(_settlement.recipient.toAddress());
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), 6);
+    assertEq(uint8(spokeProxyV6.status(_intentId)), 6);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_settlement.recipient.toAddress()), balance + _amount);
   }
 
@@ -1266,16 +1294,16 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message = abi.encode(uint8(2), _settlementData);
 
     // setting balance to 0 with deal
-    deal(USDC_MAINNET, address(spokeProxyV5), 0);
+    deal(USDC_MAINNET, address(spokeProxyV6), 0);
 
     // sending message
     uint256 balance = IERC20(USDC_MAINNET).balanceOf(_settlement.recipient.toAddress());
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), 6);
+    assertEq(uint8(spokeProxyV6.status(_intentId)), 6);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_settlement.recipient.toAddress()), balance);
-    assertEq(spokeProxyV5.balances(USDC_MAINNET.toBytes32(), _settlement.recipient), _amount);
+    assertEq(spokeProxyV6.balances(USDC_MAINNET.toBytes32(), _settlement.recipient), _amount);
   }
 
   function test_spokeUpgradeSwaps_receiveMessage_handleSettlement_zeroAmount() public {
@@ -1294,16 +1322,16 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message = abi.encode(uint8(2), _settlementData);
 
     // setting balance to 0 with deal
-    deal(USDC_MAINNET, address(spokeProxyV5), 0);
+    deal(USDC_MAINNET, address(spokeProxyV6), 0);
 
     // sending message
     uint256 balance = IERC20(USDC_MAINNET).balanceOf(_settlement.recipient.toAddress());
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), 6);
+    assertEq(uint8(spokeProxyV6.status(_intentId)), 6);
     assertEq(IERC20(USDC_MAINNET).balanceOf(_settlement.recipient.toAddress()), balance);
-    assertEq(spokeProxyV5.balances(USDC_MAINNET.toBytes32(), _settlement.recipient), 0);
+    assertEq(spokeProxyV6.balances(USDC_MAINNET.toBytes32(), _settlement.recipient), 0);
   }
 
   function test_spokeUpgradeSwaps_receiveMessage_updateGateway() public {
@@ -1317,9 +1345,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message = abi.encode(uint8(3), _data);
 
     // updating watchtower
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
-    assertEq(address(spokeProxyV5.gateway()), _newGateway);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
+    assertEq(address(spokeProxyV6.gateway()), _newGateway);
   }
 
   function test_spokeUpgradeSwaps_receiveMessage_updateMailbox() public {
@@ -1333,9 +1361,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message = abi.encode(uint8(3), _data);
 
     // updating watchtower
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
-    assertEq(address(ISpokeGateway(spokeProxyV5.gateway()).mailbox()), _newMailbox);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
+    assertEq(address(ISpokeGateway(spokeProxyV6.gateway()).mailbox()), _newMailbox);
   }
 
   function test_spokeUpgradeSwaps_receiveMessage_updateLighthouse() public {
@@ -1349,9 +1377,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message = abi.encode(uint8(3), _data);
 
     // updating lighthouse
-    vm.startPrank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
-    assertEq(spokeProxyV5.lighthouse(), _newLighthouse);
+    vm.startPrank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
+    assertEq(spokeProxyV6.lighthouse(), _newLighthouse);
   }
 
   function test_spokeUpgradeSwaps_receiveMessage_updateWatchtower() public {
@@ -1365,9 +1393,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message = abi.encode(uint8(3), _data);
 
     // updating watchtower
-    vm.startPrank(address(spokeProxyV5.gateway()));
-    spokeProxyV5.receiveMessage(_message);
-    assertEq(spokeProxyV5.watchtower(), _newWatchtower);
+    vm.startPrank(address(spokeProxyV6.gateway()));
+    spokeProxyV6.receiveMessage(_message);
+    assertEq(spokeProxyV6.watchtower(), _newWatchtower);
   }
 
   // ============ Revert ============ //
@@ -1383,9 +1411,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOutMin;
     uint48 _ttl;
 
-    vm.startPrank(spokeProxyV5.feeAdapter());
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_NewIntent_InvalidIntent.selector);
-    spokeProxyV5.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
+    vm.startPrank(spokeProxyV6.feeAdapter());
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_NewIntent_InvalidIntent.selector);
+    spokeProxyV6.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
   }
 
   function test_revert_spokeSwapUpgrade_newIntentAddress_InvalidIntent() public {
@@ -1400,16 +1428,16 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOutMin;
     uint48 _ttl;
 
-    vm.startPrank(spokeProxyV5.feeAdapter());
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_NewIntent_InvalidIntent.selector);
-    spokeProxyV5.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
+    vm.startPrank(spokeProxyV6.feeAdapter());
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_NewIntent_InvalidIntent.selector);
+    spokeProxyV6.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
   }
 
   function test_revert_spokeSwapUpgrade_executeCalldata_InvalidStatus() public {
     _upgradeSpoke();
 
     // configuring the input and mocking the storage to return SETTLED
-    address _target = address(spokeProxyV5);
+    address _target = address(spokeProxyV6);
     IEverclearV2.Intent memory _intent;
     _intent.destinations = new uint32[](1);
     _intent.destinations[0] = 1;
@@ -1422,9 +1450,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // calling and expecting revert
     vm.expectRevert(
-      abi.encodeWithSelector(IEverclearSpokeV5.EverclearSpoke_ExecuteIntentCalldata_InvalidStatus.selector, _intentId)
+      abi.encodeWithSelector(IEverclearSpokeV6.EverclearSpoke_ExecuteIntentCalldata_InvalidStatus.selector, _intentId)
     );
-    spokeProxyV5.executeIntentCalldata(_intent);
+    spokeProxyV6.executeIntentCalldata(_intent);
   }
 
   function test_revert_spokeSwapUpgrade_initialize_IntentQueueNonEmpty() public {
@@ -1439,13 +1467,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     messageReceiverV2 = new SpokeMessageReceiverV2();
 
     // Checking implementation correct and caching the state variables
-    spokeProxyV5 = EverclearSpokeV5(SPOKE_PROXY_MAINNET);
+    spokeProxyV6 = EverclearSpokeV6(SPOKE_PROXY_MAINNET);
 
     // Generating the inputs for CREATE3
     uint8 version = 5;
     bytes32 _salt = keccak256(abi.encodePacked(SPOKE_PROXY_MAINNET, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
-    bytes memory _creation = type(EverclearSpokeV5).creationCode;
+    bytes memory _creation = type(EverclearSpokeV6).creationCode;
 
     // Deploying the new implementation
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
@@ -1455,12 +1483,12 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // Initializing with new feeAdapter and upgrading
     bytes memory initializeCalldata = abi.encodeWithSelector(
-      EverclearSpokeV5.initialize.selector, address(feeAdapterV2), address(messageReceiverV2), FILL_SIGNER
+      EverclearSpokeV6.initialize.selector, address(feeAdapterV2), address(messageReceiverV2), FILL_SIGNER
     );
 
     vm.startPrank(SPOKE_PROXY_MAINNET_OWNER);
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_Initialize_IntentQueueNotEmpty.selector);
-    spokeProxyV5.upgradeToAndCall(newEverclearSpoke, initializeCalldata);
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_Initialize_IntentQueueNotEmpty.selector);
+    spokeProxyV6.upgradeToAndCall(newEverclearSpoke, initializeCalldata);
   }
 
   function test_revert_spokeSwapUpgrade_initialize_FillQueueNonEmpty() public {
@@ -1474,13 +1502,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     messageReceiverV2 = new SpokeMessageReceiverV2();
 
     // Checking implementation correct and caching the state variables
-    spokeProxyV5 = EverclearSpokeV5(SPOKE_PROXY_MAINNET);
+    spokeProxyV6 = EverclearSpokeV6(SPOKE_PROXY_MAINNET);
 
     // Generating the inputs for CREATE3
     uint8 version = 5;
     bytes32 _salt = keccak256(abi.encodePacked(SPOKE_PROXY_MAINNET, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
-    bytes memory _creation = type(EverclearSpokeV5).creationCode;
+    bytes memory _creation = type(EverclearSpokeV6).creationCode;
 
     // Deploying the new implementation
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
@@ -1493,12 +1521,12 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // Initializing with new feeAdapter and upgrading
     bytes memory initializeCalldata = abi.encodeWithSelector(
-      EverclearSpokeV5.initialize.selector, address(feeAdapterV2), address(messageReceiverV2), FILL_SIGNER
+      EverclearSpokeV6.initialize.selector, address(feeAdapterV2), address(messageReceiverV2), FILL_SIGNER
     );
 
     vm.startPrank(SPOKE_PROXY_MAINNET_OWNER);
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_Initialize_FillQueueNotEmpty.selector);
-    spokeProxyV5.upgradeToAndCall(newEverclearSpoke, initializeCalldata);
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_Initialize_FillQueueNotEmpty.selector);
+    spokeProxyV6.upgradeToAndCall(newEverclearSpoke, initializeCalldata);
   }
 
   function test_revert_spokeSwapUpgrade_initializeTwice_revert() public {
@@ -1510,9 +1538,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _fillSigner = address(0x789);
 
     // Expecting reverting on second intialize
-    vm.startPrank(spokeProxyV5.owner());
+    vm.startPrank(spokeProxyV6.owner());
     vm.expectRevert();
-    spokeProxyV5.initialize(_feeAdapter, _messageReceiver, _fillSigner);
+    spokeProxyV6.initialize(_feeAdapter, _messageReceiver, _fillSigner);
   }
 
   function test_revert_spokeSwapUpgrade_newIntentBytes_NotAuthorized() public {
@@ -1524,8 +1552,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes32 _outputAsset;
     uint256 _amount;
 
-    vm.expectRevert(ISpokeStorageV5.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
-    spokeProxyV5.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, 0, 0, '');
+    vm.expectRevert(ISpokeStorageV6.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
+    spokeProxyV6.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, 0, 0, '');
   }
 
   function test_revert_spokeSwapUpgrade_newIntent_NotAuthorized() public {
@@ -1537,8 +1565,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _outputAsset;
     uint256 _amount;
 
-    vm.expectRevert(ISpokeStorageV5.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
-    spokeProxyV5.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, 0, 0, '');
+    vm.expectRevert(ISpokeStorageV6.EverclearSpoke_FeeAdapter_NotAuthorized.selector);
+    spokeProxyV6.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, 0, 0, '');
   }
 
   function test_revert_spokeSwapUpgrade_newIntent_OutputAssetNull() public {
@@ -1553,9 +1581,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOutMin;
     uint48 _ttl = 1;
 
-    vm.startPrank(spokeProxyV5.feeAdapter());
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_NewIntent_OutputAssetNull.selector);
-    spokeProxyV5.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
+    vm.startPrank(spokeProxyV6.feeAdapter());
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_NewIntent_OutputAssetNull.selector);
+    spokeProxyV6.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
   }
 
   function test_revert_spokeSwapUpgrade_newIntent_ttl_OutputAssetNotNull() public {
@@ -1570,9 +1598,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOutMin;
     uint48 _ttl = 1;
 
-    vm.startPrank(spokeProxyV5.feeAdapter());
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_NewIntent_OutputAssetNotNull.selector);
-    spokeProxyV5.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
+    vm.startPrank(spokeProxyV6.feeAdapter());
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_NewIntent_OutputAssetNotNull.selector);
+    spokeProxyV6.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
   }
 
   function test_revert_spokeSwapUpgrade_newIntent_outputAsset_OutputAssetNotNull() public {
@@ -1587,9 +1615,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOutMin;
     uint48 _ttl;
 
-    vm.startPrank(spokeProxyV5.feeAdapter());
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_NewIntent_OutputAssetNotNull.selector);
-    spokeProxyV5.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
+    vm.startPrank(spokeProxyV6.feeAdapter());
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_NewIntent_OutputAssetNotNull.selector);
+    spokeProxyV6.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
   }
 
   function test_revert_spokeSwapUpgrade_newIntent_CalldataExceedsMaxSize() public {
@@ -1605,9 +1633,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint48 _ttl;
     bytes memory _maxCalldata = new bytes(50_001);
 
-    vm.startPrank(spokeProxyV5.feeAdapter());
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_NewIntent_CalldataExceedsLimit.selector);
-    spokeProxyV5.newIntent(
+    vm.startPrank(spokeProxyV6.feeAdapter());
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_NewIntent_CalldataExceedsLimit.selector);
+    spokeProxyV6.newIntent(
       _destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, _maxCalldata
     );
   }
@@ -1624,9 +1652,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 _amountOutMin;
     uint48 _ttl;
 
-    vm.startPrank(spokeProxyV5.feeAdapter());
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_NewIntent_ZeroAmount.selector);
-    spokeProxyV5.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
+    vm.startPrank(spokeProxyV6.feeAdapter());
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_NewIntent_ZeroAmount.selector);
+    spokeProxyV6.newIntent(_destinations, _receiver, _inputAsset, _outputAsset, _amount, _amountOutMin, _ttl, '');
   }
 
   function test_revert_spokeSwapUpgrade_fillIntent_WrongDestination() public {
@@ -1641,15 +1669,15 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     address _solver = address(0x456);
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload =
-      abi.encode(spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, _solver, _intent, 0, 0, _solverDestinations);
+      abi.encode(spokeProxyV6.FILL_INTENT_TYPEHASH(), _domain, _solver, _intent, 0, 0, _solverDestinations);
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // sending the invalid intent
     vm.startPrank(_solver);
-    vm.expectRevert(ISpokeStorageV5.EverclearSpoke_WrongDestination.selector);
-    spokeProxyV5.fillIntent(_intent, 0, 0, _solverDestinations, _fillSignature, false);
+    vm.expectRevert(ISpokeStorageV6.EverclearSpoke_WrongDestination.selector);
+    spokeProxyV6.fillIntent(_intent, 0, 0, _solverDestinations, _fillSignature, false);
     vm.stopPrank();
   }
 
@@ -1666,17 +1694,17 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _intent.ttl = 1;
     bytes32 _intentId = keccak256(abi.encode(_intent));
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
+      spokeProxyV6.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // calling
     vm.expectRevert(
-      abi.encodeWithSelector(IEverclearSpokeV5.EverclearSpoke_FillIntent_IntentExpired.selector, _intentId)
+      abi.encodeWithSelector(IEverclearSpokeV6.EverclearSpoke_FillIntent_IntentExpired.selector, _intentId)
     );
-    spokeProxyV5.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
+    spokeProxyV6.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
   }
 
   function test_revert_spokeSwapUpgrade_fillIntent_AmountOutInvalid() public {
@@ -1692,19 +1720,19 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _intent.ttl = 1 days;
     _intent.amountOutMin = 1000e6;
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
+      spokeProxyV6.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // calling
     vm.expectRevert(
       abi.encodeWithSelector(
-        IEverclearSpokeV5.EverclearSpoke_FillIntent_AmountOutInvalid.selector, _amountOut, _intent.amountOutMin
+        IEverclearSpokeV6.EverclearSpoke_FillIntent_AmountOutInvalid.selector, _amountOut, _intent.amountOutMin
       )
     );
-    spokeProxyV5.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
+    spokeProxyV6.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
   }
 
   function test_revert_spokeSwapUpgrade_fillIntent_InvalidDestinationArray_ZeroLength() public {
@@ -1720,15 +1748,15 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _intent.ttl = 1 days;
     _intent.amountOutMin = 999e6;
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
+      spokeProxyV6.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // calling
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_FillIntent_InvalidDestinationArray.selector);
-    spokeProxyV5.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_FillIntent_InvalidDestinationArray.selector);
+    spokeProxyV6.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
   }
 
   function test_revert_spokeSwapUpgrade_fillIntent_InvalidDestinationArray_MaxLength() public {
@@ -1744,22 +1772,22 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _intent.ttl = 1 days;
     _intent.amountOutMin = 999e6;
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
+      spokeProxyV6.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // calling
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_FillIntent_InvalidDestinationArray.selector);
-    spokeProxyV5.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_FillIntent_InvalidDestinationArray.selector);
+    spokeProxyV6.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
   }
 
   function test_revert_spokeSwapUpgrade_fillIntent_InvalidStatus() public {
     _upgradeSpoke();
 
     // configuring the inputs
-    address _target = address(spokeProxyV5);
+    address _target = address(spokeProxyV6);
     uint256 _amountOut = 1000e6;
     uint32[] memory _solverDestinations = _getDestinations(1);
     IEverclearV2.Intent memory _intent;
@@ -1776,17 +1804,17 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint256 v = abi.decode(ret, (uint256));
     assertEq(v, 6);
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
+      spokeProxyV6.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // calling
     vm.expectRevert(
-      abi.encodeWithSelector(IEverclearSpokeV5.EverclearSpoke_FillIntent_InvalidStatus.selector, _intentId)
+      abi.encodeWithSelector(IEverclearSpokeV6.EverclearSpoke_FillIntent_InvalidStatus.selector, _intentId)
     );
-    spokeProxyV5.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
+    spokeProxyV6.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
   }
 
   function test_revert_spokeSwapUpgrade_fillIntent_InsufficientFunds() public {
@@ -1802,31 +1830,31 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     _intent.ttl = 1 days;
     _intent.amountOutMin = 999e6;
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
+      spokeProxyV6.FILL_INTENT_TYPEHASH(), _domain, address(this), _intent, _amountOut, 0, _solverDestinations
     );
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // calling
     vm.expectRevert(
-      abi.encodeWithSelector(IEverclearSpokeV5.EverclearSpoke_FillIntent_InsufficientFunds.selector, _amountOut, 0)
+      abi.encodeWithSelector(IEverclearSpokeV6.EverclearSpoke_FillIntent_InsufficientFunds.selector, _amountOut, 0)
     );
-    spokeProxyV5.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
+    spokeProxyV6.fillIntent(_intent, _amountOut, 0, _solverDestinations, _fillSignature, false);
   }
 
   function test_revert_spokeSwapUpgrade_batchFillIntent_InvalidArrayLength() public {
     _upgradeSpoke();
 
     // configuring the invalid inputs
-    IEverclearSpokeV5.Intent[] memory _intents = new IEverclearSpokeV5.Intent[](1);
+    IEverclearSpokeV6.Intent[] memory _intents = new IEverclearSpokeV6.Intent[](1);
     uint256[] memory _amountOut = new uint256[](2);
     uint32[][] memory _destinations = new uint32[][](2);
     bytes32[] memory _solvers = new bytes32[](2);
 
     bytes memory _payload = abi.encode(
-      spokeProxyV5.BATCH_FILL_INTENT_TYPEHASH(),
-      keccak256(abi.encode(1, address(spokeProxyV5))),
+      spokeProxyV6.BATCH_FILL_INTENT_TYPEHASH(),
+      keccak256(abi.encode(1, address(spokeProxyV6))),
       address(this),
       _intents,
       _amountOut,
@@ -1836,22 +1864,22 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // sending invalid message
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_FillIntent_InvalidArrayLengths.selector);
-    spokeProxyV5.batchFillIntent(_intents, _amountOut, _solvers, _destinations, _fillSignature, false);
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_FillIntent_InvalidArrayLengths.selector);
+    spokeProxyV6.batchFillIntent(_intents, _amountOut, _solvers, _destinations, _fillSignature, false);
   }
 
   function testRevert_spokeSwapUpgrade_batchFillIntentWithPull_InvalidArrayLength() public {
     _upgradeSpoke();
 
     // configuring the invalid inputs
-    IEverclearSpokeV5.Intent[] memory _intents = new IEverclearSpokeV5.Intent[](1);
+    IEverclearSpokeV6.Intent[] memory _intents = new IEverclearSpokeV6.Intent[](1);
     uint256[] memory _amountOut = new uint256[](2);
     uint32[][] memory _destinations = new uint32[][](2);
     bytes32[] memory _solvers = new bytes32[](2);
 
     bytes memory _payload = abi.encode(
-      spokeProxyV5.BATCH_FILL_INTENT_TYPEHASH(),
-      keccak256(abi.encode(1, address(spokeProxyV5))),
+      spokeProxyV6.BATCH_FILL_INTENT_TYPEHASH(),
+      keccak256(abi.encode(1, address(spokeProxyV6))),
       address(this),
       _intents,
       _amountOut,
@@ -1861,8 +1889,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _fillSignature = _generateSignature(FILL_SIGNER_PK, _payload);
 
     // sending invalid message
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_FillIntent_InvalidArrayLengths.selector);
-    spokeProxyV5.batchFillIntent(_intents, _amountOut, _solvers, _destinations, _fillSignature, true);
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_FillIntent_InvalidArrayLengths.selector);
+    spokeProxyV6.batchFillIntent(_intents, _amountOut, _solvers, _destinations, _fillSignature, true);
   }
 
   function testRevert_spokeUpgradeSwaps_verifySiganture_SignatureAlreadyUsed(
@@ -1892,6 +1920,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encode(
         0,
         destinations,
+        _receiver,
         _inputAsset,
         _outputAsset.toBytes32(),
         _amount,
@@ -1902,8 +1931,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
         _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), (_amount + _feeParams.fee) * 2);
@@ -1911,7 +1939,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     (bytes32 _intentId,) = feeAdapterV2.newIntent(
       destinations, _receiver, _inputAsset, _outputAsset.toBytes32(), _amount, 0, 0, hex'00', _feeParams
     );
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     // Retrying the same signature with revert
     vm.expectRevert(IFeeAdapterV2.FeeAdapter_SignatureAlreadyUsed.selector);
@@ -1933,7 +1961,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _sig = _generateSignature(
       FEE_SIGNER_PK,
       abi.encode(
-        spokeProxyV5.PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH(),
+        spokeProxyV6.PROCESS_FILL_QUEUE_VIA_RELAYER_TYPEHASH(),
         block.chainid,
         _intents.length,
         _relayer,
@@ -1944,9 +1972,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     );
 
     vm.startPrank(_relayer);
-    vm.expectRevert(IEverclearSpokeV5.EverclearSpoke_InvalidSignature.selector);
-    spokeProxyV5.processFillQueueViaRelayer(
-      uint32(block.chainid), uint32(_intents.length), _relayer, _ttl, _nonce, 0, _sig
+    vm.expectRevert(IEverclearSpokeV6.EverclearSpoke_InvalidSignature.selector);
+    spokeProxyV6.processFillQueueViaRelayer(
+      uint32(block.chainid), uint32(_intents.length), _relayer, _ttl, _nonce, DEFAULT_GAS_LIMIT, _sig
     );
   }
 
@@ -1970,11 +1998,20 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // generating signature after asset is created
     bytes32 _sigData = keccak256(
       abi.encode(
-        0, destinations, _inputAsset, _outputAsset, _amount, 0, 0, hex'00', _feeParams.fee, _feeParams.deadline
+        0,
+        destinations,
+        address(0x123),
+        _inputAsset,
+        _outputAsset,
+        _amount,
+        0,
+        0,
+        hex'00',
+        _feeParams.fee,
+        _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, _sender, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(_sender);
     IERC20(_inputAsset).approve(address(feeAdapterV2), _amount + _feeParams.fee);
@@ -1986,9 +2023,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // calling
     vm.expectRevert(
-      abi.encodeWithSelector(IEverclearSpokeV5.EverclearSpoke_ProcessIntentQueue_NotFound.selector, _intentHash, 0)
+      abi.encodeWithSelector(IEverclearSpokeV6.EverclearSpoke_ProcessIntentQueue_NotFound.selector, _intentHash, 0)
     );
-    spokeProxyV5.processIntentQueue(_intents);
+    spokeProxyV6.processIntentQueue(_intents, DEFAULT_GAS_LIMIT);
   }
 
   function test_revert_spokeSwapUpgrade_processIntentQueue_ZeroAmount() public {
@@ -1998,8 +2035,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     IEverclearV2.Intent[] memory _intents;
 
     // calling process queue
-    vm.expectRevert(abi.encodeWithSelector(ISpokeStorageV5.EverclearSpoke_ProcessQueue_ZeroAmount.selector));
-    spokeProxyV5.processIntentQueue(_intents);
+    vm.expectRevert(abi.encodeWithSelector(ISpokeStorageV6.EverclearSpoke_ProcessQueue_ZeroAmount.selector));
+    spokeProxyV6.processIntentQueue(_intents, DEFAULT_GAS_LIMIT);
   }
 
   function test_revert_spokeSwapUpgrade_processIntentQueue_InvalidAmount() public {
@@ -2009,15 +2046,15 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     IEverclearV2.Intent[] memory _intents = new IEverclearV2.Intent[](1);
 
     // calling process queue
-    vm.expectRevert(abi.encodeWithSelector(ISpokeStorageV5.EverclearSpoke_ProcessQueue_InvalidAmount.selector, 1, 0, 1));
-    spokeProxyV5.processIntentQueue(_intents);
+    vm.expectRevert(abi.encodeWithSelector(ISpokeStorageV6.EverclearSpoke_ProcessQueue_InvalidAmount.selector, 1, 0, 1));
+    spokeProxyV6.processIntentQueue(_intents, DEFAULT_GAS_LIMIT);
   }
 
   function test_revert_spokeSwapUpgrade_executeCalldata_ExternalCallFailed() public {
     _upgradeSpoke();
 
     // configuring the inputs
-    address _target = address(spokeProxyV5);
+    address _target = address(spokeProxyV6);
     IEverclearV2.Intent memory _intent;
     _intent.destinations = new uint32[](1);
     _intent.destinations[0] = 1;
@@ -2033,10 +2070,10 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // calling and expecting revert
     vm.expectRevert(
       abi.encodeWithSelector(
-        IEverclearSpokeV5.EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed.selector, _intentId
+        IEverclearSpokeV6.EverclearSpoke_ExecuteIntentCalldata_ExternalCallFailed.selector, _intentId
       )
     );
-    spokeProxyV5.executeIntentCalldata(_intent);
+    spokeProxyV6.executeIntentCalldata(_intent);
   }
 
   function test_revert_spokeSwapUpgrade_receiveMessage_Unauthorized_NotGateway() public {
@@ -2046,24 +2083,24 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message;
 
     // calling receiveMessage as unexpected address
-    vm.expectRevert(ISpokeStorageV5.EverclearSpoke_Unauthorized.selector);
-    spokeProxyV5.receiveMessage(_message);
+    vm.expectRevert(ISpokeStorageV6.EverclearSpoke_Unauthorized.selector);
+    spokeProxyV6.receiveMessage(_message);
   }
 
   function test_revert_spokeSwapUpgrade_receiveMessage_Unauthorized_Paused() public {
     _upgradeSpoke();
 
     // pausing
-    vm.startPrank(spokeProxyV5.lighthouse());
-    spokeProxyV5.pause();
-    assertEq(spokeProxyV5.paused(), true);
+    vm.startPrank(spokeProxyV6.lighthouse());
+    spokeProxyV6.pause();
+    assertEq(spokeProxyV6.paused(), true);
 
     // configuring the inputs
     bytes memory _message;
 
     // calling receiveMessage whilst paused
-    vm.expectRevert(ISpokeStorageV5.EverclearSpoke_Unauthorized.selector);
-    spokeProxyV5.receiveMessage(_message);
+    vm.expectRevert(ISpokeStorageV6.EverclearSpoke_Unauthorized.selector);
+    spokeProxyV6.receiveMessage(_message);
   }
 
   function test_revert_spokeSwapUpgrade_receiveMessage_InvalidMessageType() public {
@@ -2074,9 +2111,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message = abi.encode(uint8(0), _data);
 
     // calling receiveMessage with invalid payload
-    vm.startPrank(address(spokeProxyV5.gateway()));
-    vm.expectRevert(ISpokeStorageV5.EverclearSpoke_InvalidMessageType.selector);
-    spokeProxyV5.receiveMessage(_message);
+    vm.startPrank(address(spokeProxyV6.gateway()));
+    vm.expectRevert(ISpokeStorageV6.EverclearSpoke_InvalidMessageType.selector);
+    spokeProxyV6.receiveMessage(_message);
   }
 
   function test_revert_spokeSwapUpgrade_receiveMessage_InvalidVarUpdate() public {
@@ -2088,9 +2125,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _message = abi.encode(uint8(3), _data);
 
     // calling receiveMessage with invalid payload
-    vm.startPrank(address(spokeProxyV5.gateway()));
-    vm.expectRevert(ISpokeStorageV5.EverclearSpoke_InvalidVarUpdate.selector);
-    spokeProxyV5.receiveMessage(_message);
+    vm.startPrank(address(spokeProxyV6.gateway()));
+    vm.expectRevert(ISpokeStorageV6.EverclearSpoke_InvalidVarUpdate.selector);
+    spokeProxyV6.receiveMessage(_message);
   }
 
   // ============ Helpers ============ //
@@ -2105,7 +2142,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     messageReceiverV2 = new SpokeMessageReceiverV2();
 
     // Checking implementation correct and caching the state variables
-    spokeProxyV5 = EverclearSpokeV5(SPOKE_PROXY_MAINNET);
+    spokeProxyV6 = EverclearSpokeV6(SPOKE_PROXY_MAINNET);
     address oldImplementation = (vm.load(SPOKE_PROXY_MAINNET, IMPLEMENTATION_SLOT)).toAddress();
     assertEq(oldImplementation, SPOKE_IMPL_MAINNET_V4);
 
@@ -2113,7 +2150,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     uint8 version = 5;
     bytes32 _salt = keccak256(abi.encodePacked(SPOKE_PROXY_MAINNET, version));
     bytes32 _implementationSalt = keccak256(abi.encodePacked(_salt, 'implementation'));
-    bytes memory _creation = type(EverclearSpokeV5).creationCode;
+    bytes memory _creation = type(EverclearSpokeV6).creationCode;
 
     // Deploying the new implementation
     bytes memory create3Calldata = abi.encodeWithSelector(ICREATE3.deploy.selector, _implementationSalt, _creation);
@@ -2123,14 +2160,14 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // Initializing with new feeAdapter and upgrading
     bytes memory initializeCalldata = abi.encodeWithSelector(
-      EverclearSpokeV5.initialize.selector, address(feeAdapterV2), address(messageReceiverV2), FILL_SIGNER
+      EverclearSpokeV6.initialize.selector, address(feeAdapterV2), address(messageReceiverV2), FILL_SIGNER
     );
     success = false;
     bytes memory upgradeCalldata =
       abi.encodeWithSelector(UUPSUpgradeable.upgradeToAndCall.selector, newEverclearSpoke, initializeCalldata);
 
     vm.prank(SPOKE_PROXY_MAINNET_OWNER);
-    (success,) = address(spokeProxyV5).call(upgradeCalldata);
+    (success,) = address(spokeProxyV6).call(upgradeCalldata);
     if (!success) revert UpgradeFailed();
 
     // Checking the implementation address has updated
@@ -2161,6 +2198,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       abi.encode(
         0,
         _intentParam.destinations,
+        receiver,
         _intentParam.inputAsset,
         _intentParam.outputAsset,
         _intentParam.amount,
@@ -2171,8 +2209,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
         _feeParams.deadline
       )
     );
-    _feeParams.sig =
-      _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, receiver, address(feeAdapterV2), block.chainid));
+    _feeParams.sig = _generateSignature(FEE_SIGNER_PK, abi.encode(_sigData, address(feeAdapterV2), block.chainid));
 
     vm.startPrank(receiver);
     IERC20(_intentParam.inputAsset.toAddress()).approve(address(feeAdapterV2), _intentParam.amount + _feeParams.fee);
@@ -2189,7 +2226,7 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
       _feeParams
     );
 
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
 
     vm.stopPrank();
   }
@@ -2201,13 +2238,13 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     address _inputAsset = deployAndDeal(address(feeAdapterV2), _amount).toAddress();
 
     vm.startPrank(address(feeAdapterV2));
-    IERC20(_inputAsset).approve(address(spokeProxyV5), _amount);
+    IERC20(_inputAsset).approve(address(spokeProxyV6), _amount);
 
     // sending intent via new intent bytes path
-    (bytes32 _intentId,) = spokeProxyV5.newIntent(
+    (bytes32 _intentId,) = spokeProxyV6.newIntent(
       destinations, address(feeAdapterV2).toBytes32(), _inputAsset, address(0x456).toBytes32(), _amount, 0, 0, hex'00'
     );
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.ADDED));
   }
 
   function _fillIntentAndAssert(
@@ -2218,9 +2255,9 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     // generating the intentId
     bytes32 _intentId = keccak256(abi.encode(_intent));
 
-    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV5)));
+    bytes32 _domain = keccak256(abi.encode(1, address(spokeProxyV6)));
     bytes memory _payload = abi.encode(
-      spokeProxyV5.FILL_INTENT_TYPEHASH(),
+      spokeProxyV6.FILL_INTENT_TYPEHASH(),
       _domain,
       _solver,
       _intent,
@@ -2232,17 +2269,17 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
 
     // filling the intent
     vm.startPrank(address(_solver));
-    IERC20(_intent.outputAsset.toAddress()).approve(address(spokeProxyV5), _intent.amountOutMin + 1);
-    spokeProxyV5.deposit(_intent.outputAsset.toAddress(), _intent.amountOutMin + 1);
-    uint256 _balance = spokeProxyV5.balances(_intent.outputAsset, _solver.toBytes32());
-    _fillMessage = spokeProxyV5.fillIntent(
+    IERC20(_intent.outputAsset.toAddress()).approve(address(spokeProxyV6), _intent.amountOutMin + 1);
+    spokeProxyV6.deposit(_intent.outputAsset.toAddress(), _intent.amountOutMin + 1);
+    uint256 _balance = spokeProxyV6.balances(_intent.outputAsset, _solver.toBytes32());
+    _fillMessage = spokeProxyV6.fillIntent(
       _intent, _intent.amountOutMin + 1, _solver.toBytes32(), _destinations, _fillSignature, false
     );
     vm.stopPrank();
 
     // asserting the intent status
-    assertEq(uint8(spokeProxyV5.status(_intentId)), uint8(IEverclearV2.IntentStatus.FILLED));
-    assertEq(_balance - (_intent.amountOutMin + 1), spokeProxyV5.balances(_intent.outputAsset, _solver.toBytes32()));
+    assertEq(uint8(spokeProxyV6.status(_intentId)), uint8(IEverclearV2.IntentStatus.FILLED));
+    assertEq(_balance - (_intent.amountOutMin + 1), spokeProxyV6.balances(_intent.outputAsset, _solver.toBytes32()));
   }
 
   function _fillIntentV4(
@@ -2281,8 +2318,8 @@ contract SpokeUpgradeSwaps is BaseTest, UpgradeHelper {
     bytes memory _data = abi.encode(_updateVariable, _updateData);
     bytes memory _message = abi.encode(uint8(3), _data);
 
-    vm.prank(spokeProxyV5.owner());
-    spokeProxyV5.receiveMessage(_message);
+    vm.prank(spokeProxyV6.owner());
+    spokeProxyV6.receiveMessage(_message);
   }
 
   function _calculateTotal(
