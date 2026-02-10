@@ -72,6 +72,12 @@ export const updateMessages = async () => {
       messages = await subgraph.getHubMessages(domain, latestNonce);
       await Promise.all(
         messages.map(async (message) => {
+          // Skip contract read for hub → Solana
+          // Set message status 'pending', LH will update it to 'delivered' when the intent is settled
+          if (message.destinationDomain === SOLANA_CHAINID) {
+            message.status = HyperlaneStatus.pending;
+            return;
+          }
           message.status = await getMessageStatus(message.id, config, message.destinationDomain);
         }),
       );
