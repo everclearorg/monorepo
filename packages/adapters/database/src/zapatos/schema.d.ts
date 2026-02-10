@@ -4074,6 +4074,599 @@ declare module 'zapatos/schema' {
   }
 
   /**
+   * **hub_meta**
+   * - Table in database
+   */
+  export namespace hub_meta {
+    export type Table = 'hub_meta';
+    export interface Selectable {
+      /**
+      * **hub_meta.acceptance_delay**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      acceptance_delay: db.Int8String | null;
+      /**
+      * **hub_meta.chain_gateways**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      chain_gateways: db.JSONValue | null;
+      /**
+      * **hub_meta.discount_per_epoch**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      discount_per_epoch: db.Int8String | null;
+      /**
+      * **hub_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string;
+      /**
+      * **hub_meta.epoch_length**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      epoch_length: db.Int8String | null;
+      /**
+      * **hub_meta.expiry_time_buffer**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      expiry_time_buffer: db.Int8String | null;
+      /**
+      * **hub_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway: string | null;
+      /**
+      * **hub_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string;
+      /**
+      * **hub_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox: string | null;
+      /**
+      * **hub_meta.manager**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      manager: string | null;
+      /**
+      * **hub_meta.min_solver_supported_domains**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      min_solver_supported_domains: db.Int8String | null;
+      /**
+      * **hub_meta.owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      owner: string | null;
+      /**
+      * **hub_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused: boolean | null;
+      /**
+      * **hub_meta.proposed_owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      proposed_owner: string | null;
+      /**
+      * **hub_meta.proposed_ownership_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      proposed_ownership_timestamp: db.Int8String | null;
+      /**
+      * **hub_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module: string | null;
+      /**
+      * **hub_meta.settler**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      settler: string | null;
+      /**
+      * **hub_meta.supported_domains**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      supported_domains: db.JSONValue | null;
+      /**
+      * **hub_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower: string | null;
+    }
+    export interface JSONSelectable {
+      /**
+      * **hub_meta.acceptance_delay**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      acceptance_delay: (number | db.Int8String) | null;
+      /**
+      * **hub_meta.chain_gateways**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      chain_gateways: db.JSONValue | null;
+      /**
+      * **hub_meta.discount_per_epoch**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      discount_per_epoch: (number | db.Int8String) | null;
+      /**
+      * **hub_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string;
+      /**
+      * **hub_meta.epoch_length**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      epoch_length: (number | db.Int8String) | null;
+      /**
+      * **hub_meta.expiry_time_buffer**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      expiry_time_buffer: (number | db.Int8String) | null;
+      /**
+      * **hub_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway: string | null;
+      /**
+      * **hub_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string;
+      /**
+      * **hub_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox: string | null;
+      /**
+      * **hub_meta.manager**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      manager: string | null;
+      /**
+      * **hub_meta.min_solver_supported_domains**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      min_solver_supported_domains: (number | db.Int8String) | null;
+      /**
+      * **hub_meta.owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      owner: string | null;
+      /**
+      * **hub_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused: boolean | null;
+      /**
+      * **hub_meta.proposed_owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      proposed_owner: string | null;
+      /**
+      * **hub_meta.proposed_ownership_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      proposed_ownership_timestamp: (number | db.Int8String) | null;
+      /**
+      * **hub_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module: string | null;
+      /**
+      * **hub_meta.settler**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      settler: string | null;
+      /**
+      * **hub_meta.supported_domains**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      supported_domains: db.JSONValue | null;
+      /**
+      * **hub_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower: string | null;
+    }
+    export interface Whereable {
+      /**
+      * **hub_meta.acceptance_delay**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      acceptance_delay?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.chain_gateways**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      chain_gateways?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.discount_per_epoch**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      discount_per_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.epoch_length**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      epoch_length?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.expiry_time_buffer**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      expiry_time_buffer?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.manager**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      manager?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.min_solver_supported_domains**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      min_solver_supported_domains?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.proposed_owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      proposed_owner?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.proposed_ownership_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      proposed_ownership_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.settler**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      settler?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.supported_domains**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      supported_domains?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **hub_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **hub_meta.acceptance_delay**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      acceptance_delay?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.chain_gateways**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      chain_gateways?: db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.discount_per_epoch**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      discount_per_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **hub_meta.epoch_length**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      epoch_length?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.expiry_time_buffer**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      expiry_time_buffer?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **hub_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.manager**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      manager?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.min_solver_supported_domains**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      min_solver_supported_domains?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      owner?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused?: boolean | db.Parameter<boolean> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.proposed_owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      proposed_owner?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.proposed_ownership_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      proposed_ownership_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.settler**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      settler?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.supported_domains**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      supported_domains?: db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **hub_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **hub_meta.acceptance_delay**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      acceptance_delay?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.chain_gateways**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      chain_gateways?: db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.discount_per_epoch**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      discount_per_epoch?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **hub_meta.epoch_length**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      epoch_length?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.expiry_time_buffer**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      expiry_time_buffer?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **hub_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.manager**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      manager?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.min_solver_supported_domains**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      min_solver_supported_domains?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      owner?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused?: boolean | db.Parameter<boolean> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, boolean | db.Parameter<boolean> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.proposed_owner**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      proposed_owner?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.proposed_ownership_timestamp**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      proposed_ownership_timestamp?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.settler**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      settler?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.supported_domains**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      supported_domains?: db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **hub_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'hub_meta_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
    * **intents**
    * - Materialized view in database
    */
@@ -11220,6 +11813,479 @@ declare module 'zapatos/schema' {
   }
 
   /**
+   * **spoke_meta**
+   * - Table in database
+   */
+  export namespace spoke_meta {
+    export type Table = 'spoke_meta';
+    export interface Selectable {
+      /**
+      * **spoke_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string;
+      /**
+      * **spoke_meta.fee_adapter**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter: string | null;
+      /**
+      * **spoke_meta.fee_adapter_recipient**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_recipient: string | null;
+      /**
+      * **spoke_meta.fee_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_signer: string | null;
+      /**
+      * **spoke_meta.fill_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_signer: string | null;
+      /**
+      * **spoke_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway: string | null;
+      /**
+      * **spoke_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string;
+      /**
+      * **spoke_meta.lighthouse**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      lighthouse: string | null;
+      /**
+      * **spoke_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox: string | null;
+      /**
+      * **spoke_meta.message_gas_limit**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      message_gas_limit: db.Int8String | null;
+      /**
+      * **spoke_meta.message_receiver**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      message_receiver: string | null;
+      /**
+      * **spoke_meta.module_for_strategies**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      module_for_strategies: db.JSONValue | null;
+      /**
+      * **spoke_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused: boolean | null;
+      /**
+      * **spoke_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module: string | null;
+      /**
+      * **spoke_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower: string | null;
+    }
+    export interface JSONSelectable {
+      /**
+      * **spoke_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string;
+      /**
+      * **spoke_meta.fee_adapter**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter: string | null;
+      /**
+      * **spoke_meta.fee_adapter_recipient**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_recipient: string | null;
+      /**
+      * **spoke_meta.fee_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_signer: string | null;
+      /**
+      * **spoke_meta.fill_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_signer: string | null;
+      /**
+      * **spoke_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway: string | null;
+      /**
+      * **spoke_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string;
+      /**
+      * **spoke_meta.lighthouse**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      lighthouse: string | null;
+      /**
+      * **spoke_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox: string | null;
+      /**
+      * **spoke_meta.message_gas_limit**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      message_gas_limit: (number | db.Int8String) | null;
+      /**
+      * **spoke_meta.message_receiver**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      message_receiver: string | null;
+      /**
+      * **spoke_meta.module_for_strategies**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      module_for_strategies: db.JSONValue | null;
+      /**
+      * **spoke_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused: boolean | null;
+      /**
+      * **spoke_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module: string | null;
+      /**
+      * **spoke_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower: string | null;
+    }
+    export interface Whereable {
+      /**
+      * **spoke_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.fee_adapter**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.fee_adapter_recipient**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_recipient?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.fee_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_signer?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.fill_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_signer?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.lighthouse**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      lighthouse?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.message_gas_limit**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      message_gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.message_receiver**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      message_receiver?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.module_for_strategies**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      module_for_strategies?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **spoke_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **spoke_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **spoke_meta.fee_adapter**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.fee_adapter_recipient**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_recipient?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.fee_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_signer?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.fill_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_signer?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **spoke_meta.lighthouse**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      lighthouse?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.message_gas_limit**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      message_gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.message_receiver**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      message_receiver?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.module_for_strategies**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      module_for_strategies?: db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused?: boolean | db.Parameter<boolean> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **spoke_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **spoke_meta.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **spoke_meta.fee_adapter**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.fee_adapter_recipient**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_adapter_recipient?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.fee_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fee_signer?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.fill_signer**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      fill_signer?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.gateway**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      gateway?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.id**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      id?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **spoke_meta.lighthouse**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      lighthouse?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.mailbox**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      mailbox?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.message_gas_limit**
+      * - `int8` in database
+      * - Nullable, no default
+      */
+      message_gas_limit?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.message_receiver**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      message_receiver?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.module_for_strategies**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      module_for_strategies?: db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.paused**
+      * - `bool` in database
+      * - Nullable, no default
+      */
+      paused?: boolean | db.Parameter<boolean> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, boolean | db.Parameter<boolean> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.security_module**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      security_module?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **spoke_meta.watchtower**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      watchtower?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'spoke_meta_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
    * **swap_fills**
    * - Table in database
    */
@@ -12544,20 +13610,20 @@ declare module 'zapatos/schema' {
   /* --- aggregate types --- */
 
   export namespace public {  
-    export type Table = assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | otc_sale_table.Table | protocol_update_logs.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | solana_lookup_tables.Table | swap_fills.Table | swap_intents.Table | swap_inventory_snapshots.Table | tokens.Table;
-    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | otc_sale_table.Selectable | protocol_update_logs.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | solana_lookup_tables.Selectable | swap_fills.Selectable | swap_intents.Selectable | swap_inventory_snapshots.Selectable | tokens.Selectable;
-    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | otc_sale_table.JSONSelectable | protocol_update_logs.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | solana_lookup_tables.JSONSelectable | swap_fills.JSONSelectable | swap_intents.JSONSelectable | swap_inventory_snapshots.JSONSelectable | tokens.JSONSelectable;
-    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | otc_sale_table.Whereable | protocol_update_logs.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | solana_lookup_tables.Whereable | swap_fills.Whereable | swap_intents.Whereable | swap_inventory_snapshots.Whereable | tokens.Whereable;
-    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | otc_sale_table.Insertable | protocol_update_logs.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | solana_lookup_tables.Insertable | swap_fills.Insertable | swap_intents.Insertable | swap_inventory_snapshots.Insertable | tokens.Insertable;
-    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | otc_sale_table.Updatable | protocol_update_logs.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | solana_lookup_tables.Updatable | swap_fills.Updatable | swap_intents.Updatable | swap_inventory_snapshots.Updatable | tokens.Updatable;
-    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | otc_sale_table.UniqueIndex | protocol_update_logs.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | solana_lookup_tables.UniqueIndex | swap_fills.UniqueIndex | swap_intents.UniqueIndex | swap_inventory_snapshots.UniqueIndex | tokens.UniqueIndex;
-    export type Column = assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | otc_sale_table.Column | protocol_update_logs.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | solana_lookup_tables.Column | swap_fills.Column | swap_intents.Column | swap_inventory_snapshots.Column | tokens.Column;
+    export type Table = assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | hub_meta.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | otc_sale_table.Table | protocol_update_logs.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | solana_lookup_tables.Table | spoke_meta.Table | swap_fills.Table | swap_intents.Table | swap_inventory_snapshots.Table | tokens.Table;
+    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | hub_meta.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | otc_sale_table.Selectable | protocol_update_logs.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | solana_lookup_tables.Selectable | spoke_meta.Selectable | swap_fills.Selectable | swap_intents.Selectable | swap_inventory_snapshots.Selectable | tokens.Selectable;
+    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | hub_meta.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | otc_sale_table.JSONSelectable | protocol_update_logs.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | solana_lookup_tables.JSONSelectable | spoke_meta.JSONSelectable | swap_fills.JSONSelectable | swap_intents.JSONSelectable | swap_inventory_snapshots.JSONSelectable | tokens.JSONSelectable;
+    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | hub_meta.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | otc_sale_table.Whereable | protocol_update_logs.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | solana_lookup_tables.Whereable | spoke_meta.Whereable | swap_fills.Whereable | swap_intents.Whereable | swap_inventory_snapshots.Whereable | tokens.Whereable;
+    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | hub_meta.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | otc_sale_table.Insertable | protocol_update_logs.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | solana_lookup_tables.Insertable | spoke_meta.Insertable | swap_fills.Insertable | swap_intents.Insertable | swap_inventory_snapshots.Insertable | tokens.Insertable;
+    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | hub_meta.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | otc_sale_table.Updatable | protocol_update_logs.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | solana_lookup_tables.Updatable | spoke_meta.Updatable | swap_fills.Updatable | swap_intents.Updatable | swap_inventory_snapshots.Updatable | tokens.Updatable;
+    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | hub_meta.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | otc_sale_table.UniqueIndex | protocol_update_logs.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | solana_lookup_tables.UniqueIndex | spoke_meta.UniqueIndex | swap_fills.UniqueIndex | swap_intents.UniqueIndex | swap_inventory_snapshots.UniqueIndex | tokens.UniqueIndex;
+    export type Column = assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | hub_meta.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | otc_sale_table.Column | protocol_update_logs.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | solana_lookup_tables.Column | spoke_meta.Column | swap_fills.Column | swap_intents.Column | swap_inventory_snapshots.Column | tokens.Column;
   
-    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, protocol_update_logs.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
+    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, hub_meta.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, protocol_update_logs.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, spoke_meta.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
     export type AllMaterializedViews = [daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, intents.Table, invoices.Table];
-    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, protocol_update_logs.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
+    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, hub_meta.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, protocol_update_logs.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, spoke_meta.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
   }
 
 
@@ -27937,6 +29003,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Selectable;
     "hub_intents_status_log": hub_intents_status_log.Selectable;
     "hub_invoices": hub_invoices.Selectable;
+    "hub_meta": hub_meta.Selectable;
     "intents": intents.Selectable;
     "invoices": invoices.Selectable;
     "lock_positions": lock_positions.Selectable;
@@ -27953,6 +29020,7 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Selectable;
     "settlement_intents": settlement_intents.Selectable;
     "solana_lookup_tables": solana_lookup_tables.Selectable;
+    "spoke_meta": spoke_meta.Selectable;
     "swap_fills": swap_fills.Selectable;
     "swap_intents": swap_intents.Selectable;
     "swap_inventory_snapshots": swap_inventory_snapshots.Selectable;
@@ -28010,6 +29078,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.JSONSelectable;
     "hub_intents_status_log": hub_intents_status_log.JSONSelectable;
     "hub_invoices": hub_invoices.JSONSelectable;
+    "hub_meta": hub_meta.JSONSelectable;
     "intents": intents.JSONSelectable;
     "invoices": invoices.JSONSelectable;
     "lock_positions": lock_positions.JSONSelectable;
@@ -28026,6 +29095,7 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.JSONSelectable;
     "settlement_intents": settlement_intents.JSONSelectable;
     "solana_lookup_tables": solana_lookup_tables.JSONSelectable;
+    "spoke_meta": spoke_meta.JSONSelectable;
     "swap_fills": swap_fills.JSONSelectable;
     "swap_intents": swap_intents.JSONSelectable;
     "swap_inventory_snapshots": swap_inventory_snapshots.JSONSelectable;
@@ -28083,6 +29153,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Whereable;
     "hub_intents_status_log": hub_intents_status_log.Whereable;
     "hub_invoices": hub_invoices.Whereable;
+    "hub_meta": hub_meta.Whereable;
     "intents": intents.Whereable;
     "invoices": invoices.Whereable;
     "lock_positions": lock_positions.Whereable;
@@ -28099,6 +29170,7 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Whereable;
     "settlement_intents": settlement_intents.Whereable;
     "solana_lookup_tables": solana_lookup_tables.Whereable;
+    "spoke_meta": spoke_meta.Whereable;
     "swap_fills": swap_fills.Whereable;
     "swap_intents": swap_intents.Whereable;
     "swap_inventory_snapshots": swap_inventory_snapshots.Whereable;
@@ -28156,6 +29228,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Insertable;
     "hub_intents_status_log": hub_intents_status_log.Insertable;
     "hub_invoices": hub_invoices.Insertable;
+    "hub_meta": hub_meta.Insertable;
     "intents": intents.Insertable;
     "invoices": invoices.Insertable;
     "lock_positions": lock_positions.Insertable;
@@ -28172,6 +29245,7 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Insertable;
     "settlement_intents": settlement_intents.Insertable;
     "solana_lookup_tables": solana_lookup_tables.Insertable;
+    "spoke_meta": spoke_meta.Insertable;
     "swap_fills": swap_fills.Insertable;
     "swap_intents": swap_intents.Insertable;
     "swap_inventory_snapshots": swap_inventory_snapshots.Insertable;
@@ -28229,6 +29303,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Updatable;
     "hub_intents_status_log": hub_intents_status_log.Updatable;
     "hub_invoices": hub_invoices.Updatable;
+    "hub_meta": hub_meta.Updatable;
     "intents": intents.Updatable;
     "invoices": invoices.Updatable;
     "lock_positions": lock_positions.Updatable;
@@ -28245,6 +29320,7 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Updatable;
     "settlement_intents": settlement_intents.Updatable;
     "solana_lookup_tables": solana_lookup_tables.Updatable;
+    "spoke_meta": spoke_meta.Updatable;
     "swap_fills": swap_fills.Updatable;
     "swap_intents": swap_intents.Updatable;
     "swap_inventory_snapshots": swap_inventory_snapshots.Updatable;
@@ -28302,6 +29378,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.UniqueIndex;
     "hub_intents_status_log": hub_intents_status_log.UniqueIndex;
     "hub_invoices": hub_invoices.UniqueIndex;
+    "hub_meta": hub_meta.UniqueIndex;
     "intents": intents.UniqueIndex;
     "invoices": invoices.UniqueIndex;
     "lock_positions": lock_positions.UniqueIndex;
@@ -28318,6 +29395,7 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.UniqueIndex;
     "settlement_intents": settlement_intents.UniqueIndex;
     "solana_lookup_tables": solana_lookup_tables.UniqueIndex;
+    "spoke_meta": spoke_meta.UniqueIndex;
     "swap_fills": swap_fills.UniqueIndex;
     "swap_intents": swap_intents.UniqueIndex;
     "swap_inventory_snapshots": swap_inventory_snapshots.UniqueIndex;
@@ -28375,6 +29453,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.Column;
     "hub_intents_status_log": hub_intents_status_log.Column;
     "hub_invoices": hub_invoices.Column;
+    "hub_meta": hub_meta.Column;
     "intents": intents.Column;
     "invoices": invoices.Column;
     "lock_positions": lock_positions.Column;
@@ -28391,6 +29470,7 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.Column;
     "settlement_intents": settlement_intents.Column;
     "solana_lookup_tables": solana_lookup_tables.Column;
+    "spoke_meta": spoke_meta.Column;
     "swap_fills": swap_fills.Column;
     "swap_intents": swap_intents.Column;
     "swap_inventory_snapshots": swap_inventory_snapshots.Column;
@@ -28448,6 +29528,7 @@ declare module 'zapatos/schema' {
     "hub_intents": hub_intents.SQL;
     "hub_intents_status_log": hub_intents_status_log.SQL;
     "hub_invoices": hub_invoices.SQL;
+    "hub_meta": hub_meta.SQL;
     "intents": intents.SQL;
     "invoices": invoices.SQL;
     "lock_positions": lock_positions.SQL;
@@ -28464,6 +29545,7 @@ declare module 'zapatos/schema' {
     "schema_migrations": schema_migrations.SQL;
     "settlement_intents": settlement_intents.SQL;
     "solana_lookup_tables": solana_lookup_tables.SQL;
+    "spoke_meta": spoke_meta.SQL;
     "swap_fills": swap_fills.SQL;
     "swap_intents": swap_intents.SQL;
     "swap_inventory_snapshots": swap_inventory_snapshots.SQL;
