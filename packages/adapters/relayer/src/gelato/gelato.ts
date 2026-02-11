@@ -5,14 +5,10 @@ import {
   jsonifyError,
   EverclearError,
   RelayerTaskStatus,
-  RelayerSyncFeeRequest,
-  RelayResponse,
-  RelayRequestOptions,
-  RelayerRequest,
   getGelatoRelayerAddress,
   chainIdToDomain,
-  NATIVE_TOKEN,
 } from '@chimera-monorepo/utils';
+import { StatusCode } from '@gelatocloud/gasless';
 import interval from 'interval-promise';
 
 import {
@@ -26,26 +22,13 @@ import {
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { gelatoRelay } from '.';
 
-/// MARK - Gelato Relay API
-/// Docs: https://relay.gelato.digital/api-docs/
-const GAS_LIMIT_FOR_RELAYER = (chainId: number): bigint | undefined => {
-  switch (chainId) {
-    case 42161: {
-      return BigInt('100000000');
-    }
-    case 421613: {
-      return BigInt('50000000');
-    }
-    default: {
-      return BigInt('6000000');
-    }
-  }
-};
+/// MARK - Gelato Gasless SDK
+/// Docs: https://docs.gelato.cloud/gasless-with-relay
 
 export const isChainSupportedByGelato = async (chainId: number): Promise<boolean> => {
   try {
-    const result = await gelatoRelay.isNetworkSupported(BigInt(chainId));
-    return result;
+    const capabilities = await gelatoRelay.getCapabilities();
+    return chainId in capabilities;
   } catch (error: unknown) {
     throw new UnableToGetGelatoSupportedChains(chainId, { err: jsonifyError(error as Error) });
   }
@@ -53,21 +36,12 @@ export const isChainSupportedByGelato = async (chainId: number): Promise<boolean
 
 export const getGelatoRelayChains = async (): Promise<string[]> => {
   try {
-    const result = await gelatoRelay.getSupportedNetworks();
-    return result;
+    const capabilities = await gelatoRelay.getCapabilities();
+    return Object.keys(capabilities);
   } catch (error: unknown) {
     throw new UnableToGetGelatoSupportedChains(0, { err: jsonifyError(error as Error) });
   }
 };
-
-enum TaskState {
-  CheckPending = 'CheckPending',
-  ExecPending = 'ExecPending',
-  ExecSuccess = 'ExecSuccess',
-  ExecReverted = 'ExecReverted',
-  WaitingForConfirmation = 'WaitingForConfirmation',
-  Cancelled = 'Cancelled',
-}
 
 /**
  * Gets the task status for a given taskId from gelato api
@@ -76,25 +50,22 @@ enum TaskState {
  */
 export const getTaskStatus = async (taskId: string): Promise<RelayerTaskStatus> => {
   try {
-    const result = await gelatoRelay.getTaskStatus(taskId);
-    switch (result?.taskState) {
-      case TaskState.CheckPending: {
+    const result = await gelatoRelay.getStatus({ id: taskId });
+    switch (result.status) {
+      case StatusCode.Pending: {
         return RelayerTaskStatus.CheckPending;
       }
-      case TaskState.ExecPending: {
+      case StatusCode.Submitted: {
         return RelayerTaskStatus.ExecPending;
       }
-      case TaskState.ExecSuccess: {
+      case StatusCode.Success: {
         return RelayerTaskStatus.ExecSuccess;
       }
-      case TaskState.ExecReverted: {
-        return RelayerTaskStatus.ExecReverted;
-      }
-      case TaskState.WaitingForConfirmation: {
-        return RelayerTaskStatus.WaitingForConfirmation;
-      }
-      case TaskState.Cancelled: {
+      case StatusCode.Rejected: {
         return RelayerTaskStatus.Cancelled;
+      }
+      case StatusCode.Reverted: {
+        return RelayerTaskStatus.ExecReverted;
       }
       default: {
         return RelayerTaskStatus.NotFound;
@@ -159,26 +130,37 @@ export const waitForTaskCompletion = async (
  */
 export const getTransactionHash = async (taskId: string): Promise<string | undefined> => {
   try {
-    const res = await gelatoRelay.getTaskStatus(taskId);
-    return res?.transactionHash;
+    const result = await gelatoRelay.getStatus({ id: taskId });
+    if (result.status === StatusCode.Success || result.status === StatusCode.Reverted) {
+      return result.receipt?.transactionHash;
+    }
+    if (result.status === StatusCode.Submitted) {
+      return result.hash;
+    }
+    return undefined;
   } catch (error: unknown) {
     throw new UnableToGetTransactionHash(taskId, { err: jsonifyError(error as Error) });
   }
 };
 
 export const gelatoSDKSend = async (
-  request: RelayerRequest,
-  sponsorApiKey: string,
-  options: RelayRequestOptions = {},
-): Promise<RelayResponse> => {
+  chainId: number,
+  to: string,
+  data: string,
+): Promise<string> => {
   try {
-    const response = await gelatoRelay.sponsoredCall(request, sponsorApiKey, options);
-    return response;
+    const taskId = await gelatoRelay.sendTransaction({
+      chainId,
+      to: to as `0x${string}`,
+      data: data as `0x${string}`,
+    });
+    return taskId;
   } catch (error: unknown) {
     throw new RelayerSendFailed({
       error: jsonifyError(error as Error),
-      options,
-      request,
+      chainId,
+      to,
+      data,
     });
   }
 };
@@ -194,7 +176,7 @@ export const send = async (
   encodedData: string,
   value: string,
   funcSig: string,
-  gelatoApiKey: string,
+  _gelatoApiKey: string,
   chainReader: ChainReader,
   logger: Logger,
   _requestContext?: RequestContext,
@@ -227,23 +209,18 @@ export const send = async (
     gas: gas.toString(),
   });
 
-  const request: RelayerSyncFeeRequest = {
-    chainId: BigInt(chainId),
-    target: destinationAddress,
+  logger.info('Sending to Gelato network', requestContext, methodContext, {
+    chainId,
+    to: destinationAddress,
     data: encodedData,
-    isRelayContext: false,
-    feeToken: NATIVE_TOKEN,
-  };
+  });
 
-  logger.info('Sending to Gelato network', requestContext, methodContext, request);
+  const taskId = await gelatoSDKSend(chainId, destinationAddress, encodedData);
 
-  // Future intented way to call
-  const response = await gelatoSDKSend(request, gelatoApiKey, { gasLimit: GAS_LIMIT_FOR_RELAYER(chainId) });
-
-  if (!response) {
-    throw new RelayerSendFailed({ response: response });
+  if (!taskId) {
+    throw new RelayerSendFailed({ taskId });
   } else {
-    logger.info('Sent to Gelato network', requestContext, methodContext, response);
-    return response.taskId;
+    logger.info('Sent to Gelato network', requestContext, methodContext, { taskId });
+    return taskId;
   }
 };
