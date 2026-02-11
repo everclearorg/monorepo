@@ -95,6 +95,16 @@ locals {
           "https://mantle.drpc.org"
         ]
       }
+      "4326" = {
+        providers = [
+          "https://mainnet.megaeth.com/rpc"
+        ]
+      }
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
+        ]
+      }
     }
   })
 }

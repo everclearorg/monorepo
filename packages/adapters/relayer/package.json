@@ -28,7 +28,7 @@
     "@chimera-monorepo/chainservice": "workspace:*",
     "@chimera-monorepo/relayer": "workspace:*",
     "@chimera-monorepo/utils": "workspace:*",
-    "@gelatonetwork/relay-sdk": "5.6.0",
+    "@gelatocloud/gasless": "0.0.7",
     "interval-promise": "1.4.0"
   },
   "devDependencies": {
