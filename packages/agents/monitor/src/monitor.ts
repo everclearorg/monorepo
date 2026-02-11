@@ -104,17 +104,15 @@ export const makeMonitor = async (service: MonitorService) => {
     // Adapters - relayers
     context.adapters.relayers = [];
     for (const relayerConfig of context.config.relayers) {
-      const setupFunc =
+      const relayer =
         relayerConfig.type == RelayerType.Gelato
-          ? setupGelatoRelayer
+          ? await setupGelatoRelayer(relayerConfig.apiKey)
           : relayerConfig.type == RelayerType.Everclear
-            ? setupEverclearRelayer
+            ? await setupEverclearRelayer(relayerConfig.url)
             : undefined;
-      if (!setupFunc) {
+      if (!relayer) {
         throw new Error(`Unknown relayer configured, relayer: ${relayerConfig}`);
       }
-
-      const relayer = await setupFunc(relayerConfig.url);
       context.adapters.relayers.push({
         instance: relayer,
         apiKey: relayerConfig.apiKey,
