@@ -17,6 +17,7 @@ import {
   TSettlementMessageType,
   expect,
   HyperlaneStatus,
+  SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 import { mockAppContext } from '../../globalTestHook';
 import * as mockable from '../../../src/mockable';
@@ -74,6 +75,34 @@ describe('Monitor operations', () => {
 
       const resolvedHubMessages = createHubMessages(5, Array(5).fill({ status: HyperlaneStatus.delivered }));
       expect(mockAppContext.adapters.database.saveMessages as SinonStub).calledWith(resolvedHubMessages);
+    });
+
+    it('does not call getHyperlaneMsgDelivered for hub messages with destinationDomain Solana', async () => {
+      const getHyperlaneMsgDeliveredStub = stub(mockable, 'getHyperlaneMsgDelivered').resolves(false);
+      // 2 to Solana (skip contract read), 2 to EVM (call getMessageStatus)
+      const hubMessages = createHubMessages(4, [
+        { destinationDomain: SOLANA_CHAINID },
+        { destinationDomain: SOLANA_CHAINID },
+        { destinationDomain: '1337' },
+        { destinationDomain: '1338' },
+      ]);
+      (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
+      (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves([]);
+      (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
+
+      await updateMessages();
+
+      // Only EVM-dest hub messages trigger getHyperlaneMsgDelivered (2 calls for domain 1337 and 1338)
+      expect(getHyperlaneMsgDeliveredStub).to.have.callCount(2);
+      const saveMessagesCall = (mockAppContext.adapters.database.saveMessages as SinonStub).getCalls().find(
+        (c) => c.args[0]?.length === 4 && c.args[0][0].destinationDomain === SOLANA_CHAINID,
+      );
+      expect(saveMessagesCall).to.exist;
+      const savedHubMessages = saveMessagesCall!.args[0] as Message[];
+      expect(savedHubMessages[0].status).to.equal(HyperlaneStatus.pending);
+      expect(savedHubMessages[1].status).to.equal(HyperlaneStatus.pending);
+      expect(savedHubMessages[2].status).to.equal(HyperlaneStatus.pending);
+      expect(savedHubMessages[3].status).to.equal(HyperlaneStatus.pending);
     });
 
     it('should not save checkpoint if empty', async () => {

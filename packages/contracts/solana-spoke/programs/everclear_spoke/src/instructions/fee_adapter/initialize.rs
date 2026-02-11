@@ -10,6 +10,7 @@ pub fn initialize_fee_adapter(
     ctx: Context<InitializeFeeAdapter>,
     fee_recipient: Pubkey,
     fee_signer: Pubkey,
+    fill_signer: Pubkey,
 ) -> Result<()> {
     let state = &mut ctx.accounts.fee_adapter_state;
 
@@ -18,12 +19,14 @@ pub fn initialize_fee_adapter(
     state.paused = false;
     state.fee_recipient = fee_recipient;
     state.fee_signer = fee_signer;
+    state.fill_signer = fill_signer;
 
     state.bump = ctx.bumps.fee_adapter_state;
 
     emit_cpi!(InitializedFeeAdapterEvent {
         fee_recipient,
         fee_signer,
+        fill_signer,
     });
     Ok(())
 }
