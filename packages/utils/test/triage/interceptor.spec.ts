@@ -1,5 +1,5 @@
 import { createStubInstance, restore, stub } from 'sinon';
-import { expect, Logger, createRequestContext } from '../../src';
+import { expect, Logger, Severity, createRequestContext } from '../../src';
 import { triageInterceptor } from '../../src/triage/interceptor';
 import * as ProviderModule from '../../src/triage/providers';
 import * as HistoryModule from '../../src/triage/history';
@@ -173,6 +173,151 @@ describe('triage:interceptor', () => {
     );
     expect(output.report.reason).to.eq(TEST_REPORT.reason);
     expect(output.shouldAutoResolve).to.eq(false);
+  });
+
+  it('blocks auto-resolve when matching incident is already acknowledged by human', async () => {
+    stub(HistoryModule, 'fetchRecentIncidents').resolves([
+      {
+        id: 'inc-1',
+        name: 'BadRpcDetected incident',
+        status: 'Acknowledged',
+        startedAt: new Date().toISOString(),
+        metadata: {},
+      },
+    ]);
+    stub(HistoryModule, 'clusterIncidents').returns([]);
+    stub(ProviderModule, 'createTriageProviders').returns({
+      openai: {
+        name: 'openai',
+        analyze: async () => ({
+          verdict: 'transient',
+          rca: 'rpc recovered',
+          confidence: 0.95,
+          steps: ['observe'],
+          autoResolveRecommendation: true,
+          reasoning: 'verified',
+        }),
+      },
+    });
+
+    const output = await triageInterceptor(
+      {
+        ...TEST_REPORT,
+        type: 'BadRpcDetected',
+        severity: Severity.Warning,
+        logger: createStubInstance(Logger),
+      },
+      {
+        ...config,
+        triage: {
+          ...config.triage,
+          autoResolve: {
+            minConfidence: 0.85,
+            allowedTypes: ['BadRpcDetected'],
+          },
+        },
+      },
+      createRequestContext('test'),
+    );
+    expect(output.shouldAutoResolve).to.eq(false);
+    expect(output.autoResolveReasonCode).to.eq('human_acknowledged_incident');
+  });
+
+  it('uses analyzeWithTools path when tools exist for report type', async () => {
+    stub(HistoryModule, 'fetchRecentIncidents').resolves([]);
+    stub(HistoryModule, 'clusterIncidents').returns([]);
+    let usedToolPath = false;
+    stub(ProviderModule, 'createTriageProviders').returns({
+      openai: {
+        name: 'openai',
+        analyze: async () => {
+          throw new Error('single-shot should not be used');
+        },
+        analyzeWithTools: async () => {
+          usedToolPath = true;
+          return {
+            verdict: 'transient',
+            rca: 'tool path',
+            confidence: 0.9,
+            steps: ['observe'],
+            autoResolveRecommendation: false,
+            reasoning: 'tool call complete',
+          };
+        },
+      },
+    });
+
+    const output = await triageInterceptor(
+      {
+        ...TEST_REPORT,
+        type: 'BadRpcDetected',
+        severity: Severity.Warning,
+        ids: ['1111', 'https://rpc.example'],
+        logger: createStubInstance(Logger),
+      },
+      config,
+      createRequestContext('test'),
+    );
+    expect(usedToolPath).to.eq(true);
+    expect(output.report.reason).to.include('Agent Analysis');
+  });
+
+  it('falls back to secondary provider using analyzeWithTools when primary tool path fails', async () => {
+    stub(HistoryModule, 'fetchRecentIncidents').resolves([]);
+    stub(HistoryModule, 'clusterIncidents').returns([]);
+    stub(ProviderModule, 'createTriageProviders').returns({
+      openai: {
+        name: 'openai',
+        analyze: async () => {
+          throw new Error('should not use single-shot primary');
+        },
+        analyzeWithTools: async () => {
+          throw new Error('primary tool path failed');
+        },
+      },
+      anthropic: {
+        name: 'anthropic',
+        analyze: async () => ({
+          verdict: 'unknown',
+          rca: 'should not use secondary single-shot',
+          confidence: 0,
+          steps: [],
+          autoResolveRecommendation: false,
+          reasoning: 'n/a',
+        }),
+        analyzeWithTools: async () => ({
+          verdict: 'actionable',
+          rca: 'fallback tool path',
+          confidence: 0.9,
+          steps: ['step'],
+          autoResolveRecommendation: false,
+          reasoning: 'fallback succeeded',
+        }),
+      },
+    });
+
+    const output = await triageInterceptor(
+      {
+        ...TEST_REPORT,
+        type: 'BadRpcDetected',
+        severity: Severity.Warning,
+        ids: ['1111', 'https://rpc.example'],
+        logger: createStubInstance(Logger),
+      },
+      {
+        ...config,
+        triage: {
+          ...config.triage,
+          providers: {
+            ...config.triage.providers,
+            anthropic: { apiKey: 'x', model: 'claude-sonnet-4-20250514' },
+          },
+        },
+      },
+      createRequestContext('test'),
+    );
+    expect(output.providerUsed).to.eq('anthropic');
+    expect(output.report.reason).to.include('Agent Analysis');
   });
 
   it('builds prompt with redacted report content and without logger object', async () => {

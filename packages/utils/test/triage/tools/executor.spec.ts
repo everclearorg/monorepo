@@ -1,5 +1,5 @@
 import { expect } from '../../../src';
-import { executeToolCall, setTriageToolHandlers } from '../../../src/triage/tools/executor';
+import { executeToolCall, executeToolCalls, setTriageToolHandlers } from '../../../src/triage/tools/executor';
 
 describe('triage:tools:executor', () => {
   beforeEach(() => {
@@ -54,5 +54,44 @@ describe('triage:tools:executor', () => {
     );
 
     expect(result.error).to.eq('Tool timeout');
+  });
+
+  it('rejects invalid args against registered schema', async () => {
+    let invoked = false;
+    setTriageToolHandlers({
+      check_rpc_health: async () => {
+        invoked = true;
+        return { healthy: true };
+      },
+    });
+    const result = await executeToolCall(
+      {
+        id: 'call-4',
+        name: 'check_rpc_health',
+        args: {},
+      },
+      100,
+    );
+    expect(invoked).to.eq(false);
+    expect(result.error).to.include('Invalid tool args');
+  });
+
+  it('handles mixed batch outcomes for executeToolCalls', async () => {
+    setTriageToolHandlers({
+      check_rpc_health: async () => ({ healthy: true }),
+      get_current_epoch: async () => {
+        throw new Error('secret=abc123');
+      },
+    });
+    const results = await executeToolCalls(
+      [
+        { id: 'call-5', name: 'check_rpc_health', args: { domain: '1111' } },
+        { id: 'call-6', name: 'get_current_epoch', args: {} },
+      ],
+      100,
+    );
+    expect(results).to.have.length(2);
+    expect(JSON.parse(results[0].output)).to.deep.eq({ healthy: true });
+    expect(results[1].error).to.include('{redacted}');
   });
 });

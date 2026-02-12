@@ -124,3 +124,8 @@ const toolsForType: Record<string, TriageToolDefinition[]> = {
 export const getToolsForAlertType = (alertType: string): TriageToolDefinition[] => {
   return toolsForType[alertType] ?? [];
 };
+
+export const getToolDefinitionByName = (toolName: string): TriageToolDefinition | undefined => {
+  const definitions = Object.values(TRIAGE_TOOL_DEFINITIONS);
+  return definitions.find((definition) => definition.name === toolName);
+};

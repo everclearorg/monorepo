@@ -24,6 +24,7 @@ export class OpenAITriageProvider implements TriageProvider {
     const response = await Promise.race([
       this.client.chat.completions.create({
           model,
+          max_tokens: 800,
           temperature: 0.1,
           messages: [
             {
@@ -62,6 +63,7 @@ export class OpenAITriageProvider implements TriageProvider {
       const response = await Promise.race([
         this.client.chat.completions.create({
           model: args.model,
+          max_tokens: 1024,
           temperature: 0.1,
           messages,
           tools: args.tools.map((tool) => ({
@@ -92,7 +94,13 @@ export class OpenAITriageProvider implements TriageProvider {
         .map((toolCall) => ({
           id: toolCall.id,
           name: toolCall.function.name,
-          args: JSON.parse(toolCall.function.arguments || '{}') as Record<string, unknown>,
+          args: (() => {
+            try {
+              return JSON.parse(toolCall.function.arguments || '{}') as Record<string, unknown>;
+            } catch {
+              return { _toolArgsParseError: true, raw: toolCall.function.arguments };
+            }
+          })(),
         }));
       const results = await args.executeToolCalls(calls);
 
@@ -110,6 +118,18 @@ export class OpenAITriageProvider implements TriageProvider {
       }
     }
 
-    return this.analyze(args.context, args.model, args.timeoutMs);
+    const finalResponse = await Promise.race([
+      this.client.chat.completions.create({
+        model: args.model,
+        max_tokens: 1024,
+        temperature: 0.1,
+        messages,
+      }),
+      (async () => {
+        await delay(args.timeoutMs);
+        throw new Error('Triage provider timeout');
+      })(),
+    ]);
+    return parseTriageResult(finalResponse.choices?.[0]?.message?.content ?? '{}');
   }
 }

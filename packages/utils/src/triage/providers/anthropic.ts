@@ -104,6 +104,19 @@ export class AnthropicTriageProvider implements TriageProvider {
       ];
     }
 
-    return this.analyze(args.context, args.model, args.timeoutMs);
+    const finalResponse = await Promise.race([
+      this.client.messages.create({
+        model: args.model,
+        max_tokens: 1024,
+        temperature: 0.1,
+        messages,
+      }),
+      (async () => {
+        await delay(args.timeoutMs);
+        throw new Error('Triage provider timeout');
+      })(),
+    ]);
+    const textBlock = finalResponse.content.find((item) => item.type === 'text');
+    return parseTriageResult(textBlock?.text ?? '{}');
   }
 }

@@ -6,8 +6,12 @@ import { CircuitBreaker, withRetry } from './base';
 
 const breakerCache = new Map<string, CircuitBreaker>();
 
-const getSharedBreaker = (failureThreshold: number, windowMinutes: number): CircuitBreaker => {
-  const key = `${failureThreshold}:${windowMinutes}`;
+const getProviderBreaker = (
+  provider: 'anthropic' | 'openai',
+  failureThreshold: number,
+  windowMinutes: number,
+): CircuitBreaker => {
+  const key = `${provider}:${failureThreshold}:${windowMinutes}`;
   const existing = breakerCache.get(key);
   if (existing) {
     return existing;
@@ -59,10 +63,10 @@ class WrappedProvider implements TriageProvider {
 export const createTriageProviders = (config?: TriageConfig): Partial<Record<'anthropic' | 'openai', TriageProvider>> => {
   const failureThreshold = config?.circuitBreaker?.failureThreshold ?? 3;
   const windowMinutes = config?.circuitBreaker?.windowMinutes ?? 5;
-  const breaker = getSharedBreaker(failureThreshold, windowMinutes);
 
   const providers: Partial<Record<'anthropic' | 'openai', TriageProvider>> = {};
   if (config?.providers?.anthropic?.apiKey) {
+    const breaker = getProviderBreaker('anthropic', failureThreshold, windowMinutes);
     providers.anthropic = new WrappedProvider(
       'anthropic',
       new AnthropicTriageProvider(config.providers.anthropic),
@@ -70,6 +74,7 @@ export const createTriageProviders = (config?: TriageConfig): Partial<Record<'an
     );
   }
   if (config?.providers?.openai?.apiKey) {
+    const breaker = getProviderBreaker('openai', failureThreshold, windowMinutes);
     providers.openai = new WrappedProvider('openai', new OpenAITriageProvider(config.providers.openai), breaker);
   }
   return providers;

@@ -1,5 +1,6 @@
 import { AlertConfig } from '../helpers/config';
 import { TriageConfig } from './types';
+import { DEFAULT_TRIAGE_CONFIG } from './types';
 
 export type ReadinessResult = {
   ok: boolean;
@@ -34,7 +35,7 @@ export const validateTriageReadiness = (config: AlertConfig): ReadinessResult =>
     }
   }
 
-  const timeoutMs = triage?.timeoutMs ?? 15000;
+  const timeoutMs = triage?.timeoutMs ?? DEFAULT_TRIAGE_CONFIG.timeoutMs;
   if (timeoutMs < 1000 || timeoutMs > 30000) {
     warnings.push('triage.timeoutMs should typically be within 1000-30000ms.');
   }
