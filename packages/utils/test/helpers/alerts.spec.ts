@@ -79,6 +79,20 @@ describe('helpers:alerts', () => {
 
         expect(setAutoResolveOutcomeStub.calledOnceWithExactly('fp-2', false, 'auto_resolve_dispatch_failed')).to.be.true;
       });
+
+      it('logs a sanitized report snapshot', async () => {
+        triageStub.resolves({
+          report: { ...TEST_REPORT, reason: 'token=supersecretvalue' },
+          shouldAutoResolve: false,
+        });
+
+        await sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'));
+
+        expect(logger.warn.called).to.be.true;
+        const logCtx = logger.warn.getCall(0).args[3];
+        expect(logCtx).to.have.property('report');
+        expect(logCtx.report.reason).to.not.include('supersecretvalue');
+      });
     });
 
     describe('#resolveAlerts', () => {

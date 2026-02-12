@@ -171,6 +171,40 @@ describe('Peripherals:Logger', () => {
       expect(log.config.web3SignerUrl).to.equal('**********');
     });
 
+    it('redacts triage, relayer, and alert integration secrets', () => {
+      createLogger({ level: 'trace' }, 'info');
+
+      logger.info('message', undefined, undefined, {
+        config: {
+          triage: {
+            providers: {
+              openai: { apiKey: 'openai-secret' },
+              anthropic: { apiKey: 'anthropic-secret' },
+            },
+          },
+          telegram: { apiKey: 'telegram-secret' },
+          betterUptime: { apiKey: 'bu-secret', requesterEmail: 'ops@example.com' },
+          discord: { url: 'https://discord.com/api/webhooks/abc/secret' },
+          relayers: [
+            {
+              apiKey: 'relayer-key',
+              url: 'https://relayer.example.com/path?token=value',
+            },
+          ],
+        },
+      });
+
+      const log = JSON.parse(fs.readFileSync(logFile).toString());
+      expect(log.config.triage.providers.openai.apiKey).to.equal('**********');
+      expect(log.config.triage.providers.anthropic.apiKey).to.equal('**********');
+      expect(log.config.telegram.apiKey).to.equal('**********');
+      expect(log.config.betterUptime.apiKey).to.equal('**********');
+      expect(log.config.betterUptime.requesterEmail).to.equal('**********');
+      expect(log.config.discord.url).to.equal('https://discord.com');
+      expect(log.config.relayers[0].apiKey).to.equal('**********');
+      expect(log.config.relayers[0].url).to.equal('https://relayer.example.com');
+    });
+
     describe('custom', () => {
       it('remove', () => {
         createLogger({
