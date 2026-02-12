@@ -4,6 +4,9 @@ members = [
 ]
 resolver = "2"
 
+[patch.crates-io]
+blake3 = { path = "vendor/blake3" }
+
 [profile.release]
 overflow-checks = true
 lto = "fat"

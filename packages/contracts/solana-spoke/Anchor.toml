@@ -1,6 +1,5 @@
 [toolchain]
 anchor_version = "0.31.1"
-solana_version = "2.1.0"
 
 [features]
 resolution = true
@@ -9,15 +8,12 @@ skip-lint = false
 [programs.mainnet]
 everclear_spoke = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm" #mainnet-prod
 # everclear_spoke = "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw" # mainnet-staging
-ccip_poc = "5Zc7TGwbhy91LvuXWgKTBfsArY9gxVXYdYYG2SLzzPMy"
 
 [programs.localnet]
 everclear_spoke = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
-ccip_poc = "5Zc7TGwbhy91LvuXWgKTBfsArY9gxVXYdYYG2SLzzPMy"
 
 [programs.devnet]
 everclear_spoke = "6S2JxnZESFsNiLNTwhxzC3Amv9ACEgVkNT3ZksEjcKqp"
-ccip_poc = "CTYK59jTDbqL8HQ9A6eyg2vNDTb6Bd5muDeugPL5n1Dd"
 
 [registry]
 url = "https://api.apr.dev"
