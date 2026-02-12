@@ -10,6 +10,7 @@ import {
   TRelayerConfig,
   TLogLevel,
   TSolanaConfig,
+  TTriageConfigSchema,
 } from '@chimera-monorepo/utils';
 
 // Extend the chain config to include gas threshold properties
@@ -101,6 +102,7 @@ export const TMonitorConfigSchema = Type.Object({
       url: Type.String(),
     }),
   ),
+  triage: Type.Optional(TTriageConfigSchema),
   healthUrls: Type.Partial(Type.Record(TService, Type.String({ format: 'uri' }))),
   tokenomicsTables: Type.Optional(Type.Array(Type.String())),
   solana: TSolanaConfig,

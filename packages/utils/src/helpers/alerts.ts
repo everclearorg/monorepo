@@ -9,6 +9,8 @@ import {
 import { AlertConfig, Report } from './config';
 // External imports
 import { Logger, RequestContext, createMethodContext } from '../logging';
+import { triageInterceptor } from '../triage';
+import { setAutoResolveOutcome } from '../triage/dedup';
 
 const preprocessReport = (report: Report, config: AlertConfig): Report => ({
   ...report,
@@ -33,10 +35,11 @@ export async function sendAlerts(
 ): Promise<void> {
   const methodContext = createMethodContext(sendAlerts.name);
 
-  const alertReport = preprocessReport(report, config);
+  const triageOutput = await triageInterceptor(report, config, requestContext);
+  const alertReport = preprocessReport(triageOutput.report, config);
   const alertPromises = [];
+  let autoResolvePromiseIndex: number | undefined = undefined;
 
-  //TODO: Choose channels based on severity
   if (config.discord) {
     alertPromises.push(alertDiscord(alertReport, config.discord.url, requestContext));
   }
@@ -44,12 +47,36 @@ export async function sendAlerts(
     alertPromises.push(alertTelegram(alertReport, config.telegram, requestContext));
   }
   if (config.betterUptime) {
-    alertPromises.push(alertViaBetterUptimeIfNeeded(alertReport, config.betterUptime, requestContext));
+    if (triageOutput.shouldAutoResolve) {
+      autoResolvePromiseIndex = alertPromises.length;
+      alertPromises.push(resolveAlertViaBetterUptime(alertReport, config.betterUptime, requestContext, false));
+    } else {
+      alertPromises.push(alertViaBetterUptimeIfNeeded(alertReport, config.betterUptime, requestContext));
+    }
   }
 
-  await Promise.allSettled(alertPromises);
+  const deliveryResults = await Promise.allSettled(alertPromises);
+  if (triageOutput.shouldAutoResolve && triageOutput.fingerprint && autoResolvePromiseIndex !== undefined) {
+    const autoResolveSettled = deliveryResults[autoResolvePromiseIndex];
+    const succeeded = autoResolveSettled?.status === 'fulfilled';
+    await setAutoResolveOutcome(
+      triageOutput.fingerprint,
+      succeeded,
+      succeeded ? 'auto_resolve_dispatched' : 'auto_resolve_dispatch_failed',
+    );
+  }
 
-  logger.warn('Alerts sent!!!', requestContext, methodContext, alertReport);
+  logger.warn('Alerts sent!!!', requestContext, methodContext, {
+    ...alertReport,
+    triage: {
+      provider: triageOutput.providerUsed,
+      model: triageOutput.modelUsed,
+      autoResolve: triageOutput.shouldAutoResolve,
+      reasonCode: triageOutput.autoResolveReasonCode,
+      fingerprint: triageOutput.fingerprint,
+      mode: triageOutput.mode,
+    },
+  });
 }
 
 /**
@@ -73,13 +100,7 @@ export async function resolveAlerts(
 
   const resolvePromises = [];
 
-  // //TODO: Implement report tracking in cache
-  // if (config.discord) {
-  //   resolvePromises.push(resolveDiscordAlert(alertReport, config.discord.url, requestContext));
-  // }
-  // if (config.telegram) {
-  //   resolvePromises.push(resolveTelegramAlert(alertReport, config.telegram, requestContext));
-  // }
+  // Resolution is currently BetterUptime-backed.
   if (config.betterUptime) {
     resolvePromises.push(resolveAlertViaBetterUptime(alertReport, config.betterUptime, requestContext, byName));
   }

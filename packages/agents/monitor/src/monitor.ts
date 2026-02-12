@@ -6,6 +6,8 @@ import {
   jsonifyError,
   sendHeartbeat,
   chainWrapper,
+  setTriagePersistenceStore,
+  TriageProcessingRecord,
 } from '@chimera-monorepo/utils';
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
@@ -100,6 +102,58 @@ export const makeMonitor = async (service: MonitorService) => {
 
     context.adapters.database = await getDatabase(context.config.database.url, context.logger);
     context.logger.debug('Database setup', requestContext, methodContext);
+
+    setTriagePersistenceStore({
+      hasProcessed: async (fingerprint: string) => {
+        return context.adapters.database.isTriageFingerprintProcessed(fingerprint);
+      },
+      tryReserve: async (record: TriageProcessingRecord) => {
+        return context.adapters.database.tryReserveTriageFingerprint({
+          fingerprint: record.fingerprint,
+          reportType: record.reportType,
+          severity: record.severity,
+          env: record.env,
+          network: record.network,
+          ids: record.ids,
+          reason: record.reason,
+          triageMode: record.triageMode,
+          triageResult: record.triageResult,
+          providerUsed: record.providerUsed,
+          modelUsed: record.modelUsed,
+          triageLatencyMs: record.triageLatencyMs,
+          autoResolveAttempted: record.autoResolveAttempted,
+          autoResolveSucceeded: record.autoResolveSucceeded,
+          autoResolveReasonCode: record.autoResolveReasonCode,
+          expiresAt: record.expiresAt,
+        });
+      },
+      finalize: async (record: TriageProcessingRecord) => {
+        await context.adapters.database.finalizeTriageFingerprint({
+          fingerprint: record.fingerprint,
+          reportType: record.reportType,
+          severity: record.severity,
+          env: record.env,
+          network: record.network,
+          ids: record.ids,
+          reason: record.reason,
+          triageMode: record.triageMode,
+          triageResult: record.triageResult,
+          providerUsed: record.providerUsed,
+          modelUsed: record.modelUsed,
+          triageLatencyMs: record.triageLatencyMs,
+          autoResolveAttempted: record.autoResolveAttempted,
+          autoResolveSucceeded: record.autoResolveSucceeded,
+          autoResolveReasonCode: record.autoResolveReasonCode,
+          expiresAt: record.expiresAt,
+        });
+      },
+      setAutoResolveOutcome: async (fingerprint: string, succeeded: boolean, reasonCode?: string) => {
+        await context.adapters.database.setTriageAutoResolveOutcome(fingerprint, succeeded, reasonCode);
+      },
+      pruneExpired: async () => {
+        return context.adapters.database.pruneExpiredTriageFingerprints();
+      },
+    });
 
     // Adapters - relayers
     context.adapters.relayers = [];

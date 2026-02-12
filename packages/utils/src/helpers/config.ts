@@ -3,6 +3,7 @@ import { ABIConfig, EverclearConfig, Environment, TEverclearConfig, ajv, ChainDe
 import { axiosGet } from './axios';
 import { Static, Type } from '@sinclair/typebox';
 import { Logger } from '../logging';
+import { TTriageConfigSchema, TriageConfig } from '../triage/types';
 
 export const EVERCLEAR_CONFIG_URL = 'https://raw.githubusercontent.com/connext/chaindata/main/everclear.json';
 
@@ -79,10 +80,12 @@ export const TAlertConfigSchema = Type.Object({
       url: Type.String(),
     }),
   ),
+  triage: Type.Optional(TTriageConfigSchema),
 });
 export type AlertConfig = Static<typeof TAlertConfigSchema>;
 export type TelegramConfig = Static<typeof TAlertConfigSchema>['telegram'];
 export type BetterUptimeConfig = Static<typeof TAlertConfigSchema>['betterUptime'];
+export type AlertTriageConfig = TriageConfig;
 
 export enum Severity {
   Warning = 'warning',

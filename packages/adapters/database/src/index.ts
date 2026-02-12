@@ -95,6 +95,11 @@ import {
   saveHubAssetUpdateLogs,
   saveHubMeta,
   saveSpokeMeta,
+  isTriageFingerprintProcessed,
+  tryReserveTriageFingerprint,
+  finalizeTriageFingerprint,
+  setTriageAutoResolveOutcome,
+  pruneExpiredTriageFingerprints,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
@@ -109,6 +114,25 @@ export type IntentMessageUpdate = {
   id: string;
   messageId: string;
   status: TIntentStatus;
+};
+
+export type TriageFingerprintLog = {
+  fingerprint: string;
+  reportType: string;
+  severity: string;
+  env: string;
+  network: string;
+  ids: string[];
+  reason: string;
+  triageMode: string;
+  triageResult?: object;
+  providerUsed?: string;
+  modelUsed?: string;
+  triageLatencyMs?: number;
+  autoResolveAttempted?: boolean;
+  autoResolveSucceeded?: boolean;
+  autoResolveReasonCode?: string;
+  expiresAt: Date;
 };
 
 export type Database = {
@@ -279,6 +303,19 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   updateSolanaMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
+  isTriageFingerprintProcessed: (fingerprint: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<boolean>;
+  tryReserveTriageFingerprint: (
+    log: TriageFingerprintLog,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<boolean>;
+  finalizeTriageFingerprint: (log: TriageFingerprintLog, _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  setTriageAutoResolveOutcome: (
+    fingerprint: string,
+    succeeded: boolean,
+    reasonCode?: string,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<void>;
+  pruneExpiredTriageFingerprints: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
 };
 
 export let pool: Pool | undefined;
@@ -388,5 +425,10 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getDeliveredSettlements,
     updateSettlementStatus,
     updateSolanaMessageStatuses,
+    isTriageFingerprintProcessed,
+    tryReserveTriageFingerprint,
+    finalizeTriageFingerprint,
+    setTriageAutoResolveOutcome,
+    pruneExpiredTriageFingerprints,
   };
 };

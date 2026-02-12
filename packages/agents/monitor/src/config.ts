@@ -76,6 +76,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
   let configJson: Record<string, any> = {};
   let configFile: any = {};
   let configStr: string | undefined;
+  let triageConfigJson: Record<string, any> = {};
 
   const paramName = process.env.CONFIG_PARAMETER_NAME;
   if (paramName) {
@@ -96,6 +97,35 @@ export const getConfig = async (): Promise<MonitorConfig> => {
   } catch (e: unknown) {
     console.info('No MONITOR_CONFIG exists, using config file and individual env vars');
   }
+
+  try {
+    triageConfigJson = JSON.parse(process.env.TRIAGE_CONFIG || '{}');
+  } catch (e: unknown) {
+    console.info('TRIAGE_CONFIG is not valid JSON, ignoring override');
+  }
+
+  const normalizeTriageConfig = (input: Record<string, any>): Record<string, any> => {
+    if (!input || typeof input !== 'object') {
+      return {};
+    }
+    if (input.triage && typeof input.triage === 'object') {
+      return input.triage;
+    }
+    const triageKeys = new Set([
+      'mode',
+      'timeoutMs',
+      'lookbackHours',
+      'retentionHours',
+      'timeBucketMinutes',
+      'providers',
+      'routing',
+      'autoResolve',
+      'circuitBreaker',
+    ]);
+    const hasDirectShape = Object.keys(input).some((k) => triageKeys.has(k));
+    return hasDirectShape ? input : {};
+  };
+  const triageOverride = normalizeTriageConfig(triageConfigJson);
 
   try {
     let json: string;
@@ -224,6 +254,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     thresholds: thresholdsConfig,
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},
     telegram: configJson.telegram || configFile.telegram || {},
+    triage: Object.keys(triageOverride).length > 0 ? triageOverride : configJson.triage || configFile.triage || {},
     healthUrls: process.env.MONITOR_HEALTH_URLS || configJson.healthUrls || configFile.healthUrls || {},
     tokenomicsTables: configJson.tokenomicsTables || configFile.tokenomicsTables || DefaultTokenomicsTables,
     solana: configJson?.solana || configFile?.solana || {},
