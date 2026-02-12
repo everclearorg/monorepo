@@ -57,10 +57,19 @@ export const buildTriagePrompt = (
 };
 
 export const parseTriageResult = (raw: string): TriageResult => {
-  const parsed = JSON.parse(raw) as TriageResult;
+  let parsed: Partial<TriageResult>;
+  try {
+    parsed = JSON.parse(raw) as TriageResult;
+  } catch {
+    parsed = {};
+  }
+  const allowedVerdicts = new Set<TriageResult['verdict']>(['actionable', 'duplicate', 'transient', 'unknown']);
+  const verdict = allowedVerdicts.has(parsed.verdict as TriageResult['verdict'])
+    ? (parsed.verdict as TriageResult['verdict'])
+    : 'unknown';
   const confidence = Number.isFinite(parsed.confidence) ? Number(parsed.confidence) : 0;
   return {
-    verdict: parsed.verdict ?? 'unknown',
+    verdict,
     rca: parsed.rca ?? 'No RCA produced',
     confidence: Math.max(0, Math.min(1, confidence)),
     steps: Array.isArray(parsed.steps) ? parsed.steps : [],

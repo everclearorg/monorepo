@@ -11,6 +11,7 @@ const triageMetrics = {
   toolUsageByName: {} as Record<string, number>,
   triageLatencyMs: [] as number[],
 };
+const MAX_TRIAGE_LATENCY_SAMPLES = 500;
 
 export const recordTriageIntercepted = () => {
   triageMetrics.interceptedTotal += 1;
@@ -19,6 +20,9 @@ export const recordTriageIntercepted = () => {
 export const recordTriagePerformed = (latencyMs: number) => {
   triageMetrics.triagedTotal += 1;
   triageMetrics.triageLatencyMs.push(latencyMs);
+  if (triageMetrics.triageLatencyMs.length > MAX_TRIAGE_LATENCY_SAMPLES) {
+    triageMetrics.triageLatencyMs.shift();
+  }
 };
 
 export const recordTriageDeduped = () => {
@@ -33,8 +37,11 @@ export const recordTriageFallback = () => {
   triageMetrics.fallbackTotal += 1;
 };
 
-export const recordAutoResolveAttempt = (succeeded: boolean) => {
+export const recordAutoResolveAttempt = () => {
   triageMetrics.autoResolveAttemptTotal += 1;
+};
+
+export const recordAutoResolveSuccess = (succeeded: boolean) => {
   if (succeeded) {
     triageMetrics.autoResolveSuccessTotal += 1;
   }

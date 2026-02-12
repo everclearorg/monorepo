@@ -252,7 +252,7 @@ export const triageInterceptor = async (
       policy.reasonCode = 'human_acknowledged_incident';
     }
     if (policy.shouldAutoResolve) {
-      recordAutoResolveAttempt(true);
+      recordAutoResolveAttempt();
     }
 
     await safeMarkProcessed(report, requestContext, methodContext, {

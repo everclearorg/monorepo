@@ -19,7 +19,7 @@ import { runChecks } from './checklist';
 import interval from 'interval-promise';
 import { MonitorConfig } from './types';
 import { AppContext, getContext } from './context';
-import { getDatabase } from '@chimera-monorepo/database';
+import { getDatabase, TriageFingerprintLog } from '@chimera-monorepo/database';
 import { configureTriageToolHandlers } from './triage-tools';
 
 export const MonitorService = {
@@ -29,6 +29,27 @@ export const MonitorService = {
 export type MonitorService = (typeof MonitorService)[keyof typeof MonitorService];
 
 const DEFAULT_SUBGRAPH_TIMEOUT = 7500;
+
+const toDbLogRecord = (record: TriageProcessingRecord): TriageFingerprintLog => ({
+  fingerprint: record.fingerprint,
+  reportType: record.reportType,
+  severity: record.severity,
+  env: record.env,
+  network: record.network,
+  ids: record.ids,
+  reason: record.reason,
+  triageMode: record.triageMode,
+  triageResult: record.triageResult,
+  providerUsed: record.providerUsed,
+  modelUsed: record.modelUsed,
+  triageLatencyMs: record.triageLatencyMs,
+  autoResolveAttempted: record.autoResolveAttempted,
+  autoResolveSucceeded: record.autoResolveSucceeded,
+  autoResolveReasonCode: record.autoResolveReasonCode,
+  toolCallsMade: record.toolCallsMade,
+  toolNamesUsed: record.toolNamesUsed,
+  expiresAt: record.expiresAt,
+});
 /**
  * Helper to get subgraph reader config
  * @param chains Chain entry of monitor config (includes hub domain)
@@ -80,7 +101,7 @@ export const makeMonitor = async (service: MonitorService) => {
     context.logger.info('Generated config summary.', requestContext, methodContext, {
       configSummary: {
         network: context.config.network,
-        env: context.config.env,
+        env: context.config.environment,
         service,
         chainCount: Object.keys(context.config.chains ?? {}).length,
         relayerCount: context.config.relayers?.length ?? 0,
@@ -120,48 +141,10 @@ export const makeMonitor = async (service: MonitorService) => {
         return context.adapters.database.isTriageFingerprintProcessed(fingerprint);
       },
       tryReserve: async (record: TriageProcessingRecord) => {
-        return context.adapters.database.tryReserveTriageFingerprint({
-          fingerprint: record.fingerprint,
-          reportType: record.reportType,
-          severity: record.severity,
-          env: record.env,
-          network: record.network,
-          ids: record.ids,
-          reason: record.reason,
-          triageMode: record.triageMode,
-          triageResult: record.triageResult,
-          providerUsed: record.providerUsed,
-          modelUsed: record.modelUsed,
-          triageLatencyMs: record.triageLatencyMs,
-          autoResolveAttempted: record.autoResolveAttempted,
-          autoResolveSucceeded: record.autoResolveSucceeded,
-          autoResolveReasonCode: record.autoResolveReasonCode,
-          toolCallsMade: record.toolCallsMade,
-          toolNamesUsed: record.toolNamesUsed,
-          expiresAt: record.expiresAt,
-        } as any);
+        return context.adapters.database.tryReserveTriageFingerprint(toDbLogRecord(record));
       },
       finalize: async (record: TriageProcessingRecord) => {
-        await context.adapters.database.finalizeTriageFingerprint({
-          fingerprint: record.fingerprint,
-          reportType: record.reportType,
-          severity: record.severity,
-          env: record.env,
-          network: record.network,
-          ids: record.ids,
-          reason: record.reason,
-          triageMode: record.triageMode,
-          triageResult: record.triageResult,
-          providerUsed: record.providerUsed,
-          modelUsed: record.modelUsed,
-          triageLatencyMs: record.triageLatencyMs,
-          autoResolveAttempted: record.autoResolveAttempted,
-          autoResolveSucceeded: record.autoResolveSucceeded,
-          autoResolveReasonCode: record.autoResolveReasonCode,
-          toolCallsMade: record.toolCallsMade,
-          toolNamesUsed: record.toolNamesUsed,
-          expiresAt: record.expiresAt,
-        } as any);
+        await context.adapters.database.finalizeTriageFingerprint(toDbLogRecord(record));
       },
       setAutoResolveOutcome: async (fingerprint: string, succeeded: boolean, reasonCode?: string) => {
         await context.adapters.database.setTriageAutoResolveOutcome(fingerprint, succeeded, reasonCode);

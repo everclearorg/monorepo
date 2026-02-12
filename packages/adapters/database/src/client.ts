@@ -60,7 +60,7 @@ export const isTriageFingerprintProcessed = async (
       LIMIT 1`,
     [fingerprint],
   );
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 };
 
 export const tryReserveTriageFingerprint = async (
@@ -99,7 +99,7 @@ export const tryReserveTriageFingerprint = async (
       log.expiresAt,
     ],
   );
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 };
 
 export const finalizeTriageFingerprint = async (
@@ -158,7 +158,7 @@ export const pruneExpiredTriageFingerprints = async (
 ): Promise<number> => {
   const poolToUse = _pool ?? getPool();
   const result = await poolToUse.query(`DELETE FROM alert_triage_log WHERE expires_at <= NOW()`);
-  return result.rowCount;
+  return result.rowCount ?? 0;
 };
 
 export const saveOriginIntents = async (

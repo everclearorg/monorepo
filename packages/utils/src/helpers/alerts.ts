@@ -11,6 +11,7 @@ import { AlertConfig, Report } from './config';
 import { Logger, RequestContext, createMethodContext } from '../logging';
 import { triageInterceptor } from '../triage';
 import { setAutoResolveOutcome } from '../triage/dedup';
+import { recordAutoResolveSuccess } from '../triage/metrics';
 import { redactSensitiveData } from '../triage/redact';
 
 const preprocessReport = (report: Report, config: AlertConfig): Report => ({
@@ -72,6 +73,7 @@ export async function sendAlerts(
   if (triageOutput.shouldAutoResolve && triageOutput.fingerprint && autoResolvePromiseIndex !== undefined) {
     const autoResolveSettled = deliveryResults[autoResolvePromiseIndex];
     const succeeded = autoResolveSettled?.status === 'fulfilled';
+    recordAutoResolveSuccess(succeeded);
     await setAutoResolveOutcome(
       triageOutput.fingerprint,
       succeeded,

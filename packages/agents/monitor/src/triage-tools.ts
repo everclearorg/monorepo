@@ -14,10 +14,31 @@ const toStringArg = (value: unknown, field: string): string => {
   throw new Error(`Missing required tool arg: ${field}`);
 };
 
+const toDomainArg = (value: unknown): string => {
+  const domain = toStringArg(value, 'domain');
+  if (!/^\d+$/.test(domain)) {
+    throw new Error(`Invalid domain: ${domain}`);
+  }
+  const { config } = getContext();
+  const allowedDomains = new Set<string>([config.hub.domain, ...Object.keys(config.chains)]);
+  if (!allowedDomains.has(domain)) {
+    throw new Error(`Unsupported domain: ${domain}`);
+  }
+  return domain;
+};
+
+const toAddressArg = (value: unknown, field: string): string => {
+  const address = toStringArg(value, field);
+  if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    throw new Error(`Invalid address: ${field}`);
+  }
+  return address;
+};
+
 export const configureTriageToolHandlers = () => {
   setTriageToolHandlers({
     check_rpc_health: async (args) => {
-      const domain = toStringArg(args.domain, 'domain');
+      const domain = toDomainArg(args.domain);
       const rpcOrigin = typeof args.rpcOrigin === 'string' ? args.rpcOrigin : undefined;
       const { adapters } = getContext();
       const block = await adapters.chainreader.getBlock(+domain, 'latest');
@@ -30,8 +51,8 @@ export const configureTriageToolHandlers = () => {
       };
     },
     get_gas_balance: async (args) => {
-      const domain = toStringArg(args.domain, 'domain');
-      const address = toStringArg(args.address, 'address');
+      const domain = toDomainArg(args.domain);
+      const address = toAddressArg(args.address, 'address');
       const { adapters } = getContext();
       const balance = await adapters.chainreader.getBalance(+domain, address);
       return {
@@ -41,7 +62,7 @@ export const configureTriageToolHandlers = () => {
       };
     },
     get_block_numbers: async (args) => {
-      const domain = toStringArg(args.domain, 'domain');
+      const domain = toDomainArg(args.domain);
       const { adapters } = getContext();
       const [rpcBlock, subgraphMap] = await Promise.all([
         adapters.chainreader.getBlockNumber(+domain),
@@ -56,7 +77,7 @@ export const configureTriageToolHandlers = () => {
     },
     get_queue_depth: async (args) => {
       const queueFamily = toStringArg(args.queueFamily, 'queueFamily').toLowerCase();
-      const domain = toStringArg(args.domain, 'domain');
+      const domain = toDomainArg(args.domain);
       const { adapters, config } = getContext();
       if (queueFamily === 'deposit') {
         const deposits = await adapters.database.getAllEnqueuedDeposits([domain]);
@@ -98,6 +119,9 @@ export const configureTriageToolHandlers = () => {
     },
     get_custodied_balance: async (args) => {
       const assetHash = toStringArg(args.assetHash, 'assetHash');
+      if (!/^0x[a-fA-F0-9]{64}$/.test(assetHash)) {
+        throw new Error('Invalid assetHash');
+      }
       const balance = await getCustodiedAssetsFromHubContract(assetHash);
       return {
         assetHash,
@@ -112,6 +136,9 @@ export const configureTriageToolHandlers = () => {
     },
     get_hyperlane_message_status: async (args) => {
       const messageId = toStringArg(args.messageId, 'messageId');
+      if (!/^0x[a-fA-F0-9]{64}$/.test(messageId)) {
+        throw new Error('Invalid messageId');
+      }
       const status = await getMessageStatus(messageId);
       return {
         messageId,
@@ -120,6 +147,9 @@ export const configureTriageToolHandlers = () => {
     },
     get_solana_nonce_status: async (args) => {
       const checkpointKey = typeof args.checkpointKey === 'string' ? args.checkpointKey : 'solana_intent_nonce';
+      if (checkpointKey !== 'solana_intent_nonce') {
+        throw new Error('Unsupported checkpointKey');
+      }
       const { adapters } = getContext();
       const [chainNonce, localNonce, checkpoint] = await Promise.all([
         getLastSolanaIntentNonce(),

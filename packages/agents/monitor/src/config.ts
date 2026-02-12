@@ -229,6 +229,13 @@ export const getConfig = async (): Promise<MonitorConfig> => {
 
   const database = process.env.MONITOR_DATABASE_URL || configJson.database?.url || configFile.database?.url;
 
+  const configuredAdminToken =
+    process.env.MONITOR_ADMIN_TOKEN || configJson?.server?.adminToken || configFile?.server?.adminToken;
+  const allowMissingAdminToken = ['development', 'dev', 'local', 'test'].includes(String(environment).toLowerCase());
+  if (!configuredAdminToken && !allowMissingAdminToken) {
+    throw new Error('server.adminToken is required in non-development environments');
+  }
+
   const monitorConfig: MonitorConfig = {
     environment: configJson.environment || configFile.environment || 'production',
     network: configJson.network || configFile.network || 'mainnet',
@@ -238,7 +245,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     redis: configJson.redis || configFile.redis,
     server: {
       port: configJson?.server?.port || configFile?.server?.port || 8080,
-      adminToken: configJson?.server?.adminToken || configFile?.server?.adminToken || 'blahblah',
+      adminToken: configuredAdminToken || 'development-only-token',
       host: configJson?.server?.host || configFile?.server?.host || '0.0.0.0',
     },
     logLevel: configJson.logLevel || configFile.logLevel || 'info',
