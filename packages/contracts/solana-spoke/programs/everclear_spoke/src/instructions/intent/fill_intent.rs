@@ -1,5 +1,5 @@
 use anchor_lang::solana_program::sysvar::instructions::ID as SYSVAR_INSTRUCTIONS_ID;
-use anchor_lang::{prelude::*, solana_program::program::invoke_signed};
+use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
 use crate::instructions::fee_adapter::signature::{verify_signature, FILL_SIGN_PARAMS_TYPE_HASH_PREFIX};
@@ -75,7 +75,8 @@ pub fn fill_intent(
         data: origin_data,
     };
 
-    let mut accounts = FillIntentAccounts {
+    // Box to stay under BPF stack limit (4KB)
+    let mut accounts = Box::new(FillIntentAccounts {
         spoke_state: ctx.accounts.spoke_state.clone().as_ref().clone(),
         mint: ctx.accounts.mint.clone(),
         token_program: ctx.accounts.token_program.clone(),
@@ -87,17 +88,17 @@ pub fn fill_intent(
         pda_payer: ctx.accounts.pda_payer.clone(),
         system_program: ctx.accounts.system_program.clone(),
         spl_noop_program: ctx.accounts.spl_noop_program.clone(),
-        hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.clone(),
+        hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.to_account_info(),
         mailbox_outbox: ctx.accounts.mailbox_outbox.clone(),
         dispatch_authority: ctx.accounts.dispatch_authority.clone(),
         unique_message_account: ctx.accounts.unique_message_account.clone(),
         dispatched_message_pda: ctx.accounts.dispatched_message_pda.clone(),
-        igp_program: ctx.accounts.igp_program.clone(),
+        igp_program: ctx.accounts.igp_program.to_account_info(),
         igp_program_data: ctx.accounts.igp_program_data.clone(),
         igp_payment_pda: ctx.accounts.igp_payment_pda.clone(),
         configured_igp_account: ctx.accounts.configured_igp_account.clone(),
         inner_igp_account: ctx.accounts.inner_igp_account.clone(),
-    };
+    });
     let program_id = *ctx.program_id;
 
     // verify signatures
@@ -123,7 +124,7 @@ pub fn fill_intent(
     )?;
 
     let event_data: IntentFilledEvent = handle_fill_intent(
-        &mut accounts,
+        &mut *accounts,
         program_id,
         evm_intent,
         amount_out,
@@ -218,12 +219,12 @@ pub fn handle_fill_intent<'info>(
         }
     }
 
-    // status update
-    let intent_status = IntentStatusAccount {
+    // status update (Box to stay under BPF stack limit)
+    let intent_status = Box::new(IntentStatusAccount {
         status: IntentStatus::Filled,
         accounts: vec![],
         settlement: None,
-    };
+    });
 
     intent_status.try_serialize(&mut &mut intent_status_pda.data.borrow_mut()[..])?;
 
@@ -240,9 +241,8 @@ pub fn handle_fill_intent<'info>(
 
     // TODO: possible extension for calldata execution
 
-    // Produce the EVM ABI message:
-    // NOTE: message type should be fill
-    let fill_message = FillMessage {
+    // Box to stay under BPF stack limit (4KB)
+    let fill_message = Box::new(FillMessage {
         intent_id,
         receiver: receiver.to_bytes(),
         intent_input_asset: intent.input_asset,
@@ -250,28 +250,26 @@ pub fn handle_fill_intent<'info>(
         amount_out: u128_to_u256_be(amount_out.into()),
         destinations,
         execution_timestamp: timestamp,
-    };
-    let evm_encoded_message = encode_full(MessageType::Fill, &fill_message);
+    });
+    let evm_encoded_message = encode_full(MessageType::Fill, &*fill_message);
 
-    // Build your TransferRemote
-    let xfer = TransferRemote {
+    // Box to stay under BPF stack limit (4KB)
+    let xfer = Box::new(TransferRemote {
         destination_domain: EVERCLEAR_DOMAIN,
         recipient: everclear_gateway(),
         amount_or_id: U256::from(0),
         gas_amount: message_gas_limit,
-        message_body: evm_encoded_message, // now in EVM ABI format
-    };
+        message_body: evm_encoded_message,
+    });
 
-    // TODO: make this no_copy
-    // Build your TransferRemoteContext in a local variable (so it doesn't drop too soon)
-    let mut transfer_remote_context = TransferRemoteContext {
+    // Box to stay under BPF stack limit (4KB)
+    let mut transfer_remote_context = Box::new(TransferRemoteContext {
         spoke_state,
         system_program: accounts.system_program.clone(),
         spl_noop_program: accounts.spl_noop_program.clone(),
         mailbox_program: accounts.hyperlane_mailbox.clone(),
         mailbox_outbox: accounts.mailbox_outbox.to_account_info(),
         dispatch_authority: accounts.dispatch_authority.to_account_info(),
-        // TODO: need to figure out how this is used for the IGP payer and whether this is correct
         sender_wallet: accounts.authority.to_account_info(),
         unique_message_account: accounts.unique_message_account.to_account_info(),
         dispatched_message_pda: accounts.dispatched_message_pda.to_account_info(),
@@ -280,18 +278,16 @@ pub fn handle_fill_intent<'info>(
         igp_payment_pda: accounts.igp_payment_pda.to_account_info(),
         configured_igp_account: accounts.configured_igp_account.to_account_info(),
         inner_igp_account: accounts.inner_igp_account.clone(),
-    };
+    });
 
-    // Now create the Anchor Context, referencing your local `transfer_remote_context`.
     let transfer_ctx = Context::new(
         &program_id,
-        &mut transfer_remote_context, // pass a mutable reference
-        &[],                          // remaining accounts if needed
-        Default::default(),           // any custom context seeds if needed
+        &mut *transfer_remote_context,
+        &[],
+        Default::default(),
     );
 
-    // 3) Use `transfer_ctx` safely
-    let message_id = transfer_remote(transfer_ctx, xfer)?;
+    let message_id = transfer_remote(transfer_ctx, *xfer)?;
 
     // Emit an event with full intent details.
     Ok(IntentFilledEvent {
@@ -314,14 +310,14 @@ pub struct FillIntentAccounts<'info> {
     pub token_program: Program<'info, Token>,
     pub intent_status_pda: UncheckedAccount<'info>,
     pub pda_payer: AccountInfo<'info>,
-    pub hyperlane_mailbox: Interface<'info, Mailbox>,
+    pub hyperlane_mailbox: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub spl_noop_program: Program<'info, SplNoop>,
     pub mailbox_outbox: AccountInfo<'info>,
     pub dispatch_authority: AccountInfo<'info>,
     pub unique_message_account: Signer<'info>,
     pub dispatched_message_pda: AccountInfo<'info>,
-    pub igp_program: Interface<'info, Igp>,
+    pub igp_program: AccountInfo<'info>,
     pub igp_program_data: AccountInfo<'info>,
     pub igp_payment_pda: AccountInfo<'info>,
     pub configured_igp_account: AccountInfo<'info>,

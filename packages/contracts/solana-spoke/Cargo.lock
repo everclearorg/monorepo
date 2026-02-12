@@ -481,6 +481,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ccip_poc"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -4,3 +4,6 @@
 [submodule "packages/contracts/lib/xerc20"]
 	path = packages/contracts/lib/xerc20
 	url = https://github.com/defi-wonderland/xerc20
+[submodule "packages/contracts/lib/chainlink-ccip"]
+	path = packages/contracts/lib/chainlink-ccip
+	url = https://github.com/smartcontractkit/chainlink-ccip
