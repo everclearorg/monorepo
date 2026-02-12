@@ -1,4 +1,5 @@
 import { TriageConfig, TriageProvider, TriageResult, TriageContext } from '../types';
+import { AnalyzeWithToolsArgs } from '../tools/types';
 import { AnthropicTriageProvider } from './anthropic';
 import { OpenAITriageProvider } from './openai';
 import { CircuitBreaker, withRetry } from './base';
@@ -29,6 +30,23 @@ class WrappedProvider implements TriageProvider {
     }
     try {
       const result = await withRetry(() => this.delegate.analyze(context, model, timeoutMs), 2, 300);
+      this.breaker.recordSuccess();
+      return result;
+    } catch (e) {
+      this.breaker.recordFailure();
+      throw e;
+    }
+  }
+
+  public async analyzeWithTools(args: AnalyzeWithToolsArgs): Promise<TriageResult> {
+    if (!this.breaker.canExecute()) {
+      throw new Error(`Circuit breaker open for ${this.name}`);
+    }
+    if (!this.delegate.analyzeWithTools) {
+      return this.analyze(args.context, args.model, args.timeoutMs);
+    }
+    try {
+      const result = await withRetry(() => this.delegate.analyzeWithTools!(args), 2, 300);
       this.breaker.recordSuccess();
       return result;
     } catch (e) {

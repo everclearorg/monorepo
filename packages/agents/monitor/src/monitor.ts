@@ -20,6 +20,7 @@ import interval from 'interval-promise';
 import { MonitorConfig } from './types';
 import { AppContext, getContext } from './context';
 import { getDatabase } from '@chimera-monorepo/database';
+import { configureTriageToolHandlers } from './triage-tools';
 
 export const MonitorService = {
   SERVER: 'server',
@@ -76,8 +77,19 @@ export const makeMonitor = async (service: MonitorService) => {
         },
       },
     });
-    context.logger.info('Generated config.', requestContext, methodContext, {
-      config: { ...context.config, abis: 'N/A' },
+    context.logger.info('Generated config summary.', requestContext, methodContext, {
+      configSummary: {
+        network: context.config.network,
+        env: context.config.env,
+        service,
+        chainCount: Object.keys(context.config.chains ?? {}).length,
+        relayerCount: context.config.relayers?.length ?? 0,
+        hasBetterUptime: Boolean(context.config.betterUptime?.apiKey),
+        hasTelegram: Boolean(context.config.telegram?.apiKey),
+        hasDiscord: Boolean(context.config.discord?.url),
+        triageMode: context.config.triage?.mode ?? 'disabled',
+        triageProviderCount: Object.keys(context.config.triage?.providers ?? {}).length,
+      },
     });
 
     /// MARK - Adapters
@@ -124,8 +136,10 @@ export const makeMonitor = async (service: MonitorService) => {
           autoResolveAttempted: record.autoResolveAttempted,
           autoResolveSucceeded: record.autoResolveSucceeded,
           autoResolveReasonCode: record.autoResolveReasonCode,
+          toolCallsMade: record.toolCallsMade,
+          toolNamesUsed: record.toolNamesUsed,
           expiresAt: record.expiresAt,
-        });
+        } as any);
       },
       finalize: async (record: TriageProcessingRecord) => {
         await context.adapters.database.finalizeTriageFingerprint({
@@ -144,8 +158,10 @@ export const makeMonitor = async (service: MonitorService) => {
           autoResolveAttempted: record.autoResolveAttempted,
           autoResolveSucceeded: record.autoResolveSucceeded,
           autoResolveReasonCode: record.autoResolveReasonCode,
+          toolCallsMade: record.toolCallsMade,
+          toolNamesUsed: record.toolNamesUsed,
           expiresAt: record.expiresAt,
-        });
+        } as any);
       },
       setAutoResolveOutcome: async (fingerprint: string, succeeded: boolean, reasonCode?: string) => {
         await context.adapters.database.setTriageAutoResolveOutcome(fingerprint, succeeded, reasonCode);
@@ -154,6 +170,7 @@ export const makeMonitor = async (service: MonitorService) => {
         return context.adapters.database.pruneExpiredTriageFingerprints();
       },
     });
+    configureTriageToolHandlers();
 
     // Adapters - relayers
     context.adapters.relayers = [];

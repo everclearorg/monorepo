@@ -10,3 +10,4 @@ export * from './providers';
 export * from './auto-resolve';
 export * from './metrics';
 export * from './interceptor';
+export * from './tools';

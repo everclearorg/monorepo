@@ -12,12 +12,14 @@ import {
   recordTriagePerformed,
   recordTriageTimeout,
 } from './metrics';
-import { buildTriagePrompt } from './prompt';
+import { buildTriagePrompt, TriagePromptReport } from './prompt';
 import { createTriageProviders } from './providers';
 import { redactSensitiveData } from './redact';
 import { validateTriageReadiness } from './readiness';
 import { selectTriageRoute } from './router';
 import { DEFAULT_TRIAGE_CONFIG, TriageResult } from './types';
+import { getToolsForAlertType } from './tools/registry';
+import { triageWithTools } from './tools/loop';
 
 type InterceptorOutput = {
   report: Report;
@@ -63,7 +65,7 @@ const safeMarkProcessed = async (
     await finalizeFingerprint(record);
   } catch (error: unknown) {
     report.logger.warn('Failed to persist triage fingerprint, continuing', requestContext, methodContext, {
-      error: error instanceof Error ? error.message : String(error),
+      error: sanitizeLogText(error),
       fingerprint: record.fingerprint,
     });
   }
@@ -74,6 +76,31 @@ const modelForProvider = (provider: ProviderName, config: AlertConfig['triage'],
     return config?.providers?.anthropic?.model ?? 'claude-sonnet-4-20250514';
   }
   return config?.providers?.openai?.model ?? defaultModel;
+};
+
+const sanitizeLogText = (value: unknown): string => {
+  const asString = value instanceof Error ? value.message : String(value ?? '');
+  return String(redactSensitiveData(asString));
+};
+
+const sanitizeReportForPrompt = (report: Report): TriagePromptReport => {
+  const redacted = redactSensitiveData({
+    severity: report.severity,
+    type: report.type,
+    ids: report.ids,
+    timestamp: report.timestamp,
+    reason: report.reason,
+    env: report.env,
+  }) as TriagePromptReport;
+
+  return {
+    severity: redacted.severity,
+    type: redacted.type,
+    ids: Array.isArray(redacted.ids) ? redacted.ids.map((id) => String(id)) : [],
+    timestamp: Number.isFinite(redacted.timestamp) ? Number(redacted.timestamp) : report.timestamp,
+    reason: String(redacted.reason ?? ''),
+    env: String(redacted.env ?? report.env),
+  };
 };
 
 export const triageInterceptor = async (
@@ -113,7 +140,7 @@ export const triageInterceptor = async (
     await pruneExpiredFingerprints();
   } catch (error: unknown) {
     report.logger.warn('Failed to prune triage fingerprints, continuing', requestContext, methodContext, {
-      error: error instanceof Error ? error.message : String(error),
+      error: sanitizeLogText(error),
     });
   }
 
@@ -140,7 +167,7 @@ export const triageInterceptor = async (
     }
   } catch (error: unknown) {
     report.logger.warn('Failed to check fingerprint dedup state, continuing', requestContext, methodContext, {
-      error: error instanceof Error ? error.message : String(error),
+      error: sanitizeLogText(error),
       fingerprint,
     });
   }
@@ -160,21 +187,38 @@ export const triageInterceptor = async (
   try {
     const history = await fetchRecentIncidents(report, config.betterUptime, triageConfig.lookbackHours);
     const clustered = clusterIncidents(history);
-    const prompt = buildTriagePrompt(report, redactSensitiveData(config), clustered);
+    const tools = getToolsForAlertType(report.type);
+    const sanitizedReport = sanitizeReportForPrompt(report);
+    const sanitizedRuntimeContext = redactSensitiveData(config);
+    const sanitizedHistory = redactSensitiveData(clustered);
+    const prompt = buildTriagePrompt(sanitizedReport, sanitizedRuntimeContext, sanitizedHistory, tools.length > 0);
     const start = Date.now();
     const triageContext = {
-      report,
+      report: sanitizedReport,
       prompt,
       logger: report.logger,
     };
     let providerUsed = route.provider as ProviderName;
     let modelUsed = route.model;
     let triageResult: TriageResult;
+    let toolCallsMade = 0;
+    let toolNamesUsed: string[] = [];
     try {
       if (!primaryProvider) {
         throw new Error(`Primary provider unavailable: ${route.provider}`);
       }
-      triageResult = await primaryProvider.analyze(triageContext, route.model, triageConfig.timeoutMs);
+      const toolOutput = await triageWithTools(
+        primaryProvider,
+        triageContext,
+        route.model,
+        triageConfig.timeoutMs,
+        tools,
+        triageConfig.maxToolRounds,
+        triageConfig.perToolTimeoutMs,
+      );
+      triageResult = toolOutput.triageResult;
+      toolCallsMade = toolOutput.toolCallsMade;
+      toolNamesUsed = toolOutput.toolNamesUsed;
     } catch (primaryError: unknown) {
       if (!secondaryProvider) {
         throw primaryError;
@@ -184,9 +228,20 @@ export const triageInterceptor = async (
       report.logger.warn('Primary triage provider failed, retrying with fallback provider', requestContext, methodContext, {
         primaryProvider: route.provider,
         fallbackProvider: secondaryProviderName,
-        primaryError: primaryError instanceof Error ? primaryError.message : String(primaryError),
+        primaryError: sanitizeLogText(primaryError),
       });
-      triageResult = await secondaryProvider.analyze(triageContext, modelUsed, triageConfig.timeoutMs);
+      const toolOutput = await triageWithTools(
+        secondaryProvider,
+        triageContext,
+        modelUsed,
+        triageConfig.timeoutMs,
+        tools,
+        triageConfig.maxToolRounds,
+        triageConfig.perToolTimeoutMs,
+      );
+      triageResult = toolOutput.triageResult;
+      toolCallsMade = toolOutput.toolCallsMade;
+      toolNamesUsed = toolOutput.toolNamesUsed;
     }
     const latencyMs = Date.now() - start;
     recordTriagePerformed(latencyMs);
@@ -209,6 +264,8 @@ export const triageInterceptor = async (
       autoResolveAttempted: policy.shouldAutoResolve,
       autoResolveSucceeded: false,
       autoResolveReasonCode: policy.reasonCode,
+      toolCallsMade,
+      toolNamesUsed,
       expiresAt: new Date(Date.now() + triageConfig.retentionHours * 60 * 60 * 1000),
     });
 
@@ -231,8 +288,8 @@ export const triageInterceptor = async (
     recordTriageFallback();
     report.logger.warn('Triage interceptor failed, falling back to original alert', requestContext, methodContext, {
       type: report.type,
-      reason: report.reason,
-      error: error instanceof Error ? error.message : String(error),
+      reason: sanitizeLogText(report.reason),
+      error: sanitizeLogText(error),
     });
     await safeMarkProcessed(report, requestContext, methodContext, baseRecord);
     return { report, shouldAutoResolve: false, fingerprint, mode: triageConfig.mode };

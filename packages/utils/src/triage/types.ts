@@ -1,5 +1,6 @@
 import { Type, Static } from '@sinclair/typebox';
 import { Logger } from '../logging';
+import { AnalyzeWithToolsFn } from './tools/types';
 
 export const TTriageMode = Type.Union([
   Type.Literal('disabled'),
@@ -28,6 +29,8 @@ export const TTriageRoutingRule = Type.Object({
 export const TTriageConfigSchema = Type.Object({
   mode: Type.Optional(TTriageMode),
   timeoutMs: Type.Optional(Type.Number({ minimum: 1000 })),
+  maxToolRounds: Type.Optional(Type.Number({ minimum: 1, maximum: 5 })),
+  perToolTimeoutMs: Type.Optional(Type.Number({ minimum: 1000, maximum: 10000 })),
   lookbackHours: Type.Optional(Type.Number({ minimum: 1 })),
   retentionHours: Type.Optional(Type.Number({ minimum: 1 })),
   timeBucketMinutes: Type.Optional(Type.Number({ minimum: 1 })),
@@ -109,6 +112,7 @@ export type TriageRoute = {
 export type TriageProvider = {
   name: Static<typeof TProviderName>;
   analyze: (context: TriageContext, model: string, timeoutMs: number) => Promise<TriageResult>;
+  analyzeWithTools?: AnalyzeWithToolsFn;
 };
 
 export type AutoResolvePolicyDecision = {
@@ -132,6 +136,8 @@ export type TriageProcessingRecord = {
   autoResolveAttempted?: boolean;
   autoResolveSucceeded?: boolean;
   autoResolveReasonCode?: string;
+  toolCallsMade?: number;
+  toolNamesUsed?: string[];
   expiresAt: Date;
 };
 
@@ -144,10 +150,15 @@ export type TriagePersistenceStore = {
 };
 
 export const DEFAULT_TRIAGE_CONFIG: Required<
-  Pick<TriageConfig, 'mode' | 'timeoutMs' | 'lookbackHours' | 'retentionHours' | 'timeBucketMinutes'>
+  Pick<
+    TriageConfig,
+    'mode' | 'timeoutMs' | 'maxToolRounds' | 'perToolTimeoutMs' | 'lookbackHours' | 'retentionHours' | 'timeBucketMinutes'
+  >
 > = {
   mode: 'disabled',
-  timeoutMs: 15000,
+  timeoutMs: 30000,
+  maxToolRounds: 3,
+  perToolTimeoutMs: 5000,
   lookbackHours: 6,
   retentionHours: 24,
   timeBucketMinutes: 30,

@@ -174,4 +174,38 @@ describe('triage:interceptor', () => {
     expect(output.report.reason).to.eq(TEST_REPORT.reason);
     expect(output.shouldAutoResolve).to.eq(false);
   });
+
+  it('builds prompt with redacted report content and without logger object', async () => {
+    stub(HistoryModule, 'fetchRecentIncidents').resolves([]);
+    stub(HistoryModule, 'clusterIncidents').returns([]);
+    let capturedPrompt = '';
+    stub(ProviderModule, 'createTriageProviders').returns({
+      openai: {
+        name: 'openai',
+        analyze: async (context) => {
+          capturedPrompt = context.prompt;
+          return {
+            verdict: 'actionable',
+            rca: 'ok',
+            confidence: 0.8,
+            steps: ['x'],
+            autoResolveRecommendation: false,
+            reasoning: 'ok',
+          };
+        },
+      },
+    });
+    await triageInterceptor(
+      {
+        ...TEST_REPORT,
+        reason: 'failed auth with Bearer verysecrettoken and api_key=abc123',
+        logger: createStubInstance(Logger),
+      },
+      config,
+      createRequestContext('test'),
+    );
+    expect(capturedPrompt).to.not.include('verysecrettoken');
+    expect(capturedPrompt).to.not.include('abc123');
+    expect(capturedPrompt).to.not.include('"logger"');
+  });
 });

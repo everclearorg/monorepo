@@ -72,10 +72,10 @@ export const tryReserveTriageFingerprint = async (
     `INSERT INTO alert_triage_log (
       fingerprint, report_type, severity, env, network, ids, reason, triage_mode, triage_result,
       provider_used, model_used, triage_latency_ms, auto_resolve_attempted, auto_resolve_succeeded,
-      auto_resolve_reason_code, expires_at
+      auto_resolve_reason_code, tool_calls_made, tool_names_used, expires_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9,
-      $10, $11, $12, $13, $14, $15, $16
+      $10, $11, $12, $13, $14, $15, $16, $17, $18
     )
     ON CONFLICT (fingerprint) DO NOTHING`,
     [
@@ -94,6 +94,8 @@ export const tryReserveTriageFingerprint = async (
       log.autoResolveAttempted ?? false,
       log.autoResolveSucceeded ?? false,
       log.autoResolveReasonCode ?? null,
+      log.toolCallsMade ?? 0,
+      log.toolNamesUsed ?? [],
       log.expiresAt,
     ],
   );
@@ -114,7 +116,9 @@ export const finalizeTriageFingerprint = async (
           auto_resolve_attempted = $6,
           auto_resolve_succeeded = $7,
           auto_resolve_reason_code = $8,
-          expires_at = $9
+          tool_calls_made = $9,
+          tool_names_used = $10,
+          expires_at = $11
       WHERE fingerprint = $1`,
     [
       log.fingerprint,
@@ -125,6 +129,8 @@ export const finalizeTriageFingerprint = async (
       log.autoResolveAttempted ?? false,
       log.autoResolveSucceeded ?? false,
       log.autoResolveReasonCode ?? null,
+      log.toolCallsMade ?? 0,
+      log.toolNamesUsed ?? [],
       log.expiresAt,
     ],
   );

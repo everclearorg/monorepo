@@ -11,6 +11,7 @@ import { AlertConfig, Report } from './config';
 import { Logger, RequestContext, createMethodContext } from '../logging';
 import { triageInterceptor } from '../triage';
 import { setAutoResolveOutcome } from '../triage/dedup';
+import { redactSensitiveData } from '../triage/redact';
 
 const preprocessReport = (report: Report, config: AlertConfig): Report => ({
   ...report,
@@ -18,6 +19,18 @@ const preprocessReport = (report: Report, config: AlertConfig): Report => ({
   reason: `${report.reason}#${createUniqueIds(report.ids)}`,
   env: `${report.env} - ${config.network}`,
 });
+
+const toLogSafeReport = (report: Report) => {
+  const redactedReason = String(redactSensitiveData(report.reason));
+  return {
+    type: report.type,
+    severity: report.severity,
+    env: report.env,
+    ids: report.ids,
+    timestamp: report.timestamp,
+    reason: redactedReason.slice(0, 500),
+  };
+};
 
 /**
  * Sends all alerts at once
@@ -67,7 +80,7 @@ export async function sendAlerts(
   }
 
   logger.warn('Alerts sent!!!', requestContext, methodContext, {
-    ...alertReport,
+    report: toLogSafeReport(alertReport),
     triage: {
       provider: triageOutput.providerUsed,
       model: triageOutput.modelUsed,
@@ -107,5 +120,7 @@ export async function resolveAlerts(
 
   await Promise.allSettled(resolvePromises);
 
-  logger.info('Alerts resolved!!!', requestContext, methodContext, alertReport);
+  logger.info('Alerts resolved!!!', requestContext, methodContext, {
+    report: toLogSafeReport(alertReport),
+  });
 }

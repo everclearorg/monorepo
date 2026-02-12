@@ -6,6 +6,9 @@ const triageMetrics = {
   fallbackTotal: 0,
   autoResolveAttemptTotal: 0,
   autoResolveSuccessTotal: 0,
+  toolCallsTotal: 0,
+  toolRoundsTotal: 0,
+  toolUsageByName: {} as Record<string, number>,
   triageLatencyMs: [] as number[],
 };
 
@@ -37,7 +40,17 @@ export const recordAutoResolveAttempt = (succeeded: boolean) => {
   }
 };
 
+export const recordToolCallExecuted = (toolName: string) => {
+  triageMetrics.toolCallsTotal += 1;
+  triageMetrics.toolUsageByName[toolName] = (triageMetrics.toolUsageByName[toolName] ?? 0) + 1;
+};
+
+export const recordToolRoundsUsed = (rounds: number) => {
+  triageMetrics.toolRoundsTotal += rounds;
+};
+
 export const getTriageMetricsSnapshot = () => ({
   ...triageMetrics,
+  toolUsageByName: { ...triageMetrics.toolUsageByName },
   triageLatencyMs: [...triageMetrics.triageLatencyMs],
 });

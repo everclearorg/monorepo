@@ -132,6 +132,8 @@ export type TriageFingerprintLog = {
   autoResolveAttempted?: boolean;
   autoResolveSucceeded?: boolean;
   autoResolveReasonCode?: string;
+  toolCallsMade?: number;
+  toolNamesUsed?: string[];
   expiresAt: Date;
 };
 
