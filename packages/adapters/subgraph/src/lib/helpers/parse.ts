@@ -19,6 +19,8 @@ import {
   HyperlaneStatus,
   Order,
   ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   HubMeta,
   SpokeMeta,
 } from '@chimera-monorepo/utils';
@@ -377,25 +379,17 @@ export const protocolUpdateLog = (domain: string, entity: MetaUpdateEntity): Pro
   };
 };
 
-export const hubTokenUpdateLog = (domain: string, entity: HubTokenUpdateEntity): ProtocolUpdateLog => {
-  const tokenId = entity.token.id;
-  const updated = JSON.stringify({
-    tokenId,
-    kind: entity.kind,
-    feeRecipients: entity.feeRecipients ?? [],
-    feeAmounts: entity.feeAmounts ?? [],
-    maxDiscountBps: entity.maxDiscountBps ?? null,
-    discountPerEpoch: entity.discountPerEpoch ?? null,
-    prioritizedStrategy: entity.prioritizedStrategy ?? null,
-  });
-
+export const hubTokenUpdateLog = (domain: string, entity: HubTokenUpdateEntity): HubTokenUpdateLog => {
   return {
     id: entity.id,
     domain,
-    chainId: domain,
-    event: entity.kind,
-    key: tokenId,
-    updated,
+    tickerHash: entity.token.id,
+    kind: entity.kind,
+    feeRecipients: entity.feeRecipients ?? [],
+    feeAmounts: entity.feeAmounts ?? [],
+    maxDiscountBps: StringToNumber(entity.maxDiscountBps ?? 0),
+    discountPerEpoch: StringToNumber(entity.discountPerEpoch ?? 0),
+    prioritizedStrategy: entity.prioritizedStrategy ?? 'DEFAULT',
     transactionHash: entity.transactionHash,
     timestamp: StringToNumber(entity.timestamp),
     blockNumber: StringToNumber(entity.blockNumber),
@@ -404,27 +398,19 @@ export const hubTokenUpdateLog = (domain: string, entity: HubTokenUpdateEntity):
   };
 };
 
-export const hubAssetUpdateLog = (domain: string, entity: HubAssetUpdateEntity): ProtocolUpdateLog => {
-  const assetId = entity.asset.id;
-  const updated = JSON.stringify({
-    assetId,
-    tokenId: entity.token?.id ?? null,
-    tickerHash: entity.tickerHash ?? null,
-    domain: entity.domain ?? null,
-    kind: entity.kind,
-    assetHash: entity.assetHash ?? null,
-    adopted: entity.adopted ?? null,
-    approval: entity.approval ?? null,
-    strategy: entity.strategy ?? null,
-  });
-
+export const hubAssetUpdateLog = (domain: string, entity: HubAssetUpdateEntity): HubAssetUpdateLog => {
   return {
     id: entity.id,
     domain,
-    chainId: domain,
-    event: entity.kind,
-    key: assetId,
-    updated,
+    tickerHash: (entity.tickerHash as string) ?? '',
+    tokenId: entity.token?.id ?? undefined,
+    assetId: entity.asset.id,
+    assetDomain: (entity.domain as string) ?? '',
+    kind: entity.kind,
+    assetHash: (entity.assetHash as string) ?? '',
+    adopted: (entity.adopted as string) ?? '',
+    approval: (entity.approval as boolean) ?? false,
+    strategy: (entity.strategy as string) ?? '',
     transactionHash: entity.transactionHash,
     timestamp: StringToNumber(entity.timestamp),
     blockNumber: StringToNumber(entity.blockNumber),

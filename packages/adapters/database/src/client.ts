@@ -24,6 +24,8 @@ import {
   LockPosition,
   Order,
   ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   HubMeta,
   SpokeMeta,
 } from '@chimera-monorepo/utils';
@@ -179,6 +181,32 @@ export const saveProtocolUpdateLogs = async (
   const logs = _logs.map(converters.toProtocolUpdateLog);
   await db
     .upsert('protocol_update_logs', logs, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
+export const saveHubTokenUpdateLogs = async (
+  _logs: HubTokenUpdateLog[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const logs = _logs.map(converters.toHubTokenUpdateLog);
+  await db
+    .upsert('hub_token_update_logs' as any, logs as any, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
+export const saveHubAssetUpdateLogs = async (
+  _logs: HubAssetUpdateLog[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const logs = _logs.map(converters.toHubAssetUpdateLog);
+  await db
+    .upsert('hub_asset_update_logs' as any, logs as any, ['id'], {
       noNullUpdateColumns: ['id'],
     })
     .run(poolToUse);

@@ -26,6 +26,8 @@ import {
   LockPosition,
   Order,
   ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   HubMeta,
   SpokeMeta,
 } from '@chimera-monorepo/utils';
@@ -89,6 +91,8 @@ import {
   updateSettlementStatus,
   updateSolanaMessageStatuses,
   saveProtocolUpdateLogs,
+  saveHubTokenUpdateLogs,
+  saveHubAssetUpdateLogs,
   saveHubMeta,
   saveSpokeMeta,
 } from './client';
@@ -133,6 +137,8 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   saveProtocolUpdateLogs: (protocolLogs: ProtocolUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveHubTokenUpdateLogs: (logs: HubTokenUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveHubAssetUpdateLogs: (logs: HubAssetUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveHubMeta: (meta: HubMeta[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveSpokeMeta: (meta: SpokeMeta[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveQueues: (queues: Queue[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
@@ -330,6 +336,8 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     saveBalances,
     saveMessages,
     saveProtocolUpdateLogs,
+    saveHubTokenUpdateLogs,
+    saveHubAssetUpdateLogs,
     saveHubMeta,
     saveSpokeMeta,
     saveQueues,

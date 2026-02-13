@@ -15,6 +15,8 @@ import {
   TIntentStatus,
   Order,
   ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   HubMeta,
   SpokeMeta,
 } from '@chimera-monorepo/utils';
@@ -51,8 +53,8 @@ export interface ISubgraphReader {
   getHubMessages(domain: string, latestNonce: number): Promise<HubMessage[]>;
   getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]>;
   getSpokeMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]>;
-  getHubTokenUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]>;
-  getHubAssetUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]>;
+  getHubTokenUpdates(domain: string, fromBlock: number): Promise<HubTokenUpdateLog[]>;
+  getHubAssetUpdates(domain: string, fromBlock: number): Promise<HubAssetUpdateLog[]>;
   getHubMeta(domain: string): Promise<HubMeta | undefined>;
   getSpokeMeta(domain: string): Promise<SpokeMeta | undefined>;
   getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]>;
@@ -438,13 +440,13 @@ export class SubgraphReader implements ISubgraphReader {
     return Array.from(updateMap.values());
   }
 
-  public async getHubTokenUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+  public async getHubTokenUpdates(domain: string, fromBlock: number): Promise<HubTokenUpdateLog[]> {
     const [graphResults, envioResults] = await Promise.all([
       this.graphReader.getHubTokenUpdates(domain, fromBlock).catch(() => []),
       this.envioReader.getHubTokenUpdates(domain, fromBlock).catch(() => []),
     ]);
 
-    const updateMap = new Map<string, ProtocolUpdateLog>();
+    const updateMap = new Map<string, HubTokenUpdateLog>();
     for (const update of [...graphResults, ...envioResults]) {
       if (!updateMap.has(update.id)) {
         updateMap.set(update.id, update);
@@ -454,13 +456,13 @@ export class SubgraphReader implements ISubgraphReader {
     return Array.from(updateMap.values());
   }
 
-  public async getHubAssetUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+  public async getHubAssetUpdates(domain: string, fromBlock: number): Promise<HubAssetUpdateLog[]> {
     const [graphResults, envioResults] = await Promise.all([
       this.graphReader.getHubAssetUpdates(domain, fromBlock).catch(() => []),
       this.envioReader.getHubAssetUpdates(domain, fromBlock).catch(() => []),
     ]);
 
-    const updateMap = new Map<string, ProtocolUpdateLog>();
+    const updateMap = new Map<string, HubAssetUpdateLog>();
     for (const update of [...graphResults, ...envioResults]) {
       if (!updateMap.has(update.id)) {
         updateMap.set(update.id, update);

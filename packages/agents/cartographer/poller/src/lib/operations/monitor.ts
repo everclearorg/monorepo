@@ -224,7 +224,7 @@ export const updateProtocolUpdateLogs = async () => {
       const tokenUpdates = await subgraph.getHubTokenUpdates(domain, tokenLastBlock);
       if (tokenUpdates.length > 0) {
         const latestBlock = Math.max(tokenLastBlock, getMaxBlockNumber(tokenUpdates));
-        await database.saveProtocolUpdateLogs(tokenUpdates);
+        await database.saveHubTokenUpdateLogs(tokenUpdates);
         await database.saveCheckPoint(tokenCheckpointKey, latestBlock);
         logger.debug('Saved hub token update logs', requestContext, methodContext, {
           domain,
@@ -243,7 +243,7 @@ export const updateProtocolUpdateLogs = async () => {
       const assetUpdates = await subgraph.getHubAssetUpdates(domain, assetLastBlock);
       if (assetUpdates.length > 0) {
         const latestBlock = Math.max(assetLastBlock, getMaxBlockNumber(assetUpdates));
-        await database.saveProtocolUpdateLogs(assetUpdates);
+        await database.saveHubAssetUpdateLogs(assetUpdates);
         await database.saveCheckPoint(assetCheckpointKey, latestBlock);
         logger.debug('Saved hub asset update logs', requestContext, methodContext, {
           domain,
