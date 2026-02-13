@@ -20,6 +20,8 @@ import {
   DEPOSIT_QUEUE_ENTITY,
   INTENT_SETTLEMENT_EVENT_ENTITY,
   ORDER_ENTITY,
+  HUB_TOKEN_UPDATE_ENTITY,
+  HUB_ASSET_UPDATE_ENTITY,
 } from './entities';
 
 export const getBlockNumberQuery = (): string => {
@@ -438,6 +440,44 @@ export const getSpokeMetaUpdatesQuery = (
       orderDirection: ${orderDirection}
     ) {
       ${META_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getHubTokenUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
+  return `
+    hubTokenUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${HUB_TOKEN_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getHubAssetUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
+  return `
+    hubAssetUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${HUB_ASSET_UPDATE_ENTITY}
     }
   `;
 };

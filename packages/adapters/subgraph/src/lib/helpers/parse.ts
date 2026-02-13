@@ -46,6 +46,8 @@ import {
   MetaUpdateEntity,
   HubMetaEntity,
   SpokeMetaEntity,
+  HubTokenUpdateEntity,
+  HubAssetUpdateEntity,
 } from '../operations/entities';
 
 export const StringToNumber = (num: number | string): number => {
@@ -366,6 +368,62 @@ export const protocolUpdateLog = (domain: string, entity: MetaUpdateEntity): Pro
     event: entity.kind,
     key: entity.key,
     chainId,
+    updated,
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txOrigin: entity.txOrigin,
+    txNonce: StringToNumber(entity.txNonce),
+  };
+};
+
+export const hubTokenUpdateLog = (domain: string, entity: HubTokenUpdateEntity): ProtocolUpdateLog => {
+  const tokenId = entity.token.id;
+  const updated = JSON.stringify({
+    tokenId,
+    kind: entity.kind,
+    feeRecipients: entity.feeRecipients ?? [],
+    feeAmounts: entity.feeAmounts ?? [],
+    maxDiscountBps: entity.maxDiscountBps ?? null,
+    discountPerEpoch: entity.discountPerEpoch ?? null,
+    prioritizedStrategy: entity.prioritizedStrategy ?? null,
+  });
+
+  return {
+    id: entity.id,
+    domain,
+    chainId: domain,
+    event: entity.kind,
+    key: tokenId,
+    updated,
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txOrigin: entity.txOrigin,
+    txNonce: StringToNumber(entity.txNonce),
+  };
+};
+
+export const hubAssetUpdateLog = (domain: string, entity: HubAssetUpdateEntity): ProtocolUpdateLog => {
+  const assetId = entity.asset.id;
+  const updated = JSON.stringify({
+    assetId,
+    tokenId: entity.token?.id ?? null,
+    tickerHash: entity.tickerHash ?? null,
+    domain: entity.domain ?? null,
+    kind: entity.kind,
+    assetHash: entity.assetHash ?? null,
+    adopted: entity.adopted ?? null,
+    approval: entity.approval ?? null,
+    strategy: entity.strategy ?? null,
+  });
+
+  return {
+    id: entity.id,
+    domain,
+    chainId: domain,
+    event: entity.kind,
+    key: assetId,
     updated,
     transactionHash: entity.transactionHash,
     timestamp: StringToNumber(entity.timestamp),

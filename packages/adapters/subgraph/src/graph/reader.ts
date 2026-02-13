@@ -11,6 +11,8 @@ import {
   getHubIntentFilledQuery,
   getHubMetaQuery,
   getHubMetaUpdatesQuery,
+  getHubTokenUpdatesQuery,
+  getHubAssetUpdatesQuery,
   getInvoiceEnqueuedByIntentId,
   getInvoiceEnqueuedQuery,
   getOrdersByNonce,
@@ -78,6 +80,8 @@ import {
   SpokeQueueEntity,
   TokensEntity,
   MetaUpdateEntity,
+  HubTokenUpdateEntity,
+  HubAssetUpdateEntity,
 } from '../lib/operations/entities';
 
 let context: { config: SubgraphConfig };
@@ -328,6 +332,22 @@ export class GraphReader implements ISubgraphReader {
     ]);
 
     return (response?.data.spokeMetaUpdates ?? []).map((entity) => parser.protocolUpdateLog(domain, entity));
+  }
+
+  public async getHubTokenUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ hubTokenUpdates: HubTokenUpdateEntity[]; _meta: MetaEntity }>(domain, [
+      getHubTokenUpdatesQuery(fromBlock),
+    ]);
+    return (response?.data.hubTokenUpdates ?? []).map((entity) => parser.hubTokenUpdateLog(domain, entity));
+  }
+
+  public async getHubAssetUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ hubAssetUpdates: HubAssetUpdateEntity[]; _meta: MetaEntity }>(domain, [
+      getHubAssetUpdatesQuery(fromBlock),
+    ]);
+    return (response?.data.hubAssetUpdates ?? []).map((entity) => parser.hubAssetUpdateLog(domain, entity));
   }
 
   public async getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]> {

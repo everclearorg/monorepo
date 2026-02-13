@@ -139,7 +139,11 @@ export const createAppContext = (overrides: Partial<CartographerConfig> = {}): A
       ...overrides,
     }) as CartographerConfig,
     adapters: {
-      subgraph: createStubInstance(SubgraphReader),
+      subgraph: createStubInstance(SubgraphReader, {
+        // Ensure new hub update log methods have safe defaults
+        getHubTokenUpdates: stub().resolves([]),
+        getHubAssetUpdates: stub().resolves([]),
+      }),
       chainreader: chainreader,
       database: createMockDatabase() as Database,
     },

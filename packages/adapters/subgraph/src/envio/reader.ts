@@ -218,6 +218,16 @@ export class EnvioReader implements ISubgraphReader {
     return [];
   }
 
+  public async getHubTokenUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    // Envio doesn't track hub token update logs
+    return [];
+  }
+
+  public async getHubAssetUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    // Envio doesn't track hub asset update logs
+    return [];
+  }
+
   public async getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]> {
     const allIntents: OriginIntent[] = [];
 
