@@ -1,5 +1,11 @@
 [extend]  # keep default rules
 
+[allowlist]
+description = "Allowlisted files"
+paths = [
+  '''packages/contracts/test/unit/upgrades/gateway/HubGatewayV3Upgrade\.t\.sol''',  # Test fixtures with Solana hex addresses
+]
+
 [[rules]]
 id          = "tron-hex-private-key"
 description = "64-char hex TRON private key"

@@ -1168,6 +1168,39 @@ $$;
 
 
 --
+-- Name: get_intent_status_order(public.intent_status); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_intent_status_order(status public.intent_status) RETURNS integer
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+BEGIN
+    RETURN CASE status
+        WHEN 'NONE' THEN 0
+        WHEN 'ADDED' THEN 10
+        WHEN 'ADDED_SPOKE' THEN 11
+        WHEN 'ADDED_HUB' THEN 12
+        WHEN 'DEPOSIT_PROCESSED' THEN 20
+        WHEN 'FILLED' THEN 30
+        WHEN 'ADDED_AND_FILLED' THEN 31
+        WHEN 'INVOICED' THEN 40
+        WHEN 'DISPATCHED' THEN 50
+        WHEN 'DISPATCHED_HUB' THEN 51
+        WHEN 'DISPATCHED_SPOKE' THEN 52
+        WHEN 'DISPATCHED_UNSUPPORTED' THEN 53
+        WHEN 'SETTLED' THEN 60
+        WHEN 'SETTLED_AND_COMPLETED' THEN 61
+        WHEN 'SETTLED_AND_MANUALLY_EXECUTED' THEN 62
+        WHEN 'UNSUPPORTED' THEN 70
+        WHEN 'UNSUPPORTED_RETURNED' THEN 71
+        WHEN 'DELIVERED' THEN 80
+        ELSE 0
+    END;
+END;
+$$;
+
+
+--
 -- Name: get_tron_address(text); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1479,10 +1512,10 @@ BEGIN
     pos := pos + 16;
     ttl := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 16)));
     pos := pos + 16;
-    amount := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
-    pos := pos + 32;
-    amount_out_min := to_numeric(reverse_bytes(SUBSTRING(hex_data, pos, 32)));
-    pos := pos + 32;
+    amount := to_numeric(SUBSTRING(hex_data, pos + 32, 32));
+    pos := pos + 64;
+    amount_out_min := to_numeric(SUBSTRING(hex_data, pos + 32, 32));
+    pos := pos + 64;
     destination_count := to_int(reverse_bytes(SUBSTRING(hex_data, pos, 8)));
     pos := pos + 8;
 
@@ -1515,6 +1548,7 @@ BEGIN
         block_number,
         tx_origin,
         tx_nonce,
+        max_fee,
         gas_limit,
         gas_price,
         status,
@@ -1543,6 +1577,7 @@ BEGIN
         rec.block_slot,
         solver,
         0,
+        '0',
         rec.tx_fee,
         1,
         'FILLED',
@@ -1570,6 +1605,7 @@ BEGIN
         block_number = EXCLUDED.block_number,
         tx_origin = EXCLUDED.tx_origin,
         tx_nonce = EXCLUDED.tx_nonce,
+        max_fee = EXCLUDED.max_fee,
         gas_limit = EXCLUDED.gas_limit,
         gas_price = EXCLUDED.gas_price,
         status = EXCLUDED.status,
@@ -2038,6 +2074,30 @@ $$;
 
 
 --
+-- Name: validate_ascending_status_transition(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.validate_ascending_status_transition() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    old_order INTEGER;
+    new_order INTEGER;
+BEGIN
+    IF OLD.status IS DISTINCT FROM NEW.status THEN
+        old_order := get_intent_status_order(OLD.status);
+        new_order := get_intent_status_order(NEW.status);
+        IF new_order < old_order THEN
+            NEW.status := OLD.status;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: set_timestamp_and_latency(); Type: FUNCTION; Schema: tokenomics; Owner: -
 --
 
@@ -2111,7 +2171,7 @@ CREATE TABLE public.destination_intents (
     filled_domain character varying(66) NOT NULL,
     nonce bigint NOT NULL,
     data text,
-    transaction_hash character(66) NOT NULL,
+    transaction_hash character(130) NOT NULL,
     "timestamp" bigint NOT NULL,
     block_number bigint NOT NULL,
     tx_origin character varying(66) NOT NULL,
@@ -5295,6 +5355,34 @@ CREATE TRIGGER queue_type_change_trigger AFTER UPDATE OF type ON public.queues F
 
 
 --
+-- Name: destination_intents validate_destination_intent_status_transition; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER validate_destination_intent_status_transition BEFORE UPDATE OF status ON public.destination_intents FOR EACH ROW EXECUTE FUNCTION public.validate_ascending_status_transition();
+
+
+--
+-- Name: hub_intents validate_hub_intent_status_transition; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER validate_hub_intent_status_transition BEFORE UPDATE OF status ON public.hub_intents FOR EACH ROW EXECUTE FUNCTION public.validate_ascending_status_transition();
+
+
+--
+-- Name: origin_intents validate_origin_intent_status_transition; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER validate_origin_intent_status_transition BEFORE UPDATE OF status ON public.origin_intents FOR EACH ROW EXECUTE FUNCTION public.validate_ascending_status_transition();
+
+
+--
+-- Name: settlement_intents validate_settlement_intent_status_transition; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER validate_settlement_intent_status_transition BEFORE UPDATE OF status ON public.settlement_intents FOR EACH ROW EXECUTE FUNCTION public.validate_ascending_status_transition();
+
+
+--
 -- Name: solana_spoke_instructions process_cpi_events_trigger; Type: TRIGGER; Schema: solana; Owner: -
 --
 
@@ -5477,4 +5565,7 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251110053118'),
     ('20251110182740'),
     ('20251125175538'),
-    ('20251127055400');
+    ('20251127055400'),
+    ('20251202011749'),
+    ('20251202161540'),
+    ('20251202165553');

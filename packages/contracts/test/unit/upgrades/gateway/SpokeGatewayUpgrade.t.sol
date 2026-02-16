@@ -10,6 +10,7 @@ import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {GatewayV3, IGatewayV3} from 'contracts/common/GatewayV3.sol';
 import {TypeCasts} from 'contracts/common/TypeCasts.sol';
 import {ISpokeGatewayV2, SpokeGatewayV2} from 'contracts/intent/SpokeGatewayV2.sol';
+import {ICCIP} from 'interfaces/common/ICCIP.sol';
 import {IGasTank} from 'interfaces/common/IGasTank.sol';
 import {IPolymer} from 'interfaces/common/IPolymer.sol';
 
@@ -128,9 +129,9 @@ contract SpokeGatewayV2Test is Test, Mocker {
     assertEq(newGateway.EVERCLEAR_ID(), EVERCLEAR);
     assertEq(newGateway.EVERCLEAR_GATEWAY(), hubGateway);
     assertEq(address(newGateway.polymerProver()), polymerProver);
-    assertEq(newGateway.hyperlaneMailbox(), hyperlaneMailbox);
-    assertEq(newGateway.ccipMailbox(), ccipMailbox);
-    assertEq(newGateway.polymerMailbox(), polymerMailbox);
+    assertEq(address(newGateway.hyperlaneMailbox()), hyperlaneMailbox);
+    assertEq(address(newGateway.ccipMailbox()), ccipMailbox);
+    assertEq(address(newGateway.polymerMailbox()), polymerMailbox);
   }
 
   // ============ State Check Tests ============ //
@@ -142,9 +143,9 @@ contract SpokeGatewayV2Test is Test, Mocker {
     assertEq(gateway.EVERCLEAR_ID(), EVERCLEAR);
     assertEq(gateway.EVERCLEAR_GATEWAY(), hubGateway);
     assertEq(address(gateway.polymerProver()), polymerProver);
-    assertEq(gateway.hyperlaneMailbox(), hyperlaneMailbox);
-    assertEq(gateway.ccipMailbox(), ccipMailbox);
-    assertEq(gateway.polymerMailbox(), polymerMailbox);
+    assertEq(address(gateway.hyperlaneMailbox()), hyperlaneMailbox);
+    assertEq(address(gateway.ccipMailbox()), ccipMailbox);
+    assertEq(address(gateway.polymerMailbox()), polymerMailbox);
     assertEq(gateway.mailbox(), hyperlaneMailbox);
   }
 
@@ -176,7 +177,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
     vm.prank(owner);
     gateway.updateHyperlaneMailbox(newMailbox);
 
-    assertEq(gateway.hyperlaneMailbox(), newMailbox);
+    assertEq(address(gateway.hyperlaneMailbox()), newMailbox);
   }
 
   function testRevert_spokeGateway_updateHyperlaneMailbox_notOwner() public {
@@ -193,7 +194,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
     vm.prank(owner);
     gateway.updateCCIPMailbox(newMailbox);
 
-    assertEq(gateway.ccipMailbox(), newMailbox);
+    assertEq(address(gateway.ccipMailbox()), newMailbox);
   }
 
   function testRevert_spokeGateway_updateCCIPMailbox_notOwner() public {
@@ -210,7 +211,7 @@ contract SpokeGatewayV2Test is Test, Mocker {
     vm.prank(owner);
     gateway.updatePolymerMailbox(newMailbox);
 
-    assertEq(gateway.polymerMailbox(), newMailbox);
+    assertEq(address(gateway.polymerMailbox()), newMailbox);
   }
 
   function testRevert_spokeGateway_updatePolymerMailbox_notOwner() public {
@@ -452,13 +453,13 @@ contract SpokeGatewayV2Test is Test, Mocker {
     // Construct expected CCIP message
     bytes memory extraArgs = abi.encodeWithSelector(
       gateway.GENERIC_EXTRA_ARGS_V2_TAG(),
-      IGatewayV3.GenericExtraArgsV2({gasLimit: gasLimit, allowOutOfOrderExecution: true})
+      ICCIP.GenericExtraArgsV2({gasLimit: gasLimit, allowOutOfOrderExecution: true})
     );
 
-    IGatewayV3.EVM2AnyMessage memory evm2AnyMessage = IGatewayV3.EVM2AnyMessage({
+    ICCIP.EVM2AnyMessage memory evm2AnyMessage = ICCIP.EVM2AnyMessage({
       receiver: abi.encode(hubGateway),
       data: message,
-      tokenAmounts: new IGatewayV3.EVMTokenAmount[](0),
+      tokenAmounts: new ICCIP.EVMTokenAmount[](0),
       feeToken: address(0),
       extraArgs: extraArgs
     });
@@ -585,12 +586,12 @@ contract SpokeGatewayV2Test is Test, Mocker {
   function test_spokeGateway_ccipReceive_success() public {
     bytes memory message = abi.encode('incoming ccip message');
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(EVERCLEAR_CCIP_SELECTOR),
       sender: abi.encode(hubGateway),
       data: message,
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     // Mock the receiver call
@@ -601,12 +602,12 @@ contract SpokeGatewayV2Test is Test, Mocker {
   }
 
   function testRevert_spokeGateway_ccipReceive_notMailbox() public {
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(EVERCLEAR_CCIP_SELECTOR),
       sender: abi.encode(hubGateway),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.expectRevert(IGatewayV3.GatewayV3_Handle_NotCalledByMailbox.selector);
@@ -616,12 +617,12 @@ contract SpokeGatewayV2Test is Test, Mocker {
   function testRevert_spokeGateway_ccipReceive_invalidOrigin() public {
     uint256 wrongCCIPSelector = 999_999;
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(wrongCCIPSelector),
       sender: abi.encode(hubGateway),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.prank(ccipMailbox);
@@ -632,12 +633,12 @@ contract SpokeGatewayV2Test is Test, Mocker {
   function testRevert_spokeGateway_ccipReceive_invalidSender() public {
     bytes32 wrongSender = address(0x999).toBytes32();
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(EVERCLEAR_CCIP_SELECTOR),
       sender: abi.encode(wrongSender),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.prank(ccipMailbox);
@@ -673,12 +674,12 @@ contract SpokeGatewayV2Test is Test, Mocker {
     // Test receiving from an unmapped CCIP selector
     uint256 unmappedCCIPSelector = 888_888_888;
 
-    IGatewayV3.Any2EVMMessage memory ccipMessage = IGatewayV3.Any2EVMMessage({
+    ICCIP.Any2EVMMessage memory ccipMessage = ICCIP.Any2EVMMessage({
       messageId: keccak256('ccip_msg_id'),
       sourceChainSelector: uint64(unmappedCCIPSelector),
       sender: abi.encode(hubGateway),
       data: abi.encode('test'),
-      destTokenAmounts: new IGatewayV3.EVMTokenAmount[](0)
+      destTokenAmounts: new ICCIP.EVMTokenAmount[](0)
     });
 
     vm.prank(ccipMailbox);

@@ -6,47 +6,6 @@ import {IMailbox} from '@hyperlane/interfaces/IMailbox.sol';
 import {IMessageReceiver} from 'interfaces/common/IMessageReceiver.sol';
 
 interface IGatewayV3 {
-  /// @dev RMN depends on this struct, if changing, please notify the RMN maintainers.
-  struct EVMTokenAmount {
-    address token; // token address on the local chain.
-    uint256 amount; // Amount of tokens.
-  }
-
-  struct Any2EVMMessage {
-    bytes32 messageId; // MessageId corresponding to ccipSend on source.
-    uint64 sourceChainSelector; // Source chain selector.
-    bytes sender; // abi.decode(sender) if coming from an EVM chain.
-    bytes data; // payload sent in original message.
-    EVMTokenAmount[] destTokenAmounts; // Tokens and their amounts in their destination chain representation.
-  }
-
-  // If extraArgs is empty bytes, the default is 200k gas limit.
-  struct EVM2AnyMessage {
-    bytes receiver; // abi.encode(receiver address) for dest EVM chains.
-    bytes data; // Data payload.
-    EVMTokenAmount[] tokenAmounts; // Token transfers.
-    address feeToken; // Address of feeToken. address(0) means you will send msg.value.
-    bytes extraArgs; // Populate this with _argsToBytes(EVMExtraArgsV2).
-  }
-
-  struct SVMExtraArgsV1 {
-    uint32 computeUnits;
-    uint64 accountIsWritableBitmap;
-    bool allowOutOfOrderExecution;
-    bytes32 tokenReceiver;
-    bytes32[] accounts;
-  }
-
-  /// @param gasLimit: gas limit for the callback on the destination chain.
-  /// @param allowOutOfOrderExecution: if true, it indicates that the message can be executed in any order relative to
-  /// other messages from the same sender. This value's default varies by chain. On some chains, a particular value is
-  /// enforced, meaning if the expected value is not set, the message request will revert.
-  /// @dev Fully compatible with the previously existing EVMExtraArgsV2.
-  struct GenericExtraArgsV2 {
-    uint256 gasLimit;
-    bool allowOutOfOrderExecution;
-  }
-
   /*///////////////////////////////////////////////////////////////
                               EVENTS
   //////////////////////////////////////////////////////////////*/
@@ -100,6 +59,20 @@ interface IGatewayV3 {
    * @param _newProver The new Polymer prover address
    */
   event PolymerProverUpdated(address _oldProver, address _newProver);
+
+  /**
+   * @notice Emitted when the Solana accounts are updated
+   * @param _oldAccounts The old list of Solana accounts
+   * @param _newAccounts The new list of Solana accounts
+   */
+  event SolanaAccountsUpdated(bytes32[] _oldAccounts, bytes32[] _newAccounts);
+
+  /**
+   * @notice Emitted when the Solana bitmap is updated
+   * @param _oldBitmap The old Solana bitmap
+   * @param _newBitmap The new Solana bitmap
+   */
+  event SolanaBitmapUpdated(uint64 _oldBitmap, uint64 _newBitmap);
 
   /**
    * @notice Emitted when the CCIP mappings are updated
@@ -208,6 +181,23 @@ interface IGatewayV3 {
    */
   function updateSecurityModule(
     address _securityModule
+  ) external;
+
+  /**
+   * @notice updates the Solana accounts used for CCIP messages
+   * @param _accounts The new Solana accounts
+   */
+  function updateSolanaAccounts(
+    bytes32[] calldata _accounts
+  ) external;
+
+  /**
+   * @notice updates the Solana bitmap used for CCIP messages
+   * @dev bitmask marking which of those accounts are writable by the program - ensure correct ordering and encode the bitmap properly
+   * @param _bitmap The new Solana bitmap
+   */
+  function updateSolanaBitmap(
+    uint64 _bitmap
   ) external;
 
   /*///////////////////////////////////////////////////////////////
