@@ -2,8 +2,16 @@ import { expect, mkBytes32 } from '@chimera-monorepo/utils';
 import {
   getDestinationIntentFilledQuery,
   getDestinationIntentsByIdsQuery,
+  getHubAssetUpdatesQuery,
   getHubIntentAddedQuery,
+  getHubIntentFilledQuery,
+  getHubMetaUpdatesQuery,
+  getHubTokenUpdatesQuery,
+  getInvoiceEnqueuedByIntentId,
+  getInvoiceEnqueuedQuery,
+  getOrdersByNonce,
   getOriginIntentAddedQuery,
+  getSpokeMetaUpdatesQuery,
   getSettlementEnqueuedQuery,
   getSettlementMessagesQuery,
   getSpokeMessagesQuery,
@@ -269,6 +277,91 @@ describe('Subgraph Adapter - queries', () => {
       const ret = getHubIntentAddedQuery(1, 2, 'desc');
       expect(ret).to.contain('txNonce_gt: 1');
       expect(ret).to.contain('blockNumber_lte: 2');
+    });
+  });
+
+  describe('getHubIntentFilledQuery', () => {
+    it('should include maxBlockNumber when provided', () => {
+      const ret = getHubIntentFilledQuery(1, 2, 'desc', 12);
+      expect(ret).to.contain('intentFillEvents');
+      expect(ret).to.contain('txNonce_gt: 1');
+      expect(ret).to.contain('blockNumber_lte: 2');
+      expect(ret).to.contain('first: 12');
+      expect(ret).to.contain('orderDirection: desc');
+    });
+
+    it('should omit maxBlockNumber when not provided', () => {
+      const ret = getHubIntentFilledQuery(1, undefined, 'asc', 12);
+      expect(ret).to.contain('intentFillEvents');
+      expect(ret).to.contain('txNonce_gt: 1');
+      expect(ret).to.not.contain('blockNumber_lte:');
+      expect(ret).to.contain('orderDirection: asc');
+    });
+  });
+
+  describe('hub meta update queries', () => {
+    it('getHubMetaUpdatesQuery should work', () => {
+      const ret = getHubMetaUpdatesQuery(100, 10, 'desc');
+      expect(ret).to.contain('hubMetaUpdates');
+      expect(ret).to.contain('blockNumber_gte: 100');
+      expect(ret).to.contain('first: 10');
+      expect(ret).to.contain('orderDirection: desc');
+    });
+
+    it('getSpokeMetaUpdatesQuery should work', () => {
+      const ret = getSpokeMetaUpdatesQuery(200, 20, 'asc');
+      expect(ret).to.contain('spokeMetaUpdates');
+      expect(ret).to.contain('blockNumber_gte: 200');
+      expect(ret).to.contain('first: 20');
+      expect(ret).to.contain('orderDirection: asc');
+    });
+  });
+
+  describe('hub asset/token update queries', () => {
+    it('getHubTokenUpdatesQuery should work', () => {
+      const ret = getHubTokenUpdatesQuery(300);
+      expect(ret).to.contain('hubTokenUpdates');
+      expect(ret).to.contain('blockNumber_gte: 300');
+      expect(ret).to.contain('first: 200');
+      expect(ret).to.contain('orderDirection: asc');
+    });
+
+    it('getHubAssetUpdatesQuery should work', () => {
+      const ret = getHubAssetUpdatesQuery(400, 50, 'desc');
+      expect(ret).to.contain('hubAssetUpdates');
+      expect(ret).to.contain('blockNumber_gte: 400');
+      expect(ret).to.contain('first: 50');
+      expect(ret).to.contain('orderDirection: desc');
+    });
+  });
+
+  describe('invoice queries', () => {
+    it('getInvoiceEnqueuedQuery should include maxBlockNumber when provided', () => {
+      const ret = getInvoiceEnqueuedQuery(1, 999, 'desc', 5);
+      expect(ret).to.contain('invoiceEnqueuedEvents');
+      expect(ret).to.contain('txNonce_gt: 1');
+      expect(ret).to.contain('blockNumber_lte: 999');
+      expect(ret).to.contain('first: 5');
+      expect(ret).to.contain('orderDirection: desc');
+    });
+
+    it('getInvoiceEnqueuedByIntentId should filter by intent id', () => {
+      const intentId = mkBytes32('0xintent');
+      const ret = getInvoiceEnqueuedByIntentId(intentId);
+      expect(ret).to.contain('invoiceEnqueuedEvents');
+      expect(ret).to.contain(`intent_: {id: "${intentId}"}`);
+      expect(ret).to.contain('first: 1');
+    });
+  });
+
+  describe('getOrdersByNonce', () => {
+    it('should include maxBlockNumber when provided', () => {
+      const ret = getOrdersByNonce(10, 123, 'desc', 7);
+      expect(ret).to.contain('orderCreateds');
+      expect(ret).to.contain('txNonce_gt: 10');
+      expect(ret).to.contain('blockNumber_lte: 123');
+      expect(ret).to.contain('first: 7');
+      expect(ret).to.contain('orderDirection: desc');
     });
   });
 });
