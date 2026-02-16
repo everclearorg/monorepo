@@ -9,6 +9,8 @@ use crate::{error::SpokeError, state::SpokeState};
 /// Old SpokeState body size (before CCIP fields). Must match pre-CCIP layout.
 /// Sum of: 1+1+4+4+32*2+8+8+32+1+32+1+32+33+1 = 222.
 const OLD_SPOKE_STATE_SIZE: usize = 222;
+/// Alternative old size: some deployments (e.g. staging) have 224-byte body (232 total).
+const OLD_SPOKE_STATE_SIZE_ALT: usize = 224;
 /// New fields appended: Option::None (1) x4 + MessagingProviderType::Hyperlane (1) + [0u8;32] (32) = 37
 const NEW_FIELDS_LEN: usize = 37;
 
@@ -23,11 +25,13 @@ pub fn migrate_spoke_state(ctx: Context<MigrateSpokeState>) -> Result<()> {
 
     let account_data = spoke_state_info.data.borrow();
     let current_size = account_data.len();
-    let expected_old_size = 8 + OLD_SPOKE_STATE_SIZE;
+    let expected_old_size_1 = 8 + OLD_SPOKE_STATE_SIZE;
+    let expected_old_size_2 = 8 + OLD_SPOKE_STATE_SIZE_ALT;
     require!(
-        current_size == expected_old_size,
+        current_size == expected_old_size_1 || current_size == expected_old_size_2,
         SpokeError::InvalidArgument
     );
+    let start = current_size;
 
     // Owner is at offset 8 + 1 + 1 + 4 + 4 + 32 + 32 + 8 + 8 = 98 (see SpokeState field order)
     const OWNER_OFFSET: usize = 8 + 1 + 1 + 4 + 4 + 32 + 32 + 8 + 8;
@@ -69,13 +73,16 @@ pub fn migrate_spoke_state(ctx: Context<MigrateSpokeState>) -> Result<()> {
 
     let mut data_mut = spoke_state_info.data.borrow_mut();
     // Append new fields: 4x Option::None (1 byte each) + MessagingProviderType::Hyperlane (0) + [0u8;32]
-    let start = expected_old_size;
+    // When old size is 232, we only have 267 - 232 = 35 new bytes (realloc zeroes them); we write the 5 discriminators and the rest stay zero.
     data_mut[start] = 0; // ccip_router: None
     data_mut[start + 1] = 0; // ccip_offramp: None
     data_mut[start + 2] = 0; // ccip_chain_selector: None
     data_mut[start + 3] = 0; // everclear_ccip_chain_selector: None
     data_mut[start + 4] = 0; // messaging_provider: Hyperlane
-    data_mut[start + 5..start + NEW_FIELDS_LEN].fill(0); // everclear_gateway [0u8;32]
+    let rest_len = (start + NEW_FIELDS_LEN).saturating_sub(start + 5).min(new_size.saturating_sub(start + 5));
+    if rest_len > 0 {
+        data_mut[start + 5..start + 5 + rest_len].fill(0); // everclear_gateway (partial if 232→267)
+    }
 
     Ok(())
 }

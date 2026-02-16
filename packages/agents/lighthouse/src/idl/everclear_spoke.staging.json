@@ -8,6 +8,238 @@
   },
   "instructions": [
     {
+      "name": "ccip_receive",
+      "docs": [
+        "Receive a cross-chain message via CCIP.",
+        "Called via CPI from CCIP OffRamp program."
+      ],
+      "discriminator": [
+        11,
+        244,
+        9,
+        249,
+        44,
+        83,
+        47,
+        245
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "offramp_program"
+            }
+          }
+        },
+        {
+          "name": "offramp_program"
+        },
+        {
+          "name": "allowed_offramp",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  108,
+                  108,
+                  111,
+                  119,
+                  101,
+                  100,
+                  95,
+                  111,
+                  102,
+                  102,
+                  114,
+                  97,
+                  109,
+                  112
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "message.source_chain_selector"
+              },
+              {
+                "kind": "account",
+                "path": "offramp_program"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "spoke_state.ccip_router",
+              "account": "SpokeState"
+            }
+          }
+        },
+        {
+          "name": "external_execution_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  101,
+                  114,
+                  110,
+                  97,
+                  108,
+                  95,
+                  101,
+                  120,
+                  101,
+                  99,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "spoke_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "intent_status_pda",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "pda_payer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  114,
+                  99,
+                  108,
+                  101,
+                  97,
+                  114,
+                  95,
+                  115,
+                  112,
+                  111,
+                  107,
+                  101
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  45
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  100,
+                  97,
+                  95,
+                  112,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "message",
+          "type": {
+            "defined": {
+              "name": "Any2SVMMessage"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "fill_intent",
       "docs": [
         "Fills a new intent.",
@@ -1041,6 +1273,39 @@
       ]
     },
     {
+      "name": "migrate_spoke_state",
+      "docs": [
+        "Migrate SpokeState PDA to new layout (adds CCIP fields). Call once per deployment after upgrade.",
+        "Only the owner can run this. Safe to run only on accounts that still have the old layout."
+      ],
+      "discriminator": [
+        57,
+        49,
+        198,
+        20,
+        162,
+        35,
+        84,
+        28
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "new_intent",
       "docs": [
         "Create a new intent.",
@@ -1670,6 +1935,82 @@
       "args": []
     },
     {
+      "name": "rollback_to_hyperlane",
+      "discriminator": [
+        48,
+        59,
+        183,
+        238,
+        71,
+        236,
+        115,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "settle_delivered_intent",
       "discriminator": [
         106,
@@ -1763,6 +2104,108 @@
             "defined": {
               "name": "SettleDeliveredIntentInstruction"
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "switch_to_ccip",
+      "discriminator": [
+        94,
+        212,
+        224,
+        136,
+        1,
+        215,
+        194,
+        214
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "ccip_router",
+          "type": "pubkey"
+        },
+        {
+          "name": "ccip_offramp",
+          "type": "pubkey"
+        },
+        {
+          "name": "ccip_chain_selector",
+          "type": "u64"
+        },
+        {
+          "name": "everclear_ccip_chain_selector",
+          "type": "u64"
+        },
+        {
+          "name": "everclear_gateway",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
           }
         }
       ]
@@ -3162,6 +3605,19 @@
       ]
     },
     {
+      "name": "MessagingProviderSwitchedEvent",
+      "discriminator": [
+        62,
+        53,
+        222,
+        112,
+        47,
+        129,
+        232,
+        14
+      ]
+    },
+    {
       "name": "OrderCreated",
       "discriminator": [
         224,
@@ -3508,6 +3964,45 @@
     }
   ],
   "types": [
+    {
+      "name": "Any2SVMMessage",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "message_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "source_chain_selector",
+            "type": "u64"
+          },
+          {
+            "name": "sender",
+            "type": "bytes"
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          },
+          {
+            "name": "token_amounts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "TokenAmount"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "EVMIntent",
       "docs": [
@@ -4246,6 +4741,32 @@
       }
     },
     {
+      "name": "MessagingProviderSwitchedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "provider",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MessagingProviderType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Hyperlane"
+          },
+          {
+            "name": "CCIP"
+          }
+        ]
+      }
+    },
+    {
       "name": "OrderCreated",
       "type": {
         "kind": "struct",
@@ -4606,6 +5127,63 @@
           {
             "name": "vault_authority_bump",
             "type": "u8"
+          },
+          {
+            "name": "ccip_router",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "ccip_offramp",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "ccip_chain_selector",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "everclear_ccip_chain_selector",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "messaging_provider",
+            "type": {
+              "defined": {
+                "name": "MessagingProviderType"
+              }
+            }
+          },
+          {
+            "name": "everclear_gateway",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenAmount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
           }
         ]
       }
