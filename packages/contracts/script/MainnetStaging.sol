@@ -26,7 +26,7 @@ abstract contract DefaultValues {
   ///////////////////// ACCOUNTS /////////////////////////
   address public constant OWNER = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
   address public constant ADMIN = 0xbBc0a29458eD4b2d489F2B564fE482C9086006F6;
-  address public constant LIGHTHOUSE = 0x68F44CD6b4cd9c4F723E00b1734E667bfaF72042;
+  address public constant LIGHTHOUSE = 0x33196A24853454b6f247e3726b7d810551B31748;
   address public constant WATCHTOWER = 0xc687BadC2CD8Da70eCACC748D6c27D06115a7de6;
   address public constant ASSET_MANAGER = 0xF47aA74BDe8eB56674748ba9D7090abf7447c747;
   address public constant ROUTER = 0x340c6F9E08CD50208d036a0BbCe6e244882B0E78;
