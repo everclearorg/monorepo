@@ -28,7 +28,7 @@ data "aws_region" "current" {}
 
 locals {
   account_id     = data.aws_caller_identity.current.account_id
-  repository_url_prefix = "${local.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/"
+  repository_url_prefix = "${local.account_id}.dkr.ecr.${data.aws_region.current.id}.amazonaws.com/"
 }
 
 module "centralised_message_queue" {
