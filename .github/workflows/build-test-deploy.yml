@@ -150,7 +150,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build -f docker/relayer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false --sbom=false -f docker/relayer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
@@ -188,7 +188,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build -f docker/watchtower/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false --sbom=false -f docker/watchtower/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
@@ -226,7 +226,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build -f docker/lighthouse/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false --sbom=false -f docker/lighthouse/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
@@ -264,7 +264,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build -f docker/cartographer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false --sbom=false -f docker/cartographer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
@@ -302,7 +302,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build -f docker/monitor/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false --sbom=false -f docker/monitor/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
@@ -340,7 +340,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build -f docker/monitor/poller/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false --sbom=false -f docker/monitor/poller/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
