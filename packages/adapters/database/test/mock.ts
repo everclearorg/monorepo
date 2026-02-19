@@ -14,6 +14,8 @@ import {
   SettlementIntent,
   TSettlementMessageType,
   Token,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   mkAddress,
   mkBytes32,
   mkHash,
@@ -395,6 +397,44 @@ export const createToken = (overrides: Partial<Token> = {}): Token => ({
   maxDiscountBps: 100,
   discountPerEpoch: 100,
   prioritizedStrategy: 'DEFAULT',
+  ...overrides,
+});
+
+export const createHubTokenUpdateLog = (overrides: Partial<HubTokenUpdateLog> = {}): HubTokenUpdateLog => ({
+  id: mkHash('0xtoken-update-1'),
+  domain: '1339',
+  tickerHash: mkBytes32('0xticker'),
+  kind: 'TOKEN_CONFIGS_SET',
+  feeRecipients: [mkAddress('0xaaaa')],
+  feeAmounts: ['10', '20'],
+  maxDiscountBps: 100,
+  discountPerEpoch: 5,
+  prioritizedStrategy: 'DEFAULT',
+  transactionHash: mkHash('0xtx'),
+  timestamp: Math.floor(Date.now() / 1000),
+  blockNumber: 123,
+  txOrigin: mkAddress('0x123'),
+  txNonce: 1,
+  ...overrides,
+});
+
+export const createHubAssetUpdateLog = (overrides: Partial<HubAssetUpdateLog> = {}): HubAssetUpdateLog => ({
+  id: mkHash('0xasset-update-1'),
+  domain: '1339',
+  assetId: mkBytes32('0xasset'),
+  tokenId: mkBytes32('0xticker'),
+  tickerHash: mkBytes32('0xticker'),
+  assetDomain: '1337',
+  kind: 'ASSET_CONFIG_SET',
+  assetHash: mkBytes32('0xasset-hash'),
+  adopted: mkAddress('0x456'),
+  approval: true,
+  strategy: 'DEFAULT',
+  transactionHash: mkHash('0xtx2'),
+  timestamp: Math.floor(Date.now() / 1000),
+  blockNumber: 456,
+  txOrigin: mkAddress('0x789'),
+  txNonce: 2,
   ...overrides,
 });
 

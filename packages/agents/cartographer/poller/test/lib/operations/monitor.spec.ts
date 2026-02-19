@@ -9,6 +9,8 @@ import {
 } from '../../../src/lib/operations';
 import {
   HubMeta,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   Message,
   ProtocolUpdateLog,
   SpokeMeta,
@@ -255,6 +257,88 @@ describe('Monitor operations', () => {
         'spoke_meta_log_block_1337',
         200,
       );
+    });
+
+    it('saves hub token + asset update logs and advances checkpoints', async () => {
+      // No meta updates anywhere
+      const getSpokeMetaUpdates = mockAppContext.adapters.subgraph.getSpokeMetaUpdates as SinonStub;
+      getSpokeMetaUpdates.onCall(0).resolves([]);
+      getSpokeMetaUpdates.onCall(1).resolves([]);
+      (mockAppContext.adapters.subgraph.getHubMetaUpdates as SinonStub).resolves([]);
+
+      const tokenUpdate: HubTokenUpdateLog = {
+        id: 'hub-token-log-1',
+        domain: mockAppContext.config.hub.domain,
+        tickerHash: '0xticker',
+        kind: 'TOKEN_CONFIGS_SET',
+        feeRecipients: ['0xaaa'],
+        feeAmounts: ['1', '2'],
+        maxDiscountBps: 100,
+        discountPerEpoch: 5,
+        prioritizedStrategy: 'DEFAULT',
+        transactionHash: '0xtx',
+        timestamp: 1,
+        blockNumber: 111,
+        txOrigin: '0x1',
+        txNonce: 1,
+      };
+      const assetUpdate: HubAssetUpdateLog = {
+        id: 'hub-asset-log-1',
+        domain: mockAppContext.config.hub.domain,
+        assetId: '0xasset',
+        tokenId: '0xticker',
+        tickerHash: '0xticker',
+        assetDomain: '1337',
+        kind: 'ASSET_CONFIG_SET',
+        assetHash: '0xhash',
+        adopted: '0xadopted',
+        approval: true,
+        strategy: 'DEFAULT',
+        transactionHash: '0xtx2',
+        timestamp: 2,
+        blockNumber: 222,
+        txOrigin: '0x2',
+        txNonce: 2,
+      };
+
+      (mockAppContext.adapters.subgraph.getHubTokenUpdates as SinonStub).resolves([tokenUpdate]);
+      (mockAppContext.adapters.subgraph.getHubAssetUpdates as SinonStub).resolves([assetUpdate]);
+
+      // Start checkpoints at 0
+      (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
+
+      await updateProtocolUpdateLogs();
+
+      expect(mockAppContext.adapters.database.saveHubTokenUpdateLogs as SinonStub).to.have.been.calledOnceWith([
+        tokenUpdate,
+      ]);
+      expect(mockAppContext.adapters.database.saveHubAssetUpdateLogs as SinonStub).to.have.been.calledOnceWith([
+        assetUpdate,
+      ]);
+
+      // Checkpoints advanced to max block per log type
+      expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).to.have.been.calledWith(
+        'hub_token_log_block',
+        111,
+      );
+      expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).to.have.been.calledWith(
+        'hub_asset_log_block',
+        222,
+      );
+    });
+
+    it('does not save hub token/asset logs when none found', async () => {
+      const getSpokeMetaUpdates = mockAppContext.adapters.subgraph.getSpokeMetaUpdates as SinonStub;
+      getSpokeMetaUpdates.resolves([]);
+      (mockAppContext.adapters.subgraph.getHubMetaUpdates as SinonStub).resolves([]);
+      (mockAppContext.adapters.subgraph.getHubTokenUpdates as SinonStub).resolves([]);
+      (mockAppContext.adapters.subgraph.getHubAssetUpdates as SinonStub).resolves([]);
+      (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
+
+      await updateProtocolUpdateLogs();
+
+      expect(mockAppContext.adapters.database.saveHubTokenUpdateLogs as SinonStub).to.not.have.been.called;
+      expect(mockAppContext.adapters.database.saveHubAssetUpdateLogs as SinonStub).to.not.have.been.called;
     });
   });
 
