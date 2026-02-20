@@ -1,5 +1,13 @@
 import { stub, restore, createStubInstance, SinonStubbedInstance } from 'sinon';
-import { expect, mkBytes32, OriginIntent, DestinationIntent } from '@chimera-monorepo/utils';
+import {
+  expect,
+  mkBytes32,
+  OriginIntent,
+  DestinationIntent,
+  ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
+} from '@chimera-monorepo/utils';
 import { SubgraphReader, SubgraphQueryMetaParams } from '../src';
 import { GraphReader } from '../src/graph';
 import { EnvioReader } from '../src/envio';
@@ -254,6 +262,126 @@ describe('SubgraphReader (Composite)', () => {
       expect(result[1].length).to.be.eq(3); // asset1, asset2, asset3 (deduplicated)
       // Should prefer GraphReader results for duplicates
       expect(result[0].find((t: any) => t.id === 'token2')).to.equal(graphTokens[1]);
+    });
+  });
+
+  describe('#getHubMetaUpdates', () => {
+    it('should merge results from both readers and deduplicate by id (prefer GraphReader)', async () => {
+      const graphUpdate2: ProtocolUpdateLog = {
+        id: 'hub-meta-2',
+        domain,
+        chainId: domain,
+        event: 'PAUSED',
+        key: 'paused',
+        updated: 'True',
+        transactionHash: mkBytes32('0xtx'),
+        timestamp: 1,
+        blockNumber: 10,
+        txOrigin: mkBytes32('0xorigin'),
+        txNonce: 1,
+      };
+      const graphUpdates: ProtocolUpdateLog[] = [
+        {
+          ...graphUpdate2,
+          id: 'hub-meta-1',
+        },
+        graphUpdate2,
+      ];
+      const envioDupUpdate2: ProtocolUpdateLog = { ...graphUpdate2 }; // same id, different object
+      const envioUpdates: ProtocolUpdateLog[] = [envioDupUpdate2, { ...graphUpdate2, id: 'hub-meta-3' }];
+
+      graphReader.getHubMetaUpdates.resolves(graphUpdates);
+      envioReader.getHubMetaUpdates.resolves(envioUpdates);
+
+      const result = await reader.getHubMetaUpdates(domain, 0);
+      expect(result.length).to.equal(3);
+      expect(result.find((u) => u.id === 'hub-meta-2')).to.equal(graphUpdate2);
+    });
+  });
+
+  describe('#getSpokeMetaUpdates', () => {
+    it('should handle one reader failing and still return results', async () => {
+      const graphUpdates: ProtocolUpdateLog[] = [
+        {
+          id: 'spoke-meta-1',
+          domain,
+          chainId: domain,
+          event: 'GATEWAY_UPDATED',
+          key: 'gateway',
+          updated: mkBytes32('0xgw'),
+          transactionHash: mkBytes32('0xtx'),
+          timestamp: 1,
+          blockNumber: 10,
+          txOrigin: mkBytes32('0xorigin'),
+          txNonce: 1,
+        },
+      ];
+      graphReader.getSpokeMetaUpdates.resolves(graphUpdates);
+      envioReader.getSpokeMetaUpdates.rejects(new Error('error'));
+
+      const result = await reader.getSpokeMetaUpdates(domain, 0);
+      expect(result).to.deep.equal(graphUpdates);
+    });
+  });
+
+  describe('#getHubTokenUpdates', () => {
+    it('should merge results from both readers and deduplicate by id (prefer GraphReader)', async () => {
+      const graphUpdate2: HubTokenUpdateLog = {
+        id: 'hub-token-2',
+        domain,
+        tickerHash: mkBytes32('0xticker'),
+        kind: 'TOKEN_CONFIGS_SET',
+        feeRecipients: [],
+        feeAmounts: [],
+        maxDiscountBps: 0,
+        discountPerEpoch: 0,
+        prioritizedStrategy: 'DEFAULT',
+        transactionHash: mkBytes32('0xtx'),
+        timestamp: 1,
+        blockNumber: 10,
+        txOrigin: mkBytes32('0xorigin'),
+        txNonce: 1,
+      };
+      const graphUpdates: HubTokenUpdateLog[] = [{ ...graphUpdate2, id: 'hub-token-1' }, graphUpdate2];
+      const envioDupUpdate2: HubTokenUpdateLog = { ...graphUpdate2 }; // same id, different object
+      const envioUpdates: HubTokenUpdateLog[] = [envioDupUpdate2, { ...graphUpdate2, id: 'hub-token-3' }];
+
+      graphReader.getHubTokenUpdates.resolves(graphUpdates);
+      envioReader.getHubTokenUpdates.resolves(envioUpdates);
+
+      const result = await reader.getHubTokenUpdates(domain, 0);
+      expect(result.length).to.equal(3);
+      expect(result.find((u) => u.id === 'hub-token-2')).to.equal(graphUpdate2);
+    });
+  });
+
+  describe('#getHubAssetUpdates', () => {
+    it('should handle one reader failing and still return results', async () => {
+      const graphUpdates: HubAssetUpdateLog[] = [
+        {
+          id: 'hub-asset-1',
+          domain,
+          assetId: mkBytes32('0xasset'),
+          tokenId: mkBytes32('0xticker'),
+          tickerHash: mkBytes32('0xticker'),
+          assetDomain: '1338',
+          kind: 'ASSET_CONFIG_SET',
+          assetHash: mkBytes32('0xhash'),
+          adopted: mkBytes32('0xadopted'),
+          approval: true,
+          strategy: 'DEFAULT',
+          transactionHash: mkBytes32('0xtx'),
+          timestamp: 1,
+          blockNumber: 10,
+          txOrigin: mkBytes32('0xorigin'),
+          txNonce: 1,
+        },
+      ];
+      graphReader.getHubAssetUpdates.resolves(graphUpdates);
+      envioReader.getHubAssetUpdates.rejects(new Error('error'));
+
+      const result = await reader.getHubAssetUpdates(domain, 0);
+      expect(result).to.deep.equal(graphUpdates);
     });
   });
 

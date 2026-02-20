@@ -19,6 +19,8 @@ export const createMockDatabase = (): Database => {
     saveHubIntents: stub().resolves(),
     saveMessages: stub().resolves(),
     saveProtocolUpdateLogs: stub().resolves(),
+    saveHubTokenUpdateLogs: stub().resolves(),
+    saveHubAssetUpdateLogs: stub().resolves(),
     saveHubMeta: stub().resolves(),
     saveSpokeMeta: stub().resolves(),
     saveQueues: stub().resolves(),
@@ -139,7 +141,11 @@ export const createAppContext = (overrides: Partial<CartographerConfig> = {}): A
       ...overrides,
     }) as CartographerConfig,
     adapters: {
-      subgraph: createStubInstance(SubgraphReader),
+      subgraph: createStubInstance(SubgraphReader, {
+        // Ensure new hub update log methods have safe defaults
+        getHubTokenUpdates: stub().resolves([]),
+        getHubAssetUpdates: stub().resolves([]),
+      }),
       chainreader: chainreader,
       database: createMockDatabase() as Database,
     },

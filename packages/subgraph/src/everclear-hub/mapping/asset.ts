@@ -6,7 +6,8 @@ import {
   PrioritizedStrategySet,
   DiscountPerEpochSet,
 } from '../../../generated/EverclearHub/EverclearHub';
-import { Asset, Token } from '../../../generated/schema';
+import { Asset, HubAssetUpdate, HubTokenUpdate, Token } from '../../../generated/schema';
+import { generateIdFromTx, generateTxNonce } from '../../common';
 
 enum EverclearStrategy {
   DEFAULT,
@@ -44,6 +45,106 @@ function getOrCreateToken(id: Bytes): Token {
   return token;
 }
 
+/**
+ * Logs a token update event on the hub.
+ */
+function logHubTokenUpdate(
+  kind: string,
+  event: ethereum.Event,
+  token: Token,
+): void {
+  logHubTokenUpdateWithId(kind, event, token, generateIdFromTx(event));
+}
+
+/**
+ * Logs a token update event on the hub with a custom ID.
+ * Use this when you need multiple logs in one transaction (e.g., batch operations).
+ */
+function logHubTokenUpdateWithId(
+  kind: string,
+  event: ethereum.Event,
+  token: Token,
+  id: Bytes,
+): void {
+  const log = new HubTokenUpdate(id);
+
+  log.kind = kind;
+  log.token = token.id;
+
+  // Optional snapshots for richer history queries
+  if (token.feeRecipients != null) log.feeRecipients = token.feeRecipients;
+  if (token.feeAmounts != null) log.feeAmounts = token.feeAmounts;
+  log.maxDiscountBps = token.maxDiscountBps;
+  log.discountPerEpoch = token.discountPerEpoch;
+  log.prioritizedStrategy = token.prioritizedStrategy;
+
+  log.transactionHash = event.transaction.hash;
+  log.timestamp = event.block.timestamp;
+  log.blockNumber = event.block.number;
+  log.txOrigin = event.transaction.from;
+  log.txNonce = generateTxNonce(event);
+
+  log.save();
+}
+
+/**
+ * Logs an asset update event on the hub.
+ */
+function logHubAssetUpdate(
+  kind: string,
+  event: ethereum.Event,
+  asset: Asset,
+  tokenId: Bytes | null = null,
+  tickerHash: Bytes | null = null,
+  domain: BigInt | null = null,
+): void {
+  logHubAssetUpdateWithId(
+    kind,
+    event,
+    asset,
+    tokenId,
+    tickerHash,
+    domain,
+    generateIdFromTx(event),
+  );
+}
+
+/**
+ * Logs an asset update event on the hub with a custom ID.
+ * Use this when you need multiple logs in one transaction (e.g., batch operations).
+ */
+function logHubAssetUpdateWithId(
+  kind: string,
+  event: ethereum.Event,
+  asset: Asset,
+  tokenId: Bytes | null,
+  tickerHash: Bytes | null,
+  domain: BigInt | null,
+  id: Bytes,
+): void {
+  const log = new HubAssetUpdate(id);
+
+  log.kind = kind;
+  log.asset = asset.id;
+  log.token = tokenId;
+  log.tickerHash = tickerHash;
+  log.domain = domain;
+
+  // Optional snapshots for richer history queries
+  log.assetHash = asset.assetHash;
+  log.adopted = asset.adopted;
+  log.approval = asset.approval;
+  log.strategy = asset.strategy;
+
+  log.transactionHash = event.transaction.hash;
+  log.timestamp = event.block.timestamp;
+  log.blockNumber = event.block.number;
+  log.txOrigin = event.transaction.from;
+  log.txNonce = generateTxNonce(event);
+
+  log.save();
+}
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 function getAssetHashFromAddress(address: Bytes, domain: BigInt): Bytes {
   const params = new ethereum.Tuple();
@@ -70,6 +171,15 @@ export function handleAssetConfigSet(event: AssetConfigSet): void {
   asset.strategy = EverclearStrategyStrings[event.params._config.strategy];
 
   asset.save();
+
+  logHubAssetUpdate(
+    'ASSET_CONFIG_SET',
+    event,
+    asset,
+    asset.token,
+    event.params._config.tickerHash,
+    event.params._config.domain,
+  );
 }
 
 /**
@@ -96,6 +206,9 @@ export function handleTokenConfigsSet(event: TokenConfigsSet): void {
     token.prioritizedStrategy = EverclearStrategyStrings[config.prioritizedStrategy];
     token.save();
 
+    const tokenLogId = generateIdFromTx(event).concatI32(i);
+    logHubTokenUpdateWithId('TOKEN_CONFIGS_SET', event, token, tokenLogId);
+
     for (let j = 0; j < config.adoptedForAssets.length; j++) {
       const assetId = getAssetHashFromAddress(config.tickerHash, config.adoptedForAssets[j].domain);
       const asset = getOrCreateAsset(assetId, config.tickerHash);
@@ -106,6 +219,17 @@ export function handleTokenConfigsSet(event: TokenConfigsSet): void {
       asset.strategy = EverclearStrategyStrings[config.adoptedForAssets[j].strategy];
 
       asset.save();
+
+      const assetLogId = generateIdFromTx(event).concatI32(i).concatI32(j);
+      logHubAssetUpdateWithId(
+        'TOKEN_CONFIGS_SET_ASSET',
+        event,
+        asset,
+        token.id,
+        config.tickerHash,
+        config.adoptedForAssets[j].domain,
+        assetLogId,
+      );
     }
   }
 }
@@ -119,6 +243,8 @@ export function handleMaxDiscountDbpsSet(event: MaxDiscountDbpsSet): void {
   const config = getOrCreateToken(event.params._tickerHash);
   config.maxDiscountBps = BigInt.fromI32(event.params._newMaxDiscountDbps);
   config.save();
+
+  logHubTokenUpdate('MAX_DISCOUNT_DBPS_SET', event, config);
 }
 
 /**
@@ -130,6 +256,8 @@ export function handlePrioritizedStrategySet(event: PrioritizedStrategySet): voi
   const config = getOrCreateToken(event.params._tickerHash);
   config.prioritizedStrategy = EverclearStrategyStrings[event.params._strategy];
   config.save();
+
+  logHubTokenUpdate('PRIORITIZED_STRATEGY_SET', event, config);
 }
 
 /**
@@ -141,4 +269,6 @@ export function handleDiscountPerEpochSet(event: DiscountPerEpochSet): void {
   const config = getOrCreateToken(event.params._tickerHash);
   config.discountPerEpoch = BigInt.fromI32(event.params._newDiscountPerEpoch);
   config.save();
+
+  logHubTokenUpdate('DISCOUNT_PER_EPOCH_SET', event, config);
 }
