@@ -205,29 +205,69 @@ export const updateProtocolUpdateLogs = async () => {
   const domains = [...spokeDomains, config.hub.domain];
   for (const domain of domains) {
     const isHub = domain === config.hub.domain;
-    const checkpointKey = isHub ? 'hub_meta_log_block' : `spoke_meta_log_block_${domain}`;
-    const lastBlock = await database.getCheckPoint(checkpointKey);
-    const updates = isHub
-      ? await subgraph.getHubMetaUpdates(domain, lastBlock)
-      : await subgraph.getSpokeMetaUpdates(domain, lastBlock);
+    // 1) Meta update logs (hub + spoke)
+    const metaCheckpointKey = isHub ? 'hub_meta_log_block' : `spoke_meta_log_block_${domain}`;
+    const metaLastBlock = await database.getCheckPoint(metaCheckpointKey);
+    const metaUpdates = isHub
+      ? await subgraph.getHubMetaUpdates(domain, metaLastBlock)
+      : await subgraph.getSpokeMetaUpdates(domain, metaLastBlock);
 
-    if (updates.length === 0) {
+    if (metaUpdates.length > 0) {
+      const latestBlock = Math.max(metaLastBlock, getMaxBlockNumber(metaUpdates));
+      await database.saveProtocolUpdateLogs(metaUpdates);
+      await database.saveCheckPoint(metaCheckpointKey, latestBlock);
+      logger.debug('Saved meta update logs', requestContext, methodContext, {
+        domain,
+        count: metaUpdates.length,
+        latestBlock,
+      });
+    } else {
       logger.debug('No meta updates found', requestContext, methodContext, {
         domain,
-        checkpoint: lastBlock,
+        checkpoint: metaLastBlock,
       });
-      continue;
     }
 
-    const latestBlock = Math.max(lastBlock, getMaxBlockNumber(updates));
-    await database.saveProtocolUpdateLogs(updates);
+    // 2) Hub token/asset update logs (hub only)
+    if (isHub) {
+      const tokenCheckpointKey = 'hub_token_log_block';
+      const tokenLastBlock = await database.getCheckPoint(tokenCheckpointKey);
+      const tokenUpdates = await subgraph.getHubTokenUpdates(domain, tokenLastBlock);
+      if (tokenUpdates.length > 0) {
+        const latestBlock = Math.max(tokenLastBlock, getMaxBlockNumber(tokenUpdates));
+        await database.saveHubTokenUpdateLogs(tokenUpdates);
+        await database.saveCheckPoint(tokenCheckpointKey, latestBlock);
+        logger.debug('Saved hub token update logs', requestContext, methodContext, {
+          domain,
+          count: tokenUpdates.length,
+          latestBlock,
+        });
+      } else {
+        logger.debug('No hub token updates found', requestContext, methodContext, {
+          domain,
+          checkpoint: tokenLastBlock,
+        });
+      }
 
-    await database.saveCheckPoint(checkpointKey, latestBlock);
-    logger.debug('Saved protocol update logs', requestContext, methodContext, {
-      domain,
-      count: updates.length,
-      latestBlock,
-    });
+      const assetCheckpointKey = 'hub_asset_log_block';
+      const assetLastBlock = await database.getCheckPoint(assetCheckpointKey);
+      const assetUpdates = await subgraph.getHubAssetUpdates(domain, assetLastBlock);
+      if (assetUpdates.length > 0) {
+        const latestBlock = Math.max(assetLastBlock, getMaxBlockNumber(assetUpdates));
+        await database.saveHubAssetUpdateLogs(assetUpdates);
+        await database.saveCheckPoint(assetCheckpointKey, latestBlock);
+        logger.debug('Saved hub asset update logs', requestContext, methodContext, {
+          domain,
+          count: assetUpdates.length,
+          latestBlock,
+        });
+      } else {
+        logger.debug('No hub asset updates found', requestContext, methodContext, {
+          domain,
+          checkpoint: assetLastBlock,
+        });
+      }
+    }
   }
 };
 

@@ -298,3 +298,53 @@ type HubMetaUpdate @entity(immutable: true) {
   txOrigin: Bytes!
   txNonce: BigInt!
 }
+
+# Generic tx log for any Token-updating event on the hub
+type HubTokenUpdate @entity(immutable: true) {
+  id: Bytes!
+  token: Token!
+
+  # High-level kind identifier, e.g. TOKEN_CONFIGS_SET, MAX_DISCOUNT_DBPS_SET
+  kind: String!
+
+  # Optional full snapshots (populated when available)
+  feeRecipients: [Bytes!]
+  feeAmounts: [BigInt!]
+  maxDiscountBps: BigInt
+  discountPerEpoch: BigInt
+  prioritizedStrategy: Strategy
+
+  # Transaction info
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}
+
+# Generic tx log for any Asset-updating event on the hub
+type HubAssetUpdate @entity(immutable: true) {
+  id: Bytes!
+  asset: Asset!
+
+  # Optional denormalized pointers for easier filtering
+  token: Token
+  tickerHash: Bytes
+  domain: BigInt
+
+  # High-level kind identifier, e.g. ASSET_CONFIG_SET, TOKEN_CONFIGS_SET_ASSET
+  kind: String!
+
+  # Optional full snapshots (populated when available)
+  assetHash: Bytes
+  adopted: Bytes
+  approval: Boolean
+  strategy: Strategy
+
+  # Transaction info
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes!
+  txNonce: BigInt!
+}

@@ -31,6 +31,8 @@ import {
   fromLockPosition,
   toProtocolUpdateLog,
   fromProtocolUpdateLogs,
+  toHubTokenUpdateLog,
+  toHubAssetUpdateLog,
   toHubMeta,
   fromHubMeta,
   toSpokeMeta,
@@ -49,6 +51,8 @@ import {
   createHubDeposit,
   createMerkleTree,
   createLockPosition,
+  createHubTokenUpdateLog,
+  createHubAssetUpdateLog,
 } from './mock';
 
 describe('Database Converters', () => {
@@ -1238,6 +1242,88 @@ describe('Database Converters', () => {
       const result = toProtocolUpdateLog(log as Parameters<typeof toProtocolUpdateLog>[0]);
 
       expect(result.chain_id).to.equal('1338');
+    });
+  });
+
+  describe('toHubTokenUpdateLog', () => {
+    it('should convert hub token update log to database format', () => {
+      const log = createHubTokenUpdateLog({
+        id: 'token-log-1',
+        domain: '1339',
+        tickerHash: '0xticker',
+        kind: 'MAX_DISCOUNT_DBPS_SET',
+        feeRecipients: ['0xaaa'],
+        feeAmounts: ['1', '2'],
+        maxDiscountBps: 777,
+        discountPerEpoch: 11,
+        prioritizedStrategy: 'DEFAULT',
+        transactionHash: '0xtx',
+        timestamp: 123,
+        blockNumber: 456,
+        txOrigin: '0xabc',
+        txNonce: 9,
+      });
+
+      const result = toHubTokenUpdateLog(log);
+      expect(result).to.deep.equal({
+        id: 'token-log-1',
+        domain: '1339',
+        ticker_hash: '0xticker',
+        kind: 'MAX_DISCOUNT_DBPS_SET',
+        fee_recipients: ['0xaaa'],
+        fee_amounts: ['1', '2'],
+        max_discount_bps: 777,
+        discount_per_epoch: 11,
+        prioritized_strategy: 'DEFAULT',
+        transaction_hash: '0xtx',
+        timestamp: 123,
+        block_number: 456,
+        tx_origin: '0xabc',
+        tx_nonce: 9,
+      });
+    });
+  });
+
+  describe('toHubAssetUpdateLog', () => {
+    it('should convert hub asset update log to database format', () => {
+      const log = createHubAssetUpdateLog({
+        id: 'asset-log-1',
+        domain: '1339',
+        assetId: '0xasset',
+        tokenId: '0xticker',
+        tickerHash: '0xticker',
+        assetDomain: '1337',
+        kind: 'ASSET_CONFIG_SET',
+        assetHash: '0xhash',
+        adopted: '0xadopted',
+        approval: true,
+        strategy: 'DEFAULT',
+        transactionHash: '0xtx2',
+        timestamp: 321,
+        blockNumber: 654,
+        txOrigin: '0xdef',
+        txNonce: 10,
+      });
+
+      const result = toHubAssetUpdateLog(log);
+      expect(result).to.deep.equal({
+        id: 'asset-log-1',
+        domain: '1339',
+        asset_id: '0xasset',
+        token_id: '0xticker',
+        ticker_hash: '0xticker',
+        asset_domain: '1337',
+        kind: 'ASSET_CONFIG_SET',
+        asset_hash: '0xhash',
+        adopted: '0xadopted',
+        approval: true,
+        strategy: 'DEFAULT',
+        transaction_hash: '0xtx2',
+        timestamp: 321,
+        block_number: 654,
+        tx_origin: '0xdef',
+        tx_nonce: 10,
+      });
     });
   });
 

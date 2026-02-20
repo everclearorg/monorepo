@@ -1,9 +1,14 @@
 import {
   DestinationIntent,
+  HubAssetUpdateLog,
   HubIntent,
+  HubMeta,
+  HubTokenUpdateLog,
   HyperlaneStatus,
   OriginIntent,
+  Order,
   ProtocolUpdateLog,
+  SpokeMeta,
   TIntentStatus,
   TMessageType,
   Token,
@@ -21,6 +26,11 @@ import {
   token,
   hubIntentFromSettleEnqueued,
   protocolUpdateLog,
+  hubTokenUpdateLog,
+  hubAssetUpdateLog,
+  hubMeta,
+  spokeMeta,
+  order,
   envioToOriginIntent,
   envioToDestinationIntent,
   StringToNumber,
@@ -40,6 +50,10 @@ import {
   SettlementMessageType,
   FeesEntity,
   OrderEntity,
+  HubTokenUpdateEntity,
+  HubAssetUpdateEntity,
+  HubMetaEntity,
+  SpokeMetaEntity,
 } from '../../src/lib/operations/entities';
 
 describe('Subgraph Adapter - parse', () => {
@@ -729,6 +743,285 @@ describe('Subgraph Adapter - parse', () => {
       expect(result!.destination).to.equal('1338');
       expect(result!.amountOut).to.equal('80');
       expect(result!.transactionHash).to.equal('0xfill');
+    });
+  });
+
+  describe('#hubTokenUpdateLog', () => {
+    it('should apply defaults when optional fields are missing', () => {
+      const entity: HubTokenUpdateEntity = {
+        id: mkBytes32('0xhubTokenUpdate'),
+        token: { id: mkBytes32('0xticker') },
+        kind: 'TOKEN_CONFIGS_SET',
+        transactionHash: mkBytes32('0xtx'),
+        timestamp: '10',
+        blockNumber: '20',
+        txOrigin: mkBytes32('0xorigin'),
+        txNonce: '3',
+      };
+
+      const parsed = hubTokenUpdateLog(domain, entity);
+      const expected: HubTokenUpdateLog = {
+        id: entity.id,
+        domain,
+        tickerHash: entity.token.id,
+        kind: entity.kind,
+        feeRecipients: [],
+        feeAmounts: [],
+        maxDiscountBps: 0,
+        discountPerEpoch: 0,
+        prioritizedStrategy: 'DEFAULT',
+        transactionHash: entity.transactionHash,
+        timestamp: 10,
+        blockNumber: 20,
+        txOrigin: entity.txOrigin,
+        txNonce: 3,
+      };
+      expect(parsed).to.deep.equal(expected);
+    });
+
+    it('should parse all fields when present', () => {
+      const entity: HubTokenUpdateEntity = {
+        id: mkBytes32('0xhubTokenUpdate2'),
+        token: { id: mkBytes32('0xticker2') },
+        kind: 'MAX_DISCOUNT_SET',
+        feeRecipients: [mkBytes32('0xfeeRecipient1')],
+        feeAmounts: ['1', '2'],
+        maxDiscountBps: '123',
+        discountPerEpoch: '7',
+        prioritizedStrategy: 'FAST',
+        transactionHash: mkBytes32('0xtx2'),
+        timestamp: '11',
+        blockNumber: '21',
+        txOrigin: mkBytes32('0xorigin2'),
+        txNonce: '4',
+      };
+
+      const parsed = hubTokenUpdateLog(domain, entity);
+      expect(parsed.feeRecipients).to.deep.equal(entity.feeRecipients);
+      expect(parsed.feeAmounts).to.deep.equal(entity.feeAmounts);
+      expect(parsed.maxDiscountBps).to.equal(123);
+      expect(parsed.discountPerEpoch).to.equal(7);
+      expect(parsed.prioritizedStrategy).to.equal('FAST');
+    });
+  });
+
+  describe('#hubAssetUpdateLog', () => {
+    it('should apply defaults for nullable fields', () => {
+      const entity: HubAssetUpdateEntity = {
+        id: mkBytes32('0xhubAssetUpdate'),
+        asset: { id: mkBytes32('0xasset') },
+        token: null,
+        tickerHash: null,
+        domain: null,
+        kind: 'ASSET_CONFIG_SET',
+        assetHash: null,
+        adopted: null,
+        approval: null,
+        strategy: null,
+        transactionHash: mkBytes32('0xtx'),
+        timestamp: '12',
+        blockNumber: '22',
+        txOrigin: mkBytes32('0xorigin'),
+        txNonce: '5',
+      };
+
+      const parsed = hubAssetUpdateLog(domain, entity);
+      const expected: HubAssetUpdateLog = {
+        id: entity.id,
+        domain,
+        tickerHash: '',
+        tokenId: undefined,
+        assetId: entity.asset.id,
+        assetDomain: '',
+        kind: entity.kind,
+        assetHash: '',
+        adopted: '',
+        approval: false,
+        strategy: '',
+        transactionHash: entity.transactionHash,
+        timestamp: 12,
+        blockNumber: 22,
+        txOrigin: entity.txOrigin,
+        txNonce: 5,
+      };
+      expect(parsed).to.deep.equal(expected);
+    });
+
+    it('should parse fields when present', () => {
+      const entity: HubAssetUpdateEntity = {
+        id: mkBytes32('0xhubAssetUpdate2'),
+        asset: { id: mkBytes32('0xasset2') },
+        token: { id: mkBytes32('0xticker2') },
+        tickerHash: mkBytes32('0xticker2'),
+        domain: '1338',
+        kind: 'ASSET_CONFIG_SET',
+        assetHash: mkBytes32('0xhash'),
+        adopted: mkBytes32('0xadopted'),
+        approval: true,
+        strategy: 'DEFAULT',
+        transactionHash: mkBytes32('0xtx2'),
+        timestamp: '13',
+        blockNumber: '23',
+        txOrigin: mkBytes32('0xorigin2'),
+        txNonce: '6',
+      };
+
+      const parsed = hubAssetUpdateLog(domain, entity);
+      expect(parsed.tokenId).to.equal(entity.token!.id);
+      expect(parsed.tickerHash).to.equal(entity.tickerHash);
+      expect(parsed.assetDomain).to.equal(entity.domain);
+      expect(parsed.approval).to.equal(true);
+    });
+  });
+
+  describe('#hubMeta', () => {
+    it('should map arrays when present', () => {
+      const entity: HubMetaEntity = {
+        id: mkBytes32('0xhubMeta'),
+        domain,
+        paused: false,
+        owner: mkBytes32('0xowner'),
+        proposedOwner: mkBytes32('0xproposed'),
+        proposedOwnershipTimestamp: '0',
+        gateway: mkBytes32('0xgateway'),
+        watchtower: mkBytes32('0xwatchtower'),
+        manager: mkBytes32('0xmanager'),
+        settler: mkBytes32('0xsettler'),
+        minSolverSupportedDomains: '1',
+        expiryTimeBuffer: '2',
+        discountPerEpoch: '3',
+        epochLength: '4',
+        mailbox: mkBytes32('0xmailbox'),
+        securityModule: mkBytes32('0xsec'),
+        supportedDomains: [{ domain: '1338', blockGasLimit: '123' }],
+        chainGateways: [{ chainId: '1338', gateway: mkBytes32('0xgw') }],
+        acceptanceDelay: '5',
+      };
+
+      const parsed = hubMeta(entity);
+      const expected: HubMeta = {
+        id: entity.id,
+        domain: entity.domain,
+        paused: entity.paused,
+        owner: entity.owner,
+        proposedOwner: entity.proposedOwner,
+        proposedOwnershipTimestamp: entity.proposedOwnershipTimestamp,
+        gateway: entity.gateway,
+        watchtower: entity.watchtower,
+        manager: entity.manager,
+        settler: entity.settler,
+        minSolverSupportedDomains: entity.minSolverSupportedDomains,
+        expiryTimeBuffer: entity.expiryTimeBuffer,
+        discountPerEpoch: entity.discountPerEpoch,
+        epochLength: entity.epochLength,
+        mailbox: entity.mailbox,
+        securityModule: entity.securityModule,
+        acceptanceDelay: entity.acceptanceDelay,
+        supportedDomains: [{ domain: '1338', blockGasLimit: '123' }],
+        chainGateways: [{ chainId: '1338', gateway: mkBytes32('0xgw') }],
+      };
+      expect(parsed).to.deep.equal(expected);
+    });
+
+    it('should allow supportedDomains/chainGateways to be missing', () => {
+      const entity = {
+        id: mkBytes32('0xhubMeta2'),
+        domain,
+      } as any as HubMetaEntity;
+
+      const parsed = hubMeta(entity);
+      expect(parsed.supportedDomains).to.equal(undefined);
+      expect(parsed.chainGateways).to.equal(undefined);
+    });
+  });
+
+  describe('#spokeMeta', () => {
+    it('should map moduleForStrategies when present', () => {
+      const entity: SpokeMetaEntity = {
+        id: mkBytes32('0xspokeMeta'),
+        domain,
+        paused: false,
+        gateway: mkBytes32('0xgateway'),
+        lighthouse: mkBytes32('0xlighthouse'),
+        messageReceiver: mkBytes32('0xreceiver'),
+        watchtower: mkBytes32('0xwatchtower'),
+        messageGasLimit: '1000',
+        feeAdapter: mkBytes32('0xfeeAdapter'),
+        feeAdapterRecipient: mkBytes32('0xfeeRecipient'),
+        fillSigner: mkBytes32('0xfillSigner'),
+        feeSigner: mkBytes32('0xfeeSigner'),
+        mailbox: mkBytes32('0xmailbox'),
+        securityModule: mkBytes32('0xsec'),
+        moduleForStrategies: [{ strategy: 'DEFAULT', module: mkBytes32('0xmodule') }],
+      };
+
+      const parsed = spokeMeta(entity);
+      const expected: SpokeMeta = {
+        id: entity.id,
+        domain: entity.domain,
+        paused: entity.paused,
+        gateway: entity.gateway,
+        lighthouse: entity.lighthouse,
+        messageReceiver: entity.messageReceiver,
+        watchtower: entity.watchtower,
+        messageGasLimit: entity.messageGasLimit,
+        feeAdapter: entity.feeAdapter,
+        feeAdapterRecipient: entity.feeAdapterRecipient,
+        fillSigner: entity.fillSigner,
+        feeSigner: entity.feeSigner,
+        mailbox: entity.mailbox,
+        securityModule: entity.securityModule,
+        moduleForStrategies: [{ strategy: 'DEFAULT', module: mkBytes32('0xmodule') }],
+      };
+      expect(parsed).to.deep.equal(expected);
+    });
+
+    it('should allow moduleForStrategies to be missing', () => {
+      const entity = {
+        id: mkBytes32('0xspokeMeta2'),
+        domain,
+      } as any as SpokeMetaEntity;
+
+      const parsed = spokeMeta(entity);
+      expect(parsed.moduleForStrategies).to.equal(undefined);
+    });
+  });
+
+  describe('#order', () => {
+    it('should parse order entity', () => {
+      const entity: OrderEntity = {
+        id: mkBytes32('0xorder'),
+        initiator: mkBytes32('0xinitiator'),
+        intents: [{ id: mkBytes32('0xintent1') }, { id: mkBytes32('0xintent2') }],
+        tokenFee: '10',
+        nativeFee: '20',
+        transactionHash: mkBytes32('0xtx'),
+        timestamp: 1,
+        gasPrice: '2',
+        gasLimit: '3',
+        blockNumber: 100,
+        txOrigin: mkBytes32('0xorigin'),
+        txNonce: 7,
+      };
+
+      const parsed = order(domain, entity);
+      const expected: Order & { domain: string } = {
+        domain,
+        id: entity.id,
+        autoId: 7,
+        intentIds: [mkBytes32('0xintent1'), mkBytes32('0xintent2')],
+        tokenFee: entity.tokenFee,
+        nativeFee: entity.nativeFee,
+        initiator: entity.initiator,
+        transactionHash: entity.transactionHash,
+        blockNumber: 100,
+        gasLimit: entity.gasLimit,
+        gasPrice: entity.gasPrice,
+        txOrigin: entity.txOrigin,
+        txNonce: 7,
+        timestamp: 1,
+      };
+      expect(parsed).to.deep.equal(expected);
     });
   });
 });

@@ -19,6 +19,8 @@ import {
   SpokeMeta,
   TIntentStatus,
   Token,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
 } from '@chimera-monorepo/utils';
 import { getHelpers } from '../lib/helpers';
 import { RuntimeError } from '../lib/errors';
@@ -215,6 +217,16 @@ export class EnvioReader implements ISubgraphReader {
   }
 
   public async getSpokeMetaUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    return [];
+  }
+
+  public async getHubTokenUpdates(_domain: string, _fromBlock: number): Promise<HubTokenUpdateLog[]> {
+    // Envio doesn't track hub token update logs
+    return [];
+  }
+
+  public async getHubAssetUpdates(_domain: string, _fromBlock: number): Promise<HubAssetUpdateLog[]> {
+    // Envio doesn't track hub asset update logs
     return [];
   }
 

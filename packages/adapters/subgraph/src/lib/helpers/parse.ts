@@ -19,6 +19,8 @@ import {
   HyperlaneStatus,
   Order,
   ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   HubMeta,
   SpokeMeta,
 } from '@chimera-monorepo/utils';
@@ -46,6 +48,8 @@ import {
   MetaUpdateEntity,
   HubMetaEntity,
   SpokeMetaEntity,
+  HubTokenUpdateEntity,
+  HubAssetUpdateEntity,
 } from '../operations/entities';
 
 export const StringToNumber = (num: number | string): number => {
@@ -367,6 +371,46 @@ export const protocolUpdateLog = (domain: string, entity: MetaUpdateEntity): Pro
     key: entity.key,
     chainId,
     updated,
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txOrigin: entity.txOrigin,
+    txNonce: StringToNumber(entity.txNonce),
+  };
+};
+
+export const hubTokenUpdateLog = (domain: string, entity: HubTokenUpdateEntity): HubTokenUpdateLog => {
+  return {
+    id: entity.id,
+    domain,
+    tickerHash: entity.token.id,
+    kind: entity.kind,
+    feeRecipients: entity.feeRecipients ?? [],
+    feeAmounts: entity.feeAmounts ?? [],
+    maxDiscountBps: StringToNumber(entity.maxDiscountBps ?? 0),
+    discountPerEpoch: StringToNumber(entity.discountPerEpoch ?? 0),
+    prioritizedStrategy: entity.prioritizedStrategy ?? 'DEFAULT',
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txOrigin: entity.txOrigin,
+    txNonce: StringToNumber(entity.txNonce),
+  };
+};
+
+export const hubAssetUpdateLog = (domain: string, entity: HubAssetUpdateEntity): HubAssetUpdateLog => {
+  return {
+    id: entity.id,
+    domain,
+    tickerHash: (entity.tickerHash as string) ?? '',
+    tokenId: entity.token?.id ?? undefined,
+    assetId: entity.asset.id,
+    assetDomain: (entity.domain as string) ?? '',
+    kind: entity.kind,
+    assetHash: (entity.assetHash as string) ?? '',
+    adopted: (entity.adopted as string) ?? '',
+    approval: (entity.approval as boolean) ?? false,
+    strategy: (entity.strategy as string) ?? '',
     transactionHash: entity.transactionHash,
     timestamp: StringToNumber(entity.timestamp),
     blockNumber: StringToNumber(entity.blockNumber),
