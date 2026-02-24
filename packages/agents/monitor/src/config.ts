@@ -261,6 +261,22 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     thresholds: thresholdsConfig,
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},
     telegram: configJson.telegram || configFile.telegram || {},
+    ...(() => {
+      const eventPipelineConfig = {
+        ...(configJson.eventPipeline || configFile.eventPipeline || {}),
+        ...(process.env.ALERT_EVENT_WEBHOOK_URL ? { webhookUrl: process.env.ALERT_EVENT_WEBHOOK_URL } : {}),
+        ...(process.env.ALERT_EVENT_WEBHOOK_SECRET ? { webhookSecret: process.env.ALERT_EVENT_WEBHOOK_SECRET } : {}),
+        ...(process.env.ALERT_EVENT_ENVIRONMENT ? { environment: process.env.ALERT_EVENT_ENVIRONMENT } : {}),
+        ...(process.env.ALERT_EVENT_RETRIES ? { retries: Number(process.env.ALERT_EVENT_RETRIES) } : {}),
+        ...(process.env.ALERT_EVENT_RETRY_BASE_MS
+          ? { retryBaseMs: Number(process.env.ALERT_EVENT_RETRY_BASE_MS) }
+          : {}),
+        ...(process.env.ALERT_EVENT_TIMEOUT_MS ? { timeoutMs: Number(process.env.ALERT_EVENT_TIMEOUT_MS) } : {}),
+      };
+      return Object.keys(eventPipelineConfig).length > 0
+        ? { eventPipeline: eventPipelineConfig }
+        : {};
+    })(),
     triage: Object.keys(triageOverride).length > 0 ? triageOverride : configJson.triage || configFile.triage || {},
     healthUrls: process.env.MONITOR_HEALTH_URLS || configJson.healthUrls || configFile.healthUrls || {},
     tokenomicsTables: configJson.tokenomicsTables || configFile.tokenomicsTables || DefaultTokenomicsTables,

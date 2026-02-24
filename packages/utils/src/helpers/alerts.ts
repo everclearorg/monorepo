@@ -1,4 +1,3 @@
-// Internal imports
 import {
   alertViaBetterUptimeIfNeeded,
   createUniqueIds,
@@ -7,16 +6,55 @@ import {
   alertTelegram,
 } from '../alerts';
 import { AlertConfig, Report } from './config';
-// External imports
 import { Logger, RequestContext, createMethodContext } from '../logging';
 import { triageInterceptor } from '../triage';
 import { setAutoResolveOutcome } from '../triage/dedup';
 import { recordAutoResolveSuccess } from '../triage/metrics';
 import { redactSensitiveData } from '../triage/redact';
+import { emitEvent, EventEmitterConfig } from './events';
+
+// ---------------------------------------------------------------------------
+// Pipeline mode: controls whether alerts are sent via legacy channels,
+// the new event pipeline, or both.
+//   - "legacy"      : existing Discord/Telegram/BetterUptime + triage (default)
+//   - "dual"        : legacy channels AND event emission (migration phase)
+//   - "events_only" : only emit MonitorEventV1 to everclear-agents
+// ---------------------------------------------------------------------------
+export type AlertPipelineMode = 'legacy' | 'dual' | 'events_only';
+
+const getPipelineMode = (): AlertPipelineMode => {
+  const raw = process.env.ALERT_PIPELINE_MODE ?? 'legacy';
+  if (raw === 'dual' || raw === 'events_only') return raw;
+  return 'legacy';
+};
+
+const getEmitterConfig = (config: AlertConfig): EventEmitterConfig | null => {
+  const url =
+    config.eventPipeline?.webhookUrl ??
+    process.env.ALERT_EVENT_WEBHOOK_URL ??
+    process.env.MONITOR_WEBHOOK_URL;
+  const secret =
+    config.eventPipeline?.webhookSecret ??
+    process.env.ALERT_EVENT_WEBHOOK_SECRET ??
+    process.env.MONITOR_WEBHOOK_SECRET ??
+    '';
+  if (!url) return null;
+
+  return {
+    webhookUrl: url,
+    webhookSecret: secret,
+    environment:
+      config.eventPipeline?.environment ??
+      ((process.env.ALERT_EVENT_ENVIRONMENT ?? 'prod') as 'dev' | 'staging' | 'prod'),
+    network: config.network,
+    retries: config.eventPipeline?.retries ?? 3,
+    retryBaseMs: config.eventPipeline?.retryBaseMs ?? 1000,
+    timeoutMs: config.eventPipeline?.timeoutMs ?? 10_000,
+  };
+};
 
 const preprocessReport = (report: Report, config: AlertConfig): Report => ({
   ...report,
-  // prepend unique ids to reason to make it searchable
   reason: `${report.reason}#${createUniqueIds(report.ids)}`,
   env: `${report.env} - ${config.network}`,
 });
@@ -34,12 +72,12 @@ const toLogSafeReport = (report: Report) => {
 };
 
 /**
- * Sends all alerts at once
- * @param report The report that will be sent in the alert
- * @param logger The logger that will be used to log that the alerts have been sent
- * @param config The watcher config
- * @param requestContext The request context for the logger
- * @param byName Choose if the alert should be grouped by name
+ * Sends all alerts at once.
+ *
+ * Behaviour depends on ALERT_PIPELINE_MODE:
+ *   - "legacy"      : triage + Discord/Telegram/BetterUptime (existing behaviour)
+ *   - "dual"        : legacy channels AND emit MonitorEventV1 to everclear-agents
+ *   - "events_only" : only emit MonitorEventV1 (no legacy channels, no triage)
  */
 export async function sendAlerts(
   report: Report,
@@ -48,7 +86,24 @@ export async function sendAlerts(
   requestContext: RequestContext,
 ): Promise<void> {
   const methodContext = createMethodContext(sendAlerts.name);
+  const mode = getPipelineMode();
+  const emitterConfig = getEmitterConfig(config);
 
+  // --- Event emission (dual + events_only) ---
+  if (mode !== 'legacy' && emitterConfig) {
+    await emitEvent(report, emitterConfig, logger, requestContext);
+  }
+
+  // --- If events_only, skip legacy entirely ---
+  if (mode === 'events_only') {
+    logger.info('Event emitted (events_only mode)', requestContext, methodContext, {
+      report: toLogSafeReport(report),
+      mode,
+    });
+    return;
+  }
+
+  // --- Legacy path (legacy + dual) ---
   const triageOutput = await triageInterceptor(report, config, requestContext);
   const alertReport = preprocessReport(triageOutput.report, config);
   const alertPromises = [];
@@ -81,8 +136,9 @@ export async function sendAlerts(
     );
   }
 
-  logger.warn('Alerts sent!!!', requestContext, methodContext, {
+  logger.warn('Alerts sent', requestContext, methodContext, {
     report: toLogSafeReport(alertReport),
+    mode,
     triage: {
       provider: triageOutput.providerUsed,
       model: triageOutput.modelUsed,
@@ -95,12 +151,7 @@ export async function sendAlerts(
 }
 
 /**
- * Resolves all alerts at once
- * @param report The report that will be used to resolve the alert
- * @param logger The logger that will be used to log that the alerts have been resolved
- * @param config The watcher config
- * @param requestContext The request context for the logger
- * @param byName Choose if the alert should be grouped by name
+ * Resolves all alerts at once.
  */
 export async function resolveAlerts(
   report: Report,
@@ -110,19 +161,16 @@ export async function resolveAlerts(
   byName: boolean = false,
 ): Promise<void> {
   const methodContext = createMethodContext(resolveAlerts.name);
-
   const alertReport = preprocessReport(report, config);
-
   const resolvePromises = [];
 
-  // Resolution is currently BetterUptime-backed.
   if (config.betterUptime) {
     resolvePromises.push(resolveAlertViaBetterUptime(alertReport, config.betterUptime, requestContext, byName));
   }
 
   await Promise.allSettled(resolvePromises);
 
-  logger.info('Alerts resolved!!!', requestContext, methodContext, {
+  logger.info('Alerts resolved', requestContext, methodContext, {
     report: toLogSafeReport(alertReport),
   });
 }

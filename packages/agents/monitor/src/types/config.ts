@@ -102,6 +102,18 @@ export const TMonitorConfigSchema = Type.Object({
       url: Type.String(),
     }),
   ),
+  eventPipeline: Type.Optional(
+    Type.Object({
+      webhookUrl: Type.String(),
+      webhookSecret: Type.String(),
+      environment: Type.Optional(
+        Type.Union([Type.Literal('dev'), Type.Literal('staging'), Type.Literal('prod')]),
+      ),
+      retries: Type.Optional(Type.Number()),
+      retryBaseMs: Type.Optional(Type.Number()),
+      timeoutMs: Type.Optional(Type.Number()),
+    }),
+  ),
   triage: Type.Optional(TTriageConfigSchema),
   healthUrls: Type.Partial(Type.Record(TService, Type.String({ format: 'uri' }))),
   tokenomicsTables: Type.Optional(Type.Array(Type.String())),
