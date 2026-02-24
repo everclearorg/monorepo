@@ -39,6 +39,9 @@ const getEmitterConfig = (config: AlertConfig): EventEmitterConfig | null => {
     process.env.MONITOR_WEBHOOK_SECRET ??
     '';
   if (!url) return null;
+  if (!secret) {
+    console.warn('[alerts] WARNING: Event emitter webhook secret is empty — HMAC signatures will provide no authentication');
+  }
 
   return {
     webhookUrl: url,
@@ -91,7 +94,14 @@ export async function sendAlerts(
 
   // --- Event emission (dual + events_only) ---
   if (mode !== 'legacy' && emitterConfig) {
-    await emitEvent(report, emitterConfig, logger, requestContext);
+    try {
+      await emitEvent(report, emitterConfig, logger, requestContext);
+    } catch (emitErr) {
+      logger.error('Event emission failed; continuing with legacy path', requestContext, methodContext, {
+        error: emitErr instanceof Error ? emitErr.message : String(emitErr),
+        mode,
+      });
+    }
   }
 
   // --- If events_only, skip legacy entirely ---
@@ -136,7 +146,7 @@ export async function sendAlerts(
     );
   }
 
-  logger.warn('Alerts sent', requestContext, methodContext, {
+  logger.info('Alerts sent', requestContext, methodContext, {
     report: toLogSafeReport(alertReport),
     mode,
     triage: {

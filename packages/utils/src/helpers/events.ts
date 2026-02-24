@@ -172,6 +172,13 @@ export async function emitEvent(
   if (!delivered) {
     if (dlq.length < MAX_DLQ_SIZE) {
       dlq.push(event);
+    } else {
+      logger.error('DLQ full — event dropped permanently', requestContext, methodContext, {
+        eventId: event.eventId,
+        type: event.type,
+        dlqSize: dlq.length,
+        maxDlqSize: MAX_DLQ_SIZE,
+      });
     }
     logger.warn('Event delivery failed, added to DLQ', requestContext, methodContext, {
       eventId: event.eventId,
@@ -198,13 +205,17 @@ export async function flushDlq(
   let flushed = 0;
   const resolvedConfig = { ...DEFAULT_CONFIG, ...emitterConfig } as EventEmitterConfig;
 
+  const remaining: MonitorEventV1[] = [];
   while (dlq.length > 0) {
-    const event = dlq[0];
+    const event = dlq.shift()!;
     const delivered = await sendWithRetry(event, resolvedConfig);
-    if (!delivered) break;
-    dlq.shift();
-    flushed++;
+    if (delivered) {
+      flushed++;
+    } else {
+      remaining.push(event);
+    }
   }
+  dlq.push(...remaining);
 
   if (flushed > 0) {
     logger.info('DLQ flushed', requestContext, methodContext, {
