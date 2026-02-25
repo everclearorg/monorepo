@@ -374,7 +374,7 @@ jobs:
       json: ${{ steps.meta.outputs.json }}
 
   e2e-tests:
-    if: github.ref != 'refs/heads/testnet-staging' && github.ref != 'refs/heads/mainnet-staging'
+    if: github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/mainnet-prod'
     runs-on: ubuntu-latest
     needs:
       [
