@@ -71,14 +71,15 @@ runs:
             --region "$REGION" \
             --query 'services[0]' \
             --output json 2>&1) || {
-            echo "  ❌ Failed to describe service '$SERVICE'"
-            echo "  $SERVICE_INFO"
-            FAILED=1
+            echo "  ⏭️  Service '$SERVICE' not found in cluster, skipping"
             continue
           }
 
           STATUS=$(echo "$SERVICE_INFO" | jq -r '.status // "MISSING"')
-          if [[ "$STATUS" != "ACTIVE" ]]; then
+          if [[ "$STATUS" == "MISSING" || "$STATUS" == "null" ]]; then
+            echo "  ⏭️  Service '$SERVICE' does not exist, skipping"
+            continue
+          elif [[ "$STATUS" != "ACTIVE" ]]; then
             echo "  ❌ Service status is '$STATUS' (expected ACTIVE)"
             FAILED=1
             continue

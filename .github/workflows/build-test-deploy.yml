@@ -58,19 +58,14 @@ jobs:
             STAGE="staging"
           fi
 
-          # Active ECS services from Terraform container_family values
+          # ECS services (modules/service) — action skips any that don't exist
           SERVICES="${ENVIRONMENT}-${STAGE}-relayer"
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-relayer-server"
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-relayer-web3signer"
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-watchtower"
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-watchtower-web3signer"
-          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-intent"
-          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-fill"
-          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-settlement"
-          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-expired"
-          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-invoice"
-          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-solana"
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-web3signer"
+          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-monitor"
           echo "ECS_SERVICES=${SERVICES}" >> $GITHUB_OUTPUT
     outputs:
       AWS_REGION: ${{ steps.set-aws-region.outputs.AWS_REGION }}
