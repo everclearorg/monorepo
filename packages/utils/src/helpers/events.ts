@@ -172,6 +172,11 @@ export async function emitEvent(
   if (!delivered) {
     if (dlq.length < MAX_DLQ_SIZE) {
       dlq.push(event);
+      logger.warn('Event delivery failed, added to DLQ', requestContext, methodContext, {
+        eventId: event.eventId,
+        type: event.type,
+        dlqSize: dlq.length,
+      });
     } else {
       logger.error('DLQ full — event dropped permanently', requestContext, methodContext, {
         eventId: event.eventId,
@@ -180,11 +185,6 @@ export async function emitEvent(
         maxDlqSize: MAX_DLQ_SIZE,
       });
     }
-    logger.warn('Event delivery failed, added to DLQ', requestContext, methodContext, {
-      eventId: event.eventId,
-      type: event.type,
-      dlqSize: dlq.length,
-    });
   } else {
     logger.info('Event emitted', requestContext, methodContext, {
       eventId: event.eventId,

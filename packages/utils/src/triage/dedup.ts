@@ -1,5 +1,9 @@
 import { TriageProcessingRecord, TriagePersistenceStore } from './types';
 
+// Known limitation: the default in-memory store is lost on process restart,
+// allowing duplicate triage of the same fingerprint if the monitor restarts
+// within the retention window. Use setTriagePersistenceStore() with a durable
+// backend (e.g. database-backed) to persist dedup state across restarts.
 const inMemoryStore = new Map<string, number>();
 const inMemoryFinalized = new Set<string>();
 let triageStore: TriagePersistenceStore = {

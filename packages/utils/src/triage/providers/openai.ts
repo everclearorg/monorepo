@@ -1,5 +1,4 @@
 import OpenAI from 'openai';
-import { delay } from '../../helpers/axios';
 import { parseTriageResult } from '../prompt';
 import { TriageContext, TriageProvider, TriageResult } from '../types';
 import { AnalyzeWithToolsArgs } from '../tools/types';
@@ -8,6 +7,18 @@ type OpenAIProviderConfig = {
   apiKey: string;
   baseUrl?: string;
 };
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label = 'Triage provider timeout'): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(label)), timeoutMs);
+  });
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    clearTimeout(timer!);
+  }
+}
 
 export class OpenAITriageProvider implements TriageProvider {
   public readonly name = 'openai' as const;
@@ -21,27 +32,18 @@ export class OpenAITriageProvider implements TriageProvider {
   }
 
   public async analyze(context: TriageContext, model: string, timeoutMs: number): Promise<TriageResult> {
-    const response = await Promise.race([
+    const response = await withTimeout(
       this.client.chat.completions.create({
-          model,
-          max_tokens: 800,
-          temperature: 0.1,
-          messages: [
-            {
-              role: 'system',
-              content: 'Respond with valid JSON only.',
-            },
-            {
-              role: 'user',
-              content: context.prompt,
-            },
-          ],
-        }),
-      (async () => {
-        await delay(timeoutMs);
-        throw new Error('Triage provider timeout');
-      })(),
-    ]);
+        model,
+        max_tokens: 800,
+        temperature: 0.1,
+        messages: [
+          { role: 'system', content: 'Respond with valid JSON only.' },
+          { role: 'user', content: context.prompt },
+        ],
+      }),
+      timeoutMs,
+    );
 
     const content = response.choices?.[0]?.message?.content ?? '{}';
     return parseTriageResult(content);
@@ -60,7 +62,7 @@ export class OpenAITriageProvider implements TriageProvider {
     ];
 
     for (let round = 0; round < args.maxRounds; round++) {
-      const response = await Promise.race([
+      const response = await withTimeout(
         this.client.chat.completions.create({
           model: args.model,
           max_tokens: 1024,
@@ -75,11 +77,8 @@ export class OpenAITriageProvider implements TriageProvider {
             },
           })),
         }),
-        (async () => {
-          await delay(args.timeoutMs);
-          throw new Error('Triage provider timeout');
-        })(),
-      ]);
+        args.timeoutMs,
+      );
 
       const choice = response.choices?.[0];
       const toolCalls = choice?.message?.tool_calls ?? [];
@@ -118,18 +117,15 @@ export class OpenAITriageProvider implements TriageProvider {
       }
     }
 
-    const finalResponse = await Promise.race([
+    const finalResponse = await withTimeout(
       this.client.chat.completions.create({
         model: args.model,
         max_tokens: 1024,
         temperature: 0.1,
         messages,
       }),
-      (async () => {
-        await delay(args.timeoutMs);
-        throw new Error('Triage provider timeout');
-      })(),
-    ]);
+      args.timeoutMs,
+    );
     return parseTriageResult(finalResponse.choices?.[0]?.message?.content ?? '{}');
   }
 }

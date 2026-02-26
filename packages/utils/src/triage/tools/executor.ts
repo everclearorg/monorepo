@@ -1,4 +1,3 @@
-import { delay } from '../../helpers/axios';
 import { ajv } from '../../types/ajv';
 import { redactSensitiveData } from '../redact';
 import { TriageToolCall, TriageToolResult } from './types';
@@ -56,14 +55,12 @@ export const executeToolCall = async (call: TriageToolCall, perToolTimeoutMs: nu
     };
   }
 
+  let timer: ReturnType<typeof setTimeout>;
   try {
-    const output = await Promise.race([
-      handler(call.args),
-      (async () => {
-        await delay(perToolTimeoutMs);
-        throw new Error('Tool timeout');
-      })(),
-    ]);
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error('Tool timeout')), perToolTimeoutMs);
+    });
+    const output = await Promise.race([handler(call.args), timeoutPromise]);
     return {
       toolCallId: call.id,
       output: JSON.stringify(output),
@@ -74,6 +71,8 @@ export const executeToolCall = async (call: TriageToolCall, perToolTimeoutMs: nu
       output: '',
       error: sanitizeToolError(error),
     };
+  } finally {
+    clearTimeout(timer!);
   }
 };
 

@@ -28,7 +28,7 @@ const getPipelineMode = (): AlertPipelineMode => {
   return 'legacy';
 };
 
-const getEmitterConfig = (config: AlertConfig): EventEmitterConfig | null => {
+const getEmitterConfig = (config: AlertConfig): { emitterConfig: EventEmitterConfig | null; secretEmpty: boolean } => {
   const url =
     config.eventPipeline?.webhookUrl ??
     process.env.ALERT_EVENT_WEBHOOK_URL ??
@@ -38,21 +38,21 @@ const getEmitterConfig = (config: AlertConfig): EventEmitterConfig | null => {
     process.env.ALERT_EVENT_WEBHOOK_SECRET ??
     process.env.MONITOR_WEBHOOK_SECRET ??
     '';
-  if (!url) return null;
-  if (!secret) {
-    console.warn('[alerts] WARNING: Event emitter webhook secret is empty — HMAC signatures will provide no authentication');
-  }
+  if (!url) return { emitterConfig: null, secretEmpty: false };
 
   return {
-    webhookUrl: url,
-    webhookSecret: secret,
-    environment:
-      config.eventPipeline?.environment ??
-      ((process.env.ALERT_EVENT_ENVIRONMENT ?? 'prod') as 'dev' | 'staging' | 'prod'),
-    network: config.network,
-    retries: config.eventPipeline?.retries ?? 3,
-    retryBaseMs: config.eventPipeline?.retryBaseMs ?? 1000,
-    timeoutMs: config.eventPipeline?.timeoutMs ?? 10_000,
+    emitterConfig: {
+      webhookUrl: url,
+      webhookSecret: secret,
+      environment:
+        config.eventPipeline?.environment ??
+        ((process.env.ALERT_EVENT_ENVIRONMENT ?? 'prod') as 'dev' | 'staging' | 'prod'),
+      network: config.network,
+      retries: config.eventPipeline?.retries ?? 3,
+      retryBaseMs: config.eventPipeline?.retryBaseMs ?? 1000,
+      timeoutMs: config.eventPipeline?.timeoutMs ?? 10_000,
+    },
+    secretEmpty: !secret,
   };
 };
 
@@ -90,7 +90,11 @@ export async function sendAlerts(
 ): Promise<void> {
   const methodContext = createMethodContext(sendAlerts.name);
   const mode = getPipelineMode();
-  const emitterConfig = getEmitterConfig(config);
+  const { emitterConfig, secretEmpty } = getEmitterConfig(config);
+
+  if (secretEmpty && emitterConfig) {
+    logger.warn('Event emitter webhook secret is empty — HMAC signatures will provide no authentication', requestContext, methodContext);
+  }
 
   // --- Event emission (dual + events_only) ---
   if (mode !== 'legacy' && emitterConfig) {

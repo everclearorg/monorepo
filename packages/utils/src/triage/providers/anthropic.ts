@@ -1,5 +1,4 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { delay } from '../../helpers/axios';
 import { parseTriageResult } from '../prompt';
 import { TriageContext, TriageProvider, TriageResult } from '../types';
 import { AnalyzeWithToolsArgs } from '../tools/types';
@@ -8,6 +7,18 @@ type AnthropicProviderConfig = {
   apiKey: string;
   baseUrl?: string;
 };
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label = 'Triage provider timeout'): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(label)), timeoutMs);
+  });
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    clearTimeout(timer!);
+  }
+}
 
 export class AnthropicTriageProvider implements TriageProvider {
   public readonly name = 'anthropic' as const;
@@ -21,23 +32,15 @@ export class AnthropicTriageProvider implements TriageProvider {
   }
 
   public async analyze(context: TriageContext, model: string, timeoutMs: number): Promise<TriageResult> {
-    const response = await Promise.race([
+    const response = await withTimeout(
       this.client.messages.create({
-          model,
-          max_tokens: 800,
-          temperature: 0.1,
-          messages: [
-            {
-              role: 'user',
-              content: context.prompt,
-            },
-          ],
-        }),
-      (async () => {
-        await delay(timeoutMs);
-        throw new Error('Triage provider timeout');
-      })(),
-    ]);
+        model,
+        max_tokens: 800,
+        temperature: 0.1,
+        messages: [{ role: 'user', content: context.prompt }],
+      }),
+      timeoutMs,
+    );
 
     const textBlock = response.content.find((item) => item.type === 'text');
     const text = textBlock?.text ?? '{}';
@@ -53,7 +56,7 @@ export class AnthropicTriageProvider implements TriageProvider {
     ];
 
     for (let round = 0; round < args.maxRounds; round++) {
-      const response = await Promise.race([
+      const response = await withTimeout(
         this.client.messages.create({
           model: args.model,
           max_tokens: 1024,
@@ -65,11 +68,8 @@ export class AnthropicTriageProvider implements TriageProvider {
             input_schema: tool.parameters as Anthropic.Tool.InputSchema,
           })),
         }),
-        (async () => {
-          await delay(args.timeoutMs);
-          throw new Error('Triage provider timeout');
-        })(),
-      ]);
+        args.timeoutMs,
+      );
 
       const toolUseBlocks = response.content.filter((item) => item.type === 'tool_use');
       if (toolUseBlocks.length === 0) {
@@ -104,18 +104,15 @@ export class AnthropicTriageProvider implements TriageProvider {
       ];
     }
 
-    const finalResponse = await Promise.race([
+    const finalResponse = await withTimeout(
       this.client.messages.create({
         model: args.model,
         max_tokens: 1024,
         temperature: 0.1,
         messages,
       }),
-      (async () => {
-        await delay(args.timeoutMs);
-        throw new Error('Triage provider timeout');
-      })(),
-    ]);
+      args.timeoutMs,
+    );
     const textBlock = finalResponse.content.find((item) => item.type === 'text');
     return parseTriageResult(textBlock?.text ?? '{}');
   }
