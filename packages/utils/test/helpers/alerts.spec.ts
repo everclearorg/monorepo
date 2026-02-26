@@ -88,8 +88,8 @@ describe('helpers:alerts', () => {
 
         await sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'));
 
-        expect(logger.warn.called).to.be.true;
-        const logCtx = logger.warn.getCall(0).args[3];
+        expect(logger.info.called).to.be.true;
+        const logCtx = logger.info.getCall(0).args[3];
         expect(logCtx).to.have.property('report');
         expect(logCtx.report.reason).to.not.include('supersecretvalue');
       });
