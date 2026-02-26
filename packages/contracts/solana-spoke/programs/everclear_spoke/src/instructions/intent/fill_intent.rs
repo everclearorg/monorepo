@@ -1,4 +1,7 @@
-use anchor_lang::solana_program::sysvar::instructions::ID as SYSVAR_INSTRUCTIONS_ID;
+use anchor_lang::solana_program::{
+    instruction::AccountMeta,
+    sysvar::instructions::ID as SYSVAR_INSTRUCTIONS_ID,
+};
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID};
 
@@ -19,9 +22,24 @@ use crate::{
         EVMIntent, FillMessage,
     },
     intent_status_pda_seeds,
+    messaging,
+    messaging::ccip::{
+        message::SVM2AnyMessage,
+        send::{build_ccip_send_accounts, ccip_send, CCIP_FEE_QUOTER, CCIP_RMN},
+    },
     state::IntentStatus,
-    state::{FeeAdapterState, IntentStatusAccount, SpokeState},
+    state::{FeeAdapterState, IntentStatusAccount, MessagingProviderType, SpokeState},
 };
+/// Result of handle_fill_intent (validation, transfer, status update); caller does the send.
+pub struct FillIntentResult {
+    pub intent_id: [u8; 32],
+    pub solver: Pubkey,
+    pub receiver: [u8; 32],
+    pub amount_out: u64,
+    pub intent: EVMIntent,
+    pub evm_encoded_message: Vec<u8>,
+}
+
 /// Extra params for the fill intent signature outside of the intent.
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct FillSignParams {
@@ -60,6 +78,23 @@ pub fn fill_intent(
     message_gas_limit: u64,
     signature: Vec<u8>,
 ) -> Result<()> {
+    let spoke_state = &ctx.accounts.spoke_state;
+    let messaging_provider = messaging::get_messaging_provider(spoke_state);
+    if messaging_provider == MessagingProviderType::CCIP {
+        require!(
+            spoke_state.ccip_router.is_some(),
+            SpokeError::InvalidMessage
+        );
+        require!(
+            spoke_state.everclear_ccip_chain_selector.is_some(),
+            SpokeError::InvalidMessage
+        );
+        require!(
+            ctx.remaining_accounts.len() > 0,
+            SpokeError::InvalidMessage
+        );
+    }
+
     let evm_intent = EVMIntent {
         initiator: origin_initiator,
         receiver: ctx.accounts.origin_receiver.key().to_bytes(),
@@ -123,7 +158,7 @@ pub fn fill_intent(
         FILL_SIGN_PARAMS_TYPE_HASH_PREFIX,
     )?;
 
-    let event_data: IntentFilledEvent = handle_fill_intent(
+    let fill_result = handle_fill_intent(
         &mut *accounts,
         program_id,
         evm_intent,
@@ -134,6 +169,100 @@ pub fn fill_intent(
     )
     .unwrap();
 
+    let message_id = match messaging::get_messaging_provider(&ctx.accounts.spoke_state) {
+        MessagingProviderType::Hyperlane => {
+            let xfer = Box::new(TransferRemote {
+                destination_domain: EVERCLEAR_DOMAIN,
+                recipient: everclear_gateway(),
+                amount_or_id: U256::from(0),
+                gas_amount: message_gas_limit,
+                message_body: fill_result.evm_encoded_message.clone(),
+            });
+            let mut transfer_remote_context = Box::new(TransferRemoteContext {
+                spoke_state: ctx.accounts.spoke_state.clone().as_ref().clone(),
+                system_program: accounts.system_program.clone(),
+                spl_noop_program: accounts.spl_noop_program.clone(),
+                mailbox_program: ctx.accounts.hyperlane_mailbox.to_account_info(),
+                mailbox_outbox: ctx.accounts.mailbox_outbox.to_account_info(),
+                dispatch_authority: ctx.accounts.dispatch_authority.to_account_info(),
+                sender_wallet: ctx.accounts.authority.to_account_info(),
+                unique_message_account: ctx.accounts.unique_message_account.to_account_info(),
+                dispatched_message_pda: ctx.accounts.dispatched_message_pda.to_account_info(),
+                igp_program: ctx.accounts.igp_program.to_account_info(),
+                igp_program_data: ctx.accounts.igp_program_data.to_account_info(),
+                igp_payment_pda: ctx.accounts.igp_payment_pda.to_account_info(),
+                configured_igp_account: ctx.accounts.configured_igp_account.to_account_info(),
+                inner_igp_account: ctx.accounts.inner_igp_account.clone(),
+            });
+            let transfer_ctx = Context::new(
+                &program_id,
+                &mut *transfer_remote_context,
+                &[],
+                Default::default(),
+            );
+            transfer_remote(transfer_ctx, *xfer)?.into()
+        }
+        MessagingProviderType::CCIP => {
+            let spoke_state = &ctx.accounts.spoke_state;
+            let ccip_router = spoke_state
+                .ccip_router
+                .ok_or(SpokeError::InvalidMessage)?;
+            let dest_chain_selector = spoke_state
+                .everclear_ccip_chain_selector
+                .ok_or(SpokeError::InvalidMessage)?;
+            let receiver_bytes = spoke_state.everclear_gateway.to_vec();
+            let message =
+                SVM2AnyMessage::new_data_only(receiver_bytes, fill_result.evm_encoded_message);
+            let account_metas = build_ccip_send_accounts(
+                &ccip_router,
+                &CCIP_FEE_QUOTER,
+                &CCIP_RMN,
+                &ctx.accounts.authority.key(),
+                dest_chain_selector,
+            )?;
+            let remaining_accounts = ctx.remaining_accounts;
+            require!(
+                remaining_accounts.len() >= account_metas.len() + 1,
+                SpokeError::InvalidMessage
+            );
+            require!(
+                remaining_accounts[0].key() == ccip_router,
+                SpokeError::InvalidMessage
+            );
+            let acc_metas: Vec<AccountMeta> = account_metas
+                .iter()
+                .enumerate()
+                .map(|(i, expected_meta)| {
+                    let acc_info = &remaining_accounts[i + 1];
+                    AccountMeta {
+                        pubkey: acc_info.key(),
+                        is_signer: expected_meta.is_signer || acc_info.is_signer,
+                        is_writable: expected_meta.is_writable,
+                    }
+                })
+                .collect();
+            let acc_infos_slice = &remaining_accounts[0..=account_metas.len()];
+            let authority_seeds: &[&[&[u8]]] = &[];
+            ccip_send(
+                &ccip_router,
+                authority_seeds,
+                dest_chain_selector,
+                message,
+                Vec::new(),
+                acc_metas,
+                acc_infos_slice,
+            )?
+        }
+    };
+
+    let event_data = IntentFilledEvent {
+        intent_id: fill_result.intent_id,
+        message_id,
+        solver: fill_result.solver,
+        receiver: fill_result.receiver,
+        amount_out: fill_result.amount_out,
+        intent: fill_result.intent,
+    };
     emit_cpi!(event_data);
 
     Ok(())
@@ -146,9 +275,8 @@ pub fn handle_fill_intent<'info>(
     amount_out: u64,
     receiver: Pubkey,
     destinations: Vec<u32>,
-    message_gas_limit: u64,
-) -> Result<IntentFilledEvent> {
-    let spoke_state = accounts.spoke_state.clone();
+    _message_gas_limit: u64,
+) -> Result<FillIntentResult> {
     let state = &mut accounts.spoke_state;
     require!(!state.paused, SpokeError::ContractPaused);
 
@@ -253,50 +381,13 @@ pub fn handle_fill_intent<'info>(
     });
     let evm_encoded_message = encode_full(MessageType::Fill, &*fill_message);
 
-    // Box to stay under BPF stack limit (4KB)
-    let xfer = Box::new(TransferRemote {
-        destination_domain: EVERCLEAR_DOMAIN,
-        recipient: everclear_gateway(),
-        amount_or_id: U256::from(0),
-        gas_amount: message_gas_limit,
-        message_body: evm_encoded_message,
-    });
-
-    // Box to stay under BPF stack limit (4KB)
-    let mut transfer_remote_context = Box::new(TransferRemoteContext {
-        spoke_state,
-        system_program: accounts.system_program.clone(),
-        spl_noop_program: accounts.spl_noop_program.clone(),
-        mailbox_program: accounts.hyperlane_mailbox.clone(),
-        mailbox_outbox: accounts.mailbox_outbox.to_account_info(),
-        dispatch_authority: accounts.dispatch_authority.to_account_info(),
-        sender_wallet: accounts.authority.to_account_info(),
-        unique_message_account: accounts.unique_message_account.to_account_info(),
-        dispatched_message_pda: accounts.dispatched_message_pda.to_account_info(),
-        igp_program: accounts.igp_program.clone(),
-        igp_program_data: accounts.igp_program_data.to_account_info(),
-        igp_payment_pda: accounts.igp_payment_pda.to_account_info(),
-        configured_igp_account: accounts.configured_igp_account.to_account_info(),
-        inner_igp_account: accounts.inner_igp_account.clone(),
-    });
-
-    let transfer_ctx = Context::new(
-        &program_id,
-        &mut *transfer_remote_context,
-        &[],
-        Default::default(),
-    );
-
-    let message_id = transfer_remote(transfer_ctx, *xfer)?;
-
-    // Emit an event with full intent details.
-    Ok(IntentFilledEvent {
+    Ok(FillIntentResult {
         intent_id,
-        message_id: message_id.into(),
         solver: *accounts.authority.key,
         receiver: receiver.to_bytes(),
         amount_out,
         intent,
+        evm_encoded_message,
     })
 }
 
