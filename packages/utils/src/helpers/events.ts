@@ -179,10 +179,9 @@ export async function emitEvent(
       });
     } else {
       logger.error('DLQ full — event dropped permanently', requestContext, methodContext, {
-        eventId: event.eventId,
-        type: event.type,
-        dlqSize: dlq.length,
-        maxDlqSize: MAX_DLQ_SIZE,
+        type: 'DLQFullError',
+        message: 'DLQ full — event dropped permanently',
+        context: { eventId: event.eventId, type: event.type, dlqSize: dlq.length, maxDlqSize: MAX_DLQ_SIZE },
       });
     }
   } else {

@@ -102,8 +102,10 @@ export async function sendAlerts(
       await emitEvent(report, emitterConfig, logger, requestContext);
     } catch (emitErr) {
       logger.error('Event emission failed; continuing with legacy path', requestContext, methodContext, {
-        error: emitErr instanceof Error ? emitErr.message : String(emitErr),
-        mode,
+        type: 'EventEmissionError',
+        message: emitErr instanceof Error ? emitErr.message : String(emitErr),
+        context: { mode },
+        stack: emitErr instanceof Error ? emitErr.stack : undefined,
       });
     }
   }
