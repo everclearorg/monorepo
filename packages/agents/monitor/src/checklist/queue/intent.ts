@@ -212,8 +212,11 @@ export const checkIntentQueueLatency = async (): Promise<Map<string, number>> =>
           logger: logger,
           env: config.environment,
         };
-        if (age > config.thresholds.maxIntentQueueLatency!) {
-          // Send alerts
+        const intentLatencyThreshold = config.thresholds.maxIntentQueueLatency!;
+        if (age > intentLatencyThreshold * 2) {
+          report.severity = Severity.Critical;
+        }
+        if (age > intentLatencyThreshold) {
           logger.warn(
             `Pending intent queue age for domain-${domain} exceeds threshold`,
             requestContext,
