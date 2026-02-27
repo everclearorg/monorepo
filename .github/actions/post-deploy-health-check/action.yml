@@ -1,0 +1,213 @@
+name: 'Post-Deploy Health Check'
+description: 'Verify ECS services are healthy after Terraform deployment'
+
+inputs:
+  aws-region:
+    description: 'AWS region where the services are deployed'
+    required: true
+  ecs-cluster:
+    description: 'ECS cluster name'
+    required: true
+  services:
+    description: 'Comma-separated list of ECS service names to check'
+    required: true
+  aws-access-key-id:
+    description: 'AWS Access Key ID'
+    required: true
+  aws-secret-access-key:
+    description: 'AWS Secret Access Key'
+    required: true
+  stability-timeout:
+    description: 'Max seconds to wait for service stability'
+    required: false
+    default: '300'
+  health-endpoint:
+    description: 'Optional HTTP health endpoint URL to check'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ inputs.aws-region }}
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+
+    - name: Wait for ECS Services Stability
+      shell: bash
+      env:
+        CLUSTER: ${{ inputs.ecs-cluster }}
+        SERVICES: ${{ inputs.services }}
+        REGION: ${{ inputs.aws-region }}
+        TIMEOUT: ${{ inputs.stability-timeout }}
+      run: |
+        echo "============================================"
+        echo "🔍 Post-Deploy Health Check"
+        echo "============================================"
+        echo "Cluster : $CLUSTER"
+        echo "Region  : $REGION"
+        echo "Services: $SERVICES"
+        echo "Timeout : ${TIMEOUT}s"
+        echo "============================================"
+
+        IFS=',' read -ra SERVICE_LIST <<< "$SERVICES"
+
+        FAILED=0
+
+        for SERVICE in "${SERVICE_LIST[@]}"; do
+          SERVICE=$(echo "$SERVICE" | xargs)  # trim whitespace
+          echo ""
+          echo "▶ Checking service: $SERVICE"
+
+          # ------------------------------------------------
+          # Step 1: Verify the service exists
+          # ------------------------------------------------
+          SERVICE_INFO=$(aws ecs describe-services \
+            --cluster "$CLUSTER" \
+            --services "$SERVICE" \
+            --region "$REGION" \
+            --query 'services[0]' \
+            --output json 2>&1) || {
+            echo "  ⏭️  Service '$SERVICE' not found in cluster, skipping"
+            continue
+          }
+
+          STATUS=$(echo "$SERVICE_INFO" | jq -r '.status // "MISSING"')
+          if [[ "$STATUS" == "MISSING" || "$STATUS" == "null" ]]; then
+            echo "  ⏭️  Service '$SERVICE' does not exist, skipping"
+            continue
+          elif [[ "$STATUS" != "ACTIVE" ]]; then
+            echo "  ❌ Service status is '$STATUS' (expected ACTIVE)"
+            FAILED=1
+            continue
+          fi
+
+          # ------------------------------------------------
+          # Step 2: Check deployment status
+          # ------------------------------------------------
+          DEPLOYMENT_COUNT=$(echo "$SERVICE_INFO" | jq '.deployments | length')
+          PRIMARY_STATUS=$(echo "$SERVICE_INFO" | jq -r '.deployments[] | select(.status == "PRIMARY") | .rolloutState // "UNKNOWN"')
+
+          echo "  Deployments in progress: $DEPLOYMENT_COUNT"
+          echo "  Primary deployment state: $PRIMARY_STATUS"
+
+          if [[ "$PRIMARY_STATUS" == "FAILED" ]]; then
+            echo "  ❌ Primary deployment has FAILED status"
+            FAILED_REASON=$(echo "$SERVICE_INFO" | jq -r '.deployments[] | select(.status == "PRIMARY") | .rolloutStateReason // "unknown"')
+            echo "  Reason: $FAILED_REASON"
+            FAILED=1
+            continue
+          fi
+
+          # ------------------------------------------------
+          # Step 3: Wait for service stability
+          # ------------------------------------------------
+          echo "  ⏳ Waiting for service stability (max ${TIMEOUT}s)..."
+          if aws ecs wait services-stable \
+            --cluster "$CLUSTER" \
+            --services "$SERVICE" \
+            --region "$REGION" 2>&1; then
+            echo "  ✅ Service '$SERVICE' is stable"
+          else
+            echo "  ❌ Service '$SERVICE' did not stabilize within timeout"
+            FAILED=1
+            continue
+          fi
+
+          # ------------------------------------------------
+          # Step 4: Verify running vs desired count
+          # ------------------------------------------------
+          REFRESHED=$(aws ecs describe-services \
+            --cluster "$CLUSTER" \
+            --services "$SERVICE" \
+            --region "$REGION" \
+            --query 'services[0]' \
+            --output json)
+
+          RUNNING=$(echo "$REFRESHED" | jq '.runningCount')
+          DESIRED=$(echo "$REFRESHED" | jq '.desiredCount')
+          PENDING=$(echo "$REFRESHED" | jq '.pendingCount')
+
+          echo "  Running: $RUNNING | Desired: $DESIRED | Pending: $PENDING"
+
+          if [[ "$RUNNING" -lt "$DESIRED" ]]; then
+            echo "  ⚠️  Running count ($RUNNING) < Desired count ($DESIRED)"
+            FAILED=1
+          elif [[ "$RUNNING" -eq "$DESIRED" && "$PENDING" -eq 0 ]]; then
+            echo "  ✅ Task counts healthy"
+          fi
+
+          # ------------------------------------------------
+          # Step 5: Check for recent task failures (last 5 events)
+          # ------------------------------------------------
+          echo "  📋 Recent service events:"
+          echo "$REFRESHED" | jq -r '.events[:5][] | "    \(.createdAt): \(.message)"'
+
+          STOPPED_TASKS=$(aws ecs list-tasks \
+            --cluster "$CLUSTER" \
+            --service-name "$SERVICE" \
+            --desired-status STOPPED \
+            --region "$REGION" \
+            --query 'taskArns' \
+            --output json)
+
+          STOPPED_COUNT=$(echo "$STOPPED_TASKS" | jq 'length')
+          if [[ "$STOPPED_COUNT" -gt 0 ]]; then
+            echo "  ⚠️  $STOPPED_COUNT recently stopped tasks detected"
+
+            # Get stop reasons for the most recent stopped tasks (up to 3)
+            TASK_ARNS=$(echo "$STOPPED_TASKS" | jq -r '.[:3][]')
+            if [[ -n "$TASK_ARNS" ]]; then
+              TASK_DETAILS=$(aws ecs describe-tasks \
+                --cluster "$CLUSTER" \
+                --tasks $TASK_ARNS \
+                --region "$REGION" \
+                --query 'tasks[].{taskArn:taskArn,stopCode:stopCode,stoppedReason:stoppedReason,lastStatus:lastStatus}' \
+                --output json)
+              echo "  Recent stopped task details:"
+              echo "$TASK_DETAILS" | jq -r '.[] | "    Status: \(.lastStatus) | Code: \(.stopCode) | Reason: \(.stoppedReason)"'
+            fi
+          fi
+
+          echo "  ────────────────────────────────────"
+        done
+
+        echo ""
+        echo "============================================"
+        if [[ "$FAILED" -eq 1 ]]; then
+          echo "❌ HEALTH CHECK FAILED — one or more services unhealthy"
+          echo "============================================"
+          exit 1
+        else
+          echo "✅ ALL SERVICES HEALTHY"
+          echo "============================================"
+        fi
+
+    - name: HTTP Health Endpoint Check
+      if: inputs.health-endpoint != ''
+      shell: bash
+      env:
+        HEALTH_URL: ${{ inputs.health-endpoint }}
+      run: |
+        echo "🌐 Checking HTTP health endpoint: $HEALTH_URL"
+
+        MAX_RETRIES=6
+        RETRY_DELAY=10
+
+        for i in $(seq 1 $MAX_RETRIES); do
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$HEALTH_URL" 2>/dev/null || echo "000")
+
+          if [[ "$HTTP_CODE" -ge 200 && "$HTTP_CODE" -lt 300 ]]; then
+            echo "  ✅ Health endpoint returned HTTP $HTTP_CODE"
+            exit 0
+          fi
+
+          echo "  Attempt $i/$MAX_RETRIES: HTTP $HTTP_CODE — retrying in ${RETRY_DELAY}s..."
+          sleep $RETRY_DELAY
+        done
+
+        echo "  ❌ Health endpoint failed after $MAX_RETRIES attempts"
+        exit 1
