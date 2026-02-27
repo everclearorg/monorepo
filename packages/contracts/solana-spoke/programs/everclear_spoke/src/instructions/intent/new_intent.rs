@@ -176,8 +176,7 @@ pub fn new_intent(
         data,
         message_gas_limit,
         remaining_accounts_slice,
-    )
-    .unwrap();
+    )?;
 
     require!(
         event.intent_id == intent_hash,
