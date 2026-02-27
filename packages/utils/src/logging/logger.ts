@@ -12,14 +12,28 @@ export type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' |
 const DEFAULT_REDACTED_PATHS = [
   'config.healthUrls.poller',
   'config.hub.providers',
+  'config.hub.subgraphUrls',
+  'config.hub.envioSubgraphUrl',
   'config.server.adminToken',
   'config.web3SignerUrl',
   'config.database.url',
+  'config.telegram.apiKey',
+  'config.betterUptime.apiKey',
+  'config.betterUptime.requesterEmail',
+  'config.discord.url',
+  'config.redis.password',
+  'config.redis.url',
+  'config.triage.providers.anthropic.apiKey',
+  'config.triage.providers.openai.apiKey',
+  'config.relayers[*].apiKey',
+  'config.relayers[*].url',
   'params.apiKey',
 ];
 for (const chainId of chainIds) {
   DEFAULT_REDACTED_PATHS.push(`config.chains[${chainId}].providers`);
+  DEFAULT_REDACTED_PATHS.push(`config.chains[${chainId}].subgraphUrls`);
   DEFAULT_REDACTED_PATHS.push(`chains[${chainId}].providers`);
+  DEFAULT_REDACTED_PATHS.push(`chains[${chainId}].subgraphUrls`);
   DEFAULT_REDACTED_PATHS.push(`chains[${chainId}].privateKey`);
 }
 
@@ -121,30 +135,47 @@ export class Logger {
       return url.protocol + '//' + url.host;
     };
 
-    const censor = (value: string, path: string[]) => {
+    const normalizeFieldName = (fieldName: string): string => fieldName.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    const censor = (value: any, path: string[]) => {
       const fieldName = path[path.length - 1];
-      switch (fieldName) {
+      const normalizedFieldName = normalizeFieldName(fieldName);
+
+      switch (normalizedFieldName) {
         case 'poller':
         case 'url':
-          return sanitizeUrl(value);
+        case 'web3signerurl':
+        case 'subgraphurl':
+        case 'subgraphurls':
+        case 'enviosubgraphurl':
+          if (typeof value === 'string' && isUrl(value)) {
+            return sanitizeUrl(value);
+          }
+          return this.sanitizedValue;
         case 'providers': {
+          if (!Array.isArray(value)) {
+            return this.sanitizedValue;
+          }
           const providers = [];
           for (const provider of value) {
             providers.push(isUrl(provider) ? sanitizeUrl(provider) : provider);
           }
           return providers;
         }
-        case 'adminToken':
-        case 'privateKey':
-        case 'apiKey':
+        case 'admintoken':
+        case 'privatekey':
+        case 'apikey':
+        case 'requesteremail':
+        case 'password':
+        case 'authorization':
+        case 'authtoken':
+        case 'token':
+        case 'secret':
           return this.sanitizedValue;
-        case 'web3SignerUrl':
-          if (isUrl(value)) {
-            return sanitizeUrl(value);
-          } else {
+        default:
+          if (/(token|secret|password|apikey|auth|privatekey)/.test(normalizedFieldName)) {
             return this.sanitizedValue;
           }
-        default:
           return value;
       }
     };

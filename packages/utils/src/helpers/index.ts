@@ -12,3 +12,4 @@ export * from './ssm';
 export * from './ticker';
 export * from './chain';
 export * from './fd';
+export * from '../triage';
