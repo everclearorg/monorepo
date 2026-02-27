@@ -8,6 +8,385 @@
   },
   "instructions": [
     {
+      "name": "fill_intent",
+      "docs": [
+        "Fills a new intent.",
+        "The user \"locks\" funds (previously deposited) and fills an intent.",
+        "NOTE: different from EVM, we do not support pullFunds, i.e. we requires funds to be sent during the tx",
+        "and not deposited prior in the spoke."
+      ],
+      "discriminator": [
+        68,
+        255,
+        62,
+        77,
+        155,
+        136,
+        145,
+        148
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_adapter_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  101,
+                  101,
+                  45,
+                  97,
+                  100,
+                  97,
+                  112,
+                  116,
+                  101,
+                  114,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "NOTE: the message initiator, here its the filler."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "origin_receiver"
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "solver_token_account",
+          "writable": true
+        },
+        {
+          "name": "origin_receiver_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "origin_receiver"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "intent_status_pda",
+          "writable": true
+        },
+        {
+          "name": "pda_payer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  118,
+                  101,
+                  114,
+                  99,
+                  108,
+                  101,
+                  97,
+                  114,
+                  95,
+                  115,
+                  112,
+                  111,
+                  107,
+                  101
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  45
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  100,
+                  97,
+                  95,
+                  112,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hyperlane_mailbox"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "spl_noop_program",
+          "address": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
+        },
+        {
+          "name": "mailbox_outbox",
+          "writable": true
+        },
+        {
+          "name": "dispatch_authority",
+          "writable": true
+        },
+        {
+          "name": "unique_message_account",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispatched_message_pda",
+          "writable": true
+        },
+        {
+          "name": "igp_program"
+        },
+        {
+          "name": "igp_program_data",
+          "writable": true
+        },
+        {
+          "name": "igp_payment_pda",
+          "writable": true
+        },
+        {
+          "name": "configured_igp_account",
+          "writable": true
+        },
+        {
+          "name": "signer"
+        },
+        {
+          "name": "instruction_sysvar",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        },
+        {
+          "name": "inner_igp_account",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "origin_initiator",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "origin_input_asset",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "intent_origin",
+          "type": "u32"
+        },
+        {
+          "name": "origin_nonce",
+          "type": "u64"
+        },
+        {
+          "name": "origin_timestamp",
+          "type": "u64"
+        },
+        {
+          "name": "origin_ttl",
+          "type": "u64"
+        },
+        {
+          "name": "origin_amount",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "origin_amount_out_min",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "origin_destinations",
+          "type": {
+            "vec": "u32"
+          }
+        },
+        {
+          "name": "origin_data",
+          "type": "bytes"
+        },
+        {
+          "name": "amount_out",
+          "type": "u64"
+        },
+        {
+          "name": "receiver",
+          "type": "pubkey"
+        },
+        {
+          "name": "destinations",
+          "type": {
+            "vec": "u32"
+          }
+        },
+        {
+          "name": "message_gas_limit",
+          "type": "u64"
+        },
+        {
+          "name": "signature",
+          "type": "bytes"
+        }
+      ]
+    },
+    {
       "name": "handle",
       "docs": [
         "Receive a cross‑chain message via Hyperlane.",
@@ -549,6 +928,10 @@
         {
           "name": "fee_signer",
           "type": "pubkey"
+        },
+        {
+          "name": "fill_signer",
+          "type": "pubkey"
         }
       ]
     },
@@ -598,6 +981,64 @@
           ]
         }
       }
+    },
+    {
+      "name": "migrate_fee_adapter_state",
+      "discriminator": [
+        177,
+        245,
+        82,
+        48,
+        253,
+        60,
+        192,
+        150
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_adapter_state",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "fill_signer",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "new_intent",
@@ -794,10 +1235,6 @@
           "type": "pubkey"
         },
         {
-          "name": "input_asset",
-          "type": "pubkey"
-        },
-        {
           "name": "output_asset",
           "type": "pubkey"
         },
@@ -806,8 +1243,8 @@
           "type": "u64"
         },
         {
-          "name": "max_fee",
-          "type": "u32"
+          "name": "amount_out_min",
+          "type": "u128"
         },
         {
           "name": "ttl",
@@ -1190,7 +1627,12 @@
         },
         {
           "name": "admin",
+          "writable": true,
           "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         },
         {
           "name": "event_authority",
@@ -1473,7 +1915,12 @@
         },
         {
           "name": "admin",
+          "writable": true,
           "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         },
         {
           "name": "event_authority",
@@ -1579,7 +2026,12 @@
         },
         {
           "name": "admin",
+          "writable": true,
           "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         },
         {
           "name": "event_authority",
@@ -1690,7 +2142,12 @@
         },
         {
           "name": "admin",
+          "writable": true,
           "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         },
         {
           "name": "event_authority",
@@ -1728,6 +2185,122 @@
       "args": [
         {
           "name": "fee_signer",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "update_fill_signer",
+      "discriminator": [
+        38,
+        159,
+        245,
+        223,
+        111,
+        57,
+        22,
+        13
+      ],
+      "accounts": [
+        {
+          "name": "spoke_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  112,
+                  111,
+                  107,
+                  101,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_adapter_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  101,
+                  101,
+                  45,
+                  97,
+                  100,
+                  97,
+                  112,
+                  116,
+                  101,
+                  114,
+                  45,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "fill_signer",
           "type": "pubkey"
         }
       ]
@@ -2420,6 +2993,19 @@
       ]
     },
     {
+      "name": "FillSignerUpdatedEvent",
+      "discriminator": [
+        11,
+        118,
+        112,
+        68,
+        18,
+        26,
+        210,
+        146
+      ]
+    },
+    {
       "name": "IgpUpdatedEvent",
       "discriminator": [
         117,
@@ -2469,6 +3055,19 @@
         91,
         49,
         93
+      ]
+    },
+    {
+      "name": "IntentFilledEvent",
+      "discriminator": [
+        151,
+        229,
+        192,
+        91,
+        52,
+        187,
+        168,
+        33
       ]
     },
     {
@@ -2834,11 +3433,173 @@
     },
     {
       "code": 6038,
+      "name": "InvalidFeeSignatureAccountsNotEmpty",
+      "msg": "Invalid fee signature: preinstruction accounts not empty"
+    },
+    {
+      "code": 6039,
+      "name": "InvalidFeeSignatureDataLength",
+      "msg": "Invalid fee signature: preinstruction data length mismatch"
+    },
+    {
+      "code": 6040,
+      "name": "InvalidFeeSignatureNumSignatures",
+      "msg": "Invalid fee signature: number of signatures must be 1"
+    },
+    {
+      "code": 6041,
+      "name": "InvalidFeeSignaturePadding",
+      "msg": "Invalid fee signature: padding byte must be 0"
+    },
+    {
+      "code": 6042,
+      "name": "InvalidFeeSignatureOffsets",
+      "msg": "Invalid fee signature: offset mismatch"
+    },
+    {
+      "code": 6043,
+      "name": "InvalidFeeSignaturePubkeyMismatch",
+      "msg": "Invalid fee signature: public key mismatch with configured fee signer"
+    },
+    {
+      "code": 6044,
+      "name": "InvalidFeeSignatureDataMismatch",
+      "msg": "Invalid fee signature: signature data mismatch"
+    },
+    {
+      "code": 6045,
+      "name": "InvalidFeeSignatureMessageMismatch",
+      "msg": "Invalid fee signature: message data mismatch"
+    },
+    {
+      "code": 6046,
       "name": "FeeAdapterPaused",
       "msg": "Fee adapter paused"
+    },
+    {
+      "code": 6047,
+      "name": "WrongDestination",
+      "msg": "Wrong destination for fill intent"
+    },
+    {
+      "code": 6048,
+      "name": "IntentExpired",
+      "msg": "fill intent expired"
+    },
+    {
+      "code": 6049,
+      "name": "AmountOutInvalid",
+      "msg": "fill intent amountOut is less than amountOutMin"
+    },
+    {
+      "code": 6050,
+      "name": "InvalidDestinationArray",
+      "msg": "invalid intent destinations"
+    },
+    {
+      "code": 6051,
+      "name": "InvalidFillIntentStatus",
+      "msg": "intent is already filled"
+    },
+    {
+      "code": 6052,
+      "name": "InvalidIntentHash",
+      "msg": "Intent hash mismatch - signature not bound to this intent"
     }
   ],
   "types": [
+    {
+      "name": "EVMIntent",
+      "docs": [
+        "Represents the 12 fields in our Intent struct, matching the Solidity layout.",
+        "Anchor serde is added here for putting the intent in event."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initiator",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "receiver",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "input_asset",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "output_asset",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "origin",
+            "type": "u32"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "ttl",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "amount_out_min",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "destinations",
+            "type": {
+              "vec": "u32"
+            }
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
     {
       "name": "FeeAdapterPausedEvent",
       "type": {
@@ -2868,6 +3629,10 @@
             "type": "pubkey"
           },
           {
+            "name": "fill_signer",
+            "type": "pubkey"
+          },
+          {
             "name": "bump",
             "type": "u8"
           }
@@ -2887,16 +3652,42 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "destinations",
+            "type": {
+              "vec": "u32"
+            }
+          },
+          {
+            "name": "input_asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "output_asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "amount_out_min",
+            "type": "u128"
+          },
+          {
+            "name": "ttl",
+            "type": "u64"
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          },
+          {
             "name": "token_fee",
             "type": "u64"
           },
           {
             "name": "native_fee",
             "type": "u64"
-          },
-          {
-            "name": "input_asset",
-            "type": "pubkey"
           },
           {
             "name": "deadline",
@@ -2956,6 +3747,22 @@
           },
           {
             "name": "new_fee_signer",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FillSignerUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "old_fill_signer",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_fill_signer",
             "type": "pubkey"
           }
         ]
@@ -3069,6 +3876,10 @@
           {
             "name": "fee_signer",
             "type": "pubkey"
+          },
+          {
+            "name": "fill_signer",
+            "type": "pubkey"
           }
         ]
       }
@@ -3117,8 +3928,8 @@
             "type": "u128"
           },
           {
-            "name": "max_fee",
-            "type": "u32"
+            "name": "amount_out_min",
+            "type": "u128"
           },
           {
             "name": "origin_domain",
@@ -3145,6 +3956,57 @@
           {
             "name": "data",
             "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "IntentFilledEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "intent_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "message_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "solver",
+            "type": "pubkey"
+          },
+          {
+            "name": "receiver",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "amount_out",
+            "type": "u64"
+          },
+          {
+            "name": "intent",
+            "type": {
+              "defined": {
+                "name": "EVMIntent"
+              }
+            }
           }
         ]
       }
@@ -3439,16 +4301,16 @@
             "type": "pubkey"
           },
           {
-            "name": "input_asset",
-            "type": "pubkey"
-          },
-          {
             "name": "output_asset",
             "type": "pubkey"
           },
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "amount_out_min",
+            "type": "u128"
           },
           {
             "name": "max_fee",

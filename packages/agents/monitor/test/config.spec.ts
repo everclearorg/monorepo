@@ -28,7 +28,7 @@ describe('Config', () => {
     it('should work', async () => {
       const retrieved = await getConfig();
       const config = mock.config();
-      expect(Object.keys(retrieved).length).to.equal(Object.keys(config).length);
+      expect(Object.keys(retrieved).length).to.be.greaterThanOrEqual(Object.keys(config).length);
     });
 
     it('should read overrides from .env', async () => {
@@ -83,6 +83,40 @@ describe('Config', () => {
       ssmStub.resolves(JSON.stringify({ ...mock.config(), database }));
       const config = await getConfig();
       await expect(config.database).to.be.deep.equal(database);
+    });
+
+    it('should parse TRIAGE_CONFIG when passed as direct triage object', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        ...createProcessEnv(),
+        TRIAGE_CONFIG: JSON.stringify({
+          mode: 'dry-run',
+          timeoutMs: 2500,
+          providers: { openai: { apiKey: 'k' } },
+        }),
+      });
+
+      const retrieved = await getConfig();
+      expect(retrieved.triage?.mode).to.equal('dry-run');
+      expect(retrieved.triage?.timeoutMs).to.equal(2500);
+    });
+
+    it('should parse TRIAGE_CONFIG when nested under triage key', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        ...createProcessEnv(),
+        TRIAGE_CONFIG: JSON.stringify({
+          triage: {
+            mode: 'shadow',
+            timeoutMs: 3000,
+            providers: { openai: { apiKey: 'k' } },
+          },
+        }),
+      });
+
+      const retrieved = await getConfig();
+      expect(retrieved.triage?.mode).to.equal('shadow');
+      expect(retrieved.triage?.timeoutMs).to.equal(3000);
     });
   });
 

@@ -69,6 +69,12 @@ abstract contract MainnetAssets {
 
   //////////////////// PTSUSDE
   bytes32 public constant SOLANA_PTSUSDE = 0x05c0ad344d082fe99030a0414acc5726b24c89e1a511eac6e58d809145dd6503;
+
+  ///////////////////// syrupUSDT
+  address public constant MANTLE_SYRUPUSDT = 0x051665f2455116e929b9972c36d23070F5054Ce0;
+
+  ///////////////////// USDe
+  address public constant MANTLE_USDE = 0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34;
 }
 
 abstract contract Everclear {

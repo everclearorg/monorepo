@@ -6,6 +6,8 @@ import {
   jsonifyError,
   sendHeartbeat,
   chainWrapper,
+  setTriagePersistenceStore,
+  TriageProcessingRecord,
 } from '@chimera-monorepo/utils';
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
@@ -17,7 +19,8 @@ import { runChecks } from './checklist';
 import interval from 'interval-promise';
 import { MonitorConfig } from './types';
 import { AppContext, getContext } from './context';
-import { getDatabase } from '@chimera-monorepo/database';
+import { getDatabase, TriageFingerprintLog } from '@chimera-monorepo/database';
+import { configureTriageToolHandlers } from './triage-tools';
 
 export const MonitorService = {
   SERVER: 'server',
@@ -26,6 +29,27 @@ export const MonitorService = {
 export type MonitorService = (typeof MonitorService)[keyof typeof MonitorService];
 
 const DEFAULT_SUBGRAPH_TIMEOUT = 7500;
+
+const toDbLogRecord = (record: TriageProcessingRecord): TriageFingerprintLog => ({
+  fingerprint: record.fingerprint,
+  reportType: record.reportType,
+  severity: record.severity,
+  env: record.env,
+  network: record.network,
+  ids: record.ids,
+  reason: record.reason,
+  triageMode: record.triageMode,
+  triageResult: record.triageResult,
+  providerUsed: record.providerUsed,
+  modelUsed: record.modelUsed,
+  triageLatencyMs: record.triageLatencyMs,
+  autoResolveAttempted: record.autoResolveAttempted,
+  autoResolveSucceeded: record.autoResolveSucceeded,
+  autoResolveReasonCode: record.autoResolveReasonCode,
+  toolCallsMade: record.toolCallsMade,
+  toolNamesUsed: record.toolNamesUsed,
+  expiresAt: record.expiresAt,
+});
 /**
  * Helper to get subgraph reader config
  * @param chains Chain entry of monitor config (includes hub domain)
@@ -74,8 +98,19 @@ export const makeMonitor = async (service: MonitorService) => {
         },
       },
     });
-    context.logger.info('Generated config.', requestContext, methodContext, {
-      config: { ...context.config, abis: 'N/A' },
+    context.logger.info('Generated config summary.', requestContext, methodContext, {
+      configSummary: {
+        network: context.config.network,
+        env: context.config.environment,
+        service,
+        chainCount: Object.keys(context.config.chains ?? {}).length,
+        relayerCount: context.config.relayers?.length ?? 0,
+        hasBetterUptime: Boolean(context.config.betterUptime?.apiKey),
+        hasTelegram: Boolean(context.config.telegram?.apiKey),
+        hasDiscord: Boolean(context.config.discord?.url),
+        triageMode: context.config.triage?.mode ?? 'disabled',
+        triageProviderCount: Object.keys(context.config.triage?.providers ?? {}).length,
+      },
     });
 
     /// MARK - Adapters
@@ -100,6 +135,57 @@ export const makeMonitor = async (service: MonitorService) => {
 
     context.adapters.database = await getDatabase(context.config.database.url, context.logger);
     context.logger.debug('Database setup', requestContext, methodContext);
+
+    // Validate event pipeline config if mode requires it
+    const pipelineMode = process.env.ALERT_PIPELINE_MODE ?? 'legacy';
+    if (pipelineMode === 'dual' || pipelineMode === 'events_only') {
+      const webhookUrl =
+        context.config.eventPipeline?.webhookUrl ??
+        process.env.ALERT_EVENT_WEBHOOK_URL ??
+        process.env.MONITOR_WEBHOOK_URL;
+      const webhookSecret =
+        context.config.eventPipeline?.webhookSecret ??
+        process.env.ALERT_EVENT_WEBHOOK_SECRET ??
+        process.env.MONITOR_WEBHOOK_SECRET;
+
+      if (!webhookUrl) {
+        throw new Error(
+          `ALERT_PIPELINE_MODE="${pipelineMode}" requires a webhook URL. ` +
+          'Set eventPipeline.webhookUrl in config or ALERT_EVENT_WEBHOOK_URL / MONITOR_WEBHOOK_URL env var.',
+        );
+      }
+      if (!webhookSecret) {
+        context.logger.warn(
+          `ALERT_PIPELINE_MODE="${pipelineMode}" is running without a webhook secret — HMAC authentication disabled`,
+          requestContext,
+          methodContext,
+        );
+      }
+      context.logger.info('Event pipeline config validated', requestContext, methodContext, {
+        mode: pipelineMode,
+        webhookUrl: webhookUrl.replace(/\/\/.*@/, '//***@'),
+        hasSecret: Boolean(webhookSecret),
+      });
+    }
+
+    setTriagePersistenceStore({
+      hasProcessed: async (fingerprint: string) => {
+        return context.adapters.database.isTriageFingerprintProcessed(fingerprint);
+      },
+      tryReserve: async (record: TriageProcessingRecord) => {
+        return context.adapters.database.tryReserveTriageFingerprint(toDbLogRecord(record));
+      },
+      finalize: async (record: TriageProcessingRecord) => {
+        await context.adapters.database.finalizeTriageFingerprint(toDbLogRecord(record));
+      },
+      setAutoResolveOutcome: async (fingerprint: string, succeeded: boolean, reasonCode?: string) => {
+        await context.adapters.database.setTriageAutoResolveOutcome(fingerprint, succeeded, reasonCode);
+      },
+      pruneExpired: async () => {
+        return context.adapters.database.pruneExpiredTriageFingerprints();
+      },
+    });
+    configureTriageToolHandlers();
 
     // Adapters - relayers
     context.adapters.relayers = [];
