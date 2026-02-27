@@ -109,7 +109,7 @@ describe('betteruptime', () => {
       const error = {
         response: {
           status: 422,
-          data: { error: 'validation failed' }
+          data: { error: 'validation failed', token: 'secret-token' }
         }
       };
       postStub.rejects(error);
@@ -117,6 +117,10 @@ describe('betteruptime', () => {
       await alertViaBetterUptime(TEST_REPORT, betterUptimeConfig, requestContext);
       expect(logger.error.callCount).to.be.eq(1);
       expect(logger.error.getCall(0).args[0]).to.include('v3 validation error');
+      const logContext = logger.error.getCall(0).args[4];
+      expect(logContext).to.have.property('responseSummary');
+      expect(logContext.responseSummary).to.not.include('secret-token');
+      expect(logContext).to.not.have.property('data');
     });
 
     it('Should handle 429 rate limit error', async () => {
