@@ -50,7 +50,7 @@ function getOrCreateQueue(type: string): Queue {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-function getOrCreateIntentQueueMapping(queueIdx: bigint): IntentQueueMapping {
+function getOrCreateIntentQueueMapping(queueIdx: BigInt): IntentQueueMapping {
   let mapping = IntentQueueMapping.load(BigIntToBytes(queueIdx));
   if (mapping == null) {
     mapping = new IntentQueueMapping(BigIntToBytes(queueIdx));
@@ -61,7 +61,7 @@ function getOrCreateIntentQueueMapping(queueIdx: bigint): IntentQueueMapping {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-function getOrCreateFillQueueMapping(queueIdx: bigint): FillQueueMapping {
+function getOrCreateFillQueueMapping(queueIdx: BigInt): FillQueueMapping {
   let mapping = FillQueueMapping.load(BigIntToBytes(queueIdx));
   if (mapping == null) {
     mapping = new FillQueueMapping(BigIntToBytes(queueIdx));
@@ -71,7 +71,7 @@ function getOrCreateFillQueueMapping(queueIdx: bigint): FillQueueMapping {
   return mapping;
 }
 
-function createEmptyOriginIntent(intentId: Bytes, initiator: Bytes, timestamp: bigint): OriginIntent {
+function createEmptyOriginIntent(intentId: Bytes, initiator: Bytes, timestamp: BigInt): OriginIntent {
   const intent = new OriginIntent(intentId);
   intent.status = 'ADDED';
   intent.initiator = initiator;
