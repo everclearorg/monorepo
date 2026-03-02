@@ -25,6 +25,8 @@ import {
   LockPosition,
   Order,
   ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   HubMeta,
   SpokeMeta,
 } from '@chimera-monorepo/utils';
@@ -741,6 +743,46 @@ export function toProtocolUpdateLog(log: ProtocolUpdateLog): protocol_update_log
     tx_nonce: log.txNonce,
   };
 };
+
+export function toHubTokenUpdateLog(log: HubTokenUpdateLog): Record<string, unknown> {
+  return {
+    id: log.id,
+    domain: log.domain,
+    kind: log.kind,
+    ticker_hash: log.tickerHash,
+    fee_recipients: log.feeRecipients,
+    fee_amounts: log.feeAmounts,
+    max_discount_bps: log.maxDiscountBps,
+    discount_per_epoch: log.discountPerEpoch,
+    prioritized_strategy: log.prioritizedStrategy,
+    transaction_hash: log.transactionHash,
+    timestamp: log.timestamp,
+    block_number: log.blockNumber,
+    tx_origin: log.txOrigin,
+    tx_nonce: log.txNonce,
+  };
+}
+
+export function toHubAssetUpdateLog(log: HubAssetUpdateLog): Record<string, unknown> {
+  return {
+    id: log.id,
+    domain: log.domain,
+    asset_id: log.assetId,
+    token_id: log.tokenId ?? null,
+    ticker_hash: log.tickerHash,
+    asset_domain: log.assetDomain,
+    kind: log.kind,
+    asset_hash: log.assetHash,
+    adopted: log.adopted,
+    approval: log.approval,
+    strategy: log.strategy,
+    transaction_hash: log.transactionHash,
+    timestamp: log.timestamp,
+    block_number: log.blockNumber,
+    tx_origin: log.txOrigin,
+    tx_nonce: log.txNonce,
+  };
+}
 
 export function fromProtocolUpdateLogs(log: protocol_update_logs.JSONSelectable): ProtocolUpdateLog {
   return {

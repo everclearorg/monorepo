@@ -462,6 +462,44 @@ export const ProtocolUpdateLogSchema = Type.Object({
 });
 export type ProtocolUpdateLog = Static<typeof ProtocolUpdateLogSchema>;
 
+export const HubTokenUpdateLogSchema = Type.Object({
+  id: Type.String({ maxLength: 120 }),
+  domain: TDomainId, // hub domain where the tx happened
+  tickerHash: TBytes32,
+  kind: Type.String(),
+  feeRecipients: Type.Array(TAddress),
+  feeAmounts: Type.Array(TIntegerString),
+  maxDiscountBps: Type.Integer({ minimum: 0 }),
+  discountPerEpoch: Type.Integer({ minimum: 0 }),
+  prioritizedStrategy: Type.String(),
+  transactionHash: Type.String({ maxLength: 66 }),
+  timestamp: Type.Number(),
+  blockNumber: Type.Number(),
+  txOrigin: TAddress,
+  txNonce: Type.Number(),
+});
+export type HubTokenUpdateLog = Static<typeof HubTokenUpdateLogSchema>;
+
+export const HubAssetUpdateLogSchema = Type.Object({
+  id: Type.String({ maxLength: 120 }),
+  domain: TDomainId, // hub domain where the tx happened
+  assetId: TBytes32,
+  tokenId: Type.Optional(TBytes32),
+  tickerHash: TBytes32,
+  assetDomain: TDomainId,
+  kind: Type.String(),
+  assetHash: TBytes32,
+  adopted: Type.String({ maxLength: 66 }),
+  approval: Type.Boolean(),
+  strategy: Type.String(),
+  transactionHash: Type.String({ maxLength: 66 }),
+  timestamp: Type.Number(),
+  blockNumber: Type.Number(),
+  txOrigin: TAddress,
+  txNonce: Type.Number(),
+});
+export type HubAssetUpdateLog = Static<typeof HubAssetUpdateLogSchema>;
+
 export const HubSupportedDomainSchema = Type.Object({
   domain: TDomainId,
   blockGasLimit: TIntegerString,

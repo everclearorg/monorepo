@@ -48,6 +48,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@anthropic-ai/sdk@npm:^0.74.0":
+  version: 0.74.0
+  resolution: "@anthropic-ai/sdk@npm:0.74.0"
+  dependencies:
+    json-schema-to-ts: ^3.1.1
+  peerDependencies:
+    zod: ^3.25.0 || ^4.0.0
+  peerDependenciesMeta:
+    zod:
+      optional: true
+  bin:
+    anthropic-ai-sdk: bin/cli
+  checksum: f70a3d85bde035621703720d9ee7c6c4c818cc714220b4d7e321e1880731428679e23c07125606d6adc1bd202ddccc29470f87d75bc7a6265810c3f95cfef057
+  languageName: node
+  linkType: hard
+
 "@aws-crypto/crc32@npm:5.2.0":
   version: 5.2.0
   resolution: "@aws-crypto/crc32@npm:5.2.0"
@@ -891,6 +907,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.18.3":
+  version: 7.28.6
+  resolution: "@babel/runtime@npm:7.28.6"
+  checksum: 42d8a868c2fc2e9a77927945a6daa7ec03c7ea49e611e0d15442933cdabb12f20e3a6849c729259076c10a4247adec229331d1f94c2d0073ea0979d7853e29fd
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.25.0":
   version: 7.28.3
   resolution: "@babel/runtime@npm:7.28.3"
@@ -1220,6 +1243,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/utils@workspace:packages/utils"
   dependencies:
+    "@anthropic-ai/sdk": ^0.74.0
     "@aws-sdk/client-ssm": ^3.735.0
     "@chimera-monorepo/contracts": "workspace:*"
     "@hyperlane-xyz/sdk": 3.15.1
@@ -1242,6 +1266,7 @@ __metadata:
     eslint: 8.34.0
     hyperid: 3.2.0
     nyc: 15.1.0
+    openai: ^6.21.0
     proxyquire: ^2.1.3
     rimraf: 5.0.1
     secp256k1: 4.0.3
@@ -12576,7 +12601,7 @@ __metadata:
 "isolmate@github:defi-wonderland/isolmate#59e18043c2450fef550f1744b3705ce9ebcaf1c8":
   version: 6.2.0-beta2
   resolution: "isolmate@https://github.com/defi-wonderland/isolmate.git#commit=59e18043c2450fef550f1744b3705ce9ebcaf1c8"
-  checksum: 20590bd0df236508f540f1cb76ce4a361bc5a5ebcdb6be3b013709cbcc77ab3eb727ca355b326c305bd2fb44062dffd747aefc71f4d538b9a3b5816fdd3e4f7e
+  checksum: 08e1b73c055f54999c3c4e8b729b383d7b3b36e03b5e40029e925c362a922542bdb85ecc67d9e1ca67942fc3f83f428d7b717a76f9797f327eac03a4cb02554e
   languageName: node
   linkType: hard
 
@@ -12960,6 +12985,16 @@ __metadata:
   dependencies:
     fast-deep-equal: ^3.1.3
   checksum: b4215cd58b2f5233d433c9f110e91b29d41c1efcb24534a0493be3cdded35acbba7f0b04e53848e6d5c748981dcddb3d09b1cdc3ec8806fce861694a2a94bec3
+  languageName: node
+  linkType: hard
+
+"json-schema-to-ts@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "json-schema-to-ts@npm:3.1.1"
+  dependencies:
+    "@babel/runtime": ^7.18.3
+    ts-algebra: ^2.0.0
+  checksum: b616f1c2d7492502e11eec4f8e4539ee1e897543a679d929494afdc164d9557275cead8372747b73f239b1e68056ffbf551b03ae82d0047bba0dfe2bbd6b64f4
   languageName: node
   linkType: hard
 
@@ -14832,6 +14867,23 @@ __metadata:
   dependencies:
     mimic-function: ^5.0.0
   checksum: eb08d2da9339819e2f9d52cab9caf2557d80e9af8c7d1ae86e1a0fef027d00a88e9f5bd67494d350df360f7c559fbb44e800b32f310fb989c860214eacbb561c
+  languageName: node
+  linkType: hard
+
+"openai@npm:^6.21.0":
+  version: 6.21.0
+  resolution: "openai@npm:6.21.0"
+  peerDependencies:
+    ws: ^8.18.0
+    zod: ^3.25 || ^4.0
+  peerDependenciesMeta:
+    ws:
+      optional: true
+    zod:
+      optional: true
+  bin:
+    openai: bin/cli
+  checksum: 1ba1382831fed90ea57f40ca972847847252fdbbbccf04b490cd3e0f8a4b9c8e56fcb5afa03d235a917b43343f99b0b0dd173e04300d7eb02f830bab6ee7f4bb
   languageName: node
   linkType: hard
 
@@ -18122,6 +18174,13 @@ __metadata:
     semver: 7.7.1
     validator: 13.12.0
   checksum: 232fcf9c7c3ca2e8f07487fdf40e24ce9f3d90c2de7317187b32ee8e9d0bed90ef6c6ee2d4f0f8747ddf7e718acc331ebd82b42d91381ec20d99531b19360ce4
+  languageName: node
+  linkType: hard
+
+"ts-algebra@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "ts-algebra@npm:2.0.0"
+  checksum: 970b0e7db49cf8c1a8ff2a816eb047fac8add47511f5e4995e4998c56c6f7b226399284412de88f3e137ab55c857a4262c0d8f02f0765730e7d3a021de2ea7ef
   languageName: node
   linkType: hard
 

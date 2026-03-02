@@ -24,6 +24,8 @@ import {
   LockPosition,
   Order,
   ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   HubMeta,
   SpokeMeta,
 } from '@chimera-monorepo/utils';
@@ -33,7 +35,7 @@ import { Pool } from 'pg';
 import * as db from 'zapatos/db';
 import type * as s from 'zapatos/schema';
 
-import { IntentMessageUpdate, pool } from './index';
+import { IntentMessageUpdate, TriageFingerprintLog, pool } from './index';
 
 // Helper to ensure the pool is defined when used (should always be true after getDatabase succeeds)
 const getPool = (): Pool => {
@@ -44,6 +46,120 @@ const getPool = (): Pool => {
 };
 
 db.enableCustomJSONParsingForLargeNumbers(pg);
+
+export const isTriageFingerprintProcessed = async (
+  fingerprint: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<boolean> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await poolToUse.query(
+    `SELECT 1
+      FROM alert_triage_log
+      WHERE fingerprint = $1
+      AND expires_at > NOW()
+      LIMIT 1`,
+    [fingerprint],
+  );
+  return (result.rowCount ?? 0) > 0;
+};
+
+export const tryReserveTriageFingerprint = async (
+  log: TriageFingerprintLog,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<boolean> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await poolToUse.query(
+    `INSERT INTO alert_triage_log (
+      fingerprint, report_type, severity, env, network, ids, reason, triage_mode, triage_result,
+      provider_used, model_used, triage_latency_ms, auto_resolve_attempted, auto_resolve_succeeded,
+      auto_resolve_reason_code, tool_calls_made, tool_names_used, expires_at
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6, $7, $8, $9,
+      $10, $11, $12, $13, $14, $15, $16, $17, $18
+    )
+    ON CONFLICT (fingerprint) DO NOTHING`,
+    [
+      log.fingerprint,
+      log.reportType,
+      log.severity,
+      log.env,
+      log.network,
+      log.ids,
+      log.reason,
+      log.triageMode,
+      log.triageResult ? JSON.stringify(log.triageResult) : null,
+      log.providerUsed ?? null,
+      log.modelUsed ?? null,
+      log.triageLatencyMs ?? null,
+      log.autoResolveAttempted ?? false,
+      log.autoResolveSucceeded ?? false,
+      log.autoResolveReasonCode ?? null,
+      log.toolCallsMade ?? 0,
+      log.toolNamesUsed ?? [],
+      log.expiresAt,
+    ],
+  );
+  return (result.rowCount ?? 0) > 0;
+};
+
+export const finalizeTriageFingerprint = async (
+  log: TriageFingerprintLog,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await poolToUse.query(
+    `UPDATE alert_triage_log
+      SET triage_result = $2,
+          provider_used = $3,
+          model_used = $4,
+          triage_latency_ms = $5,
+          auto_resolve_attempted = $6,
+          auto_resolve_succeeded = $7,
+          auto_resolve_reason_code = $8,
+          tool_calls_made = $9,
+          tool_names_used = $10,
+          expires_at = $11
+      WHERE fingerprint = $1`,
+    [
+      log.fingerprint,
+      log.triageResult ? JSON.stringify(log.triageResult) : null,
+      log.providerUsed ?? null,
+      log.modelUsed ?? null,
+      log.triageLatencyMs ?? null,
+      log.autoResolveAttempted ?? false,
+      log.autoResolveSucceeded ?? false,
+      log.autoResolveReasonCode ?? null,
+      log.toolCallsMade ?? 0,
+      log.toolNamesUsed ?? [],
+      log.expiresAt,
+    ],
+  );
+};
+
+export const setTriageAutoResolveOutcome = async (
+  fingerprint: string,
+  succeeded: boolean,
+  reasonCode?: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await poolToUse.query(
+    `UPDATE alert_triage_log
+      SET auto_resolve_attempted = true,
+          auto_resolve_succeeded = $2,
+          auto_resolve_reason_code = $3
+      WHERE fingerprint = $1`,
+    [fingerprint, succeeded, reasonCode ?? null],
+  );
+};
+
+export const pruneExpiredTriageFingerprints = async (
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<number> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await poolToUse.query(`DELETE FROM alert_triage_log WHERE expires_at <= NOW()`);
+  return result.rowCount ?? 0;
+};
 
 export const saveOriginIntents = async (
   _intents: OriginIntent[],
@@ -179,6 +295,32 @@ export const saveProtocolUpdateLogs = async (
   const logs = _logs.map(converters.toProtocolUpdateLog);
   await db
     .upsert('protocol_update_logs', logs, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
+export const saveHubTokenUpdateLogs = async (
+  _logs: HubTokenUpdateLog[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const logs = _logs.map(converters.toHubTokenUpdateLog);
+  await db
+    .upsert('hub_token_update_logs' as any, logs as any, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
+export const saveHubAssetUpdateLogs = async (
+  _logs: HubAssetUpdateLog[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const logs = _logs.map(converters.toHubAssetUpdateLog);
+  await db
+    .upsert('hub_asset_update_logs' as any, logs as any, ['id'], {
       noNullUpdateColumns: ['id'],
     })
     .run(poolToUse);

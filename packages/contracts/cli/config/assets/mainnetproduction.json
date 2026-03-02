@@ -30,5 +30,13 @@
   {
     "symbol": "PTSUSDE",
     "contractName": "PTSUSDE"
+  },
+  {
+    "symbol": "syrupUSDT",
+    "contractName": "SYRUPUSDT"
+  },
+  {
+    "symbol": "USDe",
+    "contractName": "USDE"
   }
 ]

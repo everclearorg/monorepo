@@ -550,6 +550,74 @@ export const META_UPDATE_ENTITY = `
     txNonce
 `;
 
+export type HubTokenUpdateEntity = {
+  id: string;
+  token: { id: string };
+  kind: string;
+  feeRecipients?: string[];
+  feeAmounts?: string[];
+  maxDiscountBps?: string;
+  discountPerEpoch?: string;
+  prioritizedStrategy?: string;
+  transactionHash: string;
+  timestamp: string;
+  blockNumber: string;
+  txOrigin: string;
+  txNonce: string;
+};
+
+export const HUB_TOKEN_UPDATE_ENTITY = `
+    id
+    token { id }
+    kind
+    feeRecipients
+    feeAmounts
+    maxDiscountBps
+    discountPerEpoch
+    prioritizedStrategy
+    transactionHash
+    timestamp
+    blockNumber
+    txOrigin
+    txNonce
+`;
+
+export type HubAssetUpdateEntity = {
+  id: string;
+  asset: { id: string };
+  token?: { id: string } | null;
+  tickerHash?: string | null;
+  domain?: string | null;
+  kind: string;
+  assetHash?: string | null;
+  adopted?: string | null;
+  approval?: boolean | null;
+  strategy?: string | null;
+  transactionHash: string;
+  timestamp: string;
+  blockNumber: string;
+  txOrigin: string;
+  txNonce: string;
+};
+
+export const HUB_ASSET_UPDATE_ENTITY = `
+    id
+    asset { id }
+    token { id }
+    tickerHash
+    domain
+    kind
+    assetHash
+    adopted
+    approval
+    strategy
+    transactionHash
+    timestamp
+    blockNumber
+    txOrigin
+    txNonce
+`;
+
 export type HubFillIntentEventEntity = {
   id: string;
   intent: HubIntentEntity;

@@ -3,6 +3,7 @@ import { jsonifyError } from '../types';
 import { BetterUptimeConfig, Severity, Report } from '../helpers';
 import { axiosPost, axiosGet } from './mockable';
 import { AxiosError } from 'axios';
+import { redactSensitiveData } from '../triage/redact';
 
 // Create a uniquely serialized and searchable ids for matching reports.
 export const createUniqueIds = (ids: string[]): string => {
@@ -65,6 +66,15 @@ const createAlertName = (report: Report): string => {
   return `Everclear ${env} Monitor - ${type}`;
 };
 
+const toLoggableReport = (report: Report) => ({
+  timestamp: report.timestamp,
+  reason: String(redactSensitiveData(report.reason)).slice(0, 500),
+  ids: report.ids,
+  severity: report.severity,
+  env: report.env,
+  type: report.type,
+});
+
 const validateBetterUptimeConfig = (
   betterUptime: BetterUptimeConfig,
   logger: Logger,
@@ -94,15 +104,8 @@ export const getMatchingIncidents = async (
   // Create incident name
   const name = createAlertName(report);
 
-  const { timestamp, reason, ids, logger, type, severity, env } = report;
-  const loggableReport = {
-    timestamp,
-    reason,
-    ids,
-    severity,
-    env,
-    type,
-  };
+  const { logger } = report;
+  const loggableReport = toLoggableReport(report);
 
   logger.info('Checking for matching incidents', requestContext, methodContext, {
     report: loggableReport,
@@ -173,15 +176,8 @@ export const alertViaBetterUptimeIfNeeded = async (
   // Create method context for the logger
   const methodContext = createMethodContext(alertViaBetterUptime.name);
 
-  const { timestamp, reason, ids, logger, type, severity, env } = report;
-  const loggableReport = {
-    timestamp,
-    reason,
-    ids,
-    severity,
-    env,
-    type,
-  };
+  const { logger } = report;
+  const loggableReport = toLoggableReport(report);
 
   // Validate betterUptime config
   if (!validateBetterUptimeConfig(betterUptime, logger, requestContext, methodContext)) {
@@ -199,7 +195,11 @@ export const alertViaBetterUptimeIfNeeded = async (
   if (matching.length) {
     logger.warn('Matching incidents found, not creating another.', requestContext, methodContext, {
       report: loggableReport,
-      incidents: matching,
+      incidents: matching.map((incident) => ({
+        id: incident.id,
+        status: incident.attributes.status,
+        name: incident.attributes.name,
+      })),
     });
     return;
   }
@@ -221,14 +221,7 @@ export const alertViaBetterUptime = async (
   const methodContext = createMethodContext(alertViaBetterUptime.name);
 
   const { timestamp, reason, ids, logger, severity, env, type } = report;
-  const loggableReport = {
-    timestamp,
-    reason,
-    ids,
-    severity,
-    env,
-    type,
-  };
+  const loggableReport = toLoggableReport(report);
 
   // Validate betterUptime config
   if (!validateBetterUptimeConfig(betterUptime, logger, requestContext, methodContext)) {
@@ -276,7 +269,7 @@ export const alertViaBetterUptime = async (
     if (error.response?.status === 422) {
       logger.error(`BetterUptime v3 validation error`, requestContext, methodContext, jsonifyError(e as Error), {
         status: error.response.status,
-        data: error.response.data,
+        responseSummary: String(redactSensitiveData(JSON.stringify(error.response.data ?? {}))).slice(0, 500),
         report: loggableReport,
       });
     } else if (error.response?.status === 429) {
@@ -310,15 +303,8 @@ export const resolveAlertViaBetterUptime = async (
   // Create method context for the logger
   const methodContext = createMethodContext(resolveAlertViaBetterUptime.name);
 
-  const { timestamp, reason, ids, logger, type, severity, env } = report;
-  const loggableReport = {
-    timestamp,
-    reason,
-    ids,
-    severity,
-    env,
-    type,
-  };
+  const { logger } = report;
+  const loggableReport = toLoggableReport(report);
 
   // Validate betterUptime config
   if (!validateBetterUptimeConfig(betterUptime, logger, requestContext, methodContext)) {
@@ -380,6 +366,10 @@ export const resolveAlertViaBetterUptime = async (
 
   logger.info(`Resolved ${successfulResolutions.length}/${matching.length} incidents`, requestContext, methodContext, {
     report: loggableReport,
-    results: resolveResults.map((r) => (r.status === 'fulfilled' ? r.value : r.reason)),
+    results: resolveResults.map((r) =>
+      r.status === 'fulfilled'
+        ? { incidentId: r.value.incidentId, status: r.value.status }
+        : { status: 'error', reason: String(redactSensitiveData(String(r.reason ?? 'unknown'))).slice(0, 300) },
+    ),
   });
 };
