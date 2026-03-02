@@ -12,6 +12,9 @@ everclear_spoke = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm" #mainnet-prod
 [programs.localnet]
 everclear_spoke = "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm"
 
+[programs.devnet]
+everclear_spoke = "6S2JxnZESFsNiLNTwhxzC3Amv9ACEgVkNT3ZksEjcKqp"
+
 [registry]
 url = "https://api.apr.dev"
 

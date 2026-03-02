@@ -296,8 +296,9 @@ pub struct TransferRemoteContext<'info> {
     /// The SPL-Noop program
     pub spl_noop_program: Program<'info, SplNoop>,
 
-    /// The mailbox program
-    pub mailbox_program: Interface<'info, Mailbox>,
+    /// CHECK: Mailbox program; AccountInfo to support CCIP. When Hyperlane, validated in calling code.
+    #[account(executable)]
+    pub mailbox_program: AccountInfo<'info>,
 
     /// CHECK: Outbox data account – we rely on the Mailbox program to check
     #[account(mut)]
@@ -320,9 +321,8 @@ pub struct TransferRemoteContext<'info> {
     #[account(mut)]
     pub dispatched_message_pda: AccountInfo<'info>,
 
-    // -- If using an IGP, add those below as well:
-    #[account(executable)]
-    pub igp_program: Interface<'info, Igp>,
+    /// CHECK: IGP program; AccountInfo to support CCIP. When Hyperlane, validated in calling code.
+    pub igp_program: AccountInfo<'info>,
 
     /// CHECK:
     #[account(mut)]

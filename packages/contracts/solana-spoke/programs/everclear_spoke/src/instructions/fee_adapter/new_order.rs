@@ -48,6 +48,14 @@ pub fn new_order(
 
     handle_batch_fees(fee_data_for_signature, fee_param.signature, fee_accounts, &program_id)?;
 
+    // Slice passed to handle_new_intent: messaging (CCIP/Hyperlane) accounts only.
+    // remaining_accounts layout: [ unique_1, dispatched_1, ..., unique_{n-1}, dispatched_{n-1}, (CCIP accounts when CCIP) ].
+    // So the first 2*(n-1) are consumed per intent; the rest are passed to handle_new_intent.
+    let num_extra_intents = params.len().saturating_sub(1);
+    let messaging_start = num_extra_intents * 2;
+    let remaining_accounts_slice: &[anchor_lang::prelude::AccountInfo] =
+        &ctx.remaining_accounts[messaging_start..];
+
     let mut remaining_accounts_iter = ctx.remaining_accounts.iter();
     let mut intent_ids: Vec<[u8; 32]> = Vec::with_capacity(params.len());
 
@@ -78,7 +86,8 @@ pub fn new_order(
             }
         };
 
-        let mut accounts = NewIntentAccounts {
+        // Box to stay under BPF stack limit (4KB)
+        let mut accounts = Box::new(NewIntentAccounts {
             spoke_state: ctx.accounts.spoke_state.as_ref().clone(),
             mint: ctx.accounts.mint.clone(),
             token_program: ctx.accounts.token_program.clone(),
@@ -87,20 +96,20 @@ pub fn new_order(
             authority: ctx.accounts.authority.clone(),
             system_program: ctx.accounts.system_program.clone(),
             spl_noop_program: ctx.accounts.spl_noop_program.clone(),
-            hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.clone(),
+            hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.to_account_info(),
             mailbox_outbox: ctx.accounts.mailbox_outbox.clone(),
             dispatch_authority: ctx.accounts.dispatch_authority.clone(),
             unique_message_account,
             dispatched_message_pda,
-            igp_program: ctx.accounts.igp_program.clone(),
+            igp_program: ctx.accounts.igp_program.to_account_info(),
             igp_program_data: ctx.accounts.igp_program_data.clone(),
             igp_payment_pda: ctx.accounts.igp_payment_pda.clone(),
             configured_igp_account: ctx.accounts.configured_igp_account.clone(),
             inner_igp_account: ctx.accounts.inner_igp_account.clone(),
-        };
+        });
 
         let event_data = handle_new_intent(
-            &mut accounts,
+            &mut *accounts,
             program_id,
             p.receiver,
             p.output_asset,
@@ -110,6 +119,7 @@ pub fn new_order(
             p.destinations.clone(),
             p.data.clone(),
             p.message_gas_limit,
+            remaining_accounts_slice,
         )?;
 
         emit_cpi!(event_data);
@@ -117,10 +127,10 @@ pub fn new_order(
         intent_ids.push(event_data.intent_id);
     }
 
-    require!(
-        remaining_accounts_iter.next().is_none(),
-        SpokeError::InvalidArgument
-    );
+    // For Hyperlane, remaining_accounts has exactly 2*(n-1) (unique, dispatched) pairs.
+    // For CCIP, remaining_accounts has 2*(n-1) pairs plus CCIP router/accounts; those extras
+    // are passed via remaining_accounts_slice to handle_new_intent. Do not require iterator
+    // exhausted so both flows are supported.
 
     let order_id = hash_intent_id_array(&intent_ids);
 

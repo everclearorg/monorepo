@@ -1,14 +1,20 @@
-{
+/**
+ * Program IDL in camelCase format in order to be used in JS/TS.
+ *
+ * Note that this is only a type helper and is not the actual IDL. The original
+ * IDL can be found at `target/idl/everclear_spoke.json`.
+ */
+export type EverclearSpoke = {
   "address": "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw",
   "metadata": {
-    "name": "everclear_spoke",
+    "name": "everclearSpoke",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "ccip_receive",
+      "name": "ccipReceive",
       "docs": [
         "Receive a cross-chain message via CCIP.",
         "Called via CPI from CCIP OffRamp program."
@@ -62,15 +68,15 @@
             ],
             "program": {
               "kind": "account",
-              "path": "offramp_program"
+              "path": "offrampProgram"
             }
           }
         },
         {
-          "name": "offramp_program"
+          "name": "offrampProgram"
         },
         {
-          "name": "allowed_offramp",
+          "name": "allowedOfframp",
           "pda": {
             "seeds": [
               {
@@ -99,18 +105,18 @@
               },
               {
                 "kind": "account",
-                "path": "offramp_program"
+                "path": "offrampProgram"
               }
             ],
             "program": {
               "kind": "account",
               "path": "spoke_state.ccip_router",
-              "account": "SpokeState"
+              "account": "spokeState"
             }
           }
         },
         {
-          "name": "external_execution_config",
+          "name": "externalExecutionConfig",
           "writable": true,
           "pda": {
             "seeds": [
@@ -148,7 +154,7 @@
           }
         },
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -172,15 +178,15 @@
           }
         },
         {
-          "name": "intent_status_pda",
+          "name": "intentStatusPda",
           "writable": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "pda_payer",
+          "name": "pdaPayer",
           "writable": true,
           "pda": {
             "seeds": [
@@ -233,14 +239,14 @@
           "name": "message",
           "type": {
             "defined": {
-              "name": "Any2SVMMessage"
+              "name": "any2SvmMessage"
             }
           }
         }
       ]
     },
     {
-      "name": "fill_intent",
+      "name": "fillIntent",
       "docs": [
         "Fills a new intent.",
         "The user \"locks\" funds (previously deposited) and fills an intent.",
@@ -259,7 +265,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -283,7 +289,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -321,27 +327,27 @@
           "signer": true
         },
         {
-          "name": "origin_receiver"
+          "name": "originReceiver"
         },
         {
           "name": "mint"
         },
         {
-          "name": "solver_token_account",
+          "name": "solverTokenAccount",
           "writable": true
         },
         {
-          "name": "origin_receiver_token_account",
+          "name": "originReceiverTokenAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "origin_receiver"
+                "path": "originReceiver"
               },
               {
                 "kind": "account",
-                "path": "token_program"
+                "path": "tokenProgram"
               },
               {
                 "kind": "account",
@@ -388,15 +394,15 @@
           }
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "intent_status_pda",
+          "name": "intentStatusPda",
           "writable": true
         },
         {
-          "name": "pda_payer",
+          "name": "pdaPayer",
           "writable": true,
           "pda": {
             "seeds": [
@@ -444,62 +450,62 @@
           }
         },
         {
-          "name": "hyperlane_mailbox"
+          "name": "hyperlaneMailbox"
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "spl_noop_program",
+          "name": "splNoopProgram",
           "address": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
         },
         {
-          "name": "mailbox_outbox",
+          "name": "mailboxOutbox",
           "writable": true
         },
         {
-          "name": "dispatch_authority",
+          "name": "dispatchAuthority",
           "writable": true
         },
         {
-          "name": "unique_message_account",
+          "name": "uniqueMessageAccount",
           "writable": true,
           "signer": true
         },
         {
-          "name": "dispatched_message_pda",
+          "name": "dispatchedMessagePda",
           "writable": true
         },
         {
-          "name": "igp_program"
+          "name": "igpProgram"
         },
         {
-          "name": "igp_program_data",
+          "name": "igpProgramData",
           "writable": true
         },
         {
-          "name": "igp_payment_pda",
+          "name": "igpPaymentPda",
           "writable": true
         },
         {
-          "name": "configured_igp_account",
+          "name": "configuredIgpAccount",
           "writable": true
         },
         {
           "name": "signer"
         },
         {
-          "name": "instruction_sysvar",
+          "name": "instructionSysvar",
           "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
-          "name": "inner_igp_account",
+          "name": "innerIgpAccount",
           "writable": true,
           "optional": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -533,7 +539,7 @@
       ],
       "args": [
         {
-          "name": "origin_initiator",
+          "name": "originInitiator",
           "type": {
             "array": [
               "u8",
@@ -542,7 +548,7 @@
           }
         },
         {
-          "name": "origin_input_asset",
+          "name": "originInputAsset",
           "type": {
             "array": [
               "u8",
@@ -551,23 +557,23 @@
           }
         },
         {
-          "name": "intent_origin",
+          "name": "intentOrigin",
           "type": "u32"
         },
         {
-          "name": "origin_nonce",
+          "name": "originNonce",
           "type": "u64"
         },
         {
-          "name": "origin_timestamp",
+          "name": "originTimestamp",
           "type": "u64"
         },
         {
-          "name": "origin_ttl",
+          "name": "originTtl",
           "type": "u64"
         },
         {
-          "name": "origin_amount",
+          "name": "originAmount",
           "type": {
             "array": [
               "u8",
@@ -576,7 +582,7 @@
           }
         },
         {
-          "name": "origin_amount_out_min",
+          "name": "originAmountOutMin",
           "type": {
             "array": [
               "u8",
@@ -585,17 +591,17 @@
           }
         },
         {
-          "name": "origin_destinations",
+          "name": "originDestinations",
           "type": {
             "vec": "u32"
           }
         },
         {
-          "name": "origin_data",
+          "name": "originData",
           "type": "bytes"
         },
         {
-          "name": "amount_out",
+          "name": "amountOut",
           "type": "u64"
         },
         {
@@ -609,7 +615,7 @@
           }
         },
         {
-          "name": "message_gas_limit",
+          "name": "messageGasLimit",
           "type": "u64"
         },
         {
@@ -640,7 +646,7 @@
           "signer": true
         },
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "pda": {
             "seeds": [
               {
@@ -663,15 +669,15 @@
           }
         },
         {
-          "name": "intent_status_pda",
+          "name": "intentStatusPda",
           "writable": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "pda_payer",
+          "name": "pdaPayer",
           "writable": true,
           "pda": {
             "seeds": [
@@ -719,7 +725,7 @@
           }
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -756,14 +762,14 @@
           "name": "handle",
           "type": {
             "defined": {
-              "name": "HandleInstruction"
+              "name": "handleInstruction"
             }
           }
         }
       ]
     },
     {
-      "name": "handle_account_metas",
+      "name": "handleAccountMetas",
       "discriminator": [
         194,
         141,
@@ -776,7 +782,7 @@
       ],
       "accounts": [
         {
-          "name": "account_metas_pda",
+          "name": "accountMetasPda",
           "docs": [
             "ref: https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/48b8508af42061d67cf46a3377e4569feb95d1d8/rust/main/chains/hyperlane-sealevel/src/mailbox.rs#L267"
           ]
@@ -787,21 +793,21 @@
           "name": "handle",
           "type": {
             "defined": {
-              "name": "HandleInstruction"
+              "name": "handleInstruction"
             }
           }
         }
       ],
       "returns": {
         "defined": {
-          "name": "SimulationReturnData",
+          "name": "simulationReturnData",
           "generics": [
             {
               "kind": "type",
               "type": {
                 "vec": {
                   "defined": {
-                    "name": "SerializableAccountMeta"
+                    "name": "serializableAccountMeta"
                   }
                 }
               }
@@ -811,7 +817,7 @@
       }
     },
     {
-      "name": "handle_as_admin",
+      "name": "handleAsAdmin",
       "discriminator": [
         85,
         72,
@@ -828,7 +834,7 @@
           "signer": true
         },
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "pda": {
             "seeds": [
               {
@@ -851,15 +857,15 @@
           }
         },
         {
-          "name": "intent_status_pda",
+          "name": "intentStatusPda",
           "writable": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "pda_payer",
+          "name": "pdaPayer",
           "writable": true,
           "pda": {
             "seeds": [
@@ -907,7 +913,7 @@
           }
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -944,7 +950,7 @@
           "name": "handle",
           "type": {
             "defined": {
-              "name": "HandleInstruction"
+              "name": "handleInstruction"
             }
           }
         }
@@ -968,7 +974,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -997,11 +1003,11 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -1038,14 +1044,14 @@
           "name": "init",
           "type": {
             "defined": {
-              "name": "SpokeInitializationParams"
+              "name": "spokeInitializationParams"
             }
           }
         }
       ]
     },
     {
-      "name": "initialize_fee_adapter",
+      "name": "initializeFeeAdapter",
       "discriminator": [
         188,
         187,
@@ -1058,7 +1064,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "pda": {
             "seeds": [
               {
@@ -1081,7 +1087,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1116,11 +1122,11 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -1154,21 +1160,21 @@
       ],
       "args": [
         {
-          "name": "fee_recipient",
+          "name": "feeRecipient",
           "type": "pubkey"
         },
         {
-          "name": "fee_signer",
+          "name": "feeSigner",
           "type": "pubkey"
         },
         {
-          "name": "fill_signer",
+          "name": "fillSigner",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "interchain_security_module",
+      "name": "interchainSecurityModule",
       "discriminator": [
         45,
         18,
@@ -1183,7 +1189,7 @@
       "args": []
     },
     {
-      "name": "interchain_security_module_account_metas",
+      "name": "interchainSecurityModuleAccountMetas",
       "discriminator": [
         190,
         214,
@@ -1198,14 +1204,14 @@
       "args": [],
       "returns": {
         "defined": {
-          "name": "SimulationReturnData",
+          "name": "simulationReturnData",
           "generics": [
             {
               "kind": "type",
               "type": {
                 "vec": {
                   "defined": {
-                    "name": "SerializableAccountMeta"
+                    "name": "serializableAccountMeta"
                   }
                 }
               }
@@ -1215,7 +1221,7 @@
       }
     },
     {
-      "name": "migrate_fee_adapter_state",
+      "name": "migrateFeeAdapterState",
       "discriminator": [
         177,
         245,
@@ -1228,7 +1234,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1252,7 +1258,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true
         },
         {
@@ -1261,19 +1267,19 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "fill_signer",
+          "name": "fillSigner",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "migrate_spoke_state",
+      "name": "migrateSpokeState",
       "docs": [
         "Migrate SpokeState PDA to new layout (adds CCIP fields). Call once per deployment after upgrade.",
         "Only the owner can run this. Safe to run only on accounts that still have the old layout."
@@ -1290,7 +1296,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true
         },
         {
@@ -1299,14 +1305,14 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": []
     },
     {
-      "name": "new_intent",
+      "name": "newIntent",
       "docs": [
         "Create a new intent.",
         "The user \"locks\" funds (previously deposited) and creates an intent.",
@@ -1325,7 +1331,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1349,7 +1355,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1387,82 +1393,82 @@
           "name": "mint"
         },
         {
-          "name": "user_token_account",
+          "name": "userTokenAccount",
           "writable": true
         },
         {
-          "name": "program_vault_account",
+          "name": "programVaultAccount",
           "writable": true
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "hyperlane_mailbox"
+          "name": "hyperlaneMailbox"
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "spl_noop_program",
+          "name": "splNoopProgram",
           "address": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
         },
         {
-          "name": "mailbox_outbox",
+          "name": "mailboxOutbox",
           "writable": true
         },
         {
-          "name": "dispatch_authority",
+          "name": "dispatchAuthority",
           "writable": true
         },
         {
-          "name": "unique_message_account",
+          "name": "uniqueMessageAccount",
           "writable": true,
           "signer": true
         },
         {
-          "name": "dispatched_message_pda",
+          "name": "dispatchedMessagePda",
           "writable": true
         },
         {
-          "name": "igp_program"
+          "name": "igpProgram"
         },
         {
-          "name": "igp_program_data",
+          "name": "igpProgramData",
           "writable": true
         },
         {
-          "name": "igp_payment_pda",
+          "name": "igpPaymentPda",
           "writable": true
         },
         {
-          "name": "configured_igp_account",
+          "name": "configuredIgpAccount",
           "writable": true
         },
         {
-          "name": "fee_signer"
+          "name": "feeSigner"
         },
         {
-          "name": "fee_recipient",
+          "name": "feeRecipient",
           "writable": true
         },
         {
-          "name": "fee_recipient_token_account",
+          "name": "feeRecipientTokenAccount",
           "writable": true
         },
         {
-          "name": "instruction_sysvar",
+          "name": "instructionSysvar",
           "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
-          "name": "inner_igp_account",
+          "name": "innerIgpAccount",
           "writable": true,
           "optional": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -1500,7 +1506,7 @@
           "type": "pubkey"
         },
         {
-          "name": "output_asset",
+          "name": "outputAsset",
           "type": "pubkey"
         },
         {
@@ -1508,7 +1514,7 @@
           "type": "u64"
         },
         {
-          "name": "amount_out_min",
+          "name": "amountOutMin",
           "type": "u128"
         },
         {
@@ -1526,21 +1532,21 @@
           "type": "bytes"
         },
         {
-          "name": "message_gas_limit",
+          "name": "messageGasLimit",
           "type": "u64"
         },
         {
-          "name": "fee_param",
+          "name": "feeParam",
           "type": {
             "defined": {
-              "name": "FeeParams"
+              "name": "feeParams"
             }
           }
         }
       ]
     },
     {
-      "name": "new_order",
+      "name": "newOrder",
       "discriminator": [
         153,
         0,
@@ -1553,7 +1559,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1577,7 +1583,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1615,82 +1621,82 @@
           "name": "mint"
         },
         {
-          "name": "user_token_account",
+          "name": "userTokenAccount",
           "writable": true
         },
         {
-          "name": "program_vault_account",
+          "name": "programVaultAccount",
           "writable": true
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "hyperlane_mailbox"
+          "name": "hyperlaneMailbox"
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "spl_noop_program",
+          "name": "splNoopProgram",
           "address": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
         },
         {
-          "name": "mailbox_outbox",
+          "name": "mailboxOutbox",
           "writable": true
         },
         {
-          "name": "dispatch_authority",
+          "name": "dispatchAuthority",
           "writable": true
         },
         {
-          "name": "unique_message_account",
+          "name": "uniqueMessageAccount",
           "writable": true,
           "signer": true
         },
         {
-          "name": "dispatched_message_pda",
+          "name": "dispatchedMessagePda",
           "writable": true
         },
         {
-          "name": "igp_program"
+          "name": "igpProgram"
         },
         {
-          "name": "igp_program_data",
+          "name": "igpProgramData",
           "writable": true
         },
         {
-          "name": "igp_payment_pda",
+          "name": "igpPaymentPda",
           "writable": true
         },
         {
-          "name": "configured_igp_account",
+          "name": "configuredIgpAccount",
           "writable": true
         },
         {
-          "name": "fee_signer"
+          "name": "feeSigner"
         },
         {
-          "name": "fee_recipient",
+          "name": "feeRecipient",
           "writable": true
         },
         {
-          "name": "fee_recipient_token_account",
+          "name": "feeRecipientTokenAccount",
           "writable": true
         },
         {
-          "name": "instruction_sysvar",
+          "name": "instructionSysvar",
           "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
-          "name": "inner_igp_account",
+          "name": "innerIgpAccount",
           "writable": true,
           "optional": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -1728,16 +1734,16 @@
           "type": {
             "vec": {
               "defined": {
-                "name": "OrderParameters"
+                "name": "orderParameters"
               }
             }
           }
         },
         {
-          "name": "fee_param",
+          "name": "feeParam",
           "type": {
             "defined": {
-              "name": "FeeParams"
+              "name": "feeParams"
             }
           }
         }
@@ -1761,7 +1767,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1789,7 +1795,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -1824,7 +1830,7 @@
       "args": []
     },
     {
-      "name": "pause_fee_adapter",
+      "name": "pauseFeeAdapter",
       "discriminator": [
         93,
         43,
@@ -1837,7 +1843,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1861,7 +1867,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1896,11 +1902,11 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -1935,7 +1941,7 @@
       "args": []
     },
     {
-      "name": "rollback_to_hyperlane",
+      "name": "rollbackToHyperlane",
       "discriminator": [
         48,
         59,
@@ -1948,7 +1954,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1976,7 +1982,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2011,7 +2017,7 @@
       "args": []
     },
     {
-      "name": "settle_delivered_intent",
+      "name": "settleDeliveredIntent",
       "discriminator": [
         106,
         187,
@@ -2029,43 +2035,43 @@
           "signer": true
         },
         {
-          "name": "spoke_state"
+          "name": "spokeState"
         },
         {
-          "name": "intent_status_pda",
+          "name": "intentStatusPda",
           "writable": true
         },
         {
-          "name": "vault_authority"
+          "name": "vaultAuthority"
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "mint_account"
+          "name": "mintAccount"
         },
         {
-          "name": "associated_token_program",
+          "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "recipient"
         },
         {
-          "name": "recipient_token_account",
+          "name": "recipientTokenAccount",
           "writable": true
         },
         {
-          "name": "vault_token_account",
+          "name": "vaultTokenAccount",
           "writable": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2099,17 +2105,17 @@
       ],
       "args": [
         {
-          "name": "settle_delivered_intent",
+          "name": "settleDeliveredIntent",
           "type": {
             "defined": {
-              "name": "SettleDeliveredIntentInstruction"
+              "name": "settleDeliveredIntentInstruction"
             }
           }
         }
       ]
     },
     {
-      "name": "switch_to_ccip",
+      "name": "switchToCcip",
       "discriminator": [
         94,
         212,
@@ -2122,7 +2128,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2150,7 +2156,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2184,23 +2190,23 @@
       ],
       "args": [
         {
-          "name": "ccip_router",
+          "name": "ccipRouter",
           "type": "pubkey"
         },
         {
-          "name": "ccip_offramp",
+          "name": "ccipOfframp",
           "type": "pubkey"
         },
         {
-          "name": "ccip_chain_selector",
+          "name": "ccipChainSelector",
           "type": "u64"
         },
         {
-          "name": "everclear_ccip_chain_selector",
+          "name": "everclearCcipChainSelector",
           "type": "u64"
         },
         {
-          "name": "everclear_gateway",
+          "name": "everclearGateway",
           "type": {
             "array": [
               "u8",
@@ -2227,7 +2233,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2255,7 +2261,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2290,7 +2296,7 @@
       "args": []
     },
     {
-      "name": "unpause_fee_adapter",
+      "name": "unpauseFeeAdapter",
       "discriminator": [
         141,
         149,
@@ -2303,7 +2309,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2327,7 +2333,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2362,11 +2368,11 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2401,7 +2407,7 @@
       "args": []
     },
     {
-      "name": "update_fee_recipient",
+      "name": "updateFeeRecipient",
       "discriminator": [
         249,
         0,
@@ -2414,7 +2420,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2438,7 +2444,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2473,11 +2479,11 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2511,13 +2517,13 @@
       ],
       "args": [
         {
-          "name": "fee_recipient",
+          "name": "feeRecipient",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "update_fee_signer",
+      "name": "updateFeeSigner",
       "discriminator": [
         140,
         214,
@@ -2530,7 +2536,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2554,7 +2560,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2589,11 +2595,11 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2627,13 +2633,13 @@
       ],
       "args": [
         {
-          "name": "fee_signer",
+          "name": "feeSigner",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "update_fill_signer",
+      "name": "updateFillSigner",
       "discriminator": [
         38,
         159,
@@ -2646,7 +2652,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2670,7 +2676,7 @@
           }
         },
         {
-          "name": "fee_adapter_state",
+          "name": "feeAdapterState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2705,11 +2711,11 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2743,13 +2749,13 @@
       ],
       "args": [
         {
-          "name": "fill_signer",
+          "name": "fillSigner",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "update_igp",
+      "name": "updateIgp",
       "docs": [
         "new_igp contains the IGP address",
         "new_igp_type contains either the IGP address (as in new_igp), or the overhead IGP address if the IGP is an overhead IGP."
@@ -2766,7 +2772,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2794,7 +2800,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2828,21 +2834,21 @@
       ],
       "args": [
         {
-          "name": "new_igp",
+          "name": "newIgp",
           "type": "pubkey"
         },
         {
-          "name": "new_igp_type",
+          "name": "newIgpType",
           "type": {
             "defined": {
-              "name": "InterchainGasPaymasterType"
+              "name": "interchainGasPaymasterType"
             }
           }
         }
       ]
     },
     {
-      "name": "update_lighthouse",
+      "name": "updateLighthouse",
       "discriminator": [
         51,
         13,
@@ -2855,7 +2861,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2883,7 +2889,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2917,13 +2923,13 @@
       ],
       "args": [
         {
-          "name": "new_lighthouse",
+          "name": "newLighthouse",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "update_mailbox",
+      "name": "updateMailbox",
       "discriminator": [
         213,
         10,
@@ -2936,7 +2942,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2964,7 +2970,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -2998,13 +3004,13 @@
       ],
       "args": [
         {
-          "name": "new_mailbox",
+          "name": "newMailbox",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "update_mailbox_dispatch_authority_bump",
+      "name": "updateMailboxDispatchAuthorityBump",
       "discriminator": [
         99,
         54,
@@ -3017,7 +3023,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3045,7 +3051,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -3079,13 +3085,13 @@
       ],
       "args": [
         {
-          "name": "new_bump",
+          "name": "newBump",
           "type": "u8"
         }
       ]
     },
     {
-      "name": "update_message_gas_limit",
+      "name": "updateMessageGasLimit",
       "discriminator": [
         95,
         171,
@@ -3098,7 +3104,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3126,7 +3132,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -3160,13 +3166,13 @@
       ],
       "args": [
         {
-          "name": "new_limit",
+          "name": "newLimit",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "update_vault_authority_bump",
+      "name": "updateVaultAuthorityBump",
       "discriminator": [
         124,
         42,
@@ -3179,7 +3185,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3207,7 +3213,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -3241,13 +3247,13 @@
       ],
       "args": [
         {
-          "name": "new_bump",
+          "name": "newBump",
           "type": "u8"
         }
       ]
     },
     {
-      "name": "update_watchtower",
+      "name": "updateWatchtower",
       "discriminator": [
         146,
         49,
@@ -3260,7 +3266,7 @@
       ],
       "accounts": [
         {
-          "name": "spoke_state",
+          "name": "spokeState",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3288,7 +3294,7 @@
           "signer": true
         },
         {
-          "name": "event_authority",
+          "name": "eventAuthority",
           "pda": {
             "seeds": [
               {
@@ -3322,7 +3328,7 @@
       ],
       "args": [
         {
-          "name": "new_watchtower",
+          "name": "newWatchtower",
           "type": "pubkey"
         }
       ]
@@ -3330,7 +3336,7 @@
   ],
   "accounts": [
     {
-      "name": "FeeAdapterState",
+      "name": "feeAdapterState",
       "discriminator": [
         169,
         215,
@@ -3343,7 +3349,7 @@
       ]
     },
     {
-      "name": "IntentStatusAccount",
+      "name": "intentStatusAccount",
       "discriminator": [
         31,
         58,
@@ -3356,7 +3362,7 @@
       ]
     },
     {
-      "name": "SpokeState",
+      "name": "spokeState",
       "discriminator": [
         203,
         210,
@@ -3371,7 +3377,7 @@
   ],
   "events": [
     {
-      "name": "FeeAdapterPausedEvent",
+      "name": "feeAdapterPausedEvent",
       "discriminator": [
         161,
         21,
@@ -3384,7 +3390,7 @@
       ]
     },
     {
-      "name": "FeeAdapterUnpausedEvent",
+      "name": "feeAdapterUnpausedEvent",
       "discriminator": [
         90,
         152,
@@ -3397,7 +3403,7 @@
       ]
     },
     {
-      "name": "FeeData",
+      "name": "feeData",
       "discriminator": [
         181,
         236,
@@ -3410,7 +3416,7 @@
       ]
     },
     {
-      "name": "FeeRecipientUpdatedEvent",
+      "name": "feeRecipientUpdatedEvent",
       "discriminator": [
         253,
         5,
@@ -3423,7 +3429,7 @@
       ]
     },
     {
-      "name": "FeeSignerUpdatedEvent",
+      "name": "feeSignerUpdatedEvent",
       "discriminator": [
         171,
         163,
@@ -3436,7 +3442,7 @@
       ]
     },
     {
-      "name": "FillSignerUpdatedEvent",
+      "name": "fillSignerUpdatedEvent",
       "discriminator": [
         11,
         118,
@@ -3449,7 +3455,7 @@
       ]
     },
     {
-      "name": "IgpUpdatedEvent",
+      "name": "igpUpdatedEvent",
       "discriminator": [
         117,
         50,
@@ -3462,7 +3468,7 @@
       ]
     },
     {
-      "name": "InitializedEvent",
+      "name": "initializedEvent",
       "discriminator": [
         136,
         202,
@@ -3475,7 +3481,7 @@
       ]
     },
     {
-      "name": "InitializedFeeAdapterEvent",
+      "name": "initializedFeeAdapterEvent",
       "discriminator": [
         190,
         147,
@@ -3488,7 +3494,7 @@
       ]
     },
     {
-      "name": "IntentAddedEvent",
+      "name": "intentAddedEvent",
       "discriminator": [
         18,
         99,
@@ -3501,7 +3507,7 @@
       ]
     },
     {
-      "name": "IntentFilledEvent",
+      "name": "intentFilledEvent",
       "discriminator": [
         151,
         229,
@@ -3514,7 +3520,7 @@
       ]
     },
     {
-      "name": "IntentWithFeesAddedEvent",
+      "name": "intentWithFeesAddedEvent",
       "discriminator": [
         89,
         204,
@@ -3527,7 +3533,7 @@
       ]
     },
     {
-      "name": "LighthouseUpdatedEvent",
+      "name": "lighthouseUpdatedEvent",
       "discriminator": [
         76,
         188,
@@ -3540,7 +3546,7 @@
       ]
     },
     {
-      "name": "MailboxDispatchAuthorityBumpUpdatedEvent",
+      "name": "mailboxDispatchAuthorityBumpUpdatedEvent",
       "discriminator": [
         136,
         254,
@@ -3553,7 +3559,7 @@
       ]
     },
     {
-      "name": "MailboxUpdatedEvent",
+      "name": "mailboxUpdatedEvent",
       "discriminator": [
         6,
         80,
@@ -3566,7 +3572,7 @@
       ]
     },
     {
-      "name": "MessageDeliveredEvent",
+      "name": "messageDeliveredEvent",
       "discriminator": [
         170,
         221,
@@ -3579,7 +3585,7 @@
       ]
     },
     {
-      "name": "MessageGasLimitUpdatedEvent",
+      "name": "messageGasLimitUpdatedEvent",
       "discriminator": [
         47,
         54,
@@ -3592,7 +3598,7 @@
       ]
     },
     {
-      "name": "MessageReceivedEvent",
+      "name": "messageReceivedEvent",
       "discriminator": [
         232,
         67,
@@ -3605,7 +3611,7 @@
       ]
     },
     {
-      "name": "MessagingProviderSwitchedEvent",
+      "name": "messagingProviderSwitchedEvent",
       "discriminator": [
         62,
         53,
@@ -3618,7 +3624,7 @@
       ]
     },
     {
-      "name": "OrderCreated",
+      "name": "orderCreated",
       "discriminator": [
         224,
         1,
@@ -3631,7 +3637,7 @@
       ]
     },
     {
-      "name": "PausedEvent",
+      "name": "pausedEvent",
       "discriminator": [
         43,
         14,
@@ -3644,7 +3650,7 @@
       ]
     },
     {
-      "name": "SettledEvent",
+      "name": "settledEvent",
       "discriminator": [
         117,
         207,
@@ -3657,7 +3663,7 @@
       ]
     },
     {
-      "name": "UnpausedEvent",
+      "name": "unpausedEvent",
       "discriminator": [
         150,
         198,
@@ -3670,7 +3676,7 @@
       ]
     },
     {
-      "name": "VaultAuthorityBumpUpdatedEvent",
+      "name": "vaultAuthorityBumpUpdatedEvent",
       "discriminator": [
         88,
         55,
@@ -3683,7 +3689,7 @@
       ]
     },
     {
-      "name": "WatchtowerUpdatedEvent",
+      "name": "watchtowerUpdatedEvent",
       "discriminator": [
         78,
         128,
@@ -3699,278 +3705,278 @@
   "errors": [
     {
       "code": 6000,
-      "name": "OnlyOwner",
+      "name": "onlyOwner",
       "msg": "Only the contract owner can call this method."
     },
     {
       "code": 6001,
-      "name": "NotAuthorizedToPause",
+      "name": "notAuthorizedToPause",
       "msg": "Not authorized to pause."
     },
     {
       "code": 6002,
-      "name": "ContractPaused",
+      "name": "contractPaused",
       "msg": "Contract is paused."
     },
     {
       "code": 6003,
-      "name": "InvalidAmount",
+      "name": "invalidAmount",
       "msg": "Invalid amount provided."
     },
     {
       "code": 6004,
-      "name": "InvalidOperation",
+      "name": "invalidOperation",
       "msg": "Invalid operation or overflow."
     },
     {
       "code": 6005,
-      "name": "IntentNotFound",
+      "name": "intentNotFound",
       "msg": "Intent not found."
     },
     {
       "code": 6006,
-      "name": "InvalidIntentStatus",
+      "name": "invalidIntentStatus",
       "msg": "Intent is in an invalid status for this operation."
     },
     {
       "code": 6007,
-      "name": "MaxFeeExceeded",
+      "name": "maxFeeExceeded",
       "msg": "Max fee exceeded."
     },
     {
       "code": 6008,
-      "name": "MultipleOrderAssets",
+      "name": "multipleOrderAssets",
       "msg": "Multiple input assets in a single order are not allowed."
     },
     {
       "code": 6009,
-      "name": "EmptyParams",
+      "name": "emptyParams",
       "msg": "Empty Params in new order function are not allowed"
     },
     {
       "code": 6010,
-      "name": "InvalidOrigin",
+      "name": "invalidOrigin",
       "msg": "Invalid origin for inbound message."
     },
     {
       "code": 6011,
-      "name": "InvalidSender",
+      "name": "invalidSender",
       "msg": "Invalid sender for inbound message."
     },
     {
       "code": 6012,
-      "name": "InvalidMessage",
+      "name": "invalidMessage",
       "msg": "Invalid or unknown message."
     },
     {
       "code": 6013,
-      "name": "Unauthorized",
+      "name": "unauthorized",
       "msg": "Unauthorized operation."
     },
     {
       "code": 6014,
-      "name": "SignatureExpired",
+      "name": "signatureExpired",
       "msg": "Signature has expired"
     },
     {
       "code": 6015,
-      "name": "InvalidSignature",
+      "name": "invalidSignature",
       "msg": "Invalid signature"
     },
     {
       "code": 6016,
-      "name": "ZeroAmount",
+      "name": "zeroAmount",
       "msg": "Zero amount provided"
     },
     {
       "code": 6017,
-      "name": "DecimalConversionOverflow",
+      "name": "decimalConversionOverflow",
       "msg": "Decimal conversion overflow"
     },
     {
       "code": 6018,
-      "name": "AlreadyInitialized",
+      "name": "alreadyInitialized",
       "msg": "Already initialized"
     },
     {
       "code": 6019,
-      "name": "InvalidOwner",
+      "name": "invalidOwner",
       "msg": "Invalid Owner"
     },
     {
       "code": 6020,
-      "name": "InvalidVarUpdate",
+      "name": "invalidVarUpdate",
       "msg": "Invalid var update"
     },
     {
       "code": 6021,
-      "name": "InvalidIntent",
+      "name": "invalidIntent",
       "msg": "Invalid intent"
     },
     {
       "code": 6022,
-      "name": "Overflow",
-      "msg": "Overflow"
+      "name": "overflow",
+      "msg": "overflow"
     },
     {
       "code": 6023,
-      "name": "InvalidAccount",
+      "name": "invalidAccount",
       "msg": "Invalid account meta"
     },
     {
       "code": 6024,
-      "name": "InvalidArgument",
+      "name": "invalidArgument",
       "msg": "Invalid argument data"
     },
     {
       "code": 6025,
-      "name": "IncorrectProgramId",
+      "name": "incorrectProgramId",
       "msg": "Incorrect program id"
     },
     {
       "code": 6026,
-      "name": "MissingRequiredSignature",
+      "name": "missingRequiredSignature",
       "msg": "Missing required signature"
     },
     {
       "code": 6027,
-      "name": "ExtraneousAccount",
+      "name": "extraneousAccount",
       "msg": "Extraneous account"
     },
     {
       "code": 6028,
-      "name": "IntegerOverflow",
+      "name": "integerOverflow",
       "msg": "Overflowing Integer"
     },
     {
       "code": 6029,
-      "name": "InvalidSeeds",
+      "name": "invalidSeeds",
       "msg": "Invalid seeds for deriving pda"
     },
     {
       "code": 6030,
-      "name": "InvalidVaultAccount",
+      "name": "invalidVaultAccount",
       "msg": "Invalid vault account"
     },
     {
       "code": 6031,
-      "name": "InvalidIntentPda",
+      "name": "invalidIntentPda",
       "msg": "Invalid intent pda"
     },
     {
       "code": 6032,
-      "name": "InvalidSettlementSize",
+      "name": "invalidSettlementSize",
       "msg": "Invalid settlement size"
     },
     {
       "code": 6033,
-      "name": "IncorrectSettlementAccounts",
+      "name": "incorrectSettlementAccounts",
       "msg": "Incorrect settlement accounts, mismatch with intent PDA."
     },
     {
       "code": 6034,
-      "name": "InvalidIntentId",
+      "name": "invalidIntentId",
       "msg": "Invalid intent id"
     },
     {
       "code": 6035,
-      "name": "InvalidDeadline",
+      "name": "invalidDeadline",
       "msg": "Invalid deadline"
     },
     {
       "code": 6036,
-      "name": "MissingEd25519Instruction",
+      "name": "missingEd25519Instruction",
       "msg": "Missing ed25519 preinstructions"
     },
     {
       "code": 6037,
-      "name": "InvalidFeeSignature",
+      "name": "invalidFeeSignature",
       "msg": "Invalid fee signature"
     },
     {
       "code": 6038,
-      "name": "InvalidFeeSignatureAccountsNotEmpty",
+      "name": "invalidFeeSignatureAccountsNotEmpty",
       "msg": "Invalid fee signature: preinstruction accounts not empty"
     },
     {
       "code": 6039,
-      "name": "InvalidFeeSignatureDataLength",
+      "name": "invalidFeeSignatureDataLength",
       "msg": "Invalid fee signature: preinstruction data length mismatch"
     },
     {
       "code": 6040,
-      "name": "InvalidFeeSignatureNumSignatures",
+      "name": "invalidFeeSignatureNumSignatures",
       "msg": "Invalid fee signature: number of signatures must be 1"
     },
     {
       "code": 6041,
-      "name": "InvalidFeeSignaturePadding",
+      "name": "invalidFeeSignaturePadding",
       "msg": "Invalid fee signature: padding byte must be 0"
     },
     {
       "code": 6042,
-      "name": "InvalidFeeSignatureOffsets",
+      "name": "invalidFeeSignatureOffsets",
       "msg": "Invalid fee signature: offset mismatch"
     },
     {
       "code": 6043,
-      "name": "InvalidFeeSignaturePubkeyMismatch",
+      "name": "invalidFeeSignaturePubkeyMismatch",
       "msg": "Invalid fee signature: public key mismatch with configured fee signer"
     },
     {
       "code": 6044,
-      "name": "InvalidFeeSignatureDataMismatch",
+      "name": "invalidFeeSignatureDataMismatch",
       "msg": "Invalid fee signature: signature data mismatch"
     },
     {
       "code": 6045,
-      "name": "InvalidFeeSignatureMessageMismatch",
+      "name": "invalidFeeSignatureMessageMismatch",
       "msg": "Invalid fee signature: message data mismatch"
     },
     {
       "code": 6046,
-      "name": "FeeAdapterPaused",
+      "name": "feeAdapterPaused",
       "msg": "Fee adapter paused"
     },
     {
       "code": 6047,
-      "name": "WrongDestination",
+      "name": "wrongDestination",
       "msg": "Wrong destination for fill intent"
     },
     {
       "code": 6048,
-      "name": "IntentExpired",
+      "name": "intentExpired",
       "msg": "fill intent expired"
     },
     {
       "code": 6049,
-      "name": "AmountOutInvalid",
+      "name": "amountOutInvalid",
       "msg": "fill intent amountOut is less than amountOutMin"
     },
     {
       "code": 6050,
-      "name": "InvalidDestinationArray",
+      "name": "invalidDestinationArray",
       "msg": "invalid intent destinations"
     },
     {
       "code": 6051,
-      "name": "InvalidFillIntentStatus",
+      "name": "invalidFillIntentStatus",
       "msg": "intent is already filled"
     },
     {
       "code": 6052,
-      "name": "InvalidIntentHash",
+      "name": "invalidIntentHash",
       "msg": "Intent hash mismatch - signature not bound to this intent"
     }
   ],
   "types": [
     {
-      "name": "Any2SVMMessage",
+      "name": "any2SvmMessage",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "message_id",
+            "name": "messageId",
             "type": {
               "array": [
                 "u8",
@@ -3979,7 +3985,7 @@
             }
           },
           {
-            "name": "source_chain_selector",
+            "name": "sourceChainSelector",
             "type": "u64"
           },
           {
@@ -3991,11 +3997,11 @@
             "type": "bytes"
           },
           {
-            "name": "token_amounts",
+            "name": "tokenAmounts",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "TokenAmount"
+                  "name": "tokenAmount"
                 }
               }
             }
@@ -4004,7 +4010,7 @@
       }
     },
     {
-      "name": "EVMIntent",
+      "name": "evmIntent",
       "docs": [
         "Represents the 12 fields in our Intent struct, matching the Solidity layout.",
         "Anchor serde is added here for putting the intent in event."
@@ -4031,7 +4037,7 @@
             }
           },
           {
-            "name": "input_asset",
+            "name": "inputAsset",
             "type": {
               "array": [
                 "u8",
@@ -4040,7 +4046,7 @@
             }
           },
           {
-            "name": "output_asset",
+            "name": "outputAsset",
             "type": {
               "array": [
                 "u8",
@@ -4074,7 +4080,7 @@
             }
           },
           {
-            "name": "amount_out_min",
+            "name": "amountOutMin",
             "type": {
               "array": [
                 "u8",
@@ -4096,14 +4102,14 @@
       }
     },
     {
-      "name": "FeeAdapterPausedEvent",
+      "name": "feeAdapterPausedEvent",
       "type": {
         "kind": "struct",
         "fields": []
       }
     },
     {
-      "name": "FeeAdapterState",
+      "name": "feeAdapterState",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4116,15 +4122,15 @@
             "type": "bool"
           },
           {
-            "name": "fee_recipient",
+            "name": "feeRecipient",
             "type": "pubkey"
           },
           {
-            "name": "fee_signer",
+            "name": "feeSigner",
             "type": "pubkey"
           },
           {
-            "name": "fill_signer",
+            "name": "fillSigner",
             "type": "pubkey"
           },
           {
@@ -4135,14 +4141,14 @@
       }
     },
     {
-      "name": "FeeAdapterUnpausedEvent",
+      "name": "feeAdapterUnpausedEvent",
       "type": {
         "kind": "struct",
         "fields": []
       }
     },
     {
-      "name": "FeeData",
+      "name": "feeData",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4153,11 +4159,11 @@
             }
           },
           {
-            "name": "input_asset",
+            "name": "inputAsset",
             "type": "pubkey"
           },
           {
-            "name": "output_asset",
+            "name": "outputAsset",
             "type": "pubkey"
           },
           {
@@ -4165,7 +4171,7 @@
             "type": "u64"
           },
           {
-            "name": "amount_out_min",
+            "name": "amountOutMin",
             "type": "u128"
           },
           {
@@ -4177,11 +4183,11 @@
             "type": "bytes"
           },
           {
-            "name": "token_fee",
+            "name": "tokenFee",
             "type": "u64"
           },
           {
-            "name": "native_fee",
+            "name": "nativeFee",
             "type": "u64"
           },
           {
@@ -4192,16 +4198,16 @@
       }
     },
     {
-      "name": "FeeParams",
+      "name": "feeParams",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "token_fee",
+            "name": "tokenFee",
             "type": "u64"
           },
           {
-            "name": "native_fee",
+            "name": "nativeFee",
             "type": "u64"
           },
           {
@@ -4216,55 +4222,55 @@
       }
     },
     {
-      "name": "FeeRecipientUpdatedEvent",
+      "name": "feeRecipientUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_fee_recipient",
+            "name": "oldFeeRecipient",
             "type": "pubkey"
           },
           {
-            "name": "new_fee_recipient",
+            "name": "newFeeRecipient",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "FeeSignerUpdatedEvent",
+      "name": "feeSignerUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_fee_signer",
+            "name": "oldFeeSigner",
             "type": "pubkey"
           },
           {
-            "name": "new_fee_signer",
+            "name": "newFeeSigner",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "FillSignerUpdatedEvent",
+      "name": "fillSignerUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_fill_signer",
+            "name": "oldFillSigner",
             "type": "pubkey"
           },
           {
-            "name": "new_fill_signer",
+            "name": "newFillSigner",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "H256",
+      "name": "h256",
       "docs": [
         "256-bit hash type."
       ],
@@ -4284,7 +4290,7 @@
       }
     },
     {
-      "name": "HandleInstruction",
+      "name": "handleInstruction",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4296,7 +4302,7 @@
             "name": "sender",
             "type": {
               "defined": {
-                "name": "H256"
+                "name": "h256"
               }
             }
           },
@@ -4308,31 +4314,31 @@
       }
     },
     {
-      "name": "IgpUpdatedEvent",
+      "name": "igpUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_igp",
+            "name": "oldIgp",
             "type": "pubkey"
           },
           {
-            "name": "new_igp",
+            "name": "newIgp",
             "type": "pubkey"
           },
           {
-            "name": "old_igp_type",
+            "name": "oldIgpType",
             "type": {
               "defined": {
-                "name": "InterchainGasPaymasterType"
+                "name": "interchainGasPaymasterType"
               }
             }
           },
           {
-            "name": "new_igp_type",
+            "name": "newIgpType",
             "type": {
               "defined": {
-                "name": "InterchainGasPaymasterType"
+                "name": "interchainGasPaymasterType"
               }
             }
           }
@@ -4340,7 +4346,7 @@
       }
     },
     {
-      "name": "InitializedEvent",
+      "name": "initializedEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4360,32 +4366,32 @@
       }
     },
     {
-      "name": "InitializedFeeAdapterEvent",
+      "name": "initializedFeeAdapterEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "fee_recipient",
+            "name": "feeRecipient",
             "type": "pubkey"
           },
           {
-            "name": "fee_signer",
+            "name": "feeSigner",
             "type": "pubkey"
           },
           {
-            "name": "fill_signer",
+            "name": "fillSigner",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "IntentAddedEvent",
+      "name": "intentAddedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intent_id",
+            "name": "intentId",
             "type": {
               "array": [
                 "u8",
@@ -4394,7 +4400,7 @@
             }
           },
           {
-            "name": "message_id",
+            "name": "messageId",
             "type": {
               "array": [
                 "u8",
@@ -4411,23 +4417,23 @@
             "type": "pubkey"
           },
           {
-            "name": "input_asset",
+            "name": "inputAsset",
             "type": "pubkey"
           },
           {
-            "name": "output_asset",
+            "name": "outputAsset",
             "type": "pubkey"
           },
           {
-            "name": "normalized_amount",
+            "name": "normalizedAmount",
             "type": "u128"
           },
           {
-            "name": "amount_out_min",
+            "name": "amountOutMin",
             "type": "u128"
           },
           {
-            "name": "origin_domain",
+            "name": "originDomain",
             "type": "u32"
           },
           {
@@ -4456,12 +4462,12 @@
       }
     },
     {
-      "name": "IntentFilledEvent",
+      "name": "intentFilledEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intent_id",
+            "name": "intentId",
             "type": {
               "array": [
                 "u8",
@@ -4470,7 +4476,7 @@
             }
           },
           {
-            "name": "message_id",
+            "name": "messageId",
             "type": {
               "array": [
                 "u8",
@@ -4492,14 +4498,14 @@
             }
           },
           {
-            "name": "amount_out",
+            "name": "amountOut",
             "type": "u64"
           },
           {
             "name": "intent",
             "type": {
               "defined": {
-                "name": "EVMIntent"
+                "name": "evmIntent"
               }
             }
           }
@@ -4507,7 +4513,7 @@
       }
     },
     {
-      "name": "IntentStatus",
+      "name": "intentStatus",
       "docs": [
         "Intent status."
       ],
@@ -4515,28 +4521,28 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "None"
+            "name": "none"
           },
           {
-            "name": "Added"
+            "name": "added"
           },
           {
-            "name": "Filled"
+            "name": "filled"
           },
           {
-            "name": "Settled"
+            "name": "settled"
           },
           {
-            "name": "SettledAndManuallyExecuted"
+            "name": "settledAndManuallyExecuted"
           },
           {
-            "name": "Delivered"
+            "name": "delivered"
           }
         ]
       }
     },
     {
-      "name": "IntentStatusAccount",
+      "name": "intentStatusAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4544,7 +4550,7 @@
             "name": "status",
             "type": {
               "defined": {
-                "name": "IntentStatus"
+                "name": "intentStatus"
               }
             }
           },
@@ -4553,7 +4559,7 @@
             "type": {
               "vec": {
                 "defined": {
-                  "name": "SerializableAccountMeta"
+                  "name": "serializableAccountMeta"
                 }
               }
             }
@@ -4563,7 +4569,7 @@
             "type": {
               "option": {
                 "defined": {
-                  "name": "Settlement"
+                  "name": "settlement"
                 }
               }
             }
@@ -4572,12 +4578,12 @@
       }
     },
     {
-      "name": "IntentWithFeesAddedEvent",
+      "name": "intentWithFeesAddedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intent_id",
+            "name": "intentId",
             "type": {
               "array": [
                 "u8",
@@ -4590,7 +4596,7 @@
             "type": "pubkey"
           },
           {
-            "name": "input_asset",
+            "name": "inputAsset",
             "type": "pubkey"
           },
           {
@@ -4611,18 +4617,18 @@
       }
     },
     {
-      "name": "InterchainGasPaymasterType",
+      "name": "interchainGasPaymasterType",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Igp",
+            "name": "igp",
             "fields": [
               "pubkey"
             ]
           },
           {
-            "name": "OverheadIgp",
+            "name": "overheadIgp",
             "fields": [
               "pubkey"
             ]
@@ -4631,55 +4637,55 @@
       }
     },
     {
-      "name": "LighthouseUpdatedEvent",
+      "name": "lighthouseUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_lighthouse",
+            "name": "oldLighthouse",
             "type": "pubkey"
           },
           {
-            "name": "new_lighthouse",
+            "name": "newLighthouse",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "MailboxDispatchAuthorityBumpUpdatedEvent",
+      "name": "mailboxDispatchAuthorityBumpUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_bump",
+            "name": "oldBump",
             "type": "u8"
           },
           {
-            "name": "new_bump",
+            "name": "newBump",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "MailboxUpdatedEvent",
+      "name": "mailboxUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_mailbox",
+            "name": "oldMailbox",
             "type": "pubkey"
           },
           {
-            "name": "new_mailbox",
+            "name": "newMailbox",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "MessageDeliveredEvent",
+      "name": "messageDeliveredEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4691,16 +4697,16 @@
             "name": "settlement",
             "type": {
               "defined": {
-                "name": "Settlement"
+                "name": "settlement"
               }
             }
           },
           {
-            "name": "account_metas",
+            "name": "accountMetas",
             "type": {
               "vec": {
                 "defined": {
-                  "name": "SerializableAccountMeta"
+                  "name": "serializableAccountMeta"
                 }
               }
             }
@@ -4709,23 +4715,23 @@
       }
     },
     {
-      "name": "MessageGasLimitUpdatedEvent",
+      "name": "messageGasLimitUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_limit",
+            "name": "oldLimit",
             "type": "u64"
           },
           {
-            "name": "new_limit",
+            "name": "newLimit",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "MessageReceivedEvent",
+      "name": "messageReceivedEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4741,7 +4747,7 @@
       }
     },
     {
-      "name": "MessagingProviderSwitchedEvent",
+      "name": "messagingProviderSwitchedEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4753,26 +4759,26 @@
       }
     },
     {
-      "name": "MessagingProviderType",
+      "name": "messagingProviderType",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Hyperlane"
+            "name": "hyperlane"
           },
           {
-            "name": "CCIP"
+            "name": "ccip"
           }
         ]
       }
     },
     {
-      "name": "OrderCreated",
+      "name": "orderCreated",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "order_id",
+            "name": "orderId",
             "type": {
               "array": [
                 "u8",
@@ -4785,7 +4791,7 @@
             "type": "pubkey"
           },
           {
-            "name": "intent_ids",
+            "name": "intentIds",
             "type": {
               "vec": {
                 "array": [
@@ -4800,14 +4806,14 @@
             "type": "u64"
           },
           {
-            "name": "native_value",
+            "name": "nativeValue",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "OrderParameters",
+      "name": "orderParameters",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4822,7 +4828,7 @@
             "type": "pubkey"
           },
           {
-            "name": "output_asset",
+            "name": "outputAsset",
             "type": "pubkey"
           },
           {
@@ -4830,11 +4836,11 @@
             "type": "u64"
           },
           {
-            "name": "amount_out_min",
+            "name": "amountOutMin",
             "type": "u128"
           },
           {
-            "name": "max_fee",
+            "name": "maxFee",
             "type": "u32"
           },
           {
@@ -4846,21 +4852,21 @@
             "type": "bytes"
           },
           {
-            "name": "message_gas_limit",
+            "name": "messageGasLimit",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "PausedEvent",
+      "name": "pausedEvent",
       "type": {
         "kind": "struct",
         "fields": []
       }
     },
     {
-      "name": "SerializableAccountMeta",
+      "name": "serializableAccountMeta",
       "docs": [
         "A borsh-serializable version of `AccountMeta`."
       ],
@@ -4872,23 +4878,23 @@
             "type": "pubkey"
           },
           {
-            "name": "is_signer",
+            "name": "isSigner",
             "type": "bool"
           },
           {
-            "name": "is_writable",
+            "name": "isWritable",
             "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "SettleDeliveredIntentInstruction",
+      "name": "settleDeliveredIntentInstruction",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intent_id",
+            "name": "intentId",
             "type": {
               "array": [
                 "u8",
@@ -4900,12 +4906,12 @@
       }
     },
     {
-      "name": "SettledEvent",
+      "name": "settledEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intent_id",
+            "name": "intentId",
             "type": {
               "array": [
                 "u8",
@@ -4933,12 +4939,12 @@
       }
     },
     {
-      "name": "Settlement",
+      "name": "settlement",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "intent_id",
+            "name": "intentId",
             "type": {
               "array": [
                 "u8",
@@ -4950,7 +4956,7 @@
             "name": "amount",
             "type": {
               "defined": {
-                "name": "U256"
+                "name": "u256"
               }
             }
           },
@@ -4963,14 +4969,14 @@
             "type": "pubkey"
           },
           {
-            "name": "update_virtual_balance",
+            "name": "updateVirtualBalance",
             "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "SimulationReturnData",
+      "name": "simulationReturnData",
       "docs": [
         "NOTE: This is used for hyperlane interop only and should not be used anywhere else",
         "A ridiculous workaround for `<https://github.com/solana-labs/solana/issues/31391>`,",
@@ -4981,27 +4987,27 @@
       "generics": [
         {
           "kind": "type",
-          "name": "T"
+          "name": "t"
         }
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "return_data",
+            "name": "returnData",
             "type": {
-              "generic": "T"
+              "generic": "t"
             }
           },
           {
-            "name": "trailing_byte",
+            "name": "trailingByte",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "SpokeInitializationParams",
+      "name": "spokeInitializationParams",
       "type": {
         "kind": "struct",
         "fields": [
@@ -5010,7 +5016,7 @@
             "type": "u32"
           },
           {
-            "name": "hub_domain",
+            "name": "hubDomain",
             "type": "u32"
           },
           {
@@ -5022,7 +5028,7 @@
             "type": "pubkey"
           },
           {
-            "name": "message_gas_limit",
+            "name": "messageGasLimit",
             "type": "u64"
           },
           {
@@ -5038,26 +5044,26 @@
             "type": "pubkey"
           },
           {
-            "name": "igp_type",
+            "name": "igpType",
             "type": {
               "defined": {
-                "name": "InterchainGasPaymasterType"
+                "name": "interchainGasPaymasterType"
               }
             }
           },
           {
-            "name": "mailbox_dispatch_authority_bump",
+            "name": "mailboxDispatchAuthorityBump",
             "type": "u8"
           },
           {
-            "name": "vault_authority_bump",
+            "name": "vaultAuthorityBump",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "SpokeState",
+      "name": "spokeState",
       "docs": [
         "SpokeState – global configuration."
       ],
@@ -5065,7 +5071,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "initialized_version",
+            "name": "initializedVersion",
             "type": "u8"
           },
           {
@@ -5089,7 +5095,7 @@
             "type": "pubkey"
           },
           {
-            "name": "message_gas_limit",
+            "name": "messageGasLimit",
             "type": "u64"
           },
           {
@@ -5109,7 +5115,7 @@
             "type": "pubkey"
           },
           {
-            "name": "mailbox_dispatch_authority_bump",
+            "name": "mailboxDispatchAuthorityBump",
             "type": "u8"
           },
           {
@@ -5117,51 +5123,51 @@
             "type": "pubkey"
           },
           {
-            "name": "igp_type",
+            "name": "igpType",
             "type": {
               "defined": {
-                "name": "InterchainGasPaymasterType"
+                "name": "interchainGasPaymasterType"
               }
             }
           },
           {
-            "name": "vault_authority_bump",
+            "name": "vaultAuthorityBump",
             "type": "u8"
           },
           {
-            "name": "ccip_router",
+            "name": "ccipRouter",
             "type": {
               "option": "pubkey"
             }
           },
           {
-            "name": "ccip_offramp",
+            "name": "ccipOfframp",
             "type": {
               "option": "pubkey"
             }
           },
           {
-            "name": "ccip_chain_selector",
+            "name": "ccipChainSelector",
             "type": {
               "option": "u64"
             }
           },
           {
-            "name": "everclear_ccip_chain_selector",
+            "name": "everclearCcipChainSelector",
             "type": {
               "option": "u64"
             }
           },
           {
-            "name": "messaging_provider",
+            "name": "messagingProvider",
             "type": {
               "defined": {
-                "name": "MessagingProviderType"
+                "name": "messagingProviderType"
               }
             }
           },
           {
-            "name": "everclear_gateway",
+            "name": "everclearGateway",
             "type": {
               "array": [
                 "u8",
@@ -5173,7 +5179,7 @@
       }
     },
     {
-      "name": "TokenAmount",
+      "name": "tokenAmount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -5189,7 +5195,7 @@
       }
     },
     {
-      "name": "U256",
+      "name": "u256",
       "docs": [
         "Little-endian large integer type",
         "256-bit unsigned integer."
@@ -5210,43 +5216,43 @@
       }
     },
     {
-      "name": "UnpausedEvent",
+      "name": "unpausedEvent",
       "type": {
         "kind": "struct",
         "fields": []
       }
     },
     {
-      "name": "VaultAuthorityBumpUpdatedEvent",
+      "name": "vaultAuthorityBumpUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_bump",
+            "name": "oldBump",
             "type": "u8"
           },
           {
-            "name": "new_bump",
+            "name": "newBump",
             "type": "u8"
           }
         ]
       }
     },
     {
-      "name": "WatchtowerUpdatedEvent",
+      "name": "watchtowerUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "old_watchtower",
+            "name": "oldWatchtower",
             "type": "pubkey"
           },
           {
-            "name": "new_watchtower",
+            "name": "newWatchtower",
             "type": "pubkey"
           }
         ]
       }
     }
   ]
-}
+};

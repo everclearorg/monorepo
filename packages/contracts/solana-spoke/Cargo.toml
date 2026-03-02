@@ -4,6 +4,9 @@ members = [
 ]
 resolver = "2"
 
+[patch.crates-io]
+blake3 = { path = "vendor/blake3" }
+
 [profile.release]
 overflow-checks = true
 lto = "fat"
@@ -12,3 +15,7 @@ codegen-units = 1
 opt-level = 3
 incremental = false
 codegen-units = 1
+
+[profile.test]
+opt-level = 1
+debug = true
