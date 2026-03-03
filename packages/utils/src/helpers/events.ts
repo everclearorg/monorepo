@@ -1,4 +1,6 @@
 import { createHmac, randomUUID } from 'crypto';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
 import { Report, Severity } from './config';
 import { Logger, RequestContext, createMethodContext } from '../logging';
 import { axiosPost } from './axios';
@@ -46,19 +48,75 @@ const DEFAULT_CONFIG: Partial<EventEmitterConfig> = {
 };
 
 // ---------------------------------------------------------------------------
-// Dead-letter queue (in-memory, bounded)
+// Dead-letter queue (persisted to disk, bounded)
 // ---------------------------------------------------------------------------
 
 const MAX_DLQ_SIZE = 500;
+const DLQ_ALERT_THRESHOLD = 50;
+const DLQ_FILE = process.env.DLQ_FILE_PATH ?? '/tmp/everclear-monitor-dlq.json';
 const dlq: MonitorEventV1[] = [];
+let dlqLoaded = false;
+
+function ensureDlqLoaded(): void {
+  if (dlqLoaded) return;
+  dlqLoaded = true;
+  try {
+    if (existsSync(DLQ_FILE)) {
+      const raw = readFileSync(DLQ_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        dlq.push(...parsed.slice(0, MAX_DLQ_SIZE));
+      }
+    }
+  } catch {
+    // corrupted file — start fresh
+  }
+}
+
+function persistDlq(): void {
+  try {
+    const dir = dirname(DLQ_FILE);
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
+    writeFileSync(DLQ_FILE, JSON.stringify(dlq), 'utf-8');
+  } catch {
+    // non-fatal: persistence is best-effort
+  }
+}
 
 export function getDlqSize(): number {
+  ensureDlqLoaded();
   return dlq.length;
 }
 
 // ---------------------------------------------------------------------------
 // Convert a Report into a MonitorEventV1
 // ---------------------------------------------------------------------------
+
+const TYPE_CATEGORY_MAP: Record<string, string> = {
+  BadRpcDetected: 'chain-infra',
+  ChainDelayed: 'chain-infra',
+  LowGasRelayer: 'gas',
+  LowGasGateway: 'gas',
+  LowGasTokenomicsGateway: 'gas',
+  MissingSpokeBalance: 'spoke-balance',
+  ExecutionQueueCountExceeded: 'queue',
+  ExecutionQueueLatencyExceeded: 'queue',
+  IntentQueueCountExceeded: 'queue',
+  IntentQueueLatencyExceeded: 'queue',
+  SettlementQueueCountExceeded: 'queue',
+  SettlementQueueAmountExceeded: 'queue',
+  SettlementQueueLatencyExceeded: 'queue',
+  DepositQueueCountExceeded: 'queue',
+  DepositQueueLatencyExceeded: 'queue',
+  InvoiceNotProcessedYet: 'invoice',
+  InvoiceDiscountedMoreThan5Times: 'invoice',
+  InvoiceAmountLessThanCustodiedAmount: 'invoice',
+  TokenomicsDataExportDelayed: 'tokenomics',
+  TokenomicsDataExportHighLatency: 'tokenomics',
+  HyperlaneMessagesProcessingDelayed: 'messaging',
+};
 
 function reportToEvent(
   report: Report,
@@ -69,6 +127,10 @@ function reportToEvent(
     [Severity.Warning]: 'warning',
     [Severity.Critical]: 'critical',
   };
+
+  const chainIds = report.ids
+    .map((id) => parseInt(id, 10))
+    .filter((n) => !isNaN(n) && n > 0);
 
   return {
     version: '1.0',
@@ -83,6 +145,11 @@ function reportToEvent(
       reason: report.reason,
       env: report.env,
       network: config.network,
+    },
+    routingHints: {
+      category: TYPE_CATEGORY_MAP[report.type],
+      chainIds: chainIds.length > 0 ? chainIds : undefined,
+      service: 'monitor',
     },
   };
 }
@@ -167,16 +234,27 @@ export async function emitEvent(
   const resolvedConfig = { ...DEFAULT_CONFIG, ...emitterConfig } as EventEmitterConfig;
   const event = reportToEvent(report, resolvedConfig);
 
+  ensureDlqLoaded();
   const delivered = await sendWithRetry(event, resolvedConfig);
 
   if (!delivered) {
     if (dlq.length < MAX_DLQ_SIZE) {
       dlq.push(event);
+      persistDlq();
+
       logger.warn('Event delivery failed, added to DLQ', requestContext, methodContext, {
         eventId: event.eventId,
         type: event.type,
         dlqSize: dlq.length,
       });
+
+      if (dlq.length >= DLQ_ALERT_THRESHOLD && dlq.length % DLQ_ALERT_THRESHOLD === 0) {
+        logger.error('DLQ size exceeds alert threshold', requestContext, methodContext, {
+          type: 'DLQThresholdExceeded',
+          message: `DLQ has ${dlq.length} undelivered events (threshold: ${DLQ_ALERT_THRESHOLD})`,
+          context: { dlqSize: dlq.length, threshold: DLQ_ALERT_THRESHOLD, maxDlqSize: MAX_DLQ_SIZE },
+        });
+      }
     } else {
       logger.error('DLQ full — event dropped permanently', requestContext, methodContext, {
         type: 'DLQFullError',
@@ -195,6 +273,46 @@ export async function emitEvent(
 /**
  * Attempt to flush the dead-letter queue.
  */
+/**
+ * Check the health of the everclear-agents pipeline via heartbeat endpoint.
+ * Returns null on success, or an error message on failure.
+ */
+export async function checkPipelineHeartbeat(
+  webhookUrl: string,
+  logger: Logger,
+  requestContext: RequestContext,
+  timeoutMs = 5_000,
+): Promise<{ ok: boolean; details?: Record<string, unknown>; error?: string }> {
+  const methodContext = createMethodContext('checkPipelineHeartbeat');
+  const heartbeatUrl = webhookUrl.replace(/\/events\/?$/, '/heartbeat');
+
+  try {
+    const response = await axiosPost(
+      heartbeatUrl,
+      {},
+      { timeout: timeoutMs, validateStatus: () => true },
+      1,
+    );
+
+    if (response.status >= 200 && response.status < 300) {
+      logger.info('Pipeline heartbeat OK', requestContext, methodContext, {
+        response: response.data,
+      });
+      return { ok: true, details: response.data as Record<string, unknown> };
+    }
+
+    const msg = `Heartbeat returned HTTP ${response.status}`;
+    logger.warn(msg, requestContext, methodContext);
+    return { ok: false, error: msg };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.warn('Pipeline heartbeat failed', requestContext, methodContext, {
+      error: msg,
+    });
+    return { ok: false, error: msg };
+  }
+}
+
 export async function flushDlq(
   emitterConfig: EventEmitterConfig,
   logger: Logger,
@@ -204,6 +322,7 @@ export async function flushDlq(
   let flushed = 0;
   const resolvedConfig = { ...DEFAULT_CONFIG, ...emitterConfig } as EventEmitterConfig;
 
+  ensureDlqLoaded();
   const remaining: MonitorEventV1[] = [];
   while (dlq.length > 0) {
     const event = dlq.shift()!;
@@ -215,6 +334,7 @@ export async function flushDlq(
     }
   }
   dlq.push(...remaining);
+  persistDlq();
 
   if (flushed > 0) {
     logger.info('DLQ flushed', requestContext, methodContext, {

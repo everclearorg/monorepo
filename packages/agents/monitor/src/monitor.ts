@@ -136,6 +136,38 @@ export const makeMonitor = async (service: MonitorService) => {
     context.adapters.database = await getDatabase(context.config.database.url, context.logger);
     context.logger.debug('Database setup', requestContext, methodContext);
 
+    // Validate event pipeline config if mode requires it
+    const pipelineMode = process.env.ALERT_PIPELINE_MODE ?? 'legacy';
+    if (pipelineMode === 'dual' || pipelineMode === 'events_only') {
+      const webhookUrl =
+        context.config.eventPipeline?.webhookUrl ??
+        process.env.ALERT_EVENT_WEBHOOK_URL ??
+        process.env.MONITOR_WEBHOOK_URL;
+      const webhookSecret =
+        context.config.eventPipeline?.webhookSecret ??
+        process.env.ALERT_EVENT_WEBHOOK_SECRET ??
+        process.env.MONITOR_WEBHOOK_SECRET;
+
+      if (!webhookUrl) {
+        throw new Error(
+          `ALERT_PIPELINE_MODE="${pipelineMode}" requires a webhook URL. ` +
+          'Set eventPipeline.webhookUrl in config or ALERT_EVENT_WEBHOOK_URL / MONITOR_WEBHOOK_URL env var.',
+        );
+      }
+      if (!webhookSecret) {
+        context.logger.warn(
+          `ALERT_PIPELINE_MODE="${pipelineMode}" is running without a webhook secret — HMAC authentication disabled`,
+          requestContext,
+          methodContext,
+        );
+      }
+      context.logger.info('Event pipeline config validated', requestContext, methodContext, {
+        mode: pipelineMode,
+        webhookUrl: webhookUrl.replace(/\/\/.*@/, '//***@'),
+        hasSecret: Boolean(webhookSecret),
+      });
+    }
+
     setTriagePersistenceStore({
       hasProcessed: async (fingerprint: string) => {
         return context.adapters.database.isTriageFingerprintProcessed(fingerprint);

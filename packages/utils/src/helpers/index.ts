@@ -1,6 +1,7 @@
 export * from './address';
 export * from './alerts';
 export * from './axios';
+export * from './events';
 export * from './hex';
 export * from './time';
 export * from './config';
