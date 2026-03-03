@@ -1,7 +1,7 @@
 import { execFile } from 'child_process';
 import * as path from 'path';
 
-import { AppContext } from '../../shared';
+import { AppContext } from '@chimera-monorepo/cartographer-core';
 
 export const runMigration = async (context: AppContext) => {
   const { service } = context.config;

@@ -25,9 +25,10 @@ variable "environment" {
   default     = "chimera"
 }
 
+# TODO: Remove once lambda decommission is complete
 variable "cartographer_image_tag" {
   type        = string
-  description = "cartographer image tag"
+  description = "cartographer poller image tag (deprecated - lambdas replaced by handler)"
   default     = "latest"
 }
 
@@ -61,9 +62,11 @@ variable "dd_api_key" {
   sensitive = true
 }
 
+# TODO: Remove once lambda decommission is complete
 variable "graph_api_key" {
   type      = string
   sensitive = true
+  default   = ""
 }
 
 variable "gelato_everclear_rpc_key" {
@@ -71,24 +74,29 @@ variable "gelato_everclear_rpc_key" {
   sensitive = true
 }
 
+# TODO: Remove once lambda decommission is complete
 variable "cartographer_intents_heartbeat" {
   type      = string
   sensitive = true
+  default   = ""
 }
 
 variable "cartographer_invoices_heartbeat" {
   type      = string
   sensitive = true
+  default   = ""
 }
 
 variable "cartographer_depositors_heartbeat" {
   type      = string
   sensitive = true
+  default   = ""
 }
 
 variable "cartographer_monitor_heartbeat" {
   type      = string
   sensitive = true
+  default   = ""
 }
 
 variable "blast_key" {
@@ -124,4 +132,16 @@ variable "trongrid_api_key" {
   type      = string
   sensitive = true
   default   = "neverclear"
+}
+
+variable "cartographer_handler_image_tag" {
+  type        = string
+  description = "cartographer handler image tag"
+  default     = "latest"
+}
+
+variable "goldsky_webhook_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
 }

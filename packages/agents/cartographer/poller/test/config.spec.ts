@@ -2,7 +2,7 @@ import { expect } from '@chimera-monorepo/utils';
 import { SinonStub, stub } from 'sinon';
 import { getConfig, getEnvConfig } from '../src/config';
 import { createProcessEnv } from './mock';
-import * as Mockable from '../src/mockable';
+import * as CoreMockable from '@chimera-monorepo/cartographer-core/dist/mockable';
 import { createCartographerConfig } from './mock';
 
 describe('Config', () => {
@@ -14,7 +14,7 @@ describe('Config', () => {
       ...createProcessEnv(),
       EVERCLEAR_CONFIG: 'https://raw.githubusercontent.com/connext/chaindata/main/everclear.testnet.json',
     });
-    ssmStub = stub(Mockable, 'getSsmParameter');
+    ssmStub = stub(CoreMockable, 'getSsmParameter');
     ssmStub.resolves(undefined);
   });
 

@@ -1,4 +1,4 @@
-import { AppContext } from '../shared';
+import { AppContext } from '@chimera-monorepo/cartographer-core';
 
 import { bindIntents } from './intents';
 import { bindInvoices } from './invoices';

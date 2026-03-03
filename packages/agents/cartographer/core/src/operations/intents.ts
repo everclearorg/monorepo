@@ -1,16 +1,17 @@
 import { createLoggingContext, getMaxTxNonce, jsonifyError } from '@chimera-monorepo/utils';
 import { SubgraphQueryMetaParams } from '@chimera-monorepo/adapters-subgraph';
 
-import { getContext } from '../../shared';
-import { DEFAULT_SAFE_CONFIRMATIONS } from '.';
+import { AppContext } from '../context';
+import { DEFAULT_SAFE_CONFIRMATIONS } from '../config';
 import { getSubgraphSupportedDomains } from './helper';
+import { computeIsSwap } from '../lib/intentHelpers';
 
-export const updateOriginIntents = async () => {
+export const updateOriginIntents = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     config,
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateOriginIntents.name);
   const domains = getSubgraphSupportedDomains(config);
 
@@ -53,7 +54,7 @@ export const updateOriginIntents = async () => {
   // Get origin intents for all domains in the mapping.
   const intents = await subgraph.getOriginIntentsByNonce(queryMetaParams);
   logger.info('Retrieved origin intents', requestContext, methodContext, { intents: intents.length });
-  
+
   // Compute is_swap for each intent by comparing ticker hashes
   const intentsWithSwapFlag = intents.map((intent) => {
     const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(
@@ -61,66 +62,7 @@ export const updateOriginIntents = async () => {
     );
     logger.debug('Retrieved origin intent', _requestContext, _methodContext, { intent });
 
-    // Determine if this is a swap by comparing ticker hashes of input and output assets
-    let isSwap = false;
-    try {
-      const originChain = config.chains[intent.origin];
-      const destinationChain = intent.destinations.length > 0 ? config.chains[intent.destinations[0]] : null;
-
-      if (originChain?.assets && destinationChain?.assets) {
-        // Find asset configs by address
-        const inputAssetConfig = Object.values(originChain.assets).find(
-          (asset) => asset.address.toLowerCase() === intent.inputAsset.toLowerCase(),
-        );
-        const outputAssetConfig = Object.values(destinationChain.assets).find(
-          (asset) => asset.address.toLowerCase() === intent.outputAsset.toLowerCase(),
-        );
-
-        // Compare ticker hashes - different tickers mean different assets = swap
-        if (inputAssetConfig && outputAssetConfig) {
-          if (
-            typeof inputAssetConfig.tickerHash === 'string' &&
-            typeof outputAssetConfig.tickerHash === 'string'
-          ) {
-            isSwap = inputAssetConfig.tickerHash.toLowerCase() !== outputAssetConfig.tickerHash.toLowerCase();
-          } else {
-            isSwap = false;
-            logger.warn(
-              'Missing tickerHash on asset config when computing is_swap flag',
-              _requestContext,
-              _methodContext,
-              {
-                intentId: intent.id,
-                inputAsset: intent.inputAsset,
-                outputAsset: intent.outputAsset,
-                inputTickerHash: inputAssetConfig.tickerHash,
-                outputTickerHash: outputAssetConfig.tickerHash,
-              },
-            );
-          }
-          logger.debug('Computed is_swap flag', _requestContext, _methodContext, {
-            intentId: intent.id,
-            inputAsset: intent.inputAsset,
-            outputAsset: intent.outputAsset,
-            inputTickerHash: inputAssetConfig.tickerHash,
-            outputTickerHash: outputAssetConfig.tickerHash,
-            isSwap,
-          });
-        } else {
-          logger.debug('Could not find asset configs for intent', _requestContext, _methodContext, {
-            intentId: intent.id,
-            inputAsset: intent.inputAsset,
-            outputAsset: intent.outputAsset,
-            foundInputAsset: !!inputAssetConfig,
-            foundOutputAsset: !!outputAssetConfig,
-          });
-        }
-      }
-    } catch (error) {
-      logger.error('Error computing is_swap flag', _requestContext, _methodContext, jsonifyError(error as Error), {
-        intentId: intent.id,
-      });
-    }
+    const isSwap = computeIsSwap(intent, config, logger);
 
     return {
       ...intent,
@@ -148,12 +90,12 @@ export const updateOriginIntents = async () => {
   logger.debug('Updated OriginIntents in database', requestContext, methodContext, { intents });
 };
 
-export const updateDestinationIntents = async () => {
+export const updateDestinationIntents = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     config,
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateDestinationIntents.name);
 
   const domains = getSubgraphSupportedDomains(config);
@@ -217,12 +159,12 @@ export const updateDestinationIntents = async () => {
   }
 };
 
-export const updateHubIntents = async () => {
+export const updateHubIntents = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     config,
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateHubIntents.name);
 
   logger.debug('Method start', requestContext, methodContext, { hubDomain: config.hub.domain });
@@ -277,7 +219,7 @@ export const updateHubIntents = async () => {
     return;
   }
 
-  // Save intents to database
+  // Save intents to the database
   await database.saveHubIntents(addedIntents, ['added_timestamp', 'added_tx_nonce', 'status']);
   await database.saveHubIntents(filledIntents, ['filled_timestamp', 'filled_tx_nonce', 'status']);
   await database.saveHubIntents(enqueuedIntents, [
@@ -309,12 +251,12 @@ export const updateHubIntents = async () => {
   }
 };
 
-export const updateSettlementIntents = async () => {
+export const updateSettlementIntents = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     config,
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateSettlementIntents.name);
   const domains = getSubgraphSupportedDomains(config);
 
@@ -361,7 +303,7 @@ export const updateSettlementIntents = async () => {
     const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(
       updateSettlementIntents.name,
     );
-    logger.debug('Retrieved setttlement intent', _requestContext, _methodContext, { intent });
+    logger.debug('Retrieved settlement intent', _requestContext, _methodContext, { intent });
   });
   const checkpoints = domains
     .map((domain) => {
@@ -383,12 +325,12 @@ export const updateSettlementIntents = async () => {
   logger.debug('Updated SettlementIntents in database', requestContext, methodContext, { intents });
 };
 
-export const updateOrders = async () => {
+export const updateOrders = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     config,
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateOrders.name);
   const domains = getSubgraphSupportedDomains(config);
 

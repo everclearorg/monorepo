@@ -1,0 +1,40 @@
+{
+  "name": "@chimera-monorepo/cartographer-handler",
+  "version": "2.0.0",
+  "description": "Cartographer webhook handler for Goldsky Mirror events",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
+    "lint": "eslint ./src --ext .ts --env node",
+    "start": "npx ts-node src/index.ts",
+    "test": "yarn test:unit",
+    "test:unit": "nyc ts-mocha --require 'test/globalTestHook.ts' --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.build.json",
+    "verify": "yarn test && yarn clean && yarn build && yarn lint --max-warnings 0"
+  },
+  "dependencies": {
+    "@chimera-monorepo/adapters-subgraph": "workspace:*",
+    "@chimera-monorepo/cartographer-core": "workspace:*",
+    "@chimera-monorepo/chainservice": "workspace:*",
+    "@chimera-monorepo/database": "workspace:*",
+    "@chimera-monorepo/utils": "workspace:*",
+    "dotenv": "16.0.3",
+    "fastify": "4.26.2"
+  },
+  "devDependencies": {
+    "eslint": "8.34.0",
+    "nyc": "15.1.0",
+    "rimraf": "5.0.1",
+    "sinon": "15.0.1",
+    "ts-mocha": "10.0.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.2"
+  }
+}

@@ -105,6 +105,8 @@ import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
 export * as db from 'zapatos/db';
 
+export type HubIntentColumn = hub_intents.Column;
+
 export type Checkpoints = {
   prefix: string;
   checkpoints: { domain: string; checkpoint: number }[];

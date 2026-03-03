@@ -1,0 +1,418 @@
+[
+  {
+    "subgraph": {
+      "name": "everclear-spoke-mainnet"
+    },
+    "network": "mainnet",
+    "domain": "1",
+    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "entities": [
+      {
+        "sourceId": "origin_intent",
+        "entity": "origin_intent",
+        "webhookName": "origin-intent"
+      },
+      {
+        "sourceId": "destination_intent",
+        "entity": "destination_intent",
+        "webhookName": "destination-intent"
+      },
+      {
+        "sourceId": "settlement_intent",
+        "entity": "settlement_intent",
+        "webhookName": "settlement-intent"
+      },
+      {
+        "sourceId": "order",
+        "entity": "order_created",
+        "webhookName": "order"
+      },
+      {
+        "sourceId": "spoke_message",
+        "entity": "message",
+        "webhookName": "spoke-message"
+      },
+      {
+        "sourceId": "spoke_queue",
+        "entity": "queue",
+        "webhookName": "spoke-queue"
+      },
+      {
+        "sourceId": "spoke_meta",
+        "entity": "spoke_meta_update",
+        "webhookName": "spoke-meta"
+      },
+      {
+        "sourceId": "depositor_event",
+        "entity": "depositor_event",
+        "webhookName": "depositor-event"
+      }
+    ],
+    "webhookName": "everclear-spoke-staging-mainnet"
+  },
+  {
+    "subgraph": {
+      "name": "everclear-spoke-optimism"
+    },
+    "network": "optimism",
+    "domain": "10",
+    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "entities": [
+      {
+        "sourceId": "origin_intent",
+        "entity": "origin_intent",
+        "webhookName": "origin-intent"
+      },
+      {
+        "sourceId": "destination_intent",
+        "entity": "destination_intent",
+        "webhookName": "destination-intent"
+      },
+      {
+        "sourceId": "settlement_intent",
+        "entity": "settlement_intent",
+        "webhookName": "settlement-intent"
+      },
+      {
+        "sourceId": "order",
+        "entity": "order_created",
+        "webhookName": "order"
+      },
+      {
+        "sourceId": "spoke_message",
+        "entity": "message",
+        "webhookName": "spoke-message"
+      },
+      {
+        "sourceId": "spoke_queue",
+        "entity": "queue",
+        "webhookName": "spoke-queue"
+      },
+      {
+        "sourceId": "spoke_meta",
+        "entity": "spoke_meta_update",
+        "webhookName": "spoke-meta"
+      },
+      {
+        "sourceId": "depositor_event",
+        "entity": "depositor_event",
+        "webhookName": "depositor-event"
+      }
+    ],
+    "webhookName": "everclear-spoke-staging-optimism"
+  },
+  {
+    "subgraph": {
+      "name": "everclear-spoke-tac"
+    },
+    "network": "tac",
+    "domain": "239",
+    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "entities": [
+      {
+        "sourceId": "origin_intent",
+        "entity": "origin_intent",
+        "webhookName": "origin-intent"
+      },
+      {
+        "sourceId": "destination_intent",
+        "entity": "destination_intent",
+        "webhookName": "destination-intent"
+      },
+      {
+        "sourceId": "settlement_intent",
+        "entity": "settlement_intent",
+        "webhookName": "settlement-intent"
+      },
+      {
+        "sourceId": "order",
+        "entity": "order_created",
+        "webhookName": "order"
+      },
+      {
+        "sourceId": "spoke_message",
+        "entity": "message",
+        "webhookName": "spoke-message"
+      },
+      {
+        "sourceId": "spoke_queue",
+        "entity": "queue",
+        "webhookName": "spoke-queue"
+      },
+      {
+        "sourceId": "spoke_meta",
+        "entity": "spoke_meta_update",
+        "webhookName": "spoke-meta"
+      },
+      {
+        "sourceId": "depositor_event",
+        "entity": "depositor_event",
+        "webhookName": "depositor-event"
+      }
+    ],
+    "webhookName": "everclear-spoke-staging-tac"
+  },
+  {
+    "subgraph": {
+      "name": "everclear-spoke-megaeth"
+    },
+    "network": "megaeth",
+    "domain": "4326",
+    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "entities": [
+      {
+        "sourceId": "origin_intent",
+        "entity": "origin_intent",
+        "webhookName": "origin-intent"
+      },
+      {
+        "sourceId": "destination_intent",
+        "entity": "destination_intent",
+        "webhookName": "destination-intent"
+      },
+      {
+        "sourceId": "settlement_intent",
+        "entity": "settlement_intent",
+        "webhookName": "settlement-intent"
+      },
+      {
+        "sourceId": "order",
+        "entity": "order_created",
+        "webhookName": "order"
+      },
+      {
+        "sourceId": "spoke_message",
+        "entity": "message",
+        "webhookName": "spoke-message"
+      },
+      {
+        "sourceId": "spoke_queue",
+        "entity": "queue",
+        "webhookName": "spoke-queue"
+      },
+      {
+        "sourceId": "spoke_meta",
+        "entity": "spoke_meta_update",
+        "webhookName": "spoke-meta"
+      },
+      {
+        "sourceId": "depositor_event",
+        "entity": "depositor_event",
+        "webhookName": "depositor-event"
+      }
+    ],
+    "webhookName": "everclear-spoke-staging-megaeth"
+  },
+  {
+    "subgraph": {
+      "name": "everclear-spoke-mantle"
+    },
+    "network": "mantle",
+    "domain": "5000",
+    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "entities": [
+      {
+        "sourceId": "origin_intent",
+        "entity": "origin_intent",
+        "webhookName": "origin-intent"
+      },
+      {
+        "sourceId": "destination_intent",
+        "entity": "destination_intent",
+        "webhookName": "destination-intent"
+      },
+      {
+        "sourceId": "settlement_intent",
+        "entity": "settlement_intent",
+        "webhookName": "settlement-intent"
+      },
+      {
+        "sourceId": "order",
+        "entity": "order_created",
+        "webhookName": "order"
+      },
+      {
+        "sourceId": "spoke_message",
+        "entity": "message",
+        "webhookName": "spoke-message"
+      },
+      {
+        "sourceId": "spoke_queue",
+        "entity": "queue",
+        "webhookName": "spoke-queue"
+      },
+      {
+        "sourceId": "spoke_meta",
+        "entity": "spoke_meta_update",
+        "webhookName": "spoke-meta"
+      },
+      {
+        "sourceId": "depositor_event",
+        "entity": "depositor_event",
+        "webhookName": "depositor-event"
+      }
+    ],
+    "webhookName": "everclear-spoke-staging-mantle"
+  },
+  {
+    "subgraph": {
+      "name": "everclear-spoke-base"
+    },
+    "network": "base",
+    "domain": "8453",
+    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "entities": [
+      {
+        "sourceId": "origin_intent",
+        "entity": "origin_intent",
+        "webhookName": "origin-intent"
+      },
+      {
+        "sourceId": "destination_intent",
+        "entity": "destination_intent",
+        "webhookName": "destination-intent"
+      },
+      {
+        "sourceId": "settlement_intent",
+        "entity": "settlement_intent",
+        "webhookName": "settlement-intent"
+      },
+      {
+        "sourceId": "order",
+        "entity": "order_created",
+        "webhookName": "order"
+      },
+      {
+        "sourceId": "spoke_message",
+        "entity": "message",
+        "webhookName": "spoke-message"
+      },
+      {
+        "sourceId": "spoke_queue",
+        "entity": "queue",
+        "webhookName": "spoke-queue"
+      },
+      {
+        "sourceId": "spoke_meta",
+        "entity": "spoke_meta_update",
+        "webhookName": "spoke-meta"
+      },
+      {
+        "sourceId": "depositor_event",
+        "entity": "depositor_event",
+        "webhookName": "depositor-event"
+      }
+    ],
+    "webhookName": "everclear-spoke-staging-base"
+  },
+  {
+    "subgraph": {
+      "name": "everclear-spoke-plasma"
+    },
+    "network": "plasma",
+    "domain": "9745",
+    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "entities": [
+      {
+        "sourceId": "origin_intent",
+        "entity": "origin_intent",
+        "webhookName": "origin-intent"
+      },
+      {
+        "sourceId": "destination_intent",
+        "entity": "destination_intent",
+        "webhookName": "destination-intent"
+      },
+      {
+        "sourceId": "settlement_intent",
+        "entity": "settlement_intent",
+        "webhookName": "settlement-intent"
+      },
+      {
+        "sourceId": "order",
+        "entity": "order_created",
+        "webhookName": "order"
+      },
+      {
+        "sourceId": "spoke_message",
+        "entity": "message",
+        "webhookName": "spoke-message"
+      },
+      {
+        "sourceId": "spoke_queue",
+        "entity": "queue",
+        "webhookName": "spoke-queue"
+      },
+      {
+        "sourceId": "spoke_meta",
+        "entity": "spoke_meta_update",
+        "webhookName": "spoke-meta"
+      },
+      {
+        "sourceId": "depositor_event",
+        "entity": "depositor_event",
+        "webhookName": "depositor-event"
+      }
+    ],
+    "webhookName": "everclear-spoke-staging-plasma"
+  },
+  {
+    "subgraph": {
+      "name": "everclear-spoke-arbitrum"
+    },
+    "network": "arbitrum-one",
+    "domain": "42161",
+    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "entities": [
+      {
+        "sourceId": "origin_intent",
+        "entity": "origin_intent",
+        "webhookName": "origin-intent"
+      },
+      {
+        "sourceId": "destination_intent",
+        "entity": "destination_intent",
+        "webhookName": "destination-intent"
+      },
+      {
+        "sourceId": "settlement_intent",
+        "entity": "settlement_intent",
+        "webhookName": "settlement-intent"
+      },
+      {
+        "sourceId": "order",
+        "entity": "order_created",
+        "webhookName": "order"
+      },
+      {
+        "sourceId": "spoke_message",
+        "entity": "message",
+        "webhookName": "spoke-message"
+      },
+      {
+        "sourceId": "spoke_queue",
+        "entity": "queue",
+        "webhookName": "spoke-queue"
+      },
+      {
+        "sourceId": "spoke_meta",
+        "entity": "spoke_meta_update",
+        "webhookName": "spoke-meta"
+      },
+      {
+        "sourceId": "depositor_event",
+        "entity": "depositor_event",
+        "webhookName": "depositor-event"
+      }
+    ],
+    "webhookName": "everclear-spoke-staging-arbitrum"
+  }
+]

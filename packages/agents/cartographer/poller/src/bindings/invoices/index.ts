@@ -1,7 +1,5 @@
 import { createLoggingContext, jsonifyError, EverclearError } from '@chimera-monorepo/utils';
-
-import { AppContext } from '../../shared';
-import { updateHubInvoices, updateHubDeposits } from '../../lib/operations';
+import { updateHubInvoices, updateHubDeposits, AppContext } from '@chimera-monorepo/cartographer-core';
 
 export const bindInvoices = async (context: AppContext) => {
   const {
@@ -11,8 +9,8 @@ export const bindInvoices = async (context: AppContext) => {
   const { requestContext, methodContext } = createLoggingContext(bindInvoices.name);
   try {
     logger.debug('Bind Invoices polling loop start', requestContext, methodContext);
-    await updateHubInvoices();
-    await updateHubDeposits();
+    await updateHubInvoices(context);
+    await updateHubDeposits(context);
 
     // Refresh the materialized view
     await database.refreshInvoicesView();

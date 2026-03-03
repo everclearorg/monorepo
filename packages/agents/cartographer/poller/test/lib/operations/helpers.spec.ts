@@ -1,4 +1,4 @@
-import { getSubgraphReaderConfig } from '../../../src/lib/operations/helper';
+import { getSubgraphReaderConfig } from '../../../src/lib/operations';
 
 import { createCartographerConfig } from '../../mock';
 import { expect } from '@chimera-monorepo/utils';

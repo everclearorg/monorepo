@@ -153,9 +153,7 @@ export const setTriageAutoResolveOutcome = async (
   );
 };
 
-export const pruneExpiredTriageFingerprints = async (
-  _pool?: Pool | db.TxnClientForRepeatableRead,
-): Promise<number> => {
+export const pruneExpiredTriageFingerprints = async (_pool?: Pool | db.TxnClientForRepeatableRead): Promise<number> => {
   const poolToUse = _pool ?? getPool();
   const result = await poolToUse.query(`DELETE FROM alert_triage_log WHERE expires_at <= NOW()`);
   return result.rowCount ?? 0;
