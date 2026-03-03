@@ -264,7 +264,7 @@ jobs:
     env:
       REGISTRY: 679752396206.dkr.ecr.${{ needs.set-aws-region.outputs.AWS_REGION }}.amazonaws.com
       IMAGE_TAG: chimera-${{ github.sha }}
-      REPOSITORY: chimera-cartographer
+      REPOSITORY: chimera-cartographer-handler
     runs-on: ubuntu-latest
     needs: [set-aws-region]
     permissions:
@@ -291,7 +291,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build --provenance=false -f docker/cartographer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false -f docker/cartographer-handler/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
@@ -497,7 +497,7 @@ jobs:
     needs: [e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
@@ -558,7 +558,7 @@ jobs:
       TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
       TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
       TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
@@ -637,7 +637,7 @@ jobs:
       TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
       TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
       TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
@@ -709,7 +709,7 @@ jobs:
     needs: [e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
@@ -772,7 +772,7 @@ jobs:
       TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
       TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
       TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
@@ -844,7 +844,7 @@ jobs:
     needs: [e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
@@ -902,7 +902,7 @@ jobs:
     needs: [e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
@@ -963,7 +963,7 @@ jobs:
       TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
       TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
       TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
