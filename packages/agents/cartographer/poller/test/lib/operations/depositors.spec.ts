@@ -12,7 +12,7 @@ describe('Depositors operations', () => {
       const depositEvents = createDepositEvents(5);
       (mockAppContext.adapters.subgraph.getDepositorEvents as SinonStub).resolves(depositEvents);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
-      await updateDepositors();
+      await updateDepositors(mockAppContext);
       expect(mockAppContext.adapters.database.saveDepositors as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.saveBalances as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length);
@@ -29,7 +29,7 @@ describe('Depositors operations', () => {
       (mockAppContext.adapters.subgraph.getTokens as SinonStub).resolves([tokens, assets]);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateAssets();
+      await updateAssets(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveAssets as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.saveTokens as SinonStub).callCount(1);

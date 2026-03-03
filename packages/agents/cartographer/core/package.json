@@ -1,0 +1,33 @@
+{
+  "name": "@chimera-monorepo/cartographer-core",
+  "version": "2.0.0",
+  "description": "Shared core for cartographer poller and handler",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
+    "lint": "eslint ./src --ext .ts --env node",
+    "test": "echo 'no tests yet'",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.build.json",
+    "verify": "yarn clean && yarn build && yarn lint --max-warnings 0"
+  },
+  "dependencies": {
+    "@chimera-monorepo/adapters-subgraph": "workspace:*",
+    "@chimera-monorepo/chainservice": "workspace:*",
+    "@chimera-monorepo/database": "workspace:*",
+    "@chimera-monorepo/utils": "workspace:*",
+    "@sinclair/typebox": "0.25.21",
+    "dotenv": "16.0.3"
+  },
+  "devDependencies": {
+    "eslint": "8.34.0",
+    "rimraf": "5.0.1",
+    "typescript": "5.9.2"
+  }
+}

@@ -166,3 +166,8 @@ pub struct IntentFilledEvent {
     pub amount_out: u64,
     pub intent: EVMIntent,
 }
+
+#[event]
+pub struct MessagingProviderSwitchedEvent {
+    pub provider: u8,
+}

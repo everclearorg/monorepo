@@ -19,7 +19,7 @@ describe('Intents operations', () => {
       );
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateOriginIntents();
+      await updateOriginIntents(mockAppContext);
 
       // Intents are now modified to include isSwap flag (defaults to false when asset configs not found)
       const expectedIntents = intents.map(intent => ({ ...intent, isSwap: false }));
@@ -40,7 +40,7 @@ describe('Intents operations', () => {
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(new Map());
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateOriginIntents();
+      await updateOriginIntents(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveOriginIntents as SinonStub).callCount(0);
 
@@ -88,7 +88,7 @@ describe('Intents operations', () => {
       );
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateOriginIntents();
+      await updateOriginIntents(mockAppContext);
 
       const savedIntents = (mockAppContext.adapters.database.saveOriginIntents as SinonStub).getCall(0).args[0];
       expect(savedIntents[0].isSwap).to.equal(false);
@@ -98,7 +98,7 @@ describe('Intents operations', () => {
       // Setup config with assets having different ticker hashes (swap scenario)
       const usdcTickerHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
       const wethTickerHash = '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
-      
+
       mockAppContext.config.chains['1337'].assets = {
         USDC: {
           symbol: 'USDC',
@@ -136,7 +136,7 @@ describe('Intents operations', () => {
       );
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateOriginIntents();
+      await updateOriginIntents(mockAppContext);
 
       const savedIntents = (mockAppContext.adapters.database.saveOriginIntents as SinonStub).getCall(0).args[0];
       expect(savedIntents[0].isSwap).to.equal(true);
@@ -163,7 +163,7 @@ describe('Intents operations', () => {
       );
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateOriginIntents();
+      await updateOriginIntents(mockAppContext);
 
       const savedIntents = (mockAppContext.adapters.database.saveOriginIntents as SinonStub).getCall(0).args[0];
       expect(savedIntents[0].isSwap).to.equal(false);
@@ -182,7 +182,7 @@ describe('Intents operations', () => {
       );
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateDestinationIntents();
+      await updateDestinationIntents(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveDestinationIntents as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.saveDestinationIntents as SinonStub).to.be.calledWithExactly(intents);
@@ -200,7 +200,7 @@ describe('Intents operations', () => {
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(new Map());
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateDestinationIntents();
+      await updateDestinationIntents(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveDestinationIntents as SinonStub).callCount(0);
 
@@ -221,7 +221,7 @@ describe('Intents operations', () => {
       );
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateSettlementIntents();
+      await updateSettlementIntents(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveSettlementIntents as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.saveSettlementIntents as SinonStub).to.be.calledWithExactly(intents);
@@ -239,7 +239,7 @@ describe('Intents operations', () => {
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(new Map());
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateDestinationIntents();
+      await updateDestinationIntents(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveSettlementIntents as SinonStub).callCount(0);
 
@@ -253,7 +253,7 @@ describe('Intents operations', () => {
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(new Map());
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateHubIntents();
+      await updateHubIntents(mockAppContext);
 
       expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(0);
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(0);
@@ -282,7 +282,7 @@ describe('Intents operations', () => {
       );
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateHubIntents();
+      await updateHubIntents(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveHubIntents as SinonStub).callCount(3);
       expect((mockAppContext.adapters.database.saveHubIntents as SinonStub).getCall(0)).to.be.calledWithExactly(
@@ -310,7 +310,7 @@ describe('Intents operations', () => {
       );
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateHubIntents();
+      await updateHubIntents(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveHubIntents as SinonStub).callCount(3);
       expect((mockAppContext.adapters.database.saveHubIntents as SinonStub).getCall(0)).to.be.calledWithExactly(

@@ -15,6 +15,9 @@ import {
   getHubAssetUpdatesQuery,
   getInvoiceEnqueuedByIntentId,
   getInvoiceEnqueuedQuery,
+  getSettlementIntentByIdQuery,
+  getDepositEnqueuedByIntentIdQuery,
+  getDepositProcessedByIntentIdQuery,
   getOrdersByNonce,
   getOriginIntentAddedQuery,
   getOriginIntentByIdQuery,
@@ -209,6 +212,48 @@ export class GraphReader implements ISubgraphReader {
 
     return response!.data.invoiceEnqueuedEvents.length
       ? parser.hubInvoiceFromInvoiceEnqueued(domain, response!.data.invoiceEnqueuedEvents[0])
+      : undefined;
+  }
+
+  public async getSettlementIntentById(domain: string, intentId: string): Promise<SettlementIntent | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{
+      intentSettleEvents: IntentSettlementEventEntity[];
+      _meta: MetaEntity;
+    }>(domain, [getSettlementIntentByIdQuery(intentId)]);
+
+    return (response?.data?.intentSettleEvents || []).length
+      ? parser.settlementIntent(domain, response!.data.intentSettleEvents[0])
+      : undefined;
+  }
+
+  public async getHubDepositEnqueuedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{
+      depositEnqueuedEvents: DepositEnqueuedEventEntity[];
+      _meta: MetaEntity;
+    }>(domain, [getDepositEnqueuedByIntentIdQuery(intentId)]);
+
+    return (response?.data?.depositEnqueuedEvents || []).length
+      ? parser.hubDepositFromEnqueued(response!.data.depositEnqueuedEvents[0])
+      : undefined;
+  }
+
+  public async getHubDepositProcessedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{
+      depositProcessedEvents: DepositProcessedEventEntity[];
+      _meta: MetaEntity;
+    }>(domain, [getDepositProcessedByIntentIdQuery(intentId)]);
+
+    return (response?.data?.depositProcessedEvents || []).length
+      ? parser.hubDepositFromProcessed(response!.data.depositProcessedEvents[0])
       : undefined;
   }
 

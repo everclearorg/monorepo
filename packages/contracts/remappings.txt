@@ -5,6 +5,7 @@ isolmate/=../../node_modules/isolmate/src
 @openzeppelin/=../../node_modules/@openzeppelin
 @upgrades/=./lib/openzeppelin-foundry-upgrades/src
 xerc20/=./lib/xerc20/solidity/contracts
+@chainlink/contracts-ccip/=lib/chainlink-ccip/chains/evm/contracts/
 
 contracts/=src/contracts
 interfaces/=src/interfaces

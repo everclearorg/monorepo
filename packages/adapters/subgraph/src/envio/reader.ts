@@ -149,6 +149,27 @@ export class EnvioReader implements ISubgraphReader {
     return undefined;
   }
 
+  public async getSettlementIntentById(_domain: string, _intentId: string): Promise<SettlementIntent | undefined> {
+    // Envio doesn't track settlement intents by ID
+    return undefined;
+  }
+
+  public async getHubDepositEnqueuedById(
+    _domain: string,
+    _intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    // Envio only tracks spoke contracts, not hub contracts
+    return undefined;
+  }
+
+  public async getHubDepositProcessedById(
+    _domain: string,
+    _intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    // Envio only tracks spoke contracts, not hub contracts
+    return undefined;
+  }
+
   public async getDepositorEvents(_domain: string, _latestNonce: number): Promise<DepositorEvent[]> {
     // Envio doesn't track depositor events
     return [];
