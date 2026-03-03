@@ -9,12 +9,11 @@ import {
 } from '@chimera-monorepo/utils';
 import { ChainReader } from '@chimera-monorepo/chainservice';
 import { getDatabase } from '@chimera-monorepo/database';
+import { CartographerConfig, getSubgraphReaderConfig } from '@chimera-monorepo/cartographer-core';
 
 import { bind } from '../bindings';
-import { CartographerConfig, getConfig } from '../config';
+import { getConfig } from '../config';
 import { context } from '../shared';
-// import { runMigration } from '../lib/operations';
-import { getSubgraphReaderConfig } from '../lib/operations/helper';
 
 export const makePoller = async (_configOverride?: CartographerConfig) => {
   const requestContext = createRequestContext('Poller Init');
@@ -22,8 +21,7 @@ export const makePoller = async (_configOverride?: CartographerConfig) => {
 
   /// MARK - Config
   // Get ChainData and parse out configuration.
-  const chainData = await getChainData();
-  context.chainData = chainData;
+  context.chainData = await getChainData();
   context.config = _configOverride ?? (await getConfig());
 
   context.logger = new Logger({
@@ -55,24 +53,20 @@ export const makePoller = async (_configOverride?: CartographerConfig) => {
   // Database setup
   context.adapters.database = await getDatabase(context.config.database, context.logger);
 
-  // TODO: Validate subgraph and database connections ?
-
   /// MARK - Bindings
   context.logger.info(`${context.config.service} poller initialized!`, requestContext, methodContext, {
     domains: context.domains,
   });
   console.log(
-    `                                                                                         
-          _/_/_/_/  _/      _/  _/_/_/_/  _/_/_/      _/_/_/  _/        _/_/_/_/    _/_/    _/_/_/    
-          _/        _/      _/  _/        _/    _/  _/        _/        _/        _/    _/  _/    _/   
-        _/_/_/    _/      _/  _/_/_/    _/_/_/    _/        _/        _/_/_/    _/_/_/_/  _/_/_/      
-        _/          _/  _/    _/        _/    _/  _/        _/        _/        _/    _/  _/    _/     
-      _/_/_/_/      _/      _/_/_/_/  _/    _/    _/_/_/  _/_/_/_/  _/_/_/_/  _/    _/  _/    _/                                                                                                  
+    `
+          _/_/_/_/  _/      _/  _/_/_/_/  _/_/_/      _/_/_/  _/        _/_/_/_/    _/_/    _/_/_/
+          _/        _/      _/  _/        _/    _/  _/        _/        _/        _/    _/  _/    _/
+        _/_/_/    _/      _/  _/_/_/    _/_/_/    _/        _/        _/_/_/    _/_/_/_/  _/_/_/
+        _/          _/  _/    _/        _/    _/  _/        _/        _/        _/    _/  _/    _/
+      _/_/_/_/      _/      _/_/_/_/  _/    _/    _/_/_/  _/_/_/_/  _/_/_/_/  _/    _/  _/    _/
      `,
   );
 
-  // Temporary disabled migrations for cross chain swap launch
-  // await runMigration(context);
   await bind(context);
   if (context.config.healthUrls[context.config.service] !== undefined) {
     const url = context.config.healthUrls[context.config.service]!;

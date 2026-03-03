@@ -40,12 +40,12 @@ describe('Invoice operations', () => {
 
     it('should exit early if cannot get latest block number from hub subgraph', async () => {
       reader.getLatestBlockNumber.resolves(new Map());
-      await updateHubDeposits();
+      await updateHubDeposits(mockAppContext);
       expect(database.saveHubDeposits.callCount).to.be.eq(0);
     });
 
     it('should work', async () => {
-      await updateHubDeposits();
+      await updateHubDeposits(mockAppContext);
 
       expect(database.saveHubDeposits).callCount(1);
       expect(database.saveCheckPoint.callCount).to.be.eq(2);
@@ -57,7 +57,7 @@ describe('Invoice operations', () => {
 
     it('should work with processed deposits', async () => {
       reader.getDepositsProcessedByNonce.resolves(processed);
-      await updateHubDeposits();
+      await updateHubDeposits(mockAppContext);
 
       expect(database.saveHubDeposits).calledOnceWith(processed);
       expect(database.saveCheckPoint.callCount).to.be.eq(2);

@@ -1,0 +1,60 @@
+{
+  "subgraph": {
+    "name": "everclear-hub"
+  },
+  "webhookBaseUrl": "https://cartographer-handler.everclear.ninja",
+  "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+  "entities": [
+    {
+      "sourceId": "hub_invoice",
+      "entity": "invoice_enqueued_event",
+      "webhookName": "hub-invoice"
+    },
+    {
+      "sourceId": "hub_deposit_enqueued",
+      "entity": "deposit_enqueued_event",
+      "webhookName": "hub-deposit-enqueued"
+    },
+    {
+      "sourceId": "hub_deposit_processed",
+      "entity": "deposit_processed_event",
+      "webhookName": "hub-deposit-processed"
+    },
+    {
+      "sourceId": "hub_intent",
+      "entity": "hub_intent",
+      "webhookName": "hub-intent"
+    },
+    {
+      "sourceId": "settlement_message",
+      "entity": "settlement_message",
+      "webhookName": "hub-message"
+    },
+    {
+      "sourceId": "settlement_queue",
+      "entity": "settlement_queue",
+      "webhookName": "settlement-queue"
+    },
+    {
+      "sourceId": "deposit_queue",
+      "entity": "deposit_queue",
+      "webhookName": "deposit-queue"
+    },
+    {
+      "sourceId": "hub_meta",
+      "entity": "meta",
+      "webhookName": "hub-meta"
+    },
+    {
+      "sourceId": "hub_token",
+      "entity": "token",
+      "webhookName": "hub-token"
+    },
+    {
+      "sourceId": "settlement_enqueued",
+      "entity": "settlement_enqueued_event",
+      "webhookName": "settlement-enqueued"
+    }
+  ],
+  "webhookName": "everclear-hub-production"
+}

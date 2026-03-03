@@ -1,5 +1,5 @@
 import { SubgraphConfig } from '@chimera-monorepo/adapters-subgraph';
-import { CartographerConfig } from '../../config';
+import { CartographerConfig } from '../config';
 
 const DEFAULT_SUBGRAPH_TIMEOUT = 7500;
 
@@ -27,7 +27,7 @@ export const getSubgraphReaderConfig = (config: CartographerConfig): SubgraphCon
   if (hasValidSubgraphUrls(config.hub.subgraphUrls)) {
     subgraphs[config.hub.domain] = { endpoints: config.hub.subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   }
-  
+
   // Add Envio configuration if available
   const envioConfig: SubgraphConfig['envio'] = config.hub.envioSubgraphUrl
     ? {

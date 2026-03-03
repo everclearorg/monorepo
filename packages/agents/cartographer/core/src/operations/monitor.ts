@@ -11,10 +11,10 @@ import {
   SpokeMeta,
 } from '@chimera-monorepo/utils';
 
-import { getContext } from '../../shared';
-import { getHyperlaneMsgDelivered } from '../../mockable';
+import { AppContext } from '../context';
+import { CartographerConfig } from '../config';
 import { getSubgraphSupportedDomains } from './helper';
-import { CartographerConfig } from '../../config';
+import { getHyperlaneMsgDelivered } from '../mockable';
 
 const getChainConfig = (domain: string, config: CartographerConfig) => {
   if (domain == config.hub.domain) {
@@ -26,10 +26,11 @@ const getChainConfig = (domain: string, config: CartographerConfig) => {
   return config.chains[domain];
 };
 
-const getMessageStatus = async (messageId: string, config: CartographerConfig, destinationDomain?: string) => {
+const getMessageStatus = async (messageId: string, context: AppContext, destinationDomain?: string) => {
   const {
+    config,
     adapters: { chainreader },
-  } = getContext();
+  } = context;
   const chainConfig = getChainConfig(destinationDomain!, config);
   const gateway = chainConfig.deployments?.gateway;
   let status: HyperlaneStatus = HyperlaneStatus.pending;
@@ -47,12 +48,12 @@ const getMessageStatus = async (messageId: string, config: CartographerConfig, d
   return status;
 };
 
-export const updateMessages = async () => {
+export const updateMessages = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     logger,
     config,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateMessages.name);
 
   const evmDomains = Object.keys(config.chains)
@@ -78,7 +79,7 @@ export const updateMessages = async () => {
             message.status = HyperlaneStatus.pending;
             return;
           }
-          message.status = await getMessageStatus(message.id, config, message.destinationDomain);
+          message.status = await getMessageStatus(message.id, context, message.destinationDomain);
         }),
       );
 
@@ -101,7 +102,7 @@ export const updateMessages = async () => {
       await Promise.all(
         messages.map(async (message) => {
           // all spoke messages go to the hub, use this domain if no destination on message
-          message.status = await getMessageStatus(message.id, config, message.destinationDomain ?? config.hub.domain);
+          message.status = await getMessageStatus(message.id, context, message.destinationDomain ?? config.hub.domain);
         }),
       );
 
@@ -135,12 +136,12 @@ export const updateMessages = async () => {
   }
 };
 
-export const updateQueues = async () => {
+export const updateQueues = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     logger,
     config,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateQueues.name);
 
   const evmDomains = Object.keys(config.chains).filter(
@@ -182,12 +183,12 @@ export const updateQueues = async () => {
   });
 };
 
-export const updateProtocolUpdateLogs = async () => {
+export const updateProtocolUpdateLogs = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     logger,
     config,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateProtocolUpdateLogs.name);
 
   const spokeDomains = getSubgraphSupportedDomains(config);
@@ -260,12 +261,12 @@ export const updateProtocolUpdateLogs = async () => {
   }
 };
 
-export const updateHubSpokeMeta = async () => {
+export const updateHubSpokeMeta = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     logger,
     config,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateHubSpokeMeta.name);
 
   const spokeDomains = getSubgraphSupportedDomains(config);
@@ -292,12 +293,11 @@ export const updateHubSpokeMeta = async () => {
   }
 };
 
-export const updateMessageStatus = async () => {
+export const updateMessageStatus = async (context: AppContext) => {
   const {
     adapters: { database },
     logger,
-    config,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateMessageStatus.name);
 
   const uncompletedStatuses = [HyperlaneStatus.none, HyperlaneStatus.pending, HyperlaneStatus.relayable];
@@ -317,7 +317,7 @@ export const updateMessageStatus = async () => {
 
     const statusRes = await Promise.all(
       messagesToProcess.map(async (message) => {
-        const status = await getMessageStatus(message.id, config, message.destinationDomain);
+        const status = await getMessageStatus(message.id, context, message.destinationDomain);
         return { id: message.id, status };
       }),
     );

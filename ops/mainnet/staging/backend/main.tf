@@ -148,74 +148,111 @@ module "postgrest" {
   domain                   = var.domain
 }
 
-module "cartographer-depositors-lambda-cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-cartographer"
-  docker_image_tag    = var.cartographer_image_tag
-  container_family    = "cartographer-depositors"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.cartographer_depositors_config_param_name
-  container_env_vars  = merge(local.cartographer_env_vars, {
-    CARTOGRAPHER_SERVICE = "depositors"
-    CONFIG_PARAMETER_NAME = local.cartographer_depositors_config_param_name
-  })
-  schedule_expression = "rate(1 minute)"
-  memory_size         = 1024
-  config              = local.local_cartographer_config
-}
+# ============================================================================
+# CARTOGRAPHER POLLER LAMBDAS - REPLACED BY CARTOGRAPHER HANDLER
+# ============================================================================
+# These Lambda functions are replaced by the cartographer-handler ECS service
+# which uses Goldsky webhook pipelines for event-driven processing.
+#
+# TODO: Remove these commented modules once migration is complete
+# ============================================================================
 
-module "cartographer-intents-lambda-cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-cartographer"
-  docker_image_tag    = var.cartographer_image_tag
-  container_family    = "cartographer-intents"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.cartographer_intents_config_param_name
-  container_env_vars  = merge(local.cartographer_env_vars, {
-    CARTOGRAPHER_SERVICE = "intents"
-    CONFIG_PARAMETER_NAME = local.cartographer_intents_config_param_name
-  })
-  schedule_expression = "rate(1 minute)"
-  memory_size         = 1024
-  config              = local.local_cartographer_config
-}
+# module "cartographer-depositors-lambda-cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-cartographer"
+#   docker_image_tag    = var.cartographer_image_tag
+#   container_family    = "cartographer-depositors"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.cartographer_depositors_config_param_name
+#   container_env_vars  = merge(local.cartographer_env_vars, {
+#     CARTOGRAPHER_SERVICE = "depositors"
+#     CONFIG_PARAMETER_NAME = local.cartographer_depositors_config_param_name
+#   })
+#   schedule_expression = "rate(1 minute)"
+#   memory_size         = 1024
+#   config              = local.local_cartographer_config
+# }
 
-module "cartographer-invoices-lambda-cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-cartographer"
-  docker_image_tag    = var.cartographer_image_tag
-  container_family    = "cartographer-invoices"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.cartographer_invoices_config_param_name
-  container_env_vars  = merge(local.cartographer_env_vars, {
-    CARTOGRAPHER_SERVICE = "invoices"
-    CONFIG_PARAMETER_NAME = local.cartographer_invoices_config_param_name
-  })
-  schedule_expression = "rate(1 minute)"
-  memory_size         = 1024
-  config              = local.local_cartographer_config
-}
+# module "cartographer-intents-lambda-cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-cartographer"
+#   docker_image_tag    = var.cartographer_image_tag
+#   container_family    = "cartographer-intents"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.cartographer_intents_config_param_name
+#   container_env_vars  = merge(local.cartographer_env_vars, {
+#     CARTOGRAPHER_SERVICE = "intents"
+#     CONFIG_PARAMETER_NAME = local.cartographer_intents_config_param_name
+#   })
+#   schedule_expression = "rate(1 minute)"
+#   memory_size         = 1024
+#   config              = local.local_cartographer_config
+# }
 
-module "cartographer-monitor-lambda-cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-cartographer"
-  docker_image_tag    = var.cartographer_image_tag
-  container_family    = "cartographer-monitor"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.cartographer_monitor_config_param_name
-  container_env_vars  = merge(local.cartographer_env_vars, {
-    CARTOGRAPHER_SERVICE = "monitor"
-    CONFIG_PARAMETER_NAME = local.cartographer_monitor_config_param_name
-  })
-  schedule_expression = "rate(1 minute)"
-  memory_size         = 1024
-  config              = local.local_cartographer_config
-}
+# module "cartographer-invoices-lambda-cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-cartographer"
+#   docker_image_tag    = var.cartographer_image_tag
+#   container_family    = "cartographer-invoices"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.cartographer_invoices_config_param_name
+#   container_env_vars  = merge(local.cartographer_env_vars, {
+#     CARTOGRAPHER_SERVICE = "invoices"
+#     CONFIG_PARAMETER_NAME = local.cartographer_invoices_config_param_name
+#   })
+#   schedule_expression = "rate(1 minute)"
+#   memory_size         = 1024
+#   config              = local.local_cartographer_config
+# }
 
+# module "cartographer-monitor-lambda-cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-cartographer"
+#   docker_image_tag    = var.cartographer_image_tag
+#   container_family    = "cartographer-monitor"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.cartographer_monitor_config_param_name
+#   container_env_vars  = merge(local.cartographer_env_vars, {
+#     CARTOGRAPHER_SERVICE = "monitor"
+#     CONFIG_PARAMETER_NAME = local.cartographer_monitor_config_param_name
+#   })
+#   schedule_expression = "rate(1 minute)"
+#   memory_size         = 1024
+#   config              = local.local_cartographer_config
+# }
+
+module "cartographer-handler" {
+  source                   = "../../../modules/service"
+  region                   = var.region
+  dd_api_key               = var.dd_api_key
+  zone_id                  = data.aws_route53_zone.primary.zone_id
+  execution_role_arn       = data.aws_iam_role.ecr_admin_role.arn
+  cluster_id               = module.ecs.ecs_cluster_id
+  vpc_id                   = module.network.vpc_id
+  lb_subnets               = module.network.public_subnets
+  internal_lb              = false
+  docker_image             = "679752396206.dkr.ecr.us-east-1.amazonaws.com/chimera-cartographer-handler:${var.cartographer_handler_image_tag}"
+  container_family         = "cartographer-handler"
+  container_port           = 3000
+  loadbalancer_port        = 80
+  cpu                      = 512
+  memory                   = 1024
+  instance_count           = 1
+  timeout                  = 180
+  health_check_path        = "/health"
+  environment              = var.environment
+  stage                    = var.stage
+  ingress_cdir_blocks      = ["0.0.0.0/0"]
+  ingress_ipv6_cdir_blocks = []
+  service_security_groups  = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  cert_arn                 = var.certificate_arn_mainnet
+  container_env_vars       = local.cartographer_handler_env_vars
+  domain                   = var.domain
+}
 
 module "network" {
   source      = "../../../modules/networking"
