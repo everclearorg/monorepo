@@ -29,6 +29,7 @@ import { base64ToHex } from './webhookHandler';
  * Only converts if the value looks like base64 (non-hex string).
  */
 function maybeBase64ToHex(value: unknown): string {
+  if (value === null || value === undefined) return '';
   if (typeof value !== 'string') return String(value);
   if (value.startsWith('0x')) return value;
   try {

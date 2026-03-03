@@ -14,6 +14,7 @@ export const TService = Type.Union([
   Type.Literal('intents'),
   Type.Literal('depositors'),
   Type.Literal('monitor'),
+  Type.Literal('handler'),
 ]);
 
 export const CartographerConfigSchema = Type.Object({
@@ -118,7 +119,7 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
       configFile.pollInterval ||
       DEFAULT_POLL_INTERVAL,
     logLevel: process.env.CARTOGRAPHER_LOG_LEVEL || configJson.logLevel || configFile.logLevel || 'info',
-    service: process.env.CARTOGRAPHER_SERVICE || configJson.service || configFile.service || 'messages',
+    service: process.env.CARTOGRAPHER_SERVICE || configJson.service || configFile.service || 'handler',
     database: process.env.DATABASE_URL || configJson.databaseUrl || configFile.databaseUrl,
     environment:
       process.env.CARTOGRAPHER_ENVIRONMENT || configJson.environment || configFile.environment || 'production',

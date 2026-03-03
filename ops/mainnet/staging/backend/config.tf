@@ -50,9 +50,11 @@ locals {
     logLevel = "debug"
     environment = "staging"
     databaseUrl = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear"
-    service = "intents"
+    service = "handler"
     pollInterval = 60000
-    healthUrls = {}
+    healthUrls = {
+      handler = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_handler_heartbeat}"
+    }
     hub = {
       domain = "25327"
       providers = [

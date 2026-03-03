@@ -33,6 +33,10 @@ export const processHubInvoice = async (payload: Record<string, unknown>, contex
     config,
   } = context;
   const intentId = extractIntentId(payload);
+  if (!intentId) {
+    logger.warn('Skipping hub invoice webhook: missing intent ID', undefined, undefined, { payload });
+    return;
+  }
   const hubDomain = config.hub.domain;
 
   logger.debug('Processing hub invoice webhook', undefined, undefined, { intentId });
@@ -77,6 +81,10 @@ export const processHubDeposit = async (
     config,
   } = context;
   const intentId = extractIntentId(payload);
+  if (!intentId) {
+    logger.warn('Skipping hub deposit webhook: missing intent ID', undefined, undefined, { payload, type });
+    return;
+  }
   const hubDomain = config.hub.domain;
 
   logger.debug('Processing hub deposit webhook', undefined, undefined, { intentId, type });

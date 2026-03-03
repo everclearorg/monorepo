@@ -27,3 +27,4 @@ export {
   getSubgraphSupportedDomains,
 } from './operations';
 export { computeIsSwap } from './lib/intentHelpers';
+export * as mockable from './mockable';

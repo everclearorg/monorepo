@@ -22,7 +22,7 @@ import {
   SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 import { mockAppContext } from '../../globalTestHook';
-import * as coreMockable from '@chimera-monorepo/cartographer-core/dist/mockable';
+import { mockable as coreMockable } from '@chimera-monorepo/cartographer-core';
 import { createHubMessages, createMessages, createQueues } from '@chimera-monorepo/database/test/mock';
 
 describe('Monitor operations', () => {
@@ -145,7 +145,6 @@ describe('Monitor operations', () => {
   describe('#updateMessageStatus', () => {
     it('should work', async () => {
       stub(coreMockable, 'getHyperlaneMsgDelivered').resolves(true);
-      const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
       // should work for both hub and spoke destination domain
       const messages = createMessages(5, [{ destinationDomain: mockAppContext.config.hub.domain }]);
       (mockAppContext.adapters.database.getMessagesByStatus as SinonStub).resolves(messages);

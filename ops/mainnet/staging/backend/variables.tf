@@ -145,3 +145,9 @@ variable "goldsky_webhook_secret" {
   sensitive = true
   default   = ""
 }
+
+variable "cartographer_handler_heartbeat" {
+  type      = string
+  sensitive = true
+  default   = ""
+}

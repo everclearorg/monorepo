@@ -30,7 +30,12 @@ function loadTemplate(): string {
   return readFileSync(join(__dirname, '../src/cartographer-webhooks/webhook.template.yaml'), 'utf-8');
 }
 
-function renderPipeline(template: string, config: HubPipelineConfig, subgraphVersion: string, subgraphLabel: string): string {
+function renderPipeline(
+  template: string,
+  config: HubPipelineConfig,
+  subgraphVersion: string,
+  subgraphLabel: string,
+): string {
   const view = {
     webhookName: config.webhookName,
     subgraphLabel: subgraphLabel.replace(/\./g, '-'),
@@ -41,6 +46,7 @@ function renderPipeline(template: string, config: HubPipelineConfig, subgraphVer
       subgraphLabel,
       webhookBaseUrl: config.webhookBaseUrl,
       secretName: config.secretName,
+      domain: (config as SpokePipelineConfig).domain,
     })),
   };
 
