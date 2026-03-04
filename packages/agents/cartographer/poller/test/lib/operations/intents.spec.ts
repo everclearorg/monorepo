@@ -10,7 +10,7 @@ describe('Intents operations', () => {
   describe('#updateOriginIntents', () => {
     it('should work', async () => {
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createOriginIntents(domains.length, [{ origin: '1337' }, { origin: '1338' }]);
       (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
@@ -33,7 +33,7 @@ describe('Intents operations', () => {
 
     it('not proceed if latest block number not available', async () => {
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createOriginIntents(domains.length, [{ origin: '1337' }, { origin: '1338' }]);
       (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
@@ -73,7 +73,7 @@ describe('Intents operations', () => {
       };
 
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createOriginIntents(1, [{
         origin: '1337',
@@ -121,7 +121,7 @@ describe('Intents operations', () => {
       };
 
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createOriginIntents(1, [{
         origin: '1337',
@@ -148,7 +148,7 @@ describe('Intents operations', () => {
       mockAppContext.config.chains['1338'].assets = {};
 
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createOriginIntents(1, [{
         origin: '1337',
@@ -173,7 +173,7 @@ describe('Intents operations', () => {
   describe('#updateDestinationIntents', () => {
     it('should work', async () => {
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createDestinationIntents(domains.length, [{ destination: '1337' }, { destination: '1338' }]);
       (mockAppContext.adapters.subgraph.getDestinationIntentsByNonce as SinonStub).resolves(intents);
@@ -193,7 +193,7 @@ describe('Intents operations', () => {
 
     it('not proceed if latest block number not available', async () => {
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createDestinationIntents(domains.length, [{ destination: '1337' }, { destination: '1338' }]);
       (mockAppContext.adapters.subgraph.getDestinationIntentsByNonce as SinonStub).resolves(intents);
@@ -212,7 +212,7 @@ describe('Intents operations', () => {
   describe('#updateSettlementIntents', () => {
     it('should work', async () => {
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createSettlementIntents(domains.length);
       (mockAppContext.adapters.subgraph.getSettlementIntentsByNonce as SinonStub).resolves(intents);
@@ -232,7 +232,7 @@ describe('Intents operations', () => {
 
     it('not proceed if latest block number not available', async () => {
       const domains = Object.keys(mockAppContext.config.chains).filter(
-        (domain) => domain !== mockAppContext.config.hub.domain,
+        (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createSettlementIntents(domains.length);
       (mockAppContext.adapters.subgraph.getSettlementIntentsByNonce as SinonStub).resolves(intents);

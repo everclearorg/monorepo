@@ -16,6 +16,10 @@ import { CartographerConfig } from '../config';
 import { getSubgraphSupportedDomains } from './helper';
 import { getHyperlaneMsgDelivered } from '../mockable';
 
+const isChainConfigured = (domain: string, config: CartographerConfig) => {
+  return domain == config.hub.domain || !!config.chains[domain];
+};
+
 const getChainConfig = (domain: string, config: CartographerConfig) => {
   if (domain == config.hub.domain) {
     return config.hub;
@@ -70,7 +74,16 @@ export const updateMessages = async (context: AppContext) => {
 
     let messages = [];
     if (domain === config.hub.domain) {
-      messages = await subgraph.getHubMessages(domain, latestNonce);
+      messages = (await subgraph.getHubMessages(domain, latestNonce)).filter((m) => {
+        if (m.destinationDomain && !isChainConfigured(m.destinationDomain, config)) {
+          logger.debug('Skipping message with unconfigured destination', requestContext, methodContext, {
+            messageId: m.id,
+            destinationDomain: m.destinationDomain,
+          });
+          return false;
+        }
+        return true;
+      });
       await Promise.all(
         messages.map(async (message) => {
           // Skip contract read for hub → Solana
@@ -312,8 +325,11 @@ export const updateMessageStatus = async (context: AppContext) => {
       result: uncompletedMessages.length,
     });
 
-    // Skip messages going to solana, they will be updated by lighthouse
-    const messagesToProcess = uncompletedMessages.filter((message) => message.destinationDomain !== SOLANA_CHAINID);
+    // Skip messages going to solana (updated by lighthouse) or to unconfigured chains
+    const messagesToProcess = uncompletedMessages.filter(
+      (message) =>
+        message.destinationDomain !== SOLANA_CHAINID && isChainConfigured(message.destinationDomain!, context.config),
+    );
 
     const statusRes = await Promise.all(
       messagesToProcess.map(async (message) => {
