@@ -18,13 +18,23 @@ WORKDIR /tmp/build
 COPY .yarn /tmp/build/.yarn/
 COPY .yarnrc.yml /tmp/build/
 COPY package.json /tmp/build/
-COPY packages/agents/cartographer/handler/package.json /tmp/build/packages/agents/cartographer/handler/
-COPY packages/agents/cartographer/core/package.json /tmp/build/packages/agents/cartographer/core/
-COPY packages/adapters/subgraph/package.json /tmp/build/packages/adapters/subgraph/
-COPY packages/adapters/database/package.json /tmp/build/packages/adapters/database/
-COPY packages/adapters/chainservice/package.json /tmp/build/packages/adapters/chainservice/
+# All workspace package.json files must be present for Yarn 3 resolution
 COPY packages/utils/package.json /tmp/build/packages/utils/
+COPY packages/adapters/cache/package.json /tmp/build/packages/adapters/cache/
+COPY packages/adapters/chainservice/package.json /tmp/build/packages/adapters/chainservice/
+COPY packages/adapters/subgraph/package.json /tmp/build/packages/adapters/subgraph/
+COPY packages/adapters/web3signer/package.json /tmp/build/packages/adapters/web3signer/
+COPY packages/adapters/relayer/package.json /tmp/build/packages/adapters/relayer/
+COPY packages/adapters/database/package.json /tmp/build/packages/adapters/database/
+COPY packages/agents/cartographer/core/package.json /tmp/build/packages/agents/cartographer/core/
+COPY packages/agents/cartographer/poller/package.json /tmp/build/packages/agents/cartographer/poller/
+COPY packages/agents/cartographer/handler/package.json /tmp/build/packages/agents/cartographer/handler/
+COPY packages/agents/lighthouse/package.json /tmp/build/packages/agents/lighthouse/
+COPY packages/agents/monitor/package.json /tmp/build/packages/agents/monitor/
+COPY packages/agents/relayer/package.json /tmp/build/packages/agents/relayer/
+COPY packages/agents/watchtower/package.json /tmp/build/packages/agents/watchtower/
 COPY packages/contracts/package.json /tmp/build/packages/contracts/
+COPY packages/subgraph/package.json /tmp/build/packages/subgraph/
 COPY yarn.lock /tmp/build/
 
 RUN yarn install
@@ -42,7 +52,7 @@ COPY .eslintignore /tmp/build/
 COPY .eslintrc.js /tmp/build/
 
 ENV SKIP_SOLIDITY_BUILD=true
-RUN yarn build
+RUN yarn workspace @chimera-monorepo/cartographer-handler build
 
 # Runtime stage
 FROM node:18-slim AS runtime
