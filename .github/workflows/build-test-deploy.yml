@@ -997,7 +997,6 @@ jobs:
       TF_VAR_full_image_name_monitor: chimera-${{ github.sha }}
       TF_VAR_full_image_name_monitor_poller: chimera-${{ github.sha }}
       TF_VAR_lighthouse_image_tag: chimera-${{ github.sha }}
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
