@@ -351,6 +351,10 @@ pub fn handle_new_intent<'info>(
                 .everclear_ccip_chain_selector
                 .ok_or(error!(SpokeError::InvalidMessage))?;
 
+            // Use program PDA as CCIP sender so Hub sees a single deterministic gateway address.
+            let (ccip_authority, ccip_authority_bump) =
+                Pubkey::find_program_address(&[b"ccip_authority"], &program_id);
+
             let receiver = spoke_state.everclear_gateway.to_vec();
             let message = SVM2AnyMessage::new_data_only(receiver, evm_encoded_message);
 
@@ -358,7 +362,7 @@ pub fn handle_new_intent<'info>(
                 &ccip_router,
                 &CCIP_FEE_QUOTER,
                 &CCIP_RMN,
-                &accounts.authority.key(),
+                &ccip_authority,
                 dest_chain_selector,
             )?;
 
@@ -369,6 +373,12 @@ pub fn handle_new_intent<'info>(
 
             require!(
                 remaining_accounts[0].key() == ccip_router,
+                SpokeError::InvalidMessage
+            );
+
+            // Authority (index 3 in account_metas) must be our ccip_authority PDA.
+            require!(
+                remaining_accounts[4].key() == ccip_authority,
                 SpokeError::InvalidMessage
             );
 
@@ -386,7 +396,9 @@ pub fn handle_new_intent<'info>(
                 .collect();
 
             let acc_infos_slice = &remaining_accounts[0..=account_metas.len()];
-            let authority_seeds: &[&[&[u8]]] = &[];
+            let ccip_seed: &[u8] = b"ccip_authority";
+            let bump_slice: &[u8] = &[ccip_authority_bump];
+            let authority_seeds: &[&[&[u8]]] = &[&[ccip_seed, bump_slice]];
             ccip_send(
                 &ccip_router,
                 authority_seeds,
