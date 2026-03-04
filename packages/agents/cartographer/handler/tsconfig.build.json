@@ -13,6 +13,9 @@
       "path": "../core/tsconfig.build.json"
     },
     {
+      "path": "../../../adapters/chainservice/tsconfig.build.json"
+    },
+    {
       "path": "../../../adapters/database/tsconfig.build.json"
     },
     {
