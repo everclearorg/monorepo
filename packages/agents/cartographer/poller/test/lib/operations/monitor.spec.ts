@@ -31,7 +31,7 @@ describe('Monitor operations', () => {
       const getHyperlaneMsgDelivered = stub(coreMockable, 'getHyperlaneMsgDelivered');
       getHyperlaneMsgDelivered.resolves(false);
 
-      const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
+      const domains = Object.keys(mockAppContext.config.chains).filter((d) => mockAppContext.config.chains[d].network === 'evm').concat(mockAppContext.config.hub.domain);
       const spokeMessages = createMessages(5);
       const hubMessages = createHubMessages(5);
       (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves(spokeMessages);
@@ -111,7 +111,7 @@ describe('Monitor operations', () => {
       const getHyperlaneMsgDelivered = stub(coreMockable, 'getHyperlaneMsgDelivered');
       getHyperlaneMsgDelivered.resolves(false);
 
-      const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
+      const domains = Object.keys(mockAppContext.config.chains).filter((d) => mockAppContext.config.chains[d].network === 'evm').concat(mockAppContext.config.hub.domain);
       const hubMessages = createHubMessages(5);
       (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves([]);
       (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
