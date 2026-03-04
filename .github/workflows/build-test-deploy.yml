@@ -297,6 +297,43 @@ jobs:
     outputs:
       json: ${{ steps.meta.outputs.json }}
 
+  build-and-push-cartographer-handler-image:
+    if: github.ref == 'refs/heads/mainnet-staging'
+    env:
+      REGISTRY: 679752396206.dkr.ecr.${{ needs.set-aws-region.outputs.AWS_REGION }}.amazonaws.com
+      IMAGE_TAG: chimera-${{ github.sha }}
+      REPOSITORY: chimera-cartographer-handler
+    runs-on: ubuntu-latest
+    needs: [set-aws-region]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Private ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+        run: |
+          DOCKER_BUILDKIT=1 docker build --provenance=false -f docker/cartographer-handler/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+    outputs:
+      json: ${{ steps.meta.outputs.json }}
+
   build-and-push-monitor-image:
     if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/testnet-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/mainnet-prod'
     env:
@@ -902,7 +939,7 @@ jobs:
     needs: [e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
-      TF_VAR_cartographer_image_tag: chimera-${{ github.sha }}
+      TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
 
     runs-on: ubuntu-latest
     permissions:
