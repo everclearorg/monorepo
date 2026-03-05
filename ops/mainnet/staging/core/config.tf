@@ -36,16 +36,24 @@ locals {
     { name = "STAGE", value = var.stage },
     { name = "GRAPH_API_KEY", value = var.graph_api_key },
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
+    { name = "ALERT_PIPELINE_MODE", value = "dual" },
+    { name = "MONITOR_WEBHOOK_URL", value = var.monitor_webhook_url },
+    { name = "MONITOR_WEBHOOK_SECRET", value = var.monitor_webhook_secret },
+    { name = "ALERT_EVENT_ENVIRONMENT", value = "staging" },
   ]
 
   monitor_poller_env_vars = {
-    ENVIRONMENT       = var.environment,
-    STAGE             = var.stage,
-    DD_LOGS_ENABLED   = true,
-    DD_ENV            = "${var.environment}-${var.stage}"
-    DD_API_KEY        = var.dd_api_key,
-    DD_LAMBDA_HANDLER = "packages/agents/monitor/dist/lambda.handler"
-    GRAPH_API_KEY     = var.graph_api_key
+    ENVIRONMENT            = var.environment,
+    STAGE                  = var.stage,
+    DD_LOGS_ENABLED        = true,
+    DD_ENV                 = "${var.environment}-${var.stage}"
+    DD_API_KEY             = var.dd_api_key,
+    DD_LAMBDA_HANDLER      = "packages/agents/monitor/dist/lambda.handler"
+    GRAPH_API_KEY          = var.graph_api_key
+    ALERT_PIPELINE_MODE    = "dual"
+    MONITOR_WEBHOOK_URL    = var.monitor_webhook_url
+    MONITOR_WEBHOOK_SECRET = var.monitor_webhook_secret
+    ALERT_EVENT_ENVIRONMENT = "staging"
   }
 
   lighthouse_env_vars = {
@@ -353,7 +361,7 @@ locals {
     ]
     agents = {
       relayer          = "https://${module.relayer_server.service_endpoint}/ping"
-      # monitor          = "https://${module.monitor.service_endpoint}/ping"
+      monitor          = "https://${module.monitor.service_endpoint}/ping"
       lighthouseSigner = "https://${module.lighthouse_web3signer.service_endpoint}/upcheck"
       relayerSigner    = "https://${module.relayer_web3signer.service_endpoint}/upcheck"
       watchtowerSigner = "https://${module.watchtower_web3signer.service_endpoint}/upcheck"

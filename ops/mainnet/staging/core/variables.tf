@@ -289,3 +289,16 @@ variable "tron_drpc_api_key" {
   sensitive = true
   default   = "neverclear"
 }
+
+variable "monitor_webhook_url" {
+  type        = string
+  description = "Webhook URL for the everclear-agents alert pipeline IngestServer"
+  default     = ""
+}
+
+variable "monitor_webhook_secret" {
+  type        = string
+  sensitive   = true
+  description = "HMAC shared secret for signing events sent to the alert pipeline"
+  default     = ""
+}
