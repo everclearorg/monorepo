@@ -75,6 +75,7 @@ describe('Config', () => {
 
     it('should not fail if config file doesnt exist', async () => {
       stub(process, 'env').value({
+        ...createProcessEnv(),
         WATCHTOWER_CONFIG_FILE: 'test-config.json',
       });
       await expect(getConfig()).to.be.fulfilled;
@@ -96,91 +97,88 @@ describe('Config', () => {
   });
 
   describe('#shouldReloadEverclearConfig', () => {
-    beforeEach(() => {});
+    const mockChains = {
+      '1337': {
+        providers: ['http://localhost:8080'],
+        subgraphUrls: ['http://1337.mocksubgraph.com'],
+      },
+      '1338': {
+        providers: ['http://localhost:8081'],
+        subgraphUrls: ['http://1338.mocksubgraph.com'],
+      },
+    };
+
+    const setupWithEverclearConfig = async (initialChains = mockChains) => {
+      stub(process, 'env').value({
+        ...process.env,
+        ...createProcessEnv(),
+      });
+      getEverclearConfigStub.resolves({ chains: initialChains });
+      await getConfig();
+    };
 
     afterEach(() => {
       restore();
       reset();
     });
 
-    it('should not reload config if everclear config is undefined', async () => {
+    it('should return false when no cached everclear config url', async () => {
+      const res = await shouldReloadEverclearConfig();
+      expect(res).to.be.deep.eq({ reloadConfig: false, reloadSubgraph: false });
+    });
+
+    it('should return false when fetch throws', async () => {
+      await setupWithEverclearConfig();
+      getEverclearConfigStub.rejects(new Error('network error'));
+      const res = await shouldReloadEverclearConfig();
+      expect(res).to.be.deep.eq({ reloadConfig: false, reloadSubgraph: false });
+    });
+
+    it('should return false when fetch returns undefined', async () => {
+      await setupWithEverclearConfig();
       getEverclearConfigStub.resolves(undefined);
       const res = await shouldReloadEverclearConfig();
       expect(res).to.be.deep.eq({ reloadConfig: false, reloadSubgraph: false });
     });
 
-    it('should reload config if subgraph config changes', async () => {
-      stub(process, 'env').value({
-        ...process.env,
-        ...createProcessEnv(),
-      });
+    it('should reload both when subgraph urls change', async () => {
+      await setupWithEverclearConfig();
       getEverclearConfigStub.resolves({
         chains: {
           '1337': {
             providers: ['http://localhost:8080'],
-            subgraphUrls: ['http://1337.mocksubgraph.com'],
+            subgraphUrls: ['http://new.1337.mocksubgraph.com'],
           },
           '1338': {
             providers: ['http://localhost:8081'],
-            subgraphUrls: ['http://1338.mocksubgraph.com'],
+            subgraphUrls: ['http://new.1338.mocksubgraph.com'],
           },
         },
       });
-
-      await getConfig();
-
-      getEverclearConfigStub.resolves({
-        chains: {
-          '1337': {
-            providers: ['http://localhost:7080'],
-            subgraphUrls: ['http://a.1337.mocksubgraph.com'],
-          },
-          '1338': {
-            providers: ['http://localhost:7081'],
-            subgraphUrls: ['http://b.1338.mocksubgraph.com'],
-          },
-        },
-      });
-
       const res = await shouldReloadEverclearConfig();
       expect(res).to.be.deep.eq({ reloadConfig: true, reloadSubgraph: true });
     });
 
-    it('should not reload subgraph config', async () => {
-      stub(process, 'env').value({
-        ...process.env,
-        ...createProcessEnv(),
-      });
+    it('should reload config only when non-subgraph config changes', async () => {
+      await setupWithEverclearConfig();
       getEverclearConfigStub.resolves({
         chains: {
+          ...mockChains,
           '1337': {
-            providers: ['http://localhost:8080'],
-            subgraphUrls: ['http://1337.mocksubgraph.com'],
-          },
-          '1338': {
-            providers: ['http://localhost:8081'],
-            subgraphUrls: ['http://1338.mocksubgraph.com'],
+            ...mockChains['1337'],
+            providers: ['http://localhost:9999'],
           },
         },
       });
-
-      await getConfig();
-
-      getEverclearConfigStub.resolves({
-        chains: {
-          '1337': {
-            providers: ['http://localhost:7080'],
-            subgraphUrls: ['http://1337.mocksubgraph.com'],
-          },
-          '1338': {
-            providers: ['http://localhost:7081'],
-            subgraphUrls: ['http://1338.mocksubgraph.com'],
-          },
-        },
-      });
-
       const res = await shouldReloadEverclearConfig();
       expect(res).to.be.deep.eq({ reloadConfig: true, reloadSubgraph: false });
+    });
+
+    it('should not reload when config is identical', async () => {
+      await setupWithEverclearConfig();
+      getEverclearConfigStub.resolves({ chains: mockChains });
+      const res = await shouldReloadEverclearConfig();
+      expect(res).to.be.deep.eq({ reloadConfig: false, reloadSubgraph: false });
     });
   });
 

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ajv, EverclearConfig, createLoggingContext, getDefaultABIConfig } from '@chimera-monorepo/utils';
+import { ajv, createLoggingContext, EverclearConfig, getDefaultABIConfig, jsonifyError } from '@chimera-monorepo/utils';
 import { config as dotenvConfig } from 'dotenv';
 import lodash from 'lodash';
-import { ChainConfig, WatcherConfig, TWatcherConfigSchema } from './lib/entities';
-import { existsSync, readFileSync, getEverclearConfig } from './mockable';
+import { ChainConfig, TWatcherConfigSchema, WatcherConfig } from './lib/entities';
+import { existsSync, getEverclearConfig, readFileSync } from './mockable';
 import { getContext } from './watcher';
 import { SubgraphConfig } from '@chimera-monorepo/adapters-subgraph';
 
@@ -41,11 +41,19 @@ export const getConfig = async (): Promise<WatcherConfig> => {
     process.exit(1);
   }
 
-  const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
+  const everclearConfigUrl = process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig;
 
   cachedEverclearConfigUrl = everclearConfigUrl;
-  const everclearConfig = await getEverclearConfig(everclearConfigUrl);
+  let everclearConfig;
+  if (everclearConfigUrl) {
+    try {
+      everclearConfig = await getEverclearConfig(everclearConfigUrl);
+    } catch (e) {
+      console.error('Failed to fetch everclear config:', e);
+    }
+  } else {
+    console.warn('Everclear config URL not set');
+  }
   if (everclearConfig) cachedEverclearConfig = everclearConfig;
 
   const hubConfig = {
@@ -176,12 +184,19 @@ export const getConfig = async (): Promise<WatcherConfig> => {
 export const shouldReloadEverclearConfig = async (): Promise<{ reloadConfig: boolean; reloadSubgraph: boolean }> => {
   const { logger } = getContext();
   const { requestContext, methodContext } = createLoggingContext(shouldReloadEverclearConfig.name);
+
+  if (!cachedEverclearConfigUrl) return { reloadConfig: false, reloadSubgraph: false };
+
+  let everclearConfig: EverclearConfig | undefined = undefined;
+  try {
+    everclearConfig = await getEverclearConfig(cachedEverclearConfigUrl);
+  } catch (e) {
+    logger.error('Failed to fetch everclear config', requestContext, methodContext, jsonifyError(e as Error));
+  }
+  if (!everclearConfig) return { reloadConfig: false, reloadSubgraph: false };
+
   let reloadSubgraph = false;
   let reloadConfig = false;
-
-  const everclearConfig = await getEverclearConfig(cachedEverclearConfigUrl);
-
-  if (!everclearConfig) return { reloadConfig, reloadSubgraph };
   for (const domainId of Object.keys(cachedEverclearConfig.chains)) {
     const cachedSubgraphUrls = cachedEverclearConfig.chains[domainId].subgraphUrls;
     const newSubgraphUrls = everclearConfig.chains[domainId].subgraphUrls;
@@ -217,7 +232,7 @@ export const getSubgraphReaderConfig = (
   Object.keys(chains).forEach((domainId) => {
     subgraphs[domainId] = { endpoints: chains[domainId].subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   });
-  
+
   // Add Envio configuration if available from hub config
   const envioConfig: SubgraphConfig['envio'] = hubConfig?.envioSubgraphUrl
     ? {
