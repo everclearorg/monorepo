@@ -4,8 +4,6 @@ import { axiosGet } from './axios';
 import { Static, Type } from '@sinclair/typebox';
 import { Logger } from '../logging';
 
-export const EVERCLEAR_CONFIG_URL = 'https://raw.githubusercontent.com/connext/chaindata/main/everclear.json';
-
 export const parseEverclearConfig = (data: object): EverclearConfig => {
   const everclearConfig = data as EverclearConfig;
 
@@ -20,21 +18,15 @@ export const parseEverclearConfig = (data: object): EverclearConfig => {
   return everclearConfig;
 };
 
-export const getEverclearConfig = async (_configUrl?: string): Promise<EverclearConfig | undefined> => {
-  const configUrl = _configUrl ?? EVERCLEAR_CONFIG_URL;
-
+export const getEverclearConfig = async (configUrl?: string): Promise<EverclearConfig | undefined> => {
+  if (!configUrl) {
+    return undefined;
+  }
   try {
     const res = await axiosGet(configUrl);
-    const everclearConfig = parseEverclearConfig(res.data);
-    return everclearConfig;
+    return parseEverclearConfig(res.data);
   } catch (err: unknown) {
-    try {
-      const res = await axiosGet(EVERCLEAR_CONFIG_URL);
-      if (res.data) return parseEverclearConfig(res.data);
-    } catch (err: unknown) {
-      return undefined;
-    }
-
+    console.error(`Failed to fetch everclear config from ${configUrl}:`, err);
     return undefined;
   }
 };

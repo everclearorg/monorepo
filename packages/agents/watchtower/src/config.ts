@@ -179,7 +179,7 @@ export const shouldReloadEverclearConfig = async (): Promise<{ reloadConfig: boo
   let reloadSubgraph = false;
   let reloadConfig = false;
 
-  const everclearConfig = await getEverclearConfig(cachedEverclearConfigUrl);
+  const everclearConfig = cachedEverclearConfigUrl ? await getEverclearConfig(cachedEverclearConfigUrl) : undefined;
 
   if (!everclearConfig) return { reloadConfig, reloadSubgraph };
   for (const domainId of Object.keys(cachedEverclearConfig.chains)) {
@@ -217,7 +217,7 @@ export const getSubgraphReaderConfig = (
   Object.keys(chains).forEach((domainId) => {
     subgraphs[domainId] = { endpoints: chains[domainId].subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   });
-  
+
   // Add Envio configuration if available from hub config
   const envioConfig: SubgraphConfig['envio'] = hubConfig?.envioSubgraphUrl
     ? {
