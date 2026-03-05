@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'fs';
-import { getEverclearConfig, ajv, EVERCLEAR_CONFIG_URL, getDefaultABIConfig } from '@chimera-monorepo/utils';
+import { getEverclearConfig, ajv, getDefaultABIConfig } from '@chimera-monorepo/utils';
 import { RelayerConfig, RelayerConfigSchema } from './lib/entities';
 import { ChainConfig } from './lib/entities';
 
@@ -29,7 +29,7 @@ export const getEnvConfig = async (): Promise<RelayerConfig> => {
   }
 
   const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || EVERCLEAR_CONFIG_URL;
+    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
 
   const everclearConfig = await getEverclearConfig(everclearConfigUrl);
   const everclearChains = everclearConfig?.chains ?? {};
