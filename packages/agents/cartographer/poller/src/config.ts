@@ -73,8 +73,7 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
     process.exit(1);
   }
 
-  const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
+  const everclearConfigUrl = process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig;
   const everclearConfig = await getEverclearConfig(everclearConfigUrl);
   const everclearChains = everclearConfig?.chains ?? {};
   const localChains = configJson.chains || configFile.chains || everclearChains || {};

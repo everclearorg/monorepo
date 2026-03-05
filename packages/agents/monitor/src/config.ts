@@ -110,8 +110,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     process.exit(1);
   }
 
-  const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
+  const everclearConfigUrl = process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig;
 
   cachedEverclearConfigUrl = everclearConfigUrl;
   const everclearConfig = await getEverclearConfig(everclearConfigUrl);

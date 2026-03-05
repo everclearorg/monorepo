@@ -41,8 +41,7 @@ export const getConfig = async (): Promise<WatcherConfig> => {
     process.exit(1);
   }
 
-  const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
+  const everclearConfigUrl = process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig;
 
   cachedEverclearConfigUrl = everclearConfigUrl;
   const everclearConfig = await getEverclearConfig(everclearConfigUrl);
@@ -217,7 +216,7 @@ export const getSubgraphReaderConfig = (
   Object.keys(chains).forEach((domainId) => {
     subgraphs[domainId] = { endpoints: chains[domainId].subgraphUrls, timeout: DEFAULT_SUBGRAPH_TIMEOUT };
   });
-  
+
   // Add Envio configuration if available from hub config
   const envioConfig: SubgraphConfig['envio'] = hubConfig?.envioSubgraphUrl
     ? {

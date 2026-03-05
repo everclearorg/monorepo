@@ -149,8 +149,7 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     process.exit(1);
   }
 
-  const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
+  const everclearConfigUrl = process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig;
   const everclearConfig = await getEverclearConfig(everclearConfigUrl);
 
   const environment = (process.env.LIGHTHOUSE_ENVIRONMENT ||
