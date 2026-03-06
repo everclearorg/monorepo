@@ -46,6 +46,7 @@
     "deploy:spoke:mainnet:production:ink": "bash -c 'source .env' && yarn deploy everclear-spoke --version production --networks ink --label v0.0.1",
     "deploy:spoke:mainnet:production:tac": "bash -c 'source .env' && yarn deploy everclear-spoke --version production --networks tac --label v0.0.1",
     "deploy:spoke:mainnet:production:blast": "bash -c 'source .env' && yarn deploy everclear-spoke --version production --networks blast --label v0.0.1",
+    "deploy:spoke:mainnet:production:plasma": "bash -c 'source .env' && yarn deploy everclear-spoke --version production --networks plasma-mainnet --label v0.0.1",
     "lint": "eslint ./src --ext .ts --env node",
     "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
     "purge": "yarn clean && rimraf ./build ./generated ./node_modules",
