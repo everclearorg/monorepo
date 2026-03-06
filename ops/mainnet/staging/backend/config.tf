@@ -23,6 +23,8 @@ locals {
   #   GRAPH_API_KEY       = var.graph_api_key
   # }
 
+  base_domain         = "everclear.ninja"
+
   postgrest_env_vars = [
     { name = "PGRST_ADMIN_SERVER_PORT", value = "3001" },
     { name = "PGRST_DB_URI", value = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear" },
