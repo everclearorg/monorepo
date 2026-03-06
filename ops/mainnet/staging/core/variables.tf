@@ -147,6 +147,12 @@ variable "full_image_name_monitor_poller" {
   default     = "ghcr.io/connext/monitor:sha-64dc7c9"
 }
 
+variable "enable_monitor" {
+  type        = bool
+  description = "Whether to deploy the monitor service, poller, and cache."
+  default     = false
+}
+
 variable "full_image_name_lighthouse" {
   type        = string
   description = "lighthouse image name"

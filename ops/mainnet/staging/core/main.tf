@@ -191,6 +191,7 @@ module "watchtower_web3signer" {
 }
 
 module "monitor" {
+  count                    = var.enable_monitor ? 1 : 0
   source                   = "../../../modules/service"
   stage                    = var.stage
   environment              = var.environment
@@ -368,6 +369,7 @@ module "lighthouse_invoice_cron" {
 # }
 
 module "monitor_poller_cron" {
+  count               = var.enable_monitor ? 1 : 0
   source              = "../../../modules/lambda"
   ecr_repository_name = "chimera-monitor-poller"
   docker_image_tag    = var.full_image_name_monitor_poller
@@ -479,6 +481,7 @@ module "relayer_cache" {
 }
 
 module "monitor_cache" {
+  count                         = var.enable_monitor ? 1 : 0
   source                        = "../../../modules/redis"
   stage                         = var.stage
   environment                   = var.environment

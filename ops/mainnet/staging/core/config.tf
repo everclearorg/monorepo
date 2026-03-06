@@ -348,8 +348,8 @@ locals {
       adminToken = var.admin_token_monitor
     }
     redis = {
-      host = module.monitor_cache.redis_instance_address
-      port = module.monitor_cache.redis_instance_port
+      host = try(module.monitor_cache[0].redis_instance_address, null)
+      port = try(module.monitor_cache[0].redis_instance_port, null)
     }
     relayers = [
       {
@@ -363,13 +363,15 @@ locals {
         url    = "https://${module.relayer_server.service_endpoint}"
       }
     ]
-    agents = {
-      relayer          = "https://${module.relayer_server.service_endpoint}/ping"
-      monitor          = "https://${module.monitor.service_endpoint}/ping"
-      lighthouseSigner = "https://${module.lighthouse_web3signer.service_endpoint}/upcheck"
-      relayerSigner    = "https://${module.relayer_web3signer.service_endpoint}/upcheck"
-      watchtowerSigner = "https://${module.watchtower_web3signer.service_endpoint}/upcheck"
-    }
+    agents = merge(
+      {
+        relayer          = "https://${module.relayer_server.service_endpoint}/ping"
+        lighthouseSigner = "https://${module.lighthouse_web3signer.service_endpoint}/upcheck"
+        relayerSigner    = "https://${module.relayer_web3signer.service_endpoint}/upcheck"
+        watchtowerSigner = "https://${module.watchtower_web3signer.service_endpoint}/upcheck"
+      },
+      var.enable_monitor ? { monitor = "https://${module.monitor[0].service_endpoint}/ping" } : {},
+    )
     healthUrls = {
       poller = "https://uptime.betterstack.com/api/v1/heartbeat/${var.monitor_poller_heartbeat}"
     }
