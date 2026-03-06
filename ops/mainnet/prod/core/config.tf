@@ -37,6 +37,8 @@ locals {
     { name = "GRAPH_API_KEY", value = var.graph_api_key },
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
     { name = "ALERT_PIPELINE_MODE", value = "dual" },
+    { name = "ALERT_EVENT_WEBHOOK_URL", value = var.monitor_webhook_url },
+    { name = "ALERT_EVENT_WEBHOOK_SECRET", value = var.monitor_webhook_secret },
     { name = "MONITOR_WEBHOOK_URL", value = var.monitor_webhook_url },
     { name = "MONITOR_WEBHOOK_SECRET", value = var.monitor_webhook_secret },
     { name = "ALERT_EVENT_ENVIRONMENT", value = "prod" },
@@ -51,6 +53,8 @@ locals {
     DD_LAMBDA_HANDLER       = "packages/agents/monitor/dist/lambda.handler"
     GRAPH_API_KEY           = var.graph_api_key
     ALERT_PIPELINE_MODE     = "dual"
+    ALERT_EVENT_WEBHOOK_URL = var.monitor_webhook_url
+    ALERT_EVENT_WEBHOOK_SECRET = var.monitor_webhook_secret
     MONITOR_WEBHOOK_URL     = var.monitor_webhook_url
     MONITOR_WEBHOOK_SECRET  = var.monitor_webhook_secret
     ALERT_EVENT_ENVIRONMENT = "prod"

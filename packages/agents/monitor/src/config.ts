@@ -264,8 +264,12 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     ...(() => {
       const eventPipelineConfig = {
         ...(configJson.eventPipeline || configFile.eventPipeline || {}),
-        ...(process.env.ALERT_EVENT_WEBHOOK_URL ? { webhookUrl: process.env.ALERT_EVENT_WEBHOOK_URL } : {}),
-        ...(process.env.ALERT_EVENT_WEBHOOK_SECRET ? { webhookSecret: process.env.ALERT_EVENT_WEBHOOK_SECRET } : {}),
+        ...((process.env.ALERT_EVENT_WEBHOOK_URL || process.env.MONITOR_WEBHOOK_URL)
+          ? { webhookUrl: process.env.ALERT_EVENT_WEBHOOK_URL || process.env.MONITOR_WEBHOOK_URL }
+          : {}),
+        ...((process.env.ALERT_EVENT_WEBHOOK_SECRET || process.env.MONITOR_WEBHOOK_SECRET)
+          ? { webhookSecret: process.env.ALERT_EVENT_WEBHOOK_SECRET || process.env.MONITOR_WEBHOOK_SECRET }
+          : {}),
         ...(process.env.ALERT_EVENT_ENVIRONMENT ? { environment: process.env.ALERT_EVENT_ENVIRONMENT } : {}),
         ...(process.env.ALERT_EVENT_RETRIES ? { retries: Number(process.env.ALERT_EVENT_RETRIES) } : {}),
         ...(process.env.ALERT_EVENT_RETRY_BASE_MS
