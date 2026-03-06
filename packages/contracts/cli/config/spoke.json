@@ -214,5 +214,12 @@
     "domainName": "TAC",
     "domainId": 239,
     "environment": "MainnetProduction"
+  },
+  {
+    "address": "0x4C1029C7BdFE1DadC7d9B753981735CD6954B40d",
+    "feeAdapterAddress": "0xb7c258C548aFf20bbB2e899477B3bB9e8F813ED4",
+    "domainName": "Plasma",
+    "domainId": 9745,
+    "environment": "MainnetProduction"
   }
 ]

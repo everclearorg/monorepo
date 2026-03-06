@@ -180,6 +180,11 @@ locals {
           "https://rpc.tac.build"
         ]
       },
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
+        ]
+      },
       "728126428" = {
         providers = [
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"

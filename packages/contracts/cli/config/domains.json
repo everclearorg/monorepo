@@ -195,7 +195,7 @@
     "id": 9745,
     "rpc": "https://rpc.plasma.to",
     "verifierUrl": "https://api.etherscan.io/v2/api?chainid=9745",
-    "environments": ["MainnetStaging"],
+    "environments": ["MainnetStaging", "MainnetProduction"],
     "realm": "spoke"
   },
   {

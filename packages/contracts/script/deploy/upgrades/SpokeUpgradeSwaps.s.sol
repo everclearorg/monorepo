@@ -202,5 +202,14 @@ contract MainnetProduction is DeploySpokeSwapsUpgrade, MainnetProductionEnvironm
       xerc20Module: address(TAC_XERC20_MODULE),
       spokeImpl: TAC_SPOKE_IMPL
     }); // set domain id as mapping key
+
+    // Plasma
+    _deploymentParams[PLASMA] = DeploymentParams({
+      owner: OWNER,
+      everclearSpoke: address(PLASMA_SPOKE),
+      fillSigner: address(FILL_SIGNER),
+      xerc20Module: address(PLASMA_XERC20_MODULE),
+      spokeImpl: PLASMA_SPOKE_IMPL
+    }); // set domain id as mapping key
   }
 }

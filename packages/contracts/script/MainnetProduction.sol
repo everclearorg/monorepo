@@ -79,6 +79,7 @@ abstract contract MainnetAssets {
   address public constant BASE_USDT = 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2;
   address public constant TRON_USDT = 0xa614f803B6FD780986A42c78Ec9c7f77e6DeD13C;
   address public constant ZIRCUIT_USDT = 0x46dDa6a5a559d861c06EC9a95Fb395f5C3Db0742;
+  address public constant PLASMA_USDT = 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb;
 
   ///////////////////// USDC, cannot find Apechain USDC
   address public constant ETHEREUM_USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -508,6 +509,21 @@ abstract contract Tron {
   IXERC20Module public TRON_XERC20_MODULE = IXERC20Module(0x9b266df36C882A73D45B18876104D5728424828f);
 }
 
+abstract contract Plasma {
+  uint32 public constant PLASMA = 9745;
+  IMailbox public PLASMA_MAILBOX = IMailbox(0x3a464f746D23Ab22155710f44dB16dcA53e0775E);
+
+  IEverclearSpoke public PLASMA_SPOKE = IEverclearSpoke(0x4C1029C7BdFE1DadC7d9B753981735CD6954B40d);
+  ISpokeGateway public PLASMA_SPOKE_GATEWAY = ISpokeGateway(0xE4197BC6b18E2BE0BAF09c13DA8239B40005D541);
+  ICallExecutor public PLASMA_EXECUTOR = ICallExecutor(0xc192b47fD86C52d987FFf2579B64c28037Bf7567);
+  IXERC20Module public PLASMA_XERC20_MODULE = IXERC20Module(0x315bCf956e887378836f6E57bC735F0cf7022352);
+  address public PLASMA_SPOKE_IMPL = 0x391BBeaffe82CCb3570F18F615AE5ab4d6eA2fc0;
+
+  // Fee adapter constants
+  address public constant PLASMA_ENG_MULTISIG = 0xBc8988C7a4b77c1d6df7546bd876Ea4D42DF0837;
+  address public constant PLASMA_FEE_ADAPTER = 0xb7c258C548aFf20bbB2e899477B3bB9e8F813ED4;
+}
+
 abstract contract MainnetProductionDomains is
   Everclear,
   Ethereum,
@@ -534,7 +550,8 @@ abstract contract MainnetProductionDomains is
   Ink,
   Solana,
   Tac,
-  Tron
+  Tron,
+  Plasma
 {}
 
 abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProductionDomains {
@@ -666,6 +683,10 @@ abstract contract MainnetProductionSupportedDomainsAndGateways is MainnetProduct
     SUPPORTED_DOMAINS_AND_GATEWAYS.push(
       DomainAndGateway({chainId: TAC, blockGasLimit: 30_000_000, gateway: address(TAC_SPOKE_GATEWAY).toBytes32()})
     );
+
+    SUPPORTED_DOMAINS_AND_GATEWAYS.push(
+      DomainAndGateway({chainId: PLASMA, blockGasLimit: 30_000_000, gateway: address(PLASMA_SPOKE_GATEWAY).toBytes32()})
+    );
   }
 }
 
@@ -698,7 +719,8 @@ abstract contract MainnetProductionEnvironment is
     MANTLE,
     SONIC,
     INK,
-    SOLANA
+    SOLANA,
+    PLASMA
   ];
 
   /**
