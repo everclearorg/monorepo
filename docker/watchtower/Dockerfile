@@ -1,20 +1,34 @@
-FROM node:18-alpine as node
+FROM node:18-slim AS node
 
 # ----------------------------------------
 # Builds Docker container for watchtower package.
 
 # ----------------------------------------
 
-FROM node as build
-RUN apk update
-RUN apk add git
-# Install Python and other dependencies
-RUN apk add --update python3 py3-pip make gcc g++ python3-dev
-# Install Forge CLI
-RUN npm install -g node-gyp @arcblock/forge-cli
+FROM node AS build
+RUN apt-get update && apt-get install -y \
+    git curl bash \
+    python3 python3-pip make gcc g++ python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+# Install node-gyp (needed for native dependencies)
+RUN npm install -g node-gyp
+# Install Foundry (needed for Solidity contract builds)
+# Pin installer script to specific commit hash and verify SHA256 checksum for supply chain security
+# Pin Foundry to specific version (v1.5.1) for reproducible builds
+# The installer script downloads foundryup, which then handles binary verification via GitHub attestations
+ARG FOUNDRY_INSTALLER_COMMIT=d9f47a72b446c7006254be185f175efd1c7a81a2
+ARG FOUNDRY_INSTALLER_SHA256=e103bb7839e0c8c65263c7971d0b6bf94ffbe2e81dff89c6b3ecb6ce2d76b71c
+ARG FOUNDRY_VERSION=v1.5.1
+RUN set -eux; \
+    curl -fsSL -o /tmp/foundry-install.sh \
+        https://raw.githubusercontent.com/foundry-rs/foundry/${FOUNDRY_INSTALLER_COMMIT}/foundryup/install; \
+    echo "${FOUNDRY_INSTALLER_SHA256}  /tmp/foundry-install.sh" | sha256sum -c -; \
+    bash /tmp/foundry-install.sh; \
+    /root/.foundry/bin/foundryup -i ${FOUNDRY_VERSION}; \
+    rm -f /tmp/foundry-install.sh
 
 ENV HOME=/tmp/build \
-    PATH=/tmp/build/node_modules/.bin:./node_modules/.bin:${PATH}
+    PATH=/root/.foundry/bin:/tmp/build/node_modules/.bin:./node_modules/.bin:${PATH}
 
 WORKDIR /tmp/build
 
@@ -59,12 +73,12 @@ RUN yarn build
 # Copy files to the deployment image.
 # ----------------------------------------
 
-FROM node as runtime
+FROM node AS runtime
 
 ENV NODE_ENV=production 
 
 ARG COMMIT_HASH
-ENV COMMIT_HASH ${COMMIT_HASH:-unknown}
+ENV COMMIT_HASH=${COMMIT_HASH:-unknown}
 
 # ----- Copy files required at runtime by the app -----
 COPY --from=build --chown=node:node /tmp/build /home/node

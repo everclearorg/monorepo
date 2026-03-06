@@ -5,6 +5,7 @@ import {
   HUB_META_ENTITY,
   MESSAGE_ENTITY,
   META_ENTITY,
+  META_UPDATE_ENTITY,
   SPOKE_QUEUE_ENTITY,
   SPOKE_ADD_INTENT_EVENT_ENTITY,
   SPOKE_FILL_INTENT_EVENT_ENTITY,
@@ -19,6 +20,8 @@ import {
   DEPOSIT_QUEUE_ENTITY,
   INTENT_SETTLEMENT_EVENT_ENTITY,
   ORDER_ENTITY,
+  HUB_TOKEN_UPDATE_ENTITY,
+  HUB_ASSET_UPDATE_ENTITY,
 } from './entities';
 
 export const getBlockNumberQuery = (): string => {
@@ -163,8 +166,9 @@ export const getSpokeQueueQuery = (type?: string): string => {
 };
 
 export const getSpokeMetaQuery = (): string => {
+  // SPOKE_META_ID is a bytes32 value, so we need to convert it to a string
   return `
-    meta(id: "SPOKE_META_ID"){
+    meta(id: "0x53504f4b455f4d4554415f4944"){
       ${SPOKE_META_ENTITY}
     }
   `;
@@ -310,6 +314,45 @@ export const getInvoiceEnqueuedByIntentId = (intentId: string): string => {
   `;
 };
 
+export const getSettlementIntentByIdQuery = (intentId: string): string => {
+  return `
+    intentSettleEvents(
+      where: {
+        intentId: "${intentId.toLowerCase()}"
+      },
+      first: 1
+    ){
+      ${INTENT_SETTLEMENT_EVENT_ENTITY}
+    }
+  `;
+};
+
+export const getDepositEnqueuedByIntentIdQuery = (intentId: string): string => {
+  return `
+    depositEnqueuedEvents(
+      where: {
+        intent_: {id: "${intentId.toLowerCase()}"}
+      },
+      first: 1
+    ){
+      ${DEPOSIT_ENQUEUED_EVENT_ENTITY}
+    }
+  `;
+};
+
+export const getDepositProcessedByIntentIdQuery = (intentId: string): string => {
+  return `
+    depositProcessedEvents(
+      where: {
+        intent_: {id: "${intentId.toLowerCase()}"}
+      },
+      first: 1
+    ){
+      ${DEPOSIT_PROCESSED_EVENT_ENTITY}
+    }
+  `;
+};
+
 export const getDepositsEnqueuedQuery = (
   fromNonce: number,
   maxBlockNumber?: number,
@@ -402,9 +445,86 @@ export const getSettlementMessagesQuery = (
   `;
 };
 
-export const getHubMetaQuery = (): string => {
+export const getHubMetaUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
   return `
-    meta (id: "HUB_META_ID"){
+    hubMetaUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${META_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getSpokeMetaUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
+  return `
+    spokeMetaUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${META_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getHubTokenUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
+  return `
+    hubTokenUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${HUB_TOKEN_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getHubAssetUpdatesQuery = (
+  fromBlock: number,
+  limit = 200,
+  orderDirection: 'asc' | 'desc' = 'asc',
+): string => {
+  return `
+    hubAssetUpdates(
+      where: {
+        blockNumber_gte: ${fromBlock}
+      },
+      first: ${limit},
+      orderBy: blockNumber,
+      orderDirection: ${orderDirection}
+    ) {
+      ${HUB_ASSET_UPDATE_ENTITY}
+    }
+  `;
+};
+
+export const getHubMetaQuery = (): string => {
+  // HUB_META_ID is a bytes32 value, so we need to convert it to a string
+  return `
+    meta (id: "0x4855425f4d4554415f4944"){
       ${HUB_META_ENTITY}
     }
   `;

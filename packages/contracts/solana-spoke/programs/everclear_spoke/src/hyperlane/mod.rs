@@ -7,7 +7,7 @@ use anchor_lang::solana_program::{
     instruction::Instruction,
     program::{get_return_data, invoke, invoke_signed},
 };
-use anchor_lang::solana_program::{msg, program_error::ProgramError};
+use anchor_lang::solana_program::program_error::ProgramError;
 use anchor_lang::{
     prelude::{
         borsh::{BorshDeserialize, BorshSerialize},
@@ -34,6 +34,7 @@ pub struct TransferRemote {
     pub destination_domain: u32,
     /// The remote recipient.
     pub recipient: H256,
+    /// NOTE: this is not used by default in intent flows
     /// The amount or ID of the token to transfer.
     pub amount_or_id: U256,
     // Gas amount
@@ -295,8 +296,9 @@ pub struct TransferRemoteContext<'info> {
     /// The SPL-Noop program
     pub spl_noop_program: Program<'info, SplNoop>,
 
-    /// The mailbox program
-    pub mailbox_program: Interface<'info, Mailbox>,
+    /// CHECK: Mailbox program; AccountInfo to support CCIP. When Hyperlane, validated in calling code.
+    #[account(executable)]
+    pub mailbox_program: AccountInfo<'info>,
 
     /// CHECK: Outbox data account – we rely on the Mailbox program to check
     #[account(mut)]
@@ -319,9 +321,8 @@ pub struct TransferRemoteContext<'info> {
     #[account(mut)]
     pub dispatched_message_pda: AccountInfo<'info>,
 
-    // -- If using an IGP, add those below as well:
-    #[account(executable)]
-    pub igp_program: Interface<'info, Igp>,
+    /// CHECK: IGP program; AccountInfo to support CCIP. When Hyperlane, validated in calling code.
+    pub igp_program: AccountInfo<'info>,
 
     /// CHECK:
     #[account(mut)]
@@ -491,12 +492,6 @@ pub fn transfer_remote(ctx: Context<TransferRemoteContext>, xfer: TransferRemote
         &igp_program_id,
         &xfer.recipient,
     )?;
-
-    msg!(
-        "transfer completed to destination: {}, recipient: {}",
-        xfer.destination_domain,
-        xfer.recipient
-    );
 
     Ok(message_id)
 }

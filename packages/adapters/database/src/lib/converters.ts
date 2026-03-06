@@ -24,6 +24,11 @@ import {
   NewLockPositionEvent,
   LockPosition,
   Order,
+  ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
+  HubMeta,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 import { toDate } from 'zapatos/db';
 import {
@@ -47,8 +52,19 @@ import {
   tokenomics,
   lock_positions,
   orders,
+  protocol_update_logs,
 } from 'zapatos/schema';
 import { db } from '..';
+
+const parseJsonValue = <T>(value: unknown): T | undefined => {
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+  if (typeof value === 'string') {
+    return JSON.parse(value) as T;
+  }
+  return value as T;
+};
 
 export function toOriginIntents(originIntent: OriginIntent): origin_intents.Insertable {
   return {
@@ -709,5 +725,165 @@ export function fromOrders(order: orders.JSONSelectable): Order {
     gasPrice: String(order.gas_price),
     txOrigin: order.tx_origin,
     txNonce: +order.tx_nonce,
+  };
+}
+
+export function toProtocolUpdateLog(log: ProtocolUpdateLog): protocol_update_logs.Insertable {
+  return {
+    id: log.id,
+    domain: log.domain,
+    event: log.event,
+    key: log.key,
+    updated: log.updated,
+    chain_id: log?.chainId ?? log.domain,
+    transaction_hash: log.transactionHash,
+    timestamp: log.timestamp,
+    block_number: log.blockNumber,
+    tx_origin: log.txOrigin,
+    tx_nonce: log.txNonce,
+  };
+};
+
+export function toHubTokenUpdateLog(log: HubTokenUpdateLog): Record<string, unknown> {
+  return {
+    id: log.id,
+    domain: log.domain,
+    kind: log.kind,
+    ticker_hash: log.tickerHash,
+    fee_recipients: log.feeRecipients,
+    fee_amounts: log.feeAmounts,
+    max_discount_bps: log.maxDiscountBps,
+    discount_per_epoch: log.discountPerEpoch,
+    prioritized_strategy: log.prioritizedStrategy,
+    transaction_hash: log.transactionHash,
+    timestamp: log.timestamp,
+    block_number: log.blockNumber,
+    tx_origin: log.txOrigin,
+    tx_nonce: log.txNonce,
+  };
+}
+
+export function toHubAssetUpdateLog(log: HubAssetUpdateLog): Record<string, unknown> {
+  return {
+    id: log.id,
+    domain: log.domain,
+    asset_id: log.assetId,
+    token_id: log.tokenId ?? null,
+    ticker_hash: log.tickerHash,
+    asset_domain: log.assetDomain,
+    kind: log.kind,
+    asset_hash: log.assetHash,
+    adopted: log.adopted,
+    approval: log.approval,
+    strategy: log.strategy,
+    transaction_hash: log.transactionHash,
+    timestamp: log.timestamp,
+    block_number: log.blockNumber,
+    tx_origin: log.txOrigin,
+    tx_nonce: log.txNonce,
+  };
+}
+
+export function fromProtocolUpdateLogs(log: protocol_update_logs.JSONSelectable): ProtocolUpdateLog {
+  return {
+    id: log.id,
+    domain: log.domain,
+    event: log.event,
+    key: log.key,
+    updated: log.updated,
+    chainId: log.chain_id,
+    transactionHash: log.transaction_hash.trim(),
+    timestamp: +log.timestamp,
+    blockNumber: +log.block_number,
+    txOrigin: log.tx_origin,
+    txNonce: +log.tx_nonce,
+  }
+}
+
+export function toHubMeta(meta: HubMeta): Record<string, unknown> {
+  return {
+    id: meta.domain,
+    domain: meta.domain,
+    paused: meta.paused ?? null,
+    owner: meta.owner ?? null,
+    proposed_owner: meta.proposedOwner ?? null,
+    proposed_ownership_timestamp: meta.proposedOwnershipTimestamp ?? null,
+    gateway: meta.gateway ?? null,
+    watchtower: meta.watchtower ?? null,
+    manager: meta.manager ?? null,
+    settler: meta.settler ?? null,
+    min_solver_supported_domains: meta.minSolverSupportedDomains ?? null,
+    expiry_time_buffer: meta.expiryTimeBuffer ?? null,
+    discount_per_epoch: meta.discountPerEpoch ?? null,
+    epoch_length: meta.epochLength ?? null,
+    mailbox: meta.mailbox ?? null,
+    security_module: meta.securityModule ?? null,
+    acceptance_delay: meta.acceptanceDelay ?? null,
+    supported_domains: meta.supportedDomains ? JSON.stringify(meta.supportedDomains) : null,
+    chain_gateways: meta.chainGateways ? JSON.stringify(meta.chainGateways) : null,
+  };
+}
+
+export function fromHubMeta(row: Record<string, unknown>): HubMeta {
+  return {
+    id: row.id as string,
+    domain: row.domain as string,
+    paused: row.paused as boolean | undefined,
+    owner: row.owner as string | undefined,
+    proposedOwner: row.proposed_owner as string | undefined,
+    proposedOwnershipTimestamp: row.proposed_ownership_timestamp as string | undefined,
+    gateway: row.gateway as string | undefined,
+    watchtower: row.watchtower as string | undefined,
+    manager: row.manager as string | undefined,
+    settler: row.settler as string | undefined,
+    minSolverSupportedDomains: row.min_solver_supported_domains as string | undefined,
+    expiryTimeBuffer: row.expiry_time_buffer as string | undefined,
+    discountPerEpoch: row.discount_per_epoch as string | undefined,
+    epochLength: row.epoch_length as string | undefined,
+    mailbox: row.mailbox as string | undefined,
+    securityModule: row.security_module as string | undefined,
+    acceptanceDelay: row.acceptance_delay as string | undefined,
+    supportedDomains: parseJsonValue<HubMeta['supportedDomains']>(row.supported_domains),
+    chainGateways: parseJsonValue<HubMeta['chainGateways']>(row.chain_gateways),
+  };
+}
+
+export function toSpokeMeta(meta: SpokeMeta): Record<string, unknown> {
+  return {
+    id: meta.domain,
+    domain: meta.domain,
+    paused: meta.paused ?? null,
+    gateway: meta.gateway ?? null,
+    lighthouse: meta.lighthouse ?? null,
+    message_receiver: meta.messageReceiver ?? null,
+    watchtower: meta.watchtower ?? null,
+    message_gas_limit: meta.messageGasLimit ?? null,
+    fee_adapter: meta.feeAdapter ?? null,
+    fee_adapter_recipient: meta.feeAdapterRecipient ?? null,
+    fill_signer: meta.fillSigner ?? null,
+    fee_signer: meta.feeSigner ?? null,
+    mailbox: meta.mailbox ?? null,
+    security_module: meta.securityModule ?? null,
+    module_for_strategies: meta.moduleForStrategies ? JSON.stringify(meta.moduleForStrategies) : null,
+  };
+}
+
+export function fromSpokeMeta(row: Record<string, unknown>): SpokeMeta {
+  return {
+    id: row.id as string,
+    domain: row.domain as string,
+    paused: row.paused as boolean | undefined,
+    gateway: row.gateway as string | undefined,
+    lighthouse: row.lighthouse as string | undefined,
+    messageReceiver: row.message_receiver as string | undefined,
+    watchtower: row.watchtower as string | undefined,
+    messageGasLimit: row.message_gas_limit as string | undefined,
+    feeAdapter: row.fee_adapter as string | undefined,
+    feeAdapterRecipient: row.fee_adapter_recipient as string | undefined,
+    fillSigner: row.fill_signer as string | undefined,
+    feeSigner: row.fee_signer as string | undefined,
+    mailbox: row.mailbox as string | undefined,
+    securityModule: row.security_module as string | undefined,
+    moduleForStrategies: parseJsonValue<SpokeMeta['moduleForStrategies']>(row.module_for_strategies),
   };
 }

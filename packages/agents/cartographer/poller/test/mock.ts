@@ -1,6 +1,7 @@
 import { Logger, chainDataToMap, mkAddress } from '@chimera-monorepo/utils';
 import { createStubInstance, stub } from 'sinon';
 import { Database } from '@chimera-monorepo/database';
+import { ChainReader, ReadTransaction } from '@chimera-monorepo/chainservice';
 
 import { CartographerConfig } from '../src/config';
 import { AppContext, SubgraphReader } from '../src/shared';
@@ -17,6 +18,11 @@ export const createMockDatabase = (): Database => {
     saveSettlementIntents: stub().resolves(),
     saveHubIntents: stub().resolves(),
     saveMessages: stub().resolves(),
+    saveProtocolUpdateLogs: stub().resolves(),
+    saveHubTokenUpdateLogs: stub().resolves(),
+    saveHubAssetUpdateLogs: stub().resolves(),
+    saveHubMeta: stub().resolves(),
+    saveSpokeMeta: stub().resolves(),
     saveQueues: stub().resolves(),
     saveAssets: stub().resolves(),
     saveTokens: stub().resolves(),
@@ -125,13 +131,22 @@ const mockChainData = [
 ];
 
 export const createAppContext = (overrides: Partial<CartographerConfig> = {}): AppContext => {
+  const chainreader = createStubInstance(ChainReader, {
+    readTx: stub<[ReadTransaction, number | string]>().resolves('0x'),
+  });
+  
   return {
     logger: createStubInstance(Logger),
     config: createCartographerConfig({
       ...overrides,
     }) as CartographerConfig,
     adapters: {
-      subgraph: createStubInstance(SubgraphReader),
+      subgraph: createStubInstance(SubgraphReader, {
+        // Ensure new hub update log methods have safe defaults
+        getHubTokenUpdates: stub().resolves([]),
+        getHubAssetUpdates: stub().resolves([]),
+      }),
+      chainreader: chainreader,
       database: createMockDatabase() as Database,
     },
     chainData: chainDataToMap(mockChainData),

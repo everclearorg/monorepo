@@ -7,14 +7,14 @@ import {
   jsonifyError,
 } from '@chimera-monorepo/utils';
 
-import { getContext } from '../../shared';
+import { AppContext } from '../context';
 
-export const updateHubInvoices = async () => {
+export const updateHubInvoices = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     config,
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateHubInvoices.name);
 
   logger.debug('Method start', requestContext, methodContext, { hubDomain: config.hub.domain });
@@ -84,12 +84,12 @@ export const updateHubInvoices = async () => {
  * @notice Updates processed and enqueued deposits from the hub subgraph.
  * @returns Promise<void>
  */
-export const updateHubDeposits = async () => {
+export const updateHubDeposits = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     config,
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateHubDeposits.name);
 
   logger.debug('Method start', requestContext, methodContext, { hubDomain: config.hub.domain });

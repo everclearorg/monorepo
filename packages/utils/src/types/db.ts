@@ -438,7 +438,7 @@ export const OrderSchema = Type.Intersect([
   OnchainTransactionContextSchema,
   Type.Object({
     id: Type.String({ maxLength: 66 }),
-    autoId: Type.Number(),
+    autoId: Type.Optional(Type.Number()),
     tokenFee: TIntegerString,
     nativeFee: TIntegerString,
     intentIds: Type.Array(TBytes32),
@@ -446,3 +446,116 @@ export const OrderSchema = Type.Intersect([
   }),
 ]);
 export type Order = Static<typeof OrderSchema>;
+
+export const ProtocolUpdateLogSchema = Type.Object({
+  id: Type.String({ maxLength: 66 }),
+  domain: TDomainId,
+  chainId: Type.String({ maxLength: 20 }),
+  event: Type.String(),
+  key: Type.String(),
+  updated: Type.String(),
+  transactionHash: Type.String({ maxLength: 66 }),
+  timestamp: Type.Number(),
+  blockNumber: Type.Number(),
+  txOrigin: TAddress,
+  txNonce: Type.Number(),
+});
+export type ProtocolUpdateLog = Static<typeof ProtocolUpdateLogSchema>;
+
+export const HubTokenUpdateLogSchema = Type.Object({
+  id: Type.String({ maxLength: 120 }),
+  domain: TDomainId, // hub domain where the tx happened
+  tickerHash: TBytes32,
+  kind: Type.String(),
+  feeRecipients: Type.Array(TAddress),
+  feeAmounts: Type.Array(TIntegerString),
+  maxDiscountBps: Type.Integer({ minimum: 0 }),
+  discountPerEpoch: Type.Integer({ minimum: 0 }),
+  prioritizedStrategy: Type.String(),
+  transactionHash: Type.String({ maxLength: 66 }),
+  timestamp: Type.Number(),
+  blockNumber: Type.Number(),
+  txOrigin: TAddress,
+  txNonce: Type.Number(),
+});
+export type HubTokenUpdateLog = Static<typeof HubTokenUpdateLogSchema>;
+
+export const HubAssetUpdateLogSchema = Type.Object({
+  id: Type.String({ maxLength: 120 }),
+  domain: TDomainId, // hub domain where the tx happened
+  assetId: TBytes32,
+  tokenId: Type.Optional(TBytes32),
+  tickerHash: TBytes32,
+  assetDomain: TDomainId,
+  kind: Type.String(),
+  assetHash: TBytes32,
+  adopted: Type.String({ maxLength: 66 }),
+  approval: Type.Boolean(),
+  strategy: Type.String(),
+  transactionHash: Type.String({ maxLength: 66 }),
+  timestamp: Type.Number(),
+  blockNumber: Type.Number(),
+  txOrigin: TAddress,
+  txNonce: Type.Number(),
+});
+export type HubAssetUpdateLog = Static<typeof HubAssetUpdateLogSchema>;
+
+export const HubSupportedDomainSchema = Type.Object({
+  domain: TDomainId,
+  blockGasLimit: TIntegerString,
+});
+export type HubSupportedDomain = Static<typeof HubSupportedDomainSchema>;
+
+export const HubChainGatewaySchema = Type.Object({
+  chainId: TIntegerString,
+  gateway: TAddress,
+});
+export type HubChainGateway = Static<typeof HubChainGatewaySchema>;
+
+export const SpokeModuleForStrategySchema = Type.Object({
+  strategy: TIntegerString,
+  module: TAddress,
+});
+export type SpokeModuleForStrategy = Static<typeof SpokeModuleForStrategySchema>;
+
+export const HubMetaSchema = Type.Object({
+  id: Type.String({ maxLength: 66 }),
+  domain: TDomainId,
+  paused: Type.Optional(Type.Boolean()),
+  owner: Type.Optional(TAddress),
+  proposedOwner: Type.Optional(TAddress),
+  proposedOwnershipTimestamp: Type.Optional(TIntegerString),
+  gateway: Type.Optional(TAddress),
+  watchtower: Type.Optional(TAddress),
+  manager: Type.Optional(TAddress),
+  settler: Type.Optional(TAddress),
+  minSolverSupportedDomains: Type.Optional(TIntegerString),
+  expiryTimeBuffer: Type.Optional(TIntegerString),
+  discountPerEpoch: Type.Optional(TIntegerString),
+  epochLength: Type.Optional(TIntegerString),
+  mailbox: Type.Optional(TAddress),
+  securityModule: Type.Optional(TAddress),
+  acceptanceDelay: Type.Optional(TIntegerString),
+  supportedDomains: Type.Optional(Type.Array(HubSupportedDomainSchema)),
+  chainGateways: Type.Optional(Type.Array(HubChainGatewaySchema)),
+});
+export type HubMeta = Static<typeof HubMetaSchema>;
+
+export const SpokeMetaSchema = Type.Object({
+  id: Type.String({ maxLength: 66 }),
+  domain: TDomainId,
+  paused: Type.Optional(Type.Boolean()),
+  gateway: Type.Optional(TAddress),
+  lighthouse: Type.Optional(TAddress),
+  messageReceiver: Type.Optional(TAddress),
+  watchtower: Type.Optional(TAddress),
+  messageGasLimit: Type.Optional(TIntegerString),
+  feeAdapter: Type.Optional(TAddress),
+  feeAdapterRecipient: Type.Optional(TAddress),
+  fillSigner: Type.Optional(TAddress),
+  feeSigner: Type.Optional(TAddress),
+  mailbox: Type.Optional(TAddress),
+  securityModule: Type.Optional(TAddress),
+  moduleForStrategies: Type.Optional(Type.Array(SpokeModuleForStrategySchema)),
+});
+export type SpokeMeta = Static<typeof SpokeMetaSchema>;

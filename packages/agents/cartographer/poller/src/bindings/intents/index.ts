@@ -1,13 +1,12 @@
 import { createLoggingContext, jsonifyError, EverclearError } from '@chimera-monorepo/utils';
-
-import { AppContext } from '../../shared';
 import {
   updateOriginIntents,
   updateDestinationIntents,
   updateSettlementIntents,
   updateHubIntents,
   updateOrders,
-} from '../../lib/operations';
+  AppContext,
+} from '@chimera-monorepo/cartographer-core';
 
 export const bindIntents = async (context: AppContext) => {
   const {
@@ -17,11 +16,11 @@ export const bindIntents = async (context: AppContext) => {
   const { requestContext, methodContext } = createLoggingContext(bindIntents.name);
   try {
     logger.debug('Bind intents polling loop start', requestContext, methodContext);
-    await updateOrders();
-    await updateOriginIntents();
-    await updateDestinationIntents();
-    await updateHubIntents();
-    await updateSettlementIntents();
+    await updateOrders(context);
+    await updateOriginIntents(context);
+    await updateDestinationIntents(context);
+    await updateHubIntents(context);
+    await updateSettlementIntents(context);
 
     // Refresh the materialized view
     await database.refreshIntentsView();

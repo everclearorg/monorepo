@@ -1,14 +1,22 @@
+// Re-export operations from core for backward compatibility
 export {
   updateOriginIntents,
   updateDestinationIntents,
   updateSettlementIntents,
   updateHubIntents,
   updateOrders,
-} from './intents';
-export { updateHubInvoices, updateHubDeposits } from './invoices';
-export { updateAssets, updateDepositors } from './depositors';
-export { updateMessages, updateQueues, updateMessageStatus } from './monitor';
+  updateHubInvoices,
+  updateHubDeposits,
+  updateAssets,
+  updateDepositors,
+  updateMessages,
+  updateQueues,
+  updateMessageStatus,
+  updateProtocolUpdateLogs,
+  updateHubSpokeMeta,
+  getSubgraphReaderConfig,
+  getSubgraphSupportedDomains,
+  DEFAULT_BATCH_SIZE,
+  DEFAULT_SAFE_CONFIRMATIONS,
+} from '@chimera-monorepo/cartographer-core';
 export { runMigration } from './migrations';
-
-export const DEFAULT_BATCH_SIZE = 3000;
-export const DEFAULT_SAFE_CONFIRMATIONS = 5;

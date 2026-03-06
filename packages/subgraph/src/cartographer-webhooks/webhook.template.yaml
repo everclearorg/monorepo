@@ -1,0 +1,22 @@
+name: {{webhookName}}-{{subgraphLabel}}
+apiVersion: 3
+sources:
+{{#entities}}
+  {{sourceId}}:
+    type: subgraph_entity
+    name: {{entity}}
+    subgraphs:
+      - name: {{subgraphName}}
+        version: {{subgraphVersion}}
+    start_at: latest
+{{/entities}}
+transforms: {}
+sinks:
+{{#entities}}
+  carto_{{sourceId}}_webhook:
+    type: webhook
+    from: {{sourceId}}
+    url: {{{webhookBaseUrl}}}/webhooks/{{webhookName}}{{#domain}}?domain={{domain}}{{/domain}}
+    secret_name: {{secretName}}
+    one_row_per_request: true
+{{/entities}}

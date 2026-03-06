@@ -6,6 +6,8 @@ import {
   jsonifyError,
   sendHeartbeat,
   chainWrapper,
+  setTriagePersistenceStore,
+  TriageProcessingRecord,
 } from '@chimera-monorepo/utils';
 import { bindServer } from './bindings';
 import { getConfig, shouldReloadEverclearConfig } from './config';
@@ -17,7 +19,8 @@ import { runChecks } from './checklist';
 import interval from 'interval-promise';
 import { MonitorConfig } from './types';
 import { AppContext, getContext } from './context';
-import { getDatabase } from '@chimera-monorepo/database';
+import { getDatabase, TriageFingerprintLog } from '@chimera-monorepo/database';
+import { configureTriageToolHandlers } from './triage-tools';
 
 export const MonitorService = {
   SERVER: 'server',
@@ -26,6 +29,27 @@ export const MonitorService = {
 export type MonitorService = (typeof MonitorService)[keyof typeof MonitorService];
 
 const DEFAULT_SUBGRAPH_TIMEOUT = 7500;
+
+const toDbLogRecord = (record: TriageProcessingRecord): TriageFingerprintLog => ({
+  fingerprint: record.fingerprint,
+  reportType: record.reportType,
+  severity: record.severity,
+  env: record.env,
+  network: record.network,
+  ids: record.ids,
+  reason: record.reason,
+  triageMode: record.triageMode,
+  triageResult: record.triageResult,
+  providerUsed: record.providerUsed,
+  modelUsed: record.modelUsed,
+  triageLatencyMs: record.triageLatencyMs,
+  autoResolveAttempted: record.autoResolveAttempted,
+  autoResolveSucceeded: record.autoResolveSucceeded,
+  autoResolveReasonCode: record.autoResolveReasonCode,
+  toolCallsMade: record.toolCallsMade,
+  toolNamesUsed: record.toolNamesUsed,
+  expiresAt: record.expiresAt,
+});
 /**
  * Helper to get subgraph reader config
  * @param chains Chain entry of monitor config (includes hub domain)
@@ -52,60 +76,6 @@ export const getSubgraphReaderConfig = (
   return { subgraphs, ...(envioConfig && { envio: envioConfig }) };
 };
 
-export const startBlockMapPoller = async (config: MonitorConfig, blockMap: AppContext['adapters']['blockMap']) => {
-  const domains = [...new Set([config.hub.domain, ...Object.keys(config.chains)])];
-  await Promise.all(
-    domains.map(async (domain) => {
-      const chainConfig = domain === config.hub.domain ? config.hub : config.chains[domain];
-      const providerUrls = chainConfig.providers ?? [];
-      const type = domain === config.hub.domain ? 'evm' : (chainConfig as { network?: string })?.network ?? 'evm';
-      await Promise.all(
-        providerUrls.map(async (provider) => {
-          const origin = URL.canParse(provider) ? new URL(provider).origin : provider;
-          if (type !== 'evm') {
-            return;
-          }
-          const client = chainWrapper.createPublicClient({
-            transport: chainWrapper.http(provider),
-          });
-
-          const handleBlockNumber = (blockNumber: bigint) => {
-            if (!blockNumber) {
-              return;
-            }
-
-            // Create the entry
-            const entry = {
-              rpcOrigin: origin,
-              number: Number(blockNumber),
-              timestamp: Math.floor(Date.now() / 1_000),
-            };
-            // Add domain array if it exists
-            if (!blockMap.has(domain)) blockMap.set(domain, []);
-
-            // Replace idx for provider if more recent
-            const idx = blockMap.get(domain)!.findIndex((a) => a.rpcOrigin.toLowerCase() === origin.toLowerCase());
-            if (idx === -1) {
-              // no entry for origin, push
-              blockMap.get(domain)!.push(entry);
-              return;
-            }
-            // Replace the entry IFF it is more recent
-            if (blockMap.get(domain)![idx].number >= Number(blockNumber)) {
-              return;
-            }
-            blockMap.get(domain)![idx] = entry;
-          };
-
-          client.watchBlockNumber({
-            onBlockNumber: handleBlockNumber,
-          });
-        }),
-      );
-    }),
-  );
-};
-
 export const makeMonitor = async (service: MonitorService) => {
   /// Load necessary configs
   const { requestContext, methodContext } = createLoggingContext(makeMonitor.name);
@@ -128,8 +98,19 @@ export const makeMonitor = async (service: MonitorService) => {
         },
       },
     });
-    context.logger.info('Generated config.', requestContext, methodContext, {
-      config: { ...context.config, abis: 'N/A' },
+    context.logger.info('Generated config summary.', requestContext, methodContext, {
+      configSummary: {
+        network: context.config.network,
+        env: context.config.environment,
+        service,
+        chainCount: Object.keys(context.config.chains ?? {}).length,
+        relayerCount: context.config.relayers?.length ?? 0,
+        hasBetterUptime: Boolean(context.config.betterUptime?.apiKey),
+        hasTelegram: Boolean(context.config.telegram?.apiKey),
+        hasDiscord: Boolean(context.config.discord?.url),
+        triageMode: context.config.triage?.mode ?? 'disabled',
+        triageProviderCount: Object.keys(context.config.triage?.providers ?? {}).length,
+      },
     });
 
     /// MARK - Adapters
@@ -145,9 +126,6 @@ export const makeMonitor = async (service: MonitorService) => {
       [context.config.hub.domain]: context.config.hub,
     });
 
-    context.adapters.blockMap = new Map();
-    await startBlockMapPoller(context.config, context.adapters.blockMap);
-
     const { domain: hubDomain, ...remainder } = context.config.hub;
     context.adapters.subgraph = await setupSubgraphReader(
       getSubgraphReaderConfig({ ...context.config.chains, [hubDomain]: remainder }, context.config.hub),
@@ -158,20 +136,37 @@ export const makeMonitor = async (service: MonitorService) => {
     context.adapters.database = await getDatabase(context.config.database.url, context.logger);
     context.logger.debug('Database setup', requestContext, methodContext);
 
+    setTriagePersistenceStore({
+      hasProcessed: async (fingerprint: string) => {
+        return context.adapters.database.isTriageFingerprintProcessed(fingerprint);
+      },
+      tryReserve: async (record: TriageProcessingRecord) => {
+        return context.adapters.database.tryReserveTriageFingerprint(toDbLogRecord(record));
+      },
+      finalize: async (record: TriageProcessingRecord) => {
+        await context.adapters.database.finalizeTriageFingerprint(toDbLogRecord(record));
+      },
+      setAutoResolveOutcome: async (fingerprint: string, succeeded: boolean, reasonCode?: string) => {
+        await context.adapters.database.setTriageAutoResolveOutcome(fingerprint, succeeded, reasonCode);
+      },
+      pruneExpired: async () => {
+        return context.adapters.database.pruneExpiredTriageFingerprints();
+      },
+    });
+    configureTriageToolHandlers();
+
     // Adapters - relayers
     context.adapters.relayers = [];
     for (const relayerConfig of context.config.relayers) {
-      const setupFunc =
+      const relayer =
         relayerConfig.type == RelayerType.Gelato
-          ? setupGelatoRelayer
+          ? await setupGelatoRelayer(relayerConfig.apiKey)
           : relayerConfig.type == RelayerType.Everclear
-            ? setupEverclearRelayer
+            ? await setupEverclearRelayer(relayerConfig.url)
             : undefined;
-      if (!setupFunc) {
+      if (!relayer) {
         throw new Error(`Unknown relayer configured, relayer: ${relayerConfig}`);
       }
-
-      const relayer = await setupFunc(relayerConfig.url);
       context.adapters.relayers.push({
         instance: relayer,
         apiKey: relayerConfig.apiKey,
@@ -179,6 +174,9 @@ export const makeMonitor = async (service: MonitorService) => {
       });
     }
     context.logger.debug('Relayers setup', requestContext, methodContext);
+
+    // Initialize the block data map for sharing block data between checks
+    context.adapters.blockMap = new Map<string, { number: number; timestamp: number }>();
 
     /// MARK - Bindings
     if (service == MonitorService.SERVER) {

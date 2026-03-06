@@ -1,7 +1,7 @@
 import { canonizeId, createLoggingContext, getMaxTxNonce, chainWrapper } from '@chimera-monorepo/utils';
-import { getContext } from '../../shared';
+import { AppContext } from '../context';
 
-export const updateDepositors = async () => {
+export const updateDepositors = async (context: AppContext) => {
   const {
     config: {
       chains,
@@ -9,7 +9,7 @@ export const updateDepositors = async () => {
     },
     adapters: { subgraph, database },
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateDepositors.name);
   const spokes = Object.keys(chains);
 
@@ -36,7 +36,7 @@ export const updateDepositors = async () => {
 
   // Save the depositors
   const flat = depositors.flat();
-  const ids = Array.from(new Set(flat.map((f) => chainWrapper.toHex(canonizeId(f.depositor)))));
+  const ids = Array.from(new Set(flat.map((f) => canonizeId(f.depositor))));
   logger.debug('Saving depositors', requestContext, methodContext, { ids });
   await database.saveDepositors(ids.map((id) => ({ id })));
 
@@ -46,8 +46,8 @@ export const updateDepositors = async () => {
     assetHash: chainWrapper.keccak256(
       chainWrapper.encodeAbiParameters(
         [{ type: 'address' }, { type: 'uint32' }],
-        [f.asset as `0x${string}`, f.domain]
-      )
+        [f.asset as `0x${string}`, f.domain],
+      ),
     ) as string,
   }));
 
@@ -61,8 +61,8 @@ export const updateDepositors = async () => {
     return {
       ...f,
       id: f.assetHash,
-      asset: chainWrapper.toHex(canonizeId(f.asset)),
-      account: chainWrapper.toHex(canonizeId(f.depositor)),
+      asset: canonizeId(f.asset),
+      account: canonizeId(f.depositor),
     };
   });
   logger.debug('Saving balances', requestContext, methodContext, { balances });
@@ -81,14 +81,14 @@ export const updateDepositors = async () => {
   logger.debug('Saved depositors', requestContext, methodContext, { spokes, depositors, updatedCheckpoints });
 };
 
-export const updateAssets = async () => {
+export const updateAssets = async (context: AppContext) => {
   const {
     config: {
       hub: { domain: hubDomain },
     },
     adapters: { subgraph, database },
     logger,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateAssets.name);
 
   logger.debug('Retrieving tokens and asset data', requestContext, methodContext, {

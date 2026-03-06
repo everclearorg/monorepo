@@ -8,14 +8,19 @@ import {
   HubIntent,
   HubInvoice,
   HubMessage,
+  HubMeta,
   jsonifyError,
   Message,
   Order,
   OriginIntent,
+  ProtocolUpdateLog,
   Queue,
   SettlementIntent,
+  SpokeMeta,
   TIntentStatus,
   Token,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
 } from '@chimera-monorepo/utils';
 import { getHelpers } from '../lib/helpers';
 import { RuntimeError } from '../lib/errors';
@@ -144,6 +149,27 @@ export class EnvioReader implements ISubgraphReader {
     return undefined;
   }
 
+  public async getSettlementIntentById(_domain: string, _intentId: string): Promise<SettlementIntent | undefined> {
+    // Envio doesn't track settlement intents by ID
+    return undefined;
+  }
+
+  public async getHubDepositEnqueuedById(
+    _domain: string,
+    _intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    // Envio only tracks spoke contracts, not hub contracts
+    return undefined;
+  }
+
+  public async getHubDepositProcessedById(
+    _domain: string,
+    _intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    // Envio only tracks spoke contracts, not hub contracts
+    return undefined;
+  }
+
   public async getDepositorEvents(_domain: string, _latestNonce: number): Promise<DepositorEvent[]> {
     // Envio doesn't track depositor events
     return [];
@@ -194,6 +220,34 @@ export class EnvioReader implements ISubgraphReader {
 
   public async getHubMessages(_domain: string, _latestNonce: number): Promise<HubMessage[]> {
     // Envio doesn't track hub messages
+    return [];
+  }
+
+  public async getHubMeta(_domain: string): Promise<HubMeta | undefined> {
+    // Envio doesn't track hub meta
+    return undefined;
+  }
+
+  public async getSpokeMeta(_domain: string): Promise<SpokeMeta | undefined> {
+    // Envio doesn't track spoke meta
+    return undefined;
+  }
+
+  public async getHubMetaUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    return [];
+  }
+
+  public async getSpokeMetaUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    return [];
+  }
+
+  public async getHubTokenUpdates(_domain: string, _fromBlock: number): Promise<HubTokenUpdateLog[]> {
+    // Envio doesn't track hub token update logs
+    return [];
+  }
+
+  public async getHubAssetUpdates(_domain: string, _fromBlock: number): Promise<HubAssetUpdateLog[]> {
+    // Envio doesn't track hub asset update logs
     return [];
   }
 

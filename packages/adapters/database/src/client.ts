@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as converters from './lib/converters';
 import {
   OriginIntent,
@@ -22,6 +23,11 @@ import {
   EpochResult,
   LockPosition,
   Order,
+  ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
+  HubMeta,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 
 import * as pg from 'pg';
@@ -29,15 +35,135 @@ import { Pool } from 'pg';
 import * as db from 'zapatos/db';
 import type * as s from 'zapatos/schema';
 
-import { IntentMessageUpdate, pool } from './index';
+import { IntentMessageUpdate, TriageFingerprintLog, pool } from './index';
+
+// Helper to ensure the pool is defined when used (should always be true after getDatabase succeeds)
+const getPool = (): Pool => {
+  if (!pool) {
+    throw new Error('Database pool is not initialized. Call getDatabase() first.');
+  }
+  return pool;
+};
 
 db.enableCustomJSONParsingForLargeNumbers(pg);
+
+export const isTriageFingerprintProcessed = async (
+  fingerprint: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<boolean> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await poolToUse.query(
+    `SELECT 1
+      FROM alert_triage_log
+      WHERE fingerprint = $1
+      AND expires_at > NOW()
+      LIMIT 1`,
+    [fingerprint],
+  );
+  return (result.rowCount ?? 0) > 0;
+};
+
+export const tryReserveTriageFingerprint = async (
+  log: TriageFingerprintLog,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<boolean> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await poolToUse.query(
+    `INSERT INTO alert_triage_log (
+      fingerprint, report_type, severity, env, network, ids, reason, triage_mode, triage_result,
+      provider_used, model_used, triage_latency_ms, auto_resolve_attempted, auto_resolve_succeeded,
+      auto_resolve_reason_code, tool_calls_made, tool_names_used, expires_at
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6, $7, $8, $9,
+      $10, $11, $12, $13, $14, $15, $16, $17, $18
+    )
+    ON CONFLICT (fingerprint) DO NOTHING`,
+    [
+      log.fingerprint,
+      log.reportType,
+      log.severity,
+      log.env,
+      log.network,
+      log.ids,
+      log.reason,
+      log.triageMode,
+      log.triageResult ? JSON.stringify(log.triageResult) : null,
+      log.providerUsed ?? null,
+      log.modelUsed ?? null,
+      log.triageLatencyMs ?? null,
+      log.autoResolveAttempted ?? false,
+      log.autoResolveSucceeded ?? false,
+      log.autoResolveReasonCode ?? null,
+      log.toolCallsMade ?? 0,
+      log.toolNamesUsed ?? [],
+      log.expiresAt,
+    ],
+  );
+  return (result.rowCount ?? 0) > 0;
+};
+
+export const finalizeTriageFingerprint = async (
+  log: TriageFingerprintLog,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await poolToUse.query(
+    `UPDATE alert_triage_log
+      SET triage_result = $2,
+          provider_used = $3,
+          model_used = $4,
+          triage_latency_ms = $5,
+          auto_resolve_attempted = $6,
+          auto_resolve_succeeded = $7,
+          auto_resolve_reason_code = $8,
+          tool_calls_made = $9,
+          tool_names_used = $10,
+          expires_at = $11
+      WHERE fingerprint = $1`,
+    [
+      log.fingerprint,
+      log.triageResult ? JSON.stringify(log.triageResult) : null,
+      log.providerUsed ?? null,
+      log.modelUsed ?? null,
+      log.triageLatencyMs ?? null,
+      log.autoResolveAttempted ?? false,
+      log.autoResolveSucceeded ?? false,
+      log.autoResolveReasonCode ?? null,
+      log.toolCallsMade ?? 0,
+      log.toolNamesUsed ?? [],
+      log.expiresAt,
+    ],
+  );
+};
+
+export const setTriageAutoResolveOutcome = async (
+  fingerprint: string,
+  succeeded: boolean,
+  reasonCode?: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await poolToUse.query(
+    `UPDATE alert_triage_log
+      SET auto_resolve_attempted = true,
+          auto_resolve_succeeded = $2,
+          auto_resolve_reason_code = $3
+      WHERE fingerprint = $1`,
+    [fingerprint, succeeded, reasonCode ?? null],
+  );
+};
+
+export const pruneExpiredTriageFingerprints = async (_pool?: Pool | db.TxnClientForRepeatableRead): Promise<number> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await poolToUse.query(`DELETE FROM alert_triage_log WHERE expires_at <= NOW()`);
+  return result.rowCount ?? 0;
+};
 
 export const saveOriginIntents = async (
   _intents: OriginIntent[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const intents = _intents.map(converters.toOriginIntents);
   await db
     .upsert('origin_intents', intents, ['id'], { noNullUpdateColumns: ['message_id', 'order_id'] })
@@ -48,7 +174,7 @@ export const saveDestinationIntents = async (
   _intents: DestinationIntent[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const intents = _intents.map(converters.toDestinationIntents);
   await db.upsert('destination_intents', intents, ['id'], { noNullUpdateColumns: ['message_id'] }).run(poolToUse);
 };
@@ -57,7 +183,7 @@ export const saveSettlementIntents = async (
   _intents: SettlementIntent[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const intents = _intents.map(converters.toSettlementIntents);
   await db.upsert('settlement_intents', intents, ['id']).run(poolToUse);
 };
@@ -67,7 +193,7 @@ export const saveHubIntents = async (
   _updateColumns: s.hub_intents.Column[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const intents = _intents.map(converters.toHubIntents);
   await db
     .upsert('hub_intents', intents, ['id'], {
@@ -81,7 +207,7 @@ export const saveHubDeposits = async (
   _deposits: HubDeposit[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const deposits = _deposits.map(converters.toHubDeposits);
   await db
     .upsert('hub_deposits', deposits, ['id'], {
@@ -94,7 +220,7 @@ export const getAllEnqueuedDeposits = async (
   domains: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<HubDeposit[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select('hub_deposits', {
       processed_tx_nonce: db.conditions.isNull,
@@ -110,7 +236,7 @@ export const saveHubInvoices = async (
   _invoices: HubInvoice[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const invoices = _invoices.map(converters.toHubInvoices);
   await db
     .upsert('hub_invoices', invoices, ['id'], {
@@ -126,7 +252,7 @@ export const saveMessages = async (
   _hubUpdates: (IntentMessageUpdate & { settlementDomain: string })[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const messages = _messages.map(converters.toMessages);
   await db.upsert('messages', messages, ['id']).run(poolToUse);
 
@@ -159,14 +285,76 @@ export const saveMessages = async (
   );
 };
 
+export const saveProtocolUpdateLogs = async (
+  _logs: ProtocolUpdateLog[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const logs = _logs.map(converters.toProtocolUpdateLog);
+  await db
+    .upsert('protocol_update_logs', logs, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
+export const saveHubTokenUpdateLogs = async (
+  _logs: HubTokenUpdateLog[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const logs = _logs.map(converters.toHubTokenUpdateLog);
+  await db
+    .upsert('hub_token_update_logs' as any, logs as any, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
+export const saveHubAssetUpdateLogs = async (
+  _logs: HubAssetUpdateLog[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const logs = _logs.map(converters.toHubAssetUpdateLog);
+  await db
+    .upsert('hub_asset_update_logs' as any, logs as any, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
+export const saveHubMeta = async (_meta: HubMeta[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const meta = _meta.map(converters.toHubMeta);
+  await db
+    .upsert('hub_meta' as any, meta, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
+export const saveSpokeMeta = async (
+  _meta: SpokeMeta[],
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const meta = _meta.map(converters.toSpokeMeta);
+  await db
+    .upsert('spoke_meta' as any, meta, ['id'], {
+      noNullUpdateColumns: ['id'],
+    })
+    .run(poolToUse);
+};
+
 export const saveQueues = async (_queues: Queue[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const queues = _queues.map(converters.toQueues);
   await db.upsert('queues', queues, ['id']).run(poolToUse);
 };
 
 export const saveAssets = async (_assets: Asset[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const assets = _assets.map(converters.toAssets);
   await db.upsert('assets', assets, ['id']).run(poolToUse);
 };
@@ -175,7 +363,7 @@ export const getAssets = async (
   tickerHashes: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<Asset[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select('assets', { token_id: db.conditions.isIn(tickerHashes.map((id) => id.toLowerCase())) })
     .run(poolToUse);
@@ -186,7 +374,7 @@ export const getHubInvoices = async (
   ids: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<HubInvoice[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select('hub_invoices', { id: db.conditions.isIn(ids.map((id) => id.toLowerCase())) })
     .run(poolToUse);
@@ -197,7 +385,7 @@ export const getHubInvoicesByIntentIds = async (
   intentIds: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<HubInvoice[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select('hub_invoices', { intent_id: db.conditions.isIn(intentIds.map((id) => id.toLowerCase())) })
     .run(poolToUse);
@@ -205,13 +393,13 @@ export const getHubInvoicesByIntentIds = async (
 };
 
 export const saveTokens = async (_tokens: Token[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const tokens = _tokens.map(converters.toTokens);
   await db.upsert('tokens', tokens, ['id']).run(poolToUse);
 };
 
 export const getTokens = async (_tokens: string[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<Token[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select('tokens', { id: db.conditions.isIn(_tokens.map((t) => t.toLowerCase())) })
     .run(poolToUse);
@@ -222,7 +410,7 @@ export const saveDepositors = async (
   _depositors: Depositor[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const depositors = _depositors.map(converters.toDepositors);
   await db.upsert('depositors', depositors, ['id']).run(poolToUse);
 };
@@ -231,7 +419,7 @@ export const saveBalances = async (
   _balances: Balance[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const balances = _balances.map(converters.toBalances);
   await db.upsert('balances', balances, ['id']).run(poolToUse);
 };
@@ -240,7 +428,7 @@ export const getBalancesByAccount = async (
   account: string,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<Balance[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('balances', { account: account.toLowerCase() }).run(poolToUse);
   return result.map(converters.fromBalance);
 };
@@ -250,7 +438,7 @@ export const saveCheckPoint = async (
   point: number,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const checkpoint = { check_name: check, check_point: point };
 
   await db.upsert('checkpoints', checkpoint, ['check_name']).run(poolToUse);
@@ -260,7 +448,7 @@ export const getCheckPoint = async (
   check_name: string,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<number> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
 
   const result = await db.selectOne('checkpoints', { check_name }).run(poolToUse);
   return Number(BigInt(result?.check_point ?? 0));
@@ -271,7 +459,7 @@ export const getMessageQueues = async (
   domains: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('queues', { type, domain: db.conditions.isIn(domains) }).run(poolToUse);
   return result.map(converters.fromQueue);
 };
@@ -281,7 +469,7 @@ export const getMessageQueueContents = async <T extends QueueType>(
   domains: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<Map<string, QueueContents[T][]>> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   let intents: { spoke: string }[] = [];
   if (type === 'FILL') {
     // Return all intents where message_id is null (the fill queue not yet dispatched)
@@ -339,7 +527,7 @@ export const getAllQueuedSettlements = async (
   domain: string,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<Map<string, HubIntent[]>> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const destinationMap = new Map<string, HubIntent[]>();
 
   const results = await db.select('hub_intents', { domain, status: TIntentStatus.Settled }).run(poolToUse);
@@ -361,13 +549,13 @@ export const getOriginIntentsByStatus = async (
   origins: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('origin_intents', { origin: db.conditions.isIn(origins), status }).run(poolToUse);
   return result.map(converters.fromOriginIntent);
 };
 
 export const getOriginIntentsById = async (id: string, _pool?: Pool | db.TxnClientForRepeatableRead) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.selectOne('origin_intents', { id }).run(poolToUse);
   return result ? converters.fromOriginIntent(result) : undefined;
 };
@@ -377,7 +565,7 @@ export const getDestinationIntentsByStatus = async (
   destinations: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select('destination_intents', { filled_domain: db.conditions.isIn(destinations), status })
     .run(poolToUse);
@@ -389,13 +577,13 @@ export const getHubIntentsByStatus = async (
   domains: string[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('hub_intents', { domain: db.conditions.isIn(domains), status }).run(poolToUse);
   return result.map(converters.fromHubIntent);
 };
 
 export const getInvoicesByStatus = async (status: s.intent_status, _pool?: Pool | db.TxnClientForRepeatableRead) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('invoices', { hub_status: status }).run(poolToUse);
   return result.map(converters.fromInvoices);
 };
@@ -404,13 +592,13 @@ export const getSettlementIntentsByStatus = async (
   status: s.intent_status,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('settlement_intents', { status }).run(poolToUse);
   return result.map(converters.fromSettlementIntents);
 };
 
 export const getMessagesByIntentIds = async (intentIds: string[], _pool?: Pool | db.TxnClientForRepeatableRead) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.sql<s.messages.SQL>`
     SELECT * 
       FROM ${'messages'} 
@@ -420,7 +608,7 @@ export const getMessagesByIntentIds = async (intentIds: string[], _pool?: Pool |
 };
 
 export const getMessagesByIds = async (ids: string[], _pool?: Pool | db.TxnClientForRepeatableRead) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('messages', { id: db.conditions.isIn(ids) }).run(poolToUse);
   return result.map(converters.fromMessages);
 };
@@ -431,7 +619,7 @@ export const getMessagesByStatus = async (
   limit: number,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select(
       'messages',
@@ -447,7 +635,7 @@ export const updateMessageStatus = async (
   status: s.message_status,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   await db.update('messages', { message_status: status }, { id: messageId }).run(poolToUse);
 };
 
@@ -457,7 +645,7 @@ export const getExpiredIntents = async (
   expiryBuffer: string,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   // Calculate the most recent timestamp that could be expired
   const time = getNtpTimeSeconds();
   const ceil = time - Number(expiryBuffer);
@@ -481,7 +669,7 @@ export const getSettledIntentsInEpoch = async (
   toTimestamp: number,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select('intents', {
       settlement_status: TIntentStatus.Settled,
@@ -505,7 +693,7 @@ export const getOpenTransfers = async (
   startTimestamp: number = 0,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
 
   const result = await db
     .select(
@@ -528,7 +716,7 @@ export const getLatestInvoicesByTickerHash = async (
   perTickerLimit: number = 10, // per-ticker
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<Map<string, Invoice[]>> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
 
   // Get the latest hub invoices by the ticker hash
   const records = await Promise.all(
@@ -561,7 +749,7 @@ export const getLatestHubInvoicesByTickerHash = async (
   perTickerLimit: number = 10, // per-ticker
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<Map<string, HubInvoice[]>> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
 
   // Get the latest hub invoices by the ticker hash
   const records = await Promise.all(
@@ -584,12 +772,12 @@ export const getLatestHubInvoicesByTickerHash = async (
 };
 
 export const refreshIntentsView = async (_pool?: Pool | db.TxnClientForRepeatableRead) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   await db.sql`REFRESH MATERIALIZED VIEW intents`.run(poolToUse);
 };
 
 export const refreshInvoicesView = async (_pool?: Pool | db.TxnClientForRepeatableRead) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   await db.sql`REFRESH MATERIALIZED VIEW invoices`.run(poolToUse);
 };
 
@@ -598,7 +786,7 @@ export const getLatestTimestamp = async (
   timestampColumnName: string,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<Date> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const promises: Promise<any[]>[] = [];
   for (const table of tables)
@@ -616,7 +804,7 @@ export const getLatestTimestamp = async (
 };
 
 export const getVotes = async (epoch: number, _pool?: Pool | db.TxnClientForRepeatableRead) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   return (
     await db
       .select(
@@ -644,7 +832,7 @@ export const getTokenomicsEvents = async (
   limit: number = 100,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   return (
     await db
       .select(
@@ -665,7 +853,7 @@ export const getMerkleTrees = async (
   epochEnd: number,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<MerkleTree[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const epochTimestamp = new Date(epochEnd * 1000);
   const result = await db
     .select('merkle_trees', { epoch_end_timestamp: db.toString(epochTimestamp, 'timestamp:UTC') as db.TimestampString })
@@ -679,7 +867,7 @@ export const getLatestMerkleTree = async (
   epochEndMillis: number,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<MerkleTree[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select(
       'merkle_trees',
@@ -703,13 +891,13 @@ export const saveMerkleTrees = async (
   _trees: MerkleTree[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const trees = _trees.map(converters.toMerkleTree);
   await db.insert('merkle_trees', trees).run(poolToUse);
 };
 
 export const saveRewards = async (_rewards: Reward[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const rewards = _rewards.map(converters.toReward);
   await db.insert('rewards', rewards).run(poolToUse);
 };
@@ -718,7 +906,7 @@ export const saveEpochResults = async (
   _epochResults: EpochResult[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const epochResults = _epochResults.map(converters.toEpochResult);
   await db.insert('epoch_results', epochResults).run(poolToUse);
 };
@@ -728,7 +916,7 @@ export const getNewLockPositionEvents = async (
   limit: number = 100,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   return (
     await db
       .select(
@@ -751,7 +939,7 @@ export const getLockPositions = async (
   startBefore?: number,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   let conditions = {};
   if (user) {
     conditions = { user, ...conditions };
@@ -777,7 +965,7 @@ export const saveLockPositions = async (
   lockPositions: LockPosition[],
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const toRemove = lockPositions.filter((lockPosition) => {
     return BigInt(lockPosition.amountLocked) === BigInt(0);
   });
@@ -795,19 +983,19 @@ export const saveLockPositions = async (
 };
 
 export const saveOrders = async (_orders: Order[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<void> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const orders = _orders.map(converters.toOrders);
   await db.upsert('orders', orders, ['id']).run(poolToUse);
 };
 
 export const getOrders = async (ids: string[], _pool?: Pool | db.TxnClientForRepeatableRead): Promise<Order[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('orders', { id: db.conditions.isIn(ids.map((i) => i.toLowerCase())) }).run(poolToUse);
   return result.map(converters.fromOrders);
 };
 
 export const getOriginIntentsLastNonce = async (origin: string, _pool?: Pool | db.TxnClientForRepeatableRead) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db
     .select(
       'origin_intents',
@@ -828,7 +1016,7 @@ export const getDeliveredSettlements = async (
   domain: string,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ): Promise<SettlementIntent[]> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   const result = await db.select('settlement_intents', { status: TIntentStatus.Delivered, domain }).run(poolToUse);
   return result.map(converters.fromSettlementIntents);
 };
@@ -838,12 +1026,12 @@ export const updateSettlementStatus = async (
   status: s.intent_status,
   _pool?: Pool | db.TxnClientForRepeatableRead,
 ) => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
   await db.update('settlement_intents', { status }, { id: intentId }).run(poolToUse);
 };
 
 export const updateSolanaMessageStatuses = async (_pool?: Pool | db.TxnClientForRepeatableRead): Promise<number> => {
-  const poolToUse = _pool ?? pool;
+  const poolToUse = _pool ?? getPool();
 
   // Set message status to 'delivered' where:
   // 1. destination_domain is Solana (1399811149)

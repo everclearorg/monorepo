@@ -28,22 +28,49 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set AWS Region
+      - name: Set Environment Config
         id: set-aws-region
         run: |
+          # ECS service name format: {environment}-{stage}-{container_family}
+          # ECS cluster name format: {prefix}-{domain}-{environment}-{stage}
+          ENVIRONMENT="chimera"
+          DOMAIN="core"
+
           if [[ "${{ github.ref }}" == "refs/heads/mainnet-prod" ]]; then
             echo "AWS_REGION=us-west-2" >> $GITHUB_OUTPUT
+            echo "ECS_CLUSTER=connext-ecs-${DOMAIN}-${ENVIRONMENT}-mainnet" >> $GITHUB_OUTPUT
+            STAGE="mainnet"
           elif [[ "${{ github.ref }}" == "refs/heads/mainnet-staging" ]]; then
             echo "AWS_REGION=us-east-1" >> $GITHUB_OUTPUT
+            echo "ECS_CLUSTER=everclear-ecs-${DOMAIN}-${ENVIRONMENT}-staging" >> $GITHUB_OUTPUT
+            STAGE="staging"
           elif [[ "${{ github.ref }}" == "refs/heads/testnet-prod" ]]; then
             echo "AWS_REGION=eu-north-1" >> $GITHUB_OUTPUT
+            echo "ECS_CLUSTER=connext-ecs-${DOMAIN}-${ENVIRONMENT}-testnet" >> $GITHUB_OUTPUT
+            STAGE="testnet"
           elif [[ "${{ github.ref }}" == "refs/heads/testnet-staging" ]]; then
             echo "AWS_REGION=eu-west-1" >> $GITHUB_OUTPUT
+            echo "ECS_CLUSTER=connext-ecs-${DOMAIN}-${ENVIRONMENT}-staging" >> $GITHUB_OUTPUT
+            STAGE="staging"
           else
             echo "AWS_REGION=eu-west-1" >> $GITHUB_OUTPUT
+            echo "ECS_CLUSTER=connext-ecs-${DOMAIN}-${ENVIRONMENT}-staging" >> $GITHUB_OUTPUT
+            STAGE="staging"
           fi
+
+          # ECS services (modules/service) — action skips any that don't exist
+          SERVICES="${ENVIRONMENT}-${STAGE}-relayer"
+          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-relayer-server"
+          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-relayer-web3signer"
+          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-watchtower"
+          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-watchtower-web3signer"
+          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-web3signer"
+          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-monitor"
+          echo "ECS_SERVICES=${SERVICES}" >> $GITHUB_OUTPUT
     outputs:
       AWS_REGION: ${{ steps.set-aws-region.outputs.AWS_REGION }}
+      ECS_CLUSTER: ${{ steps.set-aws-region.outputs.ECS_CLUSTER }}
+      ECS_SERVICES: ${{ steps.set-aws-region.outputs.ECS_SERVICES }}
 
   build-and-test:
     runs-on: ubuntu-latest
@@ -226,7 +253,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build -f docker/lighthouse/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false -f docker/lighthouse/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
@@ -264,7 +291,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
 
         run: |
-          DOCKER_BUILDKIT=1 docker build -f docker/cartographer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          DOCKER_BUILDKIT=1 docker build --provenance=false -f docker/cartographer/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     outputs:
@@ -347,7 +374,7 @@ jobs:
       json: ${{ steps.meta.outputs.json }}
 
   e2e-tests:
-    if: github.ref != 'refs/heads/testnet-staging' || github.ref != 'refs/heads/mainnet-staging'
+    if: github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/mainnet-prod'
     runs-on: ubuntu-latest
     needs:
       [
@@ -407,7 +434,7 @@ jobs:
       cartographer-tags: ${{ needs.build-and-push-cartographer-image.outputs.json }}
 
   terraform-infra:
-    if: github.ref == 'refs/heads/testnent-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/mainnet-prod'
+    if: github.ref == 'refs/heads/testnet-staging' || github.ref == 'refs/heads/mainnet-staging' || github.ref == 'refs/heads/testnet-prod' || github.ref == 'refs/heads/mainnet-prod'
     runs-on: ubuntu-latest
     needs:
       [
@@ -523,7 +550,7 @@ jobs:
 
   terraform-services-core-staging-testnet:
     if: github.ref == 'refs/heads/testnet-staging'
-    needs: [e2e-tests]
+    needs: [set-aws-region, e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
       TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
@@ -582,6 +609,16 @@ jobs:
         run: |
           terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
 
+      - name: Post-Deploy Health Check
+        if: success()
+        uses: ./.github/actions/post-deploy-health-check
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          ecs-cluster: ${{ needs.set-aws-region.outputs.ECS_CLUSTER }}
+          services: ${{ needs.set-aws-region.outputs.ECS_SERVICES }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
+
     outputs:
       relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}
       watchtower-tags: ${{ needs.e2e-tests.outputs.watchtower-tags }}
@@ -592,7 +629,7 @@ jobs:
 
   terraform-services-core-prod-testnet:
     if: github.ref == 'refs/heads/testnet-prod'
-    needs: [e2e-tests]
+    needs: [set-aws-region, e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
       TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
@@ -648,6 +685,16 @@ jobs:
         working-directory: ./ops/testnet/prod/core
         run: |
           terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
+
+      - name: Post-Deploy Health Check
+        if: success()
+        uses: ./.github/actions/post-deploy-health-check
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          ecs-cluster: ${{ needs.set-aws-region.outputs.ECS_CLUSTER }}
+          services: ${{ needs.set-aws-region.outputs.ECS_SERVICES }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
 
     outputs:
       relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}
@@ -717,7 +764,7 @@ jobs:
 
   terraform-services-core-prod:
     if: github.ref == 'refs/heads/mainnet-prod'
-    needs: [e2e-tests]
+    needs: [set-aws-region, e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
       TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
@@ -773,6 +820,16 @@ jobs:
         working-directory: ./ops/mainnet/prod/core
         run: |
           terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
+
+      - name: Post-Deploy Health Check
+        if: success()
+        uses: ./.github/actions/post-deploy-health-check
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          ecs-cluster: ${{ needs.set-aws-region.outputs.ECS_CLUSTER }}
+          services: ${{ needs.set-aws-region.outputs.ECS_SERVICES }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
 
     outputs:
       relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}
@@ -898,7 +955,7 @@ jobs:
 
   terraform-services-core-mainnet-staging:
     if: github.ref == 'refs/heads/mainnet-staging'
-    needs: [e2e-tests]
+    needs: [set-aws-region, e2e-tests]
     env:
       AWS_PROFILE: aws-deployer-connext
       TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
@@ -956,6 +1013,16 @@ jobs:
         working-directory: ./ops/mainnet/staging/core
         run: |
           terraform apply -var-file=tfvars.json -auto-approve > /dev/null 2>&1
+
+      - name: Post-Deploy Health Check
+        if: success()
+        uses: ./.github/actions/post-deploy-health-check
+        with:
+          aws-region: ${{ needs.set-aws-region.outputs.AWS_REGION }}
+          ecs-cluster: ${{ needs.set-aws-region.outputs.ECS_CLUSTER }}
+          services: ${{ needs.set-aws-region.outputs.ECS_SERVICES }}
+          aws-access-key-id: ${{ secrets.DEPLOYER_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEPLOYER_AWS_SECRET_ACCESS_KEY }}
 
     outputs:
       relayer-tags: ${{ needs.e2e-tests.outputs.relayer-tags }}

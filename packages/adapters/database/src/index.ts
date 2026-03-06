@@ -25,6 +25,11 @@ import {
   NewLockPositionEvent,
   LockPosition,
   Order,
+  ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
+  HubMeta,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 import { Pool } from 'pg';
 import { TxnClientForRepeatableRead } from 'zapatos/db';
@@ -85,10 +90,22 @@ import {
   getDeliveredSettlements,
   updateSettlementStatus,
   updateSolanaMessageStatuses,
+  saveProtocolUpdateLogs,
+  saveHubTokenUpdateLogs,
+  saveHubAssetUpdateLogs,
+  saveHubMeta,
+  saveSpokeMeta,
+  isTriageFingerprintProcessed,
+  tryReserveTriageFingerprint,
+  finalizeTriageFingerprint,
+  setTriageAutoResolveOutcome,
+  pruneExpiredTriageFingerprints,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
 export * as db from 'zapatos/db';
+
+export type HubIntentColumn = hub_intents.Column;
 
 export type Checkpoints = {
   prefix: string;
@@ -101,6 +118,27 @@ export type IntentMessageUpdate = {
   status: TIntentStatus;
 };
 
+export type TriageFingerprintLog = {
+  fingerprint: string;
+  reportType: string;
+  severity: string;
+  env: string;
+  network: string;
+  ids: string[];
+  reason: string;
+  triageMode: string;
+  triageResult?: object;
+  providerUsed?: string;
+  modelUsed?: string;
+  triageLatencyMs?: number;
+  autoResolveAttempted?: boolean;
+  autoResolveSucceeded?: boolean;
+  autoResolveReasonCode?: string;
+  toolCallsMade?: number;
+  toolNamesUsed?: string[];
+  expiresAt: Date;
+};
+
 export type Database = {
   saveOriginIntents: (originIntents: OriginIntent[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveDestinationIntents: (
@@ -108,7 +146,7 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   saveSettlementIntents: (
-    setttlementIntents: SettlementIntent[],
+    settlementIntents: SettlementIntent[],
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   saveHubIntents: (
@@ -126,6 +164,11 @@ export type Database = {
     hubUpdates: (IntentMessageUpdate & { settlementDomain: string })[],
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
+  saveProtocolUpdateLogs: (protocolLogs: ProtocolUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveHubTokenUpdateLogs: (logs: HubTokenUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveHubAssetUpdateLogs: (logs: HubAssetUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveHubMeta: (meta: HubMeta[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveSpokeMeta: (meta: SpokeMeta[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveQueues: (queues: Queue[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveAssets: (assets: Asset[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveTokens: (tokens: Token[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
@@ -264,21 +307,66 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   updateSolanaMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
+  isTriageFingerprintProcessed: (fingerprint: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<boolean>;
+  tryReserveTriageFingerprint: (
+    log: TriageFingerprintLog,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<boolean>;
+  finalizeTriageFingerprint: (log: TriageFingerprintLog, _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  setTriageAutoResolveOutcome: (
+    fingerprint: string,
+    succeeded: boolean,
+    reasonCode?: string,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<void>;
+  pruneExpiredTriageFingerprints: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
 };
 
-export let pool: Pool;
+export let pool: Pool | undefined;
+let poolInitializationPromise: Promise<Pool> | undefined;
 
 export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<Database> => {
-  pool = new Pool({ connectionString: databaseUrl, idleTimeoutMillis: 3000, allowExitOnIdle: true });
+  // Reuse the existing pool in warm Lambda invocations to avoid connection overhead
+  // Use a promise to prevent race conditions when multiple concurrent calls occur
+  if (!pool) {
+    // If initialization is already in progress, wait for it instead of creating a new pool
+    if (!poolInitializationPromise) {
+      poolInitializationPromise = (async () => {
+        // Lambda-friendly pool configuration:
+        // - max: 1-2 connections max for Lambda (default is 10, which can cause EMFILE errors)
+        // - min: 0 to allow pool to shrink when idle
+        // - idleTimeoutMillis: 3000ms to close idle connections quickly
+        // - connectionTimeoutMillis: 10000ms to fail fast if DB is unreachable
+        // - allowExitOnIdle: true to allow Lambda to exit cleanly
+        const newPool = new Pool({
+          connectionString: databaseUrl,
+          max: 2, // Limit max connections to prevent EMFILE errors in Lambda
+          min: 0, // Allow pool to shrink to zero when idle
+          idleTimeoutMillis: 3000,
+          connectionTimeoutMillis: 10000, // Fail fast if DB is unreachable
+          allowExitOnIdle: true,
+        });
 
-  // don't let a pg restart kill your app
-  pool.on('error', (err: Error) => logger.error('Database error', undefined, undefined, jsonifyError(err)));
+        // don't let a pg restart kill your app
+        newPool.on('error', (err: Error) => logger.error('Database error', undefined, undefined, jsonifyError(err)));
 
-  try {
-    await pool.query('SELECT NOW()');
-  } catch (e: unknown) {
-    logger.error('Database connection error', undefined, undefined, jsonifyError(e as Error));
-    throw new Error('Database connection error');
+        try {
+          await newPool.query('SELECT NOW()');
+        } catch (e: unknown) {
+          logger.error('Database connection error', undefined, undefined, jsonifyError(e as Error));
+          // Reset the promise so retry is possible
+          poolInitializationPromise = undefined;
+          throw new Error('Database connection error');
+        }
+
+        // Only assign to the pool after successful initialization
+        pool = newPool;
+        return newPool;
+      })();
+    }
+
+    // Wait for the initialization to complete (whether we started it or another call did)
+    await poolInitializationPromise;
   }
   return {
     saveOriginIntents,
@@ -288,6 +376,11 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     saveDepositors,
     saveBalances,
     saveMessages,
+    saveProtocolUpdateLogs,
+    saveHubTokenUpdateLogs,
+    saveHubAssetUpdateLogs,
+    saveHubMeta,
+    saveSpokeMeta,
     saveQueues,
     saveCheckPoint,
     saveAssets,
@@ -336,13 +429,10 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getDeliveredSettlements,
     updateSettlementStatus,
     updateSolanaMessageStatuses,
+    isTriageFingerprintProcessed,
+    tryReserveTriageFingerprint,
+    finalizeTriageFingerprint,
+    setTriageAutoResolveOutcome,
+    pruneExpiredTriageFingerprints,
   };
-};
-
-// Overload to close the given pool as well
-export const closeDatabase = async (_pool?: Pool): Promise<void> => {
-  await pool.end();
-  if (_pool) {
-    await _pool.end();
-  }
 };

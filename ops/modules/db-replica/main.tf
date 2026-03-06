@@ -3,7 +3,7 @@ resource "aws_db_instance" "db_read_replica" {
   replicate_source_db = var.replicate_source_db
 
   engine         = "postgres"
-  engine_version = "16.3"
+  engine_version = var.engine_version
 
   instance_class = var.instance_class
 

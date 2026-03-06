@@ -8,11 +8,13 @@ import {
   getMaxBlockNumber,
   getMaxTxNonce,
   SOLANA_CHAINID,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 
-import { getContext } from '../../shared';
-import { getHyperlaneMsgDelivered } from '../../mockable';
-import { CartographerConfig } from '../../config';
+import { AppContext } from '../context';
+import { CartographerConfig } from '../config';
+import { getSubgraphSupportedDomains } from './helper';
+import { getHyperlaneMsgDelivered } from '../mockable';
 
 const getChainConfig = (domain: string, config: CartographerConfig) => {
   if (domain == config.hub.domain) {
@@ -24,12 +26,21 @@ const getChainConfig = (domain: string, config: CartographerConfig) => {
   return config.chains[domain];
 };
 
-const getMessageStatus = async (messageId: string, config: CartographerConfig, destinationDomain?: string) => {
+const getMessageStatus = async (messageId: string, context: AppContext, destinationDomain?: string) => {
+  const {
+    config,
+    adapters: { chainreader },
+  } = context;
   const chainConfig = getChainConfig(destinationDomain!, config);
   const gateway = chainConfig.deployments?.gateway;
   let status: HyperlaneStatus = HyperlaneStatus.pending;
   if (gateway) {
-    const messageDelivered = await getHyperlaneMsgDelivered(messageId, chainConfig.providers, gateway);
+    const messageDelivered = await getHyperlaneMsgDelivered(
+      messageId,
+      gateway,
+      (params) => chainreader.readTx(params, 'latest'),
+      +destinationDomain!,
+    );
     if (messageDelivered) {
       status = HyperlaneStatus.delivered;
     }
@@ -37,12 +48,12 @@ const getMessageStatus = async (messageId: string, config: CartographerConfig, d
   return status;
 };
 
-export const updateMessages = async () => {
+export const updateMessages = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     logger,
     config,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateMessages.name);
 
   const evmDomains = Object.keys(config.chains)
@@ -62,7 +73,13 @@ export const updateMessages = async () => {
       messages = await subgraph.getHubMessages(domain, latestNonce);
       await Promise.all(
         messages.map(async (message) => {
-          message.status = await getMessageStatus(message.id, config, message.destinationDomain);
+          // Skip contract read for hub → Solana
+          // Set message status 'pending', LH will update it to 'delivered' when the intent is settled
+          if (message.destinationDomain === SOLANA_CHAINID) {
+            message.status = HyperlaneStatus.pending;
+            return;
+          }
+          message.status = await getMessageStatus(message.id, context, message.destinationDomain);
         }),
       );
 
@@ -85,7 +102,7 @@ export const updateMessages = async () => {
       await Promise.all(
         messages.map(async (message) => {
           // all spoke messages go to the hub, use this domain if no destination on message
-          message.status = await getMessageStatus(message.id, config, message.destinationDomain ?? config.hub.domain);
+          message.status = await getMessageStatus(message.id, context, message.destinationDomain ?? config.hub.domain);
         }),
       );
 
@@ -119,12 +136,12 @@ export const updateMessages = async () => {
   }
 };
 
-export const updateQueues = async () => {
+export const updateQueues = async (context: AppContext) => {
   const {
     adapters: { subgraph, database },
     logger,
     config,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateQueues.name);
 
   const evmDomains = Object.keys(config.chains).filter(
@@ -166,12 +183,121 @@ export const updateQueues = async () => {
   });
 };
 
-export const updateMessageStatus = async () => {
+export const updateProtocolUpdateLogs = async (context: AppContext) => {
+  const {
+    adapters: { subgraph, database },
+    logger,
+    config,
+  } = context;
+  const { requestContext, methodContext } = createLoggingContext(updateProtocolUpdateLogs.name);
+
+  const spokeDomains = getSubgraphSupportedDomains(config);
+  const domains = [...spokeDomains, config.hub.domain];
+  for (const domain of domains) {
+    const isHub = domain === config.hub.domain;
+    // 1) Meta update logs (hub + spoke)
+    const metaCheckpointKey = isHub ? 'hub_meta_log_block' : `spoke_meta_log_block_${domain}`;
+    const metaLastBlock = await database.getCheckPoint(metaCheckpointKey);
+    const metaUpdates = isHub
+      ? await subgraph.getHubMetaUpdates(domain, metaLastBlock)
+      : await subgraph.getSpokeMetaUpdates(domain, metaLastBlock);
+
+    if (metaUpdates.length > 0) {
+      const latestBlock = Math.max(metaLastBlock, getMaxBlockNumber(metaUpdates));
+      await database.saveProtocolUpdateLogs(metaUpdates);
+      await database.saveCheckPoint(metaCheckpointKey, latestBlock);
+      logger.debug('Saved meta update logs', requestContext, methodContext, {
+        domain,
+        count: metaUpdates.length,
+        latestBlock,
+      });
+    } else {
+      logger.debug('No meta updates found', requestContext, methodContext, {
+        domain,
+        checkpoint: metaLastBlock,
+      });
+    }
+
+    // 2) Hub token/asset update logs (hub only)
+    if (isHub) {
+      const tokenCheckpointKey = 'hub_token_log_block';
+      const tokenLastBlock = await database.getCheckPoint(tokenCheckpointKey);
+      const tokenUpdates = await subgraph.getHubTokenUpdates(domain, tokenLastBlock);
+      if (tokenUpdates.length > 0) {
+        const latestBlock = Math.max(tokenLastBlock, getMaxBlockNumber(tokenUpdates));
+        await database.saveHubTokenUpdateLogs(tokenUpdates);
+        await database.saveCheckPoint(tokenCheckpointKey, latestBlock);
+        logger.debug('Saved hub token update logs', requestContext, methodContext, {
+          domain,
+          count: tokenUpdates.length,
+          latestBlock,
+        });
+      } else {
+        logger.debug('No hub token updates found', requestContext, methodContext, {
+          domain,
+          checkpoint: tokenLastBlock,
+        });
+      }
+
+      const assetCheckpointKey = 'hub_asset_log_block';
+      const assetLastBlock = await database.getCheckPoint(assetCheckpointKey);
+      const assetUpdates = await subgraph.getHubAssetUpdates(domain, assetLastBlock);
+      if (assetUpdates.length > 0) {
+        const latestBlock = Math.max(assetLastBlock, getMaxBlockNumber(assetUpdates));
+        await database.saveHubAssetUpdateLogs(assetUpdates);
+        await database.saveCheckPoint(assetCheckpointKey, latestBlock);
+        logger.debug('Saved hub asset update logs', requestContext, methodContext, {
+          domain,
+          count: assetUpdates.length,
+          latestBlock,
+        });
+      } else {
+        logger.debug('No hub asset updates found', requestContext, methodContext, {
+          domain,
+          checkpoint: assetLastBlock,
+        });
+      }
+    }
+  }
+};
+
+export const updateHubSpokeMeta = async (context: AppContext) => {
+  const {
+    adapters: { subgraph, database },
+    logger,
+    config,
+  } = context;
+  const { requestContext, methodContext } = createLoggingContext(updateHubSpokeMeta.name);
+
+  const spokeDomains = getSubgraphSupportedDomains(config);
+  const hubDomain = config.hub.domain;
+
+  const hubMeta = await subgraph.getHubMeta(hubDomain);
+  if (hubMeta) {
+    await database.saveHubMeta([hubMeta]);
+    logger.debug('Saved hub meta', requestContext, methodContext, { domain: hubDomain });
+  } else {
+    logger.debug('No hub meta found', requestContext, methodContext, { domain: hubDomain });
+  }
+
+  const spokeMetas: (SpokeMeta | undefined)[] = await Promise.all(
+    spokeDomains.map(async (domain) => subgraph.getSpokeMeta(domain)),
+  );
+  const validSpokeMetas = spokeMetas.filter((meta): meta is SpokeMeta => Boolean(meta));
+
+  if (validSpokeMetas.length > 0) {
+    await database.saveSpokeMeta(validSpokeMetas);
+    logger.debug('Saved spoke meta', requestContext, methodContext, { count: validSpokeMetas.length });
+  } else {
+    logger.debug('No spoke meta found', requestContext, methodContext, { count: 0 });
+  }
+};
+
+export const updateMessageStatus = async (context: AppContext) => {
   const {
     adapters: { database },
     logger,
-    config,
-  } = getContext();
+  } = context;
   const { requestContext, methodContext } = createLoggingContext(updateMessageStatus.name);
 
   const uncompletedStatuses = [HyperlaneStatus.none, HyperlaneStatus.pending, HyperlaneStatus.relayable];
@@ -191,7 +317,7 @@ export const updateMessageStatus = async () => {
 
     const statusRes = await Promise.all(
       messagesToProcess.map(async (message) => {
-        const status = await getMessageStatus(message.id, config, message.destinationDomain);
+        const status = await getMessageStatus(message.id, context, message.destinationDomain);
         return { id: message.id, status };
       }),
     );

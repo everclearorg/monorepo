@@ -14,6 +14,7 @@ import * as invoice from './../../src/checklist/queue/invoice';
 import * as message from './../../src/checklist/queue/message';
 import * as tokenomics from "./../../src/checklist/tokenomics";
 import * as solana from "./../../src/checklist/solana";
+import * as chainHelpers from './../../src/helpers/chain';
 
 describe('runChecks', () => {
   let sandbox: sinon.SinonSandbox;
@@ -36,7 +37,8 @@ describe('runChecks', () => {
       logger,
     };
 
-    const chainsStub = sandbox.stub(chain, 'checkChains').resolves();
+    const getBlocksStub = sandbox.stub(chainHelpers, 'getBlocks').resolves();
+    const chainsStub = sandbox.stub(chain, 'checkChains').resolves([]);
     const checkGasStub = sandbox.stub(gas, 'checkGas').resolves();
     const agentsStub = sandbox.stub(agent, 'checkAgents').resolves();
     const rpcStub = sandbox.stub(rpc, 'checkRpcs').resolves();
@@ -59,13 +61,19 @@ describe('runChecks', () => {
     const checkTokenomicsExportStatusStub = sandbox.stub(tokenomics, 'checkTokenomicsExportStatus').resolves();
     const checkTokenomicsExportLatencyStub = sandbox.stub(tokenomics, 'checkTokenomicsExportLatency').resolves();
     const checkSolanaPipelineStatusStub = sandbox.stub(solana, 'checkSolanaPipelineStatus').resolves();
-    
 
     await runChecks();
 
+    // Verify getBlocks() is called before checks
+    expect(getBlocksStub.calledOnce).to.be.true;
+
     expect(chainsStub.calledOnce).to.be.true;
     expect(agentsStub.calledOnce).to.be.true;
+    // checkRpcs should be called after checkChains (block data is shared via adapters.blockMap)
     expect(rpcStub.calledOnce).to.be.true;
+    // Verify checkRpcs was called without arguments (uses default timeout of 5000 internally)
+    const rpcCallArgs = rpcStub.getCall(0).args;
+    expect(rpcCallArgs.length).to.equal(0);
     expect(checkSpokeBalanceStub.calledOnce).to.be.true;
     expect(checkGasStub.calledOnce).to.be.true;
     expect(messageStub.calledOnce).to.be.true;

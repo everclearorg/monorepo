@@ -40,6 +40,7 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
     "@aws-sdk/client-ssm": "^3.735.0",
     "@chimera-monorepo/contracts": "workspace:*",
     "@hyperlane-xyz/sdk": "3.15.1",
@@ -52,6 +53,7 @@
     "chai-as-promised": "7.1.1",
     "chai-subset": "1.6.0",
     "hyperid": "3.2.0",
+    "openai": "^6.21.0",
     "secp256k1": "4.0.3",
     "sinon-chai": "3.7.0",
     "tronweb": "^6.0.3",

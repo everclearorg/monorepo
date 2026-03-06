@@ -18,6 +18,11 @@ import {
   SettlementIntent,
   HyperlaneStatus,
   Order,
+  ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
+  HubMeta,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 import {
   SettlementQueueEntity,
@@ -40,6 +45,11 @@ import {
   IntentSettlementEventEntity,
   IntentStatus,
   OrderEntity,
+  MetaUpdateEntity,
+  HubMetaEntity,
+  SpokeMetaEntity,
+  HubTokenUpdateEntity,
+  HubAssetUpdateEntity,
 } from '../operations/entities';
 
 export const StringToNumber = (num: number | string): number => {
@@ -290,6 +300,176 @@ export const settlementMessage = (domain: string, entity: SettlementMessageEntit
     gasLimit: entity.gasLimit,
     gasPrice: entity.gasPrice,
   };
+};
+
+export const protocolUpdateLog = (domain: string, entity: MetaUpdateEntity): ProtocolUpdateLog => {
+  let chainId = domain;
+  let updated: string = "";
+
+  switch (entity.kind) {
+    // Hub events
+    case "HUB_CHAIN_GATEWAY_ADDED":
+    case "HUB_CHAIN_GATEWAY_REMOVED":
+      updated = entity.valueBytes ? bytes32ToAddress(entity.valueBytes) : "";
+      chainId = entity.valueBigInt ? entity.valueBigInt.toString() : chainId;
+      break;
+    case "HUB_GATEWAY_MAILBOX_UPDATED":
+    case "HUB_GATEWAY_SECURITY_MODULE_UPDATED":
+    case "OWNERSHIP_PROPOSED":
+    case "OWNERSHIP_TRANSFERRED":
+    case "GATEWAY_UPDATED":
+    case "SETTLEMENT_MODULE_UPDATED":
+    case "MANAGER_MODULE_UPDATED":
+      updated = entity.valueBytes ? bytes32ToAddress(entity.valueBytes) : "";
+      break;
+    case "SUPPORTED_DOMAINS_REMOVED":
+    case "SUPPORTED_DOMAINS_ADDED":
+      updated = entity.valueBytes ? BigInt(entity.valueBytes).toString() : "";
+      break;
+    case "ACCEPTANCE_DELAY_UPDATED":
+    case "MIN_SOLVER_SUPPORTED_DOMAINS_UPDATED":
+    case "EPOCH_LENGTH_UPDATED":
+    case "EXPIRY_TIME_BUFFER_UPDATED":
+    case "LAST_EPOCH_PROCESSED_SET":
+    case "GAS_CONFIG_UPDATED":
+      updated = entity.valueBigInt ? entity.valueBigInt.toString() : "";
+      break;
+    case "ROLE_ASSIGNED":
+      updated = `${entity.valueBytes ? bytes32ToAddress(entity.valueBytes) : ""} - Role: ${entity.valueBigInt ? entity.valueBigInt.toString() : ""}`;
+      break;
+    case "CLOSED_EPOCHS_PROCESSED":
+      updated = `${entity.valueBytes ? entity.valueBytes : ""} - Last Closed: ${entity.valueBigInt ? entity.valueBigInt.toString() : ""}`;
+      break;
+    case "PAUSED": 
+    case "UNPAUSED":
+      updated = "True"; break;
+    
+    // Spoke events
+    case "LIGHTHOUSE_UPDATED":
+    case "MESSAGE_RECEIVER_UPDATED":
+    case "FEE_RECIPIENT_UPDATED":
+    case "FEE_ADAPTER_UPDATED":
+    case "WATCHTOWER_UPDATED":
+    case "FILL_SIGNER_UPDATED":
+    case "FEE_SIGNER_UPDATED":
+    case "SPOKE_GATEWAY_MAILBOX_UPDATED":
+    case "SPOKE_GATEWAY_SECURITY_MODULE_UPDATED":
+      updated = entity.valueBytes ? bytes32ToAddress(entity.valueBytes) : "";
+      break;
+    case "STRATEGY_SET_FOR_ASSET":
+      updated = `${entity.valueBytes ? bytes32ToAddress(entity.valueBytes) : ""} - Strategy: ${entity.valueBigInt ? entity.valueBigInt.toString() : ""}`;
+      break;
+    case "MESSAGE_GAS_LIMIT_UPDATED":
+      updated = entity.valueBigInt ? entity.valueBigInt.toString() : "";
+      break;
+  }
+
+  return {
+    id: entity.id,
+    domain,
+    event: entity.kind,
+    key: entity.key,
+    chainId,
+    updated,
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txOrigin: entity.txOrigin,
+    txNonce: StringToNumber(entity.txNonce),
+  };
+};
+
+export const hubTokenUpdateLog = (domain: string, entity: HubTokenUpdateEntity): HubTokenUpdateLog => {
+  return {
+    id: entity.id,
+    domain,
+    tickerHash: entity.token.id,
+    kind: entity.kind,
+    feeRecipients: entity.feeRecipients ?? [],
+    feeAmounts: entity.feeAmounts ?? [],
+    maxDiscountBps: StringToNumber(entity.maxDiscountBps ?? 0),
+    discountPerEpoch: StringToNumber(entity.discountPerEpoch ?? 0),
+    prioritizedStrategy: entity.prioritizedStrategy ?? 'DEFAULT',
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txOrigin: entity.txOrigin,
+    txNonce: StringToNumber(entity.txNonce),
+  };
+};
+
+export const hubAssetUpdateLog = (domain: string, entity: HubAssetUpdateEntity): HubAssetUpdateLog => {
+  return {
+    id: entity.id,
+    domain,
+    tickerHash: (entity.tickerHash as string) ?? '',
+    tokenId: entity.token?.id ?? undefined,
+    assetId: entity.asset.id,
+    assetDomain: (entity.domain as string) ?? '',
+    kind: entity.kind,
+    assetHash: (entity.assetHash as string) ?? '',
+    adopted: (entity.adopted as string) ?? '',
+    approval: (entity.approval as boolean) ?? false,
+    strategy: (entity.strategy as string) ?? '',
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txOrigin: entity.txOrigin,
+    txNonce: StringToNumber(entity.txNonce),
+  };
+};
+
+export const hubMeta = (entity: HubMetaEntity): HubMeta => {
+  return {
+    id: entity.id,
+    domain: entity.domain,
+    paused: entity.paused ?? undefined,
+    owner: entity.owner ?? undefined,
+    proposedOwner: entity.proposedOwner ?? undefined,
+    proposedOwnershipTimestamp: entity.proposedOwnershipTimestamp ?? undefined,
+    gateway: entity.gateway ?? undefined,
+    watchtower: entity.watchtower ?? undefined,
+    manager: entity.manager ?? undefined,
+    settler: entity.settler ?? undefined,
+    minSolverSupportedDomains: entity.minSolverSupportedDomains ?? undefined,
+    expiryTimeBuffer: entity.expiryTimeBuffer ?? undefined,
+    discountPerEpoch: entity.discountPerEpoch ?? undefined,
+    epochLength: entity.epochLength ?? undefined,
+    mailbox: entity.mailbox ?? undefined,
+    securityModule: entity.securityModule ?? undefined,
+    acceptanceDelay: entity.acceptanceDelay ?? undefined,
+    supportedDomains: entity.supportedDomains?.map((domain) => ({
+      domain: domain.domain,
+      blockGasLimit: domain.blockGasLimit,
+    })),
+    chainGateways: entity.chainGateways?.map((gateway) => ({
+      chainId: gateway.chainId,
+      gateway: gateway.gateway,
+    })),
+  } as HubMeta;
+};
+
+export const spokeMeta = (entity: SpokeMetaEntity): SpokeMeta => {
+  return {
+    id: entity.id,
+    domain: entity.domain,
+    paused: entity.paused ?? undefined,
+    gateway: entity.gateway ?? undefined,
+    lighthouse: entity.lighthouse ?? undefined,
+    messageReceiver: entity.messageReceiver ?? undefined,
+    watchtower: entity.watchtower ?? undefined,
+    messageGasLimit: entity.messageGasLimit ?? undefined,
+    feeAdapter: entity.feeAdapter ?? undefined,
+    feeAdapterRecipient: entity.feeAdapterRecipient ?? undefined,
+    fillSigner: entity.fillSigner ?? undefined,
+    feeSigner: entity.feeSigner ?? undefined,
+    mailbox: entity.mailbox ?? undefined,
+    securityModule: entity.securityModule ?? undefined,
+    moduleForStrategies: entity.moduleForStrategies?.map((module) => ({
+      strategy: module.strategy,
+      module: module.module,
+    })),
+  } as SpokeMeta;
 };
 
 export const token = (entity: TokensEntity): Token => {

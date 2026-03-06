@@ -1,7 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
+import http from 'http';
+import https from 'https';
 
 import { jsonifyError, EverclearError } from '../types';
+
+// Create HTTP agents with keepAlive to reuse connections and prevent EMFILE errors
+// This is especially important in Lambda environments where file descriptors are limited
+const httpAgent = new http.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 1000,
+  maxSockets: 50,
+  maxFreeSockets: 10,
+  timeout: 60000,
+});
+
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 1000,
+  maxSockets: 50,
+  maxFreeSockets: 10,
+  timeout: 60000,
+});
+
+axios.defaults.httpAgent = httpAgent;
+axios.defaults.httpsAgent = httpsAgent;
 
 export const delay = (ms: number): Promise<void> => new Promise((res: () => void): any => setTimeout(res, ms));
 

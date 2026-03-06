@@ -38,41 +38,31 @@ export type MetaTxTask = {
   attempts: number;
 };
 
-// Gelato SDK send request.
+// @deprecated - Legacy Gelato Relay SDK types. Use @gelatocloud/gasless SDK types instead.
+// Kept for backward compatibility.
 export type RelayerRequest = {
-  // Chain ID of the chain where the target smart contract is deployed
   chainId: bigint;
-  // Address of the target smart contract
   target: string;
-  // Encoded payload data (usually a function selector plus the required arguments) used to call the required target address
   data: string;
-  // Address of the token that is to be used for payment
   feeToken?: string;
 };
 
+// @deprecated - Use @gelatocloud/gasless sendTransaction({ chainId, to, data }) instead.
 export type RelayerSyncFeeRequest = {
-  // Chain ID of the chain where the target smart contract is deployed
   chainId: bigint;
-  // Address of the target smart contract
   target: string;
-  // Encoded payload data (usually a function selector plus the required arguments) used to call the required target address
   data: string;
-  // An optional boolean (default: true) denoting what data you would prefer appended to the end of the calldata.
   isRelayContext?: boolean | undefined;
-  // Address of the token that is to be used for payment
   feeToken: string;
 };
 
-// Gelato SDK send response.
+// @deprecated - Gasless SDK returns task ID as string directly from sendTransaction().
 export type RelayResponse = {
-  // Unique relay task ID which can be used for monitoring and data analytics.
   taskId: string;
 };
 
-// Gelato SDK send request options.
+// @deprecated - Gasless SDK no longer supports per-call options. Configure at client creation.
 export type RelayRequestOptions = {
-  // Gas limit of the relay call. This effectively sets an upper price limit for the relay call.
   gasLimit?: bigint;
-  // Number of retries that Gelato should attempt before discarding this relay call
   retries?: number;
 };

@@ -14,6 +14,11 @@ import {
   SettlementIntent,
   TIntentStatus,
   Order,
+  ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
+  HubMeta,
+  SpokeMeta,
 } from '@chimera-monorepo/utils';
 import { QueryResponse, SubgraphQueryMetaParams, SubgraphConfig } from './lib';
 import { GraphReader } from './graph';
@@ -29,6 +34,15 @@ export interface ISubgraphReader {
   getDestinationIntentById(domain: string, intentId: string): Promise<DestinationIntent | undefined>;
   getHubIntentById(domain: string, intentId: string): Promise<HubIntent | undefined>;
   getHubInvoiceById(domain: string, intentId: string): Promise<HubInvoice | undefined>;
+  getSettlementIntentById(domain: string, intentId: string): Promise<SettlementIntent | undefined>;
+  getHubDepositEnqueuedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined>;
+  getHubDepositProcessedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined>;
   getDepositorEvents(domain: string, latestNonce: number): Promise<DepositorEvent[]>;
   getTokens(hubDomain: string): Promise<[Token[], Asset[]]>;
   getSpokeQueues(domain: string): Promise<Queue[]>;
@@ -46,6 +60,12 @@ export interface ISubgraphReader {
   ): Promise<(HubDeposit & { status: TIntentStatus })[]>;
   getSpokeMessages(domain: string, latestNonce: number): Promise<Message[]>;
   getHubMessages(domain: string, latestNonce: number): Promise<HubMessage[]>;
+  getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]>;
+  getSpokeMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]>;
+  getHubTokenUpdates(domain: string, fromBlock: number): Promise<HubTokenUpdateLog[]>;
+  getHubAssetUpdates(domain: string, fromBlock: number): Promise<HubAssetUpdateLog[]>;
+  getHubMeta(domain: string): Promise<HubMeta | undefined>;
+  getSpokeMeta(domain: string): Promise<SpokeMeta | undefined>;
   getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]>;
   getSettlementIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<SettlementIntent[]>;
   getDestinationIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<DestinationIntent[]>;
@@ -168,6 +188,51 @@ export class SubgraphReader implements ISubgraphReader {
     const [graphResult, envioResult] = await Promise.all([
       this.graphReader.getHubInvoiceById(domain, intentId).catch(() => undefined),
       this.envioReader.getHubInvoiceById(domain, intentId).catch(() => undefined),
+    ]);
+
+    return graphResult ?? envioResult;
+  }
+
+  /**
+   * Get settlement intent by ID
+   * Tries GraphReader first, falls back to EnvioReader
+   */
+  public async getSettlementIntentById(domain: string, intentId: string): Promise<SettlementIntent | undefined> {
+    const [graphResult, envioResult] = await Promise.all([
+      this.graphReader.getSettlementIntentById(domain, intentId).catch(() => undefined),
+      this.envioReader.getSettlementIntentById(domain, intentId).catch(() => undefined),
+    ]);
+
+    return graphResult ?? envioResult;
+  }
+
+  /**
+   * Get hub deposit (enqueued) by intent ID
+   * Tries GraphReader first, falls back to EnvioReader
+   */
+  public async getHubDepositEnqueuedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    const [graphResult, envioResult] = await Promise.all([
+      this.graphReader.getHubDepositEnqueuedById(domain, intentId).catch(() => undefined),
+      this.envioReader.getHubDepositEnqueuedById(domain, intentId).catch(() => undefined),
+    ]);
+
+    return graphResult ?? envioResult;
+  }
+
+  /**
+   * Get hub deposit (processed) by intent ID
+   * Tries GraphReader first, falls back to EnvioReader
+   */
+  public async getHubDepositProcessedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    const [graphResult, envioResult] = await Promise.all([
+      this.graphReader.getHubDepositProcessedById(domain, intentId).catch(() => undefined),
+      this.envioReader.getHubDepositProcessedById(domain, intentId).catch(() => undefined),
     ]);
 
     return graphResult ?? envioResult;
@@ -369,6 +434,96 @@ export class SubgraphReader implements ISubgraphReader {
     }
 
     return Array.from(messageMap.values());
+  }
+
+  /**
+   * Get hub meta
+   * Tries GraphReader first, falls back to EnvioReader
+   */
+  public async getHubMeta(domain: string): Promise<HubMeta | undefined> {
+    const [graphResult, envioResult] = await Promise.all([
+      this.graphReader.getHubMeta(domain).catch(() => undefined),
+      this.envioReader.getHubMeta(domain).catch(() => undefined),
+    ]);
+
+    return graphResult ?? envioResult;
+  }
+
+  /**
+   * Get spoke meta
+   * Tries GraphReader first, falls back to EnvioReader
+   */
+  public async getSpokeMeta(domain: string): Promise<SpokeMeta | undefined> {
+    const [graphResult, envioResult] = await Promise.all([
+      this.graphReader.getSpokeMeta(domain).catch(() => undefined),
+      this.envioReader.getSpokeMeta(domain).catch(() => undefined),
+    ]);
+
+    return graphResult ?? envioResult;
+  }
+
+  public async getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const [graphResults, envioResults] = await Promise.all([
+      this.graphReader.getHubMetaUpdates(domain, fromBlock).catch(() => []),
+      this.envioReader.getHubMetaUpdates(domain, fromBlock).catch(() => []),
+    ]);
+
+    const updateMap = new Map<string, ProtocolUpdateLog>();
+    for (const update of [...graphResults, ...envioResults]) {
+      if (!updateMap.has(update.id)) {
+        updateMap.set(update.id, update);
+      }
+    }
+
+    return Array.from(updateMap.values());
+  }
+
+  public async getSpokeMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const [graphResults, envioResults] = await Promise.all([
+      this.graphReader.getSpokeMetaUpdates(domain, fromBlock).catch(() => []),
+      this.envioReader.getSpokeMetaUpdates(domain, fromBlock).catch(() => []),
+    ]);
+
+    const updateMap = new Map<string, ProtocolUpdateLog>();
+    for (const update of [...graphResults, ...envioResults]) {
+      if (!updateMap.has(update.id)) {
+        updateMap.set(update.id, update);
+      }
+    }
+
+    return Array.from(updateMap.values());
+  }
+
+  public async getHubTokenUpdates(domain: string, fromBlock: number): Promise<HubTokenUpdateLog[]> {
+    const [graphResults, envioResults] = await Promise.all([
+      this.graphReader.getHubTokenUpdates(domain, fromBlock).catch(() => []),
+      this.envioReader.getHubTokenUpdates(domain, fromBlock).catch(() => []),
+    ]);
+
+    const updateMap = new Map<string, HubTokenUpdateLog>();
+    for (const update of [...graphResults, ...envioResults]) {
+      if (!updateMap.has(update.id)) {
+        updateMap.set(update.id, update);
+      }
+    }
+
+    return Array.from(updateMap.values());
+  }
+
+  public async getHubAssetUpdates(domain: string, fromBlock: number): Promise<HubAssetUpdateLog[]> {
+    const [graphResults, envioResults] = await Promise.all([
+      this.graphReader.getHubAssetUpdates(domain, fromBlock).catch(() => []),
+      this.envioReader.getHubAssetUpdates(domain, fromBlock).catch(() => []),
+    ]);
+
+    const updateMap = new Map<string, HubAssetUpdateLog>();
+    for (const update of [...graphResults, ...envioResults]) {
+      if (!updateMap.has(update.id)) {
+        updateMap.set(update.id, update);
+      }
+    }
+
+    return Array.from(updateMap.values());
   }
 
   /**

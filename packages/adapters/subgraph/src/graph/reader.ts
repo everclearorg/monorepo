@@ -9,8 +9,15 @@ import {
   getHubIntentAddedQuery,
   getHubIntentByIdQuery,
   getHubIntentFilledQuery,
+  getHubMetaQuery,
+  getHubMetaUpdatesQuery,
+  getHubTokenUpdatesQuery,
+  getHubAssetUpdatesQuery,
   getInvoiceEnqueuedByIntentId,
   getInvoiceEnqueuedQuery,
+  getSettlementIntentByIdQuery,
+  getDepositEnqueuedByIntentIdQuery,
+  getDepositProcessedByIntentIdQuery,
   getOrdersByNonce,
   getOriginIntentAddedQuery,
   getOriginIntentByIdQuery,
@@ -18,6 +25,8 @@ import {
   getSettlementIntentEventQuery,
   getSettlementMessagesQuery,
   getSettlementQueuesQuery,
+  getSpokeMetaQuery,
+  getSpokeMetaUpdatesQuery,
   getSpokeMessagesQuery,
   getSpokeQueueQuery,
   getTokensQuery,
@@ -35,12 +44,17 @@ import {
   HubIntent,
   HubInvoice,
   HubMessage,
+  HubMeta,
   jsonifyError,
   Message,
   Order,
   OriginIntent,
+  ProtocolUpdateLog,
+  HubTokenUpdateLog,
+  HubAssetUpdateLog,
   Queue,
   SettlementIntent,
+  SpokeMeta,
   TIntentStatus,
   Token,
 } from '@chimera-monorepo/utils';
@@ -55,6 +69,7 @@ import {
   DepositQueueEntity,
   HubAddIntentEventEntity,
   HubFillIntentEventEntity,
+  HubMetaEntity,
   IntentSettlementEventEntity,
   IntentStatus,
   InvoiceEnqueuedEventEntity,
@@ -66,8 +81,12 @@ import {
   SettlementQueueEntity,
   SpokeAddIntentEventEntity,
   SpokeFillIntentEventEntity,
+  SpokeMetaEntity,
   SpokeQueueEntity,
   TokensEntity,
+  MetaUpdateEntity,
+  HubTokenUpdateEntity,
+  HubAssetUpdateEntity,
 } from '../lib/operations/entities';
 
 let context: { config: SubgraphConfig };
@@ -196,6 +215,48 @@ export class GraphReader implements ISubgraphReader {
       : undefined;
   }
 
+  public async getSettlementIntentById(domain: string, intentId: string): Promise<SettlementIntent | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{
+      intentSettleEvents: IntentSettlementEventEntity[];
+      _meta: MetaEntity;
+    }>(domain, [getSettlementIntentByIdQuery(intentId)]);
+
+    return (response?.data?.intentSettleEvents || []).length
+      ? parser.settlementIntent(domain, response!.data.intentSettleEvents[0])
+      : undefined;
+  }
+
+  public async getHubDepositEnqueuedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{
+      depositEnqueuedEvents: DepositEnqueuedEventEntity[];
+      _meta: MetaEntity;
+    }>(domain, [getDepositEnqueuedByIntentIdQuery(intentId)]);
+
+    return (response?.data?.depositEnqueuedEvents || []).length
+      ? parser.hubDepositFromEnqueued(response!.data.depositEnqueuedEvents[0])
+      : undefined;
+  }
+
+  public async getHubDepositProcessedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{
+      depositProcessedEvents: DepositProcessedEventEntity[];
+      _meta: MetaEntity;
+    }>(domain, [getDepositProcessedByIntentIdQuery(intentId)]);
+
+    return (response?.data?.depositProcessedEvents || []).length
+      ? parser.hubDepositFromProcessed(response!.data.depositProcessedEvents[0])
+      : undefined;
+  }
+
   public async getDepositorEvents(domain: string, latestNonce: number): Promise<DepositorEvent[]> {
     const { parser } = getHelpers();
     const response = await this.query<{ depositorEvents: DepositorEventEntity[]; _meta: MetaEntity }>(domain, [
@@ -289,6 +350,51 @@ export class GraphReader implements ISubgraphReader {
     ]);
 
     return (response?.data.settlementMessages ?? []).map((e) => parser.settlementMessage(domain, e));
+  }
+
+  public async getHubMeta(domain: string): Promise<HubMeta | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ meta: HubMetaEntity; _meta: MetaEntity }>(domain, [getHubMetaQuery()]);
+    return response?.data?.meta ? parser.hubMeta(response.data.meta) : undefined;
+  }
+
+  public async getSpokeMeta(domain: string): Promise<SpokeMeta | undefined> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ meta: SpokeMetaEntity; _meta: MetaEntity }>(domain, [getSpokeMetaQuery()]);
+    return response?.data?.meta ? parser.spokeMeta(response.data.meta) : undefined;
+  }
+
+  public async getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ hubMetaUpdates: MetaUpdateEntity[]; _meta: MetaEntity }>(domain, [
+      getHubMetaUpdatesQuery(fromBlock),
+    ]);
+    return (response?.data.hubMetaUpdates ?? []).map((entity) => parser.protocolUpdateLog(domain, entity));
+  }
+
+  public async getSpokeMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ spokeMetaUpdates: MetaUpdateEntity[]; _meta: MetaEntity }>(domain, [
+      getSpokeMetaUpdatesQuery(fromBlock),
+    ]);
+
+    return (response?.data.spokeMetaUpdates ?? []).map((entity) => parser.protocolUpdateLog(domain, entity));
+  }
+
+  public async getHubTokenUpdates(domain: string, fromBlock: number): Promise<HubTokenUpdateLog[]> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ hubTokenUpdates: HubTokenUpdateEntity[]; _meta: MetaEntity }>(domain, [
+      getHubTokenUpdatesQuery(fromBlock),
+    ]);
+    return (response?.data.hubTokenUpdates ?? []).map((entity) => parser.hubTokenUpdateLog(domain, entity));
+  }
+
+  public async getHubAssetUpdates(domain: string, fromBlock: number): Promise<HubAssetUpdateLog[]> {
+    const { parser } = getHelpers();
+    const response = await this.query<{ hubAssetUpdates: HubAssetUpdateEntity[]; _meta: MetaEntity }>(domain, [
+      getHubAssetUpdatesQuery(fromBlock),
+    ]);
+    return (response?.data.hubAssetUpdates ?? []).map((entity) => parser.hubAssetUpdateLog(domain, entity));
   }
 
   public async getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]> {
