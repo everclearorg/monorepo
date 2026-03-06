@@ -58,6 +58,7 @@ locals {
     MONITOR_WEBHOOK_URL    = var.monitor_webhook_url
     MONITOR_WEBHOOK_SECRET = var.monitor_webhook_secret
     ALERT_EVENT_ENVIRONMENT = "staging"
+    MONITOR_ADMIN_TOKEN    = var.admin_token_monitor
   }
 
   lighthouse_env_vars = {
