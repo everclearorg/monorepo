@@ -57,32 +57,36 @@ export const checkInvoices = async () => {
   }
 
   const currentEpoch = await getCurrentEpoch();
-  await Promise.allSettled(
-    invoices.map(async (invoice) => {
-      const report = {
-        severity: Severity.Warning,
-        type: 'InvoiceDiscountedMoreThan5Times',
-        ids: [invoice.id],
-        reason: `${requestContext.origin}, The invoice ${invoice.intentId} got discounted more than 5 times. entryEpoch: ${invoice.entryEpoch}, currentEpoch: ${currentEpoch}`,
-        timestamp: Date.now(),
-        logger: logger,
-        env: config.environment,
-      };
-      if (currentEpoch > invoice.entryEpoch + 5) {
-        // Send alerts
-        logger.warn(`The invoice got discounted more than 5 times`, requestContext, methodContext, {
-          invoiceId: invoice.id,
-          intentId: invoice.intentId,
-          entryEpoch: invoice.entryEpoch,
-          currentEpoch,
-        });
+  const discountedInvoices = invoices.filter((inv) => currentEpoch > inv.entryEpoch + 5);
+  const discountedIds = discountedInvoices.map((inv) => inv.id);
 
-        return sendAlerts(report, logger, config, requestContext);
-      } else {
-        return resolveAlerts(report, logger, config, requestContext);
-      }
-    }),
-  );
+  const discountedReport: Report = {
+    severity: Severity.Warning,
+    type: 'InvoiceDiscountedMoreThan5Times',
+    ids: discountedIds,
+    reason:
+      discountedInvoices.length > 0
+        ? `${requestContext.origin}, ${discountedInvoices.length} invoice(s) discounted more than 5 times. currentEpoch: ${currentEpoch}, sample: ${discountedInvoices
+            .slice(0, 5)
+            .map((inv) => `${inv.intentId}(entry:${inv.entryEpoch})`)
+            .join(', ')}`
+        : '',
+    timestamp: Date.now(),
+    logger: logger,
+    env: config.environment,
+  };
+
+  if (discountedInvoices.length === 0) {
+    await resolveAlerts(discountedReport, logger, config, requestContext, true);
+    logger.info('Resolved all alerts of type InvoiceDiscountedMoreThan5Times', requestContext, methodContext);
+  } else {
+    logger.warn(`${discountedInvoices.length} invoice(s) discounted more than 5 times`, requestContext, methodContext, {
+      count: discountedInvoices.length,
+      currentEpoch,
+      sampleIds: discountedIds.slice(0, 10),
+    });
+    await sendAlerts(discountedReport, logger, config, requestContext);
+  }
 };
 
 export const checkInvoiceAmount = async () => {
