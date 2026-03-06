@@ -20,7 +20,8 @@ data "aws_iam_role" "ecr_admin_role" {
 
 
 data "aws_route53_zone" "primary" {
-  zone_id = "Z03634792TWUEHHQ5L0YX"
+  name = "everclear.ninja"
+  private_zone = false
 }
 
 data "aws_caller_identity" "current" {}
