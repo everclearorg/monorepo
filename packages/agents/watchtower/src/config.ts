@@ -248,3 +248,9 @@ export const getSubgraphReaderConfig = (
 
   return { subgraphs, ...(envioConfig && { envio: envioConfig }) };
 };
+
+/** @internal Reset cached config state — for testing only */
+export const _resetCachedEverclearConfig = () => {
+  cachedEverclearConfigUrl = undefined;
+  cachedEverclearConfig = {} as any;
+};

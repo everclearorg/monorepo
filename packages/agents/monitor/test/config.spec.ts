@@ -1,6 +1,6 @@
 import { ajv, expect } from '@chimera-monorepo/utils';
 import { stub, SinonStub } from 'sinon';
-import { getConfig, shouldReloadEverclearConfig } from '../src/config';
+import { getConfig, shouldReloadEverclearConfig, _resetCachedEverclearConfig } from '../src/config';
 import { createProcessEnv } from './mock';
 import * as MockableFns from '../src/mockable';
 import { mock } from './globalTestHook';
@@ -199,6 +199,25 @@ describe('Config', () => {
       getEverclearConfigStub.resolves({ chains: mockChains });
       const res = await shouldReloadEverclearConfig();
       expect(res).to.be.deep.eq({ reloadConfig: false, reloadSubgraph: false });
+    });
+
+    it('should signal reload when initial fetch failed and later fetch succeeds', async () => {
+      // Reset module state to simulate fresh start
+      _resetCachedEverclearConfig();
+
+      // Initial getConfig() with a failing everclear fetch — cachedEverclearConfig stays as {}
+      stub(process, 'env').value({
+        ...process.env,
+        ...createProcessEnv(mock.config()),
+        EVERCLEAR_CONFIG: 'https://mock.everclear.config',
+      });
+      getEverclearConfigStub.rejects(new Error('initial fetch failed'));
+      await getConfig();
+
+      // Now the fetch succeeds — should detect missing cached chains and signal full reload
+      getEverclearConfigStub.resolves({ chains: mockChains });
+      const res = await shouldReloadEverclearConfig();
+      expect(res).to.be.deep.eq({ reloadConfig: true, reloadSubgraph: true });
     });
   });
 });

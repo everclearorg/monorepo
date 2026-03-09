@@ -357,3 +357,9 @@ export const shouldReloadEverclearConfig = async (): Promise<{ reloadConfig: boo
 
   return { reloadConfig, reloadSubgraph };
 };
+
+/** @internal Reset cached config state — for testing only */
+export const _resetCachedEverclearConfig = () => {
+  cachedEverclearConfigUrl = undefined;
+  cachedEverclearConfig = {} as any;
+};
