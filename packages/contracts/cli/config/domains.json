@@ -191,6 +191,22 @@
     "realm": "spoke"
   },
   {
+    "name": "Plasma",
+    "id": 9745,
+    "rpc": "https://rpc.plasma.to",
+    "verifierUrl": "https://api.etherscan.io/v2/api?chainid=9745",
+    "environments": ["MainnetStaging", "MainnetProduction"],
+    "realm": "spoke"
+  },
+  {
+    "name": "megaETH",
+    "id": 4326,
+    "rpc": "https://mainnet.megaeth.com/rpc",
+    "verifierUrl": "https://megaeth.blockscout.com/api/",
+    "environments": ["MainnetStaging"],
+    "realm": "spoke"
+  },
+  {
     "name": "Scroll Sepolia",
     "id": 534351,
     "rpc": "https://scroll-testnet-public.unifra.io",

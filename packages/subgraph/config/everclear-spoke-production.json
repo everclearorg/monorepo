@@ -254,5 +254,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-plasma",
+    "domain": "9745",
+    "environment": "production",
+    "network": "plasma-mainnet",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]
