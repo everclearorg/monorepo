@@ -54,6 +54,7 @@ locals {
     databaseUrl = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear"
     service = "handler"
     pollInterval = 60000
+    everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
     healthUrls = {
       handler = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_handler_heartbeat}"
     }
