@@ -5,6 +5,7 @@ pub mod error;
 pub mod events;
 pub mod hyperlane;
 pub mod instructions;
+pub mod messaging;
 pub mod state;
 
 use error::SpokeError;
@@ -183,6 +184,16 @@ pub mod everclear_spoke {
         instructions::handle_as_admin(ctx, handle)
     }
 
+    /// Receive a cross-chain message via CCIP.
+    /// Called via CPI from CCIP OffRamp program.
+    #[instruction(discriminator = [0x0b, 0xf4, 0x09, 0xf9, 0x2c, 0x53, 0x2f, 0xf5])]
+    pub fn ccip_receive(
+        ctx: Context<CcipReceiveContext>,
+        message: messaging::ccip::message::Any2SVMMessage,
+    ) -> Result<()> {
+        instructions::receive_message::handle_ccip_receive(ctx, message)
+    }
+
     // settle delivered message
     pub fn settle_delivered_intent(
         ctx: Context<SettleDeliveredIntentContext>,
@@ -272,6 +283,40 @@ pub mod everclear_spoke {
         instructions::update_vault_authority_bump(ctx, new_bump)
     }
 
+    pub fn switch_to_ccip(
+        ctx: Context<AdminState>,
+        ccip_router: Pubkey,
+        ccip_offramp: Pubkey,
+        ccip_chain_selector: u64,
+        everclear_ccip_chain_selector: u64,
+        everclear_gateway: [u8; 32],
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+
+        instructions::switch_to_ccip(
+            ctx,
+            ccip_router,
+            ccip_offramp,
+            ccip_chain_selector,
+            everclear_ccip_chain_selector,
+            everclear_gateway,
+        )
+    }
+
+    pub fn rollback_to_hyperlane(ctx: Context<AdminState>) -> Result<()> {
+        let state = &mut ctx.accounts.spoke_state;
+        require!(
+            state.owner == ctx.accounts.admin.key(),
+            SpokeError::OnlyOwner
+        );
+
+        instructions::rollback_to_hyperlane(ctx)
+    }
+
     // Fee Adapter Functions
 
     pub fn initialize_fee_adapter(
@@ -346,5 +391,11 @@ pub mod everclear_spoke {
             SpokeError::OnlyOwner
         );
         fee_adapter::migrate_fee_adapter_state(ctx, fill_signer)
+    }
+
+    /// Migrate SpokeState PDA to new layout (adds CCIP fields). Call once per deployment after upgrade.
+    /// Only the owner can run this. Safe to run only on accounts that still have the old layout.
+    pub fn migrate_spoke_state(ctx: Context<MigrateSpokeState>) -> Result<()> {
+        instructions::state_migration::migrate_spoke_state(ctx)
     }
 }

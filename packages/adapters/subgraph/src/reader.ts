@@ -34,6 +34,15 @@ export interface ISubgraphReader {
   getDestinationIntentById(domain: string, intentId: string): Promise<DestinationIntent | undefined>;
   getHubIntentById(domain: string, intentId: string): Promise<HubIntent | undefined>;
   getHubInvoiceById(domain: string, intentId: string): Promise<HubInvoice | undefined>;
+  getSettlementIntentById(domain: string, intentId: string): Promise<SettlementIntent | undefined>;
+  getHubDepositEnqueuedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined>;
+  getHubDepositProcessedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined>;
   getDepositorEvents(domain: string, latestNonce: number): Promise<DepositorEvent[]>;
   getTokens(hubDomain: string): Promise<[Token[], Asset[]]>;
   getSpokeQueues(domain: string): Promise<Queue[]>;
@@ -179,6 +188,51 @@ export class SubgraphReader implements ISubgraphReader {
     const [graphResult, envioResult] = await Promise.all([
       this.graphReader.getHubInvoiceById(domain, intentId).catch(() => undefined),
       this.envioReader.getHubInvoiceById(domain, intentId).catch(() => undefined),
+    ]);
+
+    return graphResult ?? envioResult;
+  }
+
+  /**
+   * Get settlement intent by ID
+   * Tries GraphReader first, falls back to EnvioReader
+   */
+  public async getSettlementIntentById(domain: string, intentId: string): Promise<SettlementIntent | undefined> {
+    const [graphResult, envioResult] = await Promise.all([
+      this.graphReader.getSettlementIntentById(domain, intentId).catch(() => undefined),
+      this.envioReader.getSettlementIntentById(domain, intentId).catch(() => undefined),
+    ]);
+
+    return graphResult ?? envioResult;
+  }
+
+  /**
+   * Get hub deposit (enqueued) by intent ID
+   * Tries GraphReader first, falls back to EnvioReader
+   */
+  public async getHubDepositEnqueuedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    const [graphResult, envioResult] = await Promise.all([
+      this.graphReader.getHubDepositEnqueuedById(domain, intentId).catch(() => undefined),
+      this.envioReader.getHubDepositEnqueuedById(domain, intentId).catch(() => undefined),
+    ]);
+
+    return graphResult ?? envioResult;
+  }
+
+  /**
+   * Get hub deposit (processed) by intent ID
+   * Tries GraphReader first, falls back to EnvioReader
+   */
+  public async getHubDepositProcessedById(
+    domain: string,
+    intentId: string,
+  ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
+    const [graphResult, envioResult] = await Promise.all([
+      this.graphReader.getHubDepositProcessedById(domain, intentId).catch(() => undefined),
+      this.envioReader.getHubDepositProcessedById(domain, intentId).catch(() => undefined),
     ]);
 
     return graphResult ?? envioResult;

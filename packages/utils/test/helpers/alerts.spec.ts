@@ -4,6 +4,8 @@ import { TEST_REPORT } from './mock';
 import * as telegram from '../../src/alerts/telegram';
 import * as discord from '../../src/alerts/discord';
 import * as betterUptime from '../../src/alerts/betteruptime';
+import * as triage from '../../src/triage/interceptor';
+import * as dedup from '../../src/triage/dedup';
 
 const MOCK_TELEGRAM = { apiKey: '123', chatId: '456' };
 const MOCK_BETTERUPTIME = { apiKey: '123', requesterEmail: 'email@mock' };
@@ -20,6 +22,8 @@ describe('helpers:alerts', () => {
     let discordStub: SinonStub;
     let betterUptimeStub: SinonStub;
     let resolveBetterUptimeStub: SinonStub;
+    let triageStub: SinonStub;
+    let setAutoResolveOutcomeStub: SinonStub;
     let logger: SinonStubbedInstance<Logger>;
   
     beforeEach(() => {
@@ -29,10 +33,14 @@ describe('helpers:alerts', () => {
       telegramStub.resolves();
       discordStub = stub(discord, 'alertDiscord');
       discordStub.resolves();
-      betterUptimeStub = stub(betterUptime, 'alertViaBetterUptime');
+      betterUptimeStub = stub(betterUptime, 'alertViaBetterUptimeIfNeeded');
       betterUptimeStub.resolves();
       resolveBetterUptimeStub = stub(betterUptime, 'resolveAlertViaBetterUptime');
       resolveBetterUptimeStub.resolves();
+      triageStub = stub(triage, 'triageInterceptor');
+      triageStub.resolves({ report: TEST_REPORT, shouldAutoResolve: false });
+      setAutoResolveOutcomeStub = stub(dedup, 'setAutoResolveOutcome');
+      setAutoResolveOutcomeStub.resolves();
     });
   
     afterEach(() => {
@@ -43,6 +51,47 @@ describe('helpers:alerts', () => {
     describe('#sendAlerts', () => {
       it('should work', async () => {
         expect(sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'))).to.be.not.throw;
+      });
+
+      it('routes to BetterUptime resolve path when triage auto-resolve is enabled', async () => {
+        triageStub.resolves({
+          report: TEST_REPORT,
+          shouldAutoResolve: true,
+          fingerprint: 'fp-1',
+        });
+
+        await sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'));
+
+        expect(resolveBetterUptimeStub.calledOnce).to.be.true;
+        expect(betterUptimeStub.called).to.be.false;
+        expect(setAutoResolveOutcomeStub.calledOnceWithExactly('fp-1', true, 'auto_resolve_dispatched')).to.be.true;
+      });
+
+      it('persists failed auto-resolve dispatch outcome', async () => {
+        triageStub.resolves({
+          report: TEST_REPORT,
+          shouldAutoResolve: true,
+          fingerprint: 'fp-2',
+        });
+        resolveBetterUptimeStub.rejects(new Error('dispatch failed'));
+
+        await sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'));
+
+        expect(setAutoResolveOutcomeStub.calledOnceWithExactly('fp-2', false, 'auto_resolve_dispatch_failed')).to.be.true;
+      });
+
+      it('logs a sanitized report snapshot', async () => {
+        triageStub.resolves({
+          report: { ...TEST_REPORT, reason: 'token=supersecretvalue' },
+          shouldAutoResolve: false,
+        });
+
+        await sendAlerts(TEST_REPORT, logger, config, createRequestContext('test'));
+
+        expect(logger.info.called).to.be.true;
+        const logCtx = logger.info.getCall(0).args[3];
+        expect(logCtx).to.have.property('report');
+        expect(logCtx.report.reason).to.not.include('supersecretvalue');
       });
     });
 

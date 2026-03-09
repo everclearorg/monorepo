@@ -30,6 +30,7 @@
   "license": "MIT",
   "dependencies": {
     "@chimera-monorepo/adapters-subgraph": "workspace:*",
+    "@chimera-monorepo/cartographer-core": "workspace:*",
     "@chimera-monorepo/chainservice": "workspace:*",
     "@chimera-monorepo/database": "workspace:*",
     "@chimera-monorepo/utils": "workspace:*",

@@ -3,6 +3,7 @@ import { ABIConfig, EverclearConfig, Environment, TEverclearConfig, ajv, ChainDe
 import { axiosGet } from './axios';
 import { Static, Type } from '@sinclair/typebox';
 import { Logger } from '../logging';
+import { TTriageConfigSchema, TriageConfig } from '../triage/types';
 
 export const parseEverclearConfig = (data: object): EverclearConfig => {
   const everclearConfig = data as EverclearConfig;
@@ -63,10 +64,24 @@ export const TAlertConfigSchema = Type.Object({
       url: Type.String(),
     }),
   ),
+  eventPipeline: Type.Optional(
+    Type.Object({
+      webhookUrl: Type.String(),
+      webhookSecret: Type.String(),
+      environment: Type.Optional(
+        Type.Union([Type.Literal('dev'), Type.Literal('staging'), Type.Literal('prod')]),
+      ),
+      retries: Type.Optional(Type.Number()),
+      retryBaseMs: Type.Optional(Type.Number()),
+      timeoutMs: Type.Optional(Type.Number()),
+    }),
+  ),
+  triage: Type.Optional(TTriageConfigSchema),
 });
 export type AlertConfig = Static<typeof TAlertConfigSchema>;
 export type TelegramConfig = Static<typeof TAlertConfigSchema>['telegram'];
 export type BetterUptimeConfig = Static<typeof TAlertConfigSchema>['betterUptime'];
+export type AlertTriageConfig = TriageConfig;
 
 export enum Severity {
   Warning = 'warning',

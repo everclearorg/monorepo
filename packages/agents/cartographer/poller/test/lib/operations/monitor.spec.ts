@@ -22,23 +22,23 @@ import {
   SOLANA_CHAINID,
 } from '@chimera-monorepo/utils';
 import { mockAppContext } from '../../globalTestHook';
-import * as mockable from '../../../src/mockable';
+import { mockable as coreMockable } from '@chimera-monorepo/cartographer-core';
 import { createHubMessages, createMessages, createQueues } from '@chimera-monorepo/database/test/mock';
 
 describe('Monitor operations', () => {
   describe('#updateMessages', () => {
     it('should work', async () => {
-      const getHyperlaneMsgDelivered = stub(mockable, 'getHyperlaneMsgDelivered');
+      const getHyperlaneMsgDelivered = stub(coreMockable, 'getHyperlaneMsgDelivered');
       getHyperlaneMsgDelivered.resolves(false);
-      
-      const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
+
+      const domains = Object.keys(mockAppContext.config.chains).filter((d) => mockAppContext.config.chains[d].network === 'evm').concat(mockAppContext.config.hub.domain);
       const spokeMessages = createMessages(5);
       const hubMessages = createHubMessages(5);
       (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves(spokeMessages);
       (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateMessages();
+      await updateMessages(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveMessages as SinonStub).callCount(domains.length);
 
@@ -66,21 +66,21 @@ describe('Monitor operations', () => {
     });
 
     it('saves messages with updated status', async () => {
-      stub(mockable, 'getHyperlaneMsgDelivered').resolves(true);
+      stub(coreMockable, 'getHyperlaneMsgDelivered').resolves(true);
       const hubMessages = createHubMessages(5);
       const spokeMessages = createMessages(5);
       (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
       (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves(spokeMessages);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateMessages();
+      await updateMessages(mockAppContext);
 
       const resolvedHubMessages = createHubMessages(5, Array(5).fill({ status: HyperlaneStatus.delivered }));
       expect(mockAppContext.adapters.database.saveMessages as SinonStub).calledWith(resolvedHubMessages);
     });
 
     it('does not call getHyperlaneMsgDelivered for hub messages with destinationDomain Solana', async () => {
-      const getHyperlaneMsgDeliveredStub = stub(mockable, 'getHyperlaneMsgDelivered').resolves(false);
+      const getHyperlaneMsgDeliveredStub = stub(coreMockable, 'getHyperlaneMsgDelivered').resolves(false);
       // 2 to Solana (skip contract read), 2 to EVM (call getMessageStatus)
       const hubMessages = createHubMessages(4, [
         { destinationDomain: SOLANA_CHAINID },
@@ -92,7 +92,7 @@ describe('Monitor operations', () => {
       (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves([]);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateMessages();
+      await updateMessages(mockAppContext);
 
       // Only EVM-dest hub messages trigger getHyperlaneMsgDelivered (2 calls for domain 1337 and 1338)
       expect(getHyperlaneMsgDeliveredStub).to.have.callCount(2);
@@ -108,16 +108,16 @@ describe('Monitor operations', () => {
     });
 
     it('should not save checkpoint if empty', async () => {
-      const getHyperlaneMsgDelivered = stub(mockable, 'getHyperlaneMsgDelivered');
+      const getHyperlaneMsgDelivered = stub(coreMockable, 'getHyperlaneMsgDelivered');
       getHyperlaneMsgDelivered.resolves(false);
-      
-      const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
+
+      const domains = Object.keys(mockAppContext.config.chains).filter((d) => mockAppContext.config.chains[d].network === 'evm').concat(mockAppContext.config.hub.domain);
       const hubMessages = createHubMessages(5);
       (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves([]);
       (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateMessages();
+      await updateMessages(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveMessages as SinonStub).callCount(domains.length);
 
@@ -136,7 +136,7 @@ describe('Monitor operations', () => {
       (mockAppContext.adapters.subgraph.getSpokeQueues as SinonStub).resolves(spokeQueues);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateQueues();
+      await updateQueues(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveQueues as SinonStub).callCount(1);
     });
@@ -144,14 +144,13 @@ describe('Monitor operations', () => {
 
   describe('#updateMessageStatus', () => {
     it('should work', async () => {
-      stub(mockable, 'getHyperlaneMsgDelivered').resolves(true);
-      const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
+      stub(coreMockable, 'getHyperlaneMsgDelivered').resolves(true);
       // should work for both hub and spoke destination domain
       const messages = createMessages(5, [{ destinationDomain: mockAppContext.config.hub.domain }]);
       (mockAppContext.adapters.database.getMessagesByStatus as SinonStub).resolves(messages);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      expect(await updateMessageStatus()).to.not.throws;
+      expect(await updateMessageStatus(mockAppContext)).to.not.throws;
 
       expect(mockAppContext.adapters.database.updateMessageStatus as SinonStub).callCount(5);
     })
@@ -190,7 +189,7 @@ describe('Monitor operations', () => {
       getSpokeMetaUpdates.onCall(1).resolves([]);
       (mockAppContext.adapters.subgraph.getHubMetaUpdates as SinonStub).resolves([hubUpdate]);
 
-      await updateProtocolUpdateLogs();
+      await updateProtocolUpdateLogs(mockAppContext);
 
       const saveProtocolLogs = mockAppContext.adapters.database.saveProtocolUpdateLogs as SinonStub;
       expect(saveProtocolLogs.callCount).to.equal(2);
@@ -213,7 +212,7 @@ describe('Monitor operations', () => {
       getSpokeMetaUpdates.resolves([]);
       (mockAppContext.adapters.subgraph.getHubMetaUpdates as SinonStub).resolves([]);
 
-      await updateProtocolUpdateLogs();
+      await updateProtocolUpdateLogs(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveProtocolUpdateLogs as SinonStub).to.not.have.been.called;
     });
@@ -251,7 +250,7 @@ describe('Monitor operations', () => {
       (mockAppContext.adapters.subgraph.getSpokeMetaUpdates as SinonStub).onCall(1).resolves([]);
       (mockAppContext.adapters.subgraph.getHubMetaUpdates as SinonStub).resolves([]);
 
-      await updateProtocolUpdateLogs();
+      await updateProtocolUpdateLogs(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).to.have.been.calledWith(
         'spoke_meta_log_block_1337',
@@ -307,7 +306,7 @@ describe('Monitor operations', () => {
       // Start checkpoints at 0
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateProtocolUpdateLogs();
+      await updateProtocolUpdateLogs(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveHubTokenUpdateLogs as SinonStub).to.have.been.calledOnceWith([
         tokenUpdate,
@@ -335,7 +334,7 @@ describe('Monitor operations', () => {
       (mockAppContext.adapters.subgraph.getHubAssetUpdates as SinonStub).resolves([]);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
-      await updateProtocolUpdateLogs();
+      await updateProtocolUpdateLogs(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveHubTokenUpdateLogs as SinonStub).to.not.have.been.called;
       expect(mockAppContext.adapters.database.saveHubAssetUpdateLogs as SinonStub).to.not.have.been.called;
@@ -365,7 +364,7 @@ describe('Monitor operations', () => {
       (mockAppContext.adapters.subgraph.getHubMeta as SinonStub).resolves(hubMeta);
       (mockAppContext.adapters.subgraph.getSpokeMeta as SinonStub).resolves(undefined);
 
-      await updateHubSpokeMeta();
+      await updateHubSpokeMeta(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveHubMeta as SinonStub).to.have.been.calledOnceWith([hubMeta]);
       expect(mockAppContext.adapters.database.saveSpokeMeta as SinonStub).to.not.have.been.called;
@@ -393,7 +392,7 @@ describe('Monitor operations', () => {
         .onSecondCall()
         .resolves(undefined);
 
-      await updateHubSpokeMeta();
+      await updateHubSpokeMeta(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveHubMeta as SinonStub).to.not.have.been.called;
       expect(mockAppContext.adapters.database.saveSpokeMeta as SinonStub).to.have.been.calledOnce;
@@ -406,7 +405,7 @@ describe('Monitor operations', () => {
       (mockAppContext.adapters.subgraph.getHubMeta as SinonStub).resolves(undefined);
       (mockAppContext.adapters.subgraph.getSpokeMeta as SinonStub).resolves(undefined);
 
-      await updateHubSpokeMeta();
+      await updateHubSpokeMeta(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveHubMeta as SinonStub).to.not.have.been.called;
       expect(mockAppContext.adapters.database.saveSpokeMeta as SinonStub).to.not.have.been.called;
@@ -430,7 +429,7 @@ describe('Monitor operations', () => {
         .onSecondCall()
         .resolves(undefined);
 
-      await updateHubSpokeMeta();
+      await updateHubSpokeMeta(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveHubMeta as SinonStub).to.have.been.calledOnceWith([hubMeta]);
       expect(mockAppContext.adapters.database.saveSpokeMeta as SinonStub).to.have.been.calledOnce;

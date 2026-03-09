@@ -10,6 +10,9 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
+      "path": "../core/tsconfig.build.json"
+    },
+    {
       "path": "../../../adapters/database/tsconfig.build.json"
     },
     {

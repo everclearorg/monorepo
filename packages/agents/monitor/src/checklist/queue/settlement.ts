@@ -114,19 +114,21 @@ export const checkSettlementQueueAmount = async (): Promise<Map<string, bigint> 
         });
         return;
       }
+      const currentAmount = amountByDomain.get(destinationDomain);
+      const maxAmount = BigInt(config.thresholds.maxSettlementQueueAssetAmounts[destinationDomain]);
+      const amountCritical = currentAmount && currentAmount > maxAmount * 2n;
       const report = {
-        severity: Severity.Warning,
+        severity: amountCritical ? Severity.Critical : Severity.Warning,
         type: 'SettlementQueueAmountExceeded',
         ids: [destinationDomain],
-        reason: `${requestContext.origin}, Pending queue amount ${amountByDomain.get(destinationDomain)?.toString()} exceeds threshold ${config.thresholds.maxSettlementQueueAssetAmounts} for domain: ${destinationDomain}`,
+        reason: `${requestContext.origin}, Pending queue amount ${currentAmount?.toString()} exceeds threshold ${config.thresholds.maxSettlementQueueAssetAmounts} for domain: ${destinationDomain}`,
         timestamp: Date.now(),
         logger: logger,
         env: config.environment,
       };
       if (
-        amountByDomain.get(destinationDomain) &&
-        amountByDomain.get(destinationDomain)! >
-          BigInt(config.thresholds.maxSettlementQueueAssetAmounts[destinationDomain])
+        currentAmount &&
+        currentAmount > maxAmount
       ) {
         logger.warn(`Pending queue amount for ${destinationDomain} exceeds threshold`, requestContext, methodContext, {
           amount: amountByDomain.get(destinationDomain)?.toString(),
@@ -212,9 +214,12 @@ export const checkSettlementQueueLatency = async (): Promise<Map<string, number>
         return;
       }
 
-      // Send alert if the settlement queue exceeds the threshold
       const age = curTimestamp - latencyByTicker.get(settlementDomain)!;
-      if (age > config.thresholds.maxSettlementQueueLatency!) {
+      const latencyThreshold = config.thresholds.maxSettlementQueueLatency!;
+      if (age > latencyThreshold * 2) {
+        report.severity = Severity.Critical;
+      }
+      if (age > latencyThreshold) {
         logger.warn(`Settlement latency for ${settlementDomain} exceeds threshold`, requestContext, methodContext, {
           latency: age.toString(),
           threshold: config.thresholds.maxSettlementQueueLatency,

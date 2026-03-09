@@ -89,9 +89,9 @@ export const checkChains = async (shouldAlert = true, timeoutMs: number = 15000)
         subgraphBlockNumber,
       });
 
-      // Create report
+      const severity = (threshold > 0 && diff > threshold * 2) ? Severity.Critical : Severity.Warning;
       const report = {
-        severity: Severity.Warning,
+        severity,
         type: 'ChainDelayed',
         ids: [domainId],
         reason: `${requestContext.origin}, The subgraph or chain of ${domainId} is behind by ${rpcBlock.number - subgraphBlockNumber} blocks (threshold: ${threshold}). Check rpcs and subgraph.`,

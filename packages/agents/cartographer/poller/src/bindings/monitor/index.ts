@@ -1,18 +1,23 @@
 import { createLoggingContext, jsonifyError, EverclearError } from '@chimera-monorepo/utils';
-
-import { AppContext } from '../../shared';
-import { updateMessages, updateQueues, updateMessageStatus, updateProtocolUpdateLogs, updateHubSpokeMeta } from '../../lib/operations';
+import {
+  updateMessages,
+  updateQueues,
+  updateMessageStatus,
+  updateProtocolUpdateLogs,
+  updateHubSpokeMeta,
+  AppContext,
+} from '@chimera-monorepo/cartographer-core';
 
 export const bindMonitor = async (context: AppContext) => {
   const { logger } = context;
   const { requestContext, methodContext } = createLoggingContext(bindMonitor.name);
   try {
     logger.debug('Bind monitor polling loop start', requestContext, methodContext);
-    await updateMessages();
-    await updateQueues();
-    await updateHubSpokeMeta();
-    await updateProtocolUpdateLogs();
-    await updateMessageStatus();
+    await updateMessages(context);
+    await updateQueues(context);
+    await updateHubSpokeMeta(context);
+    await updateProtocolUpdateLogs(context);
+    await updateMessageStatus(context);
     logger.debug('Bind monitor polling loop complete', requestContext, methodContext);
   } catch (err: unknown) {
     logger.error(

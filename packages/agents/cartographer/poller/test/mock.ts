@@ -88,6 +88,10 @@ export const createCartographerConfig = (overrides: Partial<CartographerConfig> 
         minGasPrice: '3',
         network: 'evm',
       },
+      '1399811149': {
+        providers: ['http://rpc-solana:8899'],
+        network: 'svm',
+      },
     },
     hub: {
       domain: '1339',

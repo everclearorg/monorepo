@@ -83,6 +83,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
   let configJson: Record<string, any> = {};
   let configFile: any = {};
   let configStr: string | undefined;
+  let triageConfigJson: Record<string, any> = {};
 
   const paramName = process.env.CONFIG_PARAMETER_NAME;
   if (paramName) {
@@ -103,6 +104,35 @@ export const getConfig = async (): Promise<MonitorConfig> => {
   } catch (e: unknown) {
     console.info('No MONITOR_CONFIG exists, using config file and individual env vars');
   }
+
+  try {
+    triageConfigJson = JSON.parse(process.env.TRIAGE_CONFIG || '{}');
+  } catch (e: unknown) {
+    console.info('TRIAGE_CONFIG is not valid JSON, ignoring override');
+  }
+
+  const normalizeTriageConfig = (input: Record<string, any>): Record<string, any> => {
+    if (!input || typeof input !== 'object') {
+      return {};
+    }
+    if (input.triage && typeof input.triage === 'object') {
+      return input.triage;
+    }
+    const triageKeys = new Set([
+      'mode',
+      'timeoutMs',
+      'lookbackHours',
+      'retentionHours',
+      'timeBucketMinutes',
+      'providers',
+      'routing',
+      'autoResolve',
+      'circuitBreaker',
+    ]);
+    const hasDirectShape = Object.keys(input).some((k) => triageKeys.has(k));
+    return hasDirectShape ? input : {};
+  };
+  const triageOverride = normalizeTriageConfig(triageConfigJson);
 
   try {
     let json: string;
@@ -214,6 +244,13 @@ export const getConfig = async (): Promise<MonitorConfig> => {
 
   const database = process.env.MONITOR_DATABASE_URL || configJson.database?.url || configFile.database?.url;
 
+  const configuredAdminToken =
+    process.env.MONITOR_ADMIN_TOKEN || configJson?.server?.adminToken || configFile?.server?.adminToken;
+  const allowMissingAdminToken = ['development', 'dev', 'local', 'test'].includes(String(environment).toLowerCase());
+  if (!configuredAdminToken && !allowMissingAdminToken) {
+    throw new Error('server.adminToken is required in non-development environments');
+  }
+
   const monitorConfig: MonitorConfig = {
     environment: configJson.environment || configFile.environment || 'production',
     network: configJson.network || configFile.network || 'mainnet',
@@ -223,7 +260,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     redis: configJson.redis || configFile.redis,
     server: {
       port: configJson?.server?.port || configFile?.server?.port || 8080,
-      adminToken: configJson?.server?.adminToken || configFile?.server?.adminToken || 'blahblah',
+      adminToken: configuredAdminToken || 'development-only-token',
       host: configJson?.server?.host || configFile?.server?.host || '0.0.0.0',
     },
     logLevel: configJson.logLevel || configFile.logLevel || 'info',
@@ -239,6 +276,27 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     thresholds: thresholdsConfig,
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},
     telegram: configJson.telegram || configFile.telegram || {},
+    ...(() => {
+      const eventPipelineConfig = {
+        ...(configJson.eventPipeline || configFile.eventPipeline || {}),
+        ...((process.env.ALERT_EVENT_WEBHOOK_URL || process.env.MONITOR_WEBHOOK_URL)
+          ? { webhookUrl: process.env.ALERT_EVENT_WEBHOOK_URL || process.env.MONITOR_WEBHOOK_URL }
+          : {}),
+        ...((process.env.ALERT_EVENT_WEBHOOK_SECRET || process.env.MONITOR_WEBHOOK_SECRET)
+          ? { webhookSecret: process.env.ALERT_EVENT_WEBHOOK_SECRET || process.env.MONITOR_WEBHOOK_SECRET }
+          : {}),
+        ...(process.env.ALERT_EVENT_ENVIRONMENT ? { environment: process.env.ALERT_EVENT_ENVIRONMENT } : {}),
+        ...(process.env.ALERT_EVENT_RETRIES ? { retries: Number(process.env.ALERT_EVENT_RETRIES) } : {}),
+        ...(process.env.ALERT_EVENT_RETRY_BASE_MS
+          ? { retryBaseMs: Number(process.env.ALERT_EVENT_RETRY_BASE_MS) }
+          : {}),
+        ...(process.env.ALERT_EVENT_TIMEOUT_MS ? { timeoutMs: Number(process.env.ALERT_EVENT_TIMEOUT_MS) } : {}),
+      };
+      return Object.keys(eventPipelineConfig).length > 0
+        ? { eventPipeline: eventPipelineConfig }
+        : {};
+    })(),
+    triage: Object.keys(triageOverride).length > 0 ? triageOverride : configJson.triage || configFile.triage || {},
     healthUrls: process.env.MONITOR_HEALTH_URLS || configJson.healthUrls || configFile.healthUrls || {},
     tokenomicsTables: configJson.tokenomicsTables || configFile.tokenomicsTables || DefaultTokenomicsTables,
     solana: configJson?.solana || configFile?.solana || {},

@@ -24,6 +24,7 @@ describe('#everclear_spoke', () => {
 
   const feeSigner = nacl.sign.keyPair();
   const feeSignerAnchor = anchor.web3.Keypair.fromSecretKey(feeSigner.secretKey);
+  const fillSignerAnchor = anchor.web3.Keypair.generate();
 
   const feeRecipient = anchor.web3.Keypair.generate();
 
@@ -147,7 +148,7 @@ describe('#everclear_spoke', () => {
 
   describe('#initialize_fee_adapter', () => {
     it('should work', async () => {
-      const tx = await program.methods.initializeFeeAdapter(feeRecipient.publicKey, feeSignerAnchor.publicKey).accounts({
+      const tx = await program.methods.initializeFeeAdapter(feeRecipient.publicKey, feeSignerAnchor.publicKey, fillSignerAnchor.publicKey).accounts({
         program: program.programId,
       }).rpc();
 
@@ -157,6 +158,7 @@ describe('#everclear_spoke', () => {
       expect(feeAdapterState.paused).to.be.equal(false);
       expect(feeAdapterState.feeRecipient.toBase58()).to.be.equal(feeRecipient.publicKey.toBase58());
       expect(feeAdapterState.feeSigner.toBase58()).to.be.equal(feeSignerAnchor.publicKey.toBase58());
+      expect(feeAdapterState.fillSigner.toBase58()).to.be.equal(fillSignerAnchor.publicKey.toBase58());
       expect(feeAdapterState.bump).to.be.equal(feeAdapterStateBump);
     });
   });
