@@ -9,6 +9,8 @@ import {
   getMaxTxNonce,
   SOLANA_CHAINID,
   SpokeMeta,
+  jsonifyError,
+  EverclearError,
 } from '@chimera-monorepo/utils';
 
 import { AppContext } from '../context';
@@ -34,19 +36,28 @@ const getMessageStatus = async (messageId: string, context: AppContext, destinat
   const {
     config,
     adapters: { chainreader },
+    logger,
   } = context;
+  const { requestContext, methodContext } = createLoggingContext(getMessageStatus.name);
   const chainConfig = getChainConfig(destinationDomain!, config);
   const gateway = chainConfig.deployments?.gateway;
   let status: HyperlaneStatus = HyperlaneStatus.pending;
   if (gateway) {
-    const messageDelivered = await getHyperlaneMsgDelivered(
-      messageId,
-      gateway,
-      (params) => chainreader.readTx(params, 'latest'),
-      +destinationDomain!,
-    );
-    if (messageDelivered) {
-      status = HyperlaneStatus.delivered;
+    try {
+      const messageDelivered = await getHyperlaneMsgDelivered(
+        messageId,
+        gateway,
+        (params) => chainreader.readTx(params, 'latest'),
+        +destinationDomain!,
+      );
+      if (messageDelivered) {
+        status = HyperlaneStatus.delivered;
+      }
+    } catch (err) {
+      logger.error('Failed to get message status', requestContext, methodContext, jsonifyError(err as EverclearError), {
+        messageId,
+        destinationDomain,
+      });
     }
   }
   return status;

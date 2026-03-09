@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ajv, EverclearConfig, ChainConfig, createLoggingContext, ThresholdsConfig } from '@chimera-monorepo/utils';
+import {
+  ajv,
+  EverclearConfig,
+  ChainConfig,
+  createLoggingContext,
+  ThresholdsConfig,
+  jsonifyError,
+} from '@chimera-monorepo/utils';
 import { MonitorConfig, TMonitorConfigSchema } from './types';
 import { config as dotenvConfig } from 'dotenv';
 import lodash from 'lodash';
@@ -140,11 +147,19 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     process.exit(1);
   }
 
-  const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
+  const everclearConfigUrl = process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig;
 
   cachedEverclearConfigUrl = everclearConfigUrl;
-  const everclearConfig = await getEverclearConfig(everclearConfigUrl);
+  let everclearConfig;
+  if (everclearConfigUrl) {
+    try {
+      everclearConfig = await getEverclearConfig(everclearConfigUrl);
+    } catch (e) {
+      console.error('Failed to fetch everclear config:', e);
+    }
+  } else {
+    console.warn('Everclear config URL not set');
+  }
   if (everclearConfig) cachedEverclearConfig = everclearConfig;
 
   const hubDomain = configJson?.hub?.domain || configFile?.hub?.domain || everclearConfig?.hub.domain;
@@ -304,12 +319,19 @@ export const getConfig = async (): Promise<MonitorConfig> => {
 export const shouldReloadEverclearConfig = async (): Promise<{ reloadConfig: boolean; reloadSubgraph: boolean }> => {
   const { logger } = getContext();
   const { requestContext, methodContext } = createLoggingContext(shouldReloadEverclearConfig.name);
+
+  if (!cachedEverclearConfigUrl) return { reloadConfig: false, reloadSubgraph: false };
+
+  let everclearConfig: EverclearConfig | undefined = undefined;
+  try {
+    everclearConfig = await getEverclearConfig(cachedEverclearConfigUrl);
+  } catch (e) {
+    logger.error('Failed to fetch everclear config', requestContext, methodContext, jsonifyError(e as Error));
+  }
+  if (!everclearConfig) return { reloadConfig: false, reloadSubgraph: false };
+
   let reloadSubgraph = false;
   let reloadConfig = false;
-
-  const everclearConfig = await getEverclearConfig(cachedEverclearConfigUrl);
-
-  if (!everclearConfig) return { reloadConfig, reloadSubgraph };
   for (const domainId of Object.keys(cachedEverclearConfig.chains)) {
     const cachedSubgraphUrls = cachedEverclearConfig.chains[domainId].subgraphUrls;
     const newSubgraphUrls = everclearConfig.chains[domainId].subgraphUrls;

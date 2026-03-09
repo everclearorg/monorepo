@@ -45,7 +45,7 @@
   {
     "name": "Zircuit",
     "id": 48900,
-    "rpc": "https://zircuit1-mainnet.p2pify.com",
+    "rpc": "https://lb.drpc.live/zircuit-mainnet",
     "environments": ["MainnetStaging", "MainnetProduction"],
     "realm": "spoke"
   },
