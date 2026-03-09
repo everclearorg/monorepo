@@ -38,7 +38,7 @@ locals {
 
   cartographer_handler_env_vars = [
     { name = "DATABASE_URL", value = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear" },
-    { name = "GOLDSKY_WEBHOOK_SECRET", value = var.goldsky_webhook_secret },
+    { name = "GOLDSKY_WEBHOOK_SECRET", value = var.cartographer_goldsky_webhook_secret },
     { name = "CARTOGRAPHER_CONFIG", value = jsonencode(local.local_cartographer_config_obj) },
     { name = "CARTOGRAPHER_LOG_LEVEL", value = "debug" },
     { name = "ENVIRONMENT", value = var.environment },

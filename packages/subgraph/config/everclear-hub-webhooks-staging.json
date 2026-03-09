@@ -2,8 +2,8 @@
   "subgraph": {
     "name": "everclear-hub"
   },
-  "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-  "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+  "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+  "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
   "entities": [
     {
       "sourceId": "hub_invoice",

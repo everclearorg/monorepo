@@ -140,7 +140,7 @@ variable "cartographer_handler_image_tag" {
   default     = "latest"
 }
 
-variable "goldsky_webhook_secret" {
+variable "cartographer_goldsky_webhook_secret" {
   type      = string
   sensitive = true
   default   = ""
