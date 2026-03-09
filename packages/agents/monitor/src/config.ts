@@ -330,6 +330,12 @@ export const shouldReloadEverclearConfig = async (): Promise<{ reloadConfig: boo
   }
   if (!everclearConfig) return { reloadConfig: false, reloadSubgraph: false };
 
+  // If we have no cached config (e.g. initial fetch failed), seed it from the new config
+  if (!cachedEverclearConfig.chains) {
+    cachedEverclearConfig = everclearConfig;
+    return { reloadConfig: true, reloadSubgraph: true };
+  }
+
   let reloadSubgraph = false;
   let reloadConfig = false;
   for (const domainId of Object.keys(cachedEverclearConfig.chains)) {
@@ -350,5 +356,6 @@ export const shouldReloadEverclearConfig = async (): Promise<{ reloadConfig: boo
     reloadConfig = !lodash.isEqual(everclearConfig, cachedEverclearConfig);
   }
 
+  cachedEverclearConfig = everclearConfig;
   return { reloadConfig, reloadSubgraph };
 };
