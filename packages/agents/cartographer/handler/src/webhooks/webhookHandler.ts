@@ -38,9 +38,9 @@ export function base64ToHex(b64: string): string {
 }
 
 /**
- * Verify webhook secret using timing-safe comparison.
+ * Verify a secret using timing-safe comparison.
  */
-export function verifyWebhookSecret(webhookSecretHeader: string | undefined, expectedSecret: string): boolean {
+export function verifySecret(webhookSecretHeader: string | undefined, expectedSecret: string): boolean {
   if (!webhookSecretHeader) return false;
 
   try {
@@ -77,7 +77,7 @@ export async function routeWebhook(
     adapters: { database },
   } = context;
 
-  logger.debug('Routing webhook', undefined, undefined, { webhookName, webhookId, domain });
+  logger.debug('Routing webhook', undefined, undefined, { webhookName, webhookId, domain, payload });
 
   try {
     switch (webhookName) {
