@@ -4,6 +4,8 @@ import { AppContext } from '@chimera-monorepo/cartographer-core';
 
 import { verifyWebhookSecret, routeWebhook } from './webhooks/webhookHandler';
 
+export const PAUSE_CHECKPOINT_KEY = 'cartographer_handler_paused';
+
 export interface ServerState {
   appContext: AppContext | null;
   isPaused: boolean;
@@ -24,14 +26,22 @@ export function createServer(state: ServerState, logger: Logger): FastifyInstanc
 
   // Pause webhook processing (useful during pipeline backfill)
   server.post('/pause', async (_, res) => {
+    if (!state.appContext) {
+      return res.status(503).send({ error: 'Handler not initialized' });
+    }
     state.isPaused = true;
+    await state.appContext.adapters.database.saveCheckPoint(PAUSE_CHECKPOINT_KEY, 1);
     logger.info('Webhook processing paused');
     return res.status(200).send({ message: 'Webhook processing paused', paused: true });
   });
 
   // Resume webhook processing
   server.post('/resume', async (_, res) => {
+    if (!state.appContext) {
+      return res.status(503).send({ error: 'Handler not initialized' });
+    }
     state.isPaused = false;
+    await state.appContext.adapters.database.saveCheckPoint(PAUSE_CHECKPOINT_KEY, 0);
     logger.info('Webhook processing resumed');
     return res.status(200).send({ message: 'Webhook processing resumed', paused: false });
   });
@@ -84,16 +94,21 @@ export function createServer(state: ServerState, logger: Logger): FastifyInstanc
       },
     },
     async (req, res) => {
+      const webhookName = req.params.webhookName;
+      const domain = req.query.domain;
       if (state.isPaused) {
+        logger.info('Webhook processing is paused, skipping', undefined, undefined, {
+          webhookName,
+          domain,
+        });
         return res.status(200).send({ message: 'Server paused, skipping webhook', processed: false, webhookId: '' });
       }
 
       if (!state.appContext) {
+        logger.error('Cannot process webhook: handler not initialized');
         return res.status(503).send({ error: 'Handler not initialized' });
       }
 
-      const webhookName = req.params.webhookName;
-      const domain = req.query.domain;
       const webhookSecretHeader =
         (req.headers['goldsky-webhook-secret'] as string) || (req.headers['Goldsky-Webhook-Secret'] as string);
 

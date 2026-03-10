@@ -1,8 +1,9 @@
 import { expect, Logger, mkBytes32 } from '@chimera-monorepo/utils';
-import { createStubInstance } from 'sinon';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { FastifyInstance } from 'fastify';
+import { Database } from '@chimera-monorepo/database';
 
-import { createServer, ServerState } from '../src/server';
+import { createServer, ServerState, PAUSE_CHECKPOINT_KEY } from '../src/server';
 import { createAppContext } from './mock';
 
 describe('server', () => {
@@ -40,23 +41,27 @@ describe('server', () => {
   });
 
   describe('POST /pause', () => {
-    it('should set isPaused to true', async () => {
+    it('should set isPaused to true and persist to database', async () => {
       const res = await server.inject({ method: 'POST', url: '/pause' });
       expect(res.statusCode).to.equal(200);
       const body = JSON.parse(res.payload);
       expect(body.paused).to.equal(true);
       expect(state.isPaused).to.equal(true);
+      const db = state.appContext!.adapters.database as unknown as SinonStubbedInstance<Database>;
+      expect(db.saveCheckPoint.calledOnceWith(PAUSE_CHECKPOINT_KEY, 1)).to.be.true;
     });
   });
 
   describe('POST /resume', () => {
-    it('should set isPaused to false', async () => {
+    it('should set isPaused to false and persist to database', async () => {
       state.isPaused = true;
       const res = await server.inject({ method: 'POST', url: '/resume' });
       expect(res.statusCode).to.equal(200);
       const body = JSON.parse(res.payload);
       expect(body.paused).to.equal(false);
       expect(state.isPaused).to.equal(false);
+      const db = state.appContext!.adapters.database as unknown as SinonStubbedInstance<Database>;
+      expect(db.saveCheckPoint.calledWith(PAUSE_CHECKPOINT_KEY, 0)).to.be.true;
     });
   });
 

@@ -77,7 +77,7 @@ export async function routeWebhook(
     adapters: { database },
   } = context;
 
-  logger.debug('Routing webhook', undefined, undefined, { webhookName, webhookId, domain });
+  logger.debug('Routing webhook', undefined, undefined, { webhookName, webhookId, domain, payload });
 
   try {
     switch (webhookName) {
