@@ -212,7 +212,7 @@ pub fn fill_intent(
                 .ok_or(SpokeError::InvalidMessage)?;
             let receiver_bytes = spoke_state.everclear_gateway.to_vec();
             let message =
-                SVM2AnyMessage::new_data_only(receiver_bytes, fill_result.evm_encoded_message);
+                SVM2AnyMessage::new_data_only(receiver_bytes, fill_result.evm_encoded_message, message_gas_limit as u128);
             let account_metas = build_ccip_send_accounts(
                 &ccip_router,
                 &CCIP_FEE_QUOTER,
