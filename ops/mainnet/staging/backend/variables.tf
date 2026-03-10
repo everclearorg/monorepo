@@ -151,3 +151,9 @@ variable "cartographer_handler_heartbeat" {
   sensitive = true
   default   = ""
 }
+
+variable "cartographer_admin_token" {
+  type      = string
+  sensitive = true
+  default   = ""
+}

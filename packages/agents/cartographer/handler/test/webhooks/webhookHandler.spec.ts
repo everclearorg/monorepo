@@ -3,7 +3,7 @@ import { SinonStubbedInstance } from 'sinon';
 import { Database } from '@chimera-monorepo/database';
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 
-import { base64ToHex, verifyWebhookSecret, routeWebhook } from '../../src/webhooks/webhookHandler';
+import { base64ToHex, verifySecret, routeWebhook } from '../../src/webhooks/webhookHandler';
 import { createAppContext } from '../mock';
 
 describe('webhookHandler', () => {
@@ -19,27 +19,27 @@ describe('webhookHandler', () => {
     });
   });
 
-  describe('#verifyWebhookSecret', () => {
+  describe('#verifySecret', () => {
     const secret = 'my-webhook-secret-123';
 
     it('should return true for matching secret', () => {
-      expect(verifyWebhookSecret(secret, secret)).to.be.true;
+      expect(verifySecret(secret, secret)).to.be.true;
     });
 
     it('should return false for mismatched secret', () => {
-      expect(verifyWebhookSecret('wrong-secret', secret)).to.be.false;
+      expect(verifySecret('wrong-secret', secret)).to.be.false;
     });
 
     it('should return false for undefined header', () => {
-      expect(verifyWebhookSecret(undefined, secret)).to.be.false;
+      expect(verifySecret(undefined, secret)).to.be.false;
     });
 
     it('should return false for empty header', () => {
-      expect(verifyWebhookSecret('', secret)).to.be.false;
+      expect(verifySecret('', secret)).to.be.false;
     });
 
     it('should return false for different length secrets', () => {
-      expect(verifyWebhookSecret('short', secret)).to.be.false;
+      expect(verifySecret('short', secret)).to.be.false;
     });
   });
 

@@ -2,12 +2,22 @@ import fastify, { FastifyInstance } from 'fastify';
 import { Logger, jsonifyError } from '@chimera-monorepo/utils';
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 
-import { verifyWebhookSecret, routeWebhook } from './webhooks/webhookHandler';
+import { verifySecret, routeWebhook } from './webhooks/webhookHandler';
+
+export const PAUSE_CHECKPOINT_KEY = 'cartographer_handler_paused';
+
+function verifyAdminToken(authHeader: string | string[] | undefined, expectedToken: string): boolean {
+  const header = Array.isArray(authHeader) ? authHeader[0] : authHeader;
+  if (!header) return false;
+  const token = header.startsWith('Bearer ') ? header.slice(7) : '';
+  return verifySecret(token, expectedToken);
+}
 
 export interface ServerState {
   appContext: AppContext | null;
   isPaused: boolean;
   webhookSecret: string;
+  adminToken: string;
 }
 
 export function createServer(state: ServerState, logger: Logger): FastifyInstance {
@@ -23,14 +33,38 @@ export function createServer(state: ServerState, logger: Logger): FastifyInstanc
   });
 
   // Pause webhook processing (useful during pipeline backfill)
-  server.post('/pause', async (_, res) => {
+  server.post('/pause', async (req, res) => {
+    if (!verifyAdminToken(req.headers.authorization, state.adminToken)) {
+      return res.status(401).send({ error: 'Unauthorized' });
+    }
+    if (!state.appContext) {
+      return res.status(503).send({ error: 'Handler not initialized' });
+    }
+    try {
+      await state.appContext.adapters.database.saveCheckPoint(PAUSE_CHECKPOINT_KEY, 1);
+    } catch (error) {
+      logger.error('Failed to persist pause checkpoint', undefined, undefined, jsonifyError(error as Error));
+      return res.status(500).send({ error: 'Failed to persist pause state' });
+    }
     state.isPaused = true;
     logger.info('Webhook processing paused');
     return res.status(200).send({ message: 'Webhook processing paused', paused: true });
   });
 
   // Resume webhook processing
-  server.post('/resume', async (_, res) => {
+  server.post('/resume', async (req, res) => {
+    if (!verifyAdminToken(req.headers.authorization, state.adminToken)) {
+      return res.status(401).send({ error: 'Unauthorized' });
+    }
+    if (!state.appContext) {
+      return res.status(503).send({ error: 'Handler not initialized' });
+    }
+    try {
+      await state.appContext.adapters.database.saveCheckPoint(PAUSE_CHECKPOINT_KEY, 0);
+    } catch (error) {
+      logger.error('Failed to persist resume checkpoint', undefined, undefined, jsonifyError(error as Error));
+      return res.status(500).send({ error: 'Failed to persist resume state' });
+    }
     state.isPaused = false;
     logger.info('Webhook processing resumed');
     return res.status(200).send({ message: 'Webhook processing resumed', paused: false });
@@ -89,6 +123,7 @@ export function createServer(state: ServerState, logger: Logger): FastifyInstanc
       }
 
       if (!state.appContext) {
+        logger.error('Cannot process webhook: handler not initialized');
         return res.status(503).send({ error: 'Handler not initialized' });
       }
 
@@ -97,7 +132,7 @@ export function createServer(state: ServerState, logger: Logger): FastifyInstanc
       const webhookSecretHeader =
         (req.headers['goldsky-webhook-secret'] as string) || (req.headers['Goldsky-Webhook-Secret'] as string);
 
-      if (!verifyWebhookSecret(webhookSecretHeader, state.webhookSecret)) {
+      if (!verifySecret(webhookSecretHeader, state.webhookSecret)) {
         return res.status(401).send({ error: 'Invalid webhook secret' });
       }
 

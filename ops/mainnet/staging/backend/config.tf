@@ -46,6 +46,7 @@ locals {
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
     { name = "DD_LOGS_ENABLED", value = "true" },
     { name = "DD_API_KEY", value = var.dd_api_key },
+    { name = "CARTOGRAPHER_ADMIN_TOKEN", value = var.cartographer_admin_token },
   ]
 
   local_cartographer_config_obj = {
