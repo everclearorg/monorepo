@@ -3,7 +3,7 @@ import { Logger, jsonifyError, createLoggingContext } from '@chimera-monorepo/ut
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 
 import { getHandlerConfig, initializeContext, HandlerConfig } from './init';
-import { createServer, ServerState } from './server';
+import { createServer, ServerState, PAUSE_CHECKPOINT_KEY } from './server';
 import { runBackfill } from './maintenance/backfill';
 
 let server: FastifyInstance | null = null;
@@ -80,10 +80,14 @@ async function startServer(): Promise<void> {
 
     appContext = await initializeContext(handlerConfig, logger);
 
+    const pauseCheckpoint = await appContext.adapters.database.getCheckPoint(PAUSE_CHECKPOINT_KEY);
+    const isPaused = pauseCheckpoint === 1;
+
     const state: ServerState = {
       appContext,
-      isPaused: false,
+      isPaused,
       webhookSecret: handlerConfig.goldskyWebhookSecret,
+      adminToken: handlerConfig.adminToken,
     };
 
     server = createServer(state, logger);
