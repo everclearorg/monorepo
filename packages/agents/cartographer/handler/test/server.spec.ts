@@ -1,9 +1,12 @@
-import { expect, Logger, mkBytes32 } from '@chimera-monorepo/utils';
-import { createStubInstance } from 'sinon';
+import { expect, Logger } from '@chimera-monorepo/utils';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { FastifyInstance } from 'fastify';
+import { Database } from '@chimera-monorepo/database';
 
-import { createServer, ServerState } from '../src/server';
+import { createServer, ServerState, PAUSE_CHECKPOINT_KEY } from '../src/server';
 import { createAppContext } from './mock';
+
+const ADMIN_TOKEN = 'test-admin-token';
 
 describe('server', () => {
   let server: FastifyInstance;
@@ -14,6 +17,7 @@ describe('server', () => {
       appContext: createAppContext(),
       isPaused: false,
       webhookSecret: 'test-secret',
+      adminToken: ADMIN_TOKEN,
     };
     server = createServer(state, createStubInstance(Logger));
     await server.ready();
@@ -40,23 +44,63 @@ describe('server', () => {
   });
 
   describe('POST /pause', () => {
-    it('should set isPaused to true', async () => {
+    it('should return 401 without auth token', async () => {
       const res = await server.inject({ method: 'POST', url: '/pause' });
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should return 401 with invalid auth token', async () => {
+      const res = await server.inject({
+        method: 'POST',
+        url: '/pause',
+        headers: { authorization: 'Bearer wrong-token' },
+      });
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should set isPaused to true and persist to database', async () => {
+      const res = await server.inject({
+        method: 'POST',
+        url: '/pause',
+        headers: { authorization: `Bearer ${ADMIN_TOKEN}` },
+      });
       expect(res.statusCode).to.equal(200);
       const body = JSON.parse(res.payload);
       expect(body.paused).to.equal(true);
       expect(state.isPaused).to.equal(true);
+      const db = state.appContext!.adapters.database as unknown as SinonStubbedInstance<Database>;
+      expect(db.saveCheckPoint.calledOnceWith(PAUSE_CHECKPOINT_KEY, 1)).to.be.true;
     });
   });
 
   describe('POST /resume', () => {
-    it('should set isPaused to false', async () => {
-      state.isPaused = true;
+    it('should return 401 without auth token', async () => {
       const res = await server.inject({ method: 'POST', url: '/resume' });
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should return 401 with invalid auth token', async () => {
+      const res = await server.inject({
+        method: 'POST',
+        url: '/resume',
+        headers: { authorization: 'Bearer wrong-token' },
+      });
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should set isPaused to false and persist to database', async () => {
+      state.isPaused = true;
+      const res = await server.inject({
+        method: 'POST',
+        url: '/resume',
+        headers: { authorization: `Bearer ${ADMIN_TOKEN}` },
+      });
       expect(res.statusCode).to.equal(200);
       const body = JSON.parse(res.payload);
       expect(body.paused).to.equal(false);
       expect(state.isPaused).to.equal(false);
+      const db = state.appContext!.adapters.database as unknown as SinonStubbedInstance<Database>;
+      expect(db.saveCheckPoint.calledWith(PAUSE_CHECKPOINT_KEY, 0)).to.be.true;
     });
   });
 
@@ -88,8 +132,10 @@ describe('server', () => {
     });
 
     it('should resume processing after pause/resume cycle', async () => {
+      const authHeaders = { authorization: `Bearer ${ADMIN_TOKEN}` };
+
       // Pause
-      await server.inject({ method: 'POST', url: '/pause' });
+      await server.inject({ method: 'POST', url: '/pause', headers: authHeaders });
 
       // Webhook should be skipped
       const skipped = await server.inject({
@@ -101,7 +147,7 @@ describe('server', () => {
       expect(JSON.parse(skipped.payload).processed).to.equal(false);
 
       // Resume
-      await server.inject({ method: 'POST', url: '/resume' });
+      await server.inject({ method: 'POST', url: '/resume', headers: authHeaders });
 
       // Webhook should be processed
       const processed = await server.inject({
