@@ -184,6 +184,11 @@ locals {
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ],
         network = "tron"
+      },
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
+        ]
       }
     }
   })
