@@ -981,7 +981,6 @@ __metadata:
   resolution: "@chimera-monorepo/adapters-relayer@workspace:packages/adapters/relayer"
   dependencies:
     "@chimera-monorepo/chainservice": "workspace:*"
-    "@chimera-monorepo/relayer": "workspace:*"
     "@chimera-monorepo/utils": "workspace:*"
     "@gelatocloud/gasless": 0.0.7
     "@types/mocha": 10.0.1
@@ -1248,7 +1247,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@chimera-monorepo/relayer@workspace:*, @chimera-monorepo/relayer@workspace:packages/agents/relayer":
+"@chimera-monorepo/relayer@workspace:packages/agents/relayer":
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/relayer@workspace:packages/agents/relayer"
   dependencies:
