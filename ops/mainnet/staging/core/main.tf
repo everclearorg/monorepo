@@ -222,110 +222,117 @@ module "monitor" {
 }
 
 
-module "lighthouse_intent_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-lighthouse"
-  docker_image_tag    = var.lighthouse_image_tag
-  container_family    = "lighthouse-intent"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.lighthouse_intent_config_param_name
-  container_env_vars  = merge(local.lighthouse_env_vars, {
-    LIGHTHOUSE_SERVICE = "intent"
-    CONFIG_PARAMETER_NAME = local.lighthouse_intent_config_param_name
-  })
-  schedule_expression    = "rate(1 minute)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_lighthouse_config
-}
+# ============================================================================
+# LIGHTHOUSE LAMBDA FUNCTIONS - REPLACED BY LIGHTHOUSE HANDLER ECS SERVICE
+# ============================================================================
+# These Lambda cron jobs have been replaced by the event-driven lighthouse
+# handler (BullMQ workers). Keeping commented out for reference.
+# ============================================================================
 
-module "lighthouse_fill_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-lighthouse"
-  docker_image_tag    = var.lighthouse_image_tag
-  container_family    = "lighthouse-fill"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.lighthouse_fill_config_param_name
-  container_env_vars  = merge(local.lighthouse_env_vars, {
-    LIGHTHOUSE_SERVICE = "fill"
-    CONFIG_PARAMETER_NAME = local.lighthouse_fill_config_param_name
-  })
-  schedule_expression    = "rate(3 minutes)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_lighthouse_config
-}
+# module "lighthouse_intent_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-lighthouse"
+#   docker_image_tag    = var.lighthouse_image_tag
+#   container_family    = "lighthouse-intent"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.lighthouse_intent_config_param_name
+#   container_env_vars  = merge(local.lighthouse_env_vars, {
+#     LIGHTHOUSE_SERVICE = "intent"
+#     CONFIG_PARAMETER_NAME = local.lighthouse_intent_config_param_name
+#   })
+#   schedule_expression    = "rate(1 minute)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_lighthouse_config
+# }
 
-module "lighthouse_settlement_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-lighthouse"
-  docker_image_tag    = var.lighthouse_image_tag
-  container_family    = "lighthouse-settlement"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.lighthouse_settlement_config_param_name
-  container_env_vars  = merge(local.lighthouse_env_vars, {
-    LIGHTHOUSE_SERVICE = "settlement"
-    CONFIG_PARAMETER_NAME = local.lighthouse_settlement_config_param_name
-  })
-  schedule_expression    = "rate(1 minute)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_lighthouse_config
-}
+# module "lighthouse_fill_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-lighthouse"
+#   docker_image_tag    = var.lighthouse_image_tag
+#   container_family    = "lighthouse-fill"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.lighthouse_fill_config_param_name
+#   container_env_vars  = merge(local.lighthouse_env_vars, {
+#     LIGHTHOUSE_SERVICE = "fill"
+#     CONFIG_PARAMETER_NAME = local.lighthouse_fill_config_param_name
+#   })
+#   schedule_expression    = "rate(3 minutes)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_lighthouse_config
+# }
 
-module "lighthouse_expired_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-lighthouse"
-  docker_image_tag    = var.lighthouse_image_tag
-  container_family    = "lighthouse-expired"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.lighthouse_expired_config_param_name
-  container_env_vars  = merge(local.lighthouse_env_vars, {
-    LIGHTHOUSE_SERVICE = "expired"
-    CONFIG_PARAMETER_NAME = local.lighthouse_expired_config_param_name
-  })
-  schedule_expression    = "rate(10 minutes)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_lighthouse_config
-}
+# module "lighthouse_settlement_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-lighthouse"
+#   docker_image_tag    = var.lighthouse_image_tag
+#   container_family    = "lighthouse-settlement"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.lighthouse_settlement_config_param_name
+#   container_env_vars  = merge(local.lighthouse_env_vars, {
+#     LIGHTHOUSE_SERVICE = "settlement"
+#     CONFIG_PARAMETER_NAME = local.lighthouse_settlement_config_param_name
+#   })
+#   schedule_expression    = "rate(1 minute)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_lighthouse_config
+# }
 
-module "lighthouse_invoice_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-lighthouse"
-  docker_image_tag    = var.lighthouse_image_tag
-  container_family    = "lighthouse-invoice"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.lighthouse_invoice_config_param_name
-  container_env_vars  = merge(local.lighthouse_env_vars, {
-    LIGHTHOUSE_SERVICE = "invoice"
-    CONFIG_PARAMETER_NAME = local.lighthouse_invoice_config_param_name
-  })
-  schedule_expression    = "rate(15 minutes)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_lighthouse_config
-}
+# module "lighthouse_expired_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-lighthouse"
+#   docker_image_tag    = var.lighthouse_image_tag
+#   container_family    = "lighthouse-expired"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.lighthouse_expired_config_param_name
+#   container_env_vars  = merge(local.lighthouse_env_vars, {
+#     LIGHTHOUSE_SERVICE = "expired"
+#     CONFIG_PARAMETER_NAME = local.lighthouse_expired_config_param_name
+#   })
+#   schedule_expression    = "rate(10 minutes)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_lighthouse_config
+# }
+
+# module "lighthouse_invoice_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-lighthouse"
+#   docker_image_tag    = var.lighthouse_image_tag
+#   container_family    = "lighthouse-invoice"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.lighthouse_invoice_config_param_name
+#   container_env_vars  = merge(local.lighthouse_env_vars, {
+#     LIGHTHOUSE_SERVICE = "invoice"
+#     CONFIG_PARAMETER_NAME = local.lighthouse_invoice_config_param_name
+#   })
+#   schedule_expression    = "rate(15 minutes)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_lighthouse_config
+# }
 
 # module "lighthouse_reward_cron" {
 #   source              = "../../../modules/lambda"
@@ -392,25 +399,54 @@ module "monitor_poller_cron" {
 }
 
 
-module "lighthouse_solana_cron" {
-  source              = "../../../modules/lambda"
-  ecr_repository_name = "chimera-lighthouse"
-  docker_image_tag    = var.lighthouse_image_tag
-  container_family    = "lighthouse-solana"
-  environment         = var.environment
-  stage               = var.stage
-  config_param_name   = local.lighthouse_solana_config_param_name
-  container_env_vars  = merge(local.lighthouse_env_vars, {
-    LIGHTHOUSE_SERVICE = "solana"
-    CONFIG_PARAMETER_NAME = local.lighthouse_solana_config_param_name
-  })
-  schedule_expression    = "rate(1 minute)"
-  timeout                = 300
-  memory_size            = 2048
-  lambda_in_vpc          = true
-  subnet_ids             = module.network.private_subnets
-  lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
-  config                 = local.local_lighthouse_config
+# module "lighthouse_solana_cron" {
+#   source              = "../../../modules/lambda"
+#   ecr_repository_name = "chimera-lighthouse"
+#   docker_image_tag    = var.lighthouse_image_tag
+#   container_family    = "lighthouse-solana"
+#   environment         = var.environment
+#   stage               = var.stage
+#   config_param_name   = local.lighthouse_solana_config_param_name
+#   container_env_vars  = merge(local.lighthouse_env_vars, {
+#     LIGHTHOUSE_SERVICE = "solana"
+#     CONFIG_PARAMETER_NAME = local.lighthouse_solana_config_param_name
+#   })
+#   schedule_expression    = "rate(1 minute)"
+#   timeout                = 300
+#   memory_size            = 2048
+#   lambda_in_vpc          = true
+#   subnet_ids             = module.network.private_subnets
+#   lambda_security_groups = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+#   config                 = local.local_lighthouse_config
+# }
+
+module "lighthouse_handler" {
+  source                   = "../../../modules/service"
+  stage                    = var.stage
+  environment              = var.environment
+  domain                   = var.domain
+  region                   = var.region
+  dd_api_key               = var.dd_api_key
+  zone_id                  = data.aws_route53_zone.primary.zone_id
+  execution_role_arn       = data.aws_iam_role.ecr_admin_role.arn
+  cluster_id               = module.ecs.ecs_cluster_id
+  vpc_id                   = module.network.vpc_id
+  lb_subnets               = module.network.private_subnets
+  docker_image             = "${local.repository_url_prefix}chimera-lighthouse-handler:${var.lighthouse_handler_image_tag}"
+  container_family         = "lighthouse-handler"
+  health_check_path        = "/health"
+  container_port           = 8080
+  loadbalancer_port        = 80
+  cpu                      = 512
+  memory                   = 1024
+  instance_count           = 1
+  timeout                  = 180
+  internal_lb              = true
+  ingress_cdir_blocks      = [module.network.vpc_cdir_block]
+  ingress_ipv6_cdir_blocks = []
+  service_security_groups  = flatten([module.network.allow_all_sg, module.network.ecs_task_sg])
+  cert_arn                 = var.certificate_arn_mainnet
+  container_env_vars       = local.lighthouse_handler_env_vars
 }
 
 module "lighthouse_web3signer" {
@@ -492,6 +528,20 @@ module "monitor_cache" {
   cache_subnet_group_subnet_ids = module.network.public_subnets
   node_type                     = "cache.t3.small"
   public_redis                  = true
+}
+
+module "lighthouse_queue_cache" {
+  source                        = "../../../modules/redis"
+  stage                         = var.stage
+  environment                   = var.environment
+  family                        = "lighthouse-queue"
+  sg_id                         = module.network.ecs_task_sg
+  vpc_id                        = module.network.vpc_id
+  cache_subnet_group_subnet_ids = module.network.public_subnets
+  node_type                     = "cache.t3.small"
+  public_redis                  = true
+  transit_encryption_enabled    = true
+  auth_token                    = var.lighthouse_queue_redis_auth_token
 }
 
 module "watchtower_cache" {

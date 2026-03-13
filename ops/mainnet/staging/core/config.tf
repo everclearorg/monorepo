@@ -71,6 +71,17 @@ locals {
     GRAPH_API_KEY     = var.graph_api_key
   }
 
+  lighthouse_handler_env_vars = [
+    { name = "LIGHTHOUSE_CONFIG", value = local.local_lighthouse_config },
+    { name = "LIGHTHOUSE_SERVICE", value = "handler" },
+    { name = "REDIS_URL", value = "rediss://:${var.lighthouse_queue_redis_auth_token}@${module.lighthouse_queue_cache.redis_instance_address}:${module.lighthouse_queue_cache.redis_instance_port}" },
+    { name = "ENVIRONMENT", value = var.environment },
+    { name = "STAGE", value = var.stage },
+    { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
+    { name = "DD_LOGS_ENABLED", value = "true" },
+    { name = "DD_API_KEY", value = var.dd_api_key },
+  ]
+
   lighthouse_web3signer_env_vars = [
     { name = "WEB3_SIGNER_PRIVATE_KEY", value = var.lighthouse_web3_signer_private_key },
     { name = "WEB3SIGNER_HTTP_HOST_ALLOWLIST", value = "*" },

@@ -30,6 +30,12 @@ variable "lighthouse_image_tag" {
   default     = "latest"
 }
 
+variable "lighthouse_handler_image_tag" {
+  type        = string
+  description = "lighthouse handler image tag"
+  default     = "latest"
+}
+
 variable "rmq_mgt_password" {
   type        = string
   description = "RabbitMQ management password"
@@ -307,4 +313,10 @@ variable "monitor_webhook_secret" {
   sensitive   = true
   description = "HMAC shared secret for signing events sent to the alert pipeline"
   default     = ""
+}
+
+variable "lighthouse_queue_redis_auth_token" {
+  type        = string
+  sensitive   = true
+  description = "Auth token for the lighthouse queue Redis instance"
 }

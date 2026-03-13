@@ -44,7 +44,6 @@ export const processDepositsAndInvoices = async () => {
     spokes,
     domains,
     hubDomain: hub.domain,
-    assets: chains.assets,
   });
 
   // Get all the configured asset tickers excluding native assets
@@ -53,10 +52,10 @@ export const processDepositsAndInvoices = async () => {
   logger.info('Configured tickers', requestContext, methodContext, { tickers, tickerHashes });
 
   // Check that the assets exist in carto (i.e. have been registered)
-  const configued = await database.getAssets(tickerHashes);
+  const configured = await database.getAssets(tickerHashes);
 
   for (const tickerHash of tickerHashes) {
-    const registeredConfig = configued.find((a) => a.token === tickerHash.toLowerCase());
+    const registeredConfig = configured.find((a) => a.token === tickerHash.toLowerCase());
     // Check that ticker hash is configured onchain as well as in chaindata
     if (!registeredConfig) {
       logger.warn('Asset not registered', requestContext, methodContext, { tickerHash });

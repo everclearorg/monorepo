@@ -36,3 +36,16 @@ variable "public_redis" {
   default     = false
   type        = bool
 }
+
+variable "auth_token" {
+  description = "Auth token for Redis AUTH. Requires transit_encryption_enabled = true. When set, creates a replication group instead of a standalone cluster."
+  default     = null
+  type        = string
+  sensitive   = true
+}
+
+variable "transit_encryption_enabled" {
+  description = "Whether to enable TLS for in-transit encryption. Required when auth_token is set."
+  default     = false
+  type        = bool
+}

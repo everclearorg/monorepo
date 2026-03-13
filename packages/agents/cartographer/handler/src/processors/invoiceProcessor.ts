@@ -2,6 +2,8 @@ import { HubIntent, TIntentStatus } from '@chimera-monorepo/utils';
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 import { parseHubInvoice, parseHubDeposit } from '../webhooks/parsers';
 import { base64ToHex } from '../webhooks/webhookHandler';
+import { notifyLighthouse } from '../notify';
+import { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/mqclient';
 
 /**
  * Create a minimal HubIntent for status-only upserts.
@@ -54,6 +56,7 @@ export const processHubInvoice = async (payload: Record<string, unknown>, contex
       } else {
         await database.saveHubIntents([hubIntentStatusUpdate(intentId, hubDomain, TIntentStatus.Invoiced)], ['status']);
       }
+      await notifyLighthouse(LIGHTHOUSE_QUEUES.INVOICE);
       return;
     }
     logger.warn('Invoice not found in subgraph, falling back to webhook data', undefined, undefined, { intentId });
@@ -68,6 +71,7 @@ export const processHubInvoice = async (payload: Record<string, unknown>, contex
   const invoice = parseHubInvoice(payload);
   await database.saveHubInvoices([invoice]);
   await database.saveHubIntents([hubIntentStatusUpdate(invoice.id, hubDomain, TIntentStatus.Invoiced)], ['status']);
+  await notifyLighthouse(LIGHTHOUSE_QUEUES.INVOICE);
 };
 
 export const processHubDeposit = async (
@@ -112,6 +116,7 @@ export const processHubDeposit = async (
           await database.saveHubIntents([hubIntentStatusUpdate(deposit.intentId, hubDomain, intentStatus)], ['status']);
         }
       }
+      await notifyLighthouse(LIGHTHOUSE_QUEUES.INVOICE);
       return;
     }
     logger.warn('Deposit not found in subgraph, falling back to webhook data', undefined, undefined, {
@@ -133,4 +138,5 @@ export const processHubDeposit = async (
     const intentStatus = type === 'processed' ? TIntentStatus.DepositProcessed : TIntentStatus.Invoiced;
     await database.saveHubIntents([hubIntentStatusUpdate(deposit.intentId, hubDomain, intentStatus)], ['status']);
   }
+  await notifyLighthouse(LIGHTHOUSE_QUEUES.INVOICE);
 };
