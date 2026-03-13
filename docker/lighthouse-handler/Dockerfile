@@ -34,6 +34,7 @@ RUN yarn install
 COPY config config/
 COPY packages/agents/lighthouse /tmp/build/packages/agents/lighthouse
 COPY packages/adapters/mqclient /tmp/build/packages/adapters/mqclient
+COPY packages/adapters/cache /tmp/build/packages/adapters/cache
 COPY packages/adapters/database /tmp/build/packages/adapters/database
 COPY packages/adapters/chainservice /tmp/build/packages/adapters/chainservice
 COPY packages/adapters/web3signer /tmp/build/packages/adapters/web3signer

@@ -26,6 +26,7 @@ COPY packages/adapters/subgraph/package.json /tmp/build/packages/adapters/subgra
 COPY packages/adapters/web3signer/package.json /tmp/build/packages/adapters/web3signer/
 COPY packages/adapters/relayer/package.json /tmp/build/packages/adapters/relayer/
 COPY packages/adapters/database/package.json /tmp/build/packages/adapters/database/
+COPY packages/adapters/mqclient/package.json /tmp/build/packages/adapters/mqclient/
 COPY packages/agents/cartographer/core/package.json /tmp/build/packages/agents/cartographer/core/
 COPY packages/agents/cartographer/poller/package.json /tmp/build/packages/agents/cartographer/poller/
 COPY packages/agents/cartographer/handler/package.json /tmp/build/packages/agents/cartographer/handler/
@@ -45,6 +46,7 @@ COPY packages/agents/cartographer/handler /tmp/build/packages/agents/cartographe
 COPY packages/agents/cartographer/core /tmp/build/packages/agents/cartographer/core
 COPY packages/adapters/subgraph /tmp/build/packages/adapters/subgraph
 COPY packages/adapters/database /tmp/build/packages/adapters/database
+COPY packages/adapters/mqclient /tmp/build/packages/adapters/mqclient
 COPY packages/adapters/chainservice /tmp/build/packages/adapters/chainservice
 COPY packages/utils /tmp/build/packages/utils
 COPY packages/contracts /tmp/build/packages/contracts
