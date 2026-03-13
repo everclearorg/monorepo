@@ -1,0 +1,18 @@
+name: {{pipelineName}}
+apiVersion: 3
+resource_size: s
+sources:
+  solana_edge_instructions:
+    dataset_name: solana.edge_instructions
+    version: 1.0.0
+    type: dataset
+    start_at: latest
+    filter: program_id = '{{programId}}' AND accounts = '["{{accountFilter}}"]'
+transforms: {}
+sinks:
+  carto_solana_webhook:
+    type: webhook
+    from: solana_edge_instructions
+    url: {{{webhookBaseUrl}}}/webhooks/solana-instruction?domain={{domain}}
+    secret_name: {{secretName}}
+    one_row_per_request: true

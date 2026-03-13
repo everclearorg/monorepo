@@ -10,6 +10,15 @@ provider "aws" {
   region = var.region
 }
 
+data "terraform_remote_state" "core" {
+  backend = "s3"
+  config = {
+    bucket = "everclear-chimera-mainnet-staging-core"
+    key    = "state"
+    region = "us-east-1"
+  }
+}
+
 # Fetch AZs in the current region
 data "aws_availability_zones" "available" {}
 
