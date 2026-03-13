@@ -159,7 +159,7 @@
     "subgraph": {
       "name": "everclear-spoke-megaeth"
     },
-    "network": "megaeth",
+    "network": "megaeth-mainnet",
     "domain": "4326",
     "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
     "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
@@ -315,7 +315,7 @@
     "subgraph": {
       "name": "everclear-spoke-plasma"
     },
-    "network": "plasma",
+    "network": "plasma-mainnet",
     "domain": "9745",
     "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
     "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",

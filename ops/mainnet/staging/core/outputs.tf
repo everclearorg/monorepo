@@ -13,3 +13,7 @@ output "rmq-management-endpoint" {
 output "rmq-amqps-endpoint" {
   value = module.centralised_message_queue.aws_mq_amqp_endpoint
 }
+
+output "lighthouse_queue_redis_url" {
+  value = "redis://${module.lighthouse_queue_cache.redis_instance_address}:${module.lighthouse_queue_cache.redis_instance_port}"
+}

@@ -8,6 +8,8 @@ import {
   parseOrder,
 } from '../webhooks/parsers';
 import { base64ToHex } from '../webhooks/webhookHandler';
+import { notifyLighthouse } from '../notify';
+import { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/mqclient';
 
 /**
  * Safely extract an intent ID from the webhook payload.
@@ -45,6 +47,7 @@ export const processOriginIntent = async (
     if (fullIntent) {
       const isSwap = computeIsSwap(fullIntent, config, logger);
       await database.saveOriginIntents([{ ...fullIntent, isSwap }]);
+      await notifyLighthouse(LIGHTHOUSE_QUEUES.INTENT);
       return;
     }
     logger.warn('Origin intent not found in subgraph, falling back to webhook data', undefined, undefined, {
@@ -62,6 +65,7 @@ export const processOriginIntent = async (
   const intent = parseOriginIntent(payload);
   const isSwap = computeIsSwap(intent, config, logger);
   await database.saveOriginIntents([{ ...intent, isSwap }]);
+  await notifyLighthouse(LIGHTHOUSE_QUEUES.INTENT);
 };
 
 export const processDestinationIntent = async (
@@ -83,6 +87,7 @@ export const processDestinationIntent = async (
       const fullIntent = await subgraph.getDestinationIntentById(fillDomain, intentId);
       if (fullIntent) {
         await database.saveDestinationIntents([fullIntent]);
+        await notifyLighthouse(LIGHTHOUSE_QUEUES.FILL);
         return;
       }
       logger.warn('Destination intent not found in subgraph, falling back to webhook data', undefined, undefined, {
@@ -106,6 +111,7 @@ export const processDestinationIntent = async (
     intent.destination = fillDomain;
   }
   await database.saveDestinationIntents([intent]);
+  await notifyLighthouse(LIGHTHOUSE_QUEUES.FILL);
 };
 
 export const processHubIntent = async (payload: Record<string, unknown>, context: AppContext): Promise<void> => {

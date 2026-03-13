@@ -11,6 +11,8 @@ import {
   HubMessage,
 } from '@chimera-monorepo/utils';
 import { AppContext, CartographerConfig } from '@chimera-monorepo/cartographer-core';
+import { notifyLighthouse } from '../notify';
+import { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/mqclient';
 import {
   parseMessage,
   parseQueue,
@@ -85,6 +87,15 @@ export const processHubMessage = async (payload: Record<string, unknown>, contex
       : [];
 
   await database.saveMessages([message], [], [], hubIntentUpdates);
+
+  // Notify lighthouse for settlement messages
+  if (msg.type === TMessageType.Settlement) {
+    if (destDomain === SOLANA_CHAINID) {
+      await notifyLighthouse(LIGHTHOUSE_QUEUES.SOLANA);
+    } else {
+      await notifyLighthouse(LIGHTHOUSE_QUEUES.SETTLEMENT);
+    }
+  }
 };
 
 export const processSpokeMessage = async (payload: Record<string, unknown>, context: AppContext): Promise<void> => {
@@ -118,6 +129,11 @@ export const processSpokeMessage = async (payload: Record<string, unknown>, cont
       : [];
 
   await database.saveMessages([message], originIntentUpdates, destinationIntentUpdates, []);
+
+  // Notify lighthouse for fill messages
+  if (msg.type === TMessageType.Fill) {
+    await notifyLighthouse(LIGHTHOUSE_QUEUES.FILL);
+  }
 };
 
 export const processQueue = async (

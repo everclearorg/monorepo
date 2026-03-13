@@ -11,6 +11,9 @@
   "references": [
     {
       "path": "../../utils/tsconfig.build.json"
+    },
+    {
+      "path": "../../adapters/mqclient/tsconfig.build.json"
     }
   ]
 }

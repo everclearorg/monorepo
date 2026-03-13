@@ -24,7 +24,9 @@
     "@chimera-monorepo/cartographer-core": "workspace:*",
     "@chimera-monorepo/chainservice": "workspace:*",
     "@chimera-monorepo/database": "workspace:*",
+    "@chimera-monorepo/mqclient": "workspace:*",
     "@chimera-monorepo/utils": "workspace:*",
+    "bs58": "^4.0.1",
     "dotenv": "16.0.3",
     "fastify": "4.26.2"
   },

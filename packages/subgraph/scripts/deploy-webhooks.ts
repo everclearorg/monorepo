@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import { program } from 'commander';
 import * as Mustache from 'mustache';
 import { config as dotenvConfig } from 'dotenv';
+import { getLatestLabel } from './utils';
 
 dotenvConfig();
 
@@ -26,8 +27,47 @@ interface SpokePipelineConfig extends HubPipelineConfig {
   domain: string;
 }
 
+interface SolanaPipelineConfig {
+  pipelineName: string;
+  programId: string;
+  accountFilter: string;
+  domain: string;
+  webhookBaseUrl: string;
+  secretName: string;
+}
+
+interface TronPipelineConfig {
+  pipelineName: string;
+  filter: string;
+  domain: string;
+  webhookBaseUrl: string;
+  secretName: string;
+}
+
+function isSolanaConfig(parsed: unknown): parsed is SolanaPipelineConfig {
+  return typeof parsed === 'object' && parsed !== null && 'pipelineName' in parsed && 'programId' in parsed;
+}
+
+function isTronConfig(parsed: unknown): parsed is TronPipelineConfig {
+  return (
+    typeof parsed === 'object' &&
+    parsed !== null &&
+    'pipelineName' in parsed &&
+    'filter' in parsed &&
+    !('programId' in parsed)
+  );
+}
+
 function loadTemplate(): string {
   return readFileSync(join(__dirname, '../src/cartographer-webhooks/webhook.template.yaml'), 'utf-8');
+}
+
+function loadSolanaTemplate(): string {
+  return readFileSync(join(__dirname, '../src/cartographer-webhooks/solana-webhook.template.yaml'), 'utf-8');
+}
+
+function loadTronTemplate(): string {
+  return readFileSync(join(__dirname, '../src/cartographer-webhooks/tron-webhook.template.yaml'), 'utf-8');
 }
 
 function renderPipeline(
@@ -85,48 +125,55 @@ function deployPipeline(yaml: string, pipelineName: string, dryRun: boolean): vo
 
   try {
     writeFileSync(tmpFile, yaml);
-    executeCommand(`goldsky pipeline apply ${tmpFile}`, false);
+    executeCommand(`goldsky pipeline apply ${tmpFile} --status ACTIVE`, false);
     console.log(`Successfully deployed pipeline: ${pipelineName}`);
   } finally {
     rmSync(tmpDir, { recursive: true, force: true });
   }
 }
 
-program
-  .argument('<config-name>', 'Pipeline config name (e.g., everclear-hub-webhooks)')
-  .option('-v, --version <value>', 'Config version (staging or production)', 'production')
-  .option('-n, --networks <value...>', 'Network names to filter (spoke configs only)')
-  .option('-s, --subgraph-label <value>', 'Subgraph label (e.g., v0.0.3)')
-  .option('-d, --dry-run', 'Only output the resolved YAML without deploying', false)
-  .action(async (configName: string) => {
-    const options = program.opts();
-    const version = options.version;
-    const subgraphLabel = options.subgraphLabel;
-    const dryRun = options.dryRun;
-    const filterNetworks = options.networks;
+/**
+ * Deploy webhook pipelines. Exported so deploy.ts can call it after subgraph deployment.
+ */
+export async function deployWebhookPipelines(
+  configName: string,
+  version: string,
+  subgraphLabel: string,
+  filterNetworks?: string[],
+  dryRun = false,
+): Promise<void> {
+  const configFile = `${configName}-${version}.json`;
+  const configPath = join(__dirname, `../config/${configFile}`);
 
+  console.log(`Loading webhook config from: ${configPath}`);
+  const configRaw = readFileSync(configPath, 'utf-8');
+  const parsed = JSON.parse(configRaw);
+
+  if (isSolanaConfig(parsed)) {
+    // Solana dataset pipeline — no subgraph label needed
+    const solanaTemplate = loadSolanaTemplate();
+    const yaml = Mustache.render(solanaTemplate, parsed);
+    console.log(`Deploying Solana webhook pipeline: ${parsed.pipelineName}`);
+    deployPipeline(yaml, parsed.pipelineName, dryRun);
+  } else if (isTronConfig(parsed)) {
+    // Tron dataset pipeline — no subgraph label needed
+    const tronTemplate = loadTronTemplate();
+    const yaml = Mustache.render(tronTemplate, parsed);
+    console.log(`Deploying Tron webhook pipeline: ${parsed.pipelineName}`);
+    deployPipeline(yaml, parsed.pipelineName, dryRun);
+  } else {
+    // EVM subgraph pipelines — require subgraph label
     if (!subgraphLabel) {
-      console.error('Error: --subgraph-label is required');
+      console.error('Error: --subgraph-label is required for subgraph pipelines');
       process.exit(1);
     }
 
     const subgraphVersion = `${version}-${subgraphLabel}`;
-
-    const configFile = `${configName}-${version}.json`;
-    const configPath = join(__dirname, `../config/${configFile}`);
-
-    console.log(`Loading config from: ${configPath}`);
-    const configRaw = readFileSync(configPath, 'utf-8');
     const template = loadTemplate();
 
-    // Determine if this is a hub config (object) or spoke config (array)
-    const parsed = JSON.parse(configRaw);
-
     if (Array.isArray(parsed)) {
-      // Spoke configs - array of pipeline configs, one per chain
       let configs: SpokePipelineConfig[] = parsed;
 
-      // Filter by network if specified
       if (filterNetworks && filterNetworks[0] !== 'all') {
         configs = configs.filter((c) => filterNetworks.includes(c.network));
       }
@@ -138,15 +185,62 @@ program
         deployPipeline(yaml, config.webhookName, dryRun);
       }
     } else {
-      // Hub config - single pipeline config
       const config: HubPipelineConfig = parsed;
       console.log(`Deploying hub webhook pipeline: ${config.webhookName}`);
 
       const yaml = renderPipeline(template, config, subgraphVersion, subgraphLabel);
       deployPipeline(yaml, config.webhookName, dryRun);
     }
+  }
+}
 
-    console.log('Done!');
-  });
+// CLI entry point
+if (require.main === module) {
+  program
+    .argument('<config-name>', 'Pipeline config name (e.g., everclear-hub-webhooks)')
+    .option('-v, --version <value>', 'Config version (staging or production)', 'production')
+    .option('-n, --networks <value...>', 'Network names to filter (spoke configs only)')
+    .option('-s, --subgraph-label <value>', 'Subgraph label (e.g., v0.0.3). If omitted, auto-detects latest.')
+    .option('-d, --dry-run', 'Only output the resolved YAML without deploying', false)
+    .action(async (configName: string) => {
+      const options = program.opts();
+      const version = options.version;
+      let subgraphLabel = options.subgraphLabel;
+      const dryRun = options.dryRun;
+      const filterNetworks = options.networks;
 
-program.parse();
+      // Auto-detect label if not provided
+      if (!subgraphLabel) {
+        const configFile = `${configName}-${version}.json`;
+        const configPath = join(__dirname, `../config/${configFile}`);
+        const configRaw = readFileSync(configPath, 'utf-8');
+        const parsed = JSON.parse(configRaw);
+
+        // Get the subgraph name from config to query goldsky
+        let subgraphName: string;
+        if (Array.isArray(parsed)) {
+          const configs: SpokePipelineConfig[] = parsed;
+          const filtered =
+            filterNetworks && filterNetworks[0] !== 'all'
+              ? configs.filter((c) => filterNetworks.includes(c.network))
+              : configs;
+          subgraphName = filtered[0]?.subgraph.name;
+        } else {
+          subgraphName = parsed.subgraph.name;
+        }
+
+        if (!subgraphName) {
+          console.error('Error: could not determine subgraph name for auto-label detection');
+          process.exit(1);
+        }
+
+        subgraphLabel = await getLatestLabel(subgraphName, version, false);
+        console.log(`Auto-detected current label: ${subgraphLabel}`);
+      }
+
+      await deployWebhookPipelines(configName, version, subgraphLabel, filterNetworks, dryRun);
+      console.log('Done!');
+    });
+
+  program.parse();
+}

@@ -30,6 +30,12 @@ variable "lighthouse_image_tag" {
   default     = "latest"
 }
 
+variable "lighthouse_handler_image_tag" {
+  type        = string
+  description = "lighthouse handler image tag"
+  default     = "latest"
+}
+
 variable "rmq_mgt_password" {
   type        = string
   description = "RabbitMQ management password"
