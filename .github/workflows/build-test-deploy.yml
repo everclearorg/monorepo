@@ -951,7 +951,7 @@ jobs:
 
   terraform-services-backend-mainnet-staging:
     if: github.ref == 'refs/heads/mainnet-staging'
-    needs: [e2e-tests, build-and-push-cartographer-handler-image]
+    needs: [e2e-tests, build-and-push-cartographer-handler-image, terraform-services-core-mainnet-staging]
     env:
       AWS_PROFILE: aws-deployer-connext
       TF_VAR_cartographer_handler_image_tag: chimera-${{ github.sha }}
