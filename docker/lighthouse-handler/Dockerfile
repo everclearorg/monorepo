@@ -58,4 +58,4 @@ COPY --from=build /tmp/build /app
 
 EXPOSE 8080
 
-CMD ["node", "packages/agents/lighthouse/dist/server.js"]
+CMD ["node", "packages/agents/lighthouse/dist/src/server.js"]
