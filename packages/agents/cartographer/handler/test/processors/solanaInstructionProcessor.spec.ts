@@ -35,7 +35,7 @@ describe('solanaInstructionProcessor', () => {
     await processSolanaInstruction(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:intent');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-intent');
   });
 
   it('should notify FILL queue for IntentFilled discriminator', async () => {
@@ -43,7 +43,7 @@ describe('solanaInstructionProcessor', () => {
     await processSolanaInstruction(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:fill');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-fill');
   });
 
   it('should notify SOLANA queue for Settled discriminator', async () => {
@@ -51,7 +51,7 @@ describe('solanaInstructionProcessor', () => {
     await processSolanaInstruction(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:solana');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-solana');
   });
 
   it('should notify SOLANA queue for Delivered discriminator', async () => {
@@ -59,7 +59,7 @@ describe('solanaInstructionProcessor', () => {
     await processSolanaInstruction(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:solana');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-solana');
   });
 
   it('should skip when data field is missing', async () => {

@@ -24,7 +24,7 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:intent');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-intent');
   });
 
   it('should notify INTENT queue for IntentWithFeesAdded topic', async () => {
@@ -32,7 +32,7 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:intent');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-intent');
   });
 
   it('should notify INTENT queue for OrderCreated topic', async () => {
@@ -40,7 +40,7 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:intent');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-intent');
   });
 
   it('should notify FILL queue for IntentFilled topic', async () => {
@@ -48,7 +48,7 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:fill');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-fill');
   });
 
   it('should notify SETTLEMENT queue for Settled topic', async () => {
@@ -56,7 +56,7 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:settlement');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-settlement');
   });
 
   it('should notify SETTLEMENT queue for IntentQueueProcessed topic', async () => {
@@ -64,7 +64,7 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:settlement');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-settlement');
   });
 
   it('should notify SETTLEMENT queue for FillQueueProcessed topic', async () => {
@@ -72,7 +72,7 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:settlement');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-settlement');
   });
 
   it('should skip when topics field is missing', async () => {
@@ -95,7 +95,7 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:intent');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-intent');
   });
 
   it('should be case-insensitive for topic hashes', async () => {
@@ -103,6 +103,6 @@ describe('tronLogProcessor', () => {
     await processTronLog(payload, context);
 
     expect(notifyStub.callCount).to.equal(1);
-    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse:intent');
+    expect(notifyStub.getCall(0).args[0]).to.equal('lighthouse-intent');
   });
 });
