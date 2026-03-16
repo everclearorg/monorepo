@@ -42,6 +42,10 @@ export class TransactionDispatch {
   // Based on default per account rate limiting on geth.
   // TODO: Make this a configurable value, since the dev may be able to implement or may be using a custom geth node.
   static MAX_INFLIGHT_TRANSACTIONS = 64;
+  // Maximum number of mine/resubmit attempts before giving up on a transaction.
+  static MAX_MINE_ATTEMPTS = 10;
+  // A 10-minute timeout to prevent indefinite blocking when sending fails.
+  static SEND_TIMEOUT = 10 * 60 * 1_000;
   // Buffer of in-flight transactions waiting to get 1 confirmation.
   private inflightBuffer: TransactionBuffer;
 
@@ -123,7 +127,17 @@ export class TransactionDispatch {
           shouldResubmit: false,
           shouldBump: false,
         };
+        let mineAttempts = 0;
         while (!transaction.didMine && !transaction.error) {
+          mineAttempts++;
+          if (mineAttempts > TransactionDispatch.MAX_MINE_ATTEMPTS) {
+            transaction.error = new OperationTimeout({
+              message: `Transaction exceeded maximum mine attempts (${TransactionDispatch.MAX_MINE_ATTEMPTS})`,
+              domain: this.domain,
+              nonce: transaction.nonce,
+            });
+            break;
+          }
           try {
             if (meta.shouldResubmit) {
               if (meta.shouldBump) {
@@ -147,11 +161,7 @@ export class TransactionDispatch {
               (error as any).name === 'TransactionReceiptNotFoundError' ||
               (error as any).shortMessage?.includes('could not be found');
 
-            if (
-              error.type === OperationTimeout.type ||
-              error.type === BadNonce.type ||
-              isReceiptNotFoundError
-            ) {
+            if (error.type === OperationTimeout.type || error.type === BadNonce.type || isReceiptNotFoundError) {
               // Check to see if the transaction did indeed make it to chain.
               const responses = await this.rpcProvider.getTransaction(transaction);
               if (responses.every((response) => response === null)) {
@@ -396,7 +406,6 @@ export class TransactionDispatch {
           let transactionCount = 0;
           const attemptedNonces: number[] = [];
 
-
           if (getVmFromDomainId(this.domain) !== 'svm') {
             // Estimate gas here will throw if the transaction is going to revert on-chain for "legit" reasons. This means
             // that, if we get past this method, we can *generally* assume that the transaction will go through on submit - although it's
@@ -412,7 +421,7 @@ export class TransactionDispatch {
             backfill = nonceInfo.backfill;
             transactionCount = nonceInfo.transactionCount;
           }
-          
+
           switch (this.domain) {
             // Arbitrum gasLimit hardcode
             case 42161:
@@ -508,8 +517,17 @@ export class TransactionDispatch {
 
     const transaction = result.value as OnchainTransaction;
     // Wait for transaction to be picked up by the mine and confirm loops and closed out.
+    const sendStart = Date.now();
     while (!transaction.didFinish && !transaction.error) {
-      // TODO: Use wait, and wait a designated number of blocks if possible to optimize!
+      if (Date.now() - sendStart >= TransactionDispatch.SEND_TIMEOUT) {
+        transaction.error = new OperationTimeout({
+          message: 'Transaction send timed out waiting for mine/confirm loops to finish',
+          domain: this.domain,
+          nonce: transaction.nonce,
+          timeout: TransactionDispatch.SEND_TIMEOUT,
+        });
+        break;
+      }
       await delay(1_000);
     }
 
@@ -833,9 +851,17 @@ export class TransactionDispatch {
     const determinedBaseline = updatedGasPrice > BigInt(currentGasPrice) ? updatedGasPrice : BigInt(currentGasPrice);
     // Scale up gas by percentage as specified by config.
     if (transaction.type === 0) {
-      transaction.gas.price = (determinedBaseline + (determinedBaseline * BigInt(this.config.gasPriceReplacementBumpPercent)) / BigInt(100) + BigInt(1)).toString();
+      transaction.gas.price = (
+        determinedBaseline +
+        (determinedBaseline * BigInt(this.config.gasPriceReplacementBumpPercent)) / BigInt(100) +
+        BigInt(1)
+      ).toString();
     } else {
-      transaction.gas.maxPriorityFeePerGas = (determinedBaseline + (determinedBaseline * BigInt(this.config.gasPriceReplacementBumpPercent)) / BigInt(100) + BigInt(1)).toString();
+      transaction.gas.maxPriorityFeePerGas = (
+        determinedBaseline +
+        (determinedBaseline * BigInt(this.config.gasPriceReplacementBumpPercent)) / BigInt(100) +
+        BigInt(1)
+      ).toString();
     }
 
     this.logger.info(`Tx bumped.`, requestContext, methodContext, {
