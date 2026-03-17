@@ -1,5 +1,5 @@
 import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
-import { expect, HyperlaneMessageResponse, HyperlaneStatus, Message, mkHash, chainWrapper } from '@chimera-monorepo/utils';
+import { expect, HyperlaneMessageResponse, HyperlaneStatus, Message, mkHash, chainWrapper, POLYMER_DOMAIN_PAIRS } from '@chimera-monorepo/utils';
 import * as Mockable from '../../src/mockable';
 
 import { getDispatchedMessage, getDispatchedMessageFromEvent, getMessageStatus } from '../../src/helpers';
@@ -136,6 +136,28 @@ describe('Helpers:hyperlane', () => {
       expect(ret).to.be.deep.eq({
         status: 'delivered',
       });
+    });
+
+    it('should return delivered for polymer route when polymer API confirms delivery', async () => {
+      const [polymerOrigin, polymerDest] = POLYMER_DOMAIN_PAIRS[0]; // e.g. ['1', '25327']
+      database.getMessagesByIds.resolves([mock.message({ originDomain: polymerOrigin, destinationDomain: polymerDest })]);
+      const getPolymerMsgDeliveredStub = stub(Mockable, 'getPolymerMsgDelivered').resolves(HyperlaneStatus.delivered);
+      expect(await getMessageStatus(id)).to.be.deep.eq({ status: 'delivered' });
+      expect(getPolymerMsgDeliveredStub.calledOnceWith(id)).to.be.true;
+    });
+
+    it('should return pending for polymer route when polymer API returns pending', async () => {
+      const [polymerOrigin, polymerDest] = POLYMER_DOMAIN_PAIRS[0];
+      database.getMessagesByIds.resolves([mock.message({ originDomain: polymerOrigin, destinationDomain: polymerDest })]);
+      stub(Mockable, 'getPolymerMsgDelivered').resolves(HyperlaneStatus.pending);
+      expect(await getMessageStatus(id)).to.be.deep.eq({ status: 'pending' });
+    });
+
+    it('should return pending for polymer route when polymer API throws', async () => {
+      const [polymerOrigin, polymerDest] = POLYMER_DOMAIN_PAIRS[0];
+      database.getMessagesByIds.resolves([mock.message({ originDomain: polymerOrigin, destinationDomain: polymerDest })]);
+      stub(Mockable, 'getPolymerMsgDelivered').rejects(new Error('Polymer API error'));
+      expect(await getMessageStatus(id)).to.be.deep.eq({ status: 'pending' });
     });
 
     it('should work if hyperlane api fails (derives from chain)', async () => {
