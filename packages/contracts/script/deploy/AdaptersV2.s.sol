@@ -308,6 +308,15 @@ contract MainnetProduction is DeployAdapterBase, MainnetProductionEnvironment {
       feeSigner: L2_FEE_SIGNER,
       owner: TAC_ENG_MULTISIG
     });
+
+    // Plasma
+    _deploymentParams[PLASMA] = DeploymentParams({
+      spoke: address(PLASMA_SPOKE),
+      xerc20Module: address(PLASMA_XERC20_MODULE),
+      feeRecipient: PLASMA_ENG_MULTISIG,
+      feeSigner: L2_FEE_SIGNER,
+      owner: PLASMA_ENG_MULTISIG
+    });
   }
 }
 

@@ -25,10 +25,10 @@ pub struct Any2SVMMessage {
 }
 
 impl SVM2AnyMessage {
-    pub fn new_data_only(receiver: Vec<u8>, data: Vec<u8>) -> Self {
+    pub fn new_data_only(receiver: Vec<u8>, data: Vec<u8>, gas_limit: u128) -> Self {
         let mut extra_args = Vec::new();
         extra_args.extend_from_slice(&0x181dcf10u32.to_be_bytes());
-        extra_args.extend_from_slice(&0u128.to_le_bytes());
+        extra_args.extend_from_slice(&gas_limit.to_le_bytes());
         extra_args.push(1u8);
 
         Self {
