@@ -5,6 +5,7 @@ import {
   createLoggingContext,
   HyperlaneMessageResponse,
   HyperlaneStatus,
+  isPolymerRoute,
   jsonifyError,
   Message,
   RequestContext,
@@ -12,7 +13,12 @@ import {
 } from '@chimera-monorepo/utils';
 import { NoDispatchEventOnMessage, NoGatewayConfigured } from '../types';
 import { getContext } from '../context';
-import { getHyperlaneMessageStatus, getHyperlaneMsgDelivered, getMailboxInterface } from '../mockable';
+import {
+  getHyperlaneMessageStatus,
+  getHyperlaneMsgDelivered,
+  getMailboxInterface,
+  getPolymerMsgDelivered,
+} from '../mockable';
 import { WriteTransaction } from '@chimera-monorepo/chainservice';
 
 export const getMessageStatus = async (
@@ -44,6 +50,25 @@ export const getMessageStatus = async (
       destinationDomain: message.destinationDomain,
     });
     return { status: 'none' };
+  }
+
+  // For Polymer-routed messages, query the Polymer relayer API instead of on-chain mailbox
+  if (
+    message.originDomain &&
+    message.destinationDomain &&
+    isPolymerRoute(message.originDomain, message.destinationDomain)
+  ) {
+    try {
+      const status = await getPolymerMsgDelivered(id);
+      return { status };
+    } catch (e) {
+      logger.error('Failed to get Polymer message status', requestContext, methodContext, jsonifyError(e as Error), {
+        id,
+        originDomain: message.originDomain,
+        destinationDomain: message.destinationDomain,
+      });
+      return { status: 'pending' };
+    }
   }
 
   // If the message is pending, check to see if it has been delivered onchain.
