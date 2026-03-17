@@ -1,0 +1,8 @@
+{
+  "pipelineName": "solana-mainnet-staging-webhook",
+  "programId": "Aw7BDNPNb5csVdskKaWnzX2rjQVKN1ak3tbSvXDz22rw",
+  "accountFilter": "3RaCiTPYkAQPg61JVdfbxSp9V4tsw8ZuARtFMdQfNaMp",
+  "domain": "1399811149",
+  "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+  "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING"
+}

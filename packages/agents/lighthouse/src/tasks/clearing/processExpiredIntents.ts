@@ -4,7 +4,7 @@ import { sendWithRelayerWithBackup } from '@chimera-monorepo/adapters-relayer';
 import { chainWrapper } from '@chimera-monorepo/utils';
 
 /**
- * @notice Inserts any intents that have expired inot the queue. These are
+ * @notice Inserts any intents that have expired into the queue. These are
  * intents that were not boosted by any solvers, and have timed out, or
  * were never intended to be boosted by solvers.
  * @dev Calls `storeIntent` ahd `handleExpiredInt` on the hub.
@@ -58,8 +58,6 @@ export const processExpiredIntents = async () => {
   logger.debug('Expired intents', requestContext, methodContext, {
     expired: logCtx,
   });
-
-  if (expired.length == 0) return;
 
   const data = chainWrapper.encodeFunctionData({
     abi: abis.hub.everclear,

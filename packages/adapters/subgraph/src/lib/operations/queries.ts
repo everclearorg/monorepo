@@ -314,6 +314,45 @@ export const getInvoiceEnqueuedByIntentId = (intentId: string): string => {
   `;
 };
 
+export const getSettlementIntentByIdQuery = (intentId: string): string => {
+  return `
+    intentSettleEvents(
+      where: {
+        intentId: "${intentId.toLowerCase()}"
+      },
+      first: 1
+    ){
+      ${INTENT_SETTLEMENT_EVENT_ENTITY}
+    }
+  `;
+};
+
+export const getDepositEnqueuedByIntentIdQuery = (intentId: string): string => {
+  return `
+    depositEnqueuedEvents(
+      where: {
+        intent_: {id: "${intentId.toLowerCase()}"}
+      },
+      first: 1
+    ){
+      ${DEPOSIT_ENQUEUED_EVENT_ENTITY}
+    }
+  `;
+};
+
+export const getDepositProcessedByIntentIdQuery = (intentId: string): string => {
+  return `
+    depositProcessedEvents(
+      where: {
+        intent_: {id: "${intentId.toLowerCase()}"}
+      },
+      first: 1
+    ){
+      ${DEPOSIT_PROCESSED_EVENT_ENTITY}
+    }
+  `;
+};
+
 export const getDepositsEnqueuedQuery = (
   fromNonce: number,
   maxBlockNumber?: number,

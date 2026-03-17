@@ -346,6 +346,36 @@ contract MainnetStaging is DeploySpokeBase, MainnetStagingEnvironment {
       owner: OWNER,
       maxSolversFee: MAX_FEE
     });
+
+    //// Plasma
+    _deploymentParams[PLASMA] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(PLASMA_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    //// megaETH
+    _deploymentParams[MEGAETH] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(MEGAETH_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
   }
 }
 
@@ -675,6 +705,21 @@ contract MainnetProduction is DeploySpokeBase, MainnetProductionEnvironment {
       watchtower: WATCHTOWER,
       ism: address(0), // using the default ism
       mailbox: address(TAC_MAILBOX), // domain mailbox
+      hubDomain: EVERCLEAR_DOMAIN,
+      hubGateway: address(HUB_GATEWAY),
+      owner: OWNER,
+      maxSolversFee: MAX_FEE
+    });
+
+    // Plasma
+    _deploymentParams[PLASMA] = DeploymentParams({
+      gateway: ISpokeGateway(address(0)),
+      executor: ICallExecutor(address(0)),
+      messageReceiver: address(0),
+      lighthouse: LIGHTHOUSE,
+      watchtower: WATCHTOWER,
+      ism: address(0), // using the default ism
+      mailbox: address(PLASMA_MAILBOX), // domain mailbox
       hubDomain: EVERCLEAR_DOMAIN,
       hubGateway: address(HUB_GATEWAY),
       owner: OWNER,

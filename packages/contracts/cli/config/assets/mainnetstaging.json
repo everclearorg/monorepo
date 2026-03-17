@@ -14,5 +14,13 @@
     {
         "symbol": "xPufETH",
         "contractName": "PufETH"
+    },
+    {
+        "symbol": "syrupUSDT",
+        "contractName": "SYRUPUSDT"
+    },
+    {
+        "symbol": "USDe",
+        "contractName": "USDE"
     }
 ]

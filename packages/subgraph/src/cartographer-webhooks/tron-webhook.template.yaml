@@ -1,0 +1,18 @@
+name: {{pipelineName}}
+apiVersion: 3
+resource_size: s
+sources:
+  tron_raw_logs:
+    dataset_name: tron.raw_logs
+    version: 1.0.0
+    type: dataset
+    start_at: latest
+    filter: {{{filter}}}
+transforms: {}
+sinks:
+  carto_tron_webhook:
+    type: webhook
+    from: tron_raw_logs
+    url: {{{webhookBaseUrl}}}/webhooks/tron-log?domain={{domain}}
+    secret_name: {{secretName}}
+    one_row_per_request: true

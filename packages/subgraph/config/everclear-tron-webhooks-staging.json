@@ -1,0 +1,7 @@
+{
+  "pipelineName": "tron-mainnet-staging-webhook",
+  "filter": "address = '0xd84173290e0e486b12b973f704cddef6e46a308e' OR address = '0xC4eD37f91D5f695C912C082FE9519c3DF70Fc00a'",
+  "domain": "728126428",
+  "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+  "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING"
+}

@@ -70,6 +70,17 @@ describe('Monitor', () => {
       expect(makeMonitor(MonitorService.SERVER)).to.be.returned;
       expect(exitStub.calledWith(1));
     });
+
+    it('logs only config summary and not raw config', async () => {
+      await makeMonitor(MonitorService.SERVER);
+
+      const generatedConfigLog = logger.info
+        .getCalls()
+        .find((call) => call.args[0] === 'Generated config summary.');
+      expect(generatedConfigLog).to.not.be.undefined;
+      expect(generatedConfigLog?.args[3]).to.have.property('configSummary');
+      expect(generatedConfigLog?.args[3]).to.not.have.property('config');
+    });
   });
 
   describe('#bindConfig', () => {
