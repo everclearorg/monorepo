@@ -70,9 +70,17 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
     process.exit(1);
   }
 
-  const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
-  const everclearConfig = await getEverclearConfig(everclearConfigUrl);
+  const everclearConfigUrl = process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig;
+  let everclearConfig;
+  if (everclearConfigUrl) {
+    try {
+      everclearConfig = await getEverclearConfig(everclearConfigUrl);
+    } catch (e) {
+      console.error('Failed to fetch everclear config:', e);
+    }
+  } else {
+    console.warn('Everclear config URL not set');
+  }
   const everclearChains = everclearConfig?.chains ?? {};
   const localChains = configJson.chains || configFile.chains || everclearChains || {};
 

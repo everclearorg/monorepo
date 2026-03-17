@@ -19,6 +19,7 @@
         "start:reward": "LIGHTHOUSE_SERVICE=reward npx ts-node src/tasks/run.ts",
         "start:reward_metadata": "LIGHTHOUSE_SERVICE=reward_metadata npx ts-node src/tasks/run.ts",
         "start:solana": "LIGHTHOUSE_SERVICE=solana npx ts-node src/tasks/run.ts",
+        "start:handler": "LIGHTHOUSE_SERVICE=handler npx ts-node src/server.ts",
         "lint:src": "eslint ./src --env node",
         "lint:fix": "yarn lint:src --fix",
         "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
@@ -34,6 +35,7 @@
         "@chimera-monorepo/adapters-web3signer": "workspace:*",
         "@chimera-monorepo/chainservice": "workspace:*",
         "@chimera-monorepo/database": "workspace:*",
+        "@chimera-monorepo/mqclient": "workspace:*",
         "@chimera-monorepo/utils": "workspace:*",
         "@hyperlane-xyz/sdk": "3.10.0",
         "@openzeppelin/merkle-tree": "^1.0.7",
@@ -41,7 +43,8 @@
         "aws-lambda": "1.0.7",
         "datadog-lambda-js": "6.86.0",
         "dd-trace": "3.13.2",
-        "dotenv": "16.0.3"
+        "dotenv": "16.0.3",
+        "fastify": "4.26.2"
     },
     "devDependencies": {
         "@types/aws-lambda": "8.10.110",

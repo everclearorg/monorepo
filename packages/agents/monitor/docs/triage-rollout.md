@@ -1,59 +1,48 @@
-# Agent-In-The-Loop Triage Rollout
+# Monitor Event Producer Rollout
+
+This runbook replaces monorepo triage rollout guidance. The monitor is now the
+sensor plane and emits signed `MonitorEventV1` payloads to everclear-agents.
 
 ## Required Configuration
 
-Add `triage` under monitor config:
+Set pipeline mode and webhook settings:
 
-```json
-{
-  "triage": {
-    "mode": "dry-run",
-    "timeoutMs": 15000,
-    "lookbackHours": 6,
-    "retentionHours": 24,
-    "timeBucketMinutes": 30,
-    "providers": {
-      "openai": { "apiKey": "${OPENAI_API_KEY}", "model": "gpt-4o-mini" },
-      "anthropic": { "apiKey": "${ANTHROPIC_API_KEY}", "model": "claude-sonnet-4-20250514" }
-    },
-    "autoResolve": {
-      "minConfidence": 0.85,
-      "allowedTypes": ["BadRpcDetected"],
-      "cooldownMinutes": 30
-    }
-  }
-}
+```bash
+ALERT_PIPELINE_MODE=legacy|dual|events_only
+ALERT_EVENT_WEBHOOK_URL=https://<everclear-agents-host>:3100/events
+ALERT_EVENT_WEBHOOK_SECRET=<shared-secret>
+ALERT_EVENT_ENVIRONMENT=prod
+ALERT_EVENT_RETRIES=3
+ALERT_EVENT_RETRY_BASE_MS=1000
+ALERT_EVENT_TIMEOUT_MS=10000
 ```
+
+Equivalent structured config may be provided under `eventPipeline` in monitor
+config, with env vars used as runtime overrides.
 
 ## Rollout Plan
 
-1. **Phase 0 (dry-run)**: triage computes analysis but does not modify alert body and never auto-resolves.
-2. **Phase 1 (shadow)**: alert body includes `Agent Analysis`; auto-resolve remains disabled.
-3. **Phase 2 (enabled canary)**: enable auto-resolve for a single type (`BadRpcDetected`) in staging.
-4. **Phase 3 (prod)**: promote to production and gradually expand `allowedTypes`.
+1. **legacy**: baseline behavior (Discord/Telegram/BetterUptime + legacy triage).
+2. **dual**: emit signed events and keep legacy fanout for safe comparison.
+3. **events_only**: monitor emits events only; human/action handling comes from everclear-agents.
 
-## Canary Readiness Gates
+## Acceptance Gates
 
-Before moving to the next phase, verify all gates below:
+Before moving from `dual` to `events_only`, verify:
 
-1. At least one LLM provider API key is configured in `triage.providers`.
-2. `triage.mode=enabled` only when BetterUptime credentials are configured.
-3. `triage.timeoutMs` is between `1000` and `30000`.
-4. Auto-resolve is restricted to explicitly whitelisted alert types.
-5. Monitor logs contain triage metadata (`provider`, `model`, `fingerprint`, `mode`, `reasonCode`).
-6. `alert_triage_log` contains rows with both reservation and finalized analysis fields.
-7. Rollback rehearsal executed once in staging (toggle `triage.mode` to `disabled` and verify alert flow).
+1. Missed event rate from sensor to ingest is < 0.1%.
+2. Duplicate human notifications are reduced by >= 60% in trial channels.
+3. Event ingest auth is enabled (`MONITOR_WEBHOOK_SECRET` configured on consumer).
+4. Dedup and ingest metrics are stable for at least 7 days.
 
 ## Kill Switch
 
-- Set `triage.mode` to `disabled`.
-- Wait for config refresh (`polling.config`) or redeploy.
-- Confirm outbound alerts no longer include `Agent Analysis`.
+- Set `ALERT_PIPELINE_MODE=legacy`.
+- This bypasses event-only routing and restores legacy fanout immediately.
 
 ## Rollback Checklist
 
-1. Set `triage.mode=disabled`.
-2. Redeploy monitor if immediate effect is required.
-3. Verify alerts are still delivered to Better Stack/Discord/Telegram.
-4. Verify no new rows are inserted into `alert_triage_log`.
-5. Keep historical rows; they expire using `expires_at`.
+1. Flip to `legacy`.
+2. Confirm legacy channel alerts resume.
+3. Confirm no ingestion errors are blocking critical monitoring.
+4. Keep `dual` available for replay comparison until incident closes.

@@ -140,13 +140,19 @@ variable "cartographer_handler_image_tag" {
   default     = "latest"
 }
 
-variable "goldsky_webhook_secret" {
+variable "cartographer_goldsky_webhook_secret" {
   type      = string
   sensitive = true
   default   = ""
 }
 
 variable "cartographer_handler_heartbeat" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "cartographer_admin_token" {
   type      = string
   sensitive = true
   default   = ""

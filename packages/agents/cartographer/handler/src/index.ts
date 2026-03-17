@@ -3,13 +3,14 @@ import { Logger, jsonifyError, createLoggingContext } from '@chimera-monorepo/ut
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 
 import { getHandlerConfig, initializeContext, HandlerConfig } from './init';
-import { createServer, ServerState } from './server';
+import { createServer, ServerState, PAUSE_CHECKPOINT_KEY } from './server';
 import { runBackfill } from './maintenance/backfill';
+import { initNotify, closeNotify } from './notify';
 
 let server: FastifyInstance | null = null;
 let appContext: AppContext | null = null;
 let isShuttingDown = false;
-let backfillInterval: NodeJS.Timeout | null = null;
+let backfillTimeout: NodeJS.Timeout | null = null;
 let handlerConfig: HandlerConfig;
 
 const logger = new Logger({
@@ -30,7 +31,7 @@ function startBackfillLoop(): void {
 }
 
 function scheduleNextBackfill(delayMs: number): void {
-  backfillInterval = setTimeout(async () => {
+  backfillTimeout = setTimeout(async () => {
     if (!appContext || isShuttingDown) return;
 
     try {
@@ -52,11 +53,14 @@ async function gracefulShutdown(): Promise<void> {
   logger.info('Starting graceful shutdown');
 
   try {
-    if (backfillInterval) {
-      clearInterval(backfillInterval);
-      backfillInterval = null;
+    if (backfillTimeout) {
+      clearTimeout(backfillTimeout);
+      backfillTimeout = null;
       logger.info('Backfill loop stopped');
     }
+
+    await closeNotify();
+    logger.info('BullMQ notification queues closed');
 
     if (server) {
       await server.close();
@@ -78,12 +82,20 @@ async function startServer(): Promise<void> {
   try {
     handlerConfig = await getHandlerConfig();
 
+    if (!handlerConfig.adminToken) {
+      logger.error('Cartographer admin token is not set');
+    }
+
     appContext = await initializeContext(handlerConfig, logger);
+
+    const pauseCheckpoint = await appContext.adapters.database.getCheckPoint(PAUSE_CHECKPOINT_KEY);
+    const isPaused = pauseCheckpoint === 1;
 
     const state: ServerState = {
       appContext,
-      isPaused: false,
+      isPaused,
       webhookSecret: handlerConfig.goldskyWebhookSecret,
+      adminToken: handlerConfig.adminToken,
     };
 
     server = createServer(state, logger);
@@ -92,6 +104,11 @@ async function startServer(): Promise<void> {
     logger.info('Cartographer handler server started', requestContext, methodContext, {
       port: handlerConfig.handlerPort,
     });
+
+    // Initialize BullMQ notification queues if REDIS_URL is configured
+    if (handlerConfig.redisUrl) {
+      initNotify(handlerConfig.redisUrl, logger);
+    }
 
     startBackfillLoop();
 

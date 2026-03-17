@@ -1,6 +1,7 @@
 export * from './address';
 export * from './alerts';
 export * from './axios';
+export * from './events';
 export * from './hex';
 export * from './time';
 export * from './config';
@@ -8,6 +9,7 @@ export * from './health';
 export * from './db';
 export * from './tokenprice';
 export * from './hyperlane';
+export * from './polymer';
 export * from './ssm';
 export * from './ticker';
 export * from './chain';

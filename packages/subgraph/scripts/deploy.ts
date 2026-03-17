@@ -10,6 +10,8 @@ import { readFileSync, writeFileSync } from 'fs';
 import YAML from 'yaml';
 import yamlToJson from 'js-yaml';
 import { build, deploySubgraph } from './thegraph';
+import { getLatestLabel } from './utils';
+import { deployWebhookPipelines } from './deploy-webhooks';
 
 const ARTIFACTS_PREFIX = `../contracts/deployments`;
 
@@ -32,9 +34,10 @@ program
   .argument('<name>', 'Subgraph Name')
   .option('-v, --version <value>', 'Subgraph Version v0, v1,... staging, local-v0...', 'v0')
   .option('-n, --networks <value...>', 'Network name. all | mainnet optimism ...', 'all')
-  .option('-l, --label <value>', 'Subgrpah version label. v0.0.1, v0.0.2...', '')
+  .option('-l, --label <value>', 'Subgraph version label. If omitted, auto-detects latest and increments.', '')
   .option('-d, --deploy <value>', 'deploy to network?', 'true')
   .option('-i, --indexers <value...>', 'Indexers. all | studio', 'all')
+  .option('-w, --with-webhooks', 'Also deploy webhook pipelines after subgraph deploy', false)
   .action(async function (name) {
     const options = program.opts();
     console.log(options);
@@ -50,9 +53,11 @@ program
     // check if deploy
     const deploy = options.deploy === 'true';
     // Subgrpah version label. required in studio and goldsky.
-    const label = options.label || '';
+    let label = options.label || '';
     // Indexers
     const indexers = options.indexers === 'all' ? supportedIndexers : options.indexers;
+    // With webhooks
+    const withWebhooks = options.withWebhooks;
 
     // validate command args
 
@@ -74,6 +79,13 @@ program
       }
       return res;
     });
+
+    // Auto-detect label if not provided and deploying to goldsky
+    if (!label && deploy && indexers.includes('goldsky')) {
+      const firstSubgraphName = networksToDeploy[0].subgraphName;
+      label = await getLatestLabel(firstSubgraphName, version);
+      console.log(`Using auto-detected label: ${label}`);
+    }
 
     const templateJsonFile: any = yamlToJson.load(readFileSync(`./src/${subgraphName}/subgraph.template.yaml`, 'utf8'));
 
@@ -140,6 +152,13 @@ program
           }
         }
       }
+    }
+
+    // Deploy webhook pipelines if requested
+    if (withWebhooks && deploy && label) {
+      console.log(`\n--- Deploying webhook pipelines with label ${label} ---`);
+      const webhookConfigName = `${subgraphName}-webhooks`;
+      await deployWebhookPipelines(webhookConfigName, version, label, networkNames);
     }
   });
 

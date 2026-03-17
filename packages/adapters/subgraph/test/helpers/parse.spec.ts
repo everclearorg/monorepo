@@ -156,6 +156,7 @@ describe('Subgraph Adapter - parse', () => {
       });
       expect(parsed).to.be.deep.eq({
         ...expected,
+        feeAdapterInitiator: order.initiator,
         orderId: order.id,
         isSwap: undefined,
       });

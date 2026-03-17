@@ -23,6 +23,8 @@ locals {
   #   GRAPH_API_KEY       = var.graph_api_key
   # }
 
+  base_domain         = "everclear.ninja"
+
   postgrest_env_vars = [
     { name = "PGRST_ADMIN_SERVER_PORT", value = "3001" },
     { name = "PGRST_DB_URI", value = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear" },
@@ -36,7 +38,7 @@ locals {
 
   cartographer_handler_env_vars = [
     { name = "DATABASE_URL", value = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear" },
-    { name = "GOLDSKY_WEBHOOK_SECRET", value = var.goldsky_webhook_secret },
+    { name = "GOLDSKY_WEBHOOK_SECRET", value = var.cartographer_goldsky_webhook_secret },
     { name = "CARTOGRAPHER_CONFIG", value = jsonencode(local.local_cartographer_config_obj) },
     { name = "CARTOGRAPHER_LOG_LEVEL", value = "debug" },
     { name = "ENVIRONMENT", value = var.environment },
@@ -44,6 +46,8 @@ locals {
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
     { name = "DD_LOGS_ENABLED", value = "true" },
     { name = "DD_API_KEY", value = var.dd_api_key },
+    { name = "CARTOGRAPHER_ADMIN_TOKEN", value = var.cartographer_admin_token },
+    { name = "REDIS_URL", value = data.terraform_remote_state.core.outputs.lighthouse_queue_redis_url },
   ]
 
   local_cartographer_config_obj = {
@@ -52,6 +56,7 @@ locals {
     databaseUrl = "postgres://${var.postgres_user}:${var.postgres_password}@${module.cartographer_db.db_instance_endpoint}/everclear"
     service = "handler"
     pollInterval = 60000
+    everclearConfig = "https://raw.githubusercontent.com/connext/chaindata/main/everclear.mainnet.staging.json"
     healthUrls = {
       handler = "https://uptime.betterstack.com/api/v1/heartbeat/${var.cartographer_handler_heartbeat}"
     }

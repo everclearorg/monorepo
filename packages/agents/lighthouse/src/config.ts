@@ -73,6 +73,7 @@ export const TLighthouseService = Type.Union([
   Type.Literal('reward'),
   Type.Literal('reward_metadata'),
   Type.Literal('solana'),
+  Type.Literal('handler'),
 ]);
 export type LighthouseService = Static<typeof TLighthouseService>;
 
@@ -107,6 +108,8 @@ export const TLighthouseConfig = Type.Object({
     }),
   ),
   solana: TSolanaConfig,
+  redisUrl: Type.Optional(Type.String()),
+  adminToken: Type.String(),
 });
 export type LighthouseConfig = Static<typeof TLighthouseConfig>;
 
@@ -149,9 +152,17 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     process.exit(1);
   }
 
-  const everclearConfigUrl =
-    process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig || undefined;
-  const everclearConfig = await getEverclearConfig(everclearConfigUrl);
+  const everclearConfigUrl = process.env.EVERCLEAR_CONFIG || configJson.everclearConfig || configFile.everclearConfig;
+  let everclearConfig;
+  if (everclearConfigUrl) {
+    try {
+      everclearConfig = await getEverclearConfig(everclearConfigUrl);
+    } catch (e) {
+      console.error('Failed to fetch everclear config:', e);
+    }
+  } else {
+    console.warn('Everclear config URL not set');
+  }
 
   const environment = (process.env.LIGHTHOUSE_ENVIRONMENT ||
     configJson?.environment ||
@@ -267,6 +278,9 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     safe: configJson?.safe || configFile?.safe || {},
     betterUptime: configJson.betterUptime || configFile.betterUptime || {},
     solana: configJson?.solana || configFile?.solana || {},
+    redisUrl: process.env.REDIS_URL || configJson?.redisUrl || configFile?.redisUrl,
+    adminToken:
+      process.env.LIGHTHOUSE_ADMIN_TOKEN || configJson?.server?.adminToken || configFile?.server?.adminToken || '',
   };
 
   // Validate schema

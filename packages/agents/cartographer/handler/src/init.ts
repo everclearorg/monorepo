@@ -12,6 +12,8 @@ import {
 export type HandlerConfig = CartographerConfig & {
   goldskyWebhookSecret: string;
   handlerPort: number;
+  adminToken: string;
+  redisUrl?: string;
 };
 
 export const getHandlerConfig = async (): Promise<HandlerConfig> => {
@@ -21,6 +23,8 @@ export const getHandlerConfig = async (): Promise<HandlerConfig> => {
     ...baseConfig,
     goldskyWebhookSecret: process.env.GOLDSKY_WEBHOOK_SECRET || '',
     handlerPort: parseInt(process.env.PORT || '3000', 10),
+    adminToken: process.env.CARTOGRAPHER_ADMIN_TOKEN || '',
+    redisUrl: process.env.REDIS_URL || undefined,
   };
 };
 

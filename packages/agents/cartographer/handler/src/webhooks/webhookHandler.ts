@@ -22,6 +22,8 @@ import {
   processHubAssetUpdate,
 } from '../processors/monitorProcessor';
 import { processDepositorEvent, processToken } from '../processors/depositorProcessor';
+import { processSolanaInstruction } from '../processors/solanaInstructionProcessor';
+import { processTronLog } from '../processors/tronLogProcessor';
 
 export interface WebhookResponse {
   message: string;
@@ -38,13 +40,13 @@ export function base64ToHex(b64: string): string {
 }
 
 /**
- * Verify webhook secret using timing-safe comparison.
+ * Verify a secret using timing-safe comparison.
  */
-export function verifyWebhookSecret(webhookSecretHeader: string | undefined, expectedSecret: string): boolean {
-  if (!webhookSecretHeader) return false;
+export function verifySecret(authHeader: string | undefined, expectedSecret: string): boolean {
+  if (!authHeader) return false;
 
   try {
-    const providedSecret = Buffer.from(webhookSecretHeader);
+    const providedSecret = Buffer.from(authHeader);
     const expected = Buffer.from(expectedSecret);
 
     if (providedSecret.length !== expected.length) return false;
@@ -77,7 +79,7 @@ export async function routeWebhook(
     adapters: { database },
   } = context;
 
-  logger.debug('Routing webhook', undefined, undefined, { webhookName, webhookId, domain });
+  logger.debug('Routing webhook', undefined, undefined, { webhookName, webhookId, domain, payload });
 
   try {
     switch (webhookName) {
@@ -157,6 +159,16 @@ export async function routeWebhook(
         break;
       case 'hub-token':
         await processToken(payload, context);
+        break;
+
+      // Solana instruction webhook
+      case 'solana-instruction':
+        await processSolanaInstruction(payload, context);
+        break;
+
+      // Tron log webhook
+      case 'tron-log':
+        await processTronLog(payload, context);
         break;
 
       default:

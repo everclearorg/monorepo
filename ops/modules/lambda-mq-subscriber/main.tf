@@ -3,7 +3,7 @@ data "aws_region" "current" {}
 
 locals {
   account_id     = data.aws_caller_identity.current.account_id
-  repository_url = "${local.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${var.ecr_repository_name}"
+  repository_url = "${local.account_id}.dkr.ecr.${data.aws_region.current.id}.amazonaws.com/${var.ecr_repository_name}"
 }
 
 resource "aws_iam_role" "lambda" {
@@ -21,32 +21,34 @@ resource "aws_iam_role" "lambda" {
       }
     ]
   })
+}
 
-  inline_policy {
-    name = "${var.container_family}-${var.environment}-${var.stage}-lambda-mq-subscriber-policies"
-    policy = jsonencode({
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Action" : [
-            "mq:DescribeBroker",
-            "secretsmanager:GetSecretValue",
-            "ec2:CreateNetworkInterface",
-            "ec2:DescribeNetworkInterfaces",
-            "ec2:DescribeVpcs",
-            "ec2:DeleteNetworkInterface",
-            "ec2:DescribeSubnets",
-            "ec2:DescribeSecurityGroups",
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ],
-          "Resource" : ["*"]
-        }
-      ]
-    })
-  }
+resource "aws_iam_role_policy" "lambda" {
+  name = "${var.container_family}-${var.environment}-${var.stage}-lambda-mq-subscriber-policies"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "mq:DescribeBroker",
+          "secretsmanager:GetSecretValue",
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeVpcs",
+          "ec2:DeleteNetworkInterface",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : ["*"]
+      }
+    ]
+  })
 }
 resource "aws_lambda_function" "executable" {
   function_name = "${var.container_family}-${var.environment}-${var.stage}-mq-subscriber"

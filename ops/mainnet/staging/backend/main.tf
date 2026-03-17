@@ -10,6 +10,15 @@ provider "aws" {
   region = var.region
 }
 
+data "terraform_remote_state" "core" {
+  backend = "s3"
+  config = {
+    bucket = "everclear-chimera-mainnet-staging-core"
+    key    = "state"
+    region = "us-east-1"
+  }
+}
+
 # Fetch AZs in the current region
 data "aws_availability_zones" "available" {}
 
@@ -19,7 +28,8 @@ data "aws_iam_role" "ecr_admin_role" {
 
 
 data "aws_route53_zone" "primary" {
-  zone_id = "Z03634792TWUEHHQ5L0YX"
+  name = local.base_domain
+  private_zone = false
 }
 
 locals {

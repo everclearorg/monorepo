@@ -9,12 +9,19 @@ import {
   getMaxTxNonce,
   SOLANA_CHAINID,
   SpokeMeta,
+  jsonifyError,
+  EverclearError,
+  isPolymerRoute,
 } from '@chimera-monorepo/utils';
 
 import { AppContext } from '../context';
 import { CartographerConfig } from '../config';
 import { getSubgraphSupportedDomains } from './helper';
-import { getHyperlaneMsgDelivered } from '../mockable';
+import { getHyperlaneMsgDelivered, getPolymerMsgDelivered } from '../mockable';
+
+const isChainConfigured = (domain: string, config: CartographerConfig) => {
+  return domain == config.hub.domain || !!config.chains[domain];
+};
 
 const getChainConfig = (domain: string, config: CartographerConfig) => {
   if (domain == config.hub.domain) {
@@ -26,23 +33,58 @@ const getChainConfig = (domain: string, config: CartographerConfig) => {
   return config.chains[domain];
 };
 
-const getMessageStatus = async (messageId: string, context: AppContext, destinationDomain?: string) => {
+const getMessageStatus = async (
+  messageId: string,
+  context: AppContext,
+  originDomain?: string,
+  destinationDomain?: string,
+) => {
   const {
     config,
     adapters: { chainreader },
+    logger,
   } = context;
+  const { requestContext, methodContext } = createLoggingContext(getMessageStatus.name);
+
+  // For Polymer-routed messages, query the Polymer relayer API instead of on-chain mailbox
+  if (originDomain && destinationDomain && isPolymerRoute(originDomain, destinationDomain)) {
+    try {
+      return await getPolymerMsgDelivered(messageId);
+    } catch (err) {
+      logger.error(
+        'Failed to get Polymer message status',
+        requestContext,
+        methodContext,
+        jsonifyError(err as EverclearError),
+        {
+          messageId,
+          originDomain,
+          destinationDomain,
+        },
+      );
+    }
+    return HyperlaneStatus.pending;
+  }
+
   const chainConfig = getChainConfig(destinationDomain!, config);
   const gateway = chainConfig.deployments?.gateway;
   let status: HyperlaneStatus = HyperlaneStatus.pending;
   if (gateway) {
-    const messageDelivered = await getHyperlaneMsgDelivered(
-      messageId,
-      gateway,
-      (params) => chainreader.readTx(params, 'latest'),
-      +destinationDomain!,
-    );
-    if (messageDelivered) {
-      status = HyperlaneStatus.delivered;
+    try {
+      const messageDelivered = await getHyperlaneMsgDelivered(
+        messageId,
+        gateway,
+        (params) => chainreader.readTx(params, 'latest'),
+        +destinationDomain!,
+      );
+      if (messageDelivered) {
+        status = HyperlaneStatus.delivered;
+      }
+    } catch (err) {
+      logger.error('Failed to get message status', requestContext, methodContext, jsonifyError(err as EverclearError), {
+        messageId,
+        destinationDomain,
+      });
     }
   }
   return status;
@@ -70,7 +112,16 @@ export const updateMessages = async (context: AppContext) => {
 
     let messages = [];
     if (domain === config.hub.domain) {
-      messages = await subgraph.getHubMessages(domain, latestNonce);
+      messages = (await subgraph.getHubMessages(domain, latestNonce)).filter((m) => {
+        if (m.destinationDomain && !isChainConfigured(m.destinationDomain, config)) {
+          logger.debug('Skipping message with unconfigured destination', requestContext, methodContext, {
+            messageId: m.id,
+            destinationDomain: m.destinationDomain,
+          });
+          return false;
+        }
+        return true;
+      });
       await Promise.all(
         messages.map(async (message) => {
           // Skip contract read for hub → Solana
@@ -79,7 +130,7 @@ export const updateMessages = async (context: AppContext) => {
             message.status = HyperlaneStatus.pending;
             return;
           }
-          message.status = await getMessageStatus(message.id, context, message.destinationDomain);
+          message.status = await getMessageStatus(message.id, context, domain, message.destinationDomain);
         }),
       );
 
@@ -102,7 +153,12 @@ export const updateMessages = async (context: AppContext) => {
       await Promise.all(
         messages.map(async (message) => {
           // all spoke messages go to the hub, use this domain if no destination on message
-          message.status = await getMessageStatus(message.id, context, message.destinationDomain ?? config.hub.domain);
+          message.status = await getMessageStatus(
+            message.id,
+            context,
+            domain,
+            message.destinationDomain ?? config.hub.domain,
+          );
         }),
       );
 
@@ -312,12 +368,15 @@ export const updateMessageStatus = async (context: AppContext) => {
       result: uncompletedMessages.length,
     });
 
-    // Skip messages going to solana, they will be updated by lighthouse
-    const messagesToProcess = uncompletedMessages.filter((message) => message.destinationDomain !== SOLANA_CHAINID);
+    // Skip messages going to solana (updated by lighthouse) or to unconfigured chains
+    const messagesToProcess = uncompletedMessages.filter(
+      (message) =>
+        message.destinationDomain !== SOLANA_CHAINID && isChainConfigured(message.destinationDomain!, context.config),
+    );
 
     const statusRes = await Promise.all(
       messagesToProcess.map(async (message) => {
-        const status = await getMessageStatus(message.id, context, message.destinationDomain);
+        const status = await getMessageStatus(message.id, context, message.originDomain, message.destinationDomain);
         return { id: message.id, status };
       }),
     );

@@ -9,6 +9,7 @@ import {
   getTokenPriceFromUniV3 as _getTokenPriceFromUniV3,
   getHyperlaneMessageStatus as _getHyperlaneMessageStatus,
   getHyperlaneMsgDelivered as _getHyperlaneMsgDelivered,
+  getPolymerMsgDelivered as _getPolymerMsgDelivered,
   sendAlerts as _sendAlerts,
   resolveAlerts as _resolveAlerts,
   getSsmParameter as _getSsmParameter,
@@ -68,6 +69,7 @@ export const getTokenPriceFromChainlink = _getTokenPriceFromChainlink;
 export const getTokenPriceFromUniV2 = _getTokenPriceFromUniV2;
 export const getTokenPriceFromUniV3 = _getTokenPriceFromUniV3;
 export const getHyperlaneMsgDelivered = _getHyperlaneMsgDelivered;
+export const getPolymerMsgDelivered = _getPolymerMsgDelivered;
 export const sendAlerts = _sendAlerts;
 export const resolveAlerts = _resolveAlerts;
 export const getSsmParameter = _getSsmParameter;

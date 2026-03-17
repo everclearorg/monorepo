@@ -1,0 +1,26 @@
+{
+  "name": "@chimera-monorepo/mqclient",
+  "version": "0.0.1",
+  "description": "BullMQ adapter for message queue producer/worker interfaces",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "lint:src": "eslint ./src --env node",
+    "lint:fix": "yarn lint:src --fix",
+    "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
+    "build": "tsc --build ./tsconfig.json",
+    "purge": "yarn clean && rimraf ./node_modules"
+  },
+  "dependencies": {
+    "bullmq": "5.34.8"
+  },
+  "devDependencies": {
+    "eslint": "8.34.0",
+    "rimraf": "5.0.1",
+    "typescript": "5.9.2"
+  }
+}

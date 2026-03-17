@@ -91,6 +91,7 @@ export async function sendAlerts(
   const methodContext = createMethodContext(sendAlerts.name);
   const mode = getPipelineMode();
   const { emitterConfig, secretEmpty } = getEmitterConfig(config);
+  let eventEmissionSucceeded = false;
 
   if (secretEmpty && emitterConfig) {
     logger.warn('Event emitter webhook secret is empty — HMAC signatures will provide no authentication', requestContext, methodContext);
@@ -100,6 +101,7 @@ export async function sendAlerts(
   if (mode !== 'legacy' && emitterConfig) {
     try {
       await emitEvent(report, emitterConfig, logger, requestContext);
+      eventEmissionSucceeded = true;
     } catch (emitErr) {
       logger.error('Event emission failed; continuing with legacy path', requestContext, methodContext, {
         type: 'EventEmissionError',
@@ -120,7 +122,22 @@ export async function sendAlerts(
   }
 
   // --- Legacy path (legacy + dual) ---
-  const triageOutput = await triageInterceptor(report, config, requestContext);
+  // In dual mode, when event emission succeeded the everclear-agents pipeline
+  // handles triage. Skip the monorepo triage interceptor to avoid double LLM
+  // calls and potentially contradictory verdicts.
+  const skipTriage = mode === 'dual' && eventEmissionSucceeded;
+
+  const triageOutput = skipTriage
+    ? {
+        report,
+        shouldAutoResolve: false,
+        fingerprint: undefined as string | undefined,
+        autoResolveReasonCode: undefined as string | undefined,
+        providerUsed: 'skipped' as const,
+        modelUsed: 'skipped',
+        mode: 'skipped' as const,
+      }
+    : await triageInterceptor(report, config, requestContext);
   const alertReport = preprocessReport(triageOutput.report, config);
   const alertPromises = [];
   let autoResolvePromiseIndex: number | undefined = undefined;
@@ -155,6 +172,7 @@ export async function sendAlerts(
   logger.info('Alerts sent', requestContext, methodContext, {
     report: toLogSafeReport(alertReport),
     mode,
+    triageSkipped: skipTriage,
     triage: {
       provider: triageOutput.providerUsed,
       model: triageOutput.modelUsed,

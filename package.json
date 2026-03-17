@@ -14,6 +14,7 @@
     "packages/adapters/web3signer",
     "packages/adapters/relayer",
     "packages/adapters/database",
+    "packages/adapters/mqclient",
     "packages/agents/cartographer/core",
     "packages/agents/cartographer/poller",
     "packages/agents/cartographer/handler",

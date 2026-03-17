@@ -78,8 +78,7 @@ locals {
       }
       "48900" = {
         providers = [
-          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}",
-          "https://zircuit1-mainnet.p2pify.com"
+          "https://lb.drpc.live/zircuit-mainnet/${var.drpc_key}"
         ]
       }
       "81457" = {

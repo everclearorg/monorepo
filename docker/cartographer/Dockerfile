@@ -43,6 +43,7 @@ COPY .yarn /tmp/build/.yarn/
 COPY .yarnrc.yml /tmp/build/
 COPY package.json /tmp/build/
 COPY packages/agents/cartographer/poller/package.json /tmp/build/packages/agents/cartographer/poller/
+COPY packages/agents/cartographer/core/package.json /tmp/build/packages/agents/cartographer/core/
 COPY packages/adapters/subgraph/package.json /tmp/build/packages/adapters/subgraph/
 COPY packages/adapters/database/package.json /tmp/build/packages/adapters/database/
 COPY packages/adapters/chainservice/package.json /tmp/build/packages/adapters/chainservice/
@@ -57,6 +58,7 @@ RUN yarn install
 # ----- Copy source and all other files that affect lint, test, build -----
 COPY config config/
 COPY packages/agents/cartographer/poller /tmp/build/packages/agents/cartographer/poller
+COPY packages/agents/cartographer/core /tmp/build/packages/agents/cartographer/core
 COPY packages/adapters/subgraph /tmp/build/packages/adapters/subgraph
 COPY packages/adapters/database /tmp/build/packages/adapters/database
 COPY packages/adapters/chainservice /tmp/build/packages/adapters/chainservice

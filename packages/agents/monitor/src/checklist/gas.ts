@@ -86,8 +86,10 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
           : false,
       });
 
+      const relayerBalance = BigInt(relayerGas ?? '0');
+      const relayerCritical = relayerAddress && relayerBalance < BigInt(relayerThreshold) / 2n;
       const relayerReport = {
-        severity: Severity.Warning,
+        severity: relayerCritical ? Severity.Critical : Severity.Warning,
         type: 'LowGasRelayer',
         ids: [domainId],
         reason: `${requestContext.origin}, The relayer ${relayerAddress} of ${domainId} has low gas balance`,
@@ -95,7 +97,7 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
         logger: logger,
         env: config.environment,
       };
-      const relayerViolated = relayerAddress && BigInt(relayerGas ?? '0') < BigInt(relayerThreshold);
+      const relayerViolated = relayerAddress && relayerBalance < BigInt(relayerThreshold);
       if (shouldAlert && relayerViolated) {
         // Send relayer gas alerts
         logger.warn(`The relayer ${relayerAddress} of ${domainId} has low gas balance`, requestContext, methodContext, {
@@ -120,9 +122,11 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
         await resolveAlerts(relayerReport, logger, config, requestContext);
       }
 
-      const gatewayGasViolated = gatewayAddress && BigInt(gatewayGas ?? '0') < BigInt(gatewayThreshold);
+      const gatewayBalance = BigInt(gatewayGas ?? '0');
+      const gatewayGasViolated = gatewayAddress && gatewayBalance < BigInt(gatewayThreshold);
+      const gatewayCritical = gatewayAddress && gatewayBalance < BigInt(gatewayThreshold) / 2n;
       const gatewayReport = {
-        severity: Severity.Warning,
+        severity: gatewayCritical ? Severity.Critical : Severity.Warning,
         type: 'LowGasGateway',
         ids: [domainId],
         reason: `${requestContext.origin}, The gateway ${gatewayAddress} of ${domainId} has low gas balance`,
@@ -154,10 +158,12 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
         await resolveAlerts(gatewayReport, logger, config, requestContext);
       }
 
+      const tokenomicsGwBalance = BigInt(tokenomicsGatewayGas ?? '0');
       const tokenomicsGatewayGasViolated =
-        tokenonmicsGatewayAddress && BigInt(tokenomicsGatewayGas ?? '0') < BigInt(gatewayThreshold);
+        tokenonmicsGatewayAddress && tokenomicsGwBalance < BigInt(gatewayThreshold);
+      const tokenomicsGwCritical = tokenonmicsGatewayAddress && tokenomicsGwBalance < BigInt(gatewayThreshold) / 2n;
       const tokenomicsGatewayReport = {
-        severity: Severity.Warning,
+        severity: tokenomicsGwCritical ? Severity.Critical : Severity.Warning,
         type: 'LowGasTokenomicsGateway',
         ids: [domainId],
         reason: `${requestContext.origin}, The tokenomics gateway ${tokenonmicsGatewayAddress} of ${domainId} has low gas balance`,

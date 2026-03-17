@@ -263,5 +263,14 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-megaeth",
+    "domain": "4326",
+    "environment": "production",
+    "network": "megaeth-mainnet",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]

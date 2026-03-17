@@ -5,8 +5,8 @@
     },
     "network": "mainnet",
     "domain": "1",
-    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
     "entities": [
       {
         "sourceId": "origin_intent",
@@ -57,8 +57,8 @@
     },
     "network": "optimism",
     "domain": "10",
-    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
     "entities": [
       {
         "sourceId": "origin_intent",
@@ -109,8 +109,8 @@
     },
     "network": "tac",
     "domain": "239",
-    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
     "entities": [
       {
         "sourceId": "origin_intent",
@@ -159,10 +159,10 @@
     "subgraph": {
       "name": "everclear-spoke-megaeth"
     },
-    "network": "megaeth",
+    "network": "megaeth-mainnet",
     "domain": "4326",
-    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
     "entities": [
       {
         "sourceId": "origin_intent",
@@ -213,8 +213,8 @@
     },
     "network": "mantle",
     "domain": "5000",
-    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
     "entities": [
       {
         "sourceId": "origin_intent",
@@ -265,8 +265,8 @@
     },
     "network": "base",
     "domain": "8453",
-    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
     "entities": [
       {
         "sourceId": "origin_intent",
@@ -315,10 +315,10 @@
     "subgraph": {
       "name": "everclear-spoke-plasma"
     },
-    "network": "plasma",
+    "network": "plasma-mainnet",
     "domain": "9745",
-    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
     "entities": [
       {
         "sourceId": "origin_intent",
@@ -369,8 +369,8 @@
     },
     "network": "arbitrum-one",
     "domain": "42161",
-    "webhookBaseUrl": "https://cartographer-handler-staging.everclear.ninja",
-    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET",
+    "webhookBaseUrl": "https://cartographer-handler.chimera.staging.everclear.ninja",
+    "secretName": "CARTOGRAPHER_WEBHOOK_SECRET_STAGING",
     "entities": [
       {
         "sourceId": "origin_intent",
