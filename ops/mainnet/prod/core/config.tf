@@ -239,6 +239,11 @@ locals {
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
         privateKey = var.relayer_web3_signer_private_key
+      },
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
+        ]
       }
     }
     server = {
@@ -368,6 +373,11 @@ locals {
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
         privateKey = var.watchtower_web3_signer_private_key
+      },
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
+        ]
       }
     }
     server = {
@@ -544,6 +554,11 @@ locals {
         providers = [
           "https://gnosis-mainnet.g.alchemy.com/v2/${var.alchemy_key}"
         ]
+      },
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
+        ]
       }
     }
     betterUptime = {
@@ -646,6 +661,7 @@ locals {
       5000 = { maxAge = 60, size = 1 },
       146 = { maxAge = 60, size = 1 },
       57073 = { maxAge = 60, size = 1 },
+      9745 = { maxAge = 60, size = 1 },
       100 = { maxAge = 60, size = 1 },
       728126428 = { maxAge = 60, size = 1 }
     }
@@ -788,6 +804,11 @@ locals {
           "https://api.trongrid.io?apiKey=${var.trongrid_api_key}"
         ]
         privateKey = var.lighthouse_web3_signer_private_key
+      },
+      "9745" = {
+        providers = [
+          "https://rpc.plasma.to"
+        ]
       }
     }
     database = { url = local.default_db_url }
