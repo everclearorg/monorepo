@@ -11,10 +11,11 @@ import {
   SpokeMeta,
   jsonifyError,
   EverclearError,
+  isPolymerRoute,
 } from '@chimera-monorepo/utils';
 
 import { getContext } from '../../shared';
-import { getHyperlaneMsgDelivered } from '../../mockable';
+import { getHyperlaneMsgDelivered, getPolymerMsgDelivered } from '../../mockable';
 import { getSubgraphSupportedDomains } from './helper';
 import { CartographerConfig } from '../../config';
 
@@ -28,12 +29,38 @@ const getChainConfig = (domain: string, config: CartographerConfig) => {
   return config.chains[domain];
 };
 
-const getMessageStatus = async (messageId: string, config: CartographerConfig, destinationDomain?: string) => {
+const getMessageStatus = async (
+  messageId: string,
+  config: CartographerConfig,
+  originDomain?: string,
+  destinationDomain?: string,
+) => {
   const {
     adapters: { chainreader },
     logger,
   } = getContext();
   const { requestContext, methodContext } = createLoggingContext(getMessageStatus.name);
+
+  // For Polymer-routed messages, query the Polymer relayer API instead of on-chain mailbox
+  if (originDomain && destinationDomain && isPolymerRoute(originDomain, destinationDomain)) {
+    try {
+      return await getPolymerMsgDelivered(messageId);
+    } catch (err) {
+      logger.error(
+        'Failed to get Polymer message status',
+        requestContext,
+        methodContext,
+        jsonifyError(err as EverclearError),
+        {
+          messageId,
+          originDomain,
+          destinationDomain,
+        },
+      );
+    }
+    return HyperlaneStatus.pending;
+  }
+
   const chainConfig = getChainConfig(destinationDomain!, config);
   const gateway = chainConfig.deployments?.gateway;
   let status: HyperlaneStatus = HyperlaneStatus.pending;
@@ -89,7 +116,7 @@ export const updateMessages = async () => {
             message.status = HyperlaneStatus.pending;
             return;
           }
-          message.status = await getMessageStatus(message.id, config, message.destinationDomain);
+          message.status = await getMessageStatus(message.id, config, domain, message.destinationDomain);
         }),
       );
 
@@ -112,7 +139,7 @@ export const updateMessages = async () => {
       await Promise.all(
         messages.map(async (message) => {
           // all spoke messages go to the hub, use this domain if no destination on message
-          message.status = await getMessageStatus(message.id, config, message.destinationDomain ?? config.hub.domain);
+          message.status = await getMessageStatus(message.id, config, domain, message.destinationDomain ?? config.hub.domain);
         }),
       );
 
@@ -328,7 +355,7 @@ export const updateMessageStatus = async () => {
 
     const statusRes = await Promise.all(
       messagesToProcess.map(async (message) => {
-        const status = await getMessageStatus(message.id, config, message.destinationDomain);
+        const status = await getMessageStatus(message.id, config, message.originDomain, message.destinationDomain);
         return { id: message.id, status };
       }),
     );

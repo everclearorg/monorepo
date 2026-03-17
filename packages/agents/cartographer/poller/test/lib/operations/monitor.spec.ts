@@ -20,6 +20,7 @@ import {
   expect,
   HyperlaneStatus,
   SOLANA_CHAINID,
+  mkBytes32,
 } from '@chimera-monorepo/utils';
 import { mockAppContext } from '../../globalTestHook';
 import * as mockable from '../../../src/mockable';
@@ -30,7 +31,7 @@ describe('Monitor operations', () => {
     it('should work', async () => {
       const getHyperlaneMsgDelivered = stub(mockable, 'getHyperlaneMsgDelivered');
       getHyperlaneMsgDelivered.resolves(false);
-      
+
       const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
       const spokeMessages = createMessages(5);
       const hubMessages = createHubMessages(5);
@@ -110,7 +111,7 @@ describe('Monitor operations', () => {
     it('should not save checkpoint if empty', async () => {
       const getHyperlaneMsgDelivered = stub(mockable, 'getHyperlaneMsgDelivered');
       getHyperlaneMsgDelivered.resolves(false);
-      
+
       const domains = Object.keys(mockAppContext.config.chains).concat(mockAppContext.config.hub.domain);
       const hubMessages = createHubMessages(5);
       (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves([]);
@@ -154,7 +155,101 @@ describe('Monitor operations', () => {
       expect(await updateMessageStatus()).to.not.throws;
 
       expect(mockAppContext.adapters.database.updateMessageStatus as SinonStub).callCount(5);
-    })
+    });
+
+    it('should use Polymer API for Polymer-routed messages and return delivered', async () => {
+      const getPolymerStub = stub(mockable, 'getPolymerMsgDelivered').resolves(HyperlaneStatus.delivered);
+      stub(mockable, 'getHyperlaneMsgDelivered').resolves(false);
+
+      // Make hub domain 25327 so Ethereum (1) -> Hub (25327) is both a Polymer route and a configured destination
+      mockAppContext.config.hub.domain = '25327';
+
+      const messages: Message[] = [
+        {
+          id: mkBytes32('0xa1'),
+          type: 'INTENT',
+          domain: '1',
+          originDomain: '1',
+          destinationDomain: '25327',
+          quote: '100',
+          first: 1,
+          last: 2,
+          intentIds: [mkBytes32('0xa1')],
+          status: HyperlaneStatus.pending,
+          txOrigin: '0x',
+          transactionHash: '0x',
+          timestamp: 1,
+          blockNumber: 1,
+          txNonce: 1,
+        },
+      ];
+      (mockAppContext.adapters.database.getMessagesByStatus as SinonStub)
+        .onFirstCall().resolves(messages)
+        .onSecondCall().resolves([]);
+
+      await updateMessageStatus(mockAppContext);
+
+      expect(getPolymerStub).to.have.been.calledOnceWith(mkBytes32('0xa1'));
+      expect(mockAppContext.adapters.database.updateMessageStatus as SinonStub).to.have.been.calledOnceWith(
+        mkBytes32('0xa1'),
+        HyperlaneStatus.delivered,
+      );
+    });
+
+    it('should return pending when Polymer API throws', async () => {
+      const getPolymerStub = stub(mockable, 'getPolymerMsgDelivered').rejects(new Error('API down'));
+      stub(mockable, 'getHyperlaneMsgDelivered').resolves(false);
+
+      // Make hub domain 25327 so Base (8453) -> Hub (25327) is both a Polymer route and a configured destination
+      mockAppContext.config.hub.domain = '25327';
+
+      const messages: Message[] = [
+        {
+          id: mkBytes32('0xb1'),
+          type: 'INTENT',
+          domain: '8453',
+          originDomain: '8453',
+          destinationDomain: '25327',
+          quote: '100',
+          first: 1,
+          last: 2,
+          intentIds: [mkBytes32('0xb1')],
+          status: HyperlaneStatus.pending,
+          txOrigin: '0x',
+          transactionHash: '0x',
+          timestamp: 1,
+          blockNumber: 1,
+          txNonce: 1,
+        },
+      ];
+      (mockAppContext.adapters.database.getMessagesByStatus as SinonStub)
+        .onFirstCall().resolves(messages)
+        .onSecondCall().resolves([]);
+
+      await updateMessageStatus(mockAppContext);
+
+      expect(getPolymerStub).to.have.been.calledOnce;
+      expect(mockAppContext.adapters.database.updateMessageStatus as SinonStub).to.have.been.calledOnceWith(
+        mkBytes32('0xb1'),
+        HyperlaneStatus.pending,
+      );
+    });
+
+    it('should use Hyperlane for non-Polymer routes', async () => {
+      const getPolymerStub = stub(mockable, 'getPolymerMsgDelivered');
+      stub(mockable, 'getHyperlaneMsgDelivered').resolves(true);
+
+      // 1337 -> 1339 is not a Polymer route
+      const messages = createMessages(1, [{ originDomain: '1337', destinationDomain: mockAppContext.config.hub.domain }]);
+      (mockAppContext.adapters.database.getMessagesByStatus as SinonStub)
+        .onFirstCall().resolves(messages)
+        .onSecondCall().resolves([]);
+
+      await updateMessageStatus(mockAppContext);
+
+      expect(getPolymerStub).to.not.have.been.called;
+      expect(mockAppContext.adapters.database.updateMessageStatus as SinonStub).to.have.been.calledOnce;
+    });
   })
 
   describe('#updateProtocolUpdateLogs', () => {
