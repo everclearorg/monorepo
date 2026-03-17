@@ -9,6 +9,7 @@ export * from './health';
 export * from './db';
 export * from './tokenprice';
 export * from './hyperlane';
+export * from './polymer';
 export * from './ssm';
 export * from './ticker';
 export * from './chain';
