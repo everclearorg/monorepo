@@ -97,5 +97,23 @@
     "indexers": [
       "goldsky"
     ]
+  },
+  {
+    "subgraphName": "everclear-spoke-plasma",
+    "domain": "9745",
+    "environment": "staging",
+    "network": "plasma-mainnet",
+    "indexers": [
+      "goldsky"
+    ]
+  },
+  {
+    "subgraphName": "everclear-spoke-megaeth",
+    "domain": "4326",
+    "environment": "staging",
+    "network": "megaeth-mainnet",
+    "indexers": [
+      "goldsky"
+    ]
   }
 ]

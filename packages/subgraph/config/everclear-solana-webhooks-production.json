@@ -1,0 +1,8 @@
+{
+  "pipelineName": "solana-mainnet-production-webhook",
+  "programId": "everUnMiUkvZG8EyXAtW8HfMavCBTVeMhQszbrtpUQm",
+  "accountFilter": "3z7Z5HVKnacUyiNHEbgpTD71dGLy7d5FmuEB3r3hfeY4",
+  "domain": "1399811149",
+  "webhookBaseUrl": "https://cartographer-handler.everclear.ninja",
+  "secretName": "CARTOGRAPHER_WEBHOOK_SECRET"
+}

@@ -195,6 +195,11 @@ export const shouldReloadEverclearConfig = async (): Promise<{ reloadConfig: boo
   }
   if (!everclearConfig) return { reloadConfig: false, reloadSubgraph: false };
 
+  // If we have no cached config (e.g. initial fetch failed), signal a reload
+  if (!cachedEverclearConfig.chains) {
+    return { reloadConfig: true, reloadSubgraph: true };
+  }
+
   let reloadSubgraph = false;
   let reloadConfig = false;
   for (const domainId of Object.keys(cachedEverclearConfig.chains)) {
@@ -242,4 +247,10 @@ export const getSubgraphReaderConfig = (
     : undefined;
 
   return { subgraphs, ...(envioConfig && { envio: envioConfig }) };
+};
+
+/** @internal Reset cached config state — for testing only */
+export const _resetCachedEverclearConfig = () => {
+  cachedEverclearConfigUrl = undefined;
+  cachedEverclearConfig = {} as any;
 };

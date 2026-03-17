@@ -1,0 +1,7 @@
+{
+  "pipelineName": "tron-mainnet-production-webhook",
+  "filter": "address = '0x9b266df36c882a73d45b18876104d5728424828f' OR address = '0x214d73606233bfa7857f8587ba20c819fc2e9f5b'",
+  "domain": "728126428",
+  "webhookBaseUrl": "https://cartographer-handler.everclear.ninja",
+  "secretName": "CARTOGRAPHER_WEBHOOK_SECRET"
+}

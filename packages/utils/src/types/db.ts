@@ -438,7 +438,7 @@ export const OrderSchema = Type.Intersect([
   OnchainTransactionContextSchema,
   Type.Object({
     id: Type.String({ maxLength: 66 }),
-    autoId: Type.Number(),
+    autoId: Type.Optional(Type.Number()),
     tokenFee: TIntegerString,
     nativeFee: TIntegerString,
     intentIds: Type.Array(TBytes32),

@@ -30,6 +30,12 @@ variable "lighthouse_image_tag" {
   default     = "latest"
 }
 
+variable "lighthouse_handler_image_tag" {
+  type        = string
+  description = "lighthouse handler image tag"
+  default     = "latest"
+}
+
 variable "rmq_mgt_password" {
   type        = string
   description = "RabbitMQ management password"
@@ -145,6 +151,12 @@ variable "full_image_name_monitor_poller" {
   type        = string
   description = "monitor image name"
   default     = "ghcr.io/connext/monitor:sha-64dc7c9"
+}
+
+variable "enable_monitor" {
+  type        = bool
+  description = "Whether to deploy the monitor service, poller, and cache."
+  default     = false
 }
 
 variable "full_image_name_lighthouse" {
@@ -288,4 +300,23 @@ variable "tron_drpc_api_key" {
   type      = string
   sensitive = true
   default   = "neverclear"
+}
+
+variable "monitor_webhook_url" {
+  type        = string
+  description = "Webhook URL for the everclear-agents alert pipeline IngestServer"
+  default     = ""
+}
+
+variable "monitor_webhook_secret" {
+  type        = string
+  sensitive   = true
+  description = "HMAC shared secret for signing events sent to the alert pipeline"
+  default     = ""
+}
+
+variable "lighthouse_queue_redis_auth_token" {
+  type        = string
+  sensitive   = true
+  description = "Auth token for the lighthouse queue Redis instance"
 }

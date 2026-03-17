@@ -48,6 +48,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@anthropic-ai/sdk@npm:^0.74.0":
+  version: 0.74.0
+  resolution: "@anthropic-ai/sdk@npm:0.74.0"
+  dependencies:
+    json-schema-to-ts: ^3.1.1
+  peerDependencies:
+    zod: ^3.25.0 || ^4.0.0
+  peerDependenciesMeta:
+    zod:
+      optional: true
+  bin:
+    anthropic-ai-sdk: bin/cli
+  checksum: f70a3d85bde035621703720d9ee7c6c4c818cc714220b4d7e321e1880731428679e23c07125606d6adc1bd202ddccc29470f87d75bc7a6265810c3f95cfef057
+  languageName: node
+  linkType: hard
+
 "@aws-crypto/crc32@npm:5.2.0":
   version: 5.2.0
   resolution: "@aws-crypto/crc32@npm:5.2.0"
@@ -891,6 +907,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.18.3":
+  version: 7.28.6
+  resolution: "@babel/runtime@npm:7.28.6"
+  checksum: 42d8a868c2fc2e9a77927945a6daa7ec03c7ea49e611e0d15442933cdabb12f20e3a6849c729259076c10a4247adec229331d1f94c2d0073ea0979d7853e29fd
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.25.0":
   version: 7.28.3
   resolution: "@babel/runtime@npm:7.28.3"
@@ -958,7 +981,6 @@ __metadata:
   resolution: "@chimera-monorepo/adapters-relayer@workspace:packages/adapters/relayer"
   dependencies:
     "@chimera-monorepo/chainservice": "workspace:*"
-    "@chimera-monorepo/relayer": "workspace:*"
     "@chimera-monorepo/utils": "workspace:*"
     "@gelatocloud/gasless": 0.0.7
     "@types/mocha": 10.0.1
@@ -1006,11 +1028,51 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@chimera-monorepo/cartographer-core@workspace:*, @chimera-monorepo/cartographer-core@workspace:packages/agents/cartographer/core":
+  version: 0.0.0-use.local
+  resolution: "@chimera-monorepo/cartographer-core@workspace:packages/agents/cartographer/core"
+  dependencies:
+    "@chimera-monorepo/adapters-subgraph": "workspace:*"
+    "@chimera-monorepo/chainservice": "workspace:*"
+    "@chimera-monorepo/database": "workspace:*"
+    "@chimera-monorepo/utils": "workspace:*"
+    "@sinclair/typebox": 0.25.21
+    dotenv: 16.0.3
+    eslint: 8.34.0
+    rimraf: 5.0.1
+    typescript: 5.9.2
+  languageName: unknown
+  linkType: soft
+
+"@chimera-monorepo/cartographer-handler@workspace:packages/agents/cartographer/handler":
+  version: 0.0.0-use.local
+  resolution: "@chimera-monorepo/cartographer-handler@workspace:packages/agents/cartographer/handler"
+  dependencies:
+    "@chimera-monorepo/adapters-subgraph": "workspace:*"
+    "@chimera-monorepo/cartographer-core": "workspace:*"
+    "@chimera-monorepo/chainservice": "workspace:*"
+    "@chimera-monorepo/database": "workspace:*"
+    "@chimera-monorepo/mqclient": "workspace:*"
+    "@chimera-monorepo/utils": "workspace:*"
+    bs58: ^4.0.1
+    dotenv: 16.0.3
+    eslint: 8.34.0
+    fastify: 4.26.2
+    nyc: 15.1.0
+    rimraf: 5.0.1
+    sinon: 15.0.1
+    ts-mocha: 10.0.0
+    ts-node: 10.9.2
+    typescript: 5.9.2
+  languageName: unknown
+  linkType: soft
+
 "@chimera-monorepo/cartographer@workspace:packages/agents/cartographer/poller":
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/cartographer@workspace:packages/agents/cartographer/poller"
   dependencies:
     "@chimera-monorepo/adapters-subgraph": "workspace:*"
+    "@chimera-monorepo/cartographer-core": "workspace:*"
     "@chimera-monorepo/chainservice": "workspace:*"
     "@chimera-monorepo/database": "workspace:*"
     "@chimera-monorepo/utils": "workspace:*"
@@ -1077,8 +1139,14 @@ __metadata:
     "@openzeppelin/contracts": 5.0.2
     "@openzeppelin/contracts-upgradeable": 5.0.2
     "@solana-developers/helpers": ^2.8.1
+    "@types/chai": ^5.2.3
+    "@types/chai-as-promised": ^8
+    "@types/chai-subset": ^1
     "@types/node": ^24.9.1
     "@types/node-fetch": ^2.6.13
+    chai: ^6.2.2
+    chai-as-promised: ^8.0.2
+    chai-subset: ^1.6.0
     dotenv: ^16.4.5
     ds-test: "github:dapphub/ds-test#e282159d5170298eb2455a6c05280ab5a73a4ef0"
     forge-std: "github:foundry-rs/forge-std#52715a217dc51d0de15877878ab8213f6cbbbab5"
@@ -1120,6 +1188,7 @@ __metadata:
     "@chimera-monorepo/adapters-web3signer": "workspace:*"
     "@chimera-monorepo/chainservice": "workspace:*"
     "@chimera-monorepo/database": "workspace:*"
+    "@chimera-monorepo/mqclient": "workspace:*"
     "@chimera-monorepo/utils": "workspace:*"
     "@hyperlane-xyz/sdk": 3.10.0
     "@openzeppelin/merkle-tree": ^1.0.7
@@ -1130,6 +1199,7 @@ __metadata:
     dd-trace: 3.13.2
     dotenv: 16.0.3
     eslint: 8.34.0
+    fastify: 4.26.2
     nyc: 15.1.0
     rimraf: 5.0.1
     sinon: 15.0.1
@@ -1166,7 +1236,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@chimera-monorepo/relayer@workspace:*, @chimera-monorepo/relayer@workspace:packages/agents/relayer":
+"@chimera-monorepo/mqclient@workspace:*, @chimera-monorepo/mqclient@workspace:packages/adapters/mqclient":
+  version: 0.0.0-use.local
+  resolution: "@chimera-monorepo/mqclient@workspace:packages/adapters/mqclient"
+  dependencies:
+    bullmq: 5.34.8
+    eslint: 8.34.0
+    rimraf: 5.0.1
+    typescript: 5.9.2
+  languageName: unknown
+  linkType: soft
+
+"@chimera-monorepo/relayer@workspace:packages/agents/relayer":
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/relayer@workspace:packages/agents/relayer"
   dependencies:
@@ -1214,6 +1295,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/utils@workspace:packages/utils"
   dependencies:
+    "@anthropic-ai/sdk": ^0.74.0
     "@aws-sdk/client-ssm": ^3.735.0
     "@chimera-monorepo/contracts": "workspace:*"
     "@hyperlane-xyz/sdk": 3.15.1
@@ -1236,6 +1318,7 @@ __metadata:
     eslint: 8.34.0
     hyperid: 3.2.0
     nyc: 15.1.0
+    openai: ^6.21.0
     proxyquire: ^2.1.3
     rimraf: 5.0.1
     secp256k1: 4.0.3
@@ -2957,6 +3040,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ioredis/commands@npm:1.5.1":
+  version: 1.5.1
+  resolution: "@ioredis/commands@npm:1.5.1"
+  checksum: 8e9c88154d2aba3cad5cdaed01b47eca9649a3c1e869f28a31377fda0147e5c1b90d9d5dee6f6a4dd9154dba5be345071208ecf8aa5c7fffcd0e04bacaddfbb9
+  languageName: node
+  linkType: hard
+
 "@ioredis/commands@npm:^1.1.1, @ioredis/commands@npm:^1.2.0, @ioredis/commands@npm:^1.3.0":
   version: 1.3.0
   resolution: "@ioredis/commands@npm:1.3.0"
@@ -3224,6 +3314,48 @@ __metadata:
     semver: ^7.5.4
     uuid: ^9.0.1
   checksum: f720b0f7bdd46054aa88d15a9702e1de6d7200a1ca1d4f6bc48761b039f1bbffb46ac88bc87fe79e66128c196d424f3b9ef071b3cb4b40139223786d56da35e0
+  languageName: node
+  linkType: hard
+
+"@msgpackr-extract/msgpackr-extract-darwin-arm64@npm:3.0.3":
+  version: 3.0.3
+  resolution: "@msgpackr-extract/msgpackr-extract-darwin-arm64@npm:3.0.3"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@msgpackr-extract/msgpackr-extract-darwin-x64@npm:3.0.3":
+  version: 3.0.3
+  resolution: "@msgpackr-extract/msgpackr-extract-darwin-x64@npm:3.0.3"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@msgpackr-extract/msgpackr-extract-linux-arm64@npm:3.0.3":
+  version: 3.0.3
+  resolution: "@msgpackr-extract/msgpackr-extract-linux-arm64@npm:3.0.3"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@msgpackr-extract/msgpackr-extract-linux-arm@npm:3.0.3":
+  version: 3.0.3
+  resolution: "@msgpackr-extract/msgpackr-extract-linux-arm@npm:3.0.3"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@msgpackr-extract/msgpackr-extract-linux-x64@npm:3.0.3":
+  version: 3.0.3
+  resolution: "@msgpackr-extract/msgpackr-extract-linux-x64@npm:3.0.3"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@msgpackr-extract/msgpackr-extract-win32-x64@npm:3.0.3":
+  version: 3.0.3
+  resolution: "@msgpackr-extract/msgpackr-extract-win32-x64@npm:3.0.3"
+  conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
@@ -5378,12 +5510,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/chai-as-promised@npm:^8":
+  version: 8.0.2
+  resolution: "@types/chai-as-promised@npm:8.0.2"
+  dependencies:
+    "@types/chai": "*"
+  checksum: a65d360915471d5d2ea3471e8afc69884151b19c7b92494a4faabf95fcd7bb1059f32f5518f17115e2c9835afb7c0b933f9944bbb60d2ebe0a6fd3b61b1e031c
+  languageName: node
+  linkType: hard
+
 "@types/chai-subset@npm:1.3.3":
   version: 1.3.3
   resolution: "@types/chai-subset@npm:1.3.3"
   dependencies:
     "@types/chai": "*"
   checksum: 4481da7345022995f5a105e6683744f7203d2c3d19cfe88d8e17274d045722948abf55e0adfd97709e0f043dade37a4d4e98cd4c660e2e8a14f23e6ecf79418f
+  languageName: node
+  linkType: hard
+
+"@types/chai-subset@npm:^1":
+  version: 1.3.6
+  resolution: "@types/chai-subset@npm:1.3.6"
+  peerDependencies:
+    "@types/chai": <5.2.0
+  checksum: bf4586ddb4df521631ecd527ed42d193d1aeb0ae8759cd43c4f4bca309ec8b55024ac0eac37b74af47f77e15bf59a2e00d75b82409e392b7f4315ed78c27d50e
   languageName: node
   linkType: hard
 
@@ -5400,6 +5550,16 @@ __metadata:
   version: 4.3.4
   resolution: "@types/chai@npm:4.3.4"
   checksum: 571184967beb03bf64c4392a13a7d44e72da9af5a1e83077ff81c39cf59c0fda2a5c78d2005084601cf8f3d11726608574d8b5b4a0e3e9736792807afd926cd0
+  languageName: node
+  linkType: hard
+
+"@types/chai@npm:^5.2.3":
+  version: 5.2.3
+  resolution: "@types/chai@npm:5.2.3"
+  dependencies:
+    "@types/deep-eql": "*"
+    assertion-error: ^2.0.1
+  checksum: eb4c2da9ec38b474a983f39bfb5ec4fbcceb5e5d76d184094d2cbc4c41357973eb5769c8972cedac665a233251b0ed754f1e338fcf408d381968af85cdecc596
   languageName: node
   linkType: hard
 
@@ -6746,6 +6906,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"assertion-error@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "assertion-error@npm:2.0.1"
+  checksum: a0789dd882211b87116e81e2648ccb7f60340b34f19877dd020b39ebb4714e475eb943e14ba3e22201c221ef6645b7bfe10297e76b6ac95b48a9898c1211ce66
+  languageName: node
+  linkType: hard
+
 "ast-parents@npm:^0.0.1":
   version: 0.0.1
   resolution: "ast-parents@npm:0.0.1"
@@ -7332,6 +7499,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bullmq@npm:5.34.8":
+  version: 5.34.8
+  resolution: "bullmq@npm:5.34.8"
+  dependencies:
+    cron-parser: ^4.9.0
+    ioredis: ^5.4.1
+    msgpackr: ^1.11.2
+    node-abort-controller: ^3.1.1
+    semver: ^7.5.4
+    tslib: ^2.0.0
+    uuid: ^9.0.0
+  checksum: 7b18bbf12ab281682635a8b004e8b2e16f906191ac3d89e7d6620a41742f1aca84194bf0314cd8718407b01e379b44343d173fcfc2380c4e4f4a479f7626054f
+  languageName: node
+  linkType: hard
+
 "busboy@npm:^1.6.0":
   version: 1.6.0
   resolution: "busboy@npm:1.6.0"
@@ -7519,7 +7701,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai-subset@npm:1.6.0":
+"chai-as-promised@npm:^8.0.2":
+  version: 8.0.2
+  resolution: "chai-as-promised@npm:8.0.2"
+  dependencies:
+    check-error: ^2.1.1
+  peerDependencies:
+    chai: ">= 2.1.2 < 7"
+  checksum: b3c52e414c5d06b083e46fcc03a7abf8ae24cbd75416413f378c5499056a358c57426c2b26892f251a05bdb43dadaceb5115c0222137d35a4bdaab42eb4acaa0
+  languageName: node
+  linkType: hard
+
+"chai-subset@npm:1.6.0, chai-subset@npm:^1.6.0":
   version: 1.6.0
   resolution: "chai-subset@npm:1.6.0"
   checksum: c85a64b42dcb031a987c0a0fa85f21a7873a01d1e519f29b72311aade30a2626be9b48effad765fda560904c491e89b4cb4a60565e63057963207a6bcb60d285
@@ -7553,6 +7746,13 @@ __metadata:
     pathval: ^1.1.1
     type-detect: ^4.1.0
   checksum: 70e5a8418a39e577e66a441cc0ce4f71fd551a650a71de30dd4e3e31e75ed1f5aa7119cf4baf4a2cb5e85c0c6befdb4d8a05811fad8738c1a6f3aa6a23803821
+  languageName: node
+  linkType: hard
+
+"chai@npm:^6.2.2":
+  version: 6.2.2
+  resolution: "chai@npm:6.2.2"
+  checksum: c8c94857745b673dae22a7b25053a41a931848e2c20d1acb6838cf99b7d57b0e66b9eb878c6308534b2965c11ae1a66f8c58066f368c91a07797bb8ee881a733
   languageName: node
   linkType: hard
 
@@ -7607,6 +7807,13 @@ __metadata:
   dependencies:
     get-func-name: ^2.0.2
   checksum: e2131025cf059b21080f4813e55b3c480419256914601750b0fee3bd9b2b8315b531e551ef12560419b8b6d92a3636511322752b1ce905703239e7cc451b6399
+  languageName: node
+  linkType: hard
+
+"check-error@npm:^2.1.1":
+  version: 2.1.3
+  resolution: "check-error@npm:2.1.3"
+  checksum: f1868d3db60f5a7da92e140ccf33e9152bf6124161fa9b7a4ae8eafdb05e66e1f13570401e56f314f037b0f1b71eaf38ad0c7256310d82c6105e9d85ded0f202
   languageName: node
   linkType: hard
 
@@ -8312,6 +8519,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cron-parser@npm:^4.9.0":
+  version: 4.9.0
+  resolution: "cron-parser@npm:4.9.0"
+  dependencies:
+    luxon: ^3.2.1
+  checksum: 3cf248fc5cae6c19ec7124962b1cd84b76f02b9bc4f58976b3bd07624db3ef10aaf1548efcc2d2dcdab0dad4f12029d640a55ecce05ea5e1596af9db585502cf
+  languageName: node
+  linkType: hard
+
 "cross-fetch@npm:^3.1.5":
   version: 3.2.0
   resolution: "cross-fetch@npm:3.2.0"
@@ -8730,6 +8946,13 @@ __metadata:
   version: 7.0.1
   resolution: "detect-indent@npm:7.0.1"
   checksum: cbf3f0b1c3c881934ca94428e1179b26ab2a587e0d719031d37a67fb506d49d067de54ff057cb1e772e75975fed5155c01cd4518306fee60988b1486e3fc7768
+  languageName: node
+  linkType: hard
+
+"detect-libc@npm:^2.0.1":
+  version: 2.1.2
+  resolution: "detect-libc@npm:2.1.2"
+  checksum: 471740d52365084c4b2ae359e507b863f2b1d79b08a92835ebdf701918e08fc9cfba175b3db28483ca33b155e1311a91d69dc42c6d192b476f41a9e1f094ce6a
   languageName: node
   linkType: hard
 
@@ -11915,6 +12138,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ioredis@npm:^5.4.1":
+  version: 5.10.0
+  resolution: "ioredis@npm:5.10.0"
+  dependencies:
+    "@ioredis/commands": 1.5.1
+    cluster-key-slot: ^1.1.0
+    debug: ^4.3.4
+    denque: ^2.1.0
+    lodash.defaults: ^4.2.0
+    lodash.isarguments: ^3.1.0
+    redis-errors: ^1.2.0
+    redis-parser: ^3.0.0
+    standard-as-callback: ^2.1.0
+  checksum: 6c6b966ca8e34c05abc3a436ca602c24518e1613bad4cd1b19df48b36deca4f5383b0f260309a869618a53354322c892ab744d933f0f7c274dd8e84e5ea9aa24
+  languageName: node
+  linkType: hard
+
 "ip-address@npm:^10.0.1":
   version: 10.0.1
   resolution: "ip-address@npm:10.0.1"
@@ -12897,6 +13137,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-schema-to-ts@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "json-schema-to-ts@npm:3.1.1"
+  dependencies:
+    "@babel/runtime": ^7.18.3
+    ts-algebra: ^2.0.0
+  checksum: b616f1c2d7492502e11eec4f8e4539ee1e897543a679d929494afdc164d9557275cead8372747b73f239b1e68056ffbf551b03ae82d0047bba0dfe2bbd6b64f4
+  languageName: node
+  linkType: hard
+
 "json-schema-traverse@npm:^0.4.1":
   version: 0.4.1
   resolution: "json-schema-traverse@npm:0.4.1"
@@ -13554,6 +13804,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"luxon@npm:^3.2.1":
+  version: 3.7.2
+  resolution: "luxon@npm:3.7.2"
+  checksum: fc115fd6a7acc2adb7df3476d20c672beb2985d2a034294282f2c31de8c07f29a15460f5a2b7dd0107797be0dab545ddbc64862662b059fb18c1931a726064f4
+  languageName: node
+  linkType: hard
+
 "make-dir@npm:^3.0.0, make-dir@npm:^3.0.2":
   version: 3.1.0
   resolution: "make-dir@npm:3.1.0"
@@ -14157,6 +14414,49 @@ __metadata:
   languageName: node
   linkType: hard
 
+"msgpackr-extract@npm:^3.0.2":
+  version: 3.0.3
+  resolution: "msgpackr-extract@npm:3.0.3"
+  dependencies:
+    "@msgpackr-extract/msgpackr-extract-darwin-arm64": 3.0.3
+    "@msgpackr-extract/msgpackr-extract-darwin-x64": 3.0.3
+    "@msgpackr-extract/msgpackr-extract-linux-arm": 3.0.3
+    "@msgpackr-extract/msgpackr-extract-linux-arm64": 3.0.3
+    "@msgpackr-extract/msgpackr-extract-linux-x64": 3.0.3
+    "@msgpackr-extract/msgpackr-extract-win32-x64": 3.0.3
+    node-gyp: latest
+    node-gyp-build-optional-packages: 5.2.2
+  dependenciesMeta:
+    "@msgpackr-extract/msgpackr-extract-darwin-arm64":
+      optional: true
+    "@msgpackr-extract/msgpackr-extract-darwin-x64":
+      optional: true
+    "@msgpackr-extract/msgpackr-extract-linux-arm":
+      optional: true
+    "@msgpackr-extract/msgpackr-extract-linux-arm64":
+      optional: true
+    "@msgpackr-extract/msgpackr-extract-linux-x64":
+      optional: true
+    "@msgpackr-extract/msgpackr-extract-win32-x64":
+      optional: true
+  bin:
+    download-msgpackr-prebuilds: bin/download-prebuilds.js
+  checksum: 3b5ae152821feff843380f0b091afbebd80bd224e644f4410abd33d05da3159eb8b0d45c7dcf7d5226ce1d5c71cd68052f066788f46ea7a3cd8791a1c740a079
+  languageName: node
+  linkType: hard
+
+"msgpackr@npm:^1.11.2":
+  version: 1.11.8
+  resolution: "msgpackr@npm:1.11.8"
+  dependencies:
+    msgpackr-extract: ^3.0.2
+  dependenciesMeta:
+    msgpackr-extract:
+      optional: true
+  checksum: 3f5a78b835c18fb132b4c8e7494e29e5ca4375c7464953b8926baf1facf30eb848ab3156047b1c3b2a4834fd1195df6b7251edcd207f0f3d6d267a5765658816
+  languageName: node
+  linkType: hard
+
 "multiaddr-to-uri@npm:^8.0.0":
   version: 8.0.0
   resolution: "multiaddr-to-uri@npm:8.0.0"
@@ -14386,7 +14686,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-abort-controller@npm:^3.0.1":
+"node-abort-controller@npm:^3.0.1, node-abort-controller@npm:^3.1.1":
   version: 3.1.1
   resolution: "node-abort-controller@npm:3.1.1"
   checksum: 2c340916af9710328b11c0828223fc65ba320e0d082214a211311bf64c2891028e42ef276b9799188c4ada9e6e1c54cf7a0b7c05dd9d59fcdc8cd633304c8047
@@ -14440,6 +14740,19 @@ __metadata:
     fetch-blob: ^3.1.4
     formdata-polyfill: ^4.0.10
   checksum: 06a04095a2ddf05b0830a0d5302699704d59bda3102894ea64c7b9d4c865ecdff2d90fd042df7f5bc40337266961cb6183dcc808ea4f3000d024f422b462da92
+  languageName: node
+  linkType: hard
+
+"node-gyp-build-optional-packages@npm:5.2.2":
+  version: 5.2.2
+  resolution: "node-gyp-build-optional-packages@npm:5.2.2"
+  dependencies:
+    detect-libc: ^2.0.1
+  bin:
+    node-gyp-build-optional-packages: bin.js
+    node-gyp-build-optional-packages-optional: optional.js
+    node-gyp-build-optional-packages-test: build-test.js
+  checksum: 3c10d7380901ab5febcd153d2632917fe7507edb15a3405e9ef19801834a4c2162459a67b9944887f737f8718baeb4aaf0002c829a8214011930f2de80e4b42f
   languageName: node
   linkType: hard
 
@@ -14766,6 +15079,23 @@ __metadata:
   dependencies:
     mimic-function: ^5.0.0
   checksum: eb08d2da9339819e2f9d52cab9caf2557d80e9af8c7d1ae86e1a0fef027d00a88e9f5bd67494d350df360f7c559fbb44e800b32f310fb989c860214eacbb561c
+  languageName: node
+  linkType: hard
+
+"openai@npm:^6.21.0":
+  version: 6.21.0
+  resolution: "openai@npm:6.21.0"
+  peerDependencies:
+    ws: ^8.18.0
+    zod: ^3.25 || ^4.0
+  peerDependenciesMeta:
+    ws:
+      optional: true
+    zod:
+      optional: true
+  bin:
+    openai: bin/cli
+  checksum: 1ba1382831fed90ea57f40ca972847847252fdbbbccf04b490cd3e0f8a4b9c8e56fcb5afa03d235a917b43343f99b0b0dd173e04300d7eb02f830bab6ee7f4bb
   languageName: node
   linkType: hard
 
@@ -18056,6 +18386,13 @@ __metadata:
     semver: 7.7.1
     validator: 13.12.0
   checksum: 232fcf9c7c3ca2e8f07487fdf40e24ce9f3d90c2de7317187b32ee8e9d0bed90ef6c6ee2d4f0f8747ddf7e718acc331ebd82b42d91381ec20d99531b19360ce4
+  languageName: node
+  linkType: hard
+
+"ts-algebra@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "ts-algebra@npm:2.0.0"
+  checksum: 970b0e7db49cf8c1a8ff2a816eb047fac8add47511f5e4995e4998c56c6f7b226399284412de88f3e137ab55c857a4262c0d8f02f0765730e7d3a021de2ea7ef
   languageName: node
   linkType: hard
 

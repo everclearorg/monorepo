@@ -36,16 +36,29 @@ locals {
     { name = "STAGE", value = var.stage },
     { name = "GRAPH_API_KEY", value = var.graph_api_key },
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
+    { name = "ALERT_PIPELINE_MODE", value = "events_only" },
+    { name = "ALERT_EVENT_WEBHOOK_URL", value = var.monitor_webhook_url },
+    { name = "ALERT_EVENT_WEBHOOK_SECRET", value = var.monitor_webhook_secret },
+    { name = "MONITOR_WEBHOOK_URL", value = var.monitor_webhook_url },
+    { name = "MONITOR_WEBHOOK_SECRET", value = var.monitor_webhook_secret },
+    { name = "ALERT_EVENT_ENVIRONMENT", value = "staging" },
   ]
 
   monitor_poller_env_vars = {
-    ENVIRONMENT       = var.environment,
-    STAGE             = var.stage,
-    DD_LOGS_ENABLED   = true,
-    DD_ENV            = "${var.environment}-${var.stage}"
-    DD_API_KEY        = var.dd_api_key,
-    DD_LAMBDA_HANDLER = "packages/agents/monitor/dist/lambda.handler"
-    GRAPH_API_KEY     = var.graph_api_key
+    ENVIRONMENT            = var.environment,
+    STAGE                  = var.stage,
+    DD_LOGS_ENABLED        = true,
+    DD_ENV                 = "${var.environment}-${var.stage}"
+    DD_API_KEY             = var.dd_api_key,
+    DD_LAMBDA_HANDLER      = "packages/agents/monitor/dist/lambda.handler"
+    GRAPH_API_KEY          = var.graph_api_key
+    ALERT_PIPELINE_MODE    = "events_only"
+    ALERT_EVENT_WEBHOOK_URL = var.monitor_webhook_url
+    ALERT_EVENT_WEBHOOK_SECRET = var.monitor_webhook_secret
+    MONITOR_WEBHOOK_URL    = var.monitor_webhook_url
+    MONITOR_WEBHOOK_SECRET = var.monitor_webhook_secret
+    ALERT_EVENT_ENVIRONMENT = "staging"
+    MONITOR_ADMIN_TOKEN    = var.admin_token_monitor
   }
 
   lighthouse_env_vars = {
@@ -57,6 +70,17 @@ locals {
     DD_LAMBDA_HANDLER = "packages/agents/lighthouse/dist/index.handler"
     GRAPH_API_KEY     = var.graph_api_key
   }
+
+  lighthouse_handler_env_vars = [
+    { name = "LIGHTHOUSE_CONFIG", value = local.local_lighthouse_config },
+    { name = "LIGHTHOUSE_SERVICE", value = "handler" },
+    { name = "REDIS_URL", value = "rediss://:${var.lighthouse_queue_redis_auth_token}@${module.lighthouse_queue_cache.redis_instance_address}:${module.lighthouse_queue_cache.redis_instance_port}" },
+    { name = "ENVIRONMENT", value = var.environment },
+    { name = "STAGE", value = var.stage },
+    { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
+    { name = "DD_LOGS_ENABLED", value = "true" },
+    { name = "DD_API_KEY", value = var.dd_api_key },
+  ]
 
   lighthouse_web3signer_env_vars = [
     { name = "WEB3_SIGNER_PRIVATE_KEY", value = var.lighthouse_web3_signer_private_key },
@@ -336,8 +360,8 @@ locals {
       adminToken = var.admin_token_monitor
     }
     redis = {
-      host = module.monitor_cache.redis_instance_address
-      port = module.monitor_cache.redis_instance_port
+      host = try(module.monitor_cache[0].redis_instance_address, null)
+      port = try(module.monitor_cache[0].redis_instance_port, null)
     }
     relayers = [
       {
@@ -351,13 +375,15 @@ locals {
         url    = "https://${module.relayer_server.service_endpoint}"
       }
     ]
-    agents = {
-      relayer          = "https://${module.relayer_server.service_endpoint}/ping"
-      # monitor          = "https://${module.monitor.service_endpoint}/ping"
-      lighthouseSigner = "https://${module.lighthouse_web3signer.service_endpoint}/upcheck"
-      relayerSigner    = "https://${module.relayer_web3signer.service_endpoint}/upcheck"
-      watchtowerSigner = "https://${module.watchtower_web3signer.service_endpoint}/upcheck"
-    }
+    agents = merge(
+      {
+        relayer          = "https://${module.relayer_server.service_endpoint}/ping"
+        lighthouseSigner = "https://${module.lighthouse_web3signer.service_endpoint}/upcheck"
+        relayerSigner    = "https://${module.relayer_web3signer.service_endpoint}/upcheck"
+        watchtowerSigner = "https://${module.watchtower_web3signer.service_endpoint}/upcheck"
+      },
+      var.enable_monitor ? { monitor = "https://${module.monitor[0].service_endpoint}/ping" } : {},
+    )
     healthUrls = {
       poller = "https://uptime.betterstack.com/api/v1/heartbeat/${var.monitor_poller_heartbeat}"
     }
@@ -365,18 +391,18 @@ locals {
       url = local.default_db_url
     }
     thresholds = {
-      maxIntentQueueCount             = 15
-      maxIntentQueueLatency           = 2400
-      maxSettlementQueueCount         = 15
-      maxSettlementQueueLatency       = 2400
-      maxDepositQueueCount            = 15
-      maxDepositQueueLatency          = 3600
-      messageMaxDelay                 = 1800
-      maxDelayedSubgraphBlock         = 500
-      maxInvoiceProcessingTime        = 64800
-      minGasOnRelayer                 = 0.3
-      minGasOnGateway                 = 0.5
-      averageElapsedEpochs            = 6
+      maxIntentQueueCount             = 100
+      maxIntentQueueLatency           = 14400
+      maxSettlementQueueCount         = 100
+      maxSettlementQueueLatency       = 14400
+      maxDepositQueueCount            = 100
+      maxDepositQueueLatency          = 14400
+      messageMaxDelay                 = 7200
+      maxDelayedSubgraphBlock         = 2000
+      maxInvoiceProcessingTime        = 172800
+      minGasOnRelayer                 = 0.05
+      minGasOnGateway                 = 0.05
+      averageElapsedEpochs            = 200
       averageElapsedEpochsAlertAmount = 10000
       maxTokenomicsExportDelay        = 1800
       maxTokenomicsExportLatency      = 10

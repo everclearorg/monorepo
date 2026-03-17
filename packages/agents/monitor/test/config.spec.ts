@@ -1,6 +1,6 @@
 import { ajv, expect } from '@chimera-monorepo/utils';
 import { stub, SinonStub } from 'sinon';
-import { getConfig, shouldReloadEverclearConfig } from '../src/config';
+import { getConfig, shouldReloadEverclearConfig, _resetCachedEverclearConfig } from '../src/config';
 import { createProcessEnv } from './mock';
 import * as MockableFns from '../src/mockable';
 import { mock } from './globalTestHook';
@@ -28,7 +28,7 @@ describe('Config', () => {
     it('should work', async () => {
       const retrieved = await getConfig();
       const config = mock.config();
-      expect(Object.keys(retrieved).length).to.equal(Object.keys(config).length);
+      expect(Object.keys(retrieved).length).to.be.greaterThanOrEqual(Object.keys(config).length);
     });
 
     it('should read overrides from .env', async () => {
@@ -83,6 +83,40 @@ describe('Config', () => {
       ssmStub.resolves(JSON.stringify({ ...mock.config(), database }));
       const config = await getConfig();
       await expect(config.database).to.be.deep.equal(database);
+    });
+
+    it('should parse TRIAGE_CONFIG when passed as direct triage object', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        ...createProcessEnv(),
+        TRIAGE_CONFIG: JSON.stringify({
+          mode: 'dry-run',
+          timeoutMs: 2500,
+          providers: { openai: { apiKey: 'k' } },
+        }),
+      });
+
+      const retrieved = await getConfig();
+      expect(retrieved.triage?.mode).to.equal('dry-run');
+      expect(retrieved.triage?.timeoutMs).to.equal(2500);
+    });
+
+    it('should parse TRIAGE_CONFIG when nested under triage key', async () => {
+      stub(process, 'env').value({
+        ...process.env,
+        ...createProcessEnv(),
+        TRIAGE_CONFIG: JSON.stringify({
+          triage: {
+            mode: 'shadow',
+            timeoutMs: 3000,
+            providers: { openai: { apiKey: 'k' } },
+          },
+        }),
+      });
+
+      const retrieved = await getConfig();
+      expect(retrieved.triage?.mode).to.equal('shadow');
+      expect(retrieved.triage?.timeoutMs).to.equal(3000);
     });
   });
 
@@ -165,6 +199,25 @@ describe('Config', () => {
       getEverclearConfigStub.resolves({ chains: mockChains });
       const res = await shouldReloadEverclearConfig();
       expect(res).to.be.deep.eq({ reloadConfig: false, reloadSubgraph: false });
+    });
+
+    it('should signal reload when initial fetch failed and later fetch succeeds', async () => {
+      // Reset module state to simulate fresh start
+      _resetCachedEverclearConfig();
+
+      // Initial getConfig() with a failing everclear fetch — cachedEverclearConfig stays as {}
+      stub(process, 'env').value({
+        ...process.env,
+        ...createProcessEnv(mock.config()),
+        EVERCLEAR_CONFIG: 'https://mock.everclear.config',
+      });
+      getEverclearConfigStub.rejects(new Error('initial fetch failed'));
+      await getConfig();
+
+      // Now the fetch succeeds — should detect missing cached chains and signal full reload
+      getEverclearConfigStub.resolves({ chains: mockChains });
+      const res = await shouldReloadEverclearConfig();
+      expect(res).to.be.deep.eq({ reloadConfig: true, reloadSubgraph: true });
     });
   });
 });

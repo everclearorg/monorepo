@@ -7,12 +7,15 @@ use crate::state::FeeAdapterState;
 use crate::{
     consts::everclear_gateway,
     hyperlane::{
-        transfer_remote, Igp, Mailbox, SplNoop, TransferRemote, TransferRemoteContext, U256,
+        transfer_remote, SplNoop, TransferRemote, TransferRemoteContext, U256,
     },
     vault_authority_pda_seeds,
 };
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::sysvar::instructions::ID as SYSVAR_INSTRUCTIONS_ID;
+use anchor_lang::solana_program::{
+    instruction::AccountMeta,
+    sysvar::instructions::ID as SYSVAR_INSTRUCTIONS_ID,
+};
 use anchor_spl::{
     associated_token,
     token::{self, Mint, Token, TokenAccount, Transfer, ID as TOKEN_PROGRAM_ID},
@@ -22,7 +25,12 @@ use crate::{
     consts::{DEFAULT_NORMALIZED_DECIMALS, EVERCLEAR_DOMAIN},
     error::SpokeError,
     events::IntentAddedEvent,
-    state::SpokeState,
+    messaging,
+    messaging::ccip::{
+        send::{build_ccip_send_accounts, ccip_send, CCIP_FEE_QUOTER, CCIP_RMN},
+        message::SVM2AnyMessage,
+    },
+    state::{MessagingProviderType, SpokeState},
     utils::{compute_intent_hash, normalize_decimals},
 };
 
@@ -41,7 +49,34 @@ pub fn new_intent(
     message_gas_limit: u64,
     fee_param: FeeParams,
 ) -> Result<()> {
-    let mut accounts = NewIntentAccounts {
+    let spoke_state = &ctx.accounts.spoke_state;
+    let messaging_provider = messaging::get_messaging_provider(spoke_state);
+
+    match messaging_provider {
+        MessagingProviderType::CCIP => {
+            require!(
+                spoke_state.ccip_router.is_some(),
+                SpokeError::InvalidMessage
+            );
+            require!(
+                spoke_state.everclear_ccip_chain_selector.is_some(),
+                SpokeError::InvalidMessage
+            );
+            require!(
+                ctx.remaining_accounts.len() > 0,
+                SpokeError::InvalidMessage
+            );
+        }
+        MessagingProviderType::Hyperlane => {
+            require!(
+                ctx.accounts.hyperlane_mailbox.key() == spoke_state.mailbox,
+                SpokeError::InvalidMessage
+            );
+        }
+    }
+
+    // Box to stay under BPF stack limit (4KB)
+    let mut accounts = Box::new(NewIntentAccounts {
         spoke_state: ctx.accounts.spoke_state.clone().as_ref().clone(),
         mint: ctx.accounts.mint.clone(),
         token_program: ctx.accounts.token_program.clone(),
@@ -50,17 +85,17 @@ pub fn new_intent(
         authority: ctx.accounts.authority.clone(),
         system_program: ctx.accounts.system_program.clone(),
         spl_noop_program: ctx.accounts.spl_noop_program.clone(),
-        hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.clone(),
+        hyperlane_mailbox: ctx.accounts.hyperlane_mailbox.to_account_info(),
         mailbox_outbox: ctx.accounts.mailbox_outbox.clone(),
         dispatch_authority: ctx.accounts.dispatch_authority.clone(),
         unique_message_account: ctx.accounts.unique_message_account.to_account_info(),
         dispatched_message_pda: ctx.accounts.dispatched_message_pda.clone(),
-        igp_program: ctx.accounts.igp_program.clone(),
+        igp_program: ctx.accounts.igp_program.to_account_info(),
         igp_program_data: ctx.accounts.igp_program_data.clone(),
         igp_payment_pda: ctx.accounts.igp_payment_pda.clone(),
         configured_igp_account: ctx.accounts.configured_igp_account.clone(),
         inner_igp_account: ctx.accounts.inner_igp_account.clone(),
-    };
+    });
     let program_id = *ctx.program_id;
 
     let spoke_state = &ctx.accounts.spoke_state;
@@ -128,8 +163,9 @@ pub fn new_intent(
     );
     handle_fees(fee_data, fee_param.signature, fee_accounts, &program_id)?;
 
+    let remaining_accounts_slice: &[AccountInfo] = ctx.remaining_accounts;
     let event = handle_new_intent(
-        &mut accounts,
+        &mut *accounts,
         program_id,
         receiver,
         output_asset,
@@ -139,8 +175,8 @@ pub fn new_intent(
         destinations,
         data,
         message_gas_limit,
-    )
-    .unwrap();
+        remaining_accounts_slice,
+    )?;
 
     require!(
         event.intent_id == intent_hash,
@@ -172,7 +208,7 @@ fn validate_ttl_output_asset(
 
 pub fn handle_new_intent<'info>(
     accounts: &mut NewIntentAccounts<'info>,
-    program_id: Pubkey, // for ctx.programId
+    program_id: Pubkey,
     receiver: Pubkey,
     output_asset: Pubkey,
     amount: u64,
@@ -181,6 +217,7 @@ pub fn handle_new_intent<'info>(
     destinations: Vec<u32>,
     data: Vec<u8>,
     message_gas_limit: u64,
+    remaining_accounts: &[AccountInfo],
 ) -> Result<IntentAddedEvent> {
     require!(
         accounts.unique_message_account.is_signer,
@@ -267,50 +304,100 @@ pub fn handle_new_intent<'info>(
     // Hash the EVM intent information
     let intent_id = compute_intent_hash(&evm_intent);
 
-    // Produce the EVM ABI message:
     // NOTE: message type should be
     let evm_encoded_message = encode_full(MessageType::Intent, &evm_intent);
 
-    // Build your TransferRemote
-    let xfer = TransferRemote {
-        destination_domain: EVERCLEAR_DOMAIN,
-        recipient: everclear_gateway(),
-        // TODO: set this to 0, this is not used.
-        amount_or_id: U256::from(normalized_amount),
-        gas_amount: message_gas_limit,
-        message_body: evm_encoded_message, // now in EVM ABI format
+    let message_id = match messaging::get_messaging_provider(&spoke_state) {
+        MessagingProviderType::Hyperlane => {
+            let xfer = TransferRemote {
+                destination_domain: EVERCLEAR_DOMAIN,
+                recipient: everclear_gateway(),
+                amount_or_id: U256::from(normalized_amount),
+                gas_amount: message_gas_limit,
+                message_body: evm_encoded_message,
+            };
+
+            let mut transfer_remote_context = Box::new(TransferRemoteContext {
+                spoke_state,
+                system_program: accounts.system_program.clone(),
+                spl_noop_program: accounts.spl_noop_program.clone(),
+                mailbox_program: accounts.hyperlane_mailbox.clone(),
+                mailbox_outbox: accounts.mailbox_outbox.to_account_info(),
+                dispatch_authority: accounts.dispatch_authority.to_account_info(),
+                sender_wallet: accounts.authority.to_account_info(),
+                unique_message_account: accounts.unique_message_account.to_account_info(),
+                dispatched_message_pda: accounts.dispatched_message_pda.to_account_info(),
+                igp_program: accounts.igp_program.clone(),
+                igp_program_data: accounts.igp_program_data.to_account_info(),
+                igp_payment_pda: accounts.igp_payment_pda.to_account_info(),
+                configured_igp_account: accounts.configured_igp_account.to_account_info(),
+                inner_igp_account: accounts.inner_igp_account.clone(),
+            });
+
+            let transfer_ctx = Context::new(
+                &program_id,
+                &mut *transfer_remote_context,
+                &[],
+                Default::default(),
+            );
+
+            transfer_remote(transfer_ctx, xfer)?.into()
+        }
+        MessagingProviderType::CCIP => {
+            let ccip_router = spoke_state
+                .ccip_router
+                .ok_or(error!(SpokeError::InvalidMessage))?;
+            let dest_chain_selector = spoke_state
+                .everclear_ccip_chain_selector
+                .ok_or(error!(SpokeError::InvalidMessage))?;
+
+            let receiver = spoke_state.everclear_gateway.to_vec();
+            let message = SVM2AnyMessage::new_data_only(receiver, evm_encoded_message, message_gas_limit as u128);
+
+            let account_metas = build_ccip_send_accounts(
+                &ccip_router,
+                &CCIP_FEE_QUOTER,
+                &CCIP_RMN,
+                &accounts.authority.key(),
+                dest_chain_selector,
+            )?;
+
+            require!(
+                remaining_accounts.len() >= account_metas.len() + 1,
+                SpokeError::InvalidMessage
+            );
+
+            require!(
+                remaining_accounts[0].key() == ccip_router,
+                SpokeError::InvalidMessage
+            );
+
+            let acc_metas: Vec<AccountMeta> = account_metas
+                .iter()
+                .enumerate()
+                .map(|(i, expected_meta)| {
+                    let acc_info = &remaining_accounts[i + 1];
+                    AccountMeta {
+                        pubkey: acc_info.key(),
+                        is_signer: expected_meta.is_signer || acc_info.is_signer,
+                        is_writable: expected_meta.is_writable,
+                    }
+                })
+                .collect();
+
+            let acc_infos_slice = &remaining_accounts[0..=account_metas.len()];
+            let authority_seeds: &[&[&[u8]]] = &[];
+            ccip_send(
+                &ccip_router,
+                authority_seeds,
+                dest_chain_selector,
+                message,
+                Vec::new(),
+                acc_metas,
+                acc_infos_slice,
+            )?
+        }
     };
-
-    // TODO: make this no_copy
-    // Build your TransferRemoteContext in a local variable (so it doesn't drop too soon)
-    let mut transfer_remote_context = TransferRemoteContext {
-        spoke_state,
-        system_program: accounts.system_program.clone(),
-        spl_noop_program: accounts.spl_noop_program.clone(),
-        mailbox_program: accounts.hyperlane_mailbox.clone(),
-        mailbox_outbox: accounts.mailbox_outbox.to_account_info(),
-        dispatch_authority: accounts.dispatch_authority.to_account_info(),
-        // TODO: need to figure out how this is used for the IGP payer and whether this is correct
-        sender_wallet: accounts.authority.to_account_info(),
-        unique_message_account: accounts.unique_message_account.clone(),
-        dispatched_message_pda: accounts.dispatched_message_pda.to_account_info(),
-        igp_program: accounts.igp_program.clone(),
-        igp_program_data: accounts.igp_program_data.to_account_info(),
-        igp_payment_pda: accounts.igp_payment_pda.to_account_info(),
-        configured_igp_account: accounts.configured_igp_account.to_account_info(),
-        inner_igp_account: accounts.inner_igp_account.clone(),
-    };
-
-    // Now create the Anchor Context, referencing your local `transfer_remote_context`.
-    let transfer_ctx = Context::new(
-        &program_id,
-        &mut transfer_remote_context, // pass a mutable reference
-        &[],                          // remaining accounts if needed
-        Default::default(),           // any custom context seeds if needed
-    );
-
-    // 3) Use `transfer_ctx` safely
-    let message_id = transfer_remote(transfer_ctx, xfer)?;
 
     // Emit an event with full intent details.
     Ok(IntentAddedEvent {
@@ -340,12 +427,16 @@ pub struct NewIntentAccounts<'info> {
     pub authority: Signer<'info>,
     pub system_program: Program<'info, System>,
     pub spl_noop_program: Program<'info, SplNoop>,
-    pub hyperlane_mailbox: Interface<'info, Mailbox>,
+    // Changed to AccountInfo to support CCIP (where mailbox can be any executable program)
+    // When Hyperlane is enabled, we validate it implements Mailbox interface in the code
+    pub hyperlane_mailbox: AccountInfo<'info>,
     pub mailbox_outbox: AccountInfo<'info>,
     pub dispatch_authority: AccountInfo<'info>,
     pub unique_message_account: AccountInfo<'info>,
     pub dispatched_message_pda: AccountInfo<'info>,
-    pub igp_program: Interface<'info, Igp>,
+    // Changed to AccountInfo to support CCIP (where IGP can be any executable program)
+    // When Hyperlane is enabled, we validate it implements Igp interface in the code
+    pub igp_program: AccountInfo<'info>,
     pub igp_program_data: AccountInfo<'info>,
     pub igp_payment_pda: AccountInfo<'info>,
     pub configured_igp_account: AccountInfo<'info>,
@@ -409,9 +500,9 @@ pub struct NewIntent<'info> {
     #[account(address = TOKEN_PROGRAM_ID)]
     pub token_program: Program<'info, Token>,
 
-    // The Hyperlane Mailbox program (by address only).
+    /// CHECK: Mailbox program; validated in instruction when Hyperlane. When CCIP, unused.
     #[account(address = spoke_state.mailbox)]
-    pub hyperlane_mailbox: Interface<'info, Mailbox>,
+    pub hyperlane_mailbox: UncheckedAccount<'info>,
 
     // The system program
     pub system_program: Program<'info, System>,
@@ -435,9 +526,8 @@ pub struct NewIntent<'info> {
     #[account(mut)]
     pub dispatched_message_pda: AccountInfo<'info>,
 
-    //  If using IGP:
-    #[account(executable)]
-    pub igp_program: Interface<'info, Igp>,
+    /// CHECK: IGP program; validated in instruction when Hyperlane. When CCIP, unused.
+    pub igp_program: UncheckedAccount<'info>,
 
     /// CHECK:
     #[account(mut)]

@@ -20,6 +20,7 @@ import { assetDashboard } from './tasks/assetDashboard';
 import { logOwners } from './tasks/logOwners';
 import { createNewIntent } from './tasks/createNewIntent';
 import { fillIntent } from './tasks/fillIntent';
+import { upgradeSpokeV6 } from './tasks/upgradeSpokeV6';
 
 async function main() {
   const mainTask = await select({
@@ -99,6 +100,10 @@ async function main() {
         value: 'set_module_for_strategy',
       },
       {
+        name: 'Upgrade Spoke to V6',
+        value: 'upgrade_spoke_v6',
+      },
+      {
         name: 'Cancel',
         value: 'cancel',
       },
@@ -166,6 +171,9 @@ async function main() {
       break;
     case 'fill_intent':
       fillIntent();
+      break;
+    case 'upgrade_spoke_v6':
+      upgradeSpokeV6();
       break;
     case 'cancel':
       return;

@@ -430,6 +430,123 @@ describe('SubgraphReader', () => {
     });
   });
 
+  describe('#getSettlementIntentById', () => {
+    const intent = createIntentSettlementEventEntity();
+
+    beforeEach(async () => {
+      execute.resolves({ ...createMeta(), intentSettleEvents: [intent] });
+    });
+
+    it('should work', async () => {
+      const result = await reader.getSettlementIntentById('1337', intent.intentId);
+      expect(result).to.be.deep.eq(parser.settlementIntent('1337', intent));
+    });
+
+    it('should handle empty array', async () => {
+      execute.resolves({ ...createMeta(), intentSettleEvents: [] });
+      const result = await reader.getSettlementIntentById('1337', intent.intentId);
+      expect(result).to.be.undefined;
+    });
+
+    it('should handle null response', async () => {
+      execute.resolves(undefined);
+      const result = await reader.getSettlementIntentById('1337', intent.intentId);
+      expect(result).to.be.undefined;
+    });
+  });
+
+  describe('#getHubDepositEnqueuedById', () => {
+    const entity: DepositEnqueuedEventEntity = {
+      id: mkBytes32('0x1'),
+      deposit: {
+        id: mkBytes32('0x1'),
+        amount: '1000',
+        epoch: 12321,
+        domain: '1337',
+        tickerHash: mkBytes32('0x16546'),
+      },
+      intent: {
+        ...createHubIntent(),
+      },
+      timestamp: Math.floor(Date.now() / 1000),
+      txOrigin: mkAddress('0x1'),
+      txNonce: 1,
+      transactionHash: mkHash('0x2'),
+      blockNumber: 123,
+      gasLimit: '10000',
+      gasPrice: '100000',
+    };
+
+    beforeEach(() => {
+      execute.resolves({ ...createMeta(), depositEnqueuedEvents: [entity] });
+    });
+
+    it('should work', async () => {
+      const result = await reader.getHubDepositEnqueuedById('1337', entity.intent.id);
+      expect(result).to.be.deep.eq(parser.hubDepositFromEnqueued(entity));
+    });
+
+    it('should handle empty array', async () => {
+      execute.resolves({ ...createMeta(), depositEnqueuedEvents: [] });
+      const result = await reader.getHubDepositEnqueuedById('1337', entity.intent.id);
+      expect(result).to.be.undefined;
+    });
+
+    it('should handle null response', async () => {
+      execute.resolves(undefined);
+      const result = await reader.getHubDepositEnqueuedById('1337', entity.intent.id);
+      expect(result).to.be.undefined;
+    });
+  });
+
+  describe('#getHubDepositProcessedById', () => {
+    const entity: DepositProcessedEventEntity = {
+      id: mkBytes32('0x1'),
+      deposit: {
+        id: mkBytes32('0x1'),
+        amount: '1000',
+        epoch: 12321,
+        domain: '1337',
+        tickerHash: mkBytes32('0x16546'),
+        enqueuedEvent: {
+          timestamp: Math.floor(Date.now() / 1000),
+          txNonce: 1,
+        },
+      },
+      intent: {
+        ...createHubIntent(),
+      },
+      timestamp: Math.floor(Date.now() / 1000),
+      txOrigin: mkAddress('0x1'),
+      txNonce: 1,
+      transactionHash: mkHash('0x2'),
+      blockNumber: 123,
+      gasLimit: '10000',
+      gasPrice: '100000',
+    };
+
+    beforeEach(() => {
+      execute.resolves({ ...createMeta(), depositProcessedEvents: [entity] });
+    });
+
+    it('should work', async () => {
+      const result = await reader.getHubDepositProcessedById('1337', entity.intent.id);
+      expect(result).to.be.deep.eq(parser.hubDepositFromProcessed(entity));
+    });
+
+    it('should handle empty array', async () => {
+      execute.resolves({ ...createMeta(), depositProcessedEvents: [] });
+      const result = await reader.getHubDepositProcessedById('1337', entity.intent.id);
+      expect(result).to.be.undefined;
+    });
+
+    it('should handle null response', async () => {
+      execute.resolves(undefined);
+      const result = await reader.getHubDepositProcessedById('1337', entity.intent.id);
+      expect(result).to.be.undefined;
+    });
+  });
+
   describe('#getSettlementIntentsByNonce', () => {
     const intent = createIntentSettlementEventEntity();
 

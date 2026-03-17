@@ -5,6 +5,12 @@ use crate::{
     instructions::messages::Settlement,
 };
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+pub enum MessagingProviderType {
+    Hyperlane,
+    CCIP,
+}
+
 /// SpokeState – global configuration.
 #[account]
 pub struct SpokeState {
@@ -36,6 +42,13 @@ pub struct SpokeState {
     pub igp_type: InterchainGasPaymasterType,
     // Bump for vault authority
     pub vault_authority_bump: u8,
+    // CCIP configuration
+    pub ccip_router: Option<Pubkey>,
+    pub ccip_offramp: Option<Pubkey>,
+    pub ccip_chain_selector: Option<u64>,
+    pub everclear_ccip_chain_selector: Option<u64>,
+    pub messaging_provider: MessagingProviderType,
+    pub everclear_gateway: [u8; 32],
 }
 
 impl SpokeState {
@@ -53,6 +66,12 @@ impl SpokeState {
         + 32                     // igp: Pubkey
         + 33                     // igp_type: InterchainGasPaymasterType
         + 1                      // vault_authority_bump: u8
+        + 1 + 32                 // ccip_router: Option<Pubkey>
+        + 1 + 32                 // ccip_offramp: Option<Pubkey>
+        + 1 + 8                  // ccip_chain_selector: Option<u64>
+        + 1 + 8                  // everclear_ccip_chain_selector: Option<u64>
+        + 1                      // messaging_provider: MessagingProviderType
+        + 32                     // everclear_gateway: [u8; 32]
     ;
 }
 
