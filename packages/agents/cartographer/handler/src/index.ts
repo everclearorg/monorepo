@@ -82,10 +82,6 @@ async function startServer(): Promise<void> {
   try {
     handlerConfig = await getHandlerConfig();
 
-    if (!handlerConfig.adminToken) {
-      logger.error('Cartographer admin token is not set');
-    }
-
     appContext = await initializeContext(handlerConfig, logger);
 
     const pauseCheckpoint = await appContext.adapters.database.getCheckPoint(PAUSE_CHECKPOINT_KEY);
