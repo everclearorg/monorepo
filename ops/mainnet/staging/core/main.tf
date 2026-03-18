@@ -544,6 +544,19 @@ module "lighthouse_queue_cache" {
   auth_token                    = var.lighthouse_queue_redis_auth_token
 }
 
+# Expose the lighthouse queue Redis over PrivateLink so the cartographer-handler
+# in the backend VPC can enqueue BullMQ jobs without direct VPC connectivity.
+module "lighthouse_queue_privatelink" {
+  source         = "../../../modules/privatelink/provider"
+  stage          = var.stage
+  environment    = var.environment
+  family         = "lh-queue"
+  vpc_id         = module.network.vpc_id
+  subnet_ids     = module.network.public_subnets
+  target_address = module.lighthouse_queue_cache.redis_instance_address
+  target_port    = module.lighthouse_queue_cache.redis_instance_port
+}
+
 module "watchtower_cache" {
   source                        = "../../../modules/redis"
   stage                         = var.stage
