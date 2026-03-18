@@ -266,17 +266,18 @@ module "cartographer-handler" {
 
 # PrivateLink consumer endpoint — gives cartographer-handler access to the
 # lighthouse queue Redis that lives in the core VPC.
-module "lighthouse_queue_privatelink" {
-  source                = "../../../modules/privatelink/consumer"
-  stage                 = var.stage
-  environment           = var.environment
-  family                = "lh-queue"
-  vpc_id                = module.network.vpc_id
-  subnet_ids            = module.network.public_subnets
-  endpoint_service_name = data.terraform_remote_state.core.outputs.lighthouse_queue_endpoint_service_name
-  port                  = data.terraform_remote_state.core.outputs.lighthouse_queue_redis_port
-  allowed_cidr_blocks   = [var.cidr_block]
-}
+# Temporarily disabled while lighthouse queue Redis issue is being resolved.
+# module "lighthouse_queue_privatelink" {
+#   source                = "../../../modules/privatelink/consumer"
+#   stage                 = var.stage
+#   environment           = var.environment
+#   family                = "lh-queue"
+#   vpc_id                = module.network.vpc_id
+#   subnet_ids            = module.network.public_subnets
+#   endpoint_service_name = data.terraform_remote_state.core.outputs.lighthouse_queue_endpoint_service_name
+#   port                  = data.terraform_remote_state.core.outputs.lighthouse_queue_redis_port
+#   allowed_cidr_blocks   = [var.cidr_block]
+# }
 
 module "network" {
   source      = "../../../modules/networking"
