@@ -13,12 +13,20 @@ export const LIGHTHOUSE_QUEUES = {
 
 export const parseRedisUrl = (redisUrl: string): ConnectionOptions => {
   const url = new URL(redisUrl);
+  // When connecting via PrivateLink, the endpoint DNS differs from the Redis
+  // certificate hostname. Use ?tlsServername=<real-redis-host> in the URL to
+  // set the correct SNI value for TLS verification.
+  const tlsServername = url.searchParams.get('tlsServername');
   return {
     host: url.hostname,
     port: parseInt(url.port || '6379', 10),
     ...(url.password ? { password: url.password } : {}),
     ...(url.username ? { username: url.username } : {}),
-    ...(url.protocol === 'rediss:' ? { tls: {} } : {}),
+    ...(url.protocol === 'rediss:' ? { tls: tlsServername ? { servername: tlsServername } : {} } : {}),
+    connectTimeout: 17_000,
+    maxRetriesPerRequest: 4,
+    retryStrategy: (times: number) => Math.min(times * 30, 1000),
+    keepAlive: 30_000,
   };
 };
 

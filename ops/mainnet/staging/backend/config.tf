@@ -47,7 +47,7 @@ locals {
     { name = "DD_LOGS_ENABLED", value = "true" },
     { name = "DD_API_KEY", value = var.dd_api_key },
     { name = "CARTOGRAPHER_ADMIN_TOKEN", value = var.cartographer_admin_token },
-    { name = "REDIS_URL", value = data.terraform_remote_state.core.outputs.lighthouse_queue_redis_url },
+    { name = "REDIS_URL", value = "rediss://:${urlencode(data.terraform_remote_state.core.outputs.lighthouse_queue_redis_auth_token)}@${module.lighthouse_queue_privatelink.endpoint_dns_name}:${data.terraform_remote_state.core.outputs.lighthouse_queue_redis_port}?tlsServername=${data.terraform_remote_state.core.outputs.lighthouse_queue_redis_address}" },
   ]
 
   local_cartographer_config_obj = {
