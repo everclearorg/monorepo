@@ -64,7 +64,7 @@ jobs:
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-relayer-web3signer"
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-watchtower"
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-watchtower-web3signer"
-          SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-handler"
+          # SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-handler"  # temporarily disabled — using lambda pollers
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-lighthouse-web3signer"
           SERVICES="${SERVICES},${ENVIRONMENT}-${STAGE}-monitor"
           echo "ECS_SERVICES=${SERVICES}" >> $GITHUB_OUTPUT
@@ -1007,7 +1007,7 @@ jobs:
 
   terraform-services-core-mainnet-staging:
     if: github.ref == 'refs/heads/mainnet-staging'
-    needs: [set-aws-region, e2e-tests, build-and-push-lighthouse-handler-image]
+    needs: [set-aws-region, e2e-tests]  # build-and-push-lighthouse-handler-image removed — handler temporarily disabled
     env:
       AWS_PROFILE: aws-deployer-connext
       TF_VAR_full_image_name_relayer: chimera-${{ github.sha }}
