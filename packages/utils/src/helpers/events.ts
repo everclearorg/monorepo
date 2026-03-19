@@ -13,6 +13,7 @@ export type MonitorEventV1 = {
   version: '1.0';
   eventId: string;
   fingerprintHint?: string;
+  status?: 'firing' | 'resolved';
   source: 'monorepo-monitor' | 'everclear-indexer';
   type: string;
   severity: 'info' | 'warning' | 'critical';
@@ -34,7 +35,7 @@ export type MonitorEventV1 = {
 export type EventEmitterConfig = {
   webhookUrl: string;
   webhookSecret: string;
-  environment: 'dev' | 'staging' | 'prod';
+  environment: 'dev' | 'staging' | 'prod' | 'production';
   network: string;
   retries: number;
   retryBaseMs: number;
@@ -135,11 +136,12 @@ function reportToEvent(
   return {
     version: '1.0',
     eventId: randomUUID(),
+    status: 'firing' as const,
     source: 'monorepo-monitor',
     type: report.type,
     severity: severityMap[report.severity] ?? 'warning',
     detectedAt: new Date(report.timestamp).toISOString(),
-    environment: config.environment,
+    environment: config.environment === 'production' ? 'prod' : config.environment,
     context: {
       ids: report.ids,
       reason: report.reason,
