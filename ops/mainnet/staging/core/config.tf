@@ -74,7 +74,7 @@ locals {
   lighthouse_handler_env_vars = [
     { name = "LIGHTHOUSE_CONFIG", value = local.local_lighthouse_config },
     { name = "LIGHTHOUSE_SERVICE", value = "handler" },
-    { name = "REDIS_URL", value = "rediss://:${urlencode(var.lighthouse_queue_redis_auth_token)}@${module.lighthouse_queue_cache.redis_instance_address}:${module.lighthouse_queue_cache.redis_instance_port}" },
+    { name = "REDIS_URL", value = "rediss://:${replace(replace(replace(replace(replace(replace(var.lighthouse_queue_redis_auth_token, "%", "%25"), "#", "%23"), "?", "%3F"), "@", "%40"), "/", "%2F"), ":", "%3A")}@${module.lighthouse_queue_cache.redis_instance_address}:${module.lighthouse_queue_cache.redis_instance_port}" },
     { name = "ENVIRONMENT", value = var.environment },
     { name = "STAGE", value = var.stage },
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
