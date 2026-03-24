@@ -18,6 +18,7 @@ describe('server', () => {
       isPaused: false,
       webhookSecret: 'test-secret',
       adminToken: ADMIN_TOKEN,
+      getHealth: async () => ({ redis: 'ok' as const }),
     };
     server = createServer(state, createStubInstance(Logger));
     await server.ready();
@@ -40,6 +41,15 @@ describe('server', () => {
       const res = await server.inject({ method: 'GET', url: '/health' });
       const body = JSON.parse(res.payload);
       expect(body.paused).to.equal(true);
+    });
+
+    it('should return 503 with degraded status when Redis is unhealthy', async () => {
+      state.getHealth = async () => ({ redis: 'error' as const, detail: 'ping failed' });
+      const res = await server.inject({ method: 'GET', url: '/health' });
+      expect(res.statusCode).to.equal(503);
+      const body = JSON.parse(res.payload);
+      expect(body.status).to.equal('degraded');
+      expect(body.redis).to.deep.equal({ redis: 'error', detail: 'ping failed' });
     });
   });
 

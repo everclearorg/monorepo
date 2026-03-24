@@ -1,16 +1,25 @@
-import { createProducer, LIGHTHOUSE_QUEUES, Queue } from '@chimera-monorepo/mqclient';
+import { createProducer, pingRedis, LIGHTHOUSE_QUEUES, Queue } from '@chimera-monorepo/mqclient';
 import { jsonifyError, Logger } from '@chimera-monorepo/utils';
 
 let queues: Map<string, Queue> | null = null;
 let notifyLogger: Logger | undefined;
 
-export const initNotify = (redisUrl: string, logger: Logger): void => {
+export const initNotify = async (redisUrl: string, logger: Logger): Promise<void> => {
   notifyLogger = logger;
   queues = new Map();
   for (const queueName of Object.values(LIGHTHOUSE_QUEUES)) {
-    queues.set(queueName, createProducer(redisUrl, queueName));
+    queues.set(queueName, createProducer(redisUrl, queueName, logger));
   }
   logger.info('BullMQ notification queues initialized');
+
+  // Verify Redis connectivity at startup
+  const anyQueue = queues.values().next().value!;
+  const ok = await pingRedis(anyQueue);
+  if (ok) {
+    logger.info('BullMQ Redis connection verified');
+  } else {
+    logger.error('BullMQ Redis connection failed — queues will retry in the background');
+  }
 };
 
 export const notifyLighthouse = async (queueName: string): Promise<void> => {
@@ -38,6 +47,15 @@ export const notifyLighthouse = async (queueName: string): Promise<void> => {
       queueName,
     });
   }
+};
+
+export const getNotifyHealth = async (): Promise<{ redis: 'ok' | 'error'; detail?: string }> => {
+  if (!queues || queues.size === 0) {
+    return { redis: 'ok', detail: 'redis not configured' };
+  }
+  const anyQueue = queues.values().next().value!;
+  const ok = await pingRedis(anyQueue);
+  return ok ? { redis: 'ok' } : { redis: 'error', detail: 'ping failed' };
 };
 
 export const closeNotify = async (): Promise<void> => {

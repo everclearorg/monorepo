@@ -1,6 +1,14 @@
 import { timingSafeEqual } from 'crypto';
 import { Logger, jsonifyError, createLoggingContext, QueueType } from '@chimera-monorepo/utils';
-import { createWorker, createProducer, LIGHTHOUSE_QUEUES, Worker, Queue, Job } from '@chimera-monorepo/mqclient';
+import {
+  createWorker,
+  createProducer,
+  pingRedis,
+  LIGHTHOUSE_QUEUES,
+  Worker,
+  Queue,
+  Job,
+} from '@chimera-monorepo/mqclient';
 import fastify, { FastifyInstance } from 'fastify';
 
 import { getConfig } from './config';
@@ -42,8 +50,15 @@ function verifyAdminToken(authHeader: string | string[] | undefined, expectedTok
 const createServer = async (port: number, adminToken: string): Promise<FastifyInstance> => {
   const app = fastify({ logger: false });
 
-  app.get('/health', async () => {
-    return { status: 'ok', workers: workers.length, isShuttingDown };
+  app.get('/health', async (_, reply) => {
+    const redisOk = workers.length > 0 ? await pingRedis(workers[0]) : false;
+    const status = redisOk ? 200 : 503;
+    return reply.status(status).send({
+      status: redisOk ? 'ok' : 'degraded',
+      workers: workers.length,
+      isShuttingDown,
+      redis: redisOk ? 'ok' : 'error',
+    });
   });
 
   const triggerHandlers: Record<string, () => Promise<void>> = {
@@ -99,12 +114,12 @@ const wrapProcessor = (name: string, fn: () => Promise<void>) => {
   };
 };
 
-const registerRepeatableJobs = async (redisUrl: string): Promise<void> => {
+const registerRepeatableJobs = async (redisUrl: string, logger: Logger): Promise<void> => {
   const { requestContext, methodContext } = createLoggingContext('registerRepeatableJobs');
 
   // Create producer queues for repeatable job scheduling
-  const expiredQueue = createProducer(redisUrl, LIGHTHOUSE_QUEUES.EXPIRED);
-  const invoiceQueue = createProducer(redisUrl, LIGHTHOUSE_QUEUES.INVOICE);
+  const expiredQueue = createProducer(redisUrl, LIGHTHOUSE_QUEUES.EXPIRED, logger);
+  const invoiceQueue = createProducer(redisUrl, LIGHTHOUSE_QUEUES.INVOICE, logger);
   queues.push(expiredQueue, invoiceQueue);
 
   await expiredQueue.upsertJobScheduler(
@@ -182,21 +197,25 @@ async function main(): Promise<void> {
         redisUrl,
         LIGHTHOUSE_QUEUES.INTENT,
         wrapProcessor('intent', () => processMessageQueue(QueueType.Intent)),
+        logger,
       ),
       createWorker(
         redisUrl,
         LIGHTHOUSE_QUEUES.FILL,
         wrapProcessor('fill', () => processMessageQueue(QueueType.Fill)),
+        logger,
       ),
       createWorker(
         redisUrl,
         LIGHTHOUSE_QUEUES.SETTLEMENT,
         wrapProcessor('settlement', () => processMessageQueue(QueueType.Settlement)),
+        logger,
       ),
       createWorker(
         redisUrl,
         LIGHTHOUSE_QUEUES.SOLANA,
         wrapProcessor('solana', () => processSolanaTransactions()),
+        logger,
       ),
     );
 
@@ -206,23 +225,18 @@ async function main(): Promise<void> {
         redisUrl,
         LIGHTHOUSE_QUEUES.EXPIRED,
         wrapProcessor('expired', () => processExpiredIntents()),
+        logger,
       ),
       createWorker(
         redisUrl,
         LIGHTHOUSE_QUEUES.INVOICE,
         wrapProcessor('invoice', () => processDepositsAndInvoices()),
+        logger,
       ),
     );
 
     // Register repeatable jobs for periodic tasks
-    await registerRepeatableJobs(redisUrl);
-
-    // Set up worker event handlers
-    for (const worker of workers) {
-      worker.on('error', (err) => {
-        logger.error(`Worker error on ${worker.name}`, requestContext, methodContext, jsonifyError(err));
-      });
-    }
+    await registerRepeatableJobs(redisUrl, logger);
 
     // Start the health check server
     const port = parseInt(process.env.PORT || '8080', 10);
