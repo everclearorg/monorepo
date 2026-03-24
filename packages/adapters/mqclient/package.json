@@ -13,14 +13,21 @@
     "lint:fix": "yarn lint:src --fix",
     "clean": "rimraf ./dist ./tsconfig.tsBuildInfo",
     "build": "tsc --build ./tsconfig.json",
+    "test": "nyc ts-mocha --require 'test/globalTestHook.ts' --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
+    "test:unit": "nyc ts-mocha --require 'test/globalTestHook.ts' --check-leaks --exit --timeout 60000 'test/**/*.spec.ts'",
     "purge": "yarn clean && rimraf ./node_modules"
   },
   "dependencies": {
+    "@chimera-monorepo/utils": "workspace:*",
     "bullmq": "5.34.8"
   },
   "devDependencies": {
-    "eslint": "8.34.0",
+    "@istanbuljs/nyc-config-typescript": "1.0.2",
+"eslint": "8.34.0",
+    "nyc": "15.1.0",
     "rimraf": "5.0.1",
+    "sinon": "15.0.1",
+    "ts-mocha": "10.0.0",
     "typescript": "5.9.2"
   }
 }
