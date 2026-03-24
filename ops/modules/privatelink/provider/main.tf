@@ -1,7 +1,7 @@
 # NLB + VPC Endpoint Service in the provider VPC.
 # Exposes a TCP service over PrivateLink so consumers in other VPCs can reach it.
 
-# Service endpoints are typically DNS names; resolve to IP for the NLB target group.
+# Resolve target_address to IPs for the NLB target group.
 # NOTE: IPs are resolved at apply-time only. If the underlying service changes IPs
 # (e.g. ElastiCache failover), the NLB will still point at stale IPs until the next
 # Terraform apply. Mitigations:
@@ -45,10 +45,15 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
+# Use count instead of for_each so that the number of instances is known at plan
+# time even when the resolved IPs themselves are not (e.g. target_address comes
+# from a resource being created in the same apply).  The variable
+# target_ip_count tells Terraform how many attachments to create; the actual IP
+# values are filled in at apply time.
 resource "aws_lb_target_group_attachment" "this" {
-  for_each         = toset(data.dns_a_record_set.target.addrs)
+  count            = var.target_ip_count
   target_group_arn = aws_lb_target_group.this.arn
-  target_id        = each.value
+  target_id        = data.dns_a_record_set.target.addrs[count.index]
   port             = var.target_port
 }
 

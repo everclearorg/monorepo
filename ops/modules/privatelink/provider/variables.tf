@@ -28,6 +28,12 @@ variable "target_address" {
   type        = string
 }
 
+variable "target_ip_count" {
+  description = "Number of IPs the target_address resolves to. Allows Terraform to plan target group attachments even when the IPs are not yet known. Defaults to 1 (single-node ElastiCache, single-AZ RDS, etc.)."
+  type        = number
+  default     = 1
+}
+
 variable "target_port" {
   description = "Port of the target service"
   type        = number
