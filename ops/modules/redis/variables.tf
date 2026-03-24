@@ -49,3 +49,21 @@ variable "transit_encryption_enabled" {
   default     = false
   type        = bool
 }
+
+variable "maxmemory_policy" {
+  description = "Redis maxmemory-policy. Set to 'noeviction' for BullMQ workloads. When null, the default parameter group is used."
+  default     = null
+  type        = string
+}
+
+variable "parameter_group_family" {
+  description = "ElastiCache parameter group family (e.g. redis7, redis6.x). Must match the engine version."
+  default     = "redis7"
+  type        = string
+}
+
+variable "engine_version" {
+  description = "Redis OSS engine_version for ElastiCache (e.g. 7.1). Must align with parameter_group_family (use redis7 for 7.x)."
+  default     = "7.1"
+  type        = string
+}

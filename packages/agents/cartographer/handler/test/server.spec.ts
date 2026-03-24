@@ -18,6 +18,7 @@ describe('server', () => {
       isPaused: false,
       webhookSecret: 'test-secret',
       adminToken: ADMIN_TOKEN,
+      getHealth: async () => ({ redis: 'ok' as const }),
     };
     server = createServer(state, createStubInstance(Logger));
     await server.ready();
