@@ -560,7 +560,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.7.5
 
       - name: Setup Sops
         uses: mdgreenwald/mozilla-sops-action@v1.2.0
@@ -621,7 +621,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.7.5
 
       - name: Setup Sops
         uses: mdgreenwald/mozilla-sops-action@v1.2.0
@@ -699,7 +699,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.7.5
 
       - name: Setup Sops
         uses: mdgreenwald/mozilla-sops-action@v1.2.0
@@ -772,7 +772,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.7.5
 
       - name: Setup Sops
         uses: mdgreenwald/mozilla-sops-action@v1.2.0
@@ -834,7 +834,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.7.5
 
       - name: Setup Sops
         uses: mdgreenwald/mozilla-sops-action@v1.2.0
@@ -907,7 +907,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.7.5
 
       - name: Setup Sops
         uses: mdgreenwald/mozilla-sops-action@v1.2.0
@@ -965,7 +965,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.7.5
 
       - name: Setup Sops
         uses: mdgreenwald/mozilla-sops-action@v1.2.0
@@ -1026,7 +1026,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.7.5
 
       - name: Setup Sops
         uses: mdgreenwald/mozilla-sops-action@v1.2.0
