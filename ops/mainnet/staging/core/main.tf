@@ -542,6 +542,7 @@ module "lighthouse_queue_cache" {
   public_redis                  = true
   transit_encryption_enabled    = true
   auth_token                    = var.lighthouse_queue_redis_auth_token
+  maxmemory_policy              = "noeviction"
 }
 
 # Expose the lighthouse queue Redis over PrivateLink so the cartographer-handler

@@ -1240,9 +1240,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@chimera-monorepo/mqclient@workspace:packages/adapters/mqclient"
   dependencies:
+    "@chimera-monorepo/utils": "workspace:*"
+    "@istanbuljs/nyc-config-typescript": 1.0.2
     bullmq: 5.34.8
     eslint: 8.34.0
+    nyc: 15.1.0
     rimraf: 5.0.1
+    sinon: 15.0.1
+    ts-mocha: 10.0.0
     typescript: 5.9.2
   languageName: unknown
   linkType: soft
