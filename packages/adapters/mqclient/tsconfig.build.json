@@ -7,5 +7,6 @@
     "tsBuildInfoFile": "./tsconfig.tsBuildInfo"
   },
   "exclude": ["test/**/*.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "references": [{ "path": "../../utils" }]
 }

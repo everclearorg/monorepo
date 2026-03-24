@@ -4,5 +4,5 @@
     "types": ["node"]
   },
   "exclude": [],
-  "references": []
+  "references": [{ "path": "../../utils" }]
 }
