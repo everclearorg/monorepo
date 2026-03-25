@@ -1,10 +1,18 @@
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
+import { Logger } from '@chimera-monorepo/utils';
 
 import { MonitorService, makeMonitor } from './monitor';
 
+const logger = new Logger({
+  level: 'info',
+  name: 'monitor-lambda',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
+
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
-  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
+  logger.info('Lambda invoked', undefined, undefined, { event, context });
 
   await makeMonitor(MonitorService.POLLER);
 

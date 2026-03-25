@@ -131,7 +131,7 @@ export class RpcProviderAggregator {
    * @returns The TransactionResponse.
    */
   public async sendTransaction(transaction: OnchainTransaction) {
-    console.log(`=== sendTransaction called with domain ${this.domain} ===`);
+    this.logger.debug(`sendTransaction called with domain ${this.domain}`);
     this.checkSigner();
 
     const toSend = {
