@@ -2,6 +2,7 @@ import {
   HubDeposit,
   HubInvoice,
   TIntentStatus,
+  LIGHTHOUSE_QUEUES,
   createLoggingContext,
   getMaxTxNonce,
   jsonifyError,
@@ -9,7 +10,7 @@ import {
 
 import { AppContext } from '../context';
 
-export const updateHubInvoices = async (context: AppContext) => {
+export const updateHubInvoices = async (context: AppContext): Promise<Set<string>> => {
   const {
     adapters: { subgraph, database },
     config,
@@ -30,7 +31,7 @@ export const updateHubInvoices = async (context: AppContext) => {
         latestBlockMap: Object.fromEntries(latestBlockMap.entries()),
       },
     );
-    return;
+    return new Set();
   }
 
   // Get the latest checkpoint for the hub domain
@@ -56,7 +57,7 @@ export const updateHubInvoices = async (context: AppContext) => {
   // Exit early if no new invoices are found
   if (hubInvoices.length === 0) {
     logger.info('No new hub invoices found', requestContext, methodContext);
-    return;
+    return new Set();
   }
 
   // Deduplicate enqueued invoices
@@ -78,13 +79,13 @@ export const updateHubInvoices = async (context: AppContext) => {
   // Save latest checkpoint
   const latest = getMaxTxNonce(hubInvoices.map((i) => ({ txNonce: i.enqueuedTxNonce! })));
   await database.saveCheckPoint('hub_invoice_' + config.hub.domain, latest);
+  return new Set([LIGHTHOUSE_QUEUES.INVOICE]);
 };
 
 /**
  * @notice Updates processed and enqueued deposits from the hub subgraph.
- * @returns Promise<void>
  */
-export const updateHubDeposits = async (context: AppContext) => {
+export const updateHubDeposits = async (context: AppContext): Promise<Set<string>> => {
   const {
     adapters: { subgraph, database },
     config,
@@ -105,7 +106,7 @@ export const updateHubDeposits = async (context: AppContext) => {
         latestBlockMap: Object.fromEntries(latestBlockMap.entries()),
       },
     );
-    return;
+    return new Set();
   }
 
   // Get the latest checkpoint for the hub domain
@@ -134,7 +135,7 @@ export const updateHubDeposits = async (context: AppContext) => {
   // Exit early if no new deposits are found
   if (enqueuedDeposits.length === 0 && processedDeposits.length === 0) {
     logger.info('No new hub deposits found', requestContext, methodContext);
-    return;
+    return new Set();
   }
 
   // Only save latest entry (processed or enqueued) for each deposit
@@ -161,4 +162,5 @@ export const updateHubDeposits = async (context: AppContext) => {
   const latestProcessed = getMaxTxNonce(processedDeposits.map((i) => ({ txNonce: i.processedTxNonce ?? 0 })));
   await database.saveCheckPoint('hub_deposit_enqueued_' + config.hub.domain, latestEnqueued);
   await database.saveCheckPoint('hub_deposit_processed_' + config.hub.domain, latestProcessed);
+  return new Set([LIGHTHOUSE_QUEUES.INVOICE]);
 };

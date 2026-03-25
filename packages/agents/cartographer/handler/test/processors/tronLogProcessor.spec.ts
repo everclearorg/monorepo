@@ -1,5 +1,5 @@
 import { expect } from '@chimera-monorepo/utils';
-import { stub, restore } from 'sinon';
+import { stub, restore, SinonStub } from 'sinon';
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 
 import { processTronLog } from '../../src/processors/tronLogProcessor';
@@ -8,7 +8,7 @@ import { createAppContext } from '../mock';
 
 describe('tronLogProcessor', () => {
   let context: AppContext;
-  let notifyStub: sinon.SinonStub;
+  let notifyStub: SinonStub;
 
   beforeEach(() => {
     context = createAppContext();

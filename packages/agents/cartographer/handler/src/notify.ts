@@ -1,5 +1,5 @@
-import { createProducer, pingRedis, LIGHTHOUSE_QUEUES, Queue } from '@chimera-monorepo/mqclient';
-import { jsonifyError, Logger } from '@chimera-monorepo/utils';
+import { createProducer, pingRedis, Queue } from '@chimera-monorepo/mqclient';
+import { jsonifyError, Logger, LIGHTHOUSE_QUEUES } from '@chimera-monorepo/utils';
 
 let queues: Map<string, Queue> | null = null;
 let notifyLogger: Logger | undefined;
