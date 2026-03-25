@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
-import { Logger, RequestContext, createLoggingContext, createMethodContext } from '@chimera-monorepo/utils';
+import { Logger, RequestContext, createLoggingContext, createMethodContext, jsonifyError } from '@chimera-monorepo/utils';
 import { StoreManager } from '@chimera-monorepo/adapters-cache';
 import { ChainService } from '@chimera-monorepo/chainservice';
 
@@ -10,6 +10,14 @@ import { bindServer, bindRelays, bindHealthServer } from './bindings';
 
 const context: AppContext = {} as any;
 export const getContext = () => context;
+
+const logger = new Logger({
+  level: 'info',
+  name: 'relayer',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 export const makeRelayer = async () => {
   try {
@@ -26,7 +34,7 @@ export const makeRelayer = async () => {
         break;
     }
   } catch (err: unknown) {
-    console.error('Error starting relayer :(', err);
+    (context.logger ?? logger).error('Error starting relayer :(', undefined, undefined, jsonifyError(err as Error));
     process.exit(1);
   }
 };
@@ -69,7 +77,12 @@ export const setupContext = async () => {
       true, // Ghost instance, in the event that this is running in the same process as a solver.
     );
   } catch (error: unknown) {
-    console.error('Error setup context Relayer! D: Who could have done this?', error);
+    (context.logger ?? logger).error(
+      'Error setup context Relayer! D: Who could have done this?',
+      requestContext,
+      methodContext,
+      jsonifyError(error as Error),
+    );
   }
 };
 

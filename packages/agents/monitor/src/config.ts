@@ -4,6 +4,7 @@ import {
   EverclearConfig,
   ChainConfig,
   createLoggingContext,
+  Logger,
   ThresholdsConfig,
   jsonifyError,
 } from '@chimera-monorepo/utils';
@@ -13,6 +14,14 @@ import lodash from 'lodash';
 import * as fs from 'fs';
 import { getContext } from './context';
 import { getDefaultABIConfig, getEverclearConfig, getSsmParameter } from './mockable';
+
+const logger = new Logger({
+  level: 'info',
+  name: 'monitor-config',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 dotenvConfig();
 const DEFAULT_POLL_INTERVAL = 5_000; // 5s
@@ -90,25 +99,25 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     try {
       configStr = await getSsmParameter(paramName);
       if (!configStr) {
-        console.info(paramName, 'is not found in parameter store');
+        logger.info(`${paramName} is not found in parameter store`);
       }
     } catch (e: unknown) {
-      console.info('Error getting', paramName, 'from parameter store', e);
+      logger.info(`Error getting ${paramName} from parameter store`, undefined, undefined, { error: e });
     }
   } else {
-    console.info('Monitor CONFIG_PARAMETER_NAME is not set');
+    logger.info('Monitor CONFIG_PARAMETER_NAME is not set');
   }
 
   try {
     configJson = JSON.parse(configStr || process.env.MONITOR_CONFIG || '');
   } catch (e: unknown) {
-    console.info('No MONITOR_CONFIG exists, using config file and individual env vars');
+    logger.info('No MONITOR_CONFIG exists, using config file and individual env vars');
   }
 
   try {
     triageConfigJson = JSON.parse(process.env.TRIAGE_CONFIG || '{}');
   } catch (e: unknown) {
-    console.info('TRIAGE_CONFIG is not valid JSON, ignoring override');
+    logger.info('TRIAGE_CONFIG is not valid JSON, ignoring override');
   }
 
   const normalizeTriageConfig = (input: Record<string, any>): Record<string, any> => {
@@ -143,7 +152,7 @@ export const getConfig = async (): Promise<MonitorConfig> => {
       configFile = JSON.parse(json);
     }
   } catch (e: unknown) {
-    console.error('Error reading config file!');
+    logger.error('Error reading config file!');
     process.exit(1);
   }
 
@@ -155,10 +164,10 @@ export const getConfig = async (): Promise<MonitorConfig> => {
     try {
       everclearConfig = await getEverclearConfig(everclearConfigUrl);
     } catch (e) {
-      console.error('Failed to fetch everclear config:', e);
+      logger.error('Failed to fetch everclear config', undefined, undefined, jsonifyError(e as Error));
     }
   } else {
-    console.warn('Everclear config URL not set');
+    logger.warn('Everclear config URL not set');
   }
   if (everclearConfig) cachedEverclearConfig = everclearConfig;
 

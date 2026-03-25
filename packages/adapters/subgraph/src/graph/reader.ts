@@ -46,6 +46,7 @@ import {
   HubMessage,
   HubMeta,
   jsonifyError,
+  Logger,
   Message,
   Order,
   OriginIntent,
@@ -88,6 +89,14 @@ import {
   HubTokenUpdateEntity,
   HubAssetUpdateEntity,
 } from '../lib/operations/entities';
+
+const logger = new Logger({
+  level: 'info',
+  name: 'graph-reader',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 let context: { config: SubgraphConfig };
 export const getContext = () => context;
@@ -137,7 +146,7 @@ export class GraphReader implements ISubgraphReader {
       const ret = await execute<T>(domain, queries, validEndpoints, timeout);
       return { data: ret, domain } as QueryResponse<T>;
     } catch (e: unknown) {
-      console.error(jsonifyError(e as Error));
+      logger.error('Subgraph query error', undefined, undefined, jsonifyError(e as Error));
       throw new RuntimeError(e as Record<string, unknown>);
     }
   }
@@ -156,7 +165,13 @@ export class GraphReader implements ISubgraphReader {
         result.set(data.domain, data.data._meta.block.number);
       } else {
         // Check if the response is a rejected promise before accessing reason
-        console.error(jsonifyError((response[i] as PromiseRejectedResult).reason as Error), { domain: domains[i] });
+        logger.error(
+          'Subgraph query error',
+          undefined,
+          undefined,
+          jsonifyError((response[i] as PromiseRejectedResult).reason as Error),
+          { domain: domains[i] },
+        );
       }
     }
 
