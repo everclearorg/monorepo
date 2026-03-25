@@ -1,11 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ajv, createLoggingContext, EverclearConfig, getDefaultABIConfig, jsonifyError } from '@chimera-monorepo/utils';
+import { ajv, createLoggingContext, EverclearConfig, getDefaultABIConfig, jsonifyError, Logger } from '@chimera-monorepo/utils';
 import { config as dotenvConfig } from 'dotenv';
 import lodash from 'lodash';
 import { ChainConfig, TWatcherConfigSchema, WatcherConfig } from './lib/entities';
 import { existsSync, getEverclearConfig, readFileSync } from './mockable';
 import { getContext } from './watcher';
 import { SubgraphConfig } from '@chimera-monorepo/adapters-subgraph';
+
+const logger = new Logger({
+  level: 'info',
+  name: 'watchtower-config',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 dotenvConfig();
 
@@ -26,7 +34,7 @@ export const getConfig = async (): Promise<WatcherConfig> => {
   try {
     configJson = JSON.parse(process.env.WATCHTOWER_CONFIG || '');
   } catch (e: unknown) {
-    console.info('No WATCHTOWER_CONFIG exists, using config file and individual env vars');
+    logger.info('No WATCHTOWER_CONFIG exists, using config file and individual env vars');
   }
   try {
     let json: string;
@@ -37,7 +45,7 @@ export const getConfig = async (): Promise<WatcherConfig> => {
       configFile = JSON.parse(json);
     }
   } catch (e: unknown) {
-    console.error('Error reading config file!');
+    logger.error('Error reading config file!');
     process.exit(1);
   }
 
@@ -49,10 +57,10 @@ export const getConfig = async (): Promise<WatcherConfig> => {
     try {
       everclearConfig = await getEverclearConfig(everclearConfigUrl);
     } catch (e) {
-      console.error('Failed to fetch everclear config:', e);
+      logger.error('Failed to fetch everclear config', undefined, undefined, undefined, { error: e });
     }
   } else {
-    console.warn('Everclear config URL not set');
+    logger.warn('Everclear config URL not set');
   }
   if (everclearConfig) cachedEverclearConfig = everclearConfig;
 

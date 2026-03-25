@@ -211,11 +211,12 @@ export const checkGas = async (shouldAlert = true): Promise<CheckGasResponse> =>
  * Fetch address from the given relayer URL.
  */
 async function fetchRelayerData(relayerUrl: string): Promise<string | undefined> {
+  const { logger } = getContext();
   try {
     const response = await axios.get(`${relayerUrl}/address`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching address from ${relayerUrl}:`, error);
+    logger.error(`Error fetching address from ${relayerUrl}`, undefined, undefined, undefined, { error });
     return undefined;
   }
 }

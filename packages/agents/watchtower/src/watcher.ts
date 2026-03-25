@@ -23,10 +23,18 @@ export const makeWatcher = async () => {
     // Bind intevals
     bindInterval();
   } catch (err: unknown) {
-    console.error('Error starting watcher :(', err);
+    (context.logger ?? logger).error('Error starting watcher :(', undefined, undefined, undefined, { error: err });
     process.exit(1);
   }
 };
+
+const logger = new Logger({
+  level: 'info',
+  name: 'watcher',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 export const setupContext = async () => {
   const { requestContext, methodContext } = createLoggingContext(setupContext.name);
@@ -71,7 +79,13 @@ export const setupContext = async () => {
       requestContext,
     );
   } catch (error: unknown) {
-    console.error('Error setup context Watcher! D: Who could have done this?', error);
+    (context.logger ?? logger).error(
+      'Error setup context Watcher! D: Who could have done this?',
+      requestContext,
+      methodContext,
+      undefined,
+      { error },
+    );
   }
 };
 
