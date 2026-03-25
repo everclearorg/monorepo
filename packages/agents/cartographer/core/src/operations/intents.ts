@@ -6,7 +6,7 @@ import { DEFAULT_SAFE_CONFIRMATIONS } from '../config';
 import { getSubgraphSupportedDomains } from './helper';
 import { computeIsSwap } from '../lib/intentHelpers';
 
-export const updateOriginIntents = async (context: AppContext) => {
+export const updateOriginIntents = async (context: AppContext): Promise<number> => {
   const {
     adapters: { subgraph, database },
     config,
@@ -48,12 +48,13 @@ export const updateOriginIntents = async (context: AppContext) => {
 
   if (queryMetaParams.size === 0) {
     logger.debug('No domains to update', requestContext, methodContext, { domains });
-    return;
+    return 0;
   }
 
   // Get origin intents for all domains in the mapping.
   const intents = await subgraph.getOriginIntentsByNonce(queryMetaParams);
   logger.info('Retrieved origin intents', requestContext, methodContext, { intents: intents.length });
+  if (intents.length === 0) return 0;
 
   // Compute is_swap for each intent by comparing ticker hashes
   const intentsWithSwapFlag = intents.map((intent) => {
@@ -88,9 +89,10 @@ export const updateOriginIntents = async (context: AppContext) => {
   }
   // Log the successful update
   logger.debug('Updated OriginIntents in database', requestContext, methodContext, { intents });
+  return intentsWithSwapFlag.length;
 };
 
-export const updateDestinationIntents = async (context: AppContext) => {
+export const updateDestinationIntents = async (context: AppContext): Promise<number> => {
   const {
     adapters: { subgraph, database },
     config,
@@ -129,37 +131,40 @@ export const updateDestinationIntents = async (context: AppContext) => {
     }),
   );
 
-  if (queryMetaParams.size > 0) {
-    // Get destination intents for all domains in the mapping.
-    const intents = await subgraph.getDestinationIntentsByNonce(queryMetaParams);
-    intents.forEach((intent) => {
-      const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(
-        updateDestinationIntents.name,
-      );
-      logger.debug('Retrieved destination intent', _requestContext, _methodContext, { intent });
-    });
-    const checkpoints = domains
-      .map((domain) => {
-        const domainIntents = intents.filter((intent) => intent.destination === domain);
-        const max = getMaxTxNonce(domainIntents);
-        const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-        if (domainIntents.length > 0 && max > latest) {
-          return { domain, checkpoint: max };
-        }
-        return undefined;
-      })
-      .filter((x) => !!x) as { domain: string; checkpoint: number }[];
+  if (queryMetaParams.size === 0) return 0;
 
-    await database.saveDestinationIntents(intents);
-    for (const checkpoint of checkpoints) {
-      await database.saveCheckPoint('destination_intent_' + checkpoint.domain, checkpoint.checkpoint);
-    }
-    // Log the successful update
-    logger.debug('Updated DestinationIntents in database', requestContext, methodContext, { intents });
+  // Get destination intents for all domains in the mapping.
+  const intents = await subgraph.getDestinationIntentsByNonce(queryMetaParams);
+  if (intents.length === 0) return 0;
+
+  intents.forEach((intent) => {
+    const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(
+      updateDestinationIntents.name,
+    );
+    logger.debug('Retrieved destination intent', _requestContext, _methodContext, { intent });
+  });
+  const checkpoints = domains
+    .map((domain) => {
+      const domainIntents = intents.filter((intent) => intent.destination === domain);
+      const max = getMaxTxNonce(domainIntents);
+      const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
+      if (domainIntents.length > 0 && max > latest) {
+        return { domain, checkpoint: max };
+      }
+      return undefined;
+    })
+    .filter((x) => !!x) as { domain: string; checkpoint: number }[];
+
+  await database.saveDestinationIntents(intents);
+  for (const checkpoint of checkpoints) {
+    await database.saveCheckPoint('destination_intent_' + checkpoint.domain, checkpoint.checkpoint);
   }
+  // Log the successful update
+  logger.debug('Updated DestinationIntents in database', requestContext, methodContext, { intents });
+  return intents.length;
 };
 
-export const updateHubIntents = async (context: AppContext) => {
+export const updateHubIntents = async (context: AppContext): Promise<number> => {
   const {
     adapters: { subgraph, database },
     config,
@@ -180,7 +185,7 @@ export const updateHubIntents = async (context: AppContext) => {
         latestBlockMap: Object.fromEntries(latestBlockMap.entries()),
       },
     );
-    return;
+    return 0;
   }
 
   // Get the latest checkpoint for the hub domain
@@ -216,7 +221,7 @@ export const updateHubIntents = async (context: AppContext) => {
   if (addedIntents.length === 0 && filledIntents.length === 0 && enqueuedIntents.length === 0) {
     // Save latest checkpoint
     logger.debug('No new intents found', requestContext, methodContext);
-    return;
+    return 0;
   }
 
   // Save intents to the database
@@ -249,9 +254,10 @@ export const updateHubIntents = async (context: AppContext) => {
     const latest = getMaxTxNonce(enqueuedIntents.map((i) => ({ txNonce: i.settlementEnqueuedTxNonce! })));
     await database.saveCheckPoint('hub_intent_enqueued_' + config.hub.domain, latest);
   }
+  return addedIntents.length + filledIntents.length + enqueuedIntents.length;
 };
 
-export const updateSettlementIntents = async (context: AppContext) => {
+export const updateSettlementIntents = async (context: AppContext): Promise<number> => {
   const {
     adapters: { subgraph, database },
     config,
@@ -293,7 +299,7 @@ export const updateSettlementIntents = async (context: AppContext) => {
 
   if (queryMetaParams.size === 0) {
     logger.debug('No domains to update', requestContext, methodContext, { domains });
-    return;
+    return 0;
   }
 
   // Get settlement intents for all domains in the mapping.
@@ -323,6 +329,7 @@ export const updateSettlementIntents = async (context: AppContext) => {
   }
   // Log the successful update
   logger.debug('Updated SettlementIntents in database', requestContext, methodContext, { intents });
+  return intents.length;
 };
 
 export const updateOrders = async (context: AppContext) => {
