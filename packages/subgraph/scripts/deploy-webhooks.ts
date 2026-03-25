@@ -101,10 +101,7 @@ function executeCommand(cmd: string, dryRun: boolean): void {
 
   console.log(`Executing: ${cmd}`);
   try {
-    const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' });
-    if (output.trim()) {
-      console.log(output);
-    }
+    execSync(cmd, { encoding: 'utf-8', stdio: 'inherit' });
   } catch (error) {
     console.error(`Command failed: ${error}`);
     throw error;
@@ -125,7 +122,7 @@ function deployPipeline(yaml: string, pipelineName: string, dryRun: boolean): vo
 
   try {
     writeFileSync(tmpFile, yaml);
-    executeCommand(`goldsky pipeline apply ${tmpFile} --status ACTIVE`, false);
+    executeCommand(`goldsky pipeline apply ${tmpFile} --status ACTIVE --force`, false);
     console.log(`Successfully deployed pipeline: ${pipelineName}`);
   } finally {
     rmSync(tmpDir, { recursive: true, force: true });
