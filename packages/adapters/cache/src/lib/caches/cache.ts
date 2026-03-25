@@ -1,10 +1,19 @@
 import Redis from 'ioredis';
+import { Logger, jsonifyError } from '@chimera-monorepo/utils';
 
 import { CacheParams, RedisClearFailure } from '../entities';
 
 /**
  * @classdesc Manages storage, updates, and retrieval of a set of data determined by use-case.
  */
+const logger = new Logger({
+  level: 'info',
+  name: 'cache',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
+
 export abstract class Cache {
   protected readonly data!: Redis;
 
@@ -22,7 +31,7 @@ export abstract class Cache {
       });
       // Handle Redis connection errors to prevent unhandled exceptions
       this.data.on('error', (err) => {
-        console.error('Redis connection error:', err);
+        logger.error('Redis connection error', undefined, undefined, jsonifyError(err as Error));
       });
     }
   }

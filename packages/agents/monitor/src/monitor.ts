@@ -264,7 +264,7 @@ export const makeMonitor = async (service: MonitorService) => {
       chains: [...Object.keys(context.config.chains)],
     });
 
-    console.log(
+    context.logger.info(
       `                                                                                         
             _/_/_/_/  _/      _/  _/_/_/_/  _/_/_/      _/_/_/  _/        _/_/_/_/    _/_/    _/_/_/    
             _/        _/      _/  _/        _/    _/  _/        _/        _/        _/    _/  _/    _/   
@@ -274,7 +274,7 @@ export const makeMonitor = async (service: MonitorService) => {
        `,
     );
   } catch (err: unknown) {
-    console.error('Error starting monitor. Sad! :(', err);
+    context.logger.error('Error starting monitor. Sad! :(', requestContext, methodContext, jsonifyError(err as Error));
     process.exit(1);
   }
 };

@@ -57,7 +57,7 @@ export const makePoller = async (_configOverride?: CartographerConfig) => {
   context.logger.info(`${context.config.service} poller initialized!`, requestContext, methodContext, {
     domains: context.domains,
   });
-  console.log(
+  context.logger.info(
     `
           _/_/_/_/  _/      _/  _/_/_/_/  _/_/_/      _/_/_/  _/        _/_/_/_/    _/_/    _/_/_/
           _/        _/      _/  _/        _/    _/  _/        _/        _/        _/    _/  _/    _/

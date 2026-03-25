@@ -2,8 +2,25 @@
 import { existsSync, readFileSync } from 'fs';
 import { config as dotenvConfig } from 'dotenv';
 import { Type, Static } from '@sinclair/typebox';
-import { ajv, ChainConfig, getEverclearConfig, TChainConfig, THubConfig, TLogLevel } from '@chimera-monorepo/utils';
+import {
+  ajv,
+  ChainConfig,
+  getEverclearConfig,
+  jsonifyError,
+  Logger,
+  TChainConfig,
+  THubConfig,
+  TLogLevel,
+} from '@chimera-monorepo/utils';
 import { getSsmParameter } from './mockable';
+
+const logger = new Logger({
+  level: 'info',
+  name: 'cartographer-config',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 export const DEFAULT_SAFE_CONFIRMATIONS = 5;
 export const DEFAULT_BATCH_SIZE = 3000;
@@ -42,19 +59,21 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
     try {
       configStr = await getSsmParameter(paramName);
       if (!configStr) {
-        console.info(paramName, 'is not found in parameter store');
+        logger.info(`${paramName} is not found in parameter store`);
       }
     } catch (e: unknown) {
-      console.info('Error getting', paramName, 'from parameter store', e);
+      logger.info(`Error getting ${paramName} from parameter store`, undefined, undefined, { error: e });
     }
   } else {
-    console.info('Cartographer CONFIG_PARAMETER_NAME is not set');
+    logger.info('Cartographer CONFIG_PARAMETER_NAME is not set');
   }
 
   try {
     configJson = JSON.parse(configStr || process.env.CARTOGRAPHER_CONFIG || '{}');
   } catch (e: unknown) {
-    console.info('No CARTOGRAPHER_CONFIG exists, using config file and individual env vars', e);
+    logger.info('No CARTOGRAPHER_CONFIG exists, using config file and individual env vars', undefined, undefined, {
+      error: e,
+    });
   }
 
   try {
@@ -66,7 +85,7 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
       configFile = JSON.parse(json);
     }
   } catch (e: unknown) {
-    console.error('Error reading config file!', e);
+    logger.error('Error reading config file!', undefined, undefined, jsonifyError(e as Error));
     process.exit(1);
   }
 
@@ -76,10 +95,10 @@ export const getEnvConfig = async (): Promise<CartographerConfig> => {
     try {
       everclearConfig = await getEverclearConfig(everclearConfigUrl);
     } catch (e) {
-      console.error('Failed to fetch everclear config:', e);
+      logger.error('Failed to fetch everclear config', undefined, undefined, jsonifyError(e as Error));
     }
   } else {
-    console.warn('Everclear config URL not set');
+    logger.warn('Everclear config URL not set');
   }
   const everclearChains = everclearConfig?.chains ?? {};
   const localChains = configJson.chains || configFile.chains || everclearChains || {};
