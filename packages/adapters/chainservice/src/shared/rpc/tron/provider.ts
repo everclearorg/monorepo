@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { chainWrapper } from '@chimera-monorepo/utils';
+import { chainWrapper, Logger, jsonifyError } from '@chimera-monorepo/utils';
 import { IBlock, ITransactionReceipt } from '../../types';
 import {
   ISigner,
@@ -26,6 +26,14 @@ interface TronLog {
 }
 
 type TronWebInstance = InstanceType<typeof TronWeb>;
+
+const logger = new Logger({
+  level: 'debug',
+  name: 'tron-provider',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 const DEFAULT_ADDRESS = '410000000000000000000000000000000000000000';
 
@@ -152,12 +160,13 @@ class TronWeb3Signer implements ISigner {
   }
 
   public async sendTransaction(transaction: ITransactionRequest): Promise<ITransactionResponse> {
-    console.log('=== TronWeb3Signer sendTransaction START ===');
-    console.log('TronWeb defaultAddress.hex:', this.tronWeb.defaultAddress.hex);
-    console.log('TronWeb defaultAddress.base58:', this.tronWeb.defaultAddress.base58);
+    logger.debug('TronWeb3Signer sendTransaction START', undefined, undefined, {
+      defaultAddressHex: this.tronWeb.defaultAddress.hex,
+      defaultAddressBase58: this.tronWeb.defaultAddress.base58,
+    });
     
     // BYPASS WEB3SIGNER: Always use private key directly for Tron
-    console.log('=== BYPASSING WEB3SIGNER - Using private key directly ===');
+    logger.debug('Bypassing web3signer - using private key directly');
     
     // Use secure key manager to get private key
     const { TronKeyManager } = await import('@chimera-monorepo/utils');
@@ -172,11 +181,11 @@ class TronWeb3Signer implements ISigner {
     tronWeb.setPrivateKey(privateKey);
     
     const fromAddress = tronWeb.defaultAddress.base58 as string;
-    console.log('Using TronKeyManager address for transaction:', fromAddress);
+    logger.debug('Using TronKeyManager address for transaction', undefined, undefined, { fromAddress });
 
     if (!transaction.data || !transaction.data.length || transaction.data === '0x') {
       // Handle TRX transfer
-      console.log('TRON DEBUG: Handling TRX transfer');
+      logger.debug('Handling TRX transfer');
       const tx = await tronWeb.transactionBuilder.sendTrx(
         transaction.to,
         Number.parseInt(transaction.value || '0'),
@@ -192,7 +201,7 @@ class TronWeb3Signer implements ISigner {
       // Update nonce count for sender address (TRX transfer)
       const currentNonce = this.provider.nonces.get(fromAddress) || 0;
       this.provider.nonces.set(fromAddress, currentNonce + 1);
-      console.log('TRON DEBUG: Updated nonce for TRX transfer address', fromAddress, 'from', currentNonce, 'to', currentNonce + 1);
+      logger.debug('Updated nonce for TRX transfer address', undefined, undefined, { fromAddress, previousNonce: currentNonce, newNonce: currentNonce + 1 });
 
       return {
         hash: result.txid,
@@ -203,14 +212,14 @@ class TronWeb3Signer implements ISigner {
       };
     } else {
       // Handle smart contract transaction - USE DIRECT APPROACH WITHOUT MANUAL INJECTION
-      console.log('TRON DEBUG: Handling smart contract transaction');
+      logger.debug('Handling smart contract transaction');
       const rawData = transaction.data.startsWith('0x') ? transaction.data.slice(2) : transaction.data;
       
       // Extract function selector (first 4 bytes / 8 hex chars)
       const functionSelector = rawData.slice(0, 8);
       const parameterData = rawData.slice(8);
       
-      console.log('TRON DEBUG: Transaction details:', {
+      logger.debug('Transaction details', undefined, undefined, {
         to: transaction.to,
         functionSelector,
         parameterDataLength: parameterData.length,
@@ -226,7 +235,7 @@ class TronWeb3Signer implements ISigner {
         // Convert contract address from hex to TRON base58 if needed
         if (transaction.to.startsWith('0x')) {
           contractAddress = this.tronWeb.address.fromHex(transaction.to);
-          console.log('TRON DEBUG: Converted contract address from hex to base58 for sendTransaction', {
+          logger.debug('Converted contract address from hex to base58 for sendTransaction', undefined, undefined, {
             hexAddress: transaction.to,
             base58Address: contractAddress,
           });
@@ -243,8 +252,7 @@ class TronWeb3Signer implements ISigner {
         const energyPriceInSun = Number.parseInt(await this.provider.getGasPrice());
         const feeLimit = energyUnits * energyPriceInSun;
         
-        console.log('TRON DEBUG: Building contract transaction with proper function signature');
-        console.log('TRON DEBUG: Energy calculation:', {
+        logger.debug('Building contract transaction with proper function signature', undefined, undefined, {
           providedGasLimit,
           minEnergyUnits,
           maxEnergyUnits,
@@ -255,10 +263,7 @@ class TronWeb3Signer implements ISigner {
         
         // 🎯 CRITICAL FIX: Use function signature string instead of empty string
         const functionSignature = transaction.funcSig || '';
-        console.log('TRON DEBUG: Using function signature:', functionSignature);
-        
-        // 🎯 ENHANCED DEBUG: Log all transaction parameters for contract validation analysis
-        console.log('TRON DEBUG: Contract call parameters:', {
+        logger.debug('Contract call parameters', undefined, undefined, {
           contractAddress,
           functionSignature,
           feeLimit,
@@ -281,7 +286,7 @@ class TronWeb3Signer implements ISigner {
           fromAddress,
         );
 
-        console.log('TRON DEBUG: Contract transaction built successfully');
+        logger.debug('Contract transaction built successfully');
 
         // Validate transaction structure
         if (!tx.result || !tx.result.result) {
@@ -297,15 +302,15 @@ class TronWeb3Signer implements ISigner {
           throw new Error('Transaction raw_data is missing');
         }
 
-        console.log('TRON DEBUG: Transaction validation passed, proceeding to sign');
+        logger.debug('Transaction validation passed, proceeding to sign');
 
         // Sign the transaction
         const signedTx = await tronWeb.trx.sign(tx.transaction);
-        console.log('TRON DEBUG: Transaction signed successfully');
+        logger.debug('Transaction signed successfully');
 
         // Broadcast the transaction
         const result = await tronWeb.trx.sendRawTransaction(signedTx);
-        console.log('TRON DEBUG: Transaction broadcast result:', { result: result.result, txid: result.txid });
+        logger.debug('Transaction broadcast result', undefined, undefined, { result: result.result, txid: result.txid });
 
         if (!result.result) {
           throw new Error(`Transaction broadcast failed: ${result.code || result.message || 'Unknown error'}`);
@@ -320,18 +325,16 @@ class TronWeb3Signer implements ISigner {
             confirmations = currentBlock.block_header.raw_data.number - txInfo.blockNumber;
           }
         } catch (error) {
-          console.log('TRON DEBUG: Could not get transaction confirmations, setting to 0');
+          logger.debug('Could not get transaction confirmations, setting to 0');
         }
 
-        console.log('=== TRON TRANSACTION SUCCESS ===');
-        console.log('Transaction Hash:', result.txid);
-        console.log('Confirmations:', confirmations);
+        logger.debug('Tron transaction success', undefined, undefined, { hash: result.txid, confirmations });
 
         // Update nonce count for sender address
         const senderAddress = fromAddress;
         const currentNonce = this.provider.nonces.get(senderAddress) || 0;
         this.provider.nonces.set(senderAddress, currentNonce + 1);
-        console.log('TRON DEBUG: Updated nonce for address', senderAddress, 'from', currentNonce, 'to', currentNonce + 1);
+        logger.debug('Updated nonce for address', undefined, undefined, { senderAddress, previousNonce: currentNonce, newNonce: currentNonce + 1 });
 
         return {
           hash: result.txid,
@@ -342,7 +345,7 @@ class TronWeb3Signer implements ISigner {
         };
 
       } catch (error) {
-        console.error('TRON DEBUG: Smart contract transaction failed:', error);
+        logger.error('Smart contract transaction failed', undefined, undefined, jsonifyError(error as Error));
         if (error instanceof Error) {
           const errorMessage = error.message.toLowerCase();
           
@@ -411,7 +414,7 @@ export class TronSyncProvider extends SyncProvider {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async call(tx: ReadTransaction, _block: number | string): Promise<string> {
-    console.log('TRON DEBUG: call method invoked', {
+    logger.debug('call method invoked', undefined, undefined, {
       to: tx.to,
       funcSig: tx.funcSig,
       data: tx.data,
@@ -422,7 +425,7 @@ export class TronSyncProvider extends SyncProvider {
       let contractAddress = tx.to;
       if (tx.to.startsWith('0x')) {
         contractAddress = this.tronWeb.address.fromHex(tx.to);
-        console.log('TRON DEBUG: Converted contract address from hex to base58', {
+        logger.debug('Converted contract address from hex to base58', undefined, undefined, {
           hexAddress: tx.to,
           base58Address: contractAddress,
         });
@@ -445,26 +448,26 @@ export class TronSyncProvider extends SyncProvider {
       });
 
       const data = await response.json() as any;
-      console.log('TRON DEBUG: Raw API response', data);
+      logger.debug('Raw API response', undefined, undefined, { data });
 
       if (data.constant_result && data.constant_result.length > 0) {
-        console.log('TRON DEBUG: Successfully read from contract', {
+        logger.debug('Successfully read from contract', undefined, undefined, {
           result: data.constant_result[0]
         });
         return '0x' + data.constant_result[0];
       } else if (data.result && data.result.code) {
-        console.log('TRON DEBUG: Contract read failed', data.result);
+        logger.debug('Contract read failed', undefined, undefined, { result: data.result });
         throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { 
           error: data.result.message 
         });
       } else {
-        console.log('TRON DEBUG: Unexpected response format', data);
+        logger.debug('Unexpected response format', undefined, undefined, { data });
         throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { 
           error: 'Unexpected response format' 
         });
       }
     } catch (error) {
-      console.log('TRON DEBUG: Contract read exception', error);
+      logger.debug('Contract read exception', undefined, undefined, { error });
       throw new TransactionReadError(TransactionReadError.reasons.ContractReadError, { 
         error: error instanceof Error ? error.message : String(error)
       });
@@ -506,7 +509,7 @@ export class TronSyncProvider extends SyncProvider {
     const { tx, txInfo, from, to, status, confirmations, blockHash } = await this.getTransactionData(hash);
 
     // 🎯 ENHANCED DEBUG: Log detailed transaction info for revert analysis
-    console.log('TRON DEBUG: Transaction receipt details:', {
+    logger.debug('Transaction receipt details', undefined, undefined, {
       hash,
       status,
       contractRet: (tx as any).ret[0]?.contractRet,
@@ -519,7 +522,7 @@ export class TronSyncProvider extends SyncProvider {
 
     // 🎯 ENHANCED DEBUG: If transaction failed, analyze failure reason
     if (status === 0) {
-      console.log('TRON DEBUG: Transaction FAILED - analyzing failure reason:', {
+      logger.debug('Transaction FAILED - analyzing failure reason', undefined, undefined, {
         contractRet: (tx as any).ret[0]?.contractRet,
         energyUsage: txInfo.receipt?.energy_usage,
         energyUsageTotal: txInfo.receipt?.energy_usage_total,
@@ -633,7 +636,7 @@ export class TronSyncProvider extends SyncProvider {
         }
       }
     } catch (error) {
-      console.log('Failed to get current energy price, falling back to default', error);
+      logger.debug('Failed to get current energy price, falling back to default', undefined, undefined, { error });
     }
 
     // Fallback to the current market price (100 SUN based on TronGrid data)
@@ -651,7 +654,7 @@ export class TronSyncProvider extends SyncProvider {
       fromAddress = this.tronWeb.address.fromHex(fromAddress);
     }
 
-    console.log('TRON ENERGY ESTIMATION: Starting estimation', {
+    logger.debug('Energy estimation: starting', undefined, undefined, {
       funcSig: tx.funcSig,
       to: tx.to,
       dataLength: tx.data.length,
@@ -663,7 +666,7 @@ export class TronSyncProvider extends SyncProvider {
       
       if (decodedParams.length > 0) {
         // Use decoded parameters for simple types
-        console.log('TRON ENERGY ESTIMATION: Using decoded parameters approach');
+        logger.debug('Energy estimation: using decoded parameters approach');
         const result = await this.tronWeb.transactionBuilder.estimateEnergy(
           tx.to,
           tx.funcSig,
@@ -676,7 +679,7 @@ export class TronSyncProvider extends SyncProvider {
         if (!result.result.result) {
           throw new UnpredictableGasLimit();
         }
-        console.log('TRON ENERGY ESTIMATION: Success with decoded parameters', {
+        logger.debug('Energy estimation: success with decoded parameters', undefined, undefined, {
           energyRequired: result.energy_required,
         });
         
@@ -685,7 +688,7 @@ export class TronSyncProvider extends SyncProvider {
         if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
           // Use 100x multiplier for complex relayer functions due to underestimation
           finalEstimate = result.energy_required * 100;
-          console.log('TRON ENERGY ESTIMATION: Applied 100x safety multiplier for processIntentQueueViaRelayer', {
+          logger.debug('Energy estimation: applied 100x safety multiplier for processIntentQueueViaRelayer', undefined, undefined, {
             original: result.energy_required,
             multiplied: finalEstimate,
           });
@@ -694,7 +697,7 @@ export class TronSyncProvider extends SyncProvider {
         return finalEstimate.toString();
       } else {
         // For complex types, use rawParameter to bypass parameter validation
-        console.log('TRON ENERGY ESTIMATION: Using rawParameter approach');
+        logger.debug('Energy estimation: using rawParameter approach');
         const rawParameter = tx.data.startsWith('0x') ? tx.data.slice(2) : tx.data;
         const paramData = rawParameter.length > 8 ? rawParameter.slice(8) : rawParameter;
         
@@ -711,7 +714,7 @@ export class TronSyncProvider extends SyncProvider {
         if (!result.result.result) {
           throw new UnpredictableGasLimit();
         }
-        console.log('TRON ENERGY ESTIMATION: Success with rawParameter', {
+        logger.debug('Energy estimation: success with rawParameter', undefined, undefined, {
           energyRequired: result.energy_required,
         });
         
@@ -720,7 +723,7 @@ export class TronSyncProvider extends SyncProvider {
         if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
           // Use 100x multiplier for complex relayer functions due to underestimation
           finalEstimate = result.energy_required * 100;
-          console.log('TRON ENERGY ESTIMATION: Applied 100x safety multiplier for processIntentQueueViaRelayer', {
+          logger.debug('Energy estimation: applied 100x safety multiplier for processIntentQueueViaRelayer', undefined, undefined, {
             original: result.energy_required,
             multiplied: finalEstimate,
           });
@@ -734,14 +737,14 @@ export class TronSyncProvider extends SyncProvider {
         throw error;
       }
       
-      console.log('TRON ENERGY ESTIMATION: estimateEnergy failed, trying triggerConstantContract fallback', {
+      logger.debug('Energy estimation: estimateEnergy failed, trying triggerConstantContract fallback', undefined, undefined, {
         error: error instanceof Error ? error.message : 'Unknown error',
         funcSig: tx.funcSig,
       });
       
       try {
         // Try triggerConstantContract as fallback to get energy usage from simulation
-        console.log('TRON ENERGY ESTIMATION: Using triggerConstantContract fallback');
+        logger.debug('Energy estimation: using triggerConstantContract fallback');
         
         const decodedParams = decodeSimpleParameters(tx.data, tx.funcSig, writeTx?.value);
         let contractAddress = tx.to;
@@ -781,7 +784,7 @@ export class TronSyncProvider extends SyncProvider {
         }
         
         if (constantResult.result && constantResult.result.result && constantResult.energy_used) {
-          console.log('TRON ENERGY ESTIMATION: triggerConstantContract success', {
+          logger.debug('Energy estimation: triggerConstantContract success', undefined, undefined, {
             energyUsed: constantResult.energy_used,
           });
           
@@ -789,7 +792,7 @@ export class TronSyncProvider extends SyncProvider {
           let finalEstimate = constantResult.energy_used;
           if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
             finalEstimate = constantResult.energy_used * 100;
-            console.log('TRON ENERGY ESTIMATION: Applied 100x safety multiplier for processIntentQueueViaRelayer', {
+            logger.debug('Energy estimation: applied 100x safety multiplier for processIntentQueueViaRelayer', undefined, undefined, {
               original: constantResult.energy_used,
               multiplied: finalEstimate,
             });
@@ -800,7 +803,7 @@ export class TronSyncProvider extends SyncProvider {
           throw new Error('triggerConstantContract failed or returned no energy_used');
         }
       } catch (constantError) {
-        console.log('TRON ENERGY ESTIMATION: triggerConstantContract fallback also failed, using empirical constants', {
+        logger.debug('Energy estimation: triggerConstantContract fallback also failed, using empirical constants', undefined, undefined, {
           constantError: constantError instanceof Error ? constantError.message : 'Unknown error',
           funcSig: tx.funcSig,
         });
@@ -808,16 +811,16 @@ export class TronSyncProvider extends SyncProvider {
         // Enhanced fallback values based on actual Tron network requirements
         // These values are derived from successful transactions and TronScan analysis
         if (tx.funcSig && tx.funcSig.includes('processIntentQueueViaRelayer')) {
-          console.log('TRON ENERGY ESTIMATION: Using high empirical fallback for processIntentQueueViaRelayer');
+          logger.debug('Energy estimation: using high empirical fallback for processIntentQueueViaRelayer');
           return '10000000'; // 10M energy for complex relayer functions (increased from 150k)
         } else if (tx.funcSig && tx.funcSig.includes('processFillQueueViaRelayer')) {
-          console.log('TRON ENERGY ESTIMATION: Using high empirical fallback for processFillQueueViaRelayer');
+          logger.debug('Energy estimation: using high empirical fallback for processFillQueueViaRelayer');
           return '10000000'; // 10M energy for complex relayer functions
         } else if (tx.funcSig && tx.funcSig.includes('transfer')) {
-          console.log('TRON ENERGY ESTIMATION: Using standard empirical fallback for transfer');
+          logger.debug('Energy estimation: using standard empirical fallback for transfer');
           return '50000'; // 50k energy for simple transfers
         } else {
-          console.log('TRON ENERGY ESTIMATION: Using default empirical fallback');
+          logger.debug('Energy estimation: using default empirical fallback');
           return '1000000'; // 1M energy default for other contract calls
         }
       }
@@ -835,17 +838,18 @@ export class TronSyncProvider extends SyncProvider {
   }
 
   public async getSigner(signer: ISigner | string): Promise<ISigner> {
-    console.log('=== TronSyncProvider getSigner called ===');
-    
+    logger.debug('TronSyncProvider getSigner called');
+
     const privateKey = typeof signer === 'string' ? signer : (signer as any).privateKey;
     if (privateKey) {
-      console.log('Setting private key on TronWeb instance');
+      logger.debug('Setting private key on TronWeb instance');
       this.tronWeb.setPrivateKey(privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey);
       return new TronWeb3Signer(this);
     }
 
-    console.log('Creating TronWeb3Signer with ISigner object - NO PRIVATE KEY SET!');
-    console.log('ISigner has signerApi:', !!(signer as ISigner).signerApi);
+    logger.debug('Creating TronWeb3Signer with ISigner object - no private key set', undefined, undefined, {
+      hasSignerApi: !!(signer as ISigner).signerApi,
+    });
     return new TronWeb3Signer(this, (signer as ISigner).signerApi, signer as ISigner);
   }
 
