@@ -1,5 +1,5 @@
 import { expect } from '@chimera-monorepo/utils';
-import { stub, restore } from 'sinon';
+import { stub, restore, SinonStub } from 'sinon';
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 import bs58 from 'bs58';
 
@@ -9,7 +9,7 @@ import { createAppContext } from '../mock';
 
 describe('solanaInstructionProcessor', () => {
   let context: AppContext;
-  let notifyStub: sinon.SinonStub;
+  let notifyStub: SinonStub;
 
   // CPI discriminator: e445a52e51cb9a1d
   const CPI_DISC = Buffer.from('e445a52e51cb9a1d', 'hex');

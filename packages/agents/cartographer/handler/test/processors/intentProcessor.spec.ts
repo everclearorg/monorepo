@@ -1,7 +1,7 @@
 import { expect, mkAddress, mkBytes32 } from '@chimera-monorepo/utils';
 import { SinonStubbedInstance } from 'sinon';
 import { Database } from '@chimera-monorepo/database';
-import { AppContext, CartographerConfig } from '@chimera-monorepo/cartographer-core';
+import { AppContext } from '@chimera-monorepo/cartographer-core';
 
 import {
   processOriginIntent,

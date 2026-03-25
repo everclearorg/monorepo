@@ -9,7 +9,7 @@ import {
 } from '../webhooks/parsers';
 import { base64ToHex } from '../webhooks/webhookHandler';
 import { notifyLighthouse } from '../notify';
-import { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/mqclient';
+import { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/utils';
 
 /**
  * Safely extract an intent ID from the webhook payload.

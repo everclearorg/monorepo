@@ -2,15 +2,7 @@ import { Queue, Worker, Job, ConnectionOptions, QueueOptions, WorkerOptions } fr
 import { jsonifyError, Logger } from '@chimera-monorepo/utils';
 
 export { Queue, Worker, Job } from 'bullmq';
-
-export const LIGHTHOUSE_QUEUES = {
-  INTENT: 'lighthouse-intent',
-  FILL: 'lighthouse-fill',
-  SETTLEMENT: 'lighthouse-settlement',
-  SOLANA: 'lighthouse-solana',
-  EXPIRED: 'lighthouse-expired',
-  INVOICE: 'lighthouse-invoice',
-} as const;
+export { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/utils';
 
 export const parseRedisUrl = (redisUrl: string): ConnectionOptions => {
   const url = new URL(redisUrl);
