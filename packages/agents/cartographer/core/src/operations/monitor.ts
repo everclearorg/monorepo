@@ -90,7 +90,7 @@ const getMessageStatus = async (
   return status;
 };
 
-export const updateMessages = async (context: AppContext) => {
+export const updateMessages = async (context: AppContext): Promise<number> => {
   const {
     adapters: { subgraph, database },
     logger,
@@ -101,6 +101,7 @@ export const updateMessages = async (context: AppContext) => {
   const evmDomains = Object.keys(config.chains)
     .filter((d) => config.chains[d].network === 'evm')
     .concat(config.hub.domain);
+  let totalMessages = 0;
   for (const domain of evmDomains) {
     // Retrieve the most recent timestamp
     const latestNonce = await database.getCheckPoint('message_' + domain);
@@ -184,12 +185,14 @@ export const updateMessages = async (context: AppContext) => {
 
     // If there are any new messages, update the checkpoint with the timestamp of the latest message
     if (messages.length > 0) {
+      totalMessages += messages.length;
       const maxNonce = getMaxTxNonce(messages);
       await database.saveCheckPoint('message_' + domain, maxNonce);
     }
 
     logger.debug('Saved messages', requestContext, methodContext, { messages });
   }
+  return totalMessages;
 };
 
 export const updateQueues = async (context: AppContext) => {
