@@ -49,6 +49,8 @@ pub struct SpokeState {
     pub everclear_ccip_chain_selector: Option<u64>,
     pub messaging_provider: MessagingProviderType,
     pub everclear_gateway: [u8; 32],
+    /// Pending CCIP settlement awaiting relay-triggered settlement
+    pub pending_ccip_settlement: Option<Settlement>,
 }
 
 impl SpokeState {
@@ -72,6 +74,7 @@ impl SpokeState {
         + 1 + 8                  // everclear_ccip_chain_selector: Option<u64>
         + 1                      // messaging_provider: MessagingProviderType
         + 32                     // everclear_gateway: [u8; 32]
+        + 1 + 136               // pending_ccip_settlement: Option<Settlement>
     ;
 }
 

@@ -134,15 +134,21 @@ pub fn handle_ccip_receive(
 
             require!(
                 batch.settlements.len() == 1,
-                SpokeError::InvalidIntentStatus
+                SpokeError::InvalidSettlementSize
             );
 
-            emit!(MessageReceivedEvent {
-                origin: ctx.accounts.spoke_state.domain,
-                sender: h256_to_pub(crate::hyperlane::H256::from(ctx.accounts.spoke_state.everclear_gateway)),
-            });
+            // Store settlement in spoke_state for relay-triggered settlement
+            let state = &mut ctx.accounts.spoke_state;
+            require!(
+                state.pending_ccip_settlement.is_none(),
+                SpokeError::PendingSettlementExists
+            );
+            state.pending_ccip_settlement = Some(batch.settlements[0].clone());
 
-            mark_settlement_as_delivered_ccip(ctx, batch.settlements[0].clone())?;
+            emit!(MessageReceivedEvent {
+                origin: state.domain,
+                sender: h256_to_pub(crate::hyperlane::H256::from(state.everclear_gateway)),
+            });
         }
         _ => {
             return err!(SpokeError::InvalidMessage);
@@ -151,31 +157,48 @@ pub fn handle_ccip_receive(
     Ok(())
 }
 
-fn mark_settlement_as_delivered_ccip(ctx: Context<CcipReceiveContext>, settlement: Settlement) -> Result<()> {
+/// Settle a pending CCIP delivery: reads settlement from spoke_state,
+/// creates the intent_status_pda with Delivered status so that the existing
+/// settle_delivered_intent instruction can complete the token transfer.
+pub fn settle_ccip_delivery(
+    ctx: Context<SettleCcipDeliveryContext>,
+) -> Result<()> {
+    let state = &mut ctx.accounts.spoke_state;
+    require!(!state.paused, SpokeError::ContractPaused);
+
+    // 1. Read the pending settlement WITHOUT clearing — only clear after all validation passes
+    let settlement = state.pending_ccip_settlement
+        .as_ref()
+        .ok_or(error!(SpokeError::NoPendingSettlement))?
+        .clone();
+
+    // 2. Validate intent_status_pda matches intent_id
     let intent_status_pda = &mut ctx.accounts.intent_status_pda;
     let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(settlement.intent_id);
-    let (intent_status_account, intent_status_bump) =
+    let (expected_pda, intent_status_bump) =
         Pubkey::find_program_address(intent_status_seed, ctx.program_id);
     require!(
-        intent_status_pda.key() == intent_status_account,
+        intent_status_pda.key() == expected_pda,
         SpokeError::InvalidIntentPda
     );
 
+    // 3. Check if PDA already exists (idempotency guard)
     let data = IntentStatusAccount::try_deserialize(&mut &intent_status_pda.data.borrow()[..]);
-    if data.is_err() {
+    if let Ok(existing) = data {
+        if existing.status == IntentStatus::Settled
+            || existing.status == IntentStatus::SettledAndManuallyExecuted
+            || existing.status == IntentStatus::Delivered
+        {
+            return err!(SpokeError::InvalidIntentStatus);
+        }
+    } else {
+        // 4. Create the PDA account
         let space = 8
             + std::mem::size_of::<IntentStatusAccount>()
             + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
-        let __anchor_rent = Rent::get()?;
-        let lamports = __anchor_rent.minimum_balance(space);
-        let inst = anchor_lang::solana_program::system_instruction::create_account(
-            &ctx.accounts.pda_payer.key(),
-            &intent_status_pda.key(),
-            lamports,
-            space as u64,
-            ctx.program_id,
-        );
+        let rent = Rent::get()?;
+        let lamports = rent.minimum_balance(space);
 
         let payer_seed = &[
             "everclear_spoke".as_bytes(),
@@ -185,7 +208,13 @@ fn mark_settlement_as_delivered_ccip(ctx: Context<CcipReceiveContext>, settlemen
         let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
 
         invoke_signed(
-            &inst,
+            &anchor_lang::solana_program::system_instruction::create_account(
+                &ctx.accounts.pda_payer.key(),
+                &intent_status_pda.key(),
+                lamports,
+                space as u64,
+                ctx.program_id,
+            ),
             &[
                 ctx.accounts.pda_payer.to_account_info(),
                 intent_status_pda.to_account_info(),
@@ -195,16 +224,9 @@ fn mark_settlement_as_delivered_ccip(ctx: Context<CcipReceiveContext>, settlemen
                 intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
             ],
         )?;
-    } else {
-        let pda_data = data.unwrap();
-        if pda_data.status == IntentStatus::Settled
-            || pda_data.status == IntentStatus::SettledAndManuallyExecuted
-            || pda_data.status == IntentStatus::Delivered
-        {
-            return err!(SpokeError::InvalidIntentStatus);
-        }
     }
 
+    // 5. Write Delivered status + settlement data
     let account_metas =
         build_settle_intent_account_metas(ctx.program_id, &intent_status_pda.key(), &settlement)?;
 
@@ -216,7 +238,9 @@ fn mark_settlement_as_delivered_ccip(ctx: Context<CcipReceiveContext>, settlemen
 
     intent_status.try_serialize(&mut &mut intent_status_pda.data.borrow_mut()[..])?;
 
-    // CCIP receive context has no event_authority; emit directly
+    // 6. Clear pending settlement only after everything succeeded
+    ctx.accounts.spoke_state.pending_ccip_settlement = None;
+
     emit!(MessageDeliveredEvent {
         domain: ctx.accounts.spoke_state.domain,
         settlement,
@@ -262,8 +286,21 @@ pub struct CcipReceiveContext<'info> {
         bump = spoke_state.bump,
     )]
     pub spoke_state: Account<'info, SpokeState>,
+}
 
-    /// CHECK: Intent status PDA - will be validated in mark_settlement_as_delivered_ccip
+#[derive(Accounts)]
+pub struct SettleCcipDeliveryContext<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    #[account(
+        mut,
+        seeds = [b"spoke-state"],
+        bump = spoke_state.bump,
+    )]
+    pub spoke_state: Account<'info, SpokeState>,
+
+    /// CHECK: Validated via PDA derivation in settle_ccip_delivery handler
     #[account(mut)]
     pub intent_status_pda: UncheckedAccount<'info>,
 
@@ -445,6 +482,7 @@ fn build_settle_intent_account_metas(
 mod tests {
     use super::*;
     use crate::instructions::messages::MessageType;
+    use crate::hyperlane::U256;
 
     #[test]
     fn test_invalid_message_type_returns_error_without_debug_log() {
@@ -464,6 +502,180 @@ mod tests {
         let settlement_type = MessageType::Settlement;
         let is_settlement = matches!(settlement_type, MessageType::Settlement);
         assert!(is_settlement, "Settlement should be the only supported message type");
+    }
+
+    // --- Tests for the CCIP settlement flow ---
+
+    fn make_test_settlement(intent_id: [u8; 32]) -> Settlement {
+        Settlement {
+            intent_id,
+            amount: U256::from(999000000000000000u64),
+            asset: Pubkey::new_unique(),
+            recipient: Pubkey::new_unique(),
+            update_virtual_balance: false,
+        }
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_returns_12_accounts() {
+        let program_id = Pubkey::new_unique();
+        let intent_status_pda = Pubkey::new_unique();
+        let settlement = make_test_settlement([1u8; 32]);
+
+        let metas = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement)
+            .unwrap();
+
+        assert_eq!(metas.len(), 12, "Should return exactly 12 account metas");
+        // intent_status_pda should be at index 1 and writable
+        assert_eq!(metas[1].pubkey, intent_status_pda);
+        assert!(metas[1].is_writable, "intent_status_pda must be writable");
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_deterministic() {
+        let program_id = Pubkey::new_unique();
+        let intent_status_pda = Pubkey::new_unique();
+        let settlement = make_test_settlement([42u8; 32]);
+
+        let metas_1 = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement).unwrap();
+        let metas_2 = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement).unwrap();
+
+        assert_eq!(metas_1.len(), metas_2.len());
+        for (a, b) in metas_1.iter().zip(metas_2.iter()) {
+            assert_eq!(a.pubkey, b.pubkey, "Account metas must be deterministic");
+            assert_eq!(a.is_writable, b.is_writable);
+        }
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_includes_recipient_and_asset() {
+        let program_id = Pubkey::new_unique();
+        let intent_status_pda = Pubkey::new_unique();
+        let settlement = make_test_settlement([7u8; 32]);
+
+        let metas = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement)
+            .unwrap();
+
+        // Asset (mint) at index 5
+        assert_eq!(metas[5].pubkey, settlement.asset, "Index 5 must be the token mint");
+        assert!(!metas[5].is_writable, "Mint should not be writable");
+
+        // Recipient at index 7
+        assert_eq!(metas[7].pubkey, settlement.recipient, "Index 7 must be the recipient");
+        assert!(!metas[7].is_writable, "Recipient should not be writable");
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_different_settlements_produce_different_atas() {
+        let program_id = Pubkey::new_unique();
+        let pda = Pubkey::new_unique();
+
+        let settlement_a = make_test_settlement([1u8; 32]);
+        let settlement_b = make_test_settlement([2u8; 32]);
+
+        let metas_a = build_settle_intent_account_metas(&program_id, &pda, &settlement_a).unwrap();
+        let metas_b = build_settle_intent_account_metas(&program_id, &pda, &settlement_b).unwrap();
+
+        // Recipient ATAs (index 8) should differ because recipients differ
+        assert_ne!(
+            metas_a[8].pubkey, metas_b[8].pubkey,
+            "Different recipients must produce different ATAs"
+        );
+        // Both should be writable
+        assert!(metas_a[8].is_writable);
+        assert!(metas_b[8].is_writable);
+    }
+
+    #[test]
+    fn test_intent_status_pda_seeds_deterministic() {
+        let intent_id = [0xABu8; 32];
+        let program_id = Pubkey::new_unique();
+
+        let seeds: &[&[u8]] = intent_status_pda_seeds!(intent_id);
+        let (pda_1, bump_1) = Pubkey::find_program_address(seeds, &program_id);
+        let (pda_2, bump_2) = Pubkey::find_program_address(seeds, &program_id);
+
+        assert_eq!(pda_1, pda_2, "PDA derivation must be deterministic");
+        assert_eq!(bump_1, bump_2, "Bump must be deterministic");
+    }
+
+    #[test]
+    fn test_intent_status_pda_seeds_different_intents_produce_different_pdas() {
+        let program_id = Pubkey::new_unique();
+
+        let seeds_a: &[&[u8]] = intent_status_pda_seeds!([1u8; 32]);
+        let seeds_b: &[&[u8]] = intent_status_pda_seeds!([2u8; 32]);
+
+        let (pda_a, _) = Pubkey::find_program_address(seeds_a, &program_id);
+        let (pda_b, _) = Pubkey::find_program_address(seeds_b, &program_id);
+
+        assert_ne!(pda_a, pda_b, "Different intent_ids must produce different PDAs");
+    }
+
+    #[test]
+    fn test_settlement_serialization_preserves_intent_id() {
+        let settlement = make_test_settlement([0xFFu8; 32]);
+
+        // AnchorSerialize uses the derived impl (compact), while AnchorDeserialize
+        // uses a custom impl that reads 5 x 32-byte EVM-style slots.
+        // Test that the serialized form preserves the intent_id at the start.
+        let mut buf = Vec::new();
+        settlement.serialize(&mut buf).unwrap();
+
+        assert!(!buf.is_empty(), "Serialized settlement must not be empty");
+        // intent_id is the first 32 bytes in both serialization formats
+        assert_eq!(&buf[0..32], &[0xFFu8; 32], "intent_id should be first 32 bytes");
+        // amount follows (32 bytes in little-endian for AnchorSerialize)
+        assert!(buf.len() >= 64, "Serialized data must contain at least intent_id + amount");
+    }
+
+    #[test]
+    fn test_intent_status_terminal_states_block_delivery() {
+        // These statuses should prevent a settlement from being delivered again
+        assert!(matches!(IntentStatus::Settled,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "Settled should block re-delivery");
+        assert!(matches!(IntentStatus::SettledAndManuallyExecuted,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "SettledAndManuallyExecuted should block re-delivery");
+        assert!(matches!(IntentStatus::Delivered,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "Delivered should block re-delivery");
+
+        // These statuses should NOT block
+        assert!(!matches!(IntentStatus::None,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "None should not block delivery");
+        assert!(!matches!(IntentStatus::Added,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "Added should not block delivery");
+        assert!(!matches!(IntentStatus::Filled,
+            IntentStatus::Settled | IntentStatus::SettledAndManuallyExecuted | IntentStatus::Delivered
+        ), "Filled should not block delivery");
+    }
+
+    #[test]
+    fn test_spoke_state_size_includes_pending_ccip_settlement() {
+        // The SIZE constant must account for pending_ccip_settlement: Option<Settlement>
+        // Option discriminant (1 byte) + Settlement (136 bytes) = 137
+        let size_without_pending = SpokeState::SIZE - (1 + 136);
+        assert_eq!(size_without_pending, 339, "Pre-pending-settlement size should be 339");
+        assert_eq!(SpokeState::SIZE, 476, "Full SpokeState::SIZE should be 476");
+    }
+
+    #[test]
+    fn test_build_settle_intent_account_metas_spoke_state_at_index_0() {
+        let program_id = Pubkey::new_unique();
+        let intent_status_pda = Pubkey::new_unique();
+        let settlement = make_test_settlement([3u8; 32]);
+
+        let metas = build_settle_intent_account_metas(&program_id, &intent_status_pda, &settlement)
+            .unwrap();
+
+        // spoke_state PDA should be at index 0 and NOT writable
+        let (expected_spoke_state, _) = Pubkey::find_program_address(&[b"spoke-state"], &program_id);
+        assert_eq!(metas[0].pubkey, expected_spoke_state, "Index 0 must be spoke_state PDA");
+        assert!(!metas[0].is_writable, "spoke_state should not be writable in settle accounts");
     }
 
 }

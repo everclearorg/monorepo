@@ -194,6 +194,15 @@ pub mod everclear_spoke {
         instructions::receive_message::handle_ccip_receive(ctx, message)
     }
 
+    /// Settle a pending CCIP delivery: creates the intent_status_pda from
+    /// settlement data stored by ccip_receive, setting status to Delivered.
+    /// Call settle_delivered_intent afterwards to transfer tokens.
+    pub fn settle_ccip_delivery(
+        ctx: Context<SettleCcipDeliveryContext>,
+    ) -> Result<()> {
+        instructions::receive_message::settle_ccip_delivery(ctx)
+    }
+
     // settle delivered message
     pub fn settle_delivered_intent(
         ctx: Context<SettleDeliveredIntentContext>,
@@ -397,5 +406,12 @@ pub mod everclear_spoke {
     /// Only the owner can run this. Safe to run only on accounts that still have the old layout.
     pub fn migrate_spoke_state(ctx: Context<MigrateSpokeState>) -> Result<()> {
         instructions::state_migration::migrate_spoke_state(ctx)
+    }
+
+    /// Migrate SpokeState PDA to add pending_ccip_settlement field.
+    /// Run once after upgrading from CCIP layout to CCIP+pending_settlement layout.
+    /// Only the owner can run this.
+    pub fn migrate_spoke_state_v2(ctx: Context<MigrateSpokeState>) -> Result<()> {
+        instructions::state_migration::migrate_spoke_state_v2(ctx)
     }
 }

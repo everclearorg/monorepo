@@ -112,4 +112,8 @@ pub enum SpokeError {
     InvalidFillIntentStatus,
     #[msg("Intent hash mismatch - signature not bound to this intent")]
     InvalidIntentHash,
+    #[msg("A pending CCIP settlement already exists — settle it first")]
+    PendingSettlementExists,
+    #[msg("No pending CCIP settlement to settle")]
+    NoPendingSettlement,
 }
