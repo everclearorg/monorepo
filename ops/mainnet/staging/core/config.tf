@@ -163,8 +163,10 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://mantle.drpc.org"
+          # "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {
@@ -247,8 +249,10 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://mantle.drpc.org"
+          # "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {
@@ -336,8 +340,10 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://mantle.drpc.org"
+          # "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {
@@ -488,8 +494,10 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://mantle.drpc.org"
+          # "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {
