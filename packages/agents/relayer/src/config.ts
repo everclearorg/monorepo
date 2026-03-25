@@ -1,8 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'fs';
-import { getEverclearConfig, ajv, getDefaultABIConfig } from '@chimera-monorepo/utils';
+import { getEverclearConfig, ajv, getDefaultABIConfig, Logger, jsonifyError } from '@chimera-monorepo/utils';
 import { RelayerConfig, RelayerConfigSchema } from './lib/entities';
 import { ChainConfig } from './lib/entities';
+
+const logger = new Logger({
+  level: 'info',
+  name: 'relayer-config',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 const DEFAULT_CONFIRMATIONS = 3;
 
@@ -13,7 +21,7 @@ export const getEnvConfig = async (): Promise<RelayerConfig> => {
   try {
     configJson = JSON.parse(process.env.EVERCLEAR_CONFIG || process.env.RELAYER_CONFIG || '');
   } catch (e: unknown) {
-    console.info('No RELAYER_CONFIG or EVERCLEAR_CONFIG exists; using config file and individual env vars.');
+    logger.info('No RELAYER_CONFIG or EVERCLEAR_CONFIG exists; using config file and individual env vars.');
   }
   try {
     let json: string;
@@ -24,7 +32,7 @@ export const getEnvConfig = async (): Promise<RelayerConfig> => {
       configFile = JSON.parse(json);
     }
   } catch (e: unknown) {
-    console.error('Error reading config file!');
+    logger.error('Error reading config file!');
     process.exit(1);
   }
 
@@ -35,10 +43,10 @@ export const getEnvConfig = async (): Promise<RelayerConfig> => {
     try {
       everclearConfig = await getEverclearConfig(everclearConfigUrl);
     } catch (e) {
-      console.error('Failed to fetch everclear config:', e);
+      logger.error('Failed to fetch everclear config', undefined, undefined, jsonifyError(e as Error));
     }
   } else {
-    console.warn('Everclear config URL not set');
+    logger.warn('Everclear config URL not set');
   }
   const everclearChains = everclearConfig?.chains ?? {};
   const localChains = configJson.chains || configFile.chains || everclearChains || {};

@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Signer } from '@chimera-monorepo/adapters-web3signer';
-import { Logger, RequestContext, createLoggingContext, createMethodContext } from '@chimera-monorepo/utils';
+import {
+  Logger,
+  RequestContext,
+  createLoggingContext,
+  createMethodContext,
+  jsonifyError,
+} from '@chimera-monorepo/utils';
 import { StoreManager } from '@chimera-monorepo/adapters-cache';
 import { ChainService } from '@chimera-monorepo/chainservice';
 import { SubgraphReader, SubgraphConfig } from '@chimera-monorepo/adapters-subgraph';
@@ -23,10 +29,18 @@ export const makeWatcher = async () => {
     // Bind intevals
     bindInterval();
   } catch (err: unknown) {
-    console.error('Error starting watcher :(', err);
+    (context.logger ?? logger).error('Error starting watcher :(', undefined, undefined, jsonifyError(err as Error));
     process.exit(1);
   }
 };
+
+const logger = new Logger({
+  level: 'info',
+  name: 'watcher',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 export const setupContext = async () => {
   const { requestContext, methodContext } = createLoggingContext(setupContext.name);
@@ -71,7 +85,12 @@ export const setupContext = async () => {
       requestContext,
     );
   } catch (error: unknown) {
-    console.error('Error setup context Watcher! D: Who could have done this?', error);
+    (context.logger ?? logger).error(
+      'Error setup context Watcher! D: Who could have done this?',
+      requestContext,
+      methodContext,
+      jsonifyError(error as Error),
+    );
   }
 };
 
