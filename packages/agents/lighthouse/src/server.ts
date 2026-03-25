@@ -1,14 +1,6 @@
 import { timingSafeEqual } from 'crypto';
-import { Logger, jsonifyError, createLoggingContext, QueueType } from '@chimera-monorepo/utils';
-import {
-  createWorker,
-  createProducer,
-  pingRedis,
-  LIGHTHOUSE_QUEUES,
-  Worker,
-  Queue,
-  Job,
-} from '@chimera-monorepo/mqclient';
+import { Logger, jsonifyError, createLoggingContext, QueueType, LIGHTHOUSE_QUEUES } from '@chimera-monorepo/utils';
+import { createWorker, createProducer, pingRedis, Worker, Queue, Job } from '@chimera-monorepo/mqclient';
 import fastify, { FastifyInstance } from 'fastify';
 
 import { getConfig } from './config';

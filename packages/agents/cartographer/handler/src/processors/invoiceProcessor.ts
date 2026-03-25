@@ -1,9 +1,8 @@
-import { HubIntent, TIntentStatus } from '@chimera-monorepo/utils';
+import { HubIntent, TIntentStatus, LIGHTHOUSE_QUEUES } from '@chimera-monorepo/utils';
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 import { parseHubInvoice, parseHubDeposit } from '../webhooks/parsers';
 import { base64ToHex } from '../webhooks/webhookHandler';
 import { notifyLighthouse } from '../notify';
-import { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/mqclient';
 
 /**
  * Create a minimal HubIntent for status-only upserts.
