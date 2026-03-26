@@ -302,13 +302,19 @@ class BaseSyncProvider {
   }
 
   public async getTransactionReceipt(hash: string): Promise<ITransactionReceipt> {
-    const receipt = await this.client.getTransactionReceipt({ hash: hash as any });
+    const [receipt, currentBlockNumber] = await Promise.all([
+      this.client.getTransactionReceipt({ hash: hash as any }),
+      this.client.getBlockNumber(),
+    ]);
+
+    const receiptBlockNumber = Number(receipt.blockNumber);
+    const confirmations = Math.max(Number(currentBlockNumber) - receiptBlockNumber + 1, 0);
 
     return {
       transactionHash: receipt.transactionHash,
-      blockNumber: Number(receipt.blockNumber),
+      blockNumber: receiptBlockNumber,
       status: receipt.status === 'success' ? 1 : 0,
-      confirmations: 0, // Will be set by caller
+      confirmations,
       logs: receipt.logs.map(log => ({
         address: log.address,
         topics: log.topics,
