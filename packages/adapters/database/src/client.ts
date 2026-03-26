@@ -1030,23 +1030,30 @@ export const updateSettlementStatus = async (
   await db.update('settlement_intents', { status }, { id: intentId }).run(poolToUse);
 };
 
-export const updateSolanaMessageStatuses = async (_pool?: Pool | db.TxnClientForRepeatableRead): Promise<number> => {
+export const updateMessageStatuses = async (_pool?: Pool | db.TxnClientForRepeatableRead): Promise<number> => {
   const poolToUse = _pool ?? getPool();
 
-  // Set message status to 'delivered' where:
-  // 1. destination_domain is Solana (1399811149)
-  // 2. message_status is not already 'delivered'
-  // 3. settlement intent exists with status 'SETTLED'
+  // Infer message delivery from downstream on-chain state:
+  // - SETTLEMENT messages: delivered when settlement_intents has a SETTLED entry
+  // - INTENT/FILL messages: delivered when hub_intents has a row (hub processed it)
+  // This is a universal fallback regardless of delivery method (Hyperlane, Polymer, CCIP).
   const result = await db.sql<s.messages.SQL>`
-      UPDATE messages 
+      UPDATE messages
       SET message_status = 'delivered'
-      WHERE destination_domain = '1399811149' 
-        AND message_status != 'delivered'
-        AND EXISTS (
-          SELECT 1 
-          FROM settlement_intents si 
-          WHERE si.status = 'SETTLED' 
-            AND si.id = ANY(messages.intent_ids)
+      WHERE message_status != 'delivered'
+        AND (
+          (type = 'SETTLEMENT' AND EXISTS (
+            SELECT 1
+            FROM settlement_intents si
+            WHERE si.status = 'SETTLED'
+              AND si.id = ANY(messages.intent_ids)
+          ))
+          OR
+          (type IN ('INTENT', 'FILL') AND EXISTS (
+            SELECT 1
+            FROM hub_intents hi
+            WHERE hi.id = ANY(messages.intent_ids)
+          ))
         )
       RETURNING id
     `.run(poolToUse);
