@@ -31,12 +31,613 @@ declare module 'zapatos/schema' {
   export namespace every {
     export type message_type = ['FILL', 'GATEWAY_UPDATE', 'INTENT', 'LIGHTHOUSE_UPDATE', 'MAILBOX_UPDATE', 'SECURITY_MODULE_UPDATE', 'SETTLEMENT'];
   }
+  export type queue_dispatch_relayer_type = 'claim' | 'everclear' | 'gelato' | 'mock';
+  export namespace every {
+    export type queue_dispatch_relayer_type = ['claim', 'everclear', 'gelato', 'mock'];
+  }
+  export type queue_dispatch_status = 'cancelled' | 'failed' | 'pending' | 'reverted' | 'success';
+  export namespace every {
+    export type queue_dispatch_status = ['cancelled', 'failed', 'pending', 'reverted', 'success'];
+  }
   export type queue_type = 'DEPOSIT' | 'FILL' | 'INTENT' | 'SETTLEMENT';
   export namespace every {
     export type queue_type = ['DEPOSIT', 'FILL', 'INTENT', 'SETTLEMENT'];
   }
 
   /* --- tables --- */
+
+  /**
+   * **alert_triage_log**
+   * - Table in database
+   */
+  export namespace alert_triage_log {
+    export type Table = 'alert_triage_log';
+    export interface Selectable {
+      /**
+      * **alert_triage_log.auto_resolve_attempted**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_attempted: boolean;
+      /**
+      * **alert_triage_log.auto_resolve_reason_code**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      auto_resolve_reason_code: string | null;
+      /**
+      * **alert_triage_log.auto_resolve_succeeded**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_succeeded: boolean;
+      /**
+      * **alert_triage_log.created_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      created_at: Date;
+      /**
+      * **alert_triage_log.env**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      env: string;
+      /**
+      * **alert_triage_log.expires_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, no default
+      */
+      expires_at: Date;
+      /**
+      * **alert_triage_log.fingerprint**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      fingerprint: string;
+      /**
+      * **alert_triage_log.ids**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      ids: string[];
+      /**
+      * **alert_triage_log.model_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      model_used: string | null;
+      /**
+      * **alert_triage_log.network**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      network: string;
+      /**
+      * **alert_triage_log.provider_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      provider_used: string | null;
+      /**
+      * **alert_triage_log.reason**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      reason: string;
+      /**
+      * **alert_triage_log.report_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      report_type: string;
+      /**
+      * **alert_triage_log.severity**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      severity: string;
+      /**
+      * **alert_triage_log.tool_calls_made**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      tool_calls_made: number;
+      /**
+      * **alert_triage_log.tool_names_used**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      tool_names_used: string[];
+      /**
+      * **alert_triage_log.triage_latency_ms**
+      * - `int4` in database
+      * - Nullable, no default
+      */
+      triage_latency_ms: number | null;
+      /**
+      * **alert_triage_log.triage_mode**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      triage_mode: string;
+      /**
+      * **alert_triage_log.triage_result**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      triage_result: db.JSONValue | null;
+    }
+    export interface JSONSelectable {
+      /**
+      * **alert_triage_log.auto_resolve_attempted**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_attempted: boolean;
+      /**
+      * **alert_triage_log.auto_resolve_reason_code**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      auto_resolve_reason_code: string | null;
+      /**
+      * **alert_triage_log.auto_resolve_succeeded**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_succeeded: boolean;
+      /**
+      * **alert_triage_log.created_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      created_at: db.TimestampTzString;
+      /**
+      * **alert_triage_log.env**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      env: string;
+      /**
+      * **alert_triage_log.expires_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, no default
+      */
+      expires_at: db.TimestampTzString;
+      /**
+      * **alert_triage_log.fingerprint**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      fingerprint: string;
+      /**
+      * **alert_triage_log.ids**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      ids: string[];
+      /**
+      * **alert_triage_log.model_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      model_used: string | null;
+      /**
+      * **alert_triage_log.network**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      network: string;
+      /**
+      * **alert_triage_log.provider_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      provider_used: string | null;
+      /**
+      * **alert_triage_log.reason**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      reason: string;
+      /**
+      * **alert_triage_log.report_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      report_type: string;
+      /**
+      * **alert_triage_log.severity**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      severity: string;
+      /**
+      * **alert_triage_log.tool_calls_made**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      tool_calls_made: number;
+      /**
+      * **alert_triage_log.tool_names_used**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      tool_names_used: string[];
+      /**
+      * **alert_triage_log.triage_latency_ms**
+      * - `int4` in database
+      * - Nullable, no default
+      */
+      triage_latency_ms: number | null;
+      /**
+      * **alert_triage_log.triage_mode**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      triage_mode: string;
+      /**
+      * **alert_triage_log.triage_result**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      triage_result: db.JSONValue | null;
+    }
+    export interface Whereable {
+      /**
+      * **alert_triage_log.auto_resolve_attempted**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_attempted?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.auto_resolve_reason_code**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      auto_resolve_reason_code?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.auto_resolve_succeeded**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_succeeded?: boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.created_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      created_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.env**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      env?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.expires_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, no default
+      */
+      expires_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.fingerprint**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      fingerprint?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.ids**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      ids?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.model_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      model_used?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.network**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      network?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.provider_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      provider_used?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.reason**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      reason?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.report_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      report_type?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.severity**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      severity?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.tool_calls_made**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      tool_calls_made?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.tool_names_used**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      tool_names_used?: string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.triage_latency_ms**
+      * - `int4` in database
+      * - Nullable, no default
+      */
+      triage_latency_ms?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.triage_mode**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      triage_mode?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **alert_triage_log.triage_result**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      triage_result?: db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **alert_triage_log.auto_resolve_attempted**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_attempted?: boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.auto_resolve_reason_code**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      auto_resolve_reason_code?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.auto_resolve_succeeded**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_succeeded?: boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.created_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      created_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.env**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      env: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **alert_triage_log.expires_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, no default
+      */
+      expires_at: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment;
+      /**
+      * **alert_triage_log.fingerprint**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      fingerprint: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **alert_triage_log.ids**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      ids?: string[] | db.Parameter<string[]> | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.model_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      model_used?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.network**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      network: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **alert_triage_log.provider_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      provider_used?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.reason**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      reason: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **alert_triage_log.report_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      report_type: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **alert_triage_log.severity**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      severity: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **alert_triage_log.tool_calls_made**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      tool_calls_made?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.tool_names_used**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      tool_names_used?: string[] | db.Parameter<string[]> | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.triage_latency_ms**
+      * - `int4` in database
+      * - Nullable, no default
+      */
+      triage_latency_ms?: number | db.Parameter<number> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **alert_triage_log.triage_mode**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      triage_mode: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **alert_triage_log.triage_result**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      triage_result?: db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **alert_triage_log.auto_resolve_attempted**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_attempted?: boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.auto_resolve_reason_code**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      auto_resolve_reason_code?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.auto_resolve_succeeded**
+      * - `bool` in database
+      * - `NOT NULL`, default: `false`
+      */
+      auto_resolve_succeeded?: boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, boolean | db.Parameter<boolean> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.created_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      created_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.env**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      env?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **alert_triage_log.expires_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, no default
+      */
+      expires_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.SQLFragment<any, (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment>;
+      /**
+      * **alert_triage_log.fingerprint**
+      * - `bpchar` in database
+      * - `NOT NULL`, no default
+      */
+      fingerprint?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **alert_triage_log.ids**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      ids?: string[] | db.Parameter<string[]> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.model_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      model_used?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.network**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      network?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **alert_triage_log.provider_used**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      provider_used?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.reason**
+      * - `text` in database
+      * - `NOT NULL`, no default
+      */
+      reason?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **alert_triage_log.report_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      report_type?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **alert_triage_log.severity**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      severity?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **alert_triage_log.tool_calls_made**
+      * - `int4` in database
+      * - `NOT NULL`, default: `0`
+      */
+      tool_calls_made?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.tool_names_used**
+      * - `_text` in database
+      * - `NOT NULL`, default: `'{}'::text[]`
+      */
+      tool_names_used?: string[] | db.Parameter<string[]> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string[] | db.Parameter<string[]> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.triage_latency_ms**
+      * - `int4` in database
+      * - Nullable, no default
+      */
+      triage_latency_ms?: number | db.Parameter<number> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **alert_triage_log.triage_mode**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      triage_mode?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **alert_triage_log.triage_result**
+      * - `jsonb` in database
+      * - Nullable, no default
+      */
+      triage_result?: db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, db.JSONValue | db.Parameter<db.JSONValue> | null | db.DefaultType | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'alert_triage_log_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
 
   /**
    * **assets**
@@ -11121,6 +11722,329 @@ declare module 'zapatos/schema' {
   }
 
   /**
+   * **queue_dispatches**
+   * - Table in database
+   */
+  export namespace queue_dispatches {
+    export type Table = 'queue_dispatches';
+    export interface Selectable {
+      /**
+      * **queue_dispatches.dispatched_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      dispatched_at: Date;
+      /**
+      * **queue_dispatches.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string;
+      /**
+      * **queue_dispatches.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('queue_dispatches_id_seq'::regclass)`
+      */
+      id: number;
+      /**
+      * **queue_dispatches.queue_first**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_first: db.Int8String;
+      /**
+      * **queue_dispatches.queue_last**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_last: db.Int8String;
+      /**
+      * **queue_dispatches.queue_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      queue_type: string;
+      /**
+      * **queue_dispatches.relayer_type**
+      * - `queue_dispatch_relayer_type` in database
+      * - `NOT NULL`, default: `'claim'::queue_dispatch_relayer_type`
+      */
+      relayer_type: queue_dispatch_relayer_type;
+      /**
+      * **queue_dispatches.status**
+      * - `queue_dispatch_status` in database
+      * - `NOT NULL`, default: `'pending'::queue_dispatch_status`
+      */
+      status: queue_dispatch_status;
+      /**
+      * **queue_dispatches.task_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      task_id: string | null;
+      /**
+      * **queue_dispatches.updated_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      updated_at: Date;
+    }
+    export interface JSONSelectable {
+      /**
+      * **queue_dispatches.dispatched_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      dispatched_at: db.TimestampTzString;
+      /**
+      * **queue_dispatches.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string;
+      /**
+      * **queue_dispatches.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('queue_dispatches_id_seq'::regclass)`
+      */
+      id: number;
+      /**
+      * **queue_dispatches.queue_first**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_first: (number | db.Int8String);
+      /**
+      * **queue_dispatches.queue_last**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_last: (number | db.Int8String);
+      /**
+      * **queue_dispatches.queue_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      queue_type: string;
+      /**
+      * **queue_dispatches.relayer_type**
+      * - `queue_dispatch_relayer_type` in database
+      * - `NOT NULL`, default: `'claim'::queue_dispatch_relayer_type`
+      */
+      relayer_type: queue_dispatch_relayer_type;
+      /**
+      * **queue_dispatches.status**
+      * - `queue_dispatch_status` in database
+      * - `NOT NULL`, default: `'pending'::queue_dispatch_status`
+      */
+      status: queue_dispatch_status;
+      /**
+      * **queue_dispatches.task_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      task_id: string | null;
+      /**
+      * **queue_dispatches.updated_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      updated_at: db.TimestampTzString;
+    }
+    export interface Whereable {
+      /**
+      * **queue_dispatches.dispatched_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      dispatched_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('queue_dispatches_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, number | db.Parameter<number> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.queue_first**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_first?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.queue_last**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_last?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.queue_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      queue_type?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.relayer_type**
+      * - `queue_dispatch_relayer_type` in database
+      * - `NOT NULL`, default: `'claim'::queue_dispatch_relayer_type`
+      */
+      relayer_type?: queue_dispatch_relayer_type | db.Parameter<queue_dispatch_relayer_type> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, queue_dispatch_relayer_type | db.Parameter<queue_dispatch_relayer_type> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.status**
+      * - `queue_dispatch_status` in database
+      * - `NOT NULL`, default: `'pending'::queue_dispatch_status`
+      */
+      status?: queue_dispatch_status | db.Parameter<queue_dispatch_status> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, queue_dispatch_status | db.Parameter<queue_dispatch_status> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.task_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      task_id?: string | db.Parameter<string> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment | db.ParentColumn>;
+      /**
+      * **queue_dispatches.updated_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      updated_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.ParentColumn | db.SQLFragment<any, (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.SQLFragment | db.ParentColumn>;
+    }
+    export interface Insertable {
+      /**
+      * **queue_dispatches.dispatched_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      dispatched_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment;
+      /**
+      * **queue_dispatches.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **queue_dispatches.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('queue_dispatches_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment;
+      /**
+      * **queue_dispatches.queue_first**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_first: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **queue_dispatches.queue_last**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_last: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment;
+      /**
+      * **queue_dispatches.queue_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      queue_type: string | db.Parameter<string> | db.SQLFragment;
+      /**
+      * **queue_dispatches.relayer_type**
+      * - `queue_dispatch_relayer_type` in database
+      * - `NOT NULL`, default: `'claim'::queue_dispatch_relayer_type`
+      */
+      relayer_type?: queue_dispatch_relayer_type | db.Parameter<queue_dispatch_relayer_type> | db.DefaultType | db.SQLFragment;
+      /**
+      * **queue_dispatches.status**
+      * - `queue_dispatch_status` in database
+      * - `NOT NULL`, default: `'pending'::queue_dispatch_status`
+      */
+      status?: queue_dispatch_status | db.Parameter<queue_dispatch_status> | db.DefaultType | db.SQLFragment;
+      /**
+      * **queue_dispatches.task_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      task_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment;
+      /**
+      * **queue_dispatches.updated_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      updated_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment;
+    }
+    export interface Updatable {
+      /**
+      * **queue_dispatches.dispatched_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      dispatched_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **queue_dispatches.domain**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      domain?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **queue_dispatches.id**
+      * - `int4` in database
+      * - `NOT NULL`, default: `nextval('queue_dispatches_id_seq'::regclass)`
+      */
+      id?: number | db.Parameter<number> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, number | db.Parameter<number> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **queue_dispatches.queue_first**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_first?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **queue_dispatches.queue_last**
+      * - `int8` in database
+      * - `NOT NULL`, no default
+      */
+      queue_last?: (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment | db.SQLFragment<any, (number | db.Int8String | bigint) | db.Parameter<(number | db.Int8String | bigint)> | db.SQLFragment>;
+      /**
+      * **queue_dispatches.queue_type**
+      * - `varchar` in database
+      * - `NOT NULL`, no default
+      */
+      queue_type?: string | db.Parameter<string> | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | db.SQLFragment>;
+      /**
+      * **queue_dispatches.relayer_type**
+      * - `queue_dispatch_relayer_type` in database
+      * - `NOT NULL`, default: `'claim'::queue_dispatch_relayer_type`
+      */
+      relayer_type?: queue_dispatch_relayer_type | db.Parameter<queue_dispatch_relayer_type> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, queue_dispatch_relayer_type | db.Parameter<queue_dispatch_relayer_type> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **queue_dispatches.status**
+      * - `queue_dispatch_status` in database
+      * - `NOT NULL`, default: `'pending'::queue_dispatch_status`
+      */
+      status?: queue_dispatch_status | db.Parameter<queue_dispatch_status> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, queue_dispatch_status | db.Parameter<queue_dispatch_status> | db.DefaultType | db.SQLFragment>;
+      /**
+      * **queue_dispatches.task_id**
+      * - `varchar` in database
+      * - Nullable, no default
+      */
+      task_id?: string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment | db.SQLFragment<any, string | db.Parameter<string> | null | db.DefaultType | db.SQLFragment>;
+      /**
+      * **queue_dispatches.updated_at**
+      * - `timestamptz` in database
+      * - `NOT NULL`, default: `now()`
+      */
+      updated_at?: (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment | db.SQLFragment<any, (db.TimestampTzString | Date) | db.Parameter<(db.TimestampTzString | Date)> | db.DefaultType | db.SQLFragment>;
+    }
+    export type UniqueIndex = 'idx_queue_dispatches_pending_unique' | 'idx_queue_dispatches_task_id' | 'queue_dispatches_pkey';
+    export type Column = keyof Selectable;
+    export type OnlyCols<T extends readonly Column[]> = Pick<Selectable, T[number]>;
+    export type SQLExpression = Table | db.ColumnNames<Updatable | (keyof Updatable)[]> | db.ColumnValues<Updatable> | Whereable | Column | db.ParentColumn | db.GenericSQLExpression;
+    export type SQL = SQLExpression | SQLExpression[];
+  }
+
+  /**
    * **queues**
    * - Table in database
    */
@@ -14556,20 +15480,20 @@ declare module 'zapatos/schema' {
   /* --- aggregate types --- */
 
   export namespace public {  
-    export type Table = assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_asset_update_logs.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | hub_meta.Table | hub_token_update_logs.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | otc_sale_table.Table | protocol_update_logs.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | solana_lookup_tables.Table | spoke_meta.Table | swap_fills.Table | swap_intents.Table | swap_inventory_snapshots.Table | tokens.Table;
-    export type Selectable = assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_asset_update_logs.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | hub_meta.Selectable | hub_token_update_logs.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | otc_sale_table.Selectable | protocol_update_logs.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | solana_lookup_tables.Selectable | spoke_meta.Selectable | swap_fills.Selectable | swap_intents.Selectable | swap_inventory_snapshots.Selectable | tokens.Selectable;
-    export type JSONSelectable = assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_asset_update_logs.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | hub_meta.JSONSelectable | hub_token_update_logs.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | otc_sale_table.JSONSelectable | protocol_update_logs.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | solana_lookup_tables.JSONSelectable | spoke_meta.JSONSelectable | swap_fills.JSONSelectable | swap_intents.JSONSelectable | swap_inventory_snapshots.JSONSelectable | tokens.JSONSelectable;
-    export type Whereable = assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_asset_update_logs.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | hub_meta.Whereable | hub_token_update_logs.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | otc_sale_table.Whereable | protocol_update_logs.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | solana_lookup_tables.Whereable | spoke_meta.Whereable | swap_fills.Whereable | swap_intents.Whereable | swap_inventory_snapshots.Whereable | tokens.Whereable;
-    export type Insertable = assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_asset_update_logs.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | hub_meta.Insertable | hub_token_update_logs.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | otc_sale_table.Insertable | protocol_update_logs.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | solana_lookup_tables.Insertable | spoke_meta.Insertable | swap_fills.Insertable | swap_intents.Insertable | swap_inventory_snapshots.Insertable | tokens.Insertable;
-    export type Updatable = assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_asset_update_logs.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | hub_meta.Updatable | hub_token_update_logs.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | otc_sale_table.Updatable | protocol_update_logs.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | solana_lookup_tables.Updatable | spoke_meta.Updatable | swap_fills.Updatable | swap_intents.Updatable | swap_inventory_snapshots.Updatable | tokens.Updatable;
-    export type UniqueIndex = assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_asset_update_logs.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | hub_meta.UniqueIndex | hub_token_update_logs.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | otc_sale_table.UniqueIndex | protocol_update_logs.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | solana_lookup_tables.UniqueIndex | spoke_meta.UniqueIndex | swap_fills.UniqueIndex | swap_intents.UniqueIndex | swap_inventory_snapshots.UniqueIndex | tokens.UniqueIndex;
-    export type Column = assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_asset_update_logs.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | hub_meta.Column | hub_token_update_logs.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | otc_sale_table.Column | protocol_update_logs.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | solana_lookup_tables.Column | spoke_meta.Column | swap_fills.Column | swap_intents.Column | swap_inventory_snapshots.Column | tokens.Column;
+    export type Table = alert_triage_log.Table | assets.Table | balances.Table | checkpoints.Table | daily_metrics_by_chains_tokens.Table | daily_metrics_by_date.Table | depositors.Table | destination_intents.Table | destination_intents_status_log.Table | epoch_results.Table | hub_asset_update_logs.Table | hub_deposits.Table | hub_intents.Table | hub_intents_status_log.Table | hub_invoices.Table | hub_meta.Table | hub_token_update_logs.Table | intents.Table | invoices.Table | lock_positions.Table | merkle_trees.Table | messages.Table | orders.Table | origin_intents.Table | origin_intents_status_log.Table | otc_sale_table.Table | protocol_update_logs.Table | queue_dispatches.Table | queues.Table | queues_type_log.Table | rewards.Table | schema_migrations.Table | settlement_intents.Table | solana_lookup_tables.Table | spoke_meta.Table | swap_fills.Table | swap_intents.Table | swap_inventory_snapshots.Table | tokens.Table;
+    export type Selectable = alert_triage_log.Selectable | assets.Selectable | balances.Selectable | checkpoints.Selectable | daily_metrics_by_chains_tokens.Selectable | daily_metrics_by_date.Selectable | depositors.Selectable | destination_intents.Selectable | destination_intents_status_log.Selectable | epoch_results.Selectable | hub_asset_update_logs.Selectable | hub_deposits.Selectable | hub_intents.Selectable | hub_intents_status_log.Selectable | hub_invoices.Selectable | hub_meta.Selectable | hub_token_update_logs.Selectable | intents.Selectable | invoices.Selectable | lock_positions.Selectable | merkle_trees.Selectable | messages.Selectable | orders.Selectable | origin_intents.Selectable | origin_intents_status_log.Selectable | otc_sale_table.Selectable | protocol_update_logs.Selectable | queue_dispatches.Selectable | queues.Selectable | queues_type_log.Selectable | rewards.Selectable | schema_migrations.Selectable | settlement_intents.Selectable | solana_lookup_tables.Selectable | spoke_meta.Selectable | swap_fills.Selectable | swap_intents.Selectable | swap_inventory_snapshots.Selectable | tokens.Selectable;
+    export type JSONSelectable = alert_triage_log.JSONSelectable | assets.JSONSelectable | balances.JSONSelectable | checkpoints.JSONSelectable | daily_metrics_by_chains_tokens.JSONSelectable | daily_metrics_by_date.JSONSelectable | depositors.JSONSelectable | destination_intents.JSONSelectable | destination_intents_status_log.JSONSelectable | epoch_results.JSONSelectable | hub_asset_update_logs.JSONSelectable | hub_deposits.JSONSelectable | hub_intents.JSONSelectable | hub_intents_status_log.JSONSelectable | hub_invoices.JSONSelectable | hub_meta.JSONSelectable | hub_token_update_logs.JSONSelectable | intents.JSONSelectable | invoices.JSONSelectable | lock_positions.JSONSelectable | merkle_trees.JSONSelectable | messages.JSONSelectable | orders.JSONSelectable | origin_intents.JSONSelectable | origin_intents_status_log.JSONSelectable | otc_sale_table.JSONSelectable | protocol_update_logs.JSONSelectable | queue_dispatches.JSONSelectable | queues.JSONSelectable | queues_type_log.JSONSelectable | rewards.JSONSelectable | schema_migrations.JSONSelectable | settlement_intents.JSONSelectable | solana_lookup_tables.JSONSelectable | spoke_meta.JSONSelectable | swap_fills.JSONSelectable | swap_intents.JSONSelectable | swap_inventory_snapshots.JSONSelectable | tokens.JSONSelectable;
+    export type Whereable = alert_triage_log.Whereable | assets.Whereable | balances.Whereable | checkpoints.Whereable | daily_metrics_by_chains_tokens.Whereable | daily_metrics_by_date.Whereable | depositors.Whereable | destination_intents.Whereable | destination_intents_status_log.Whereable | epoch_results.Whereable | hub_asset_update_logs.Whereable | hub_deposits.Whereable | hub_intents.Whereable | hub_intents_status_log.Whereable | hub_invoices.Whereable | hub_meta.Whereable | hub_token_update_logs.Whereable | intents.Whereable | invoices.Whereable | lock_positions.Whereable | merkle_trees.Whereable | messages.Whereable | orders.Whereable | origin_intents.Whereable | origin_intents_status_log.Whereable | otc_sale_table.Whereable | protocol_update_logs.Whereable | queue_dispatches.Whereable | queues.Whereable | queues_type_log.Whereable | rewards.Whereable | schema_migrations.Whereable | settlement_intents.Whereable | solana_lookup_tables.Whereable | spoke_meta.Whereable | swap_fills.Whereable | swap_intents.Whereable | swap_inventory_snapshots.Whereable | tokens.Whereable;
+    export type Insertable = alert_triage_log.Insertable | assets.Insertable | balances.Insertable | checkpoints.Insertable | daily_metrics_by_chains_tokens.Insertable | daily_metrics_by_date.Insertable | depositors.Insertable | destination_intents.Insertable | destination_intents_status_log.Insertable | epoch_results.Insertable | hub_asset_update_logs.Insertable | hub_deposits.Insertable | hub_intents.Insertable | hub_intents_status_log.Insertable | hub_invoices.Insertable | hub_meta.Insertable | hub_token_update_logs.Insertable | intents.Insertable | invoices.Insertable | lock_positions.Insertable | merkle_trees.Insertable | messages.Insertable | orders.Insertable | origin_intents.Insertable | origin_intents_status_log.Insertable | otc_sale_table.Insertable | protocol_update_logs.Insertable | queue_dispatches.Insertable | queues.Insertable | queues_type_log.Insertable | rewards.Insertable | schema_migrations.Insertable | settlement_intents.Insertable | solana_lookup_tables.Insertable | spoke_meta.Insertable | swap_fills.Insertable | swap_intents.Insertable | swap_inventory_snapshots.Insertable | tokens.Insertable;
+    export type Updatable = alert_triage_log.Updatable | assets.Updatable | balances.Updatable | checkpoints.Updatable | daily_metrics_by_chains_tokens.Updatable | daily_metrics_by_date.Updatable | depositors.Updatable | destination_intents.Updatable | destination_intents_status_log.Updatable | epoch_results.Updatable | hub_asset_update_logs.Updatable | hub_deposits.Updatable | hub_intents.Updatable | hub_intents_status_log.Updatable | hub_invoices.Updatable | hub_meta.Updatable | hub_token_update_logs.Updatable | intents.Updatable | invoices.Updatable | lock_positions.Updatable | merkle_trees.Updatable | messages.Updatable | orders.Updatable | origin_intents.Updatable | origin_intents_status_log.Updatable | otc_sale_table.Updatable | protocol_update_logs.Updatable | queue_dispatches.Updatable | queues.Updatable | queues_type_log.Updatable | rewards.Updatable | schema_migrations.Updatable | settlement_intents.Updatable | solana_lookup_tables.Updatable | spoke_meta.Updatable | swap_fills.Updatable | swap_intents.Updatable | swap_inventory_snapshots.Updatable | tokens.Updatable;
+    export type UniqueIndex = alert_triage_log.UniqueIndex | assets.UniqueIndex | balances.UniqueIndex | checkpoints.UniqueIndex | daily_metrics_by_chains_tokens.UniqueIndex | daily_metrics_by_date.UniqueIndex | depositors.UniqueIndex | destination_intents.UniqueIndex | destination_intents_status_log.UniqueIndex | epoch_results.UniqueIndex | hub_asset_update_logs.UniqueIndex | hub_deposits.UniqueIndex | hub_intents.UniqueIndex | hub_intents_status_log.UniqueIndex | hub_invoices.UniqueIndex | hub_meta.UniqueIndex | hub_token_update_logs.UniqueIndex | intents.UniqueIndex | invoices.UniqueIndex | lock_positions.UniqueIndex | merkle_trees.UniqueIndex | messages.UniqueIndex | orders.UniqueIndex | origin_intents.UniqueIndex | origin_intents_status_log.UniqueIndex | otc_sale_table.UniqueIndex | protocol_update_logs.UniqueIndex | queue_dispatches.UniqueIndex | queues.UniqueIndex | queues_type_log.UniqueIndex | rewards.UniqueIndex | schema_migrations.UniqueIndex | settlement_intents.UniqueIndex | solana_lookup_tables.UniqueIndex | spoke_meta.UniqueIndex | swap_fills.UniqueIndex | swap_intents.UniqueIndex | swap_inventory_snapshots.UniqueIndex | tokens.UniqueIndex;
+    export type Column = alert_triage_log.Column | assets.Column | balances.Column | checkpoints.Column | daily_metrics_by_chains_tokens.Column | daily_metrics_by_date.Column | depositors.Column | destination_intents.Column | destination_intents_status_log.Column | epoch_results.Column | hub_asset_update_logs.Column | hub_deposits.Column | hub_intents.Column | hub_intents_status_log.Column | hub_invoices.Column | hub_meta.Column | hub_token_update_logs.Column | intents.Column | invoices.Column | lock_positions.Column | merkle_trees.Column | messages.Column | orders.Column | origin_intents.Column | origin_intents_status_log.Column | otc_sale_table.Column | protocol_update_logs.Column | queue_dispatches.Column | queues.Column | queues_type_log.Column | rewards.Column | schema_migrations.Column | settlement_intents.Column | solana_lookup_tables.Column | spoke_meta.Column | swap_fills.Column | swap_intents.Column | swap_inventory_snapshots.Column | tokens.Column;
   
-    export type AllBaseTables = [assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_asset_update_logs.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, hub_meta.Table, hub_token_update_logs.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, protocol_update_logs.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, spoke_meta.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
+    export type AllBaseTables = [alert_triage_log.Table, assets.Table, balances.Table, checkpoints.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_asset_update_logs.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, hub_meta.Table, hub_token_update_logs.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, protocol_update_logs.Table, queue_dispatches.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, spoke_meta.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
     export type AllForeignTables = [];
     export type AllViews = [];
     export type AllMaterializedViews = [daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, intents.Table, invoices.Table];
-    export type AllTablesAndViews = [assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_asset_update_logs.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, hub_meta.Table, hub_token_update_logs.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, protocol_update_logs.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, spoke_meta.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
+    export type AllTablesAndViews = [alert_triage_log.Table, assets.Table, balances.Table, checkpoints.Table, daily_metrics_by_chains_tokens.Table, daily_metrics_by_date.Table, depositors.Table, destination_intents.Table, destination_intents_status_log.Table, epoch_results.Table, hub_asset_update_logs.Table, hub_deposits.Table, hub_intents.Table, hub_intents_status_log.Table, hub_invoices.Table, hub_meta.Table, hub_token_update_logs.Table, intents.Table, invoices.Table, lock_positions.Table, merkle_trees.Table, messages.Table, orders.Table, origin_intents.Table, origin_intents_status_log.Table, otc_sale_table.Table, protocol_update_logs.Table, queue_dispatches.Table, queues.Table, queues_type_log.Table, rewards.Table, schema_migrations.Table, settlement_intents.Table, solana_lookup_tables.Table, spoke_meta.Table, swap_fills.Table, swap_intents.Table, swap_inventory_snapshots.Table, tokens.Table];
   }
 
 
@@ -29936,6 +30860,7 @@ declare module 'zapatos/schema' {
   /* === lookups === */
 
   export type SelectableForTable<T extends Table> = {
+    "alert_triage_log": alert_triage_log.Selectable;
     "assets": assets.Selectable;
     "balances": balances.Selectable;
     "checkpoints": checkpoints.Selectable;
@@ -29962,6 +30887,7 @@ declare module 'zapatos/schema' {
     "origin_intents_status_log": origin_intents_status_log.Selectable;
     "otc_sale_table": otc_sale_table.Selectable;
     "protocol_update_logs": protocol_update_logs.Selectable;
+    "queue_dispatches": queue_dispatches.Selectable;
     "queues": queues.Selectable;
     "queues_type_log": queues_type_log.Selectable;
     "rewards": rewards.Selectable;
@@ -30013,6 +30939,7 @@ declare module 'zapatos/schema' {
   }[T];
 
   export type JSONSelectableForTable<T extends Table> = {
+    "alert_triage_log": alert_triage_log.JSONSelectable;
     "assets": assets.JSONSelectable;
     "balances": balances.JSONSelectable;
     "checkpoints": checkpoints.JSONSelectable;
@@ -30039,6 +30966,7 @@ declare module 'zapatos/schema' {
     "origin_intents_status_log": origin_intents_status_log.JSONSelectable;
     "otc_sale_table": otc_sale_table.JSONSelectable;
     "protocol_update_logs": protocol_update_logs.JSONSelectable;
+    "queue_dispatches": queue_dispatches.JSONSelectable;
     "queues": queues.JSONSelectable;
     "queues_type_log": queues_type_log.JSONSelectable;
     "rewards": rewards.JSONSelectable;
@@ -30090,6 +31018,7 @@ declare module 'zapatos/schema' {
   }[T];
 
   export type WhereableForTable<T extends Table> = {
+    "alert_triage_log": alert_triage_log.Whereable;
     "assets": assets.Whereable;
     "balances": balances.Whereable;
     "checkpoints": checkpoints.Whereable;
@@ -30116,6 +31045,7 @@ declare module 'zapatos/schema' {
     "origin_intents_status_log": origin_intents_status_log.Whereable;
     "otc_sale_table": otc_sale_table.Whereable;
     "protocol_update_logs": protocol_update_logs.Whereable;
+    "queue_dispatches": queue_dispatches.Whereable;
     "queues": queues.Whereable;
     "queues_type_log": queues_type_log.Whereable;
     "rewards": rewards.Whereable;
@@ -30167,6 +31097,7 @@ declare module 'zapatos/schema' {
   }[T];
 
   export type InsertableForTable<T extends Table> = {
+    "alert_triage_log": alert_triage_log.Insertable;
     "assets": assets.Insertable;
     "balances": balances.Insertable;
     "checkpoints": checkpoints.Insertable;
@@ -30193,6 +31124,7 @@ declare module 'zapatos/schema' {
     "origin_intents_status_log": origin_intents_status_log.Insertable;
     "otc_sale_table": otc_sale_table.Insertable;
     "protocol_update_logs": protocol_update_logs.Insertable;
+    "queue_dispatches": queue_dispatches.Insertable;
     "queues": queues.Insertable;
     "queues_type_log": queues_type_log.Insertable;
     "rewards": rewards.Insertable;
@@ -30244,6 +31176,7 @@ declare module 'zapatos/schema' {
   }[T];
 
   export type UpdatableForTable<T extends Table> = {
+    "alert_triage_log": alert_triage_log.Updatable;
     "assets": assets.Updatable;
     "balances": balances.Updatable;
     "checkpoints": checkpoints.Updatable;
@@ -30270,6 +31203,7 @@ declare module 'zapatos/schema' {
     "origin_intents_status_log": origin_intents_status_log.Updatable;
     "otc_sale_table": otc_sale_table.Updatable;
     "protocol_update_logs": protocol_update_logs.Updatable;
+    "queue_dispatches": queue_dispatches.Updatable;
     "queues": queues.Updatable;
     "queues_type_log": queues_type_log.Updatable;
     "rewards": rewards.Updatable;
@@ -30321,6 +31255,7 @@ declare module 'zapatos/schema' {
   }[T];
 
   export type UniqueIndexForTable<T extends Table> = {
+    "alert_triage_log": alert_triage_log.UniqueIndex;
     "assets": assets.UniqueIndex;
     "balances": balances.UniqueIndex;
     "checkpoints": checkpoints.UniqueIndex;
@@ -30347,6 +31282,7 @@ declare module 'zapatos/schema' {
     "origin_intents_status_log": origin_intents_status_log.UniqueIndex;
     "otc_sale_table": otc_sale_table.UniqueIndex;
     "protocol_update_logs": protocol_update_logs.UniqueIndex;
+    "queue_dispatches": queue_dispatches.UniqueIndex;
     "queues": queues.UniqueIndex;
     "queues_type_log": queues_type_log.UniqueIndex;
     "rewards": rewards.UniqueIndex;
@@ -30398,6 +31334,7 @@ declare module 'zapatos/schema' {
   }[T];
 
   export type ColumnForTable<T extends Table> = {
+    "alert_triage_log": alert_triage_log.Column;
     "assets": assets.Column;
     "balances": balances.Column;
     "checkpoints": checkpoints.Column;
@@ -30424,6 +31361,7 @@ declare module 'zapatos/schema' {
     "origin_intents_status_log": origin_intents_status_log.Column;
     "otc_sale_table": otc_sale_table.Column;
     "protocol_update_logs": protocol_update_logs.Column;
+    "queue_dispatches": queue_dispatches.Column;
     "queues": queues.Column;
     "queues_type_log": queues_type_log.Column;
     "rewards": rewards.Column;
@@ -30475,6 +31413,7 @@ declare module 'zapatos/schema' {
   }[T];
 
   export type SQLForTable<T extends Table> = {
+    "alert_triage_log": alert_triage_log.SQL;
     "assets": assets.SQL;
     "balances": balances.SQL;
     "checkpoints": checkpoints.SQL;
@@ -30501,6 +31440,7 @@ declare module 'zapatos/schema' {
     "origin_intents_status_log": origin_intents_status_log.SQL;
     "otc_sale_table": otc_sale_table.SQL;
     "protocol_update_logs": protocol_update_logs.SQL;
+    "queue_dispatches": queue_dispatches.SQL;
     "queues": queues.SQL;
     "queues_type_log": queues_type_log.SQL;
     "rewards": rewards.SQL;

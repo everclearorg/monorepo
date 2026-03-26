@@ -131,6 +131,31 @@ CREATE TYPE public.message_type AS ENUM (
 
 
 --
+-- Name: queue_dispatch_relayer_type; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.queue_dispatch_relayer_type AS ENUM (
+    'claim',
+    'gelato',
+    'everclear',
+    'mock'
+);
+
+
+--
+-- Name: queue_dispatch_status; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.queue_dispatch_status AS ENUM (
+    'pending',
+    'failed',
+    'success',
+    'reverted',
+    'cancelled'
+);
+
+
+--
 -- Name: queue_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -3352,6 +3377,44 @@ CREATE TABLE public.protocol_update_logs (
 
 
 --
+-- Name: queue_dispatches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.queue_dispatches (
+    id integer NOT NULL,
+    domain character varying NOT NULL,
+    queue_type character varying NOT NULL,
+    queue_first bigint NOT NULL,
+    queue_last bigint NOT NULL,
+    task_id character varying,
+    relayer_type public.queue_dispatch_relayer_type DEFAULT 'claim'::public.queue_dispatch_relayer_type NOT NULL,
+    status public.queue_dispatch_status DEFAULT 'pending'::public.queue_dispatch_status NOT NULL,
+    dispatched_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: queue_dispatches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.queue_dispatches_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: queue_dispatches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.queue_dispatches_id_seq OWNED BY public.queue_dispatches.id;
+
+
+--
 -- Name: queues; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4566,6 +4629,13 @@ ALTER TABLE ONLY public.origin_intents_status_log ALTER COLUMN id SET DEFAULT ne
 
 
 --
+-- Name: queue_dispatches id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.queue_dispatches ALTER COLUMN id SET DEFAULT nextval('public.queue_dispatches_id_seq'::regclass);
+
+
+--
 -- Name: queues_type_log id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4782,6 +4852,14 @@ ALTER TABLE ONLY public.otc_sale_table
 
 ALTER TABLE ONLY public.protocol_update_logs
     ADD CONSTRAINT protocol_update_logs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: queue_dispatches queue_dispatches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.queue_dispatches
+    ADD CONSTRAINT queue_dispatches_pkey PRIMARY KEY (id);
 
 
 --
@@ -5497,6 +5575,27 @@ CREATE INDEX idx_proofs_merkle_root ON public.rewards USING btree (merkle_root);
 
 
 --
+-- Name: idx_queue_dispatches_pending_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_queue_dispatches_pending_unique ON public.queue_dispatches USING btree (domain, queue_type, queue_first, queue_last) WHERE (status = 'pending'::public.queue_dispatch_status);
+
+
+--
+-- Name: idx_queue_dispatches_status_updated; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_queue_dispatches_status_updated ON public.queue_dispatches USING btree (status, updated_at);
+
+
+--
+-- Name: idx_queue_dispatches_task_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_queue_dispatches_task_id ON public.queue_dispatches USING btree (task_id) WHERE (task_id IS NOT NULL);
+
+
+--
 -- Name: idx_snapshot_chain_asset; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5901,4 +6000,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20260212000100'),
     ('20260213000100'),
     ('20260213194500'),
-    ('20260325000100');
+    ('20260325000100'),
+    ('20260326000100');
