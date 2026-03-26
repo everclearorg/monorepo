@@ -1072,3 +1072,121 @@ export const updateSolanaMessageStatuses = async (_pool?: Pool | db.TxnClientFor
 
   return result.length;
 };
+
+export const getPendingQueueDispatch = async (
+  domain: string,
+  queueType: string,
+  first: number,
+  last: number,
+  staleThresholdMinutes: number,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<{ taskId: string; relayerType: string; dispatchedAt: Date } | null> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await (poolToUse as Pool).query(
+    `SELECT task_id, relayer_type, dispatched_at
+     FROM queue_dispatches
+     WHERE domain = $1
+       AND queue_type = $2
+       AND queue_first = $3
+       AND queue_last = $4
+       AND status = 'pending'
+       AND dispatched_at > NOW() - make_interval(mins => $5)
+     LIMIT 1`,
+    [domain, queueType, first, last, staleThresholdMinutes],
+  );
+  if ((result.rowCount ?? 0) === 0) return null;
+  return {
+    taskId: result.rows[0].task_id,
+    relayerType: result.rows[0].relayer_type,
+    dispatchedAt: result.rows[0].dispatched_at,
+  };
+};
+
+export const saveQueueDispatch = async (
+  domain: string,
+  queueType: string,
+  first: number,
+  last: number,
+  taskId: string,
+  relayerType: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  const client = await (poolToUse as Pool).connect();
+  try {
+    await client.query('BEGIN');
+    // Advisory lock keyed on the queue slice to serialize concurrent dispatches
+    await client.query(
+      `SELECT pg_advisory_xact_lock(hashtext($1 || ':' || $2 || ':' || $3 || ':' || $4))`,
+      [domain, queueType, first.toString(), last.toString()],
+    );
+    // Expire any existing pending dispatch for this queue slice
+    await client.query(
+      `UPDATE queue_dispatches
+       SET status = 'expired', updated_at = NOW()
+       WHERE domain = $1
+         AND queue_type = $2
+         AND queue_first = $3
+         AND queue_last = $4
+         AND status = 'pending'`,
+      [domain, queueType, first, last],
+    );
+    // Insert the new dispatch
+    await client.query(
+      `INSERT INTO queue_dispatches (domain, queue_type, queue_first, queue_last, task_id, relayer_type, status, dispatched_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pending', NOW(), NOW())`,
+      [domain, queueType, first, last, taskId, relayerType],
+    );
+    await client.query('COMMIT');
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+};
+
+export const getAllPendingQueueDispatches = async (
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<{ taskId: string; relayerType: string; domain: string; queueType: string }[]> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await (poolToUse as Pool).query(
+    `SELECT task_id, relayer_type, domain, queue_type
+     FROM queue_dispatches
+     WHERE status = 'pending'`,
+  );
+  return result.rows.map((row: any) => ({
+    taskId: row.task_id,
+    relayerType: row.relayer_type,
+    domain: row.domain,
+    queueType: row.queue_type,
+  }));
+};
+
+export const updateQueueDispatchStatus = async (
+  taskId: string,
+  status: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await (poolToUse as Pool).query(
+    `UPDATE queue_dispatches
+     SET status = $1, updated_at = NOW()
+     WHERE task_id = $2 AND status = 'pending'`,
+    [status, taskId],
+  );
+};
+
+export const pruneOldQueueDispatches = async (
+  retentionDays: number,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<number> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await (poolToUse as Pool).query(
+    `DELETE FROM queue_dispatches
+     WHERE status != 'pending'
+       AND updated_at < NOW() - make_interval(days => $1)`,
+    [retentionDays],
+  );
+  return result.rowCount ?? 0;
+};
