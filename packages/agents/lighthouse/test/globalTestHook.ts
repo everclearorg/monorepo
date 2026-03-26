@@ -322,6 +322,7 @@ export const mock = {
             instance: {
               getRelayerAddress: stub().resolves(mkAddress('0x1234')),
               isChainSupported: stub().resolves(true),
+              getTaskStatus: stub().resolves('ExecPending'),
             } as any,
           };
         }),
@@ -464,6 +465,11 @@ export const mochaHooks = {
       saveRewards: stub().resolves(),
       saveCheckPoint: stub().resolves(),
       getOriginIntentsLastNonce: stub().resolves(0),
+      getPendingQueueDispatch: stub().resolves(null),
+      saveQueueDispatch: stub().resolves(),
+      getAllPendingQueueDispatches: stub().resolves([]),
+      updateQueueDispatchStatus: stub().resolves(),
+      pruneOldQueueDispatches: stub().resolves(0),
     } as unknown as Database;
     mockHistoricPrice = {
       getHistoricTokenPrice: stub(),

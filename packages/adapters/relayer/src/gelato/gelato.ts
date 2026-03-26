@@ -143,67 +143,16 @@ export const getTransactionHash = async (taskId: string): Promise<string | undef
   }
 };
 
-/**
- * Encodes a sponsoredCallV2 call to the Gelato relay contract.
- * This wraps the inner calldata so that the relay contract forwards the call,
- * making msg.sender at the target = relay contract address (e.g. 0xceA8...).
- *
- * sponsoredCallV2(address _target, bytes _data, bytes32 _correlationId, bytes32 _feeToken, bytes32 _oneBalanceChainId)
- * selector: 0xad718d2a
- */
-export const encodeSponsoredCallV2 = (target: string, innerData: string): string => {
-  const selector = '0xad718d2a';
-  const targetPadded = target.toLowerCase().replace('0x', '').padStart(64, '0');
-  const zeroBytes32 = '0'.repeat(64);
-
-  // ABI encode: (address, bytes, bytes32, bytes32, bytes32)
-  // Offsets: address at 0x00, bytes pointer at 0x20, bytes32s at 0x40/0x60/0x80
-  // bytes is dynamic, so we use an offset pointer
-  const dataWithout0x = innerData.replace('0x', '');
-  const dataLength = (dataWithout0x.length / 2).toString(16).padStart(64, '0');
-
-  // Pad data to 32-byte boundary
-  const dataPadded = dataWithout0x + '0'.repeat((64 - (dataWithout0x.length % 64)) % 64);
-
-  // Layout:
-  // [0x00]  target (address, padded to 32 bytes)
-  // [0x20]  offset to bytes _data (= 0xa0 = 160, after 5 slots of 32 bytes)
-  // [0x40]  _correlationId (bytes32)
-  // [0x60]  _feeToken (bytes32)
-  // [0x80]  _oneBalanceChainId (bytes32)
-  // [0xa0]  length of bytes _data
-  // [0xc0+] bytes _data (padded)
-  const dataOffset = 'a0'.padStart(64, '0'); // 5 * 32 = 160 = 0xa0
-
-  return (
-    selector +
-    targetPadded +
-    dataOffset +
-    zeroBytes32 + // correlationId
-    zeroBytes32 + // feeToken
-    zeroBytes32 + // oneBalanceChainId
-    dataLength +
-    dataPadded
-  );
-};
-
 export const gelatoSDKSend = async (
   chainId: number,
   to: string,
   data: string,
-  relayContractAddress?: string,
 ): Promise<string> => {
   try {
-    // If a relay contract address is provided, wrap the call through sponsoredCallV2.
-    // This makes msg.sender at the target = relay contract address, which is required
-    // for spoke contracts that check _relayer == msg.sender.
-    const actualTo = relayContractAddress || to;
-    const actualData = relayContractAddress ? encodeSponsoredCallV2(to, data) : data;
-
     const taskId = await gelatoRelay.sendTransaction({
       chainId,
-      to: actualTo as `0x${string}`,
-      data: actualData as `0x${string}`,
+      to: to as `0x${string}`,
+      data: data as `0x${string}`,
     });
     return taskId;
   } catch (error: unknown) {
@@ -253,31 +202,25 @@ export const send = async (
     funcSig,
   });
 
-  logger.info('Sending via Gelato sponsoredCallV2', requestContext, methodContext, {
-    relayContract: relayerAddress,
-    target: destinationAddress,
+  logger.info('Sending tx to relayer', requestContext, methodContext, {
+    relayer: relayerAddress,
+    everclear: destinationAddress,
     domain,
-    chainId,
     gas: gas.toString(),
-    funcSig,
   });
 
-  // Send through the relay contract's sponsoredCallV2 so that msg.sender
-  // at the target contract = relay contract address (required for spoke
-  // contracts that check _relayer == msg.sender).
-  const taskId = await gelatoSDKSend(chainId, destinationAddress, encodedData, relayerAddress);
+  logger.info('Sending to Gelato network', requestContext, methodContext, {
+    chainId,
+    to: destinationAddress,
+    data: encodedData,
+  });
+
+  const taskId = await gelatoSDKSend(chainId, destinationAddress, encodedData);
 
   if (!taskId) {
     throw new RelayerSendFailed({ taskId });
   } else {
-    logger.info('Gelato task submitted via sponsoredCallV2', requestContext, methodContext, {
-      taskId,
-      chainId,
-      domain,
-      relayContract: relayerAddress,
-      target: destinationAddress,
-      funcSig,
-    });
+    logger.info('Sent to Gelato network', requestContext, methodContext, { taskId });
     return taskId;
   }
 };
