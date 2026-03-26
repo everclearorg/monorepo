@@ -2124,6 +2124,33 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: alert_triage_log; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.alert_triage_log (
+    fingerprint character(64) NOT NULL,
+    report_type character varying(128) NOT NULL,
+    severity character varying(16) NOT NULL,
+    env character varying(64) NOT NULL,
+    network character varying(32) NOT NULL,
+    ids text[] DEFAULT '{}'::text[] NOT NULL,
+    reason text NOT NULL,
+    triage_mode character varying(16) NOT NULL,
+    triage_result jsonb,
+    provider_used character varying(32),
+    model_used character varying(64),
+    triage_latency_ms integer,
+    auto_resolve_attempted boolean DEFAULT false NOT NULL,
+    auto_resolve_succeeded boolean DEFAULT false NOT NULL,
+    auto_resolve_reason_code character varying(64),
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
+    tool_calls_made integer DEFAULT 0 NOT NULL,
+    tool_names_used text[] DEFAULT '{}'::text[] NOT NULL
+);
+
+
+--
 -- Name: assets; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2949,6 +2976,30 @@ ALTER SEQUENCE public.epoch_results_id_seq OWNED BY public.epoch_results.id;
 
 
 --
+-- Name: hub_asset_update_logs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.hub_asset_update_logs (
+    id character(120) NOT NULL,
+    domain character varying NOT NULL,
+    asset_id character varying(66) NOT NULL,
+    token_id character varying(66),
+    ticker_hash character varying(66) NOT NULL,
+    asset_domain character varying(66) NOT NULL,
+    kind character varying NOT NULL,
+    asset_hash character varying(66) NOT NULL,
+    adopted character varying(66) NOT NULL,
+    approval boolean NOT NULL,
+    strategy character varying(255) NOT NULL,
+    transaction_hash character(130) NOT NULL,
+    "timestamp" bigint NOT NULL,
+    block_number bigint NOT NULL,
+    tx_origin character varying(66) NOT NULL,
+    tx_nonce bigint NOT NULL
+);
+
+
+--
 -- Name: hub_deposits; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3080,6 +3131,28 @@ CREATE TABLE public.hub_meta (
     acceptance_delay bigint,
     supported_domains jsonb,
     chain_gateways jsonb
+);
+
+
+--
+-- Name: hub_token_update_logs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.hub_token_update_logs (
+    id character(120) NOT NULL,
+    domain character varying NOT NULL,
+    ticker_hash character varying(66) NOT NULL,
+    kind character varying NOT NULL,
+    fee_recipients character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    fee_amounts character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    max_discount_bps bigint NOT NULL,
+    discount_per_epoch bigint NOT NULL,
+    prioritized_strategy character varying(255) NOT NULL,
+    transaction_hash character(130) NOT NULL,
+    "timestamp" bigint NOT NULL,
+    block_number bigint NOT NULL,
+    tx_origin character varying(66) NOT NULL,
+    tx_nonce bigint NOT NULL
 );
 
 
@@ -4528,6 +4601,14 @@ ALTER TABLE ONLY public.swap_inventory_snapshots ALTER COLUMN id SET DEFAULT nex
 
 
 --
+-- Name: alert_triage_log alert_triage_log_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.alert_triage_log
+    ADD CONSTRAINT alert_triage_log_pkey PRIMARY KEY (fingerprint);
+
+
+--
 -- Name: assets assets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4584,6 +4665,14 @@ ALTER TABLE ONLY public.epoch_results
 
 
 --
+-- Name: hub_asset_update_logs hub_asset_update_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.hub_asset_update_logs
+    ADD CONSTRAINT hub_asset_update_logs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: hub_deposits hub_deposits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4621,6 +4710,14 @@ ALTER TABLE ONLY public.hub_invoices
 
 ALTER TABLE ONLY public.hub_meta
     ADD CONSTRAINT hub_meta_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hub_token_update_logs hub_token_update_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.hub_token_update_logs
+    ADD CONSTRAINT hub_token_update_logs_pkey PRIMARY KEY (id);
 
 
 --
@@ -5204,6 +5301,41 @@ CREATE INDEX destination_intents_tx_nonce_idx ON public.destination_intents USIN
 
 
 --
+-- Name: hub_asset_update_logs_asset_domain_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_asset_update_logs_asset_domain_idx ON public.hub_asset_update_logs USING btree (asset_domain);
+
+
+--
+-- Name: hub_asset_update_logs_asset_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_asset_update_logs_asset_id_idx ON public.hub_asset_update_logs USING btree (asset_id);
+
+
+--
+-- Name: hub_asset_update_logs_block_number_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_asset_update_logs_block_number_idx ON public.hub_asset_update_logs USING btree (block_number);
+
+
+--
+-- Name: hub_asset_update_logs_ticker_hash_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_asset_update_logs_ticker_hash_idx ON public.hub_asset_update_logs USING btree (ticker_hash);
+
+
+--
+-- Name: hub_asset_update_logs_timestamp_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_asset_update_logs_timestamp_idx ON public.hub_asset_update_logs USING btree ("timestamp");
+
+
+--
 -- Name: hub_deposits_auto_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5236,6 +5368,48 @@ CREATE INDEX hub_invoices_domain_status_queue_id_idx ON public.hub_invoices USIN
 --
 
 CREATE INDEX hub_meta_domain_idx ON public.hub_meta USING btree (domain);
+
+
+--
+-- Name: hub_token_update_logs_block_number_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_token_update_logs_block_number_idx ON public.hub_token_update_logs USING btree (block_number);
+
+
+--
+-- Name: hub_token_update_logs_ticker_hash_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_token_update_logs_ticker_hash_idx ON public.hub_token_update_logs USING btree (ticker_hash);
+
+
+--
+-- Name: hub_token_update_logs_timestamp_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX hub_token_update_logs_timestamp_idx ON public.hub_token_update_logs USING btree ("timestamp");
+
+
+--
+-- Name: idx_alert_triage_log_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_alert_triage_log_created_at ON public.alert_triage_log USING btree (created_at);
+
+
+--
+-- Name: idx_alert_triage_log_expires_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_alert_triage_log_expires_at ON public.alert_triage_log USING btree (expires_at);
+
+
+--
+-- Name: idx_alert_triage_log_type_env; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_alert_triage_log_type_env ON public.alert_triage_log USING btree (report_type, env);
 
 
 --
@@ -5369,6 +5543,13 @@ CREATE INDEX idx_swap_user ON public.swap_intents USING btree (user_address);
 --
 
 CREATE INDEX messages_auto_id_index ON public.messages USING btree (auto_id);
+
+
+--
+-- Name: messages_status_type_partial_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX messages_status_type_partial_idx ON public.messages USING btree (message_status, type) WHERE (message_status <> 'delivered'::public.message_status);
 
 
 --
@@ -5715,6 +5896,9 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20251205153936'),
     ('20251211224120'),
     ('20260112150248'),
-    ('20260128120000'),
     ('20260203002000'),
-    ('20260203200000');
+    ('20260203200000'),
+    ('20260212000100'),
+    ('20260213000100'),
+    ('20260213194500'),
+    ('20260325000100');
