@@ -1072,3 +1072,147 @@ export const updateSolanaMessageStatuses = async (_pool?: Pool | db.TxnClientFor
 
   return result.length;
 };
+
+export const claimQueueDispatch = async (
+  domain: string,
+  queueType: string,
+  first: number,
+  last: number,
+  staleThresholdMinutes: number,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<{ claimToken: string } | null> => {
+  const poolToUse = _pool ?? getPool();
+  const sliceKey = `${domain}:${queueType}:${first}:${last}`;
+  const claimToken = `claim:${sliceKey}`;
+  try {
+    let claimed = false;
+    await db.transaction(poolToUse, db.IsolationLevel.Serializable, async (client) => {
+      // Advisory lock keyed on the queue slice to serialize concurrent claims
+      await db.sql`
+        SELECT pg_advisory_xact_lock(hashtext(${db.param(sliceKey)}))
+      `.run(client);
+      // Check for an existing pending row for this queue slice
+      const existing = await db.sql<s.queue_dispatches.SQL>`
+        SELECT ${'task_id'}, ${'dispatched_at'}
+        FROM ${'queue_dispatches'}
+        WHERE ${'domain'} = ${db.param(domain)}
+          AND ${'queue_type'} = ${db.param(queueType)}
+          AND ${'queue_first'} = ${db.param(first)}
+          AND ${'queue_last'} = ${db.param(last)}
+          AND ${'status'} = ${db.param('pending')}
+        LIMIT 1`.run(client);
+
+      if (existing.length > 0) {
+        const row = existing[0];
+        const isClaim = row.task_id.startsWith('claim:');
+        if (!isClaim) {
+          // Real dispatch in-flight — do not reclaim
+          return;
+        }
+        // Stale claim — check if it's old enough to reclaim
+        const ageMs = Date.now() - new Date(row.dispatched_at).getTime();
+        if (ageMs < staleThresholdMinutes * 60_000) {
+          // Fresh claim by another worker — do not reclaim
+          return;
+        }
+        // Reclaim: reset timestamps on the stale claim row
+        await db.sql<s.queue_dispatches.SQL>`
+          UPDATE ${'queue_dispatches'}
+          SET ${'dispatched_at'} = NOW(), ${'updated_at'} = NOW()
+          WHERE ${'task_id'} = ${db.param(row.task_id)}
+            AND ${'status'} = ${db.param('pending')}
+        `.run(client);
+        claimed = true;
+      } else {
+        // No pending row — insert a new claim
+        await db.sql<s.queue_dispatches.SQL>`
+          INSERT INTO ${'queue_dispatches'} (${'domain'}, ${'queue_type'}, ${'queue_first'}, ${'queue_last'}, ${'task_id'}, ${'relayer_type'}, ${'status'}, ${'dispatched_at'}, ${'updated_at'})
+          VALUES (${db.param(domain)}, ${db.param(queueType)}, ${db.param(first)}, ${db.param(last)}, ${db.param(claimToken)}, ${db.param('claim')}, ${db.param('pending')}, NOW(), NOW())
+        `.run(client);
+        claimed = true;
+      }
+    });
+    return claimed ? { claimToken } : null;
+  } catch (err: unknown) {
+    // Unique violation (concurrent insert) — treat as claim failure
+    if (err && typeof err === 'object' && 'code' in err && (err as { code: string }).code === '23505') {
+      return null;
+    }
+    throw err;
+  }
+};
+
+export const promoteQueueDispatchClaim = async (
+  claimToken: string,
+  taskId: string,
+  relayerType: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await db.sql<s.queue_dispatches.SQL>`
+    UPDATE ${'queue_dispatches'}
+    SET ${'task_id'} = ${db.param(taskId)},
+        ${'relayer_type'} = ${db.param(relayerType)},
+        ${'updated_at'} = NOW()
+    WHERE ${'task_id'} = ${db.param(claimToken)}
+      AND ${'status'} = ${db.param('pending')}
+  `.run(poolToUse);
+};
+
+export const releaseQueueDispatchClaim = async (
+  claimToken: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await db.sql<s.queue_dispatches.SQL>`
+    UPDATE ${'queue_dispatches'}
+    SET ${'status'} = ${db.param('failed')}, ${'updated_at'} = NOW()
+    WHERE ${'task_id'} = ${db.param(claimToken)}
+      AND ${'status'} = ${db.param('pending')}
+  `.run(poolToUse);
+};
+
+export const getAllPendingQueueDispatches = async (
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<{ taskId: string; relayerType: string; domain: string; queueType: string }[]> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await db.sql<s.queue_dispatches.SQL>`
+    SELECT ${'task_id'}, ${'relayer_type'}, ${'domain'}, ${'queue_type'}
+    FROM ${'queue_dispatches'}
+    WHERE ${'status'} = ${db.param('pending')}
+      AND ${'task_id'} NOT LIKE ${db.param('claim:%')}
+  `.run(poolToUse);
+  return result.map((row) => ({
+    taskId: row.task_id,
+    relayerType: row.relayer_type,
+    domain: row.domain,
+    queueType: row.queue_type,
+  }));
+};
+
+export const updatePendingQueueDispatchStatus = async (
+  taskId: string,
+  status: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await db.sql<s.queue_dispatches.SQL>`
+    UPDATE ${'queue_dispatches'}
+    SET ${'status'} = ${db.param(status)}, ${'updated_at'} = NOW()
+    WHERE ${'task_id'} = ${db.param(taskId)} AND ${'status'} = ${db.param('pending')}
+  `.run(poolToUse);
+};
+
+export const pruneOldQueueDispatches = async (
+  retentionDays: number,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<number> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await db.sql<s.queue_dispatches.SQL>`
+    DELETE FROM ${'queue_dispatches'}
+    WHERE ${'status'} != ${db.param('pending')}
+      AND ${'updated_at'} < NOW() - make_interval(days => ${db.param(retentionDays)})
+    RETURNING ${'task_id'}
+  `.run(poolToUse);
+  return result.length;
+};

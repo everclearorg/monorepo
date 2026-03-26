@@ -106,7 +106,7 @@ export const dispatchMessageQueueViaRelayers = async (
   queue: Queue,
   sortedContents: unknown[], // OriginIntent, DestinationIntent, HubIntent
   _requestContext: RequestContext,
-): Promise<string[]> => {
+): Promise<{ taskId: string; relayerType: RelayerType }[]> => {
   const {
     config: { chains, hub, abis },
     logger,
@@ -354,7 +354,7 @@ export const dispatchMessageQueueViaRelayers = async (
     }
   }
 
-  const taskIds: Record<number, string> = {};
+  const taskIds: Record<number, { taskId: string; relayerType: RelayerType }> = {};
   for (let i = 0; i < totalIntents; i += maxDequeue) {
     const toDequeue = Math.min(maxDequeue, totalIntents - i);
     // Trim intents to match max elements, sorted by block number
@@ -601,7 +601,7 @@ export const dispatchMessageQueueViaRelayers = async (
           relayerType,
           queue,
         });
-        taskIds[i] = taskId;
+        taskIds[i] = { taskId, relayerType };
         // exit early if the task was dispatched
         break;
       } catch (e) {

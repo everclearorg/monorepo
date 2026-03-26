@@ -1,10 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createLoggingContext, getNtpTimeSeconds, Queue, QueueType } from '@chimera-monorepo/utils';
+import { createLoggingContext, getNtpTimeSeconds, Queue, QueueType, RelayerTaskStatus } from '@chimera-monorepo/utils';
 import { getContext } from '../../context';
 import { MissingThresholds, UnknownQueueType } from '../../errors';
 import { dispatchMessageQueueViaRelayers } from './dispatchMessageQueueViaRelayers';
 import { Interface } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers';
+
+const DISPATCH_STALE_THRESHOLD_MINUTES = 10;
+const DISPATCH_RETENTION_DAYS = 7;
+const RECONCILE_INTERVAL_MS = 60_000; // Run reconciliation at most once per minute
+const RECONCILE_CONCURRENCY = 10; // Max parallel relayer status checks
+
+let lastReconcileTimestamp = 0;
 
 interface OnchainQueueState {
   first: number;
@@ -135,6 +141,13 @@ export const processMessageQueue = async (type: QueueType) => {
   // Throw if the type is not a message queue (i.e. deposit)
   if (type === 'DEPOSIT') {
     throw new UnknownQueueType(type, { details: 'Deposit queues are not message queues.' });
+  }
+
+  // Reconcile pending dispatch statuses with the relayer (throttled to avoid redundant work in handler mode)
+  const now = Date.now();
+  if (now - lastReconcileTimestamp >= RECONCILE_INTERVAL_MS) {
+    lastReconcileTimestamp = now;
+    await reconcileQueueDispatches();
   }
 
   logger.info('Processing message queues for all domains', requestContext, methodContext, {
@@ -274,6 +287,29 @@ export const processMessageQueue = async (type: QueueType) => {
   // Dispatch the message queues via relayers
   const results = await Promise.allSettled(
     toDispatch.map(async (queue) => {
+      // Claim the queue slice atomically before dispatching to prevent duplicate relayer calls
+      const claim = await database.claimQueueDispatch(
+        queue.domain,
+        type,
+        queue.first,
+        queue.last,
+        DISPATCH_STALE_THRESHOLD_MINUTES,
+      );
+      if (!claim) {
+        logger.info(
+          'Skipping queue dispatch - claim failed (already claimed or pending)',
+          requestContext,
+          methodContext,
+          {
+            domain: queue.domain,
+            type,
+            first: queue.first,
+            last: queue.last,
+          },
+        );
+        return;
+      }
+
       // Get the contents associated with that domain
       const domainQueue = queueContents.get(queue.domain) ?? [];
       const sorted = domainQueue.sort((a, b) => {
@@ -289,9 +325,44 @@ export const processMessageQueue = async (type: QueueType) => {
         sortedItemsCount: sorted.length,
       });
 
-      // Get the associated contents
-      const taskIds = await dispatchMessageQueueViaRelayers(type, queue, sorted, requestContext);
-      logger.info('Submitted relayer tasks', requestContext, methodContext, { type, taskIds, queue });
+      // Dispatch to relayer; release claim on failure
+      let dispatches;
+      try {
+        dispatches = await dispatchMessageQueueViaRelayers(type, queue, sorted, requestContext);
+        logger.info('Submitted relayer tasks', requestContext, methodContext, { type, dispatches, queue });
+      } catch (err) {
+        logger.warn('Relayer dispatch failed, releasing claim', requestContext, methodContext, {
+          domain: queue.domain,
+          type,
+          claimToken: claim.claimToken,
+          error: err,
+        });
+        try {
+          await database.releaseQueueDispatchClaim(claim.claimToken);
+        } catch (releaseErr) {
+          logger.warn('Failed to release claim after dispatch failure', requestContext, methodContext, {
+            claimToken: claim.claimToken,
+            error: releaseErr,
+          });
+        }
+        throw err;
+      }
+
+      // Promote the claim with real relayer task ID(s)
+      for (const dispatch of dispatches) {
+        try {
+          await database.promoteQueueDispatchClaim(claim.claimToken, dispatch.taskId, dispatch.relayerType);
+        } catch (err) {
+          logger.warn('Failed to promote queue dispatch claim', requestContext, methodContext, {
+            domain: queue.domain,
+            type,
+            taskId: dispatch.taskId,
+            relayerType: dispatch.relayerType,
+            claimToken: claim.claimToken,
+            error: err,
+          });
+        }
+      }
     }),
   );
 
@@ -307,3 +378,90 @@ export const processMessageQueue = async (type: QueueType) => {
     errors: rejected.map((value: unknown) => (value as PromiseRejectedResult).reason),
   });
 };
+
+/**
+ * Reconcile pending queue dispatch statuses with the relayer.
+ * Queries all pending dispatches from the database, checks their status via the relayer API,
+ * and updates terminal statuses so they no longer block re-dispatch.
+ */
+async function reconcileQueueDispatches() {
+  const {
+    logger,
+    adapters: { database, relayers },
+  } = getContext();
+  const { requestContext, methodContext } = createLoggingContext(reconcileQueueDispatches.name);
+
+  try {
+    // Prune old terminal-state records
+    await database.pruneOldQueueDispatches(DISPATCH_RETENTION_DAYS);
+
+    const pendingDispatches = await database.getAllPendingQueueDispatches();
+    if (pendingDispatches.length === 0) return;
+
+    // Build a map of relayer type -> relayer instance for status checks
+    const relayerMap = new Map(relayers.map((r) => [r.type as string, r]));
+
+    let updated = 0;
+
+    // Process dispatches in batches with bounded concurrency
+    for (let i = 0; i < pendingDispatches.length; i += RECONCILE_CONCURRENCY) {
+      const batch = pendingDispatches.slice(i, i + RECONCILE_CONCURRENCY);
+      const results = await Promise.allSettled(
+        batch.map(async (dispatch) => {
+          const relayer = relayerMap.get(dispatch.relayerType);
+          if (!relayer) {
+            logger.debug('No relayer configured for dispatch, skipping', requestContext, methodContext, {
+              taskId: dispatch.taskId,
+              relayerType: dispatch.relayerType,
+            });
+            return;
+          }
+
+          const relayerStatus = await relayer.instance.getTaskStatus(dispatch.taskId);
+
+          let newStatus: string | null = null;
+          switch (relayerStatus) {
+            case RelayerTaskStatus.ExecSuccess:
+              newStatus = 'success';
+              break;
+            case RelayerTaskStatus.ExecReverted:
+              newStatus = 'reverted';
+              break;
+            case RelayerTaskStatus.Cancelled:
+            case RelayerTaskStatus.Blacklisted:
+            case RelayerTaskStatus.NotFound:
+              newStatus = 'cancelled';
+              break;
+            // ExecPending, CheckPending, WaitingForConfirmation — keep as 'pending'
+            default:
+              break;
+          }
+
+          if (newStatus) {
+            await database.updatePendingQueueDispatchStatus(dispatch.taskId, newStatus);
+            return newStatus;
+          }
+        }),
+      );
+
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value) {
+          updated++;
+        } else if (result.status === 'rejected') {
+          logger.debug('Failed to check dispatch task status', requestContext, methodContext, {
+            error: result.reason,
+          });
+        }
+      }
+    }
+
+    if (updated > 0) {
+      logger.info('Reconciled queue dispatch statuses', requestContext, methodContext, {
+        total: pendingDispatches.length,
+        updated,
+      });
+    }
+  } catch (err) {
+    logger.warn('Failed to reconcile queue dispatches', requestContext, methodContext, { error: err });
+  }
+}
