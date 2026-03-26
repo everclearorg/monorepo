@@ -143,7 +143,11 @@ export const getTransactionHash = async (taskId: string): Promise<string | undef
   }
 };
 
-export const gelatoSDKSend = async (chainId: number, to: string, data: string): Promise<string> => {
+export const gelatoSDKSend = async (
+  chainId: number,
+  to: string,
+  data: string,
+): Promise<string> => {
   try {
     const taskId = await gelatoRelay.sendTransaction({
       chainId,
@@ -162,9 +166,7 @@ export const gelatoSDKSend = async (chainId: number, to: string, data: string): 
 };
 
 export const getRelayerAddress = async (_chainId: number): Promise<string> => {
-  const domain = chainIdToDomain(_chainId).toString();
-  const address = getGelatoRelayerAddress(domain);
-  return Promise.resolve(address);
+  return Promise.resolve(getGelatoRelayerAddress(chainIdToDomain(_chainId).toString()));
 };
 
 export const send = async (
@@ -183,14 +185,6 @@ export const send = async (
 
   const relayerAddress = await getRelayerAddress(chainId);
 
-  logger.info('Gelato relayer address resolved', requestContext, methodContext, {
-    chainId,
-    domain,
-    relayerAddress,
-    envOverride: process.env.GELATO_RELAYER_ADDRESS || 'none',
-    funcSig,
-  });
-
   logger.debug('Getting gas estimate', requestContext, methodContext, {
     chainId,
     to: destinationAddress,
@@ -208,13 +202,17 @@ export const send = async (
     funcSig,
   });
 
-  logger.info('Gas estimate passed, sending to Gelato', requestContext, methodContext, {
+  logger.info('Sending tx to relayer', requestContext, methodContext, {
     relayer: relayerAddress,
     everclear: destinationAddress,
     domain,
-    chainId,
     gas: gas.toString(),
-    funcSig,
+  });
+
+  logger.info('Sending to Gelato network', requestContext, methodContext, {
+    chainId,
+    to: destinationAddress,
+    data: encodedData,
   });
 
   const taskId = await gelatoSDKSend(chainId, destinationAddress, encodedData);
@@ -222,14 +220,7 @@ export const send = async (
   if (!taskId) {
     throw new RelayerSendFailed({ taskId });
   } else {
-    logger.info('Gelato task submitted', requestContext, methodContext, {
-      taskId,
-      chainId,
-      domain,
-      relayerAddress,
-      to: destinationAddress,
-      funcSig,
-    });
+    logger.info('Sent to Gelato network', requestContext, methodContext, { taskId });
     return taskId;
   }
 };
