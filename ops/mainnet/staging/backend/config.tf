@@ -108,7 +108,9 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle.drpc.org"
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {
