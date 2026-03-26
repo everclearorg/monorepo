@@ -1072,3 +1072,107 @@ export const updateSolanaMessageStatuses = async (_pool?: Pool | db.TxnClientFor
 
   return result.length;
 };
+
+export const getPendingQueueDispatch = async (
+  domain: string,
+  queueType: string,
+  first: number,
+  last: number,
+  staleThresholdMinutes: number,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<{ taskId: string; relayerType: string; dispatchedAt: Date } | null> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await db.sql<s.queue_dispatches.SQL>`
+    SELECT ${'task_id'}, ${'relayer_type'}, ${'dispatched_at'}
+    FROM ${'queue_dispatches'}
+    WHERE ${'domain'} = ${db.param(domain)}
+      AND ${'queue_type'} = ${db.param(queueType)}
+      AND ${'queue_first'} = ${db.param(first)}
+      AND ${'queue_last'} = ${db.param(last)}
+      AND ${'status'} = ${db.param('pending')}
+      AND ${'dispatched_at'} > NOW() - make_interval(mins => ${db.param(staleThresholdMinutes)})
+    LIMIT 1`.run(poolToUse);
+  if (result.length === 0) return null;
+  return {
+    taskId: result[0].task_id,
+    relayerType: result[0].relayer_type,
+    dispatchedAt: result[0].dispatched_at,
+  };
+};
+
+export const saveQueueDispatch = async (
+  domain: string,
+  queueType: string,
+  first: number,
+  last: number,
+  taskId: string,
+  relayerType: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await db.transaction(poolToUse, db.IsolationLevel.Serializable, async (client) => {
+    // Advisory lock keyed on the queue slice to serialize concurrent dispatches
+    await db.sql`
+      SELECT pg_advisory_xact_lock(hashtext(${db.param(domain)} || ':' || ${db.param(queueType)} || ':' || ${db.param(first.toString())} || ':' || ${db.param(last.toString())}))
+    `.run(client);
+    // Expire any existing pending dispatch for this queue slice
+    await db.sql<s.queue_dispatches.SQL>`
+      UPDATE ${'queue_dispatches'}
+      SET ${'status'} = ${db.param('expired')}, ${'updated_at'} = NOW()
+      WHERE ${'domain'} = ${db.param(domain)}
+        AND ${'queue_type'} = ${db.param(queueType)}
+        AND ${'queue_first'} = ${db.param(first)}
+        AND ${'queue_last'} = ${db.param(last)}
+        AND ${'status'} = ${db.param('pending')}
+    `.run(client);
+    // Insert the new dispatch
+    await db.sql<s.queue_dispatches.SQL>`
+      INSERT INTO ${'queue_dispatches'} (${'domain'}, ${'queue_type'}, ${'queue_first'}, ${'queue_last'}, ${'task_id'}, ${'relayer_type'}, ${'status'}, ${'dispatched_at'}, ${'updated_at'})
+      VALUES (${db.param(domain)}, ${db.param(queueType)}, ${db.param(first)}, ${db.param(last)}, ${db.param(taskId)}, ${db.param(relayerType)}, ${db.param('pending')}, NOW(), NOW())
+    `.run(client);
+  });
+};
+
+export const getAllPendingQueueDispatches = async (
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<{ taskId: string; relayerType: string; domain: string; queueType: string }[]> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await db.sql<s.queue_dispatches.SQL>`
+    SELECT ${'task_id'}, ${'relayer_type'}, ${'domain'}, ${'queue_type'}
+    FROM ${'queue_dispatches'}
+    WHERE ${'status'} = ${db.param('pending')}
+  `.run(poolToUse);
+  return result.map((row) => ({
+    taskId: row.task_id,
+    relayerType: row.relayer_type,
+    domain: row.domain,
+    queueType: row.queue_type,
+  }));
+};
+
+export const updateQueueDispatchStatus = async (
+  taskId: string,
+  status: string,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<void> => {
+  const poolToUse = _pool ?? getPool();
+  await db.sql<s.queue_dispatches.SQL>`
+    UPDATE ${'queue_dispatches'}
+    SET ${'status'} = ${db.param(status)}, ${'updated_at'} = NOW()
+    WHERE ${'task_id'} = ${db.param(taskId)} AND ${'status'} = ${db.param('pending')}
+  `.run(poolToUse);
+};
+
+export const pruneOldQueueDispatches = async (
+  retentionDays: number,
+  _pool?: Pool | db.TxnClientForRepeatableRead,
+): Promise<number> => {
+  const poolToUse = _pool ?? getPool();
+  const result = await db.sql<s.queue_dispatches.SQL>`
+    DELETE FROM ${'queue_dispatches'}
+    WHERE ${'status'} != ${db.param('pending')}
+      AND ${'updated_at'} < NOW() - make_interval(days => ${db.param(retentionDays)})
+    RETURNING id
+  `.run(poolToUse);
+  return result.length;
+};
