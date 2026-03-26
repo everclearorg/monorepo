@@ -56,18 +56,39 @@ export const sendWithRelayerWithBackup = async (
   const { methodContext, requestContext } = createLoggingContext(sendWithRelayerWithBackup.name, _requestContext);
 
   let error_msg = '';
-  for (const relayer of relayers) {
+  const relayerTypes = relayers.map((r) => r.type);
+  logger.info('Attempting to send with relayer(s)', requestContext, methodContext, {
+    chainId,
+    domain,
+    funcSig,
+    destinationAddress,
+    relayerCount: relayers.length,
+    relayerTypes,
+  });
+
+  for (let idx = 0; idx < relayers.length; idx++) {
+    const relayer = relayers[idx];
     const supported = await relayer.instance.isChainSupported(chainId);
     if (!supported) {
       error_msg = `Chain ${chainId} not supported by ${relayer.type}`;
+      logger.warn(`Relayer ${relayer.type} does not support chain`, requestContext, methodContext, {
+        chainId,
+        domain,
+        relayerIndex: idx,
+        totalRelayers: relayers.length,
+      });
       continue;
     }
 
+    const relayerAddress = await relayer.instance.getRelayerAddress(chainId);
     logger.info(`Sending tx with ${relayer.type} relayer`, requestContext, methodContext, {
       chainId,
       domain,
       destinationAddress,
-      data,
+      relayerAddress,
+      relayerIndex: idx,
+      totalRelayers: relayers.length,
+      funcSig,
     });
     try {
       const taskId = await relayer.instance.send(
@@ -82,11 +103,25 @@ export const sendWithRelayerWithBackup = async (
         logger,
         requestContext,
       );
+      logger.info(`Successfully submitted via ${relayer.type}`, requestContext, methodContext, {
+        taskId,
+        chainId,
+        domain,
+        relayerAddress,
+        funcSig,
+      });
       return { taskId, relayerType: relayer.type };
     } catch (err: unknown) {
       const jsonError = jsonifyError(err as EverclearError);
       error_msg = jsonError.context?.message ?? jsonError.message;
-      logger.error(`Failed to send data with ${relayer.type}`, requestContext, methodContext, jsonError);
+      logger.error(`Failed to send data with ${relayer.type}`, requestContext, methodContext, jsonError, {
+        chainId,
+        domain,
+        relayerAddress,
+        relayerIndex: idx,
+        totalRelayers: relayers.length,
+        funcSig,
+      });
 
       if (jsonError.type == TransactionReverted.type) {
         // If relayer failed with tx reverted error, don't need to attempt another
@@ -98,6 +133,11 @@ export const sendWithRelayerWithBackup = async (
         );
         break;
       }
+
+      logger.info(`Will try next relayer (${idx + 1}/${relayers.length} attempted)`, requestContext, methodContext, {
+        failedRelayer: relayer.type,
+        remainingRelayers: relayerTypes.slice(idx + 1),
+      });
     }
   }
 
