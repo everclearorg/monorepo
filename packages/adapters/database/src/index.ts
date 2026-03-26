@@ -89,7 +89,7 @@ import {
   getOriginIntentsLastNonce,
   getDeliveredSettlements,
   updateSettlementStatus,
-  updateSolanaMessageStatuses,
+  updateMessageStatuses,
   saveProtocolUpdateLogs,
   saveHubTokenUpdateLogs,
   saveHubAssetUpdateLogs,
@@ -306,7 +306,7 @@ export type Database = {
     status: intent_status,
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
-  updateSolanaMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
+  updateMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
   isTriageFingerprintProcessed: (fingerprint: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<boolean>;
   tryReserveTriageFingerprint: (
     log: TriageFingerprintLog,
@@ -428,7 +428,7 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getOriginIntentsLastNonce,
     getDeliveredSettlements,
     updateSettlementStatus,
-    updateSolanaMessageStatuses,
+    updateMessageStatuses,
     isTriageFingerprintProcessed,
     tryReserveTriageFingerprint,
     finalizeTriageFingerprint,

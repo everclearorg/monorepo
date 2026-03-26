@@ -66,7 +66,7 @@ import {
   getOriginIntentsLastNonce,
   getDeliveredSettlements,
   updateSettlementStatus,
-  updateSolanaMessageStatuses,
+  updateMessageStatuses,
   getSettledIntentsInEpoch,
 } from '../src/client';
 import { TriageFingerprintLog } from '../src';
@@ -503,10 +503,10 @@ describe('Database Client (unit)', () => {
     });
   });
 
-  describe('updateSolanaMessageStatuses', () => {
+  describe('updateMessageStatuses', () => {
     it('returns count of updated rows', async () => {
       mockPool.query.callsFake(async () => ({ rows: [{ id: '1' }, { id: '2' }], rowCount: 2 }));
-      const result = await updateSolanaMessageStatuses(mockPool as any);
+      const result = await updateMessageStatuses(mockPool as any);
       expect(result).to.equal(2);
     });
   });

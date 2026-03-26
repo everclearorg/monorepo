@@ -356,6 +356,13 @@ export const updateMessageStatus = async (context: AppContext) => {
   } = context;
   const { requestContext, methodContext } = createLoggingContext(updateMessageStatus.name);
 
+  // Infer message delivery from the downstream on-chain state (hub_intents, settlement_intents).
+  // Resolves messages where the relayer API (Polymer, Hyperlane) failed to report delivery.
+  const updatedCount = await database.updateMessageStatuses();
+  if (updatedCount > 0) {
+    logger.info(`Bulk updated ${updatedCount} message statuses to delivered`, requestContext, methodContext);
+  }
+
   const uncompletedStatuses = [HyperlaneStatus.none, HyperlaneStatus.pending, HyperlaneStatus.relayable];
   let end = false;
   const limit = 100;

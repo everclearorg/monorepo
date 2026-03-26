@@ -19,8 +19,10 @@ export const processSolanaTransactions = async () => {
   // Create logging context
   const { requestContext, methodContext } = createLoggingContext(processSolanaTransactions.name);
 
-  const updatedCount = await database.updateSolanaMessageStatuses();
-  logger.info(`Bulk updated ${updatedCount} solana message statuses to delivered`, requestContext, methodContext);
+  const updatedCount = await database.updateMessageStatuses();
+  if (updatedCount > 0) {
+    logger.info(`Bulk updated ${updatedCount} message statuses to delivered`, requestContext, methodContext);
+  }
 
   // Get pending Solana settlements from database
   logger.info('Fetching pending Solana settlements', requestContext, methodContext);
