@@ -100,6 +100,11 @@ import {
   finalizeTriageFingerprint,
   setTriageAutoResolveOutcome,
   pruneExpiredTriageFingerprints,
+  getPendingQueueDispatch,
+  saveQueueDispatch,
+  getAllPendingQueueDispatches,
+  updateQueueDispatchStatus,
+  pruneOldQueueDispatches,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
@@ -320,6 +325,36 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   pruneExpiredTriageFingerprints: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
+  // Queue dispatch dedup
+  getPendingQueueDispatch: (
+    domain: string,
+    queueType: string,
+    first: number,
+    last: number,
+    staleThresholdMinutes: number,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<{ taskId: string; relayerType: string; dispatchedAt: Date } | null>;
+  saveQueueDispatch: (
+    domain: string,
+    queueType: string,
+    first: number,
+    last: number,
+    taskId: string,
+    relayerType: string,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<void>;
+  getAllPendingQueueDispatches: (
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<{ taskId: string; relayerType: string; domain: string; queueType: string }[]>;
+  updateQueueDispatchStatus: (
+    taskId: string,
+    status: string,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<void>;
+  pruneOldQueueDispatches: (
+    retentionDays: number,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<number>;
 };
 
 export let pool: Pool | undefined;
@@ -434,5 +469,10 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     finalizeTriageFingerprint,
     setTriageAutoResolveOutcome,
     pruneExpiredTriageFingerprints,
+    getPendingQueueDispatch,
+    saveQueueDispatch,
+    getAllPendingQueueDispatches,
+    updateQueueDispatchStatus,
+    pruneOldQueueDispatches,
   };
 };
