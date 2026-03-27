@@ -1,6 +1,6 @@
 use anchor_lang::{
     prelude::*,
-    solana_program::{program::invoke_signed, system_program},
+    solana_program::system_program,
 };
 use anchor_spl::{
     associated_token::{get_associated_token_address, AssociatedToken},
@@ -10,18 +10,18 @@ use anchor_spl::{
 use crate::{
     consts::{everclear_gateway, h256_to_pub, EVERCLEAR_DOMAIN},
     error::SpokeError,
-    events::{MessageDeliveredEvent, MessageReceivedEvent},
+    events::{CcipSettlementReceived, MessageDeliveredEvent, MessageReceivedEvent},
     hyperlane::{
         mailbox::HandleInstruction, to_serializable_account_meta, SerializableAccountMeta,
         SimulationReturnData,
     },
     instructions::{
         messages::{HyperlaneMessages, MessageType, Settlement, Settlements},
-        utils::create_or_claim_intent_status_pda,
+        utils::{create_or_claim_intent_status_pda, keccak_256},
     },
     intent_status_pda_seeds, mailbox_process_authority_pda_seeds,
     messaging,
-    state::{IntentStatus, IntentStatusAccount, MessagingProviderType, SpokeState},
+    state::{IntentStatus, IntentStatusAccount, MessagingProviderType, PendingCcipInbox, SpokeState},
 };
 
 /// Return accounts required for the handle call.
@@ -137,17 +137,37 @@ pub fn handle_ccip_receive(
                 SpokeError::InvalidSettlementSize
             );
 
-            // Store settlement in spoke_state for relay-triggered settlement
-            let state = &mut ctx.accounts.spoke_state;
+            let settlement = &batch.settlements[0];
+
+            // 1. Compute commitment hash
+            let mut buf = Vec::new();
+            settlement.serialize(&mut buf).unwrap();
+            let hash = keccak_256(&buf);
+
+            let inbox = &mut ctx.accounts.inbox;
+
+            // 2. Dedupe — reject if this settlement was already committed
             require!(
-                state.pending_ccip_settlement.is_none(),
+                !inbox.hashes.iter().any(|h| *h == hash),
                 SpokeError::PendingSettlementExists
             );
-            state.pending_ccip_settlement = Some(batch.settlements[0].clone());
 
-            emit!(MessageReceivedEvent {
-                origin: state.domain,
-                sender: h256_to_pub(crate::hyperlane::H256::from(state.everclear_gateway)),
+            // 3. Find first empty slot
+            let slot = inbox.hashes.iter_mut()
+                .find(|h| **h == [0u8; 32])
+                .ok_or(error!(SpokeError::PendingSettlementsFull))?;
+            *slot = hash;
+
+            // 4. Emit event with full settlement data so relayer can reconstruct
+            let state = &ctx.accounts.spoke_state;
+            emit!(CcipSettlementReceived {
+                origin: state.everclear,
+                settlement_hash: hash,
+                intent_id: settlement.intent_id,
+                amount: settlement.amount,
+                asset: settlement.asset,
+                recipient: settlement.recipient,
+                update_virtual_balance: settlement.update_virtual_balance,
             });
         }
         _ => {
@@ -157,22 +177,29 @@ pub fn handle_ccip_receive(
     Ok(())
 }
 
-/// Settle a pending CCIP delivery: reads settlement from spoke_state,
+/// Settle a CCIP delivery: verifies settlement hash against inbox,
 /// creates the intent_status_pda with Delivered status so that the existing
 /// settle_delivered_intent instruction can complete the token transfer.
 pub fn settle_ccip_delivery(
     ctx: Context<SettleCcipDeliveryContext>,
+    settlement: Settlement,
 ) -> Result<()> {
-    let state = &mut ctx.accounts.spoke_state;
+    let state = &ctx.accounts.spoke_state;
     require!(!state.paused, SpokeError::ContractPaused);
 
-    // 1. Read the pending settlement WITHOUT clearing — only clear after all validation passes
-    let settlement = state.pending_ccip_settlement
-        .as_ref()
-        .ok_or(error!(SpokeError::NoPendingSettlement))?
-        .clone();
+    // 1. Hash the provided settlement (preimage verification)
+    let mut buf = Vec::new();
+    settlement.serialize(&mut buf).unwrap();
+    let hash = keccak_256(&buf);
 
-    // 2. Validate intent_status_pda matches intent_id
+    // 2. Find and clear the matching hash from inbox
+    let inbox = &mut ctx.accounts.inbox;
+    let slot = inbox.hashes.iter_mut()
+        .find(|h| **h == hash)
+        .ok_or(error!(SpokeError::NoPendingSettlement))?;
+    *slot = [0u8; 32]; // clear immediately — tx is atomic, reverts undo this
+
+    // 3. Validate intent_status_pda matches intent_id
     let intent_status_pda = &mut ctx.accounts.intent_status_pda;
     let intent_status_seed: &[&[u8]] = intent_status_pda_seeds!(settlement.intent_id);
     let (expected_pda, intent_status_bump) =
@@ -182,51 +209,33 @@ pub fn settle_ccip_delivery(
         SpokeError::InvalidIntentPda
     );
 
-    // 3. Check if PDA already exists (idempotency guard)
+    // 4. Check if PDA already exists — if terminal state, return Ok (hash already cleared)
     let data = IntentStatusAccount::try_deserialize(&mut &intent_status_pda.data.borrow()[..]);
     if let Ok(existing) = data {
         if existing.status == IntentStatus::Settled
             || existing.status == IntentStatus::SettledAndManuallyExecuted
             || existing.status == IntentStatus::Delivered
         {
-            return err!(SpokeError::InvalidIntentStatus);
+            // Already handled — hash is cleared, inbox slot freed, done
+            return Ok(());
         }
     } else {
-        // 4. Create the PDA account
+        // 5. Create the PDA account (using allocate+assign pattern to handle pre-funded PDAs)
         let space = 8
             + std::mem::size_of::<IntentStatusAccount>()
             + 12 * std::mem::size_of::<SerializableAccountMeta>();
 
-        let rent = Rent::get()?;
-        let lamports = rent.minimum_balance(space);
-
-        let payer_seed = &[
-            "everclear_spoke".as_bytes(),
-            "-".as_bytes(),
-            "pda_payer".as_bytes(),
-        ];
-        let (_payer_pda, payer_pda_bump) = Pubkey::find_program_address(payer_seed, ctx.program_id);
-
-        invoke_signed(
-            &anchor_lang::solana_program::system_instruction::create_account(
-                &ctx.accounts.pda_payer.key(),
-                &intent_status_pda.key(),
-                lamports,
-                space as u64,
-                ctx.program_id,
-            ),
-            &[
-                ctx.accounts.pda_payer.to_account_info(),
-                intent_status_pda.to_account_info(),
-            ],
-            &[
-                &[b"everclear_spoke", b"-", b"pda_payer", &[payer_pda_bump]],
-                intent_status_pda_seeds!(settlement.intent_id, intent_status_bump),
-            ],
+        create_or_claim_intent_status_pda(
+            &ctx.accounts.pda_payer,
+            &intent_status_pda,
+            ctx.program_id,
+            space,
+            &settlement.intent_id,
+            intent_status_bump,
         )?;
     }
 
-    // 5. Write Delivered status + settlement data
+    // 6. Write Delivered status + settlement data
     let account_metas =
         build_settle_intent_account_metas(ctx.program_id, &intent_status_pda.key(), &settlement)?;
 
@@ -238,11 +247,8 @@ pub fn settle_ccip_delivery(
 
     intent_status.try_serialize(&mut &mut intent_status_pda.data.borrow_mut()[..])?;
 
-    // 6. Clear pending settlement only after everything succeeded
-    ctx.accounts.spoke_state.pending_ccip_settlement = None;
-
     emit!(MessageDeliveredEvent {
-        domain: ctx.accounts.spoke_state.domain,
+        domain: state.domain,
         settlement,
         account_metas,
     });
@@ -276,29 +282,43 @@ pub struct CcipReceiveContext<'info> {
     )]
     pub allowed_offramp: UncheckedAccount<'info>,
 
-    /// CHECK: External execution config PDA - validated by offramp program
+    /// CHECK: External execution config PDA — derived from our program's seeds, not the offramp's.
+    /// Required by the CCIP offramp CPI call structure but not read by our handler.
     #[account(mut, seeds = [b"external_execution_config"], bump)]
     pub external_execution_config: UncheckedAccount<'info>,
 
     #[account(
-        mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump,
     )]
     pub spoke_state: Account<'info, SpokeState>,
+
+    #[account(
+        mut,
+        seeds = [b"ccip-inbox"],
+        bump = inbox.bump,
+    )]
+    pub inbox: Account<'info, PendingCcipInbox>,
 }
 
 #[derive(Accounts)]
+#[instruction(settlement: Settlement)]
 pub struct SettleCcipDeliveryContext<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
     #[account(
-        mut,
         seeds = [b"spoke-state"],
         bump = spoke_state.bump,
     )]
     pub spoke_state: Account<'info, SpokeState>,
+
+    #[account(
+        mut,
+        seeds = [b"ccip-inbox"],
+        bump = inbox.bump,
+    )]
+    pub inbox: Account<'info, PendingCcipInbox>,
 
     /// CHECK: Validated via PDA derivation in settle_ccip_delivery handler
     #[account(mut)]
@@ -313,6 +333,23 @@ pub struct SettleCcipDeliveryContext<'info> {
         bump,
     )]
     pub pda_payer: AccountInfo<'info>,
+}
+
+#[derive(Accounts)]
+pub struct InitCcipInbox<'info> {
+    #[account(
+        init,
+        seeds = [b"ccip-inbox"],
+        bump,
+        payer = admin,
+        space = 8 + PendingCcipInbox::SIZE,
+    )]
+    pub inbox: Account<'info, PendingCcipInbox>,
+    #[account(mut, constraint = admin.key() == spoke_state.owner @ SpokeError::OnlyOwner)]
+    pub admin: Signer<'info>,
+    #[account(seeds = [b"spoke-state"], bump = spoke_state.bump)]
+    pub spoke_state: Account<'info, SpokeState>,
+    pub system_program: Program<'info, System>,
 }
 
 #[event_cpi]
@@ -655,12 +692,134 @@ mod tests {
     }
 
     #[test]
-    fn test_spoke_state_size_includes_pending_ccip_settlement() {
-        // The SIZE constant must account for pending_ccip_settlement: Option<Settlement>
-        // Option discriminant (1 byte) + Settlement (136 bytes) = 137
-        let size_without_pending = SpokeState::SIZE - (1 + 136);
-        assert_eq!(size_without_pending, 339, "Pre-pending-settlement size should be 339");
-        assert_eq!(SpokeState::SIZE, 476, "Full SpokeState::SIZE should be 476");
+    fn test_spoke_state_size_no_pending_field() {
+        // SpokeState no longer has pending_ccip_settlement — that's in the inbox PDA
+        assert_eq!(SpokeState::SIZE, 339, "SpokeState::SIZE should be 339 (no pending field)");
+    }
+
+    #[test]
+    fn test_pending_ccip_inbox_size() {
+        assert_eq!(PendingCcipInbox::SIZE, 1 + 32 * 32, "Inbox: 1 bump + 32 hashes × 32 bytes");
+        // Total account: 8 discriminator + 1025 = 1033
+        assert_eq!(8 + PendingCcipInbox::SIZE, 1033);
+    }
+
+    #[test]
+    fn test_settlement_hash_deterministic() {
+        let settlement = make_test_settlement([0xAB; 32]);
+        let mut buf1 = Vec::new();
+        settlement.serialize(&mut buf1).unwrap();
+        let hash1 = keccak_256(&buf1);
+
+        let mut buf2 = Vec::new();
+        settlement.serialize(&mut buf2).unwrap();
+        let hash2 = keccak_256(&buf2);
+
+        assert_eq!(hash1, hash2, "Same settlement must produce same hash");
+    }
+
+    #[test]
+    fn test_different_settlements_different_hashes() {
+        let s1 = make_test_settlement([1u8; 32]);
+        let s2 = make_test_settlement([2u8; 32]);
+
+        let mut buf1 = Vec::new();
+        s1.serialize(&mut buf1).unwrap();
+        let hash1 = keccak_256(&buf1);
+
+        let mut buf2 = Vec::new();
+        s2.serialize(&mut buf2).unwrap();
+        let hash2 = keccak_256(&buf2);
+
+        assert_ne!(hash1, hash2, "Different settlements must produce different hashes");
+    }
+
+    #[test]
+    fn test_settlement_hash_never_zero() {
+        let settlement = make_test_settlement([0u8; 32]);
+        let mut buf = Vec::new();
+        settlement.serialize(&mut buf).unwrap();
+        let hash = keccak_256(&buf);
+        assert_ne!(hash, [0u8; 32], "keccak256 of any data must never be all zeros");
+    }
+
+    #[test]
+    fn test_inbox_insert_and_clear() {
+        let mut hashes = [[0u8; 32]; 32];
+        let test_hash = [0xABu8; 32];
+
+        // Insert
+        let slot = hashes.iter_mut().find(|h| **h == [0u8; 32]).unwrap();
+        *slot = test_hash;
+        assert!(hashes.iter().any(|h| *h == test_hash), "Hash should be in inbox after insert");
+
+        // Clear
+        let slot = hashes.iter_mut().find(|h| **h == test_hash).unwrap();
+        *slot = [0u8; 32];
+        assert!(!hashes.iter().any(|h| *h == test_hash), "Hash should not be in inbox after clear");
+    }
+
+    #[test]
+    fn test_inbox_dedupe() {
+        let mut hashes = [[0u8; 32]; 32];
+        let test_hash = [0xCDu8; 32];
+
+        // First insert succeeds
+        let slot = hashes.iter_mut().find(|h| **h == [0u8; 32]).unwrap();
+        *slot = test_hash;
+
+        // Second insert should detect duplicate
+        let already_exists = hashes.iter().any(|h| *h == test_hash);
+        assert!(already_exists, "Dedupe should detect existing hash");
+    }
+
+    #[test]
+    fn test_inbox_full() {
+        let hashes = [[0xFFu8; 32]; 32]; // all slots occupied
+        let has_empty = hashes.iter().any(|h| *h == [0u8; 32]);
+        assert!(!has_empty, "Full inbox should have no empty slots");
+        // Insert should fail — no empty slot found
+        let insert_result = hashes.iter().find(|h| **h == [0u8; 32]);
+        assert!(insert_result.is_none(), "Insert into full inbox must return None");
+    }
+
+    #[test]
+    fn test_inbox_multi_hash_clear_preserves_others() {
+        let mut hashes = [[0u8; 32]; 32];
+        let hash_a = [0xAAu8; 32];
+        let hash_b = [0xBBu8; 32];
+        let hash_c = [0xCCu8; 32];
+
+        // Insert 3 hashes
+        hashes[0] = hash_a;
+        hashes[1] = hash_b;
+        hashes[2] = hash_c;
+
+        // Clear the middle one
+        let slot = hashes.iter_mut().find(|h| **h == hash_b).unwrap();
+        *slot = [0u8; 32];
+
+        // Verify: B gone, A and C still present
+        assert!(hashes.iter().any(|h| *h == hash_a), "Hash A must survive");
+        assert!(!hashes.iter().any(|h| *h == hash_b), "Hash B must be gone");
+        assert!(hashes.iter().any(|h| *h == hash_c), "Hash C must survive");
+        // Verify exactly 29 empty slots (32 - 3 + 1 cleared)
+        let empty_count = hashes.iter().filter(|h| **h == [0u8; 32]).count();
+        assert_eq!(empty_count, 30, "Should have 30 empty slots after 3 inserts and 1 clear");
+    }
+
+    #[test]
+    fn test_inbox_dedupe_count() {
+        let mut hashes = [[0u8; 32]; 32];
+        let test_hash = [0xEEu8; 32];
+
+        hashes[0] = test_hash;
+        // Count occurrences — must be exactly 1
+        let count = hashes.iter().filter(|h| **h == test_hash).count();
+        assert_eq!(count, 1, "Hash should appear exactly once");
+        // Verify it's at the expected position
+        assert_eq!(hashes[0], test_hash, "Hash should be at index 0");
+        assert_eq!(hashes[1], [0u8; 32], "Index 1 should still be empty");
     }
 
     #[test]

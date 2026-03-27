@@ -194,13 +194,14 @@ pub mod everclear_spoke {
         instructions::receive_message::handle_ccip_receive(ctx, message)
     }
 
-    /// Settle a pending CCIP delivery: creates the intent_status_pda from
-    /// settlement data stored by ccip_receive, setting status to Delivered.
+    /// Settle a CCIP delivery: verifies settlement hash against inbox,
+    /// creates the intent_status_pda, sets status to Delivered.
     /// Call settle_delivered_intent afterwards to transfer tokens.
     pub fn settle_ccip_delivery(
         ctx: Context<SettleCcipDeliveryContext>,
+        settlement: instructions::messages::Settlement,
     ) -> Result<()> {
-        instructions::receive_message::settle_ccip_delivery(ctx)
+        instructions::receive_message::settle_ccip_delivery(ctx, settlement)
     }
 
     // settle delivered message
@@ -408,10 +409,9 @@ pub mod everclear_spoke {
         instructions::state_migration::migrate_spoke_state(ctx)
     }
 
-    /// Migrate SpokeState PDA to add pending_ccip_settlement field.
-    /// Run once after upgrading from CCIP layout to CCIP+pending_settlement layout.
-    /// Only the owner can run this.
-    pub fn migrate_spoke_state_v2(ctx: Context<MigrateSpokeState>) -> Result<()> {
-        instructions::state_migration::migrate_spoke_state_v2(ctx)
+    /// Initialize the CCIP inbox PDA. Call once after program upgrade.
+    pub fn init_ccip_inbox(ctx: Context<InitCcipInbox>) -> Result<()> {
+        ctx.accounts.inbox.bump = ctx.bumps.inbox;
+        Ok(())
     }
 }
