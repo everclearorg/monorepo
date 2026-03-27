@@ -8,6 +8,7 @@ import {
   OriginIntent,
   SettlementIntent,
   Queue,
+  RelayerTaskStatus,
   RelayerType,
   RewardConfig,
   createRequestContext,
@@ -322,6 +323,7 @@ export const mock = {
             instance: {
               getRelayerAddress: stub().resolves(mkAddress('0x1234')),
               isChainSupported: stub().resolves(true),
+              getTaskStatus: stub().resolves(RelayerTaskStatus.ExecPending),
             } as any,
           };
         }),
@@ -464,6 +466,12 @@ export const mochaHooks = {
       saveRewards: stub().resolves(),
       saveCheckPoint: stub().resolves(),
       getOriginIntentsLastNonce: stub().resolves(0),
+      claimQueueDispatch: stub().resolves({ claimId: 1 }),
+      promoteQueueDispatchClaim: stub().resolves(),
+      releaseQueueDispatchClaim: stub().resolves(),
+      getAllPendingQueueDispatches: stub().resolves([]),
+      updatePendingQueueDispatchStatus: stub().resolves(),
+      pruneOldQueueDispatches: stub().resolves(0),
     } as unknown as Database;
     mockHistoricPrice = {
       getHistoricTokenPrice: stub(),
