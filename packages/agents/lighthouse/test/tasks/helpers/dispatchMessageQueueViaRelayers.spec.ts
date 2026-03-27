@@ -80,7 +80,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
 
   it('should return early if chain is not configured', async () => {
     const result = await dispatchMessageQueueViaRelayers('INTENT', { ...queue, domain: '123123' }, intents, rc);
-    expect(result).to.be.empty;
+    expect(result).to.be.null;
     expect(sendWithRelayerWithBackupStub.callCount).to.be.eq(0);
     expect((context.logger.warn as SinonStub).calledWith('Missing chain config')).to.be.true;
   });
@@ -88,7 +88,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
   it('should return early if chain is not supported', async () => {
     (context.adapters.relayers[0].instance.isChainSupported as SinonStub).resolves(false);
     const result = await dispatchMessageQueueViaRelayers('INTENT', queue, intents, rc);
-    expect(result).to.be.empty;
+    expect(result).to.be.null;
     expect(sendWithRelayerWithBackupStub.callCount).to.be.eq(0);
     expect((context.logger.info as SinonStub).calledWith('Failed to dispatch full queue')).to.be.true;
   });
@@ -107,7 +107,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
       },
     });
     const result = await dispatchMessageQueueViaRelayers('INTENT', queue, intents, rc);
-    expect(result).to.be.empty;
+    expect(result).to.be.null;
     expect(sendWithRelayerWithBackupStub.callCount).to.be.eq(0);
     expect((context.logger.warn as SinonStub).calledWith('Missing gateway or everclear address')).to.be.true;
   });
@@ -139,7 +139,9 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
 
   it('should work', async () => {
     const ret = await dispatchMessageQueueViaRelayers('INTENT', queue, intents, rc);
-    expect(ret).to.not.be.empty;
+    expect(ret).to.not.be.null;
+    expect(ret!.taskId).to.equal('123');
+    expect(ret!.relayerType).to.equal(RelayerType.Everclear);
     expect(
       sendWithRelayerWithBackupStub.alwaysCalledWithExactly(
         domainToChainId(queue.domain),
@@ -166,7 +168,7 @@ describe('Helpers:dispatchMessageQueueViaRelayers', () => {
       },
     ];
     const ret = await dispatchMessageQueueViaRelayers('SETTLEMENT', { ...queue, type: 'SETTLEMENT' }, settlements, rc);
-    expect(ret).to.not.be.empty;
+    expect(ret).to.not.be.null;
     expect(encodeStub.called).to.be.true;
   });
 
