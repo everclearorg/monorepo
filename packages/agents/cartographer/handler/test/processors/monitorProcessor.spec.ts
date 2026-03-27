@@ -24,18 +24,16 @@ import {
   processHubTokenUpdate,
   processHubAssetUpdate,
 } from '../../src/processors/monitorProcessor';
-import { createAppContext, MockSubgraphReader } from '../mock';
+import { createAppContext } from '../mock';
 
 describe('monitorProcessor', () => {
   let context: AppContext;
   let database: SinonStubbedInstance<Database>;
-  let subgraph: MockSubgraphReader;
   let chainreader: SinonStubbedInstance<ChainReader>;
 
   beforeEach(() => {
     context = createAppContext();
     database = context.adapters.database as unknown as SinonStubbedInstance<Database>;
-    subgraph = context.adapters.subgraph as unknown as MockSubgraphReader;
     chainreader = context.adapters.chainreader as unknown as SinonStubbedInstance<ChainReader>;
   });
 
@@ -276,29 +274,7 @@ describe('monitorProcessor', () => {
   });
 
   describe('#processSettlementEnqueued', () => {
-    it('should use subgraph data when available', async () => {
-      const intentId = mkBytes32('0xabc');
-      const fullIntent = {
-        id: intentId,
-        status: 'ADDED',
-        domain: '1339',
-        addedTimestamp: 1700000000,
-        addedTxNonce: 42,
-      };
-
-      subgraph.getHubIntentById.resolves(fullIntent);
-      const payload = { intent: intentId };
-
-      await processSettlementEnqueued(payload, context);
-
-      expect(subgraph.getHubIntentById.callCount).to.equal(1);
-      expect(database.saveHubIntents.callCount).to.equal(1);
-      const update = database.saveHubIntents.getCall(0).args[0][0];
-      expect(update.id).to.equal(intentId);
-      expect(update.status).to.equal(TIntentStatus.Dispatched);
-    });
-
-    it('should fall back to minimal update when subgraph unavailable', async () => {
+    it('should update hub intent status to Dispatched', async () => {
       const intentId = mkBytes32('0xabc');
       const payload = { intent: intentId };
 

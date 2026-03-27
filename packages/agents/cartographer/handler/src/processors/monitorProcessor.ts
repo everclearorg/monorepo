@@ -163,7 +163,7 @@ export const processSettlementEnqueued = async (
 ): Promise<void> => {
   const {
     logger,
-    adapters: { database, subgraph },
+    adapters: { database },
     config,
   } = context;
   // Settlement enqueued events trigger intent status updates
@@ -176,20 +176,8 @@ export const processSettlementEnqueued = async (
   if (intentId) {
     logger.debug('Processing settlement enqueued webhook', undefined, undefined, { intentId });
 
-    // Try to get full hub intent from the subgraph
-    const hubDomain = config.hub.domain;
-    try {
-      const fullIntent = await subgraph.getHubIntentById(hubDomain, intentId);
-      if (fullIntent) {
-        await database.saveHubIntents([{ ...fullIntent, status: TIntentStatus.Dispatched }], ['status']);
-        return;
-      }
-    } catch {
-      // Fall through to minimal update
-    }
-
     await database.saveHubIntents(
-      [{ id: intentId, domain: hubDomain, status: TIntentStatus.Dispatched } as HubIntent],
+      [{ id: intentId, domain: config.hub.domain, status: TIntentStatus.Dispatched } as HubIntent],
       ['status'],
     );
   }
