@@ -18,12 +18,17 @@ export type HandlerConfig = CartographerConfig & {
 
 export const getHandlerConfig = async (): Promise<HandlerConfig> => {
   const baseConfig = await getEnvConfig();
+  const adminToken = process.env.CARTOGRAPHER_ADMIN_TOKEN || '';
+
+  if (!adminToken) {
+    throw new Error('CARTOGRAPHER_ADMIN_TOKEN is required');
+  }
 
   return {
     ...baseConfig,
     goldskyWebhookSecret: process.env.GOLDSKY_WEBHOOK_SECRET || '',
     handlerPort: parseInt(process.env.PORT || '3000', 10),
-    adminToken: process.env.CARTOGRAPHER_ADMIN_TOKEN || '',
+    adminToken,
     redisUrl: process.env.REDIS_URL || undefined,
   };
 };

@@ -318,7 +318,7 @@ describe('SyncProvider', () => {
   });
 
   describe('getTransactionReceipt', () => {
-    it('should return transaction receipt', async () => {
+    it('should return transaction receipt with computed confirmations', async () => {
       const mockReceipt = {
         transactionHash: '0x123',
         blockNumber: BigInt(12345),
@@ -336,11 +336,13 @@ describe('SyncProvider', () => {
         }],
       };
       mockClient.getTransactionReceipt.resolves(mockReceipt);
-      
+      mockClient.getBlockNumber.resolves(BigInt(12350));
+
       const result = await provider.getTransactionReceipt('0x123');
-      
+
       expect(result.transactionHash).to.equal('0x123');
       expect(result.status).to.equal(1);
+      expect(result.confirmations).to.equal(6);
       expect(result.logs).to.have.length(1);
       expect(mockClient.getTransactionReceipt.calledWith({ hash: '0x123' })).to.be.true;
     });
@@ -353,10 +355,26 @@ describe('SyncProvider', () => {
         logs: [],
       };
       mockClient.getTransactionReceipt.resolves(mockReceipt);
-      
+      mockClient.getBlockNumber.resolves(BigInt(12345));
+
       const result = await provider.getTransactionReceipt('0x123');
-      
+
       expect(result.status).to.equal(0);
+    });
+
+    it('should return at least 0 confirmations when block number is behind receipt', async () => {
+      const mockReceipt = {
+        transactionHash: '0x123',
+        blockNumber: BigInt(12345),
+        status: 'success',
+        logs: [],
+      };
+      mockClient.getTransactionReceipt.resolves(mockReceipt);
+      mockClient.getBlockNumber.resolves(BigInt(12340));
+
+      const result = await provider.getTransactionReceipt('0x123');
+
+      expect(result.confirmations).to.equal(0);
     });
   });
 

@@ -38,6 +38,13 @@ resource "aws_elasticache_cluster" "redis" {
     Stage       = var.stage
     Environment = var.environment
   }
+
+  lifecycle {
+    precondition {
+      condition     = var.auth_token == null
+      error_message = "Redis auth_token requires transit_encryption_enabled = true."
+    }
+  }
 }
 
 resource "aws_elasticache_replication_group" "redis" {

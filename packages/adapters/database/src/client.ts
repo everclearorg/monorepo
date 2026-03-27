@@ -77,7 +77,26 @@ export const tryReserveTriageFingerprint = async (
       $1, $2, $3, $4, $5, $6, $7, $8, $9,
       $10, $11, $12, $13, $14, $15, $16, $17, $18
     )
-    ON CONFLICT (fingerprint) DO NOTHING`,
+    ON CONFLICT (fingerprint) DO UPDATE
+      SET report_type = EXCLUDED.report_type,
+          severity = EXCLUDED.severity,
+          env = EXCLUDED.env,
+          network = EXCLUDED.network,
+          ids = EXCLUDED.ids,
+          reason = EXCLUDED.reason,
+          triage_mode = EXCLUDED.triage_mode,
+          triage_result = EXCLUDED.triage_result,
+          provider_used = EXCLUDED.provider_used,
+          model_used = EXCLUDED.model_used,
+          triage_latency_ms = EXCLUDED.triage_latency_ms,
+          auto_resolve_attempted = EXCLUDED.auto_resolve_attempted,
+          auto_resolve_succeeded = EXCLUDED.auto_resolve_succeeded,
+          auto_resolve_reason_code = EXCLUDED.auto_resolve_reason_code,
+          tool_calls_made = EXCLUDED.tool_calls_made,
+          tool_names_used = EXCLUDED.tool_names_used,
+          created_at = NOW(),
+          expires_at = EXCLUDED.expires_at
+      WHERE alert_triage_log.expires_at <= NOW()`,
     [
       log.fingerprint,
       log.reportType,
