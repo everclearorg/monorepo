@@ -150,6 +150,14 @@ describe('Database Client (unit)', () => {
       expect(result).to.be.false;
     });
 
+    it('reclaims an expired fingerprint reservation', async () => {
+      mockPool.query.resolves({ rowCount: 1 });
+      const result = await tryReserveTriageFingerprint(makeLog(), mockPool as any);
+      expect(result).to.be.true;
+      expect(mockPool.query.firstCall.args[0]).to.include('ON CONFLICT (fingerprint) DO UPDATE');
+      expect(mockPool.query.firstCall.args[0]).to.include('WHERE alert_triage_log.expires_at <= NOW()');
+    });
+
     it('handles optional fields with defaults', async () => {
       mockPool.query.resolves({ rowCount: 1 });
       await tryReserveTriageFingerprint(makeLog({ triageResult: { action: 'alert' } }), mockPool as any);

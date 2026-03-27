@@ -81,6 +81,16 @@ describe('server', () => {
       const db = state.appContext!.adapters.database as unknown as SinonStubbedInstance<Database>;
       expect(db.saveCheckPoint.calledOnceWith(PAUSE_CHECKPOINT_KEY, 1)).to.be.true;
     });
+
+    it('should reject empty bearer auth when admin token is not configured', async () => {
+      state.adminToken = '';
+      const res = await server.inject({
+        method: 'POST',
+        url: '/pause',
+        headers: { authorization: 'Bearer ' },
+      });
+      expect(res.statusCode).to.equal(401);
+    });
   });
 
   describe('POST /resume', () => {

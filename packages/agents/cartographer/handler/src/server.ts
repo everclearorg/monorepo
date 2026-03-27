@@ -8,6 +8,7 @@ import { getNotifyHealth } from './notify';
 export const PAUSE_CHECKPOINT_KEY = 'cartographer_handler_paused';
 
 function verifyAdminToken(authHeader: string | string[] | undefined, expectedToken: string): boolean {
+  if (!expectedToken) return false;
   const header = Array.isArray(authHeader) ? authHeader[0] : authHeader;
   if (!header) return false;
   const token = header.startsWith('Bearer ') ? header.slice(7) : '';
