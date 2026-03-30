@@ -1,0 +1,344 @@
+name: everclear-indexer-prod
+unordered_multichain_mode: true
+description: Indexes IntentAdded and IntentFilled events from EverclearSpoke contracts across all mainnet chains
+
+# Configure which fields to include from events
+field_selection:
+  transaction_fields:
+    - 'hash'
+    - 'from'
+    - 'gasPrice'
+
+# Define the contract ABIs
+contracts:
+  - name: EverclearSpoke
+    abi_file_path: ./abis/EverclearSpoke.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: IntentAdded
+      - event: IntentFilled
+      - event: IntentQueueProcessed
+      - event: Deposited
+      - event: Withdrawn
+      - event: Settled
+      - event: FillQueueProcessed
+      - event: ExternalCalldataExecuted
+      - event: AssetTransferFailed
+      - event: AssetMintFailed
+
+  - name: EverclearSpokeV5
+    abi_file_path: ./abis/EverclearSpokeV5.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: IntentAdded
+      - event: IntentFilled
+      - event: IntentQueueProcessed
+      - event: Deposited
+      - event: Withdrawn
+      - event: Settled
+      - event: FillQueueProcessed
+      - event: ExternalCalldataExecuted
+      - event: AssetTransferFailed
+      - event: AssetMintFailed
+      - event: Paused
+      - event: Unpaused
+      - event: GatewayUpdated
+      - event: LighthouseUpdated
+      - event: MessageReceiverUpdated
+      - event: WatchtowerUpdated
+      - event: MessageGasLimitUpdated
+      - event: FeeAdapterUpdated
+      - event: FillSignerUpdated
+
+  - name: FeeAdapter
+    abi_file_path: ./abis/FeeAdapter.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: IntentWithFeesAdded
+
+  - name: FeeAdapterV2
+    abi_file_path: ./abis/FeeAdapterV2.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: IntentWithFeesAdded
+      - event: OrderCreated
+
+  - name: EverclearHubV2
+    abi_file_path: ./abis/EverclearHubV2.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: SettlementEnqueued
+      - event: IntentProcessed
+      - event: FillProcessed
+      - event: SettlementQueueProcessed
+      - event: InvoiceEnqueued
+      - event: DepositEnqueued
+      - event: DepositProcessed
+      - event: FeesWithdrawn
+      - event: ReturnUnsupportedIntent
+      - event: TokenConfigsSet
+      - event: AssetConfigSet
+      - event: MaxDiscountDbpsSet
+      - event: PrioritizedStrategySet
+      - event: DiscountPerEpochSet
+      - event: SolverConfigUpdated
+      - event: IncreaseVirtualBalanceSet
+      - event: Paused
+      - event: Unpaused
+      - event: OwnershipTransferred
+      - event: OwnershipProposed
+      - event: GatewayUpdated
+      - event: AcceptanceDelayUpdated
+      - event: MinSolverSupportedDomainsUpdated
+      - event: EpochLengthUpdated
+      - event: ExpiryTimeBufferUpdated
+      - event: SupportedDomainsAdded
+      - event: SupportedDomainsRemoved
+      - event: WatchtowerUpdated
+      - event: MailboxUpdated
+      - event: SecurityModuleUpdated
+
+# Define all networks
+# NOTE: we are using reorg-safe values from hyperlane: https://docs.hyperlane.xyz/docs/reference/addresses/validators/latencies
+networks:
+  - id: 1 # Ethereum
+    start_block: 20760959
+    confirmed_block_threshold: 15
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 42161 # Arbitrum
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 10 # Optimism
+    start_block: 0
+    confirmed_block_threshold: 10
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 8453 # Base
+    start_block: 0
+    confirmed_block_threshold: 10
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 56 # BNB
+    start_block: 0
+    # using CCTP attestation time: https://developers.circle.com/cctp/required-block-confirmations
+    confirmed_block_threshold: 3
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 59144 # Linea
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpoke
+        address: 0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751
+      - name: FeeAdapter
+        address: 0x1B0Dc9CB7EadDa36f4CcFB8130B0Ad967b0A3508
+      - name: EverclearSpokeV5
+        address: 0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x1B0Dc9CB7EadDa36f4CcFB8130B0Ad967b0A3508
+
+  - id: 137 # Polygon
+    start_block: 0
+    # using CCTP attestation time: https://developers.circle.com/cctp/required-block-confirmations
+    confirmed_block_threshold: 3
+    contracts:
+      - name: EverclearSpoke
+        address: 0x7189C59e245135696bFd2906b56607755F84F3fD
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+      - name: EverclearSpokeV5
+        address: 0x7189C59e245135696bFd2906b56607755F84F3fD # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 43114 # Avalanche
+    start_block: 0
+    confirmed_block_threshold: 3
+    contracts:
+      - name: EverclearSpoke
+        address: 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460
+      - name: FeeAdapter
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+      - name: EverclearSpokeV5
+        address: 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 130 # Unichain
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpoke
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapter
+        address: 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1
+
+  - id: 5000 # Mantle
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xe0F010e465f15dcD42098dF9b99F1038c11B3056 # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4
+
+  - id: 239 # Tac
+    rpc_config:
+      url: ${ENVIO_TAC_RPC}
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpoke
+        address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa
+      - name: EverclearSpokeV5
+        address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa # Same address as V1 (upgraded contract)
+      - name: FeeAdapterV2
+        address: 0xA388d644241A2185440EAf0ADd41C9Da30958ba5
+
+  - id: 324 # zkSync
+    start_block: 0
+    confirmed_block_threshold: 0
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0x7F5e085981C93C579c865554B9b723B058AaE4D3
+      - name: FeeAdapterV2
+        address: 0x80EF3ee093aE3B5aDd1B213628875A4C73F640AF
+
+  - id: 534352 # Scroll
+    start_block: 0
+    confirmed_block_threshold: 17
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapterV2
+        address: 0x8ad36C1aCB23b47Db6573A51a8a3009D4A4bC3b1
+
+  - id: 34443 # Mode
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xeFa6Ac3F931620fD0449eC8c619f2A14A0A78E99
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 48900 # Zircuit
+    start_block: 0
+    confirmed_block_threshold: 300
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xD0E86F280D26Be67A672d1bFC9bB70500adA76fe
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 81457 # Blast
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0x9ADA72CCbAfe94248aFaDE6B604D1bEAacc899A7
+      - name: FeeAdapterV2
+        address: 0x15a7cA97D1ed168fB34a4055CEFa2E2f9Bdb6C75
+
+  - id: 100 # Gnosis
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xe0F010e465f15dcD42098dF9b99F1038c11B3056
+      - name: FeeAdapterV2
+        address: 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4
+
+  - id: 80094 # Berachain
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapterV2
+        address: 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4
+
+  - id: 146 # Sonic
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapterV2
+        address: 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4
+
+  - id: 57073 # Ink
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+      - name: FeeAdapterV2
+        address: 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4
+
+  - id: 9745 # Plasma
+    start_block: 0
+    confirmed_block_threshold: 5
+    contracts:
+      - name: EverclearSpokeV5
+        address: 0x4C1029C7BdFE1DadC7d9B753981735CD6954B40d
+      - name: FeeAdapterV2
+        address: 0xb7c258C548aFf20bbB2e899477B3bB9e8F813ED4
+
+  - id: 25327 # Everclear Hub Chain
+    rpc_config:
+      url: https://rpc.everclear.raas.gelato.cloud
+    start_block: 0
+    confirmed_block_threshold: 10
+    contracts:
+      - name: EverclearHubV2
+        address: 0xa05A3380889115bf313f1Db9d5f335157Be4D816
+
+rollback_on_reorg: true
