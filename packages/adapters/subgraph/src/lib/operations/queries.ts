@@ -578,6 +578,11 @@ export const ENVIO_INTENT_ENTITY = `
   tokenFee
   nativeFee
   status
+  gasLimit
+  gasPrice
+  txNonce
+  txOrigin
+  orderId
   fills {
     id
     intentId
@@ -601,6 +606,10 @@ export const ENVIO_INTENT_ENTITY = `
     blockNumber
     blockTimestamp
     transactionHash
+    gasLimit
+    gasPrice
+    txNonce
+    txOrigin
   }
 `;
 
@@ -1045,6 +1054,15 @@ export const getEnvioOrdersQuery = (): string => `
   query GetOrders($where: Order_bool_exp!, $limit: Int, $offset: Int) {
     Order(where: $where, order_by: { blockNumber: asc }, limit: $limit, offset: $offset) {
       ${ENVIO_ORDER_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioChainMetadataQuery = (): string => `
+  query GetChainMetadata {
+    chain_metadata {
+      chain_id
+      latest_processed_block
     }
   }
 `;

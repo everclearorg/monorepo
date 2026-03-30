@@ -843,7 +843,12 @@ export interface EnvioIntentEntity {
   isFastPath: boolean;
   tokenFee?: string;
   nativeFee?: string;
-  status: 'ADDED' | 'FILLED';
+  status: 'ADDED' | 'FILLED' | 'SETTLED';
+  gasLimit?: string | null;
+  gasPrice?: string | null;
+  txNonce?: string | null;
+  txOrigin?: string | null;
+  orderId?: string | null;
   fills?: EnvioFillEntity[];
 }
 
@@ -870,6 +875,10 @@ export interface EnvioFillEntity {
   blockNumber: string;
   blockTimestamp: string;
   transactionHash: string;
+  gasLimit?: string | null;
+  gasPrice?: string | null;
+  txNonce?: string | null;
+  txOrigin?: string | null;
 }
 
 /**
@@ -910,17 +919,17 @@ export const envioToOriginIntent = (entity: EnvioIntentEntity, domain?: string):
     ttl: StringToNumber(entity.ttl),
 
     transactionHash: entity.transactionHash,
-    timestamp: StringToNumber(entity.timestamp), // Use timestamp from intent struct
+    timestamp: StringToNumber(entity.timestamp),
     blockNumber: StringToNumber(entity.blockNumber),
-    gasLimit: '0', // Envio doesn't track gasLimit
-    gasPrice: '0', // Envio doesn't track gasPrice
-    txOrigin: bytes32ToAddress(entity.sender), // Use sender (actual user address)
-    txNonce: StringToNumber(entity.blockNumber), // Use blockNumber as pagination cursor (Envio doesn't have EVM tx nonce)
+    gasLimit: entity.gasLimit ?? '0',
+    gasPrice: entity.gasPrice ?? '0',
+    txOrigin: entity.txOrigin ? bytes32ToAddress(entity.txOrigin) : bytes32ToAddress(entity.sender),
+    txNonce: entity.txNonce ? StringToNumber(entity.txNonce) : StringToNumber(entity.blockNumber),
 
     tokenFee: entity.tokenFee,
     nativeFee: entity.nativeFee,
-    feeAdapterInitiator: bytes32ToAddress(entity.sender), // Use sender (actual user address)
-    orderId: undefined, // Envio doesn't track orderId
+    feeAdapterInitiator: bytes32ToAddress(entity.sender),
+    orderId: entity.orderId ?? undefined,
     isSwap: undefined,
   };
 };
@@ -966,13 +975,13 @@ export const envioToDestinationIntent = (
     destination: destinationDomain,
     returnData: undefined, // Envio doesn't track returnData
 
-    transactionHash: fill.transactionHash, // Use fill transaction hash
-    timestamp: StringToNumber(fill.timestamp), // Use fill timestamp
-    blockNumber: StringToNumber(fill.blockNumber), // Use fill block number
-    gasLimit: '0', // Envio doesn't track gasLimit
-    gasPrice: '0', // Envio doesn't track gasPrice
-    txOrigin: bytes32ToAddress(fill.solver), // Use solver as txOrigin
-    txNonce: StringToNumber(fill.blockNumber), // Use blockNumber as pagination cursor (Envio doesn't have EVM tx nonce)
+    transactionHash: fill.transactionHash,
+    timestamp: StringToNumber(fill.timestamp),
+    blockNumber: StringToNumber(fill.blockNumber),
+    gasLimit: fill.gasLimit ?? '0',
+    gasPrice: fill.gasPrice ?? '0',
+    txOrigin: fill.txOrigin ? bytes32ToAddress(fill.txOrigin) : bytes32ToAddress(fill.solver),
+    txNonce: fill.txNonce ? StringToNumber(fill.txNonce) : StringToNumber(fill.blockNumber),
   };
 };
 

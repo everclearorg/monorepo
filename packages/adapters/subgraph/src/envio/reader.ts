@@ -68,6 +68,7 @@ import {
   getEnvioHubMetaQuery,
   getEnvioSpokeMetaQuery,
   getEnvioOrdersQuery,
+  getEnvioChainMetadataQuery,
   QueryResponse,
   SubgraphConfig,
   SubgraphQueryMetaParams,
@@ -150,15 +151,22 @@ export class EnvioReader implements ISubgraphReader {
   public async getLatestBlockNumber(domains: string[]): Promise<Map<string, number>> {
     const result: Map<string, number> = new Map();
 
-    for (const domain of domains) {
-      try {
-        const blockNumber = await this.getEnvioLatestBlockNumber(domain);
-        if (blockNumber !== undefined) {
-          result.set(domain, blockNumber);
+    try {
+      const data = await this.queryEnvio<{
+        chain_metadata: { chain_id: number; latest_processed_block: number }[];
+      }>(getEnvioChainMetadataQuery());
+
+      if (data?.chain_metadata) {
+        const domainSet = new Set(domains);
+        for (const chain of data.chain_metadata) {
+          const domainStr = chain.chain_id.toString();
+          if (domainSet.has(domainStr) && chain.latest_processed_block > 0) {
+            result.set(domainStr, chain.latest_processed_block);
+          }
         }
-      } catch (e: unknown) {
-        console.error(jsonifyError(e as Error), { domain });
       }
+    } catch (e: unknown) {
+      console.error(jsonifyError(e as Error));
     }
 
     return result;
@@ -787,25 +795,4 @@ export class EnvioReader implements ISubgraphReader {
     return destinationIntents;
   }
 
-  public async getEnvioLatestBlockNumber(domain?: string): Promise<number | undefined> {
-    const where: Record<string, unknown> = {};
-
-    if (domain) {
-      where.origin = { _eq: parseInt(domain, 10) };
-    }
-
-    const query = getEnvioIntentsQuery('blockNumber', 'desc');
-    const result = await this.queryEnvio<{ Intent: EnvioIntentEntity[] }>(query, {
-      where,
-      limit: 1,
-      offset: 0,
-      orderBy: [{ blockNumber: 'desc' }],
-    });
-
-    if (!result?.Intent || result.Intent.length === 0) {
-      return undefined;
-    }
-
-    return parseInt(result.Intent[0].blockNumber, 10);
-  }
 }

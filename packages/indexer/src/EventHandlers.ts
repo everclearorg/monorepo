@@ -84,24 +84,24 @@ function getTxMeta(event: any) {
 }
 
 // Helper: Check if an address is a FeeAdapter contract
+const FEE_ADAPTER_ADDRESSES = new Set<string>([
+  // Production V2 addresses (from MainnetProduction.sol)
+  "0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75", // Ethereum, Arbitrum, Optimism, Base, BNB, Polygon, Avalanche, Zircuit, Blast, Mode
+  "0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508", // Linea
+  "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", // Scroll, Unichain
+  "0x00000000000000000000000080ef3ee093ae3b5add1b213628875a4c73f640af", // zkSync
+  "0x0000000000000000000000006dea30929a575b8b29f459aae1b3b85e52a723f4", // Gnosis, Berachain, Mantle, Sonic, Ink
+  "0x000000000000000000000000b7c258c548aff20bbb2e899477b3bb9e8f813ed4", // Plasma
+  // Legacy addresses (for historical event detection)
+  "0x000000000000000000000000d0185bfb8107c5b2336bc73ce3fdd9bfb504540e", // Legacy V2
+  "0x000000000000000000000000aa7ee09f745a3c5de329eb0cd67878ba87b70ffe", // Legacy Linea
+  "0x000000000000000000000000877fd0a881b63ebe413124eee6abbcd7e82cf10b", // Legacy Unichain/Ink
+  "0x000000000000000000000000a537f0d027cba1661dd1eb46fcd79030cd75a2cd", // Legacy zkSync
+  "0x000000000000000000000000e5f2f4afad6211cfbd6a882d5a6a435530ee3909", // Legacy Zircuit
+  "0x0000000000000000000000003c135048306b412ad8f4375f6a8cbe94b5d56184", // Legacy Berachain
+]);
 function isFeeAdapterAddress(address: string): boolean {
-  const feeAdapterAddresses = [
-    // Production V2 addresses (from MainnetProduction.sol)
-    "0x00000000000000000000000015a7ca97d1ed168fb34a4055cefa2e2f9bdb6c75", // Ethereum, Arbitrum, Optimism, Base, BNB, Polygon, Avalanche, Zircuit, Blast, Mode
-    "0x0000000000000000000000001b0dc9cb7eadda36f4ccfb8130b0ad967b0a3508", // Linea
-    "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", // Scroll, Unichain
-    "0x00000000000000000000000080ef3ee093ae3b5add1b213628875a4c73f640af", // zkSync
-    "0x0000000000000000000000006dea30929a575b8b29f459aae1b3b85e52a723f4", // Gnosis, Berachain, Mantle, Sonic, Ink
-    "0x000000000000000000000000b7c258c548aff20bbb2e899477b3bb9e8f813ed4", // Plasma
-    // Legacy addresses (for historical event detection)
-    "0x000000000000000000000000d0185bfb8107c5b2336bc73ce3fdd9bfb504540e", // Legacy V2
-    "0x000000000000000000000000aa7ee09f745a3c5de329eb0cd67878ba87b70ffe", // Legacy Linea
-    "0x000000000000000000000000877fd0a881b63ebe413124eee6abbcd7e82cf10b", // Legacy Unichain/Ink
-    "0x000000000000000000000000a537f0d027cba1661dd1eb46fcd79030cd75a2cd", // Legacy zkSync
-    "0x000000000000000000000000e5f2f4afad6211cfbd6a882d5a6a435530ee3909", // Legacy Zircuit
-    "0x0000000000000000000000003c135048306b412ad8f4375f6a8cbe94b5d56184", // Legacy Berachain
-  ];
-  return feeAdapterAddresses.includes(address.toLowerCase());
+  return FEE_ADAPTER_ADDRESSES.has(address.toLowerCase());
 }
 
 const StrategyStrings = ['DEFAULT', 'XERC20'];
@@ -207,8 +207,9 @@ async function handleIntentAdded({ event, context, isV5 }: { event: any; context
     context.Asset.set({ ...asset, totalIntentVolume: asset.totalIntentVolume + amount, intentCount: asset.intentCount + 1n });
 
     const ubAsset = bytes32ToAddress(inputAsset);
-    let ub = await context.UnclaimedBalance.get(ubAsset);
-    context.UnclaimedBalance.set({ id: ubAsset, amount: (ub?.amount ?? 0n) + amount });
+    const ubId = `${ubAsset}-${chainId}`;
+    let ub = await context.UnclaimedBalance.get(ubId);
+    context.UnclaimedBalance.set({ id: ubId, amount: (ub?.amount ?? 0n) + amount, chainId });
   }
 
   // Update Intent Queue
@@ -258,14 +259,14 @@ async function handleIntentFilled({ event, context, isV5 }: { event: any; contex
   }
 
   let initiator: string, receiver: string, inputAsset: string, outputAsset: string,
-    nonce: bigint, timestamp: bigint, ttl: bigint, amount: bigint, destinations: any[], data: string;
+    origin: any, nonce: bigint, timestamp: bigint, ttl: bigint, amount: bigint, destinations: any[], data: string;
   let maxFee = 0;
 
   if (isV5) {
-    [initiator, receiver, inputAsset, outputAsset, , nonce, timestamp, ttl, amount, , destinations, data] = _intent;
+    [initiator, receiver, inputAsset, outputAsset, origin, nonce, timestamp, ttl, amount, , destinations, data] = _intent;
   } else {
     let maxFeeRaw: any;
-    [initiator, receiver, inputAsset, outputAsset, maxFeeRaw, , nonce, timestamp, ttl, amount, destinations, data] = _intent;
+    [initiator, receiver, inputAsset, outputAsset, maxFeeRaw, origin, nonce, timestamp, ttl, amount, destinations, data] = _intent;
     maxFee = Number(maxFeeRaw);
     const _totalFeeDBPS = event.params._totalFeeDBPS;
     const feeAmount = (amount * _totalFeeDBPS) / 10000n;
@@ -286,7 +287,7 @@ async function handleIntentFilled({ event, context, isV5 }: { event: any; contex
     queueIdx: _queueIdx,
     intent_id: _intentId,
     initiator, receiver, inputAsset, outputAsset, maxFee,
-    origin: Number(chainId), nonce, timestamp, ttl,
+    origin: Number(origin), nonce, timestamp, ttl,
     originAmount: amount, fillAmount,
     destinations: destinations.map((d: any) => Number(d)),
     data, chainId,
@@ -538,7 +539,7 @@ async function handleDeposited({ event, context }: { event: any; context: any })
   context.Balance.set({ id: balanceId, account: _depositant, asset: _asset, amount: newBalance, chainId });
 
   context.DepositorEvent.set({
-    id: `${txHash}-${event.logIndex}`,
+    id: `${chainId}-${txHash}-${event.logIndex}`,
     depositor: _depositant, eventType: 'DEPOSIT' as const,
     asset: _asset, amount: _amount, balance: newBalance,
     transactionHash: txHash,
@@ -564,7 +565,7 @@ async function handleWithdrawn({ event, context }: { event: any; context: any })
   context.Balance.set({ id: balanceId, account: _withdrawer, asset: _asset, amount: newBalance, chainId });
 
   context.DepositorEvent.set({
-    id: `${txHash}-${event.logIndex}`,
+    id: `${chainId}-${txHash}-${event.logIndex}`,
     depositor: _withdrawer, eventType: 'WITHDRAW' as const,
     asset: _asset, amount: _amount, balance: newBalance,
     transactionHash: txHash,
@@ -650,7 +651,7 @@ async function handleAssetTransferFailed({ event, context }: { event: any; conte
   const { _asset, _recipient, _amount } = event.params;
   const txMeta = getTxMeta(event);
   context.AssetTransferFailedEvent.set({
-    id: `${event.transaction.hash}-${event.logIndex}`,
+    id: `${event.chainId}-${event.transaction.hash}-${event.logIndex}`,
     asset: _asset, recipient: _recipient, amount: _amount,
     transactionHash: event.transaction.hash,
     timestamp: BigInt(event.block.timestamp), blockNumber: BigInt(event.block.number),
@@ -665,7 +666,7 @@ async function handleAssetMintFailed({ event, context }: { event: any; context: 
   const { _asset, _recipient, _amount, _strategy } = event.params;
   const txMeta = getTxMeta(event);
   context.AssetMintFailedEvent.set({
-    id: `${event.transaction.hash}-${event.logIndex}`,
+    id: `${event.chainId}-${event.transaction.hash}-${event.logIndex}`,
     asset: _asset, recipient: _recipient, amount: _amount,
     strategy: (StrategyStrings[Number(_strategy)] || 'DEFAULT') as 'DEFAULT' | 'XERC20',
     transactionHash: event.transaction.hash,

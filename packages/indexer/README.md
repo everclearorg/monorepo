@@ -1,15 +1,15 @@
 # Everclear Indexer
 
-High-performance blockchain indexer for Everclear protocol using [Envio](https://envio.dev/). Tracks `IntentAdded` and `IntentFilled` events across 9 mainnet chains.
+High-performance blockchain indexer for the Everclear protocol using [Envio](https://envio.dev/). Indexes Everclear hub and spoke contracts and related events (intents, fills, queues, balances, settlements, invoices, fees, and stats) across all supported networks.
 
 ## Overview
 
-This indexer monitors EverclearSpoke and FeeAdapter contracts across multiple chains and provides a unified GraphQL API to query:
-- **Intents**: Cross-chain intent creation and fulfillment
+This indexer monitors Everclear hub and spoke contracts (including EverclearSpoke and FeeAdapter) across multiple chains and provides a unified GraphQL API to query:
+- **Intents & Queues**: Cross-chain intent creation, queueing, and fulfillment
 - **Fills**: Solver activity and fill details
-- **Fee Information**: Token and native fees paid by initiators
-- **Statistics**: Global metrics for intents and fills
-- **Asset Tracking**: Volume and usage statistics
+- **Fees & Balances**: Token/native fees paid by initiators and protocol balance tracking
+- **Hub Settlements & Invoices**: Settlement flows and invoice state on the hub
+- **Statistics & Asset Tracking**: Global metrics for intents/fills and volume/usage statistics
 
 ## Quick Start
 
@@ -605,5 +605,5 @@ For issues or questions:
 
 ---
 
-**Built with Envio v2.30.0** - High-performance blockchain indexing
+**Built with Envio v2.32.3** - High-performance blockchain indexing
 

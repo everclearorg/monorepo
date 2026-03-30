@@ -111,7 +111,7 @@ type IntentStatistics @entity {
 }
 
 type Asset @entity {
-  id: ID! # asset address on chain
+  id: ID! # address-chainId
   address: Bytes!
   chainId: Int!
 
@@ -173,7 +173,7 @@ type ExternalCalldataExecutedEvent @entity {
 # ============================================================================
 
 type Balance @entity {
-  id: ID! # account-asset
+  id: ID! # account-asset-chainId
   account: Bytes!
   asset: Bytes!
   amount: BigInt!
@@ -181,7 +181,7 @@ type Balance @entity {
 }
 
 type DepositorEvent @entity {
-  id: ID! # txHash-logIndex
+  id: ID! # chainId-txHash-logIndex
   depositor: Bytes!
   eventType: DepositorEventType!
   asset: Bytes!
@@ -204,8 +204,9 @@ enum DepositorEventType {
 }
 
 type UnclaimedBalance @entity {
-  id: ID! # asset address
+  id: ID! # asset-chainId
   amount: BigInt!
+  chainId: Int!
 }
 
 # ============================================================================
@@ -213,7 +214,7 @@ type UnclaimedBalance @entity {
 # ============================================================================
 
 type AssetTransferFailedEvent @entity {
-  id: ID! # txHash-logIndex
+  id: ID! # chainId-txHash-logIndex
   asset: Bytes!
   recipient: Bytes!
   amount: BigInt!
@@ -234,7 +235,7 @@ enum Strategy {
 }
 
 type AssetMintFailedEvent @entity {
-  id: ID! # txHash-logIndex
+  id: ID! # chainId-txHash-logIndex
   asset: Bytes!
   recipient: Bytes!
   amount: BigInt!

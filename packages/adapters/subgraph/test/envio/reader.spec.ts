@@ -222,10 +222,12 @@ describe('EnvioReader', () => {
 
   describe('#getLatestBlockNumber', () => {
     it('should return block numbers for domains', async () => {
-      const intent1 = createEnvioIntentEntity({ blockNumber: '100', origin: 1337 });
-      const intent2 = createEnvioIntentEntity({ blockNumber: '200', origin: 1338 });
-
-      executeEnvioQuery.onFirstCall().resolves({ Intent: [intent1] }).onSecondCall().resolves({ Intent: [intent2] });
+      executeEnvioQuery.resolves({
+        chain_metadata: [
+          { chain_id: 1337, latest_processed_block: 100 },
+          { chain_id: 1338, latest_processed_block: 200 },
+        ],
+      });
 
       const result = await reader.getLatestBlockNumber(['1337', '1338']);
       expect(result.get('1337')).to.be.eq(100);
@@ -953,22 +955,6 @@ describe('EnvioReader', () => {
   // ============================================================================
   // Envio-specific helpers
   // ============================================================================
-
-  describe('#getEnvioLatestBlockNumber', () => {
-    it('should return latest block number for domain', async () => {
-      const intent = createEnvioIntentEntity({ blockNumber: '100', origin: 1337 });
-      executeEnvioQuery.resolves({ Intent: [intent] });
-
-      const result = await (reader as any).getEnvioLatestBlockNumber('1337');
-      expect(result).to.be.eq(100);
-    });
-
-    it('should return undefined if no intents found', async () => {
-      executeEnvioQuery.resolves({ Intent: [] });
-      const result = await (reader as any).getEnvioLatestBlockNumber('1337');
-      expect(result).to.be.undefined;
-    });
-  });
 
   describe('#getEnvioOriginIntentById', () => {
     it('should return origin intent', async () => {
