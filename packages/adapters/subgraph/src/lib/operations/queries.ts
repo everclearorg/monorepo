@@ -636,3 +636,415 @@ export const getEnvioIntentByIdQuery = (): string => {
     }
   `;
 };
+
+// ============================================================================
+// ENVIO ENTITY FIELD STRINGS
+// ============================================================================
+
+export const ENVIO_HUB_INTENT_FIELDS = `
+  id
+  status
+  settlementId
+  messageId
+  addEventTransactionHash
+  addEventTimestamp
+  addEventBlockNumber
+  addEventTxNonce
+  fillEventTransactionHash
+  fillEventTimestamp
+  fillEventBlockNumber
+  fillEventTxNonce
+`;
+
+export const ENVIO_HUB_SETTLEMENT_FIELDS = `
+  id
+  intentId
+  queueIdx
+  amount
+  asset
+  updateVirtualBalance
+  recipient
+  domain
+  entryEpoch
+  enqueuedTransactionHash
+  enqueuedTimestamp
+  enqueuedBlockNumber
+  enqueuedTxOrigin
+  enqueuedTxNonce
+`;
+
+export const ENVIO_INVOICE_FIELDS = `
+  id
+  intentId
+  tickerHash
+  amount
+  owner
+  entryEpoch
+  transactionHash
+  timestamp
+  blockNumber
+  txOrigin
+  txNonce
+`;
+
+export const ENVIO_SETTLEMENT_INTENT_FIELDS = `
+  id
+  status
+  recipient
+  asset
+  amount
+  settlementTransactionHash
+  settlementTimestamp
+  settlementBlockNumber
+  settlementTxOrigin
+  settlementTxNonce
+  settlementGasPrice
+  settlementGasLimit
+`;
+
+export const ENVIO_DEPOSIT_FIELDS = `
+  id
+  intentId
+  epoch
+  domain
+  amount
+  tickerHash
+  enqueuedTransactionHash
+  enqueuedTimestamp
+  enqueuedBlockNumber
+  enqueuedTxNonce
+  processedTransactionHash
+  processedTimestamp
+  processedBlockNumber
+  processedTxNonce
+`;
+
+export const ENVIO_DEPOSIT_QUEUE_FIELDS = `
+  id
+  epoch
+  domain
+  tickerHash
+  lastProcessed
+  size
+  first
+  last
+  blockNumber
+`;
+
+export const ENVIO_DEPOSITOR_EVENT_FIELDS = `
+  id
+  depositor
+  eventType
+  asset
+  amount
+  balance
+  txOrigin
+  transactionHash
+  timestamp
+  blockNumber
+  txNonce
+  gasPrice
+  gasLimit
+  chainId
+`;
+
+export const ENVIO_TOKEN_FIELDS = `
+  id
+  feeRecipients
+  feeAmounts
+  maxDiscountBps
+  discountPerEpoch
+  prioritizedStrategy
+`;
+
+export const ENVIO_HUB_ASSET_FIELDS = `
+  id
+  tickerHash
+  domain
+  adopted
+  approval
+  strategy
+`;
+
+export const ENVIO_QUEUE_FIELDS = `
+  id
+  queueType
+  lastProcessed
+  size
+  first
+  last
+  chainId
+`;
+
+export const ENVIO_SETTLEMENT_QUEUE_FIELDS = `
+  id
+  domain
+  lastProcessed
+  size
+  first
+  last
+`;
+
+export const ENVIO_MESSAGE_FIELDS = `
+  id
+  messageType
+  quote
+  firstIdx
+  lastIdx
+  intentIds
+  txOrigin
+  transactionHash
+  timestamp
+  blockNumber
+  txNonce
+  gasPrice
+  gasLimit
+  chainId
+`;
+
+export const ENVIO_SETTLEMENT_MESSAGE_FIELDS = `
+  id
+  quote
+  domain
+  intentIds
+  messageType
+  txOrigin
+  transactionHash
+  timestamp
+  blockNumber
+  txNonce
+  gasPrice
+  gasLimit
+`;
+
+export const ENVIO_HUB_META_FIELDS = `
+  id
+  domain
+  paused
+  owner
+  proposedOwner
+  proposedOwnershipTimestamp
+  gateway
+  watchtower
+  mailbox
+  securityModule
+  acceptanceDelay
+  minSolverSupportedDomains
+  epochLength
+  expiryTimeBuffer
+  supportedDomains
+`;
+
+export const ENVIO_DOMAIN_FIELDS = `
+  id
+  domain
+  blockGasLimit
+`;
+
+export const ENVIO_SPOKE_META_FIELDS = `
+  id
+  domain
+  paused
+  gateway
+  lighthouse
+  messageReceiver
+  watchtower
+  messageGasLimit
+  feeAdapter
+  fillSigner
+`;
+
+export const ENVIO_ORDER_FIELDS = `
+  id
+  initiator
+  intentIds
+  tokenFee
+  nativeFee
+  transactionHash
+  timestamp
+  blockNumber
+  txOrigin
+  txNonce
+  gasPrice
+  gasLimit
+  chainId
+`;
+
+// ============================================================================
+// ENVIO QUERY GENERATORS
+// ============================================================================
+
+export const getEnvioHubIntentByIdQuery = (): string => `
+  query GetHubIntentById($intentId: String!) {
+    HubIntent(where: { id: { _eq: $intentId } }) {
+      ${ENVIO_HUB_INTENT_FIELDS}
+    }
+    HubSettlement(where: { id: { _eq: $intentId } }) {
+      ${ENVIO_HUB_SETTLEMENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioHubIntentsAddedQuery = (): string => `
+  query GetHubIntentsAdded($where: HubIntent_bool_exp!, $limit: Int, $offset: Int) {
+    HubIntent(where: $where, order_by: { addEventBlockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_HUB_INTENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioHubIntentsFilledQuery = (): string => `
+  query GetHubIntentsFilled($where: HubIntent_bool_exp!, $limit: Int, $offset: Int) {
+    HubIntent(where: $where, order_by: { fillEventBlockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_HUB_INTENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioHubSettlementsQuery = (): string => `
+  query GetHubSettlements($where: HubSettlement_bool_exp!, $limit: Int, $offset: Int) {
+    HubSettlement(where: $where, order_by: { enqueuedBlockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_HUB_SETTLEMENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioInvoiceByIntentIdQuery = (): string => `
+  query GetInvoiceByIntentId($intentId: String!) {
+    Invoice(where: { intentId: { _eq: $intentId } }, limit: 1) {
+      ${ENVIO_INVOICE_FIELDS}
+    }
+    HubIntent(where: { id: { _eq: $intentId } }) {
+      ${ENVIO_HUB_INTENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioInvoicesQuery = (): string => `
+  query GetInvoices($where: Invoice_bool_exp!, $limit: Int, $offset: Int) {
+    Invoice(where: $where, order_by: { blockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_INVOICE_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioSettlementIntentByIdQuery = (): string => `
+  query GetSettlementIntentById($intentId: String!) {
+    SettlementIntent(where: { id: { _eq: $intentId } }) {
+      ${ENVIO_SETTLEMENT_INTENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioSettlementIntentsQuery = (): string => `
+  query GetSettlementIntents($where: SettlementIntent_bool_exp!, $limit: Int, $offset: Int) {
+    SettlementIntent(where: $where, order_by: { settlementBlockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_SETTLEMENT_INTENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioDepositByIntentIdQuery = (): string => `
+  query GetDepositByIntentId($intentId: String!) {
+    Deposit(where: { id: { _eq: $intentId } }) {
+      ${ENVIO_DEPOSIT_FIELDS}
+    }
+    HubIntent(where: { id: { _eq: $intentId } }) {
+      ${ENVIO_HUB_INTENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioDepositsQuery = (): string => `
+  query GetDeposits($where: Deposit_bool_exp!, $limit: Int, $offset: Int, $orderBy: [Deposit_order_by!]) {
+    Deposit(where: $where, order_by: $orderBy, limit: $limit, offset: $offset) {
+      ${ENVIO_DEPOSIT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioDepositQueuesQuery = (): string => `
+  query GetDepositQueues($where: DepositQueue_bool_exp!, $limit: Int, $offset: Int) {
+    DepositQueue(where: $where, order_by: { blockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_DEPOSIT_QUEUE_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioDepositorEventsQuery = (): string => `
+  query GetDepositorEvents($where: DepositorEvent_bool_exp!, $limit: Int, $offset: Int) {
+    DepositorEvent(where: $where, order_by: { blockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_DEPOSITOR_EVENT_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioTokensQuery = (): string => `
+  query GetTokens {
+    Token(limit: 100) {
+      ${ENVIO_TOKEN_FIELDS}
+    }
+    HubAsset(limit: 500) {
+      ${ENVIO_HUB_ASSET_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioSpokeQueuesQuery = (): string => `
+  query GetSpokeQueues($where: Queue_bool_exp!) {
+    Queue(where: $where) {
+      ${ENVIO_QUEUE_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioSettlementQueuesQuery = (): string => `
+  query GetSettlementQueues {
+    SettlementQueue(limit: 100) {
+      ${ENVIO_SETTLEMENT_QUEUE_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioSpokeMessagesQuery = (): string => `
+  query GetSpokeMessages($where: Message_bool_exp!, $limit: Int, $offset: Int) {
+    Message(where: $where, order_by: { blockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_MESSAGE_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioSettlementMessagesQuery = (): string => `
+  query GetSettlementMessages($where: SettlementMessage_bool_exp!, $limit: Int, $offset: Int) {
+    SettlementMessage(where: $where, order_by: { blockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_SETTLEMENT_MESSAGE_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioHubMetaQuery = (): string => `
+  query GetHubMeta {
+    HubMeta(where: { id: { _eq: "HUB_META" } }) {
+      ${ENVIO_HUB_META_FIELDS}
+    }
+    Domain {
+      ${ENVIO_DOMAIN_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioSpokeMetaQuery = (): string => `
+  query GetSpokeMeta($chainId: String!) {
+    SpokeMeta(where: { id: { _eq: $chainId } }) {
+      ${ENVIO_SPOKE_META_FIELDS}
+    }
+  }
+`;
+
+export const getEnvioOrdersQuery = (): string => `
+  query GetOrders($where: Order_bool_exp!, $limit: Int, $offset: Int) {
+    Order(where: $where, order_by: { blockNumber: asc }, limit: $limit, offset: $offset) {
+      ${ENVIO_ORDER_FIELDS}
+    }
+  }
+`;

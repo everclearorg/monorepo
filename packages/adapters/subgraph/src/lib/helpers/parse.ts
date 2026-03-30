@@ -584,6 +584,239 @@ export const order = (domain: string, entity: OrderEntity): Order & { domain: st
   };
 };
 
+// ============================================================================
+// ENVIO ENTITY TYPES
+// ============================================================================
+
+export interface EnvioHubIntentEntity {
+  id: string;
+  status: string;
+  settlementId: string | null;
+  messageId: string | null;
+  addEventTransactionHash: string | null;
+  addEventTimestamp: string | null;
+  addEventBlockNumber: string | null;
+  addEventTxNonce: string | null;
+  fillEventTransactionHash: string | null;
+  fillEventTimestamp: string | null;
+  fillEventBlockNumber: string | null;
+  fillEventTxNonce: string | null;
+}
+
+export interface EnvioHubSettlementEntity {
+  id: string;
+  intentId: string;
+  queueIdx: string;
+  amount: string;
+  asset: string;
+  updateVirtualBalance: boolean;
+  recipient: string;
+  domain: number;
+  entryEpoch: string;
+  enqueuedTransactionHash: string;
+  enqueuedTimestamp: string;
+  enqueuedBlockNumber: string;
+  enqueuedTxOrigin: string | null;
+  enqueuedTxNonce: string | null;
+}
+
+export interface EnvioInvoiceEntity {
+  id: string;
+  intentId: string;
+  tickerHash: string;
+  amount: string;
+  owner: string;
+  entryEpoch: string;
+  transactionHash: string;
+  timestamp: string;
+  blockNumber: string;
+  txOrigin: string | null;
+  txNonce: string | null;
+}
+
+export interface EnvioSettlementIntentEntity {
+  id: string;
+  status: string;
+  recipient: string;
+  asset: string;
+  amount: string;
+  settlementTransactionHash: string;
+  settlementTimestamp: string;
+  settlementBlockNumber: string;
+  settlementTxOrigin: string | null;
+  settlementTxNonce: string | null;
+  settlementGasPrice: string | null;
+  settlementGasLimit: string | null;
+}
+
+export interface EnvioDepositEntity {
+  id: string;
+  intentId: string;
+  epoch: string;
+  domain: number;
+  amount: string;
+  tickerHash: string;
+  enqueuedTransactionHash: string | null;
+  enqueuedTimestamp: string | null;
+  enqueuedBlockNumber: string | null;
+  enqueuedTxNonce: string | null;
+  processedTransactionHash: string | null;
+  processedTimestamp: string | null;
+  processedBlockNumber: string | null;
+  processedTxNonce: string | null;
+}
+
+export interface EnvioDepositorEventEntity {
+  id: string;
+  depositor: string;
+  eventType: string;
+  asset: string;
+  amount: string;
+  balance: string;
+  txOrigin: string | null;
+  transactionHash: string;
+  timestamp: string;
+  blockNumber: string;
+  txNonce: string | null;
+  gasPrice: string | null;
+  gasLimit: string | null;
+  chainId: number;
+}
+
+export interface EnvioTokenEntity {
+  id: string;
+  feeRecipients: string[];
+  feeAmounts: string[];
+  maxDiscountBps: string;
+  discountPerEpoch: string;
+  prioritizedStrategy: string;
+}
+
+export interface EnvioHubAssetEntity {
+  id: string;
+  tickerHash: string;
+  domain: number;
+  adopted: string;
+  approval: boolean;
+  strategy: string;
+}
+
+export interface EnvioQueueEntity {
+  id: string;
+  queueType: string;
+  lastProcessed: string | null;
+  size: string;
+  first: string;
+  last: string;
+  chainId: number;
+}
+
+export interface EnvioSettlementQueueEntity {
+  id: string;
+  domain: number;
+  lastProcessed: string | null;
+  size: string;
+  first: string;
+  last: string;
+}
+
+export interface EnvioDepositQueueEntity {
+  id: string;
+  epoch: string;
+  domain: number;
+  tickerHash: string;
+  lastProcessed: string | null;
+  size: string;
+  first: string;
+  last: string;
+  blockNumber: string;
+}
+
+export interface EnvioMessageEntity {
+  id: string;
+  messageType: string;
+  quote: string;
+  firstIdx: string;
+  lastIdx: string;
+  intentIds: string[];
+  txOrigin: string | null;
+  transactionHash: string;
+  timestamp: string;
+  blockNumber: string;
+  txNonce: string | null;
+  gasPrice: string | null;
+  gasLimit: string | null;
+  chainId: number;
+}
+
+export interface EnvioSettlementMessageEntity {
+  id: string;
+  quote: string;
+  domain: number;
+  intentIds: string[];
+  messageType: string;
+  txOrigin: string | null;
+  transactionHash: string;
+  timestamp: string;
+  blockNumber: string;
+  txNonce: string | null;
+  gasPrice: string | null;
+  gasLimit: string | null;
+}
+
+export interface EnvioHubMetaEntity {
+  id: string;
+  domain: number | null;
+  paused: boolean;
+  owner: string | null;
+  proposedOwner: string | null;
+  proposedOwnershipTimestamp: string | null;
+  gateway: string | null;
+  watchtower: string | null;
+  mailbox: string | null;
+  securityModule: string | null;
+  acceptanceDelay: string | null;
+  minSolverSupportedDomains: number | null;
+  epochLength: string | null;
+  expiryTimeBuffer: string | null;
+  supportedDomains: number[];
+}
+
+export interface EnvioDomainEntity {
+  id: string;
+  domain: number;
+  blockGasLimit: string;
+}
+
+export interface EnvioSpokeMetaEntity {
+  id: string;
+  domain: number;
+  paused: boolean;
+  gateway: string | null;
+  lighthouse: string | null;
+  messageReceiver: string | null;
+  watchtower: string | null;
+  messageGasLimit: string | null;
+  feeAdapter: string | null;
+  fillSigner: string | null;
+}
+
+export interface EnvioOrderEntity {
+  id: string;
+  initiator: string;
+  intentIds: string[];
+  tokenFee: string;
+  nativeFee: string;
+  transactionHash: string;
+  timestamp: string;
+  blockNumber: string;
+  txOrigin: string | null;
+  txNonce: string | null;
+  gasPrice: string | null;
+  gasLimit: string | null;
+  chainId: number;
+}
+
 export interface EnvioIntentEntity {
   id: string;
   intentId: string;
@@ -682,7 +915,7 @@ export const envioToOriginIntent = (entity: EnvioIntentEntity, domain?: string):
     gasLimit: '0', // Envio doesn't track gasLimit
     gasPrice: '0', // Envio doesn't track gasPrice
     txOrigin: bytes32ToAddress(entity.sender), // Use sender (actual user address)
-    txNonce: StringToNumber(entity.nonce),
+    txNonce: StringToNumber(entity.blockNumber), // Use blockNumber as pagination cursor (Envio doesn't have EVM tx nonce)
 
     tokenFee: entity.tokenFee,
     nativeFee: entity.nativeFee,
@@ -739,6 +972,334 @@ export const envioToDestinationIntent = (
     gasLimit: '0', // Envio doesn't track gasLimit
     gasPrice: '0', // Envio doesn't track gasPrice
     txOrigin: bytes32ToAddress(fill.solver), // Use solver as txOrigin
-    txNonce: StringToNumber(fill.nonce),
+    txNonce: StringToNumber(fill.blockNumber), // Use blockNumber as pagination cursor (Envio doesn't have EVM tx nonce)
+  };
+};
+
+// ============================================================================
+// ENVIO PARSER FUNCTIONS — Hub entities
+// ============================================================================
+
+export const envioToHubIntent = (
+  entity: EnvioHubIntentEntity,
+  settlement: EnvioHubSettlementEntity | undefined,
+  domain: string,
+): HubIntent => {
+  return {
+    addedTimestamp: entity.addEventTimestamp ? StringToNumber(entity.addEventTimestamp) : undefined,
+    addedTxNonce: entity.addEventBlockNumber ? StringToNumber(entity.addEventBlockNumber) : undefined, // Use blockNumber as pagination cursor
+    filledTimestamp: entity.fillEventTimestamp ? StringToNumber(entity.fillEventTimestamp) : undefined,
+    filledTxNonce: entity.fillEventBlockNumber ? StringToNumber(entity.fillEventBlockNumber) : undefined, // Use blockNumber as pagination cursor
+    id: entity.id,
+    domain,
+    status: entity.messageId ? TIntentStatus.Dispatched : (entity.status as TIntentStatus),
+    queueIdx: settlement?.queueIdx ? StringToNumber(settlement.queueIdx) : undefined,
+    messageId: entity.messageId ?? undefined,
+    settlementDomain: settlement?.domain?.toString() ?? undefined,
+    settlementAmount: settlement?.amount ?? undefined,
+    settlementEpoch: settlement?.entryEpoch ? StringToNumber(settlement.entryEpoch) : undefined,
+    updateVirtualBalance: settlement?.updateVirtualBalance ?? undefined,
+  };
+};
+
+export const envioToHubIntentFromSettlement = (
+  settlement: EnvioHubSettlementEntity,
+  hubIntent: EnvioHubIntentEntity | undefined,
+  domain: string,
+): HubIntent => {
+  return {
+    settlementEnqueuedTimestamp: StringToNumber(settlement.enqueuedTimestamp),
+    settlementEnqueuedTxNonce: StringToNumber(settlement.enqueuedBlockNumber), // Use blockNumber as pagination cursor
+    settlementEnqueuedBlockNumber: StringToNumber(settlement.enqueuedBlockNumber),
+    id: settlement.id,
+    domain,
+    status: hubIntent?.messageId
+      ? TIntentStatus.Dispatched
+      : (hubIntent?.status as TIntentStatus) ?? TIntentStatus.Added,
+    queueIdx: StringToNumber(settlement.queueIdx),
+    messageId: hubIntent?.messageId ?? undefined,
+    settlementDomain: settlement.domain.toString(),
+    settlementAmount: settlement.amount,
+    settlementEpoch: StringToNumber(settlement.entryEpoch),
+    updateVirtualBalance: settlement.updateVirtualBalance,
+  };
+};
+
+export const envioToHubInvoice = (entity: EnvioInvoiceEntity): HubInvoice => {
+  return {
+    id: entity.id,
+    intentId: entity.intentId,
+    amount: entity.amount,
+    tickerHash: entity.tickerHash,
+    owner: entity.owner,
+    entryEpoch: StringToNumber(entity.entryEpoch),
+    enqueuedTimestamp: StringToNumber(entity.timestamp),
+    enqueuedTxNonce: StringToNumber(entity.blockNumber), // Use blockNumber as pagination cursor
+    enqueuedBlockNumber: StringToNumber(entity.blockNumber),
+    enqueuedTransactionHash: entity.transactionHash,
+  };
+};
+
+export const envioToHubIntentFromInvoice = (
+  invoice: EnvioInvoiceEntity,
+  hubIntent: EnvioHubIntentEntity | undefined,
+  domain: string,
+): HubIntent => {
+  return {
+    id: invoice.intentId,
+    domain,
+    status: hubIntent?.messageId
+      ? TIntentStatus.Dispatched
+      : (hubIntent?.status as TIntentStatus) ?? TIntentStatus.Added,
+  };
+};
+
+export const envioToSettlementIntent = (entity: EnvioSettlementIntentEntity, domain: string): SettlementIntent => {
+  return {
+    intentId: entity.id,
+    amount: entity.amount,
+    asset: entity.asset,
+    recipient: entity.recipient,
+    domain,
+    status: entity.status as TIntentStatus,
+    returnData: undefined,
+    transactionHash: entity.settlementTransactionHash,
+    timestamp: StringToNumber(entity.settlementTimestamp),
+    blockNumber: StringToNumber(entity.settlementBlockNumber),
+    gasLimit: entity.settlementGasLimit ?? '0',
+    gasPrice: entity.settlementGasPrice ?? '0',
+    txOrigin: entity.settlementTxOrigin ?? '',
+    txNonce: StringToNumber(entity.settlementBlockNumber), // Use blockNumber as pagination cursor
+  };
+};
+
+export const envioToHubDepositFromEnqueued = (
+  entity: EnvioDepositEntity,
+  hubIntent: EnvioHubIntentEntity | undefined,
+): HubDeposit & { status: TIntentStatus } => {
+  return {
+    id: entity.id,
+    intentId: entity.intentId,
+    epoch: StringToNumber(entity.epoch),
+    domain: entity.domain.toString(),
+    amount: entity.amount,
+    tickerHash: entity.tickerHash,
+    enqueuedTimestamp: entity.enqueuedTimestamp ? StringToNumber(entity.enqueuedTimestamp) : 0,
+    enqueuedTxNonce: entity.enqueuedBlockNumber ? StringToNumber(entity.enqueuedBlockNumber) : 0, // Use blockNumber as pagination cursor
+    processedTimestamp: entity.processedTimestamp ? StringToNumber(entity.processedTimestamp) : undefined,
+    processedTxNonce: entity.processedBlockNumber ? StringToNumber(entity.processedBlockNumber) : undefined, // Use blockNumber as pagination cursor
+    status: (hubIntent?.messageId
+      ? TIntentStatus.Dispatched
+      : hubIntent?.status ?? TIntentStatus.Added) as TIntentStatus,
+  };
+};
+
+export const envioToHubDepositFromProcessed = (
+  entity: EnvioDepositEntity,
+  hubIntent: EnvioHubIntentEntity | undefined,
+): HubDeposit & { status: TIntentStatus } => {
+  return {
+    id: entity.id,
+    intentId: entity.intentId,
+    epoch: StringToNumber(entity.epoch),
+    domain: entity.domain.toString(),
+    amount: entity.amount,
+    tickerHash: entity.tickerHash,
+    enqueuedTimestamp: entity.enqueuedTimestamp ? StringToNumber(entity.enqueuedTimestamp) : 0,
+    enqueuedTxNonce: entity.enqueuedBlockNumber ? StringToNumber(entity.enqueuedBlockNumber) : 0, // Use blockNumber as pagination cursor
+    processedTimestamp: entity.processedTimestamp ? StringToNumber(entity.processedTimestamp) : 0,
+    processedTxNonce: entity.processedBlockNumber ? StringToNumber(entity.processedBlockNumber) : 0, // Use blockNumber as pagination cursor
+    status: (hubIntent?.messageId
+      ? TIntentStatus.Dispatched
+      : hubIntent?.status ?? TIntentStatus.Added) as TIntentStatus,
+  };
+};
+
+// ============================================================================
+// ENVIO PARSER FUNCTIONS — Spoke entities
+// ============================================================================
+
+export const envioToDepositorEvent = (entity: EnvioDepositorEventEntity): DepositorEvent => {
+  return {
+    id: entity.id,
+    depositor: entity.depositor,
+    type: entity.eventType === 'DEPOSIT' ? 'DEPOSIT' : 'WITHDRAW',
+    asset: entity.asset,
+    amount: entity.amount,
+    balance: entity.balance,
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txOrigin: entity.txOrigin ?? '',
+    txNonce: StringToNumber(entity.blockNumber), // Use blockNumber as pagination cursor
+    gasLimit: entity.gasLimit ?? '0',
+    gasPrice: entity.gasPrice ?? '0',
+  };
+};
+
+export const envioToToken = (entity: EnvioTokenEntity): Token => {
+  return {
+    id: entity.id,
+    feeAmounts: entity.feeAmounts,
+    feeRecipients: entity.feeRecipients,
+    maxDiscountBps: StringToNumber(entity.maxDiscountBps),
+    discountPerEpoch: StringToNumber(entity.discountPerEpoch),
+    prioritizedStrategy: entity.prioritizedStrategy,
+  };
+};
+
+export const envioToAsset = (entity: EnvioHubAssetEntity): Asset => {
+  return {
+    id: entity.id,
+    token: entity.tickerHash,
+    domain: entity.domain.toString(),
+    adopted: entity.adopted,
+    approval: entity.approval,
+    strategy: entity.strategy,
+  };
+};
+
+export const envioToSpokeQueue = (entity: EnvioQueueEntity): Queue => {
+  return {
+    id: entity.id,
+    domain: entity.chainId.toString(),
+    lastProcessed: entity.lastProcessed ? StringToNumber(entity.lastProcessed) : undefined,
+    size: StringToNumber(entity.size),
+    first: StringToNumber(entity.first),
+    last: StringToNumber(entity.last),
+    type: entity.queueType as QueueType,
+  };
+};
+
+export const envioToSettlementQueue = (entity: EnvioSettlementQueueEntity): Queue => {
+  return {
+    id: entity.id,
+    domain: entity.domain.toString(),
+    lastProcessed: entity.lastProcessed ? StringToNumber(entity.lastProcessed) : undefined,
+    size: StringToNumber(entity.size),
+    first: StringToNumber(entity.first),
+    last: StringToNumber(entity.last),
+    type: QueueType.Settlement,
+  };
+};
+
+export const envioToDepositQueue = (entity: EnvioDepositQueueEntity): DepositQueue => {
+  return {
+    id: entity.id,
+    domain: entity.domain.toString(),
+    lastProcessed: entity.lastProcessed ? StringToNumber(entity.lastProcessed) : undefined,
+    size: StringToNumber(entity.size),
+    first: StringToNumber(entity.first),
+    last: StringToNumber(entity.last),
+    type: QueueType.Deposit,
+    tickerHash: entity.tickerHash,
+    epoch: StringToNumber(entity.epoch),
+    blockNumber: StringToNumber(entity.blockNumber),
+  };
+};
+
+export const envioToSpokeMessage = (entity: EnvioMessageEntity): Message => {
+  const domain = entity.chainId.toString();
+  return {
+    id: entity.id,
+    domain,
+    originDomain: domain,
+    type: entity.messageType as unknown as TMessageType,
+    quote: entity.quote,
+    first: StringToNumber(entity.firstIdx),
+    last: StringToNumber(entity.lastIdx),
+    intentIds: entity.intentIds,
+    status: HyperlaneStatus.none,
+    txOrigin: entity.txOrigin ?? '',
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txNonce: StringToNumber(entity.blockNumber), // Use blockNumber as pagination cursor
+    gasLimit: entity.gasLimit ?? '0',
+    gasPrice: entity.gasPrice ?? '0',
+  };
+};
+
+export const envioToSettlementMessage = (entity: EnvioSettlementMessageEntity, hubDomain: string): HubMessage => {
+  return {
+    id: entity.id,
+    domain: hubDomain,
+    originDomain: hubDomain,
+    destinationDomain: entity.domain.toString(),
+    type: TMessageType.Settlement,
+    quote: entity.quote,
+    first: 0,
+    last: 0,
+    intentIds: entity.intentIds,
+    settlementDomain: entity.domain.toString(),
+    settlementType: entity.messageType as unknown as TSettlementMessageType,
+    status: HyperlaneStatus.none,
+    txOrigin: entity.txOrigin ?? '',
+    transactionHash: entity.transactionHash,
+    timestamp: StringToNumber(entity.timestamp),
+    blockNumber: StringToNumber(entity.blockNumber),
+    txNonce: StringToNumber(entity.blockNumber), // Use blockNumber as pagination cursor
+    gasLimit: entity.gasLimit ?? '0',
+    gasPrice: entity.gasPrice ?? '0',
+  };
+};
+
+// ============================================================================
+// ENVIO PARSER FUNCTIONS — Meta & Order
+// ============================================================================
+
+export const envioToHubMeta = (entity: EnvioHubMetaEntity, domains: EnvioDomainEntity[]): HubMeta => {
+  return {
+    id: entity.id,
+    domain: entity.domain?.toString() ?? '',
+    paused: entity.paused,
+    owner: entity.owner ?? undefined,
+    proposedOwner: entity.proposedOwner ?? undefined,
+    proposedOwnershipTimestamp: entity.proposedOwnershipTimestamp ?? undefined,
+    gateway: entity.gateway ?? undefined,
+    watchtower: entity.watchtower ?? undefined,
+    mailbox: entity.mailbox ?? undefined,
+    securityModule: entity.securityModule ?? undefined,
+    acceptanceDelay: entity.acceptanceDelay ?? undefined,
+    minSolverSupportedDomains: entity.minSolverSupportedDomains ?? undefined,
+    epochLength: entity.epochLength ?? undefined,
+    expiryTimeBuffer: entity.expiryTimeBuffer ?? undefined,
+    supportedDomains: domains
+      .filter((d) => entity.supportedDomains.includes(d.domain))
+      .map((d) => ({ domain: d.domain.toString(), blockGasLimit: d.blockGasLimit })),
+  } as HubMeta;
+};
+
+export const envioToSpokeMeta = (entity: EnvioSpokeMetaEntity): SpokeMeta => {
+  return {
+    id: entity.id,
+    domain: entity.domain.toString(),
+    paused: entity.paused,
+    gateway: entity.gateway ?? undefined,
+    lighthouse: entity.lighthouse ?? undefined,
+    messageReceiver: entity.messageReceiver ?? undefined,
+    watchtower: entity.watchtower ?? undefined,
+    messageGasLimit: entity.messageGasLimit ?? undefined,
+    feeAdapter: entity.feeAdapter ?? undefined,
+    fillSigner: entity.fillSigner ?? undefined,
+  } as SpokeMeta;
+};
+
+export const envioToOrder = (entity: EnvioOrderEntity): Order & { domain: string } => {
+  return {
+    domain: entity.chainId.toString(),
+    id: entity.id,
+    autoId: StringToNumber(entity.blockNumber),
+    intentIds: entity.intentIds,
+    tokenFee: entity.tokenFee,
+    nativeFee: entity.nativeFee,
+    initiator: entity.initiator,
+    transactionHash: entity.transactionHash,
+    blockNumber: StringToNumber(entity.blockNumber),
+    gasLimit: entity.gasLimit ?? '0',
+    gasPrice: entity.gasPrice ?? '0',
+    txOrigin: entity.txOrigin ?? '',
+    txNonce: StringToNumber(entity.blockNumber), // Use blockNumber as pagination cursor
+    timestamp: StringToNumber(entity.timestamp),
   };
 };
