@@ -1,8 +1,12 @@
+# ============================================================================
+# EXISTING ENTITIES (Intent lifecycle tracking)
+# ============================================================================
+
 type Intent @entity {
   id: ID! # intentId
   intentId: Bytes!
   queueIdx: BigInt!
-  
+
   # Intent struct fields
   initiator: Bytes!
   receiver: Bytes!
@@ -17,28 +21,34 @@ type Intent @entity {
   originAmount: BigInt!
   destinations: [Int!]!
   data: Bytes!
-  
+
   # Metadata
   chainId: Int!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   sender: Bytes! # The address that submitted the intent
-  
+
+  # Transaction metadata (for Cartographer checkpoint/pagination)
+  txOrigin: Bytes
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
+
   # Fill metadata
   receiveBlockNumber: BigInt # Block number when filled (from Fill event)
   isFastPath: Boolean! # true if ttl != 0
-  
+
   # Fee information (from FeeAdapter IntentWithFeesAdded event)
   tokenFee: BigInt # Token fee paid by initiator
   nativeFee: BigInt # Native token fee paid by initiator
-  
+
   # Order information (from FeeAdapterV2 OrderCreated event)
   orderId: Bytes # The order ID if this intent was created as part of a batch order
-  
+
   # Relations
   fills: [Fill!]! @derivedFrom(field: "intent")
-  
+
   # Status tracking
   status: IntentStatus!
 }
@@ -56,10 +66,10 @@ type Fill @entity {
   solver: Bytes!
   totalFeeDBPS: BigInt!
   queueIdx: BigInt!
-  
+
   # Linked intent
   intent: Intent!
-  
+
   # Intent data at fill time (for reference)
   initiator: Bytes!
   receiver: Bytes!
@@ -74,22 +84,28 @@ type Fill @entity {
   fillAmount: BigInt! # Amount after deducting fee (originAmount - fee)
   destinations: [Int!]!
   data: Bytes!
-  
+
   # Metadata
   chainId: Int!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+
+  # Transaction metadata
+  txOrigin: Bytes
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
 }
 
 type IntentStatistics @entity {
   id: ID! # "global"
-  
+
   # Intent counts
   totalUniqueIntents: BigInt!      # All intents (nettable + fillable)
   totalNettableIntents: BigInt!    # Intents with ttl == 0
   totalFillableIntents: BigInt!    # Intents with ttl != 0
-  
+
   # Fill counts (only valid fills where intent exists)
   totalFills: BigInt!
 }
@@ -98,13 +114,468 @@ type Asset @entity {
   id: ID! # asset address on chain
   address: Bytes!
   chainId: Int!
-  
+
   # Volume tracking
   totalIntentVolume: BigInt!
   totalFillVolume: BigInt!
-  
+
   # Count tracking
   intentCount: BigInt!
   fillCount: BigInt!
 }
 
+# ============================================================================
+# SPOKE ENTITIES — Settlement lifecycle
+# ============================================================================
+
+enum SpokeIntentStatus {
+  NONE
+  ADDED
+  DISPATCHED
+  SETTLED
+  SETTLED_AND_MANUALLY_EXECUTED
+}
+
+type SettlementIntent @entity {
+  id: ID! # intentId
+  status: SpokeIntentStatus!
+  recipient: Bytes!
+  asset: Bytes!
+  amount: BigInt!
+
+  # Settlement transaction
+  settlementTransactionHash: Bytes!
+  settlementTimestamp: BigInt!
+  settlementBlockNumber: BigInt!
+  settlementTxOrigin: Bytes
+  settlementTxNonce: BigInt
+  settlementGasPrice: BigInt
+  settlementGasLimit: BigInt
+}
+
+type ExternalCalldataExecutedEvent @entity {
+  id: ID! # intentId
+  intentId: Bytes!
+  returnData: Bytes!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
+  chainId: Int!
+}
+
+# ============================================================================
+# SPOKE ENTITIES — Balance tracking
+# ============================================================================
+
+type Balance @entity {
+  id: ID! # account-asset
+  account: Bytes!
+  asset: Bytes!
+  amount: BigInt!
+  chainId: Int!
+}
+
+type DepositorEvent @entity {
+  id: ID! # txHash-logIndex
+  depositor: Bytes!
+  eventType: DepositorEventType!
+  asset: Bytes!
+  amount: BigInt!
+  balance: BigInt!
+
+  txOrigin: Bytes
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
+  chainId: Int!
+}
+
+enum DepositorEventType {
+  DEPOSIT
+  WITHDRAW
+}
+
+type UnclaimedBalance @entity {
+  id: ID! # asset address
+  amount: BigInt!
+}
+
+# ============================================================================
+# SPOKE ENTITIES — Error tracking
+# ============================================================================
+
+type AssetTransferFailedEvent @entity {
+  id: ID! # txHash-logIndex
+  asset: Bytes!
+  recipient: Bytes!
+  amount: BigInt!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
+  chainId: Int!
+}
+
+enum Strategy {
+  DEFAULT
+  XERC20
+}
+
+type AssetMintFailedEvent @entity {
+  id: ID! # txHash-logIndex
+  asset: Bytes!
+  recipient: Bytes!
+  amount: BigInt!
+  strategy: Strategy!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
+  chainId: Int!
+}
+
+# ============================================================================
+# SPOKE ENTITIES — Queue tracking
+# ============================================================================
+
+enum QueueType {
+  INTENT
+  FILL
+}
+
+type Queue @entity {
+  id: ID! # chainId-INTENT or chainId-FILL
+  queueType: QueueType!
+  lastProcessed: BigInt
+  size: BigInt!
+  first: BigInt!
+  last: BigInt!
+  chainId: Int!
+}
+
+type IntentQueueMapping @entity {
+  id: ID! # chainId-queueIdx
+  intentId: Bytes!
+  chainId: Int!
+}
+
+type FillQueueMapping @entity {
+  id: ID! # chainId-queueIdx
+  intentId: Bytes!
+  chainId: Int!
+}
+
+# ============================================================================
+# SPOKE ENTITIES — Message tracking
+# ============================================================================
+
+enum MessageType {
+  INTENT
+  FILL
+  SETTLEMENT
+  MAILBOX_UPDATE
+  SECURITY_MODULE_UPDATE
+  GATEWAY_UPDATE
+  LIGHTHOUSE_UPDATE
+}
+
+type Message @entity {
+  id: ID! # messageId
+  messageType: MessageType!
+  quote: BigInt!
+  firstIdx: BigInt!
+  lastIdx: BigInt!
+  intentIds: [Bytes!]!
+
+  txOrigin: Bytes
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
+  chainId: Int!
+}
+
+# ============================================================================
+# SPOKE ENTITIES — Order tracking (FeeAdapterV2)
+# ============================================================================
+
+type Order @entity {
+  id: ID! # orderId (hash)
+  initiator: Bytes!
+  intentIds: [Bytes!]!
+  tokenFee: BigInt!
+  nativeFee: BigInt!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
+  chainId: Int!
+}
+
+# ============================================================================
+# SPOKE ENTITIES — Meta (protocol admin state)
+# ============================================================================
+
+type SpokeMeta @entity {
+  id: ID! # chainId
+  domain: Int!
+  paused: Boolean!
+  gateway: Bytes
+  lighthouse: Bytes
+  messageReceiver: Bytes
+  watchtower: Bytes
+  messageGasLimit: BigInt
+  feeAdapter: Bytes
+  fillSigner: Bytes
+}
+
+# ============================================================================
+# HUB ENTITIES — Intent lifecycle
+# ============================================================================
+
+enum HubIntentStatus {
+  NONE
+  ADDED
+  DEPOSIT_PROCESSED
+  FILLED
+  ADDED_AND_FILLED
+  INVOICED
+  SETTLED
+  SETTLED_AND_MANUALLY_EXECUTED
+  UNSUPPORTED
+  UNSUPPORTED_RETURNED
+}
+
+type HubIntent @entity {
+  id: ID! # intentId
+  status: HubIntentStatus!
+  settlementId: String # reference to HubSettlement
+  messageId: String # reference to SettlementMessage
+
+  # IntentProcessed event data
+  addEventTransactionHash: Bytes
+  addEventTimestamp: BigInt
+  addEventBlockNumber: BigInt
+  addEventTxNonce: BigInt
+
+  # FillProcessed event data
+  fillEventTransactionHash: Bytes
+  fillEventTimestamp: BigInt
+  fillEventBlockNumber: BigInt
+  fillEventTxNonce: BigInt
+}
+
+# ============================================================================
+# HUB ENTITIES — Settlement lifecycle
+# ============================================================================
+
+type SettlementQueue @entity {
+  id: ID! # domain
+  domain: Int!
+  lastProcessed: BigInt
+  size: BigInt!
+  first: BigInt!
+  last: BigInt!
+}
+
+type SettlementQueueMapping @entity {
+  id: ID! # domain-queueIdx
+  intentId: Bytes!
+}
+
+type HubSettlement @entity {
+  id: ID! # intentId
+  intentId: Bytes!
+  queueIdx: BigInt!
+  amount: BigInt!
+  asset: Bytes!
+  updateVirtualBalance: Boolean!
+  recipient: Bytes!
+  domain: Int!
+  entryEpoch: BigInt!
+
+  # Enqueued event data
+  enqueuedTransactionHash: Bytes!
+  enqueuedTimestamp: BigInt!
+  enqueuedBlockNumber: BigInt!
+  enqueuedTxOrigin: Bytes
+  enqueuedTxNonce: BigInt
+}
+
+enum SettlementMessageType {
+  SETTLED
+  UNSUPPORTED_RETURNED
+}
+
+type SettlementMessage @entity {
+  id: ID! # messageId
+  quote: BigInt!
+  domain: Int!
+  intentIds: [Bytes!]!
+  messageType: SettlementMessageType!
+
+  txOrigin: Bytes
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txNonce: BigInt # Not available on RPC chains (TAC, Hub)
+  gasPrice: BigInt # Not available on RPC chains
+  gasLimit: BigInt # Not available via Envio field_selection
+}
+
+# ============================================================================
+# HUB ENTITIES — Invoice tracking
+# ============================================================================
+
+type Invoice @entity {
+  id: ID! # txHash-logIndex
+  intentId: Bytes!
+  tickerHash: Bytes!
+  amount: BigInt!
+  owner: Bytes!
+  entryEpoch: BigInt!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes
+  txNonce: BigInt
+}
+
+# ============================================================================
+# HUB ENTITIES — Deposit tracking
+# ============================================================================
+
+type DepositQueue @entity {
+  id: ID! # epoch-domain-tickerHash
+  epoch: BigInt!
+  domain: Int!
+  tickerHash: Bytes!
+  lastProcessed: BigInt
+  size: BigInt!
+  first: BigInt!
+  last: BigInt!
+  blockNumber: BigInt!
+}
+
+type Deposit @entity {
+  id: ID! # intentId
+  intentId: Bytes!
+  epoch: BigInt!
+  domain: Int!
+  amount: BigInt!
+  tickerHash: Bytes!
+
+  # Enqueued event
+  enqueuedTransactionHash: Bytes
+  enqueuedTimestamp: BigInt
+  enqueuedBlockNumber: BigInt
+  enqueuedTxNonce: BigInt
+
+  # Processed event
+  processedTransactionHash: Bytes
+  processedTimestamp: BigInt
+  processedBlockNumber: BigInt
+  processedTxNonce: BigInt
+}
+
+# ============================================================================
+# HUB ENTITIES — Fee tracking
+# ============================================================================
+
+type FeesWithdrawnEvent @entity {
+  id: ID! # txHash-logIndex
+  withdrawer: Bytes!
+  recipient: Bytes!
+  tickerHash: Bytes!
+  amount: BigInt!
+  paymentId: Bytes!
+
+  transactionHash: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txOrigin: Bytes
+  txNonce: BigInt
+}
+
+# ============================================================================
+# HUB ENTITIES — Token & Asset configuration
+# ============================================================================
+
+type Token @entity {
+  id: ID! # tickerHash
+  feeRecipients: [Bytes!]!
+  feeAmounts: [BigInt!]!
+  maxDiscountBps: BigInt!
+  discountPerEpoch: BigInt!
+  prioritizedStrategy: Strategy!
+}
+
+type HubAsset @entity {
+  id: ID! # tickerHash-domain
+  tickerHash: Bytes!
+  domain: Int!
+  adopted: Bytes!
+  approval: Boolean!
+  strategy: Strategy!
+}
+
+# ============================================================================
+# HUB ENTITIES — Solver configuration
+# ============================================================================
+
+type Solver @entity {
+  id: ID! # solver address (bytes32)
+  supportedDomains: [Int!]!
+  updateVirtualBalance: Boolean!
+}
+
+# ============================================================================
+# HUB ENTITIES — Domain & Meta (protocol admin state)
+# ============================================================================
+
+type Domain @entity {
+  id: ID! # domain id
+  domain: Int!
+  blockGasLimit: BigInt!
+}
+
+type HubMeta @entity {
+  id: ID! # "HUB_META"
+  domain: Int
+  paused: Boolean!
+  owner: Bytes
+  proposedOwner: Bytes
+  proposedOwnershipTimestamp: BigInt
+  gateway: Bytes
+  watchtower: Bytes
+  mailbox: Bytes
+  securityModule: Bytes
+  acceptanceDelay: BigInt
+  minSolverSupportedDomains: Int
+  epochLength: BigInt
+  expiryTimeBuffer: BigInt
+  supportedDomains: [Int!]!
+}
