@@ -229,19 +229,6 @@ networks:
       - name: FeeAdapterV2
         address: 0x6Dea30929A575B8b29F459AaE1B3b85E52a723F4
 
-  - id: 239 # Tac
-    rpc_config:
-      url: ${ENVIO_TAC_RPC}
-    start_block: 0
-    confirmed_block_threshold: 5
-    contracts:
-      - name: EverclearSpoke
-        address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa
-      - name: EverclearSpokeV5
-        address: 0xEFfAB7cCEBF63FbEFB4884964b12259d4374FaAa # Same address as V1 (upgraded contract)
-      - name: FeeAdapterV2
-        address: 0xA388d644241A2185440EAf0ADd41C9Da30958ba5
-
   - id: 324 # zkSync
     start_block: 0
     confirmed_block_threshold: 0

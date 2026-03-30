@@ -92,7 +92,6 @@ function isFeeAdapterAddress(address: string): boolean {
     "0x0000000000000000000000008ad36c1acb23b47db6573a51a8a3009d4a4bc3b1", // Scroll, Unichain
     "0x00000000000000000000000080ef3ee093ae3b5add1b213628875a4c73f640af", // zkSync
     "0x0000000000000000000000006dea30929a575b8b29f459aae1b3b85e52a723f4", // Gnosis, Berachain, Mantle, Sonic, Ink
-    "0x000000000000000000000000a388d644241a2185440eaf0add41c9da30958ba5", // TAC
     "0x000000000000000000000000b7c258c548aff20bbb2e899477b3bb9e8f813ed4", // Plasma
     // Legacy addresses (for historical event detection)
     "0x000000000000000000000000d0185bfb8107c5b2336bc73ce3fdd9bfb504540e", // Legacy V2
