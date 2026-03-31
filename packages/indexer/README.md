@@ -17,16 +17,16 @@ This indexer monitors Everclear hub and spoke contracts (including EverclearSpok
 
 - **Docker Desktop** - Required for PostgreSQL and Hasura
 - **Node.js** - v18 or higher
-- **pnpm** - For package management
+- **Yarn** - v3+ (managed by monorepo root)
 
 ### Installation
 
 ```bash
 # Install dependencies
-pnpm install
+yarn install
 
 # Generate TypeScript types from schema
-pnpm codegen
+yarn codegen
 ```
 
 ### Running Locally
@@ -38,10 +38,10 @@ docker-compose up -d
 cd ..
 
 # Start the indexer
-pnpm start
+yarn start
 
 # Or use dev mode (auto-restart on changes)
-pnpm dev
+yarn dev
 ```
 
 The indexer will:
@@ -67,7 +67,7 @@ The indexer will:
 | Linea | 59144 | 0xc24dC29774fD2c1c0c5FA31325Bb9cbC11D8b751 | 0 |
 | Polygon | 137 | 0x7189C59e245135696bFd2906b56607755F84F3fD | 0 |
 | Avalanche | 43114 | 0x9aA2Ecad5C77dfcB4f34893993f313ec4a370460 | 0 |
-| Unizen | 130 | 0xa05A3380889115bf313f1Db9d5f335157Be4D816 | 0 |
+| Unichain | 130 | 0xa05A3380889115bf313f1Db9d5f335157Be4D816 | 0 |
 
 All chains use [HyperSync](https://docs.envio.dev/docs/HyperIndex/hypersync) for fast indexing.
 
@@ -378,7 +378,7 @@ networks:
 After modifying, regenerate types:
 
 ```bash
-pnpm codegen
+yarn codegen
 ```
 
 ## Event Handlers
@@ -469,7 +469,7 @@ events:
 
 3. Run codegen:
 ```bash
-pnpm codegen
+yarn codegen
 ```
 
 4. Implement handler in `src/EventHandlers.ts`:
@@ -512,14 +512,14 @@ docker-compose up -d
 cd ..
 
 # Restart indexer
-pnpm start
+yarn start
 ```
 
 ### TypeScript errors
 
 ```bash
 # Regenerate types
-pnpm codegen
+yarn codegen
 ```
 
 ### Database connection errors
@@ -545,7 +545,7 @@ docker-compose up -d
 cd ..
 
 # Restart indexer
-pnpm start
+yarn start
 ```
 
 ## Performance
@@ -590,10 +590,10 @@ https://docs.envio.dev/docs/HyperIndex/overview#hypersync-api-token-requirements
 ## Commands
 
 ```bash
-pnpm install      # Install dependencies
-pnpm codegen      # Generate TypeScript types
-pnpm start        # Start indexer
-pnpm dev          # Start in dev mode (auto-restart)
+yarn install      # Install dependencies
+yarn codegen      # Generate TypeScript types
+yarn start        # Start indexer
+yarn dev          # Start in dev mode (auto-restart)
 ```
 
 ## Support
