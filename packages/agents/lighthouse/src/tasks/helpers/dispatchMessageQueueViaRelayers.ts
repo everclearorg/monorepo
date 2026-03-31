@@ -106,7 +106,7 @@ export const dispatchMessageQueueViaRelayers = async (
   queue: Queue,
   sortedContents: unknown[], // OriginIntent, DestinationIntent, HubIntent
   _requestContext: RequestContext,
-): Promise<string[]> => {
+): Promise<{ taskId: string; relayerType: RelayerType } | null> => {
   const {
     config: { chains, hub, abis },
     logger,
@@ -123,7 +123,7 @@ export const dispatchMessageQueueViaRelayers = async (
       spokes,
       hub: hub.domain,
     });
-    return [];
+    return null;
   }
 
   // Get addresses from deployment
@@ -136,7 +136,7 @@ export const dispatchMessageQueueViaRelayers = async (
       spoke: queue.domain,
       chains,
     });
-    return [];
+    return null;
   }
   const everclearAbi = transactionDomain === hub.domain ? abis.hub.everclear : abis.spoke.everclear;
 
@@ -173,7 +173,7 @@ export const dispatchMessageQueueViaRelayers = async (
       bufferMultiple: bufferMultiple.toString(),
       blockLimit: blockLimit.toString(),
     });
-    return [];
+    return null;
   }
 
   const totalIntents = queue.size;
@@ -201,14 +201,11 @@ export const dispatchMessageQueueViaRelayers = async (
       queue,
       reason: 'No relayers support this chain',
     });
-    return [];
+    return null;
   }
 
-  // Dequeue in batches
-  // This handles the case where the queue is too large to dequeue in a single transaction
-  // Can happen in failure scenarios where the queue is not processed for a long time
-
-  // Get the nonce for the signer (each transaction in the batch must increment the nonce)
+  // Dispatch a single batch of up to maxDequeue elements per invocation.
+  // The caller is responsible for invoking this function again if the queue has more items to drain.
 
   // Use `pending` block tag for hub chains because they're lazy blockchains right now.
   const blockTag = transactionDomain == hub.domain ? 'pending' : 'latest';
@@ -354,287 +351,266 @@ export const dispatchMessageQueueViaRelayers = async (
     }
   }
 
-  const taskIds: Record<number, string> = {};
-  for (let i = 0; i < totalIntents; i += maxDequeue) {
-    const toDequeue = Math.min(maxDequeue, totalIntents - i);
-    // Trim intents to match max elements, sorted by block number
-    const trimmedIntents = sortedContents.slice(i, i + toDequeue);
-    if (trimmedIntents.length !== toDequeue) {
-      logger.error('Trimmed intents do not match dequeue target', requestContext, methodContext, undefined, {
-        trimmedIntents: trimmedIntents.length ? trimmedIntents : '[]',
-        toDequeue,
-        sortedContents: sortedContents.length ? sortedContents : '[]',
-        totalIntents,
-        index: i,
-      });
-      break;
-    }
+  const toDequeue = Math.min(maxDequeue, totalIntents);
+  // Trim intents to match max elements, sorted by block number
+  const trimmedIntents = sortedContents.slice(0, toDequeue);
+  if (trimmedIntents.length !== toDequeue) {
+    logger.error('Trimmed intents do not match dequeue target', requestContext, methodContext, undefined, {
+      trimmedIntents: trimmedIntents.length ? trimmedIntents : '[]',
+      toDequeue,
+      sortedContents: sortedContents.length ? sortedContents : '[]',
+      totalIntents,
+    });
+    return null;
+  }
 
-    // NOTE: the signature _must_ include the relayer address, meaning a different
-    // relayer transaction will be required for each configured relayer.
-    const errors: Error[] = [];
-    for (const relayer of relayers) {
-      try {
-        // Check if relayer supports this chain before generating a signature
-        // Use cached result from an earlier check to avoid duplicate calls
-        const supported = relayerSupportMap.get(relayer.type);
-        if (!supported) {
-          logger.warn('Skipping relayer - chain not supported', requestContext, methodContext, {
-            relayer: relayer.type,
-            chainId,
-            transactionDomain,
-            queue,
-          });
-          continue;
-        }
-
-        logger.debug('Generating transaction for relayer', requestContext, methodContext, {
+  // NOTE: the signature _must_ include the relayer address, meaning a different
+  // relayer transaction will be required for each configured relayer.
+  const errors: Error[] = [];
+  for (const relayer of relayers) {
+    try {
+      // Check if relayer supports this chain before generating a signature
+      // Use cached result from an earlier check to avoid duplicate calls
+      const supported = relayerSupportMap.get(relayer.type);
+      if (!supported) {
+        logger.warn('Skipping relayer - chain not supported', requestContext, methodContext, {
           relayer: relayer.type,
+          chainId,
+          transactionDomain,
           queue,
-          toDequeue,
-          owner: walletAddr,
         });
-        const relayerAddress = await relayer.instance.getRelayerAddress(domainToChainId(transactionDomain));
+        continue;
+      }
 
-        // Generate the signature
-        const ttl = getNtpTimeSeconds() + DEFAULT_SIGNATURE_TTL;
-        logger.debug('Generating signature', requestContext, methodContext, {
-          typeHash: getTypeHash(type),
-          domain: transactionDomain,
+      logger.debug('Generating transaction for relayer', requestContext, methodContext, {
+        relayer: relayer.type,
+        queue,
+        toDequeue,
+        owner: walletAddr,
+      });
+      const relayerAddress = await relayer.instance.getRelayerAddress(domainToChainId(transactionDomain));
+
+      // Generate the signature
+      const ttl = getNtpTimeSeconds() + DEFAULT_SIGNATURE_TTL;
+      logger.debug('Generating signature', requestContext, methodContext, {
+        typeHash: getTypeHash(type),
+        domain: transactionDomain,
+        toDequeue,
+        relayerAddress,
+        ttl,
+        nonce: nonce.toString(),
+        signer: walletAddr,
+      });
+
+      // NOTE: Settlement queue encodes buffer after the nonce. Spoke queues do not.
+      const payload = chainWrapper.encodeAbiParameters(
+        [
+          { type: 'bytes32', name: 'typeHash' },
+          { type: 'uint32', name: 'domain' },
+          { type: 'uint32', name: 'toDequeue' },
+          { type: 'address', name: 'relayerAddress' },
+          { type: 'uint256', name: 'ttl' },
+          { type: 'uint256', name: 'nonce' },
+          { type: 'uint256', name: 'messageGasLimit' },
+        ],
+        [
+          getTypeHash(type) as `0x${string}`,
+          +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
           toDequeue,
-          relayerAddress,
-          ttl,
-          nonce: nonce.toString(),
-          signer: walletAddr,
+          relayerAddress as `0x${string}`,
+          BigInt(ttl),
+          nonce,
+          BigInt(messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, toDequeue)),
+        ],
+      );
+      const digest = chainWrapper.keccak256(payload) as string;
+
+      // Use different signing methods for different chains
+      let signature: string;
+      if (transactionDomain === TRON_CHAINID) {
+        // For Tron, the contract uses MessageHashUtils.toEthSignedMessageHash()
+        // which applies the Ethereum message prefix "\x19Ethereum Signed Message:\n32"
+        // We can use wallet.signMessage(digest) which applies the same prefix automatically
+        logger.info('Using Tron signing with Ethereum message prefix compatibility', requestContext, methodContext, {
+          digest,
+          transactionDomain,
         });
 
-        // NOTE: Settlement queue encodes buffer after the nonce. Spoke queues do not.
-        const payload = chainWrapper.encodeAbiParameters(
-          [
-            { type: 'bytes32', name: 'typeHash' },
-            { type: 'uint32', name: 'domain' },
-            { type: 'uint32', name: 'toDequeue' },
-            { type: 'address', name: 'relayerAddress' },
-            { type: 'uint256', name: 'ttl' },
-            { type: 'uint256', name: 'nonce' },
-            { type: 'uint256', name: 'messageGasLimit' },
-          ],
-          [
-            getTypeHash(type) as `0x${string}`,
-            +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
-            toDequeue,
-            relayerAddress as `0x${string}`,
-            BigInt(ttl),
-            nonce,
-            BigInt(messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, toDequeue)),
-          ],
-        );
-        const digest = chainWrapper.keccak256(payload) as string;
+        // For Tron, use the lighthouse's web3signer (which has the correct lighthouse private key)
+        // This ensures the signature comes from the lighthouse address expected by the contract
+        signature = await wallet.signMessage(digest);
 
-        // Use different signing methods for different chains
-        let signature: string;
-        if (transactionDomain === TRON_CHAINID) {
-          // For Tron, the contract uses MessageHashUtils.toEthSignedMessageHash()
-          // which applies the Ethereum message prefix "\x19Ethereum Signed Message:\n32"
-          // We can use wallet.signMessage(digest) which applies the same prefix automatically
-          logger.info('Using Tron signing with Ethereum message prefix compatibility', requestContext, methodContext, {
-            digest,
-            transactionDomain,
-          });
+        // Calculate prefixed hash for logging
+        const prefix = '\x19Ethereum Signed Message:\n32';
+        const prefixedMessage = chainWrapper.concat([
+          chainWrapper.stringToBytes(prefix),
+          chainWrapper.toBytes(digest),
+        ]);
+        const prefixedHash = chainWrapper.keccak256(prefixedMessage) as string;
 
-          // For Tron, use the lighthouse's web3signer (which has the correct lighthouse private key)
-          // This ensures the signature comes from the lighthouse address expected by the contract
-          signature = await wallet.signMessage(digest);
-
-          // Calculate prefixed hash for logging
-          const prefix = '\x19Ethereum Signed Message:\n32';
-          const prefixedMessage = chainWrapper.concat([
-            chainWrapper.stringToBytes(prefix),
-            chainWrapper.toBytes(digest),
-          ]);
-          const prefixedHash = chainWrapper.keccak256(prefixedMessage) as string;
-
-          logger.info('Generated Tron signature with Ethereum message prefix', requestContext, methodContext, {
-            signature,
-            digest,
-            prefixedHash,
-          });
-        } else {
-          // For Ethereum and other EVM chains, use standard Ethereum message signing
-          // The contract will apply MessageHashUtils.toEthSignedMessageHash to the payload hash,
-          // so we need to sign the raw digest bytes using signMessage which applies the same prefix
-          signature = await wallet.signMessage(digest);
-        }
-        logger.info('Generated signature', requestContext, methodContext, {
-          typeHash: getTypeHash(type),
-          domain: transactionDomain,
-          toDequeue,
-          relayerAddress,
-          ttl,
-          nonce: nonce.toString(),
-          payload,
+        logger.info('Generated Tron signature with Ethereum message prefix', requestContext, methodContext, {
           signature,
-          signer: walletAddr,
+          digest,
+          prefixedHash,
         });
+      } else {
+        // For Ethereum and other EVM chains, use standard Ethereum message signing
+        // The contract will apply MessageHashUtils.toEthSignedMessageHash to the payload hash,
+        // so we need to sign the raw digest bytes using signMessage which applies the same prefix
+        signature = await wallet.signMessage(digest);
+      }
+      logger.info('Generated signature', requestContext, methodContext, {
+        typeHash: getTypeHash(type),
+        domain: transactionDomain,
+        toDequeue,
+        relayerAddress,
+        ttl,
+        nonce: nonce.toString(),
+        payload,
+        signature,
+        signer: walletAddr,
+      });
 
-        const queueMethodName = getQueueMethodName(type);
+      const queueMethodName = getQueueMethodName(type);
 
-        // Convert OriginIntent objects to Intent structs for proper contract encoding
-        const intentStructs = type === 'INTENT' ? convertOriginIntentsToIntentStructs(trimmedIntents) : toDequeue;
+      // Convert OriginIntent objects to Intent structs for proper contract encoding
+      const intentStructs = type === 'INTENT' ? convertOriginIntentsToIntentStructs(trimmedIntents) : toDequeue;
 
-        // CRITICAL FIX: Use the actual length of intentStructs for signature generation
-        // This ensures the signature matches what the contract will validate
-        const actualIntentCount = type === 'INTENT' ? (intentStructs as unknown[]).length : (intentStructs as number);
+      // CRITICAL FIX: Use the actual length of intentStructs for signature generation
+      // This ensures the signature matches what the contract will validate
+      const actualIntentCount = type === 'INTENT' ? (intentStructs as unknown[]).length : (intentStructs as number);
 
-        // Re-generate payload with the correct intent count
-        const correctedPayload = chainWrapper.encodeAbiParameters(
-          [
-            { type: 'bytes32', name: 'typeHash' },
-            { type: 'uint32', name: 'domain' },
-            { type: 'uint32', name: 'actualIntentCount' },
-            { type: 'address', name: 'relayerAddress' },
-            { type: 'uint256', name: 'ttl' },
-            { type: 'uint256', name: 'nonce' },
-            { type: 'uint256', name: 'messageGasLimit' },
-          ],
-          [
-            getTypeHash(type) as `0x${string}`,
+      // Re-generate payload with the correct intent count
+      const correctedPayload = chainWrapper.encodeAbiParameters(
+        [
+          { type: 'bytes32', name: 'typeHash' },
+          { type: 'uint32', name: 'domain' },
+          { type: 'uint32', name: 'actualIntentCount' },
+          { type: 'address', name: 'relayerAddress' },
+          { type: 'uint256', name: 'ttl' },
+          { type: 'uint256', name: 'nonce' },
+          { type: 'uint256', name: 'messageGasLimit' },
+        ],
+        [
+          getTypeHash(type) as `0x${string}`,
+          +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
+          actualIntentCount, // Use actual intent count instead of toDequeue
+          relayerAddress as `0x${string}`,
+          BigInt(ttl),
+          nonce,
+          BigInt(messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount)),
+        ],
+      );
+      const correctedDigest = chainWrapper.keccak256(correctedPayload) as string;
+
+      // Re-generate signature with corrected payload
+      let correctedSignature: string;
+      if (transactionDomain === TRON_CHAINID) {
+        logger.info('Re-generating Tron signature with corrected intent count', requestContext, methodContext, {
+          originalToDequeue: toDequeue,
+          actualIntentCount,
+          correctedDigest,
+          transactionDomain,
+        });
+        correctedSignature = await wallet.signMessage(correctedDigest);
+      } else {
+        correctedSignature = await wallet.signMessage(correctedDigest);
+      }
+
+      logger.info('Generated corrected signature', requestContext, methodContext, {
+        typeHash: getTypeHash(type),
+        domain: transactionDomain,
+        originalToDequeue: toDequeue,
+        actualIntentCount,
+        relayerAddress,
+        ttl,
+        nonce: nonce.toString(),
+        correctedPayload,
+        correctedSignature,
+        signer: walletAddr,
+      });
+
+      const funcSig = `${queueMethodName}(uint32,${type === 'INTENT' ? '(bytes32,bytes32,bytes32,bytes32,uint32,uint64,uint48,uint48,uint256,uint256,uint32[],bytes)[]' : 'uint256'},address,uint256,uint256,uint256,bytes)`;
+
+      logger.info('Generating transaction', requestContext, methodContext, {
+        queueDomain: queue.domain,
+        transactionDomain,
+        funcSig,
+        intentStructs,
+      });
+
+      const tx: WriteTransaction = {
+        data: chainWrapper.encodeFunctionData({
+          abi: everclearAbi,
+          functionName: queueMethodName,
+          args: [
             +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
-            actualIntentCount, // Use actual intent count instead of toDequeue
-            relayerAddress as `0x${string}`,
-            BigInt(ttl),
+            intentStructs,
+            relayerAddress,
+            ttl,
             nonce,
-            BigInt(messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount)),
+            messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
+            correctedSignature, // Use corrected signature
           ],
-        );
-        const correctedDigest = chainWrapper.keccak256(correctedPayload) as string;
+        }),
+        to: everclear,
+        value: '0',
+        domain: +transactionDomain,
+        funcSig,
+      };
 
-        // Re-generate signature with corrected payload
-        let correctedSignature: string;
-        if (transactionDomain === TRON_CHAINID) {
-          logger.info('Re-generating Tron signature with corrected intent count', requestContext, methodContext, {
-            originalToDequeue: toDequeue,
-            actualIntentCount,
-            correctedDigest,
-            transactionDomain,
-          });
-          correctedSignature = await wallet.signMessage(correctedDigest);
-        } else {
-          correctedSignature = await wallet.signMessage(correctedDigest);
-        }
-
-        logger.info('Generated corrected signature', requestContext, methodContext, {
-          typeHash: getTypeHash(type),
-          domain: transactionDomain,
+      logger.debug(
+        'Sending process queue transaction to relayer with corrected signature',
+        requestContext,
+        methodContext,
+        {
+          type,
+          queue,
           originalToDequeue: toDequeue,
           actualIntentCount,
           relayerAddress,
           ttl,
           nonce: nonce.toString(),
-          correctedPayload,
           correctedSignature,
-          signer: walletAddr,
-        });
+          correctedPayload,
+          tx,
+        },
+      );
 
-        const funcSig = `${queueMethodName}(uint32,${type === 'INTENT' ? '(bytes32,bytes32,bytes32,bytes32,uint32,uint64,uint48,uint48,uint256,uint256,uint32[],bytes)[]' : 'uint256'},address,uint256,uint256,uint256,bytes)`;
-
-        logger.info('Generating transaction', requestContext, methodContext, {
-          queueDomain: queue.domain,
-          transactionDomain,
-          funcSig,
-          intentStructs,
-        });
-
-        const tx: WriteTransaction = {
-          data: chainWrapper.encodeFunctionData({
-            abi: everclearAbi,
-            functionName: queueMethodName,
-            args: [
-              +queue.domain, // Fix: Convert string domain to number for proper ABI encoding
-              intentStructs,
-              relayerAddress,
-              ttl,
-              nonce,
-              messageGasLimit(queue.type === 'SETTLEMENT' ? hub.domain : queue.domain, actualIntentCount),
-              correctedSignature, // Use corrected signature
-            ],
-          }),
-          to: everclear,
-          value: '0',
-          domain: +transactionDomain,
-          funcSig,
-        };
-
-        logger.debug(
-          'Sending process queue transaction to relayer with corrected signature',
-          requestContext,
-          methodContext,
-          {
-            type,
-            queue,
-            originalToDequeue: toDequeue,
-            actualIntentCount,
-            relayerAddress,
-            ttl,
-            nonce: nonce.toString(),
-            correctedSignature,
-            correctedPayload,
-            tx,
-          },
-        );
-
-        const { taskId, relayerType } = await sendWithRelayerWithBackup(
-          domainToChainId(tx.domain),
-          tx.domain.toString(),
-          tx.to,
-          tx.data,
-          tx.value,
-          tx.funcSig,
-          [relayer],
-          chainservice,
-          logger,
-          requestContext,
-        );
-        logger.info('Dispatched queue', requestContext, methodContext, {
-          type,
-          taskId,
-          relayerType,
-          queue,
-        });
-        taskIds[i] = taskId;
-        // exit early if the task was dispatched
-        break;
-      } catch (e) {
-        logger.error('Failed to dispatch queue', requestContext, methodContext, jsonifyError(e as Error), {
-          relayer: relayer.type,
-          type,
-          queue,
-          toDequeue,
-        });
-        errors.push(e as Error);
-      }
-    }
-
-    // Error if all relayers fail for any batch
-    if (errors.length === relayers.length) {
-      logger.info('Failed to dispatch full queue', requestContext, methodContext, {
-        completed: Object.keys(taskIds).length,
-        pending: totalIntents - Object.keys(taskIds).length,
-        tasks: Object.values(taskIds),
+      const { taskId, relayerType } = await sendWithRelayerWithBackup(
+        domainToChainId(tx.domain),
+        tx.domain.toString(),
+        tx.to,
+        tx.data,
+        tx.value,
+        tx.funcSig,
+        [relayer],
+        chainservice,
+        logger,
+        requestContext,
+      );
+      logger.info('Dispatched queue', requestContext, methodContext, {
         type,
+        taskId,
+        relayerType,
         queue,
       });
-      throw new RelayerSendFailed(
-        queue.domain,
-        relayers.map((r) => r.type),
-        errors,
-      );
+      return { taskId, relayerType };
+    } catch (e) {
+      logger.error('Failed to dispatch queue', requestContext, methodContext, jsonifyError(e as Error), {
+        relayer: relayer.type,
+        type,
+        queue,
+        toDequeue,
+      });
+      errors.push(e as Error);
     }
-
-    // Increment the nonce for the next batch
-    nonce = nonce + BigInt(1);
-    // FIXME: Should process the full batch
-    break;
   }
-  return Object.values(taskIds);
+
+  // All relayers failed
+  throw new RelayerSendFailed(
+    queue.domain,
+    relayers.map((r) => r.type),
+    errors,
+  );
 };

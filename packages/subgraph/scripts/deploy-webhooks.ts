@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'fs';
 import { join } from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { program } from 'commander';
 import * as Mustache from 'mustache';
 import { config as dotenvConfig } from 'dotenv';
@@ -93,7 +93,8 @@ function renderPipeline(
   return Mustache.render(template, view);
 }
 
-function executeCommand(cmd: string, dryRun: boolean): void {
+function executeCommand(args: string[], dryRun: boolean): void {
+  const cmd = `goldsky ${args.join(' ')}`;
   if (dryRun) {
     console.log(`[DRY RUN] Would execute: ${cmd}`);
     return;
@@ -101,12 +102,9 @@ function executeCommand(cmd: string, dryRun: boolean): void {
 
   console.log(`Executing: ${cmd}`);
   try {
-    const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' });
-    if (output.trim()) {
-      console.log(output);
-    }
+    execFileSync('goldsky', args, { encoding: 'utf-8', stdio: 'inherit' });
   } catch (error) {
-    console.error(`Command failed: ${error}`);
+    console.error('Command failed:', cmd, error);
     throw error;
   }
 }
@@ -125,7 +123,7 @@ function deployPipeline(yaml: string, pipelineName: string, dryRun: boolean): vo
 
   try {
     writeFileSync(tmpFile, yaml);
-    executeCommand(`goldsky pipeline apply ${tmpFile} --status ACTIVE`, false);
+    executeCommand(['pipeline', 'apply', tmpFile, '--status', 'ACTIVE', '--force'], dryRun);
     console.log(`Successfully deployed pipeline: ${pipelineName}`);
   } finally {
     rmSync(tmpDir, { recursive: true, force: true });

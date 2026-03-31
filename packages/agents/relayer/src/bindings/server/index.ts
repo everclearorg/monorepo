@@ -116,7 +116,7 @@ export const bindServer = () =>
       },
       (err, address) => {
         if (err) {
-          console.error(err);
+          logger.error('Server failed to start', undefined, undefined, jsonifyError(err as Error));
           process.exit(1);
         }
         logger.info(`Server listening at ${address}`);

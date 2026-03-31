@@ -1,8 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bs58 = require('bs58') as { decode: (input: string) => Uint8Array };
 import { AppContext } from '@chimera-monorepo/cartographer-core';
-import { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/mqclient';
-import { SOLANA_CHAINID } from '@chimera-monorepo/utils';
+import { LIGHTHOUSE_QUEUES, SOLANA_CHAINID } from '@chimera-monorepo/utils';
 import { notifyLighthouse } from '../notify';
 
 /** CPI discriminator that must match bytes 0–7 of the decoded instruction data. */

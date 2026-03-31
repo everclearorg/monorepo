@@ -47,6 +47,7 @@ export const createMockDatabase = (): Database => {
     getLockPositions: stub().resolves([]),
     saveLockPositions: stub().resolves(),
     getOriginIntentsLastNonce: stub().resolves(0),
+    updateMessageStatuses: stub().resolves(0),
   };
 };
 

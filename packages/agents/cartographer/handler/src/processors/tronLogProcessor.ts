@@ -1,6 +1,5 @@
 import { AppContext } from '@chimera-monorepo/cartographer-core';
-import { LIGHTHOUSE_QUEUES } from '@chimera-monorepo/mqclient';
-import { TRON_CHAINID } from '@chimera-monorepo/utils';
+import { LIGHTHOUSE_QUEUES, TRON_CHAINID } from '@chimera-monorepo/utils';
 import { notifyLighthouse } from '../notify';
 
 /** Map of topic[0] hash → lighthouse queue name. */

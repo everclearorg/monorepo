@@ -89,7 +89,7 @@ import {
   getOriginIntentsLastNonce,
   getDeliveredSettlements,
   updateSettlementStatus,
-  updateSolanaMessageStatuses,
+  updateMessageStatuses,
   saveProtocolUpdateLogs,
   saveHubTokenUpdateLogs,
   saveHubAssetUpdateLogs,
@@ -100,6 +100,12 @@ import {
   finalizeTriageFingerprint,
   setTriageAutoResolveOutcome,
   pruneExpiredTriageFingerprints,
+  claimQueueDispatch,
+  promoteQueueDispatchClaim,
+  releaseQueueDispatchClaim,
+  getAllPendingQueueDispatches,
+  updatePendingQueueDispatchStatus,
+  pruneOldQueueDispatches,
 } from './client';
 import { hub_intents, intent_status, message_status } from 'zapatos/schema';
 
@@ -164,7 +170,10 @@ export type Database = {
     hubUpdates: (IntentMessageUpdate & { settlementDomain: string })[],
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
-  saveProtocolUpdateLogs: (protocolLogs: ProtocolUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  saveProtocolUpdateLogs: (
+    protocolLogs: ProtocolUpdateLog[],
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<void>;
   saveHubTokenUpdateLogs: (logs: HubTokenUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveHubAssetUpdateLogs: (logs: HubAssetUpdateLog[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
   saveHubMeta: (meta: HubMeta[], _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
@@ -306,7 +315,7 @@ export type Database = {
     status: intent_status,
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
-  updateSolanaMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
+  updateMessageStatuses: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
   isTriageFingerprintProcessed: (fingerprint: string, _pool?: Pool | TxnClientForRepeatableRead) => Promise<boolean>;
   tryReserveTriageFingerprint: (
     log: TriageFingerprintLog,
@@ -320,6 +329,31 @@ export type Database = {
     _pool?: Pool | TxnClientForRepeatableRead,
   ) => Promise<void>;
   pruneExpiredTriageFingerprints: (_pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
+  // Queue dispatch dedup
+  claimQueueDispatch: (
+    domain: string,
+    queueType: string,
+    first: number,
+    last: number,
+    staleThresholdMinutes: number,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<{ claimId: number } | null>;
+  promoteQueueDispatchClaim: (
+    claimId: number,
+    taskId: string,
+    relayerType: string,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<void>;
+  releaseQueueDispatchClaim: (claimId: number, _pool?: Pool | TxnClientForRepeatableRead) => Promise<void>;
+  getAllPendingQueueDispatches: (
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<{ taskId: string; relayerType: string; domain: string; queueType: string }[]>;
+  updatePendingQueueDispatchStatus: (
+    taskId: string,
+    status: string,
+    _pool?: Pool | TxnClientForRepeatableRead,
+  ) => Promise<void>;
+  pruneOldQueueDispatches: (retentionDays: number, _pool?: Pool | TxnClientForRepeatableRead) => Promise<number>;
 };
 
 export let pool: Pool | undefined;
@@ -428,11 +462,17 @@ export const getDatabase = async (databaseUrl: string, logger: Logger): Promise<
     getOriginIntentsLastNonce,
     getDeliveredSettlements,
     updateSettlementStatus,
-    updateSolanaMessageStatuses,
+    updateMessageStatuses,
     isTriageFingerprintProcessed,
     tryReserveTriageFingerprint,
     finalizeTriageFingerprint,
     setTriageAutoResolveOutcome,
     pruneExpiredTriageFingerprints,
+    claimQueueDispatch,
+    promoteQueueDispatchClaim,
+    releaseQueueDispatchClaim,
+    getAllPendingQueueDispatches,
+    updatePendingQueueDispatchStatus,
+    pruneOldQueueDispatches,
   };
 };

@@ -1,0 +1,46 @@
+variable "environment" {
+  description = "Environment name"
+  type        = string
+}
+
+variable "stage" {
+  description = "Stage of deployment"
+  type        = string
+}
+
+variable "family" {
+  description = "Service family name for resource naming"
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "VPC ID where the target service lives"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "Subnet IDs for the NLB"
+  type        = list(string)
+}
+
+variable "target_address" {
+  description = "DNS address of the target service (resolved to IP for the NLB target group)"
+  type        = string
+}
+
+variable "target_ip_count" {
+  description = "Number of IPs the target_address resolves to. Allows Terraform to plan target group attachments even when the IPs are not yet known. Defaults to 1 (single-node ElastiCache, single-AZ RDS, etc.)."
+  type        = number
+  default     = 1
+}
+
+variable "target_port" {
+  description = "Port of the target service"
+  type        = number
+}
+
+variable "allowed_principal_arns" {
+  description = "ARNs of AWS principals (accounts or roles) allowed to create VPC endpoints against this service. When empty, no restrictions are applied."
+  type        = list(string)
+  default     = []
+}

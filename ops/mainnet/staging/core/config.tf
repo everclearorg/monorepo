@@ -74,7 +74,7 @@ locals {
   lighthouse_handler_env_vars = [
     { name = "LIGHTHOUSE_CONFIG", value = local.local_lighthouse_config },
     { name = "LIGHTHOUSE_SERVICE", value = "handler" },
-    { name = "REDIS_URL", value = "rediss://:${var.lighthouse_queue_redis_auth_token}@${module.lighthouse_queue_cache.redis_instance_address}:${module.lighthouse_queue_cache.redis_instance_port}" },
+    { name = "REDIS_URL", value = "rediss://:${urlencode(var.lighthouse_queue_redis_auth_token)}@${module.lighthouse_queue_cache.redis_instance_address}:${module.lighthouse_queue_cache.redis_instance_port}" },
     { name = "ENVIRONMENT", value = var.environment },
     { name = "STAGE", value = var.stage },
     { name = "DD_ENV", value = "${var.environment}-${var.stage}" },
@@ -163,8 +163,10 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://mantle.drpc.org"
+          # "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {
@@ -247,8 +249,10 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://mantle.drpc.org"
+          # "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {
@@ -336,8 +340,10 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://mantle.drpc.org"
+          # "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {
@@ -488,8 +494,10 @@ locals {
       }
       "5000" = {
         providers = [
-          "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
-          "https://mantle.drpc.org"
+          # "https://mantle-mainnet.g.alchemy.com/v2/${var.alchemy_key}",
+          # "https://mantle.drpc.org"
+          "https://rpc.mantle.xyz",
+          "https://mantle-rpc.publicnode.com"
         ]
       }
       "4326" = {

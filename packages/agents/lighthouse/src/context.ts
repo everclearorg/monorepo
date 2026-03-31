@@ -172,7 +172,7 @@ export const makeLighthouseTask = async (
   try {
     await initializeLighthouseContext(config, logger, service === 'solana');
 
-    console.log(
+    logger.info(
       `
             _/_/_/_/  _/      _/  _/_/_/_/  _/_/_/      _/_/_/  _/        _/_/_/_/    _/_/    _/_/_/
             _/        _/      _/  _/        _/    _/  _/        _/        _/        _/    _/  _/    _/
@@ -191,7 +191,6 @@ export const makeLighthouseTask = async (
     // Log file descriptor usage after task completion
     logFileDescriptorUsage(logger);
   } catch (e: unknown) {
-    console.error('Error creating lighthouse context. Sad! :(', e);
     logger.error(
       'Error creating lighthouse context. Sad! :(',
       requestContext,

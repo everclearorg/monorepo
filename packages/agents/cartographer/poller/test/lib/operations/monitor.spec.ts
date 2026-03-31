@@ -234,6 +234,16 @@ describe('Monitor operations', () => {
       );
     });
 
+    it('should call updateMessageStatuses at the beginning to infer delivery from on-chain state', async () => {
+      stub(coreMockable, 'getHyperlaneMsgDelivered').resolves(false);
+
+      (mockAppContext.adapters.database.getMessagesByStatus as SinonStub).resolves([]);
+
+      await updateMessageStatus(mockAppContext);
+
+      expect(mockAppContext.adapters.database.updateMessageStatuses as SinonStub).to.have.been.calledOnce;
+    });
+
     it('should use Hyperlane for non-Polymer routes', async () => {
       const getPolymerStub = stub(coreMockable, 'getPolymerMsgDelivered');
       stub(coreMockable, 'getHyperlaneMsgDelivered').resolves(true);

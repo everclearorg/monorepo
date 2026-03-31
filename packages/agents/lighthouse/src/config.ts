@@ -7,6 +7,7 @@ import {
   ajv,
   ChainConfig,
   getEverclearConfig,
+  Logger,
   LogLevel,
   TABIConfig,
   TChainConfig,
@@ -20,9 +21,18 @@ import {
   TokenVolumeReward,
   TokenStakingReward,
   TSolanaConfig,
+  jsonifyError,
 } from '@chimera-monorepo/utils';
 import { InvalidConfig } from './errors';
 import { getSsmParameter } from './tasks/helpers/mockable';
+
+const logger = new Logger({
+  level: 'info',
+  name: 'lighthouse-config',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 // FIXME: read from chaindata
 const DEFAULT_SIZE = 10;
@@ -123,20 +133,20 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     try {
       configStr = await getSsmParameter(paramName);
       if (!configStr) {
-        console.info(paramName, 'is not found in parameter store');
+        logger.info(`${paramName} is not found in parameter store`);
       }
     } catch (e: unknown) {
-      console.info('Error getting', paramName, 'from parameter store', e);
+      logger.info(`Error getting ${paramName} from parameter store`, undefined, undefined, { error: e });
     }
   } else {
-    console.info('Lighthouse CONFIG_PARAMETER_NAME is not set');
+    logger.info('Lighthouse CONFIG_PARAMETER_NAME is not set');
   }
 
   // try to read from env
   try {
     configJson = JSON.parse(configStr || process.env.LIGHTHOUSE_CONFIG || '{}');
   } catch (e: unknown) {
-    console.warn('No LIGHTHOUSE_CONFIG exists, using config file and individual env vars', e);
+    logger.warn('No LIGHTHOUSE_CONFIG exists, using config file and individual env vars', undefined, undefined, { error: e });
   }
 
   try {
@@ -148,7 +158,7 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
       configFile = JSON.parse(json);
     }
   } catch (e: unknown) {
-    console.error('Error reading config file!', e);
+    logger.error('Error reading config file!', undefined, undefined, jsonifyError(e as Error));
     process.exit(1);
   }
 
@@ -158,10 +168,10 @@ export const loadConfig = async (): Promise<LighthouseConfig> => {
     try {
       everclearConfig = await getEverclearConfig(everclearConfigUrl);
     } catch (e) {
-      console.error('Failed to fetch everclear config:', e);
+      logger.error('Failed to fetch everclear config', undefined, undefined, jsonifyError(e as Error));
     }
   } else {
-    console.warn('Everclear config URL not set');
+    logger.warn('Everclear config URL not set');
   }
 
   const environment = (process.env.LIGHTHOUSE_ENVIRONMENT ||

@@ -3,6 +3,7 @@ import { Logger, jsonifyError } from '@chimera-monorepo/utils';
 import { AppContext } from '@chimera-monorepo/cartographer-core';
 
 import { verifySecret, routeWebhook } from './webhooks/webhookHandler';
+import { getNotifyHealth } from './notify';
 
 export const PAUSE_CHECKPOINT_KEY = 'cartographer_handler_paused';
 
@@ -19,6 +20,7 @@ export interface ServerState {
   isPaused: boolean;
   webhookSecret: string;
   adminToken: string;
+  getHealth?: () => Promise<{ redis: 'ok' | 'error'; detail?: string }>;
 }
 
 export function createServer(state: ServerState, logger: Logger): FastifyInstance {
@@ -26,10 +28,14 @@ export function createServer(state: ServerState, logger: Logger): FastifyInstanc
 
   // Health check
   server.get('/health', async (_, res) => {
-    return res.status(200).send({
-      status: 'ok',
+    const healthFn = state.getHealth ?? getNotifyHealth;
+    const redisHealth = await healthFn();
+    const status = redisHealth.redis === 'ok' ? 200 : 503;
+    return res.status(status).send({
+      status: redisHealth.redis === 'ok' ? 'ok' : 'degraded',
       mode: 'cartographer-handler',
       paused: state.isPaused,
+      redis: redisHealth,
     });
   });
 

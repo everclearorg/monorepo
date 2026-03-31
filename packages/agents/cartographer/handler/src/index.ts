@@ -103,7 +103,7 @@ async function startServer(): Promise<void> {
 
     // Initialize BullMQ notification queues if REDIS_URL is configured
     if (handlerConfig.redisUrl) {
-      initNotify(handlerConfig.redisUrl, logger);
+      await initNotify(handlerConfig.redisUrl, logger);
     }
 
     startBackfillLoop();

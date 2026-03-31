@@ -1,4 +1,4 @@
-import { reset, restore } from 'sinon';
+import { restore, reset } from 'sinon';
 
 export const mochaHooks = {
   afterEach() {

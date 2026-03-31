@@ -1,10 +1,25 @@
-import { EverclearError, delay, domainToChainId, parseHostname, ERC20Abi } from '@chimera-monorepo/utils';
-import { chainWrapper, type PublicClient } from '@chimera-monorepo/utils';
-
+import {
+  EverclearError,
+  Logger,
+  delay,
+  domainToChainId,
+  parseHostname,
+  ERC20Abi,
+  chainWrapper,
+  type PublicClient,
+} from '@chimera-monorepo/utils';
 import { parseError, RpcError, ServerError, StallTimeout } from '../../errors';
 import { ISigner, ReadTransaction, WriteTransaction, ITransactionReceipt, ITransactionResponse, IBlock } from '../../types';
 import { RpcProvider } from '..';
 import { EthWallet } from './wallet';
+
+const ethProviderLogger = new Logger({
+  level: 'debug',
+  name: 'eth-provider',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
 
 // TODO: Wrap metrics in a type, and add a getter for it for logging purposes (after sync() calls, for example)
 // TODO: Should be a multiton mapped by URL (such that no duplicate instances are created).
@@ -144,7 +159,7 @@ class BaseSyncProvider {
       try {
         sendTimestamp = Date.now();
         this.cpsTimestamps.push(sendTimestamp);
-        console.log(`=== ETH PROVIDER SEND called with method: ${method}, domain: ${this.domain}, params:`, params);
+        this.debugLog('ETH_PROVIDER_SEND', method, this.domain, params);
         return await Promise.race(
           [
             new Promise(async (resolve, reject) => {
@@ -248,8 +263,7 @@ class BaseSyncProvider {
 
   private debugLog(message: string, ...args: unknown[]) {
     if (this.debugLogging) {
-      // eslint-disable-next-line
-      console.log(`[${Date.now()}]`, `(${this.name})`, message, ...args);
+      ethProviderLogger.debug(`(${this.name}) ${message}`, undefined, undefined, { args });
     }
   }
 
@@ -302,13 +316,19 @@ class BaseSyncProvider {
   }
 
   public async getTransactionReceipt(hash: string): Promise<ITransactionReceipt> {
-    const receipt = await this.client.getTransactionReceipt({ hash: hash as any });
+    const [receipt, currentBlockNumber] = await Promise.all([
+      this.client.getTransactionReceipt({ hash: hash as any }),
+      this.client.getBlockNumber(),
+    ]);
+
+    const receiptBlockNumber = Number(receipt.blockNumber);
+    const confirmations = Math.max(Number(currentBlockNumber) - receiptBlockNumber + 1, 0);
 
     return {
       transactionHash: receipt.transactionHash,
-      blockNumber: Number(receipt.blockNumber),
+      blockNumber: receiptBlockNumber,
       status: receipt.status === 'success' ? 1 : 0,
-      confirmations: 0, // Will be set by caller
+      confirmations,
       logs: receipt.logs.map(log => ({
         address: log.address,
         topics: log.topics,

@@ -50,7 +50,7 @@ import {
   getOriginIntentsLastNonce,
   getDeliveredSettlements,
   updateSettlementStatus,
-  updateSolanaMessageStatuses,
+  updateMessageStatuses,
 } from '../src/client';
 import {
   expect,
@@ -1041,8 +1041,8 @@ describe('Database Adapter:Client', () => {
     });
   });
 
-  describe('#updateSolanaMessageStatuses', () => {
-    it('should update Solana messages to delivered when intent is settled', async () => {
+  describe('#updateMessageStatuses', () => {
+    it('should update settlement messages to delivered when intent is settled', async () => {
       const settledIntentId = mkBytes32('0x123');
       const unsettledIntentId = mkBytes32('0x456');
 
@@ -1057,17 +1057,17 @@ describe('Database Adapter:Client', () => {
         createMessage({
           id: mkBytes32('0xmsg1'),
           intentIds: [settledIntentId],
-          destinationDomain: SOLANA_CHAINID,
+          type: 'SETTLEMENT',
         }),
         createMessage({
           id: mkBytes32('0xmsg2'),
           intentIds: [unsettledIntentId],
-          destinationDomain: SOLANA_CHAINID,
+          type: 'SETTLEMENT',
         }),
         createMessage({
           id: mkBytes32('0xmsg3'),
           intentIds: [mkBytes32('0x789')],
-          destinationDomain: '100'
+          type: 'SETTLEMENT',
         }),
       ];
 
@@ -1077,9 +1077,9 @@ describe('Database Adapter:Client', () => {
       const deliveredBefore = await getMessagesByStatus([HyperlaneStatus.delivered], 0, 100, pool);
       expect(deliveredBefore.length).to.be.eq(0);
 
-      const updatedCount = await updateSolanaMessageStatuses(pool);
+      const updatedCount = await updateMessageStatuses(pool);
 
-      // Should have updated 1 message (the Solana message with settled intent)
+      // Should have updated 1 message (the one with settled intent)
       expect(updatedCount).to.be.eq(1);
 
       // Check that the correct message was updated
@@ -1092,7 +1092,7 @@ describe('Database Adapter:Client', () => {
       expect(pendingMessages.length).to.be.eq(2);
       expect(pendingMessages.map(m => m.id).sort()).to.be.deep.eq([messages[1].id, messages[2].id].sort());
     });
-    
+
     it('should not update already delivered messages', async () => {
       const intentId = mkBytes32('0x789');
 
@@ -1104,17 +1104,110 @@ describe('Database Adapter:Client', () => {
       const message = createMessage({
         id: mkBytes32('0xmsg4'),
         intentIds: [intentId],
-        destinationDomain: SOLANA_CHAINID,
+        type: 'SETTLEMENT',
         status: HyperlaneStatus.delivered
       });
 
       await saveMessages([message], [], [], [], pool);
 
       // Run the function
-      const updatedCount = await updateSolanaMessageStatuses(pool);
+      const updatedCount = await updateMessageStatuses(pool);
 
       // Should not update any messages since it's already delivered
       expect(updatedCount).to.be.eq(0);
+    });
+
+    it('should update intent messages to delivered when hub intent exists', async () => {
+      const processedIntentId = mkBytes32('0xaaa');
+      const unprocessedIntentId = mkBytes32('0xbbb');
+
+      // Create a hub intent for the processed one (hub received and processed it)
+      const hubIntent = createHubIntent({ id: processedIntentId, status: TIntentStatus.Added });
+      await saveHubIntents([hubIntent], ['added_timestamp', 'added_tx_nonce', 'status'], pool);
+
+      const messages = [
+        createMessage({
+          id: mkBytes32('0xmsg5'),
+          intentIds: [processedIntentId],
+          type: 'INTENT',
+        }),
+        createMessage({
+          id: mkBytes32('0xmsg6'),
+          intentIds: [unprocessedIntentId],
+          type: 'INTENT',
+        }),
+      ];
+
+      await saveMessages(messages, [], [], [], pool);
+
+      const updatedCount = await updateMessageStatuses(pool);
+
+      // Only the message whose intent exists in hub_intents should be updated
+      expect(updatedCount).to.be.eq(1);
+
+      const deliveredAfter = await getMessagesByStatus([HyperlaneStatus.delivered], 0, 100, pool);
+      expect(deliveredAfter.length).to.be.eq(1);
+      expect(deliveredAfter[0].id).to.be.eq(messages[0].id);
+
+      const pendingMessages = await getMessagesByStatus([HyperlaneStatus.none], 0, 100, pool);
+      expect(pendingMessages.length).to.be.eq(1);
+      expect(pendingMessages[0].id).to.be.eq(messages[1].id);
+    });
+
+    it('should update fill messages to delivered when hub intent exists', async () => {
+      const filledIntentId = mkBytes32('0xccc');
+      const unfilledIntentId = mkBytes32('0xddd');
+
+      // Create a hub intent for the filled one
+      const hubIntent = createHubIntent({ id: filledIntentId, status: TIntentStatus.Filled });
+      await saveHubIntents([hubIntent], ['filled_timestamp', 'filled_tx_nonce', 'status'], pool);
+
+      const messages = [
+        createMessage({
+          id: mkBytes32('0xmsg7'),
+          intentIds: [filledIntentId],
+          type: 'FILL',
+        }),
+        createMessage({
+          id: mkBytes32('0xmsg8'),
+          intentIds: [unfilledIntentId],
+          type: 'FILL',
+        }),
+      ];
+
+      await saveMessages(messages, [], [], [], pool);
+
+      const updatedCount = await updateMessageStatuses(pool);
+
+      expect(updatedCount).to.be.eq(1);
+
+      const deliveredAfter = await getMessagesByStatus([HyperlaneStatus.delivered], 0, 100, pool);
+      expect(deliveredAfter.length).to.be.eq(1);
+      expect(deliveredAfter[0].id).to.be.eq(messages[0].id);
+    });
+
+    it('should not update intent or fill messages when no hub intent exists', async () => {
+      const messages = [
+        createMessage({
+          id: mkBytes32('0xmsg9'),
+          intentIds: [mkBytes32('0xeee')],
+          type: 'INTENT',
+        }),
+        createMessage({
+          id: mkBytes32('0xmsg10'),
+          intentIds: [mkBytes32('0xfff')],
+          type: 'FILL',
+        }),
+      ];
+
+      await saveMessages(messages, [], [], [], pool);
+
+      const updatedCount = await updateMessageStatuses(pool);
+
+      expect(updatedCount).to.be.eq(0);
+
+      const pendingMessages = await getMessagesByStatus([HyperlaneStatus.none], 0, 100, pool);
+      expect(pendingMessages.length).to.be.eq(2);
     });
   });
 });

@@ -10,6 +10,7 @@ import {
   HubMessage,
   HubMeta,
   jsonifyError,
+  Logger,
   Message,
   Order,
   OriginIntent,
@@ -74,6 +75,14 @@ import {
   SubgraphQueryMetaParams,
 } from '../lib';
 
+const logger = new Logger({
+  level: 'info',
+  name: 'envio-reader',
+  formatters: {
+    level: (label) => ({ level: label.toUpperCase() }),
+  },
+});
+
 let context: { config: SubgraphConfig };
 export const getContext = () => context;
 
@@ -121,7 +130,7 @@ export class EnvioReader implements ISubgraphReader {
     try {
       return await executeEnvioQuery<T>(config, query, variables);
     } catch (e: unknown) {
-      console.error(jsonifyError(e as Error));
+      logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error));
       throw new RuntimeError(e as Record<string, unknown>);
     }
   }
@@ -139,7 +148,7 @@ export class EnvioReader implements ISubgraphReader {
       const result = await this.queryEnvio<T>(queries[0]);
       return { data: result as T, domain } as QueryResponse<T>;
     } catch (e: unknown) {
-      console.error(jsonifyError(e as Error));
+      logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error));
       throw new RuntimeError(e as Record<string, unknown>);
     }
   }
@@ -166,7 +175,7 @@ export class EnvioReader implements ISubgraphReader {
         }
       }
     } catch (e: unknown) {
-      console.error(jsonifyError(e as Error));
+      logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error));
     }
 
     return result;
@@ -477,7 +486,7 @@ export class EnvioReader implements ISubgraphReader {
         );
         allIntents.push(...intents);
       } catch (e: unknown) {
-        console.error(jsonifyError(e as Error), { domain });
+        logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error), { domain });
       }
     }
 
@@ -529,7 +538,7 @@ export class EnvioReader implements ISubgraphReader {
         );
         allIntents.push(...intents);
       } catch (e: unknown) {
-        console.error(jsonifyError(e as Error), { domain });
+        logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error), { domain });
       }
     }
 
