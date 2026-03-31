@@ -24,11 +24,51 @@ import {
 } from '@chimera-monorepo/utils';
 import { getHelpers } from '../lib/helpers';
 import { RuntimeError } from '../lib/errors';
-import { EnvioIntentEntity } from '../lib/helpers/parse';
+import {
+  EnvioIntentEntity,
+  EnvioHubIntentEntity,
+  EnvioHubSettlementEntity,
+  EnvioInvoiceEntity,
+  EnvioSettlementIntentEntity,
+  EnvioDepositEntity,
+  EnvioDepositorEventEntity,
+  EnvioTokenEntity,
+  EnvioHubAssetEntity,
+  EnvioQueueEntity,
+  EnvioSettlementQueueEntity,
+  EnvioDepositQueueEntity,
+  EnvioMessageEntity,
+  EnvioSettlementMessageEntity,
+  EnvioHubMetaEntity,
+  EnvioDomainEntity,
+  EnvioSpokeMetaEntity,
+  EnvioOrderEntity,
+} from '../lib/helpers/parse';
 import { ISubgraphReader } from '../reader';
 import {
   getEnvioIntentByIdQuery,
   getEnvioIntentsQuery,
+  getEnvioHubIntentByIdQuery,
+  getEnvioHubIntentsAddedQuery,
+  getEnvioHubIntentsFilledQuery,
+  getEnvioHubSettlementsQuery,
+  getEnvioInvoiceByIntentIdQuery,
+  getEnvioInvoicesQuery,
+  getEnvioSettlementIntentByIdQuery,
+  getEnvioSettlementIntentsQuery,
+  getEnvioDepositByIntentIdQuery,
+  getEnvioDepositsQuery,
+  getEnvioDepositQueuesQuery,
+  getEnvioDepositorEventsQuery,
+  getEnvioTokensQuery,
+  getEnvioSpokeQueuesQuery,
+  getEnvioSettlementQueuesQuery,
+  getEnvioSpokeMessagesQuery,
+  getEnvioSettlementMessagesQuery,
+  getEnvioHubMetaQuery,
+  getEnvioSpokeMetaQuery,
+  getEnvioOrdersQuery,
+  getEnvioChainMetadataQuery,
   QueryResponse,
   SubgraphConfig,
   SubgraphQueryMetaParams,
@@ -43,8 +83,10 @@ export const getContext = () => context;
  * Unlike Goldsky subgraphs which are domain-specific, Envio provides a single
  * subgraph per environment (mainnet-staging, mainnet-prod) that covers all domains.
  *
- * Note: Envio only tracks spoke contracts (IntentAdded/IntentFilled events),
- * so hub-specific methods return empty arrays or throw errors.
+ * Envio now tracks both spoke and hub contracts with full subgraph parity.
+ * Only 4 audit-trail methods remain as stubs (getHubMetaUpdates, getSpokeMetaUpdates,
+ * getHubTokenUpdates, getHubAssetUpdates) since Envio doesn't have immutable
+ * update-log entities.
  */
 export class EnvioReader implements ISubgraphReader {
   private static instance: EnvioReader | undefined;
@@ -64,12 +106,6 @@ export class EnvioReader implements ISubgraphReader {
 
   /**
    * Query Envio HyperIndex (multichain, environment-specific subgraph)
-   * Unlike Goldsky subgraphs which are domain-specific, Envio provides a single
-   * subgraph per environment (mainnet-staging, mainnet-prod) that covers all domains.
-   *
-   * @param query - GraphQL query string
-   * @param variables - Optional query variables
-   * @returns Query result
    */
   public async queryEnvio<T = Record<string, unknown>>(
     query: string,
@@ -93,14 +129,8 @@ export class EnvioReader implements ISubgraphReader {
   /**
    * Make a direct GraphQL query to the subgraph of the given domain.
    * For Envio, the domain is ignored as it's multichain.
-   *
-   * @param domain - Domain (ignored for Envio, kept for interface compatibility)
-   * @param queries - The GraphQL query strings you want to send
-   * @returns Query result
    */
   public async query<T>(domain: string, queries: string[]): Promise<QueryResponse<T> | undefined> {
-    // Envio is multichain, so we combine queries and execute against Envio
-    // For now, we'll execute the first query (Envio doesn't support batching like Goldsky)
     if (queries.length === 0) {
       return undefined;
     }
@@ -114,22 +144,37 @@ export class EnvioReader implements ISubgraphReader {
     }
   }
 
+  // ============================================================================
+  // ISubgraphReader — Block number
+  // ============================================================================
+
   public async getLatestBlockNumber(domains: string[]): Promise<Map<string, number>> {
     const result: Map<string, number> = new Map();
 
-    for (const domain of domains) {
-      try {
-        const blockNumber = await this.getEnvioLatestBlockNumber(domain);
-        if (blockNumber !== undefined) {
-          result.set(domain, blockNumber);
+    try {
+      const data = await this.queryEnvio<{
+        chain_metadata: { chain_id: number; latest_processed_block: number }[];
+      }>(getEnvioChainMetadataQuery());
+
+      if (data?.chain_metadata) {
+        const domainSet = new Set(domains);
+        for (const chain of data.chain_metadata) {
+          const domainStr = chain.chain_id.toString();
+          if (domainSet.has(domainStr) && chain.latest_processed_block > 0) {
+            result.set(domainStr, chain.latest_processed_block);
+          }
         }
-      } catch (e: unknown) {
-        console.error(jsonifyError(e as Error), { domain });
       }
+    } catch (e: unknown) {
+      console.error(jsonifyError(e as Error));
     }
 
     return result;
   }
+
+  // ============================================================================
+  // ISubgraphReader — Single entity by ID
+  // ============================================================================
 
   public async getOriginIntentById(domain: string, intentId: string): Promise<OriginIntent | undefined> {
     return this.getEnvioOriginIntentById(intentId, domain);
@@ -139,100 +184,266 @@ export class EnvioReader implements ISubgraphReader {
     return this.getEnvioDestinationIntentById(intentId, domain);
   }
 
-  public async getHubIntentById(_domain: string, _intentId: string): Promise<HubIntent | undefined> {
-    // Envio only tracks spoke contracts, not hub contracts
-    return undefined;
+  public async getHubIntentById(domain: string, intentId: string): Promise<HubIntent | undefined> {
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{
+      HubIntent: EnvioHubIntentEntity[];
+      HubSettlement: EnvioHubSettlementEntity[];
+    }>(getEnvioHubIntentByIdQuery(), { intentId: intentId.toLowerCase() });
+
+    if (!result?.HubIntent || result.HubIntent.length === 0) {
+      return undefined;
+    }
+
+    const settlement = result.HubSettlement?.[0];
+    return parser.envioToHubIntent(result.HubIntent[0], settlement, domain);
   }
 
-  public async getHubInvoiceById(_domain: string, _intentId: string): Promise<HubInvoice | undefined> {
-    // Envio only tracks spoke contracts, not hub contracts
-    return undefined;
+  public async getHubInvoiceById(domain: string, intentId: string): Promise<HubInvoice | undefined> {
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{
+      Invoice: EnvioInvoiceEntity[];
+      HubIntent: EnvioHubIntentEntity[];
+    }>(getEnvioInvoiceByIntentIdQuery(), { intentId: intentId.toLowerCase() });
+
+    if (!result?.Invoice || result.Invoice.length === 0) {
+      return undefined;
+    }
+
+    return parser.envioToHubInvoice(result.Invoice[0]);
   }
 
-  public async getSettlementIntentById(_domain: string, _intentId: string): Promise<SettlementIntent | undefined> {
-    // Envio doesn't track settlement intents by ID
-    return undefined;
+  public async getSettlementIntentById(domain: string, intentId: string): Promise<SettlementIntent | undefined> {
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{
+      SettlementIntent: EnvioSettlementIntentEntity[];
+    }>(getEnvioSettlementIntentByIdQuery(), { intentId: intentId.toLowerCase() });
+
+    if (!result?.SettlementIntent || result.SettlementIntent.length === 0) {
+      return undefined;
+    }
+
+    return parser.envioToSettlementIntent(result.SettlementIntent[0], domain);
   }
 
   public async getHubDepositEnqueuedById(
-    _domain: string,
-    _intentId: string,
+    domain: string,
+    intentId: string,
   ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
-    // Envio only tracks spoke contracts, not hub contracts
-    return undefined;
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{
+      Deposit: EnvioDepositEntity[];
+      HubIntent: EnvioHubIntentEntity[];
+    }>(getEnvioDepositByIntentIdQuery(), { intentId: intentId.toLowerCase() });
+
+    if (!result?.Deposit || result.Deposit.length === 0) {
+      return undefined;
+    }
+
+    const deposit = result.Deposit[0];
+    if (!deposit.enqueuedTimestamp) {
+      return undefined;
+    }
+
+    const hubIntent = result.HubIntent?.[0];
+    return parser.envioToHubDepositFromEnqueued(deposit, hubIntent);
   }
 
   public async getHubDepositProcessedById(
-    _domain: string,
-    _intentId: string,
+    domain: string,
+    intentId: string,
   ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
-    // Envio only tracks spoke contracts, not hub contracts
-    return undefined;
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{
+      Deposit: EnvioDepositEntity[];
+      HubIntent: EnvioHubIntentEntity[];
+    }>(getEnvioDepositByIntentIdQuery(), { intentId: intentId.toLowerCase() });
+
+    if (!result?.Deposit || result.Deposit.length === 0) {
+      return undefined;
+    }
+
+    const deposit = result.Deposit[0];
+    if (!deposit.processedTimestamp) {
+      return undefined;
+    }
+
+    const hubIntent = result.HubIntent?.[0];
+    return parser.envioToHubDepositFromProcessed(deposit, hubIntent);
   }
 
-  public async getDepositorEvents(_domain: string, _latestNonce: number): Promise<DepositorEvent[]> {
-    // Envio doesn't track depositor events
-    return [];
+  // ============================================================================
+  // ISubgraphReader — Spoke entity lists
+  // ============================================================================
+
+  public async getDepositorEvents(domain: string, latestNonce: number): Promise<DepositorEvent[]> {
+    const { parser } = getHelpers();
+    const where: Record<string, unknown> = {
+      chainId: { _eq: parseInt(domain, 10) },
+      blockNumber: { _gt: latestNonce.toString() },
+    };
+
+    const result = await this.queryEnvio<{ DepositorEvent: EnvioDepositorEventEntity[] }>(
+      getEnvioDepositorEventsQuery(),
+      { where, limit: 200, offset: 0 },
+    );
+
+    return (result?.DepositorEvent ?? []).map(parser.envioToDepositorEvent);
   }
 
   public async getTokens(_hubDomain: string): Promise<[Token[], Asset[]]> {
-    // Envio doesn't track tokens/assets
-    return [[], []];
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{
+      Token: EnvioTokenEntity[];
+      HubAsset: EnvioHubAssetEntity[];
+    }>(getEnvioTokensQuery());
+
+    const tokens = (result?.Token ?? []).map(parser.envioToToken);
+    const assets = (result?.HubAsset ?? []).map(parser.envioToAsset);
+    return [tokens, assets];
   }
 
-  public async getSpokeQueues(_domain: string): Promise<Queue[]> {
-    // Envio doesn't track queues
-    return [];
+  public async getSpokeQueues(domain: string): Promise<Queue[]> {
+    const { parser } = getHelpers();
+    const where = { chainId: { _eq: parseInt(domain, 10) } };
+
+    const result = await this.queryEnvio<{ Queue: EnvioQueueEntity[] }>(
+      getEnvioSpokeQueuesQuery(),
+      { where },
+    );
+
+    return (result?.Queue ?? []).map(parser.envioToSpokeQueue);
   }
 
   public async getSettlementQueues(_hubDomain: string): Promise<Queue[]> {
-    // Envio doesn't track settlement queues
-    return [];
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{ SettlementQueue: EnvioSettlementQueueEntity[] }>(
+      getEnvioSettlementQueuesQuery(),
+    );
+
+    return (result?.SettlementQueue ?? []).map(parser.envioToSettlementQueue);
   }
 
-  public async getDepositQueues(_hubDomain: string, _fromBlock: number): Promise<DepositQueue[]> {
-    // Envio doesn't track deposit queues
-    return [];
+  public async getDepositQueues(_hubDomain: string, fromBlock: number): Promise<DepositQueue[]> {
+    const { parser } = getHelpers();
+    const where: Record<string, unknown> = {
+      blockNumber: { _gte: fromBlock.toString() },
+    };
+
+    const result = await this.queryEnvio<{ DepositQueue: EnvioDepositQueueEntity[] }>(
+      getEnvioDepositQueuesQuery(),
+      { where, limit: 200, offset: 0 },
+    );
+
+    return (result?.DepositQueue ?? []).map(parser.envioToDepositQueue);
   }
 
   public async getDepositsEnqueuedByNonce(
     _hubDomain: string,
-    _enqueuedLatestNonce: number,
-    _maxBlockNumber: number,
+    enqueuedLatestNonce: number,
+    maxBlockNumber: number,
   ): Promise<(HubDeposit & { status: TIntentStatus })[]> {
-    // Envio doesn't track deposits
-    return [];
+    const { parser } = getHelpers();
+    const where: Record<string, unknown> = {
+      enqueuedBlockNumber: {
+        _gt: enqueuedLatestNonce.toString(),
+        _lte: maxBlockNumber.toString(),
+      },
+      enqueuedTimestamp: { _is_null: false },
+    };
+
+    const result = await this.queryEnvio<{ Deposit: EnvioDepositEntity[] }>(
+      getEnvioDepositsQuery(),
+      { where, limit: 200, offset: 0, orderBy: [{ enqueuedBlockNumber: 'asc' }] },
+    );
+
+    return (result?.Deposit ?? []).map((d) => parser.envioToHubDepositFromEnqueued(d, undefined));
   }
 
   public async getDepositsProcessedByNonce(
     _hubDomain: string,
-    _processedLatestNonce: number,
-    _maxBlockNumber: number,
+    processedLatestNonce: number,
+    maxBlockNumber: number,
   ): Promise<(HubDeposit & { status: TIntentStatus })[]> {
-    // Envio doesn't track deposits
-    return [];
+    const { parser } = getHelpers();
+    const where: Record<string, unknown> = {
+      processedBlockNumber: {
+        _gt: processedLatestNonce.toString(),
+        _lte: maxBlockNumber.toString(),
+      },
+      processedTimestamp: { _is_null: false },
+    };
+
+    const result = await this.queryEnvio<{ Deposit: EnvioDepositEntity[] }>(
+      getEnvioDepositsQuery(),
+      { where, limit: 200, offset: 0, orderBy: [{ processedBlockNumber: 'asc' }] },
+    );
+
+    return (result?.Deposit ?? []).map((d) => parser.envioToHubDepositFromProcessed(d, undefined));
   }
 
-  public async getSpokeMessages(_domain: string, _latestNonce: number): Promise<Message[]> {
-    // Envio doesn't track messages
-    return [];
+  public async getSpokeMessages(domain: string, latestNonce: number): Promise<Message[]> {
+    const { parser } = getHelpers();
+    const where: Record<string, unknown> = {
+      chainId: { _eq: parseInt(domain, 10) },
+      blockNumber: { _gt: latestNonce.toString() },
+    };
+
+    const result = await this.queryEnvio<{ Message: EnvioMessageEntity[] }>(
+      getEnvioSpokeMessagesQuery(),
+      { where, limit: 200, offset: 0 },
+    );
+
+    return (result?.Message ?? []).map(parser.envioToSpokeMessage);
   }
 
-  public async getHubMessages(_domain: string, _latestNonce: number): Promise<HubMessage[]> {
-    // Envio doesn't track hub messages
-    return [];
+  public async getHubMessages(domain: string, latestNonce: number): Promise<HubMessage[]> {
+    const { parser } = getHelpers();
+    const where: Record<string, unknown> = {
+      blockNumber: { _gt: latestNonce.toString() },
+    };
+
+    const result = await this.queryEnvio<{ SettlementMessage: EnvioSettlementMessageEntity[] }>(
+      getEnvioSettlementMessagesQuery(),
+      { where, limit: 200, offset: 0 },
+    );
+
+    return (result?.SettlementMessage ?? []).map((e) => parser.envioToSettlementMessage(e, domain));
   }
+
+  // ============================================================================
+  // ISubgraphReader — Meta
+  // ============================================================================
 
   public async getHubMeta(_domain: string): Promise<HubMeta | undefined> {
-    // Envio doesn't track hub meta
-    return undefined;
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{
+      HubMeta: EnvioHubMetaEntity[];
+      Domain: EnvioDomainEntity[];
+    }>(getEnvioHubMetaQuery());
+
+    if (!result?.HubMeta || result.HubMeta.length === 0) {
+      return undefined;
+    }
+
+    return parser.envioToHubMeta(result.HubMeta[0], result.Domain ?? []);
   }
 
-  public async getSpokeMeta(_domain: string): Promise<SpokeMeta | undefined> {
-    // Envio doesn't track spoke meta
-    return undefined;
+  public async getSpokeMeta(domain: string): Promise<SpokeMeta | undefined> {
+    const { parser } = getHelpers();
+    const result = await this.queryEnvio<{ SpokeMeta: EnvioSpokeMetaEntity[] }>(
+      getEnvioSpokeMetaQuery(),
+      { chainId: domain },
+    );
+
+    if (!result?.SpokeMeta || result.SpokeMeta.length === 0) {
+      return undefined;
+    }
+
+    return parser.envioToSpokeMeta(result.SpokeMeta[0]);
   }
 
+  // Audit trail methods — stay as stubs (Envio doesn't have immutable update-log entities)
   public async getHubMetaUpdates(_domain: string, _fromBlock: number): Promise<ProtocolUpdateLog[]> {
     return [];
   }
@@ -242,14 +453,16 @@ export class EnvioReader implements ISubgraphReader {
   }
 
   public async getHubTokenUpdates(_domain: string, _fromBlock: number): Promise<HubTokenUpdateLog[]> {
-    // Envio doesn't track hub token update logs
     return [];
   }
 
   public async getHubAssetUpdates(_domain: string, _fromBlock: number): Promise<HubAssetUpdateLog[]> {
-    // Envio doesn't track hub asset update logs
     return [];
   }
+
+  // ============================================================================
+  // ISubgraphReader — Batch queries by nonce
+  // ============================================================================
 
   public async getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]> {
     const allIntents: OriginIntent[] = [];
@@ -265,7 +478,6 @@ export class EnvioReader implements ISubgraphReader {
         allIntents.push(...intents);
       } catch (e: unknown) {
         console.error(jsonifyError(e as Error), { domain });
-        // Continue with other domains
       }
     }
 
@@ -273,10 +485,33 @@ export class EnvioReader implements ISubgraphReader {
   }
 
   public async getSettlementIntentsByNonce(
-    _queryParams: Map<string, SubgraphQueryMetaParams>,
+    queryParams: Map<string, SubgraphQueryMetaParams>,
   ): Promise<SettlementIntent[]> {
-    // Envio doesn't track settlement intents
-    return [];
+    const { parser } = getHelpers();
+    const allIntents: SettlementIntent[] = [];
+
+    for (const [domain, params] of queryParams.entries()) {
+      try {
+        const where: Record<string, unknown> = {
+          settlementBlockNumber: {
+            _gt: params.latestNonce.toString(),
+            ...(params.maxBlockNumber ? { _lte: params.maxBlockNumber.toString() } : {}),
+          },
+        };
+
+        const result = await this.queryEnvio<{ SettlementIntent: EnvioSettlementIntentEntity[] }>(
+          getEnvioSettlementIntentsQuery(),
+          { where, limit: params.limit || 200, offset: 0 },
+        );
+
+        const intents = (result?.SettlementIntent ?? []).map((e) => parser.envioToSettlementIntent(e, domain));
+        allIntents.push(...intents);
+      } catch (e: unknown) {
+        console.error(jsonifyError(e as Error), { domain });
+      }
+    }
+
+    return allIntents;
   }
 
   public async getDestinationIntentsByNonce(
@@ -286,18 +521,15 @@ export class EnvioReader implements ISubgraphReader {
 
     for (const [domain, params] of queryParams.entries()) {
       try {
-        // Envio doesn't track txNonce, so we use blockNumber filtering
-        // latestNonce is ignored, we filter by maxBlockNumber only
         const intents = await this.getEnvioDestinationIntentsByNonce(
           [domain],
-          undefined, // fromBlockNumber - not using latestNonce
+          params.latestNonce,
           params.maxBlockNumber,
           params.limit || 200,
         );
         allIntents.push(...intents);
       } catch (e: unknown) {
         console.error(jsonifyError(e as Error), { domain });
-        // Continue with other domains
       }
     }
 
@@ -305,40 +537,117 @@ export class EnvioReader implements ISubgraphReader {
   }
 
   public async getHubIntentsByNonce(
-    _domain: string,
-    _addedLatestNonce: number,
-    _filledLatestNonce: number,
-    _enqueuedLatestNonce: number,
-    _maxBlockNumber: number,
+    domain: string,
+    addedLatestNonce: number,
+    filledLatestNonce: number,
+    enqueuedLatestNonce: number,
+    maxBlockNumber: number,
   ): Promise<[HubIntent[], HubIntent[], HubIntent[]]> {
-    // Envio doesn't track hub intents
-    return [[], [], []];
+    const { parser } = getHelpers();
+
+    const maxBlock = maxBlockNumber.toString();
+
+    // Query added intents
+    const addedWhere: Record<string, unknown> = {
+      addEventBlockNumber: { _gt: addedLatestNonce.toString(), _lte: maxBlock },
+      addEventTimestamp: { _is_null: false },
+    };
+
+    // Query filled intents
+    const filledWhere: Record<string, unknown> = {
+      fillEventBlockNumber: { _gt: filledLatestNonce.toString(), _lte: maxBlock },
+      fillEventTimestamp: { _is_null: false },
+    };
+
+    // Query settlement-enqueued settlements
+    const enqueuedWhere: Record<string, unknown> = {
+      enqueuedBlockNumber: { _gt: enqueuedLatestNonce.toString(), _lte: maxBlock },
+    };
+
+    const [addedResult, filledResult, enqueuedResult] = await Promise.all([
+      this.queryEnvio<{ HubIntent: EnvioHubIntentEntity[] }>(
+        getEnvioHubIntentsAddedQuery(),
+        { where: addedWhere, limit: 200, offset: 0 },
+      ),
+      this.queryEnvio<{ HubIntent: EnvioHubIntentEntity[] }>(
+        getEnvioHubIntentsFilledQuery(),
+        { where: filledWhere, limit: 200, offset: 0 },
+      ),
+      this.queryEnvio<{ HubSettlement: EnvioHubSettlementEntity[] }>(
+        getEnvioHubSettlementsQuery(),
+        { where: enqueuedWhere, limit: 200, offset: 0 },
+      ),
+    ]);
+
+    const added = (addedResult?.HubIntent ?? []).map((e) => parser.envioToHubIntent(e, undefined, domain));
+    const filled = (filledResult?.HubIntent ?? []).map((e) => parser.envioToHubIntent(e, undefined, domain));
+    const enqueued = (enqueuedResult?.HubSettlement ?? []).map((e) =>
+      parser.envioToHubIntentFromSettlement(e, undefined, domain),
+    );
+
+    return [added, filled, enqueued];
   }
 
   public async getHubInvoicesByNonce(
-    _domain: string,
-    _enqueuedLatestNonce: number,
-    _maxBlockNumber: number,
+    domain: string,
+    enqueuedLatestNonce: number,
+    maxBlockNumber: number,
   ): Promise<[HubInvoice[], HubIntent[]]> {
-    // Envio doesn't track hub invoices
-    return [[], []];
+    const { parser } = getHelpers();
+
+    const where: Record<string, unknown> = {
+      blockNumber: {
+        _gt: enqueuedLatestNonce.toString(),
+        _lte: maxBlockNumber.toString(),
+      },
+    };
+
+    const result = await this.queryEnvio<{ Invoice: EnvioInvoiceEntity[] }>(
+      getEnvioInvoicesQuery(),
+      { where, limit: 200, offset: 0 },
+    );
+
+    const invoices = (result?.Invoice ?? []).map(parser.envioToHubInvoice);
+    const intents = (result?.Invoice ?? []).map((e) => parser.envioToHubIntentFromInvoice(e, undefined, domain));
+
+    return [invoices, intents];
   }
 
   public async getOrdersByNonce(
-    _queryParams: Map<string, SubgraphQueryMetaParams>,
+    queryParams: Map<string, SubgraphQueryMetaParams>,
   ): Promise<(Order & { domain: string })[]> {
-    // Envio doesn't track orders
-    return [];
+    const { parser } = getHelpers();
+    const allOrders: (Order & { domain: string })[] = [];
+
+    for (const [domain, params] of queryParams.entries()) {
+      try {
+        const where: Record<string, unknown> = {
+          chainId: { _eq: parseInt(domain, 10) },
+          blockNumber: {
+            _gt: params.latestNonce.toString(),
+            ...(params.maxBlockNumber ? { _lte: params.maxBlockNumber.toString() } : {}),
+          },
+        };
+
+        const result = await this.queryEnvio<{ Order: EnvioOrderEntity[] }>(
+          getEnvioOrdersQuery(),
+          { where, limit: params.limit || 200, offset: 0 },
+        );
+
+        const orders = (result?.Order ?? []).map(parser.envioToOrder);
+        allOrders.push(...orders);
+      } catch (e: unknown) {
+        console.error(jsonifyError(e as Error), { domain });
+      }
+    }
+
+    return allOrders;
   }
 
   // ============================================================================
   // ENVIO-SPECIFIC METHODS (not part of ISubgraphReader interface)
   // ============================================================================
 
-  /**
-   * Get origin intent by ID from Envio HyperIndex
-   * Equivalent to getOriginIntentById but queries multichain Envio subgraph
-   */
   public async getEnvioOriginIntentById(intentId: string, originDomain?: string): Promise<OriginIntent | undefined> {
     const { parser } = getHelpers();
     const result = await this.queryEnvio<{ Intent: EnvioIntentEntity[] }>(getEnvioIntentByIdQuery(), { intentId });
@@ -348,7 +657,6 @@ export class EnvioReader implements ISubgraphReader {
     }
 
     const envioIntent = result.Intent[0];
-    // Filter by origin domain if provided
     if (originDomain && envioIntent.origin.toString() !== originDomain) {
       return undefined;
     }
@@ -356,10 +664,6 @@ export class EnvioReader implements ISubgraphReader {
     return parser.envioToOriginIntent(envioIntent, originDomain);
   }
 
-  /**
-   * Get destination intent by ID from Envio HyperIndex
-   * Equivalent to getDestinationIntentById but queries multichain Envio subgraph
-   */
   public async getEnvioDestinationIntentById(
     intentId: string,
     destinationDomain: string,
@@ -372,7 +676,6 @@ export class EnvioReader implements ISubgraphReader {
     }
 
     const envioIntent = result.Intent[0];
-    // Check if this intent has the destination domain
     if (!envioIntent.destinations.includes(parseInt(destinationDomain, 10))) {
       return undefined;
     }
@@ -380,11 +683,6 @@ export class EnvioReader implements ISubgraphReader {
     return parser.envioToDestinationIntent(envioIntent, destinationDomain);
   }
 
-  /**
-   * Get origin intents by nonce from Envio HyperIndex
-   * Equivalent to getOriginIntentsByNonce but queries multichain Envio subgraph
-   * Note: Envio doesn't use txNonce, so we use blockNumber/timestamp for filtering
-   */
   public async getEnvioOriginIntentsByNonce(
     originDomains: string[],
     fromBlockNumber?: number,
@@ -433,10 +731,6 @@ export class EnvioReader implements ISubgraphReader {
     }).filter((intent): intent is OriginIntent => intent !== null);
   }
 
-  /**
-   * Get destination intents by nonce from Envio HyperIndex
-   * Equivalent to getDestinationIntentsByNonce but queries multichain Envio subgraph
-   */
   public async getEnvioDestinationIntentsByNonce(
     destinationDomains: string[],
     fromBlockNumber?: number,
@@ -449,10 +743,7 @@ export class EnvioReader implements ISubgraphReader {
       status: { _eq: 'FILLED' },
     };
 
-    // Filter by destinations array - check if intent has the destination domain
     if (destinationDomains.length > 0) {
-      // Use _has_keys_any for array contains check, or try _contains
-      // Note: Hasura might use different syntax for array contains
       where.destinations = {
         _contains: destinationDomains.map((d) => parseInt(d, 10)),
       };
@@ -483,17 +774,13 @@ export class EnvioReader implements ISubgraphReader {
 
     const destinationIntents: DestinationIntent[] = [];
     for (const intent of result.Intent) {
-      // Only process intents that have fills
       if (!intent.fills || intent.fills.length === 0) {
         continue;
       }
 
-      // If no specific destination domains, use all destinations from the intent
       const domainsToCheck = destinationDomains.length > 0 ? destinationDomains : intent.destinations.map(String);
 
       for (const destDomain of domainsToCheck) {
-        // Check if this intent has a fill for this destination domain
-        // The fill's chainId should match the destination domain
         const hasFillForDomain = intent.fills.some((fill) => fill.chainId.toString() === destDomain);
 
         if (hasFillForDomain) {
@@ -508,30 +795,4 @@ export class EnvioReader implements ISubgraphReader {
     return destinationIntents;
   }
 
-  /**
-   * Get the latest block number from Envio HyperIndex
-   * Note: Envio is multichain, so this returns the latest block across all chains
-   * or for a specific chain if a domain is provided
-   */
-  public async getEnvioLatestBlockNumber(domain?: string): Promise<number | undefined> {
-    const where: Record<string, unknown> = {};
-
-    if (domain) {
-      where.origin = { _eq: parseInt(domain, 10) };
-    }
-
-    const query = getEnvioIntentsQuery('blockNumber', 'desc');
-    const result = await this.queryEnvio<{ Intent: EnvioIntentEntity[] }>(query, {
-      where,
-      limit: 1,
-      offset: 0,
-      orderBy: [{ blockNumber: 'desc' }],
-    });
-
-    if (!result?.Intent || result.Intent.length === 0) {
-      return undefined;
-    }
-
-    return parseInt(result.Intent[0].blockNumber, 10);
-  }
 }

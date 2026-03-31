@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   OriginIntent,
   DestinationIntent,
@@ -85,17 +86,23 @@ export interface ISubgraphReader {
 }
 
 /**
- * Composite SubgraphReader that combines GraphReader (Goldsky) and EnvioReader
- * Calls both readers in parallel and merges results
+ * Composite SubgraphReader that combines enabled readers (Goldsky, Envio).
+ * Calls all enabled readers in parallel and merges results.
  */
 export class SubgraphReader implements ISubgraphReader {
-  private graphReader: GraphReader;
-  private envioReader: EnvioReader;
+  private readers: ISubgraphReader[];
   private static instance: SubgraphReader | undefined;
 
   private constructor(config: SubgraphConfig) {
-    this.graphReader = GraphReader.create(config);
-    this.envioReader = EnvioReader.create(config);
+    this.readers = [];
+
+    if (config.goldskyEnabled !== false) {
+      this.readers.push(GraphReader.create(config));
+    }
+
+    if (config.envioEnabled !== false && config.envio?.url) {
+      this.readers.push(EnvioReader.create(config));
+    }
   }
 
   public static create(config: SubgraphConfig): SubgraphReader {
@@ -108,495 +115,254 @@ export class SubgraphReader implements ISubgraphReader {
     return instance;
   }
 
-  /**
-   * Make a direct GraphQL query to the subgraph
-   * Returns result from GraphReader (Goldsky) as a primary source
-   */
-  public async query<T>(domain: string, queries: string[]): Promise<QueryResponse<T> | undefined> {
-    // GraphReader is primary for direct queries
-    return this.graphReader.query<T>(domain, queries);
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  /** Call a method on all readers, returning first non-undefined result. */
+  private async firstResult<T>(fn: (r: ISubgraphReader) => Promise<T | undefined>): Promise<T | undefined> {
+    const results = await Promise.all(
+      this.readers.map((r) => {
+        try {
+          const p = fn(r);
+          return p && typeof (p as any).catch === 'function' ? p.catch(() => undefined) : p;
+        } catch {
+          return undefined;
+        }
+      }),
+    );
+    return results.find((r) => r !== undefined);
   }
 
-  /**
-   * Get the latest block number for given domains
-   * Merges results from both readers, preferring higher block numbers
-   */
-  public async getLatestBlockNumber(domains: string[]): Promise<Map<string, number>> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getLatestBlockNumber(domains).catch(() => new Map<string, number>()),
-      this.envioReader.getLatestBlockNumber(domains).catch(() => new Map<string, number>()),
-    ]);
-
-    const result = new Map<string, number>();
-    for (const domain of domains) {
-      const graphBlock = graphResults.get(domain);
-      const envioBlock = envioResults.get(domain);
-      // Prefer higher block number
-      const maxBlock = Math.max(graphBlock ?? 0, envioBlock ?? 0);
-      if (maxBlock > 0) {
-        result.set(domain, maxBlock);
+  /** Call a method on all readers, merge flat arrays, deduplicate by key. */
+  private async mergeArrays<T extends Record<string, unknown>>(
+    fn: (r: ISubgraphReader) => Promise<T[]>,
+    key: string,
+  ): Promise<T[]> {
+    const results = await Promise.all(
+      this.readers.map((r) => {
+        try {
+          const p = fn(r);
+          return p && typeof (p as any).catch === 'function' ? p.catch(() => [] as T[]) : (p ?? []);
+        } catch {
+          return [] as T[];
+        }
+      }),
+    );
+    const map = new Map<unknown, T>();
+    for (const arr of results) {
+      for (const item of arr) {
+        const k = item[key];
+        if (!map.has(k)) {
+          map.set(k, item);
+        }
       }
     }
-
-    return result;
+    return Array.from(map.values());
   }
 
-  /**
-   * Get origin intent by ID
-   * Tries GraphReader first, falls back to EnvioReader
-   */
+  // ---------------------------------------------------------------------------
+  // ISubgraphReader — direct query (propagates errors unlike firstResult)
+  // ---------------------------------------------------------------------------
+
+  public async query<T>(domain: string, queries: string[]): Promise<QueryResponse<T> | undefined> {
+    if (this.readers.length === 0) return undefined;
+
+    const settled = await Promise.allSettled(this.readers.map((r) => r.query<T>(domain, queries)));
+    // Return first fulfilled non-undefined result
+    for (const s of settled) {
+      if (s.status === 'fulfilled' && s.value !== undefined) return s.value;
+    }
+    // If all rejected, throw the first error
+    for (const s of settled) {
+      if (s.status === 'rejected') throw s.reason;
+    }
+    return undefined;
+  }
+
+  // ---------------------------------------------------------------------------
+  // ISubgraphReader — Block number
+  // ---------------------------------------------------------------------------
+
+  public async getLatestBlockNumber(domains: string[]): Promise<Map<string, number>> {
+    const results = await Promise.all(
+      this.readers.map((r) => r.getLatestBlockNumber(domains).catch(() => new Map<string, number>())),
+    );
+
+    const merged = new Map<string, number>();
+    for (const domain of domains) {
+      let max = 0;
+      for (const res of results) {
+        const block = res.get(domain) ?? 0;
+        if (block > max) max = block;
+      }
+      if (max > 0) merged.set(domain, max);
+    }
+    return merged;
+  }
+
+  // ---------------------------------------------------------------------------
+  // ISubgraphReader — Single entity by ID
+  // ---------------------------------------------------------------------------
+
   public async getOriginIntentById(domain: string, intentId: string): Promise<OriginIntent | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getOriginIntentById(domain, intentId).catch(() => undefined),
-      this.envioReader.getOriginIntentById(domain, intentId).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
+    return this.firstResult((r) => r.getOriginIntentById(domain, intentId));
   }
 
-  /**
-   * Get destination intent by ID
-   * Tries GraphReader first, falls back to EnvioReader
-   */
   public async getDestinationIntentById(domain: string, intentId: string): Promise<DestinationIntent | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getDestinationIntentById(domain, intentId).catch(() => undefined),
-      this.envioReader.getDestinationIntentById(domain, intentId).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
+    return this.firstResult((r) => r.getDestinationIntentById(domain, intentId));
   }
 
-  /**
-   * Get hub intent by ID
-   * Tries GraphReader first, falls back to EnvioReader
-   */
   public async getHubIntentById(domain: string, intentId: string): Promise<HubIntent | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getHubIntentById(domain, intentId).catch(() => undefined),
-      this.envioReader.getHubIntentById(domain, intentId).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
+    return this.firstResult((r) => r.getHubIntentById(domain, intentId));
   }
 
-  /**
-   * Get hub invoice by ID
-   * Tries GraphReader first, falls back to EnvioReader
-   */
   public async getHubInvoiceById(domain: string, intentId: string): Promise<HubInvoice | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getHubInvoiceById(domain, intentId).catch(() => undefined),
-      this.envioReader.getHubInvoiceById(domain, intentId).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
+    return this.firstResult((r) => r.getHubInvoiceById(domain, intentId));
   }
 
-  /**
-   * Get settlement intent by ID
-   * Tries GraphReader first, falls back to EnvioReader
-   */
   public async getSettlementIntentById(domain: string, intentId: string): Promise<SettlementIntent | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getSettlementIntentById(domain, intentId).catch(() => undefined),
-      this.envioReader.getSettlementIntentById(domain, intentId).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
+    return this.firstResult((r) => r.getSettlementIntentById(domain, intentId));
   }
 
-  /**
-   * Get hub deposit (enqueued) by intent ID
-   * Tries GraphReader first, falls back to EnvioReader
-   */
   public async getHubDepositEnqueuedById(
     domain: string,
     intentId: string,
   ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getHubDepositEnqueuedById(domain, intentId).catch(() => undefined),
-      this.envioReader.getHubDepositEnqueuedById(domain, intentId).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
+    return this.firstResult((r) => r.getHubDepositEnqueuedById(domain, intentId));
   }
 
-  /**
-   * Get hub deposit (processed) by intent ID
-   * Tries GraphReader first, falls back to EnvioReader
-   */
   public async getHubDepositProcessedById(
     domain: string,
     intentId: string,
   ): Promise<(HubDeposit & { status: TIntentStatus }) | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getHubDepositProcessedById(domain, intentId).catch(() => undefined),
-      this.envioReader.getHubDepositProcessedById(domain, intentId).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
+    return this.firstResult((r) => r.getHubDepositProcessedById(domain, intentId));
   }
 
-  /**
-   * Get depositor events
-   * Merges results from both readers
-   */
+  // ---------------------------------------------------------------------------
+  // ISubgraphReader — Meta (single entity)
+  // ---------------------------------------------------------------------------
+
+  public async getHubMeta(domain: string): Promise<HubMeta | undefined> {
+    return this.firstResult((r) => r.getHubMeta(domain));
+  }
+
+  public async getSpokeMeta(domain: string): Promise<SpokeMeta | undefined> {
+    return this.firstResult((r) => r.getSpokeMeta(domain));
+  }
+
+  // ---------------------------------------------------------------------------
+  // ISubgraphReader — Array results (merged + deduplicated)
+  // ---------------------------------------------------------------------------
+
   public async getDepositorEvents(domain: string, latestNonce: number): Promise<DepositorEvent[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getDepositorEvents(domain, latestNonce).catch(() => []),
-      this.envioReader.getDepositorEvents(domain, latestNonce).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by event ID if needed
-    return [...graphResults, ...envioResults];
+    return this.mergeArrays((r) => r.getDepositorEvents(domain, latestNonce), 'id');
   }
 
-  /**
-   * Get tokens and assets
-   * Merges results from both readers
-   */
   public async getTokens(hubDomain: string): Promise<[Token[], Asset[]]> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getTokens(hubDomain).catch(() => [[], []] as [Token[], Asset[]]),
-      this.envioReader.getTokens(hubDomain).catch(() => [[], []] as [Token[], Asset[]]),
-    ]);
+    const results = await Promise.all(
+      this.readers.map((r) => r.getTokens(hubDomain).catch(() => [[], []] as [Token[], Asset[]])),
+    );
 
-    // Merge tokens and assets, deduplicate by ID
     const tokenMap = new Map<string, Token>();
     const assetMap = new Map<string, Asset>();
 
-    for (const token of [...graphResult[0], ...envioResult[0]]) {
-      if (!tokenMap.has(token.id)) {
-        tokenMap.set(token.id, token);
+    for (const [tokens, assets] of results) {
+      for (const token of tokens) {
+        if (!tokenMap.has(token.id)) tokenMap.set(token.id, token);
       }
-    }
-
-    for (const asset of [...graphResult[1], ...envioResult[1]]) {
-      if (!assetMap.has(asset.id)) {
-        assetMap.set(asset.id, asset);
+      for (const asset of assets) {
+        if (!assetMap.has(asset.id)) assetMap.set(asset.id, asset);
       }
     }
 
     return [Array.from(tokenMap.values()), Array.from(assetMap.values())];
   }
 
-  /**
-   * Get spoke queues
-   * Merges results from both readers
-   */
   public async getSpokeQueues(domain: string): Promise<Queue[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getSpokeQueues(domain).catch(() => []),
-      this.envioReader.getSpokeQueues(domain).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by queue ID
-    const queueMap = new Map<string, Queue>();
-    for (const queue of [...graphResults, ...envioResults]) {
-      if (!queueMap.has(queue.id)) {
-        queueMap.set(queue.id, queue);
-      }
-    }
-
-    return Array.from(queueMap.values());
+    return this.mergeArrays((r) => r.getSpokeQueues(domain), 'id');
   }
 
-  /**
-   * Get settlement queues
-   * Merges results from both readers
-   */
   public async getSettlementQueues(hubDomain: string): Promise<Queue[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getSettlementQueues(hubDomain).catch(() => []),
-      this.envioReader.getSettlementQueues(hubDomain).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by queue ID
-    const queueMap = new Map<string, Queue>();
-    for (const queue of [...graphResults, ...envioResults]) {
-      if (!queueMap.has(queue.id)) {
-        queueMap.set(queue.id, queue);
-      }
-    }
-
-    return Array.from(queueMap.values());
+    return this.mergeArrays((r) => r.getSettlementQueues(hubDomain), 'id');
   }
 
-  /**
-   * Get deposit queues
-   * Merges results from both readers
-   */
   public async getDepositQueues(hubDomain: string, fromBlock: number): Promise<DepositQueue[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getDepositQueues(hubDomain, fromBlock).catch(() => []),
-      this.envioReader.getDepositQueues(hubDomain, fromBlock).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by queue ID
-    const queueMap = new Map<string, DepositQueue>();
-    for (const queue of [...graphResults, ...envioResults]) {
-      if (!queueMap.has(queue.id)) {
-        queueMap.set(queue.id, queue);
-      }
-    }
-
-    return Array.from(queueMap.values());
+    return this.mergeArrays((r) => r.getDepositQueues(hubDomain, fromBlock), 'id');
   }
 
-  /**
-   * Get deposits enqueued by nonce
-   * Merges results from both readers
-   */
   public async getDepositsEnqueuedByNonce(
     hubDomain: string,
     enqueuedLatestNonce: number,
     maxBlockNumber: number,
   ): Promise<(HubDeposit & { status: TIntentStatus })[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getDepositsEnqueuedByNonce(hubDomain, enqueuedLatestNonce, maxBlockNumber).catch(() => []),
-      this.envioReader.getDepositsEnqueuedByNonce(hubDomain, enqueuedLatestNonce, maxBlockNumber).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by deposit ID
-    const depositMap = new Map<string, HubDeposit & { status: TIntentStatus }>();
-    for (const deposit of [...graphResults, ...envioResults]) {
-      if (!depositMap.has(deposit.id)) {
-        depositMap.set(deposit.id, deposit);
-      }
-    }
-
-    return Array.from(depositMap.values());
+    return this.mergeArrays(
+      (r) => r.getDepositsEnqueuedByNonce(hubDomain, enqueuedLatestNonce, maxBlockNumber),
+      'id',
+    );
   }
 
-  /**
-   * Get deposits processed by nonce
-   * Merges results from both readers
-   */
   public async getDepositsProcessedByNonce(
     hubDomain: string,
     processedLatestNonce: number,
     maxBlockNumber: number,
   ): Promise<(HubDeposit & { status: TIntentStatus })[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getDepositsProcessedByNonce(hubDomain, processedLatestNonce, maxBlockNumber).catch(() => []),
-      this.envioReader.getDepositsProcessedByNonce(hubDomain, processedLatestNonce, maxBlockNumber).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by deposit ID
-    const depositMap = new Map<string, HubDeposit & { status: TIntentStatus }>();
-    for (const deposit of [...graphResults, ...envioResults]) {
-      if (!depositMap.has(deposit.id)) {
-        depositMap.set(deposit.id, deposit);
-      }
-    }
-
-    return Array.from(depositMap.values());
+    return this.mergeArrays(
+      (r) => r.getDepositsProcessedByNonce(hubDomain, processedLatestNonce, maxBlockNumber),
+      'id',
+    );
   }
 
-  /**
-   * Get spoke messages
-   * Merges results from both readers
-   */
   public async getSpokeMessages(domain: string, latestNonce: number): Promise<Message[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getSpokeMessages(domain, latestNonce).catch(() => []),
-      this.envioReader.getSpokeMessages(domain, latestNonce).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by message ID
-    const messageMap = new Map<string, Message>();
-    for (const message of [...graphResults, ...envioResults]) {
-      if (!messageMap.has(message.id)) {
-        messageMap.set(message.id, message);
-      }
-    }
-
-    return Array.from(messageMap.values());
+    return this.mergeArrays((r) => r.getSpokeMessages(domain, latestNonce), 'id');
   }
 
-  /**
-   * Get hub messages
-   * Merges results from both readers
-   */
   public async getHubMessages(domain: string, latestNonce: number): Promise<HubMessage[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getHubMessages(domain, latestNonce).catch(() => []),
-      this.envioReader.getHubMessages(domain, latestNonce).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by message ID
-    const messageMap = new Map<string, HubMessage>();
-    for (const message of [...graphResults, ...envioResults]) {
-      if (!messageMap.has(message.id)) {
-        messageMap.set(message.id, message);
-      }
-    }
-
-    return Array.from(messageMap.values());
-  }
-
-  /**
-   * Get hub meta
-   * Tries GraphReader first, falls back to EnvioReader
-   */
-  public async getHubMeta(domain: string): Promise<HubMeta | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getHubMeta(domain).catch(() => undefined),
-      this.envioReader.getHubMeta(domain).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
-  }
-
-  /**
-   * Get spoke meta
-   * Tries GraphReader first, falls back to EnvioReader
-   */
-  public async getSpokeMeta(domain: string): Promise<SpokeMeta | undefined> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader.getSpokeMeta(domain).catch(() => undefined),
-      this.envioReader.getSpokeMeta(domain).catch(() => undefined),
-    ]);
-
-    return graphResult ?? envioResult;
+    return this.mergeArrays((r) => r.getHubMessages(domain, latestNonce), 'id');
   }
 
   public async getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getHubMetaUpdates(domain, fromBlock).catch(() => []),
-      this.envioReader.getHubMetaUpdates(domain, fromBlock).catch(() => []),
-    ]);
-
-    const updateMap = new Map<string, ProtocolUpdateLog>();
-    for (const update of [...graphResults, ...envioResults]) {
-      if (!updateMap.has(update.id)) {
-        updateMap.set(update.id, update);
-      }
-    }
-
-    return Array.from(updateMap.values());
+    return this.mergeArrays((r) => r.getHubMetaUpdates(domain, fromBlock), 'id');
   }
 
   public async getSpokeMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getSpokeMetaUpdates(domain, fromBlock).catch(() => []),
-      this.envioReader.getSpokeMetaUpdates(domain, fromBlock).catch(() => []),
-    ]);
-
-    const updateMap = new Map<string, ProtocolUpdateLog>();
-    for (const update of [...graphResults, ...envioResults]) {
-      if (!updateMap.has(update.id)) {
-        updateMap.set(update.id, update);
-      }
-    }
-
-    return Array.from(updateMap.values());
+    return this.mergeArrays((r) => r.getSpokeMetaUpdates(domain, fromBlock), 'id');
   }
 
   public async getHubTokenUpdates(domain: string, fromBlock: number): Promise<HubTokenUpdateLog[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getHubTokenUpdates(domain, fromBlock).catch(() => []),
-      this.envioReader.getHubTokenUpdates(domain, fromBlock).catch(() => []),
-    ]);
-
-    const updateMap = new Map<string, HubTokenUpdateLog>();
-    for (const update of [...graphResults, ...envioResults]) {
-      if (!updateMap.has(update.id)) {
-        updateMap.set(update.id, update);
-      }
-    }
-
-    return Array.from(updateMap.values());
+    return this.mergeArrays((r) => r.getHubTokenUpdates(domain, fromBlock), 'id');
   }
 
   public async getHubAssetUpdates(domain: string, fromBlock: number): Promise<HubAssetUpdateLog[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getHubAssetUpdates(domain, fromBlock).catch(() => []),
-      this.envioReader.getHubAssetUpdates(domain, fromBlock).catch(() => []),
-    ]);
-
-    const updateMap = new Map<string, HubAssetUpdateLog>();
-    for (const update of [...graphResults, ...envioResults]) {
-      if (!updateMap.has(update.id)) {
-        updateMap.set(update.id, update);
-      }
-    }
-
-    return Array.from(updateMap.values());
+    return this.mergeArrays((r) => r.getHubAssetUpdates(domain, fromBlock), 'id');
   }
 
-  /**
-   * Get origin intents by nonce
-   * Merges results from both readers, deduplicates by intent ID
-   */
   public async getOriginIntentsByNonce(queryParams: Map<string, SubgraphQueryMetaParams>): Promise<OriginIntent[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getOriginIntentsByNonce(queryParams).catch(() => []),
-      this.envioReader.getOriginIntentsByNonce(queryParams).catch(() => []),
-    ]);
-
-    // Deduplicate by intent ID, prefer GraphReader results
-    const intentMap = new Map<string, OriginIntent>();
-    for (const intent of [...graphResults, ...envioResults]) {
-      if (!intentMap.has(intent.id)) {
-        intentMap.set(intent.id, intent);
-      }
-    }
-
-    return Array.from(intentMap.values());
+    return this.mergeArrays((r) => r.getOriginIntentsByNonce(queryParams), 'id');
   }
 
-  /**
-   * Get settlement intents by nonce
-   * Merges results from both readers
-   */
   public async getSettlementIntentsByNonce(
     queryParams: Map<string, SubgraphQueryMetaParams>,
   ): Promise<SettlementIntent[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getSettlementIntentsByNonce(queryParams).catch(() => []),
-      this.envioReader.getSettlementIntentsByNonce(queryParams).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by intent ID
-    const intentMap = new Map<string, SettlementIntent>();
-    for (const intent of [...graphResults, ...envioResults]) {
-      if (!intentMap.has(intent.intentId)) {
-        intentMap.set(intent.intentId, intent);
-      }
-    }
-
-    return Array.from(intentMap.values());
+    return this.mergeArrays((r) => r.getSettlementIntentsByNonce(queryParams), 'intentId');
   }
 
-  /**
-   * Get destination intents by nonce
-   * Merges results from both readers, deduplicates by intent ID
-   */
   public async getDestinationIntentsByNonce(
     queryParams: Map<string, SubgraphQueryMetaParams>,
   ): Promise<DestinationIntent[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getDestinationIntentsByNonce(queryParams).catch(() => []),
-      this.envioReader.getDestinationIntentsByNonce(queryParams).catch(() => []),
-    ]);
-
-    // Deduplicate by intent ID, prefer GraphReader results
-    const intentMap = new Map<string, DestinationIntent>();
-    for (const intent of [...graphResults, ...envioResults]) {
-      if (!intentMap.has(intent.id)) {
-        intentMap.set(intent.id, intent);
-      }
-    }
-
-    return Array.from(intentMap.values());
+    return this.mergeArrays((r) => r.getDestinationIntentsByNonce(queryParams), 'id');
   }
 
-  /**
-   * Get hub intents by nonce
-   * Merges results from both readers
-   */
+  public async getOrdersByNonce(
+    queryParams: Map<string, SubgraphQueryMetaParams>,
+  ): Promise<(Order & { domain: string })[]> {
+    return this.mergeArrays((r) => r.getOrdersByNonce(queryParams), 'id');
+  }
+
+  // ---------------------------------------------------------------------------
+  // ISubgraphReader — Tuple results (merged per position)
+  // ---------------------------------------------------------------------------
+
   public async getHubIntentsByNonce(
     domain: string,
     addedLatestNonce: number,
@@ -604,90 +370,56 @@ export class SubgraphReader implements ISubgraphReader {
     enqueuedLatestNonce: number,
     maxBlockNumber: number,
   ): Promise<[HubIntent[], HubIntent[], HubIntent[]]> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader
-        .getHubIntentsByNonce(domain, addedLatestNonce, filledLatestNonce, enqueuedLatestNonce, maxBlockNumber)
-        .catch(() => [[], [], []] as [HubIntent[], HubIntent[], HubIntent[]]),
-      this.envioReader
-        .getHubIntentsByNonce(domain, addedLatestNonce, filledLatestNonce, enqueuedLatestNonce, maxBlockNumber)
-        .catch(() => [[], [], []] as [HubIntent[], HubIntent[], HubIntent[]]),
-    ]);
+    const empty: [HubIntent[], HubIntent[], HubIntent[]] = [[], [], []];
+    const results = await Promise.all(
+      this.readers.map((r) =>
+        r
+          .getHubIntentsByNonce(domain, addedLatestNonce, filledLatestNonce, enqueuedLatestNonce, maxBlockNumber)
+          .catch(() => empty),
+      ),
+    );
 
-    // Merge each array, deduplicate by intent ID
-    const mergeHubIntents = (arr1: HubIntent[], arr2: HubIntent[]): HubIntent[] => {
-      const intentMap = new Map<string, HubIntent>();
-      for (const intent of [...arr1, ...arr2]) {
-        if (!intentMap.has(intent.id)) {
-          intentMap.set(intent.id, intent);
+    const dedup = (arrays: HubIntent[][]): HubIntent[] => {
+      const map = new Map<string, HubIntent>();
+      for (const arr of arrays) {
+        for (const item of arr) {
+          if (!map.has(item.id)) map.set(item.id, item);
         }
       }
-      return Array.from(intentMap.values());
+      return Array.from(map.values());
     };
 
     return [
-      mergeHubIntents(graphResult[0], envioResult[0]),
-      mergeHubIntents(graphResult[1], envioResult[1]),
-      mergeHubIntents(graphResult[2], envioResult[2]),
+      dedup(results.map((r) => r[0])),
+      dedup(results.map((r) => r[1])),
+      dedup(results.map((r) => r[2])),
     ];
   }
 
-  /**
-   * Get hub invoices by nonce
-   * Merges results from both readers
-   */
   public async getHubInvoicesByNonce(
     domain: string,
     enqueuedLatestNonce: number,
     maxBlockNumber: number,
   ): Promise<[HubInvoice[], HubIntent[]]> {
-    const [graphResult, envioResult] = await Promise.all([
-      this.graphReader
-        .getHubInvoicesByNonce(domain, enqueuedLatestNonce, maxBlockNumber)
-        .catch(() => [[], []] as [HubInvoice[], HubIntent[]]),
-      this.envioReader
-        .getHubInvoicesByNonce(domain, enqueuedLatestNonce, maxBlockNumber)
-        .catch(() => [[], []] as [HubInvoice[], HubIntent[]]),
-    ]);
+    const empty: [HubInvoice[], HubIntent[]] = [[], []];
+    const results = await Promise.all(
+      this.readers.map((r) =>
+        r.getHubInvoicesByNonce(domain, enqueuedLatestNonce, maxBlockNumber).catch(() => empty),
+      ),
+    );
 
-    // Merge invoices and intents, deduplicate by ID
     const invoiceMap = new Map<string, HubInvoice>();
     const intentMap = new Map<string, HubIntent>();
 
-    for (const invoice of [...graphResult[0], ...envioResult[0]]) {
-      if (!invoiceMap.has(invoice.id)) {
-        invoiceMap.set(invoice.id, invoice);
+    for (const [invoices, intents] of results) {
+      for (const invoice of invoices) {
+        if (!invoiceMap.has(invoice.id)) invoiceMap.set(invoice.id, invoice);
       }
-    }
-
-    for (const intent of [...graphResult[1], ...envioResult[1]]) {
-      if (!intentMap.has(intent.id)) {
-        intentMap.set(intent.id, intent);
+      for (const intent of intents) {
+        if (!intentMap.has(intent.id)) intentMap.set(intent.id, intent);
       }
     }
 
     return [Array.from(invoiceMap.values()), Array.from(intentMap.values())];
-  }
-
-  /**
-   * Get orders by nonce
-   * Merges results from both readers
-   */
-  public async getOrdersByNonce(
-    queryParams: Map<string, SubgraphQueryMetaParams>,
-  ): Promise<(Order & { domain: string })[]> {
-    const [graphResults, envioResults] = await Promise.all([
-      this.graphReader.getOrdersByNonce(queryParams).catch(() => []),
-      this.envioReader.getOrdersByNonce(queryParams).catch(() => []),
-    ]);
-
-    // Merge results, deduplicate by order ID
-    const orderMap = new Map<string, Order & { domain: string }>();
-    for (const order of [...graphResults, ...envioResults]) {
-      if (!orderMap.has(order.id)) {
-        orderMap.set(order.id, order);
-      }
-    }
-
-    return Array.from(orderMap.values());
   }
 }
