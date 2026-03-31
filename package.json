@@ -23,7 +23,8 @@
     "packages/agents/relayer",
     "packages/agents/watchtower",
     "packages/contracts",
-    "packages/subgraph"
+    "packages/subgraph",
+    "packages/indexer"
   ],
   "scripts": {
     "build:contracts": "yarn workspace @chimera-monorepo/contracts build",
