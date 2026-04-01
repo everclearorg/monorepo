@@ -36,7 +36,7 @@ contract PufETH is AddAssetBase, MainnetProductionEnvironment {
                          ADOPTED CONFIGURATION
     //////////////////////////////////////////////////////////////*/
 
-    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](3);
+    IHubStorage.AssetConfig[] memory _assetConfigs = new IHubStorage.AssetConfig[](5);
 
     ///// Ethereum
     _assetConfigs[0] = IHubStorage.AssetConfig({
@@ -61,6 +61,24 @@ contract PufETH is AddAssetBase, MainnetProductionEnvironment {
       tickerHash: _tickerHash,
       adopted: APECHAIN_PUFETH.toBytes32(),
       domain: APECHAIN,
+      approval: true,
+      strategy: IEverclear.Strategy.XERC20
+    });
+
+    // Base
+    _assetConfigs[3] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BASE_PUFETH.toBytes32(),
+      domain: BASE,
+      approval: true,
+      strategy: IEverclear.Strategy.XERC20
+    });
+
+    // BNB
+    _assetConfigs[4] = IHubStorage.AssetConfig({
+      tickerHash: _tickerHash,
+      adopted: BNB_PUFETH.toBytes32(),
+      domain: BNB,
       approval: true,
       strategy: IEverclear.Strategy.XERC20
     });

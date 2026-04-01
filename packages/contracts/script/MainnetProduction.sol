@@ -107,6 +107,8 @@ abstract contract MainnetAssets {
   address public constant ETHEREUM_PUFETH = 0xD7D2802f6b19843ac4DfE25022771FD83b5A7464;
   address public constant ZIRCUIT_PUFETH = 0x9346A5043C590133FE900aec643D9622EDddBA57;
   address public constant APECHAIN_PUFETH = 0x6234E5ef39B12EFdFcbd99dd7F452F27F3fEAE3b;
+  address public constant BASE_PUFETH = 0x23dA5F2d509cb43A59d43C108a43eDf34510eff1;
+  address public constant BNB_PUFETH = 0x64274835D88F5c0215da8AADd9A5f2D2A2569381;
 
   ///////////////////// CLEAR
   address public constant ETHEREUM_CLEAR = 0x58b9cB810A68a7f3e1E4f8Cb45D1B9B3c79705E8;
