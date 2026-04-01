@@ -21,6 +21,7 @@ import {
   Token,
   HubTokenUpdateLog,
   HubAssetUpdateLog,
+  Logger,
 } from '@chimera-monorepo/utils';
 import { getHelpers } from '../lib/helpers';
 import { RuntimeError } from '../lib/errors';
@@ -77,6 +78,8 @@ import {
 let context: { config: SubgraphConfig };
 export const getContext = () => context;
 
+const logger = new Logger({ name: 'EnvioReader', level: process.env.LOG_LEVEL ?? 'info' });
+
 /**
  * EnvioReader - Reader for Envio HyperIndex
  *
@@ -121,7 +124,7 @@ export class EnvioReader implements ISubgraphReader {
     try {
       return await executeEnvioQuery<T>(config, query, variables);
     } catch (e: unknown) {
-      console.error(jsonifyError(e as Error));
+      logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error));
       throw new RuntimeError(e as Record<string, unknown>);
     }
   }
@@ -139,7 +142,7 @@ export class EnvioReader implements ISubgraphReader {
       const result = await this.queryEnvio<T>(queries[0]);
       return { data: result as T, domain } as QueryResponse<T>;
     } catch (e: unknown) {
-      console.error(jsonifyError(e as Error));
+      logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error));
       throw new RuntimeError(e as Record<string, unknown>);
     }
   }
@@ -166,7 +169,7 @@ export class EnvioReader implements ISubgraphReader {
         }
       }
     } catch (e: unknown) {
-      console.error(jsonifyError(e as Error));
+      logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error));
     }
 
     return result;
@@ -307,10 +310,7 @@ export class EnvioReader implements ISubgraphReader {
     const { parser } = getHelpers();
     const where = { chainId: { _eq: parseInt(domain, 10) } };
 
-    const result = await this.queryEnvio<{ Queue: EnvioQueueEntity[] }>(
-      getEnvioSpokeQueuesQuery(),
-      { where },
-    );
+    const result = await this.queryEnvio<{ Queue: EnvioQueueEntity[] }>(getEnvioSpokeQueuesQuery(), { where });
 
     return (result?.Queue ?? []).map(parser.envioToSpokeQueue);
   }
@@ -330,10 +330,11 @@ export class EnvioReader implements ISubgraphReader {
       blockNumber: { _gte: fromBlock.toString() },
     };
 
-    const result = await this.queryEnvio<{ DepositQueue: EnvioDepositQueueEntity[] }>(
-      getEnvioDepositQueuesQuery(),
-      { where, limit: 200, offset: 0 },
-    );
+    const result = await this.queryEnvio<{ DepositQueue: EnvioDepositQueueEntity[] }>(getEnvioDepositQueuesQuery(), {
+      where,
+      limit: 200,
+      offset: 0,
+    });
 
     return (result?.DepositQueue ?? []).map(parser.envioToDepositQueue);
   }
@@ -352,12 +353,17 @@ export class EnvioReader implements ISubgraphReader {
       enqueuedTimestamp: { _is_null: false },
     };
 
-    const result = await this.queryEnvio<{ Deposit: EnvioDepositEntity[] }>(
-      getEnvioDepositsQuery(),
-      { where, limit: 200, offset: 0, orderBy: [{ enqueuedBlockNumber: 'asc' }] },
-    );
+    const result = await this.queryEnvio<{ Deposit: EnvioDepositEntity[] }>(getEnvioDepositsQuery(), {
+      where,
+      limit: 200,
+      offset: 0,
+      orderBy: [{ enqueuedBlockNumber: 'asc' }],
+    });
 
-    return (result?.Deposit ?? []).map((d) => parser.envioToHubDepositFromEnqueued(d, undefined));
+    const deposits = result?.Deposit ?? [];
+    const hubIntentMap = await this.fetchHubIntentsByDepositIds(deposits);
+
+    return deposits.map((d) => parser.envioToHubDepositFromEnqueued(d, hubIntentMap.get(d.intentId)));
   }
 
   public async getDepositsProcessedByNonce(
@@ -374,12 +380,17 @@ export class EnvioReader implements ISubgraphReader {
       processedTimestamp: { _is_null: false },
     };
 
-    const result = await this.queryEnvio<{ Deposit: EnvioDepositEntity[] }>(
-      getEnvioDepositsQuery(),
-      { where, limit: 200, offset: 0, orderBy: [{ processedBlockNumber: 'asc' }] },
-    );
+    const result = await this.queryEnvio<{ Deposit: EnvioDepositEntity[] }>(getEnvioDepositsQuery(), {
+      where,
+      limit: 200,
+      offset: 0,
+      orderBy: [{ processedBlockNumber: 'asc' }],
+    });
 
-    return (result?.Deposit ?? []).map((d) => parser.envioToHubDepositFromProcessed(d, undefined));
+    const deposits = result?.Deposit ?? [];
+    const hubIntentMap = await this.fetchHubIntentsByDepositIds(deposits);
+
+    return deposits.map((d) => parser.envioToHubDepositFromProcessed(d, hubIntentMap.get(d.intentId)));
   }
 
   public async getSpokeMessages(domain: string, latestNonce: number): Promise<Message[]> {
@@ -389,10 +400,11 @@ export class EnvioReader implements ISubgraphReader {
       blockNumber: { _gt: latestNonce.toString() },
     };
 
-    const result = await this.queryEnvio<{ Message: EnvioMessageEntity[] }>(
-      getEnvioSpokeMessagesQuery(),
-      { where, limit: 200, offset: 0 },
-    );
+    const result = await this.queryEnvio<{ Message: EnvioMessageEntity[] }>(getEnvioSpokeMessagesQuery(), {
+      where,
+      limit: 200,
+      offset: 0,
+    });
 
     return (result?.Message ?? []).map(parser.envioToSpokeMessage);
   }
@@ -431,10 +443,9 @@ export class EnvioReader implements ISubgraphReader {
 
   public async getSpokeMeta(domain: string): Promise<SpokeMeta | undefined> {
     const { parser } = getHelpers();
-    const result = await this.queryEnvio<{ SpokeMeta: EnvioSpokeMetaEntity[] }>(
-      getEnvioSpokeMetaQuery(),
-      { chainId: domain },
-    );
+    const result = await this.queryEnvio<{ SpokeMeta: EnvioSpokeMetaEntity[] }>(getEnvioSpokeMetaQuery(), {
+      chainId: domain,
+    });
 
     if (!result?.SpokeMeta || result.SpokeMeta.length === 0) {
       return undefined;
@@ -477,7 +488,7 @@ export class EnvioReader implements ISubgraphReader {
         );
         allIntents.push(...intents);
       } catch (e: unknown) {
-        console.error(jsonifyError(e as Error), { domain });
+        logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error), { domain });
       }
     }
 
@@ -507,7 +518,7 @@ export class EnvioReader implements ISubgraphReader {
         const intents = (result?.SettlementIntent ?? []).map((e) => parser.envioToSettlementIntent(e, domain));
         allIntents.push(...intents);
       } catch (e: unknown) {
-        console.error(jsonifyError(e as Error), { domain });
+        logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error), { domain });
       }
     }
 
@@ -529,7 +540,7 @@ export class EnvioReader implements ISubgraphReader {
         );
         allIntents.push(...intents);
       } catch (e: unknown) {
-        console.error(jsonifyError(e as Error), { domain });
+        logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error), { domain });
       }
     }
 
@@ -565,18 +576,21 @@ export class EnvioReader implements ISubgraphReader {
     };
 
     const [addedResult, filledResult, enqueuedResult] = await Promise.all([
-      this.queryEnvio<{ HubIntent: EnvioHubIntentEntity[] }>(
-        getEnvioHubIntentsAddedQuery(),
-        { where: addedWhere, limit: 200, offset: 0 },
-      ),
-      this.queryEnvio<{ HubIntent: EnvioHubIntentEntity[] }>(
-        getEnvioHubIntentsFilledQuery(),
-        { where: filledWhere, limit: 200, offset: 0 },
-      ),
-      this.queryEnvio<{ HubSettlement: EnvioHubSettlementEntity[] }>(
-        getEnvioHubSettlementsQuery(),
-        { where: enqueuedWhere, limit: 200, offset: 0 },
-      ),
+      this.queryEnvio<{ HubIntent: EnvioHubIntentEntity[] }>(getEnvioHubIntentsAddedQuery(), {
+        where: addedWhere,
+        limit: 200,
+        offset: 0,
+      }),
+      this.queryEnvio<{ HubIntent: EnvioHubIntentEntity[] }>(getEnvioHubIntentsFilledQuery(), {
+        where: filledWhere,
+        limit: 200,
+        offset: 0,
+      }),
+      this.queryEnvio<{ HubSettlement: EnvioHubSettlementEntity[] }>(getEnvioHubSettlementsQuery(), {
+        where: enqueuedWhere,
+        limit: 200,
+        offset: 0,
+      }),
     ]);
 
     const added = (addedResult?.HubIntent ?? []).map((e) => parser.envioToHubIntent(e, undefined, domain));
@@ -602,13 +616,31 @@ export class EnvioReader implements ISubgraphReader {
       },
     };
 
-    const result = await this.queryEnvio<{ Invoice: EnvioInvoiceEntity[] }>(
-      getEnvioInvoicesQuery(),
-      { where, limit: 200, offset: 0 },
-    );
+    const result = await this.queryEnvio<{ Invoice: EnvioInvoiceEntity[] }>(getEnvioInvoicesQuery(), {
+      where,
+      limit: 200,
+      offset: 0,
+    });
 
-    const invoices = (result?.Invoice ?? []).map(parser.envioToHubInvoice);
-    const intents = (result?.Invoice ?? []).map((e) => parser.envioToHubIntentFromInvoice(e, undefined, domain));
+    const invoiceEntities = result?.Invoice ?? [];
+
+    // Fetch existing HubIntents to preserve their status
+    const intentIds = invoiceEntities.map((e) => e.intentId);
+    const hubIntentMap = new Map<string, EnvioHubIntentEntity>();
+    if (intentIds.length > 0) {
+      const hubIntentResult = await this.queryEnvio<{ HubIntent: EnvioHubIntentEntity[] }>(
+        getEnvioHubIntentsAddedQuery(),
+        { where: { id: { _in: intentIds } }, limit: 200, offset: 0 },
+      );
+      for (const entity of hubIntentResult?.HubIntent ?? []) {
+        hubIntentMap.set(entity.id, entity);
+      }
+    }
+
+    const invoices = invoiceEntities.map(parser.envioToHubInvoice);
+    const intents = invoiceEntities.map((e) =>
+      parser.envioToHubIntentFromInvoice(e, hubIntentMap.get(e.intentId) ?? undefined, domain),
+    );
 
     return [invoices, intents];
   }
@@ -629,15 +661,16 @@ export class EnvioReader implements ISubgraphReader {
           },
         };
 
-        const result = await this.queryEnvio<{ Order: EnvioOrderEntity[] }>(
-          getEnvioOrdersQuery(),
-          { where, limit: params.limit || 200, offset: 0 },
-        );
+        const result = await this.queryEnvio<{ Order: EnvioOrderEntity[] }>(getEnvioOrdersQuery(), {
+          where,
+          limit: params.limit || 200,
+          offset: 0,
+        });
 
         const orders = (result?.Order ?? []).map(parser.envioToOrder);
         allOrders.push(...orders);
       } catch (e: unknown) {
-        console.error(jsonifyError(e as Error), { domain });
+        logger.error('Envio query error', undefined, undefined, jsonifyError(e as Error), { domain });
       }
     }
 
@@ -795,4 +828,21 @@ export class EnvioReader implements ISubgraphReader {
     return destinationIntents;
   }
 
+  private async fetchHubIntentsByDepositIds(
+    deposits: EnvioDepositEntity[],
+  ): Promise<Map<string, EnvioHubIntentEntity>> {
+    const intentIds = deposits.map((d) => d.intentId);
+    const map = new Map<string, EnvioHubIntentEntity>();
+    if (intentIds.length === 0) return map;
+
+    const result = await this.queryEnvio<{ HubIntent: EnvioHubIntentEntity[] }>(getEnvioHubIntentsAddedQuery(), {
+      where: { id: { _in: intentIds } },
+      limit: 200,
+      offset: 0,
+    });
+    for (const entity of result?.HubIntent ?? []) {
+      map.set(entity.id, entity);
+    }
+    return map;
+  }
 }
