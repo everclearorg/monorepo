@@ -15,6 +15,8 @@ export const SubgraphConfigSchema = Type.Object({
       timeout: Type.Optional(Type.Number({ minimum: 1, maximum: 60, default: 10 })),
     }),
   ),
+  goldskyEnabled: Type.Optional(Type.Boolean({ default: true })),
+  envioEnabled: Type.Optional(Type.Boolean({ default: true })),
 });
 
 export type SubgraphConfig = Static<typeof SubgraphConfigSchema>;
