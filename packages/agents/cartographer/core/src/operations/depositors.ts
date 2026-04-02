@@ -1,5 +1,7 @@
-import { canonizeId, createLoggingContext, getMaxTxNonce, chainWrapper } from '@chimera-monorepo/utils';
+import { canonizeId, createLoggingContext, chainWrapper } from '@chimera-monorepo/utils';
+import { ReaderCheckpoints } from '@chimera-monorepo/adapters-subgraph';
 import { AppContext } from '../context';
+import { loadReaderCheckpoints, saveReaderCheckpoints } from './checkpoints';
 
 export const updateDepositors = async (context: AppContext) => {
   const {
@@ -12,27 +14,27 @@ export const updateDepositors = async (context: AppContext) => {
   } = context;
   const { requestContext, methodContext } = createLoggingContext(updateDepositors.name);
   const spokes = Object.keys(chains);
+  const readerTypes = subgraph.getReaderTypes();
 
   logger.debug('Method start', requestContext, methodContext, {
     hubDomain,
     spokes,
   });
 
-  const depositors = await Promise.all(
+  const depositorResults = await Promise.all(
     spokes.map(async (spoke) => {
-      // Retrieve the most recent tx nonce
-      const latestTxNonce = await database.getCheckPoint('depositors_' + spoke);
+      // Retrieve per-reader checkpoints
+      const checkpoints = await loadReaderCheckpoints(database, 'depositors', spoke, readerTypes);
       logger.debug('Retrieving depositor data', requestContext, methodContext, {
         spoke,
-        latestTxNonce,
+        checkpoints,
       });
-      const events = await subgraph.getDepositorEvents(spoke, latestTxNonce);
-      return events.map((e) => ({ ...e, domain: spoke }));
+      const [events, newCheckpoints] = await subgraph.getDepositorEventsWithCheckpoints(spoke, checkpoints);
+      return { spoke, events: events.map((e) => ({ ...e, domain: spoke })), newCheckpoints };
     }),
   );
-  const updatedCheckpoints = depositors.map((depositor) => {
-    return getMaxTxNonce(depositor);
-  });
+  const depositors = depositorResults.map((r) => r.events);
+  const updatedCheckpoints: ReaderCheckpoints[] = depositorResults.map((r) => r.newCheckpoints);
 
   // Save the depositors
   const flat = depositors.flat();
@@ -74,7 +76,7 @@ export const updateDepositors = async (context: AppContext) => {
         // dont save checkpoint
         return;
       }
-      return database.saveCheckPoint('depositors_' + spoke, updatedCheckpoints[idx]);
+      return saveReaderCheckpoints(database, 'depositors', spoke, updatedCheckpoints[idx]);
     }),
   );
 

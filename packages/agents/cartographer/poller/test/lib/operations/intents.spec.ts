@@ -13,7 +13,7 @@ describe('Intents operations', () => {
         (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createOriginIntents(domains.length, [{ origin: '1337' }, { origin: '1338' }]);
-      (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getOriginIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.origin, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
         new Map(domains.map((domain) => [domain, 1])),
       );
@@ -27,7 +27,9 @@ describe('Intents operations', () => {
       expect(mockAppContext.adapters.database.saveOriginIntents as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.saveOriginIntents as SinonStub).to.be.calledWithExactly(expectedIntents);
 
-      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length);
+      // loadReaderCheckpoints: 2 calls per domain (legacy + goldsky)
+      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length * 2);
+      // saveReaderCheckpoints: 1 save per domain per reader type
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(domains.length);
     });
 
@@ -36,7 +38,7 @@ describe('Intents operations', () => {
         (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createOriginIntents(domains.length, [{ origin: '1337' }, { origin: '1338' }]);
-      (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getOriginIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.origin, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(new Map());
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
@@ -82,7 +84,7 @@ describe('Intents operations', () => {
         destinations: ['1338'],
       }]);
 
-      (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getOriginIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.origin, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
         new Map(domains.map((domain) => [domain, 1])),
       );
@@ -130,7 +132,7 @@ describe('Intents operations', () => {
         destinations: ['1338'],
       }]);
 
-      (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getOriginIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.origin, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
         new Map(domains.map((domain) => [domain, 1])),
       );
@@ -157,7 +159,7 @@ describe('Intents operations', () => {
         destinations: ['1338'],
       }]);
 
-      (mockAppContext.adapters.subgraph.getOriginIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getOriginIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.origin, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
         new Map(domains.map((domain) => [domain, 1])),
       );
@@ -176,7 +178,7 @@ describe('Intents operations', () => {
         (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createDestinationIntents(domains.length, [{ destination: '1337' }, { destination: '1338' }]);
-      (mockAppContext.adapters.subgraph.getDestinationIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getDestinationIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.destination, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
         new Map(domains.map((domain) => [domain, 1])),
       );
@@ -187,7 +189,7 @@ describe('Intents operations', () => {
       expect(mockAppContext.adapters.database.saveDestinationIntents as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.saveDestinationIntents as SinonStub).to.be.calledWithExactly(intents);
 
-      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length);
+      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length * 2);
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(domains.length);
     });
 
@@ -196,7 +198,7 @@ describe('Intents operations', () => {
         (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createDestinationIntents(domains.length, [{ destination: '1337' }, { destination: '1338' }]);
-      (mockAppContext.adapters.subgraph.getDestinationIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getDestinationIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.destination, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(new Map());
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
@@ -215,7 +217,7 @@ describe('Intents operations', () => {
         (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createSettlementIntents(domains.length);
-      (mockAppContext.adapters.subgraph.getSettlementIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getSettlementIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.domain, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
         new Map(domains.map((domain) => [domain, 1])),
       );
@@ -226,8 +228,9 @@ describe('Intents operations', () => {
       expect(mockAppContext.adapters.database.saveSettlementIntents as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.saveSettlementIntents as SinonStub).to.be.calledWithExactly(intents);
 
-      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length);
-      expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(1);
+      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length * 2);
+      // saveReaderCheckpoints called for each domain with results
+      expect((mockAppContext.adapters.database.saveCheckPoint as SinonStub).called).to.be.true;
     });
 
     it('not proceed if latest block number not available', async () => {
@@ -235,7 +238,7 @@ describe('Intents operations', () => {
         (domain) => domain !== mockAppContext.config.hub.domain && mockAppContext.config.chains[domain].network === 'evm',
       );
       const intents = createSettlementIntents(domains.length);
-      (mockAppContext.adapters.subgraph.getSettlementIntentsByNonce as SinonStub).resolves(intents);
+      (mockAppContext.adapters.subgraph.getSettlementIntentsByNonceWithCheckpoints as SinonStub).resolves([intents, new Map(intents.map((i: any) => [i.domain, { goldsky: i.txNonce ?? 1 }]))]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(new Map());
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
@@ -272,10 +275,9 @@ describe('Intents operations', () => {
         { status: 'DISPATCHED', domain: '1337' },
         { status: 'SETTLED', domain: '1338' },
       ]);
-      (mockAppContext.adapters.subgraph.getHubIntentsByNonce as SinonStub).resolves([
-        addedIntents,
-        filledIntents,
-        enqueuedIntents,
+      (mockAppContext.adapters.subgraph.getHubIntentsByNonceWithCheckpoints as SinonStub).resolves([
+        [addedIntents, filledIntents, enqueuedIntents],
+        { goldsky: 1 }, { goldsky: 1 }, { goldsky: 1 },
       ]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
         new Map([mockAppContext.config.hub.domain].map((domain) => [domain, 1])),
@@ -294,7 +296,9 @@ describe('Intents operations', () => {
         ['filled_timestamp', 'filled_tx_nonce', 'status'],
       );
 
-      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(3);
+      // loadReaderCheckpoints: 3 checkpoints * 2 calls each (legacy + goldsky)
+      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(6);
+      // saveReaderCheckpoints: 3 checkpoint types * 1 reader = 3
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(3);
     });
 
@@ -304,7 +308,10 @@ describe('Intents operations', () => {
         { status: 'SETTLED', domain: '1338' },
       ]);
 
-      (mockAppContext.adapters.subgraph.getHubIntentsByNonce as SinonStub).resolves([addedIntents, [], []]);
+      (mockAppContext.adapters.subgraph.getHubIntentsByNonceWithCheckpoints as SinonStub).resolves([
+        [addedIntents, [], []],
+        { goldsky: 1 }, {}, {},
+      ]);
       (mockAppContext.adapters.subgraph.getLatestBlockNumber as SinonStub).resolves(
         new Map([mockAppContext.config.hub.domain].map((domain) => [domain, 1])),
       );
@@ -322,7 +329,8 @@ describe('Intents operations', () => {
         ['filled_timestamp', 'filled_tx_nonce', 'status'],
       );
 
-      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(3);
+      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(6);
+      // Only addedCheckpoints has results (goldsky: 1), filled and enqueued are empty
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(1);
     });
   });

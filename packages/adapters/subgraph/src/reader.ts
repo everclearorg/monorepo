@@ -21,7 +21,7 @@ import {
   HubMeta,
   SpokeMeta,
 } from '@chimera-monorepo/utils';
-import { QueryResponse, SubgraphQueryMetaParams, SubgraphConfig } from './lib';
+import { QueryResponse, SubgraphQueryMetaParams, SubgraphConfig, ReaderCheckpoints } from './lib';
 import { GraphReader } from './graph';
 import { EnvioReader } from './envio';
 
@@ -29,6 +29,7 @@ import { EnvioReader } from './envio';
  * Interface for subgraph readers (both Goldsky and Envio)
  */
 export interface ISubgraphReader {
+  readonly readerType: string;
   query<T>(domain: string, queries: string[]): Promise<QueryResponse<T> | undefined>;
   getLatestBlockNumber(domains: string[]): Promise<Map<string, number>>;
   getOriginIntentById(domain: string, intentId: string): Promise<OriginIntent | undefined>;
@@ -90,6 +91,7 @@ export interface ISubgraphReader {
  * Calls all enabled readers in parallel and merges results.
  */
 export class SubgraphReader implements ISubgraphReader {
+  public readonly readerType = 'composite';
   private readers: ISubgraphReader[];
   private static instance: SubgraphReader | undefined;
 
@@ -143,7 +145,7 @@ export class SubgraphReader implements ISubgraphReader {
       this.readers.map((r) => {
         try {
           const p = fn(r);
-          return p && typeof (p as any).catch === 'function' ? p.catch(() => [] as T[]) : (p ?? []);
+          return p && typeof (p as any).catch === 'function' ? p.catch(() => [] as T[]) : p ?? [];
         } catch {
           return [] as T[];
         }
@@ -259,6 +261,17 @@ export class SubgraphReader implements ISubgraphReader {
     return this.mergeArrays((r) => r.getDepositorEvents(domain, latestNonce), 'id');
   }
 
+  public async getDepositorEventsWithCheckpoints(
+    domain: string,
+    checkpoints: ReaderCheckpoints,
+  ): Promise<[DepositorEvent[], ReaderCheckpoints]> {
+    return this.mergeArraysWithCheckpoints(
+      (r) => r.getDepositorEvents(domain, checkpoints[r.readerType] ?? checkpoints['default'] ?? 0),
+      'id',
+      (item) => item.txNonce ?? 0,
+    );
+  }
+
   public async getTokens(hubDomain: string): Promise<[Token[], Asset[]]> {
     const results = await Promise.all(
       this.readers.map((r) => r.getTokens(hubDomain).catch(() => [[], []] as [Token[], Asset[]])),
@@ -296,9 +309,28 @@ export class SubgraphReader implements ISubgraphReader {
     enqueuedLatestNonce: number,
     maxBlockNumber: number,
   ): Promise<(HubDeposit & { status: TIntentStatus })[]> {
-    return this.mergeArrays(
-      (r) => r.getDepositsEnqueuedByNonce(hubDomain, enqueuedLatestNonce, maxBlockNumber),
+    const [results] = await this.getDepositsEnqueuedByNonceWithCheckpoints(
+      hubDomain,
+      { default: enqueuedLatestNonce },
+      maxBlockNumber,
+    );
+    return results;
+  }
+
+  public async getDepositsEnqueuedByNonceWithCheckpoints(
+    hubDomain: string,
+    checkpoints: ReaderCheckpoints,
+    maxBlockNumber: number,
+  ): Promise<[(HubDeposit & { status: TIntentStatus })[], ReaderCheckpoints]> {
+    return this.mergeArraysWithCheckpoints(
+      (r) =>
+        r.getDepositsEnqueuedByNonce(
+          hubDomain,
+          checkpoints[r.readerType] ?? checkpoints['default'] ?? 0,
+          maxBlockNumber,
+        ),
       'id',
+      (item) => item.enqueuedTxNonce ?? 0,
     );
   }
 
@@ -307,9 +339,28 @@ export class SubgraphReader implements ISubgraphReader {
     processedLatestNonce: number,
     maxBlockNumber: number,
   ): Promise<(HubDeposit & { status: TIntentStatus })[]> {
-    return this.mergeArrays(
-      (r) => r.getDepositsProcessedByNonce(hubDomain, processedLatestNonce, maxBlockNumber),
+    const [results] = await this.getDepositsProcessedByNonceWithCheckpoints(
+      hubDomain,
+      { default: processedLatestNonce },
+      maxBlockNumber,
+    );
+    return results;
+  }
+
+  public async getDepositsProcessedByNonceWithCheckpoints(
+    hubDomain: string,
+    checkpoints: ReaderCheckpoints,
+    maxBlockNumber: number,
+  ): Promise<[(HubDeposit & { status: TIntentStatus })[], ReaderCheckpoints]> {
+    return this.mergeArraysWithCheckpoints(
+      (r) =>
+        r.getDepositsProcessedByNonce(
+          hubDomain,
+          checkpoints[r.readerType] ?? checkpoints['default'] ?? 0,
+          maxBlockNumber,
+        ),
       'id',
+      (item) => item.processedTxNonce ?? 0,
     );
   }
 
@@ -317,8 +368,30 @@ export class SubgraphReader implements ISubgraphReader {
     return this.mergeArrays((r) => r.getSpokeMessages(domain, latestNonce), 'id');
   }
 
+  public async getSpokeMessagesWithCheckpoints(
+    domain: string,
+    checkpoints: ReaderCheckpoints,
+  ): Promise<[Message[], ReaderCheckpoints]> {
+    return this.mergeArraysWithCheckpoints(
+      (r) => r.getSpokeMessages(domain, checkpoints[r.readerType] ?? checkpoints['default'] ?? 0),
+      'id',
+      (item) => item.txNonce ?? 0,
+    );
+  }
+
   public async getHubMessages(domain: string, latestNonce: number): Promise<HubMessage[]> {
     return this.mergeArrays((r) => r.getHubMessages(domain, latestNonce), 'id');
+  }
+
+  public async getHubMessagesWithCheckpoints(
+    domain: string,
+    checkpoints: ReaderCheckpoints,
+  ): Promise<[HubMessage[], ReaderCheckpoints]> {
+    return this.mergeArraysWithCheckpoints(
+      (r) => r.getHubMessages(domain, checkpoints[r.readerType] ?? checkpoints['default'] ?? 0),
+      'id',
+      (item) => item.txNonce ?? 0,
+    );
   }
 
   public async getHubMetaUpdates(domain: string, fromBlock: number): Promise<ProtocolUpdateLog[]> {
@@ -341,10 +414,34 @@ export class SubgraphReader implements ISubgraphReader {
     return this.mergeArrays((r) => r.getOriginIntentsByNonce(queryParams), 'id');
   }
 
+  public async getOriginIntentsByNonceWithCheckpoints(
+    queryParamsPerReader: Map<string, Map<string, SubgraphQueryMetaParams>>,
+  ): Promise<[OriginIntent[], Map<string, ReaderCheckpoints>]> {
+    return this.mergeMultiDomainWithCheckpoints(
+      queryParamsPerReader,
+      (r, params) => r.getOriginIntentsByNonce(params),
+      'id',
+      (item) => item.txNonce ?? 0,
+      (item) => (item as any).origin?.toString() ?? '',
+    );
+  }
+
   public async getSettlementIntentsByNonce(
     queryParams: Map<string, SubgraphQueryMetaParams>,
   ): Promise<SettlementIntent[]> {
     return this.mergeArrays((r) => r.getSettlementIntentsByNonce(queryParams), 'intentId');
+  }
+
+  public async getSettlementIntentsByNonceWithCheckpoints(
+    queryParamsPerReader: Map<string, Map<string, SubgraphQueryMetaParams>>,
+  ): Promise<[SettlementIntent[], Map<string, ReaderCheckpoints>]> {
+    return this.mergeMultiDomainWithCheckpoints(
+      queryParamsPerReader,
+      (r, params) => r.getSettlementIntentsByNonce(params),
+      'intentId',
+      (item) => item.txNonce ?? 0,
+      (item) => (item as any).domain ?? '',
+    );
   }
 
   public async getDestinationIntentsByNonce(
@@ -353,10 +450,34 @@ export class SubgraphReader implements ISubgraphReader {
     return this.mergeArrays((r) => r.getDestinationIntentsByNonce(queryParams), 'id');
   }
 
+  public async getDestinationIntentsByNonceWithCheckpoints(
+    queryParamsPerReader: Map<string, Map<string, SubgraphQueryMetaParams>>,
+  ): Promise<[DestinationIntent[], Map<string, ReaderCheckpoints>]> {
+    return this.mergeMultiDomainWithCheckpoints(
+      queryParamsPerReader,
+      (r, params) => r.getDestinationIntentsByNonce(params),
+      'id',
+      (item) => item.txNonce ?? 0,
+      (item) => (item as any).domain ?? '',
+    );
+  }
+
   public async getOrdersByNonce(
     queryParams: Map<string, SubgraphQueryMetaParams>,
   ): Promise<(Order & { domain: string })[]> {
     return this.mergeArrays((r) => r.getOrdersByNonce(queryParams), 'id');
+  }
+
+  public async getOrdersByNonceWithCheckpoints(
+    queryParamsPerReader: Map<string, Map<string, SubgraphQueryMetaParams>>,
+  ): Promise<[(Order & { domain: string })[], Map<string, ReaderCheckpoints>]> {
+    return this.mergeMultiDomainWithCheckpoints(
+      queryParamsPerReader,
+      (r, params) => r.getOrdersByNonce(params),
+      'id',
+      (item) => item.txNonce ?? 0,
+      (item) => item.domain,
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -370,13 +491,34 @@ export class SubgraphReader implements ISubgraphReader {
     enqueuedLatestNonce: number,
     maxBlockNumber: number,
   ): Promise<[HubIntent[], HubIntent[], HubIntent[]]> {
+    const [result] = await this.getHubIntentsByNonceWithCheckpoints(
+      domain,
+      { default: addedLatestNonce },
+      { default: filledLatestNonce },
+      { default: enqueuedLatestNonce },
+      maxBlockNumber,
+    );
+    return result;
+  }
+
+  public async getHubIntentsByNonceWithCheckpoints(
+    domain: string,
+    addedCheckpoints: ReaderCheckpoints,
+    filledCheckpoints: ReaderCheckpoints,
+    enqueuedCheckpoints: ReaderCheckpoints,
+    maxBlockNumber: number,
+  ): Promise<[[HubIntent[], HubIntent[], HubIntent[]], ReaderCheckpoints, ReaderCheckpoints, ReaderCheckpoints]> {
     const empty: [HubIntent[], HubIntent[], HubIntent[]] = [[], [], []];
-    const results = await Promise.all(
-      this.readers.map((r) =>
-        r
-          .getHubIntentsByNonce(domain, addedLatestNonce, filledLatestNonce, enqueuedLatestNonce, maxBlockNumber)
-          .catch(() => empty),
-      ),
+    const perReader = await Promise.all(
+      this.readers.map(async (r) => {
+        const addedNonce = addedCheckpoints[r.readerType] ?? addedCheckpoints['default'] ?? 0;
+        const filledNonce = filledCheckpoints[r.readerType] ?? filledCheckpoints['default'] ?? 0;
+        const enqueuedNonce = enqueuedCheckpoints[r.readerType] ?? enqueuedCheckpoints['default'] ?? 0;
+        const result = await r
+          .getHubIntentsByNonce(domain, addedNonce, filledNonce, enqueuedNonce, maxBlockNumber)
+          .catch(() => empty);
+        return { readerType: r.readerType, result };
+      }),
     );
 
     const dedup = (arrays: HubIntent[][]): HubIntent[] => {
@@ -389,10 +531,26 @@ export class SubgraphReader implements ISubgraphReader {
       return Array.from(map.values());
     };
 
+    const addedCps: ReaderCheckpoints = {};
+    const filledCps: ReaderCheckpoints = {};
+    const enqueuedCps: ReaderCheckpoints = {};
+
+    for (const { readerType, result } of perReader) {
+      const [added, filled, enqueued] = result;
+      addedCps[readerType] = Math.max(0, ...added.map((i) => i.addedTxNonce ?? 0));
+      filledCps[readerType] = Math.max(0, ...filled.map((i) => i.filledTxNonce ?? 0));
+      enqueuedCps[readerType] = Math.max(0, ...enqueued.map((i) => i.settlementEnqueuedTxNonce ?? 0));
+    }
+
     return [
-      dedup(results.map((r) => r[0])),
-      dedup(results.map((r) => r[1])),
-      dedup(results.map((r) => r[2])),
+      [
+        dedup(perReader.map((r) => r.result[0])),
+        dedup(perReader.map((r) => r.result[1])),
+        dedup(perReader.map((r) => r.result[2])),
+      ],
+      addedCps,
+      filledCps,
+      enqueuedCps,
     ];
   }
 
@@ -401,25 +559,135 @@ export class SubgraphReader implements ISubgraphReader {
     enqueuedLatestNonce: number,
     maxBlockNumber: number,
   ): Promise<[HubInvoice[], HubIntent[]]> {
+    const [result] = await this.getHubInvoicesByNonceWithCheckpoints(
+      domain,
+      { default: enqueuedLatestNonce },
+      maxBlockNumber,
+    );
+    return result;
+  }
+
+  public async getHubInvoicesByNonceWithCheckpoints(
+    domain: string,
+    checkpoints: ReaderCheckpoints,
+    maxBlockNumber: number,
+  ): Promise<[[HubInvoice[], HubIntent[]], ReaderCheckpoints]> {
     const empty: [HubInvoice[], HubIntent[]] = [[], []];
-    const results = await Promise.all(
-      this.readers.map((r) =>
-        r.getHubInvoicesByNonce(domain, enqueuedLatestNonce, maxBlockNumber).catch(() => empty),
-      ),
+    const perReader = await Promise.all(
+      this.readers.map(async (r) => {
+        const nonce = checkpoints[r.readerType] ?? checkpoints['default'] ?? 0;
+        const result = await r.getHubInvoicesByNonce(domain, nonce, maxBlockNumber).catch(() => empty);
+        return { readerType: r.readerType, result };
+      }),
     );
 
     const invoiceMap = new Map<string, HubInvoice>();
     const intentMap = new Map<string, HubIntent>();
+    const newCheckpoints: ReaderCheckpoints = {};
 
-    for (const [invoices, intents] of results) {
+    for (const { readerType, result } of perReader) {
+      const [invoices, intents] = result;
       for (const invoice of invoices) {
         if (!invoiceMap.has(invoice.id)) invoiceMap.set(invoice.id, invoice);
       }
       for (const intent of intents) {
         if (!intentMap.has(intent.id)) intentMap.set(intent.id, intent);
       }
+      newCheckpoints[readerType] = Math.max(0, ...invoices.map((i) => i.enqueuedTxNonce ?? 0));
     }
 
-    return [Array.from(invoiceMap.values()), Array.from(intentMap.values())];
+    return [[Array.from(invoiceMap.values()), Array.from(intentMap.values())], newCheckpoints];
+  }
+
+  // ---------------------------------------------------------------------------
+  // Helpers — per-reader checkpoint tracking
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Call a method on all readers with per-reader checkpoints, merge results,
+   * and return per-reader max checkpoint values.
+   */
+  private async mergeArraysWithCheckpoints<T extends Record<string, unknown>>(
+    fn: (r: ISubgraphReader) => Promise<T[]>,
+    key: string,
+    getNonce: (item: T) => number,
+  ): Promise<[T[], ReaderCheckpoints]> {
+    const perReader = await Promise.all(
+      this.readers.map(async (r) => {
+        try {
+          const p = fn(r);
+          const items = p && typeof (p as any).catch === 'function' ? await p.catch(() => [] as T[]) : (await p) ?? [];
+          return { readerType: r.readerType, items };
+        } catch {
+          return { readerType: r.readerType, items: [] as T[] };
+        }
+      }),
+    );
+
+    const map = new Map<unknown, T>();
+    const newCheckpoints: ReaderCheckpoints = {};
+
+    for (const { readerType, items } of perReader) {
+      for (const item of items) {
+        const k = item[key];
+        if (!map.has(k)) {
+          map.set(k, item);
+        }
+      }
+      newCheckpoints[readerType] = items.length > 0 ? Math.max(0, ...items.map(getNonce)) : 0;
+    }
+
+    return [Array.from(map.values()), newCheckpoints];
+  }
+
+  /**
+   * For multi-domain methods: each reader gets its own queryParams built from
+   * per-reader checkpoints. Returns merged results + per-domain per-reader checkpoints.
+   */
+  private async mergeMultiDomainWithCheckpoints<T extends Record<string, unknown>>(
+    queryParamsPerReader: Map<string, Map<string, SubgraphQueryMetaParams>>,
+    fn: (r: ISubgraphReader, params: Map<string, SubgraphQueryMetaParams>) => Promise<T[]>,
+    key: string,
+    getNonce: (item: T) => number,
+    getDomain: (item: T) => string,
+  ): Promise<[T[], Map<string, ReaderCheckpoints>]> {
+    const perReader = await Promise.all(
+      this.readers.map(async (r) => {
+        const params = queryParamsPerReader.get(r.readerType);
+        if (!params || params.size === 0) return { readerType: r.readerType, items: [] as T[] };
+        try {
+          const items = await fn(r, params).catch(() => [] as T[]);
+          return { readerType: r.readerType, items };
+        } catch {
+          return { readerType: r.readerType, items: [] as T[] };
+        }
+      }),
+    );
+
+    const map = new Map<unknown, T>();
+    // domainCheckpoints: domain -> { readerType -> maxNonce }
+    const domainCheckpoints = new Map<string, ReaderCheckpoints>();
+
+    for (const { readerType, items } of perReader) {
+      for (const item of items) {
+        const k = item[key];
+        if (!map.has(k)) map.set(k, item);
+
+        const domain = getDomain(item);
+        if (domain) {
+          if (!domainCheckpoints.has(domain)) domainCheckpoints.set(domain, {});
+          const dc = domainCheckpoints.get(domain)!;
+          const nonce = getNonce(item);
+          dc[readerType] = Math.max(dc[readerType] ?? 0, nonce);
+        }
+      }
+    }
+
+    return [Array.from(map.values()), domainCheckpoints];
+  }
+
+  /** Returns the reader types present in this composite reader. */
+  public getReaderTypes(): string[] {
+    return this.readers.map((r) => r.readerType);
   }
 }

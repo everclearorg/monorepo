@@ -6,13 +6,14 @@ import {
   TSettlementMessageType,
   createLoggingContext,
   getMaxBlockNumber,
-  getMaxTxNonce,
   SOLANA_CHAINID,
   SpokeMeta,
   jsonifyError,
   EverclearError,
   isPolymerRoute,
 } from '@chimera-monorepo/utils';
+import { ReaderCheckpoints } from '@chimera-monorepo/adapters-subgraph';
+import { loadReaderCheckpoints, saveReaderCheckpoints } from './checkpoints';
 
 import { AppContext } from '../context';
 import { CartographerConfig } from '../config';
@@ -101,18 +102,22 @@ export const updateMessages = async (context: AppContext) => {
   const evmDomains = Object.keys(config.chains)
     .filter((d) => config.chains[d].network === 'evm')
     .concat(config.hub.domain);
+  const readerTypes = subgraph.getReaderTypes();
   for (const domain of evmDomains) {
-    // Retrieve the most recent timestamp
-    const latestNonce = await database.getCheckPoint('message_' + domain);
+    // Retrieve per-reader checkpoints
+    const checkpoints = await loadReaderCheckpoints(database, 'message', domain, readerTypes);
 
     logger.debug('Retrieving messages', requestContext, methodContext, {
       domain,
-      latestNonce,
+      checkpoints,
     });
 
     let messages = [];
+    let newCheckpoints: ReaderCheckpoints = {};
     if (domain === config.hub.domain) {
-      messages = (await subgraph.getHubMessages(domain, latestNonce)).filter((m) => {
+      const [hubMessages, hubCps] = await subgraph.getHubMessagesWithCheckpoints(domain, checkpoints);
+      newCheckpoints = hubCps;
+      messages = hubMessages.filter((m) => {
         if (m.destinationDomain && !isChainConfigured(m.destinationDomain, config)) {
           logger.debug('Skipping message with unconfigured destination', requestContext, methodContext, {
             messageId: m.id,
@@ -149,7 +154,9 @@ export const updateMessages = async (context: AppContext) => {
         });
       await database.saveMessages(messages as Message[], [], [], hubIntentUpdates);
     } else {
-      messages = await subgraph.getSpokeMessages(domain, latestNonce);
+      const [spokeMessages, spokeCps] = await subgraph.getSpokeMessagesWithCheckpoints(domain, checkpoints);
+      newCheckpoints = spokeCps;
+      messages = spokeMessages;
       await Promise.all(
         messages.map(async (message) => {
           // all spoke messages go to the hub, use this domain if no destination on message
@@ -182,10 +189,9 @@ export const updateMessages = async (context: AppContext) => {
       );
     }
 
-    // If there are any new messages, update the checkpoint with the timestamp of the latest message
+    // If there are any new messages, save per-reader checkpoints
     if (messages.length > 0) {
-      const maxNonce = getMaxTxNonce(messages);
-      await database.saveCheckPoint('message_' + domain, maxNonce);
+      await saveReaderCheckpoints(database, 'message', domain, newCheckpoints);
     }
 
     logger.debug('Saved messages', requestContext, methodContext, { messages });

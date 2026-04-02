@@ -92,6 +92,7 @@ const logger = new Logger({ name: 'EnvioReader', level: process.env.LOG_LEVEL ??
  * update-log entities.
  */
 export class EnvioReader implements ISubgraphReader {
+  public readonly readerType = 'envio';
   private static instance: EnvioReader | undefined;
 
   private constructor(config: SubgraphConfig) {

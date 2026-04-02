@@ -30,8 +30,8 @@ describe('Invoice operations', () => {
       config = mockAppContext.config;
 
       reader.getLatestBlockNumber.resolves(new Map([[config.hub.domain, 100_00]]));
-      reader.getDepositsEnqueuedByNonce.resolves(enqueued);
-      reader.getDepositsProcessedByNonce.resolves([]);
+      (reader.getDepositsEnqueuedByNonceWithCheckpoints as any).resolves([enqueued, { goldsky: 1 }]);
+      (reader.getDepositsProcessedByNonceWithCheckpoints as any).resolves([[], {}]);
 
       database.getCheckPoint.resolves(0);
       database.saveHubDeposits.resolves();
@@ -48,7 +48,8 @@ describe('Invoice operations', () => {
       await updateHubDeposits(mockAppContext);
 
       expect(database.saveHubDeposits).callCount(1);
-      expect(database.saveCheckPoint.callCount).to.be.eq(2);
+      // saveReaderCheckpoints: 1 for enqueued (has results), 0 for processed (empty)
+      expect(database.saveCheckPoint.callCount).to.be.eq(1);
       expect(database.saveHubIntents).calledOnceWith(
         enqueued.map((e) => ({ status: e.status, domain: config.hub.domain, id: e.intentId })),
         ['status'],
@@ -56,10 +57,11 @@ describe('Invoice operations', () => {
     });
 
     it('should work with processed deposits', async () => {
-      reader.getDepositsProcessedByNonce.resolves(processed);
+      (reader.getDepositsProcessedByNonceWithCheckpoints as any).resolves([processed, { goldsky: 1 }]);
       await updateHubDeposits(mockAppContext);
 
-      expect(database.saveHubDeposits).calledOnceWith(processed);
+      expect(database.saveHubDeposits).callCount(1);
+      // saveReaderCheckpoints: 1 for enqueued + 1 for processed
       expect(database.saveCheckPoint.callCount).to.be.eq(2);
       expect(database.saveHubIntents).calledOnceWith(
         processed.map((e) => ({ status: e.status, domain: config.hub.domain, id: e.intentId })),
