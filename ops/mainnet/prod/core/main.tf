@@ -232,7 +232,7 @@ module "lighthouse_intent_cron" {
     LIGHTHOUSE_SERVICE = "intent"
     CONFIG_PARAMETER_NAME = local.lighthouse_intent_config_param_name
   })
-  schedule_expression    = "rate(1 minute)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -253,7 +253,7 @@ module "lighthouse_fill_cron" {
     LIGHTHOUSE_SERVICE = "fill"
     CONFIG_PARAMETER_NAME = local.lighthouse_fill_config_param_name
   })
-  schedule_expression    = "rate(3 minutes)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -274,7 +274,7 @@ module "lighthouse_settlement_cron" {
     LIGHTHOUSE_SERVICE = "settlement"
     CONFIG_PARAMETER_NAME = local.lighthouse_settlement_config_param_name
   })
-  schedule_expression    = "rate(1 minute)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -295,7 +295,7 @@ module "lighthouse_expired_cron" {
     LIGHTHOUSE_SERVICE = "expired"
     CONFIG_PARAMETER_NAME = local.lighthouse_expired_config_param_name
   })
-  schedule_expression    = "rate(10 minutes)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -316,7 +316,7 @@ module "lighthouse_invoice_cron" {
     LIGHTHOUSE_SERVICE = "invoice"
     CONFIG_PARAMETER_NAME = local.lighthouse_invoice_config_param_name
   })
-  schedule_expression    = "rate(1 minute)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -379,7 +379,7 @@ module "monitor_poller_cron" {
     MONITOR_SERVICE = "poller"
     CONFIG_PARAMETER_NAME = local.monitor_poller_config_param_name
   })
-  schedule_expression    = "rate(15 minutes)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 750
   memory_size            = 2048
   lambda_in_vpc          = true
@@ -401,7 +401,7 @@ module "lighthouse_solana_cron" {
     LIGHTHOUSE_SERVICE = "solana"
     CONFIG_PARAMETER_NAME = local.lighthouse_solana_config_param_name
   })
-  schedule_expression    = "rate(1 minute)"
+  schedule_expression    = "rate(1 hour)"
   timeout                = 300
   memory_size            = 2048
   lambda_in_vpc          = true

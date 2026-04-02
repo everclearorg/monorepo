@@ -71,42 +71,6 @@ module "cartographer-db-alarms" {
   sns_topic_subscription_emails           = local.db_alarm_emails
 }
 
-module "cartographer_db_replica" {
-  domain              = "cartographer"
-  source              = "../../../modules/db-replica"
-  replicate_source_db = module.cartographer_db.db_instance_identifier
-  depends_on          = [module.cartographer_db]
-  replica_identifier  = "rds-postgres-cartographer-replica-${var.environment}"
-  instance_class      = "db.t4g.xlarge"
-  allocated_storage     = 5000
-  max_allocated_storage = 5500
-
-  name     = module.cartographer_db.db_instance_name
-  username = module.cartographer_db.db_instance_username
-  password = module.cartographer_db.db_instance_password
-  port     = module.cartographer_db.db_instance_port
-
-  engine_version = module.cartographer_db.db_instance_engine_version
-
-  maintenance_window      = module.cartographer_db.db_maintenance_window
-  backup_retention_period = module.cartographer_db.db_backup_retention_period
-  backup_window           = module.cartographer_db.db_backup_window
-
-  tags = {
-    Environment = var.environment
-    Domain      = var.domain
-  }
-
-  parameter_group_name = "rds-postgres"
-
-  hosted_zone_id        = data.aws_route53_zone.primary.zone_id
-  stage                 = var.stage
-  environment           = var.environment
-  db_security_group_ids = module.cartographer_db.db_instance_vpc_security_group_ids
-  db_subnet_group_name  = module.cartographer_db.db_subnet_group_name
-  publicly_accessible   = module.cartographer_db.db_publicly_accessible
-}
-
 module "cartographer-db-replica-alarms" {
   source                                  = "../../../modules/db-alarms"
   db_instance_name                        = module.cartographer_db.db_instance_name
@@ -160,7 +124,7 @@ module "cartographer-depositors-lambda-cron" {
     CARTOGRAPHER_SERVICE = "depositors"
     CONFIG_PARAMETER_NAME = local.cartographer_depositors_config_param_name
   })
-  schedule_expression = "rate(1 minute)"
+  schedule_expression = "rate(1 hour)"
   memory_size         = 1024
   config              = local.local_cartographer_config
 }
@@ -177,7 +141,7 @@ module "cartographer-intents-lambda-cron" {
     CARTOGRAPHER_SERVICE = "intents"
     CONFIG_PARAMETER_NAME = local.cartographer_intents_config_param_name
   })
-  schedule_expression = "rate(1 minute)"
+  schedule_expression = "rate(1 hour)"
   memory_size         = 1024
   config              = local.local_cartographer_config
 }
@@ -194,7 +158,7 @@ module "cartographer-invoices-lambda-cron" {
     CARTOGRAPHER_SERVICE = "invoices"
     CONFIG_PARAMETER_NAME = local.cartographer_invoices_config_param_name
   })
-  schedule_expression = "rate(1 minute)"
+  schedule_expression = "rate(1 hour)"
   memory_size         = 1024
   config              = local.local_cartographer_config
 }
@@ -211,7 +175,7 @@ module "cartographer-monitor-lambda-cron" {
     CARTOGRAPHER_SERVICE = "monitor"
     CONFIG_PARAMETER_NAME = local.cartographer_monitor_config_param_name
   })
-  schedule_expression = "rate(1 minute)"
+  schedule_expression = "rate(1 hour)"
   memory_size         = 1024
   config              = local.local_cartographer_config
 }
