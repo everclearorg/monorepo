@@ -30,17 +30,6 @@ variable "lighthouse_image_tag" {
   default     = "latest"
 }
 
-variable "rmq_mgt_password" {
-  type        = string
-  description = "RabbitMQ management password"
-  sensitive   = true
-}
-
-variable "rmq_mgt_user" {
-  type        = string
-  default     = "everclear"
-  description = "RabbitMQ management user"
-}
 
 variable "certificate_arn_mainnet" {
   default = "arn:aws:acm:us-west-2:679752396206:certificate/f075a99b-4908-45fc-8bb6-f17c2754e4f0"
