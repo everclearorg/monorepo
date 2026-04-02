@@ -189,8 +189,11 @@ export const updateMessages = async (context: AppContext) => {
       );
     }
 
-    // If there are any new messages, save per-reader checkpoints
-    if (messages.length > 0) {
+    // Save per-reader checkpoints if any reader returned results,
+    // regardless of post-filter messages count (filtering may drop messages
+    // but the reader cursor should still advance).
+    const hasAdvanced = Object.values(newCheckpoints).some((v) => v > 0);
+    if (hasAdvanced) {
       await saveReaderCheckpoints(database, 'message', domain, newCheckpoints);
     }
 

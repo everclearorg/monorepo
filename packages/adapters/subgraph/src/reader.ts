@@ -458,7 +458,7 @@ export class SubgraphReader implements ISubgraphReader {
       (r, params) => r.getDestinationIntentsByNonce(params),
       'id',
       (item) => item.txNonce ?? 0,
-      (item) => (item as any).domain ?? '',
+      (item) => item.destination,
     );
   }
 
