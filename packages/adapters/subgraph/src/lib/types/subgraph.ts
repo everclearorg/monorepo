@@ -1,3 +1,9 @@
+/**
+ * Per-reader checkpoint values, keyed by readerType ('goldsky' | 'envio').
+ * Each reader uses its own cursor semantics (Goldsky: txNonce, Envio: blockNumber).
+ */
+export type ReaderCheckpoints = Record<string, number>;
+
 export type SubgraphQueryMetaParams = {
   maxBlockNumber: number;
   latestNonce: number;

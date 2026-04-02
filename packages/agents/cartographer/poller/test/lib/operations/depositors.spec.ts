@@ -10,12 +10,14 @@ describe('Depositors operations', () => {
     it('should work', async () => {
       const domains = Object.keys(mockAppContext.config.chains);
       const depositEvents = createDepositEvents(5);
-      (mockAppContext.adapters.subgraph.getDepositorEvents as SinonStub).resolves(depositEvents);
+      (mockAppContext.adapters.subgraph.getDepositorEventsWithCheckpoints as SinonStub).resolves([depositEvents, { goldsky: 1 }]);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
       await updateDepositors(mockAppContext);
       expect(mockAppContext.adapters.database.saveDepositors as SinonStub).callCount(1);
       expect(mockAppContext.adapters.database.saveBalances as SinonStub).callCount(1);
-      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length);
+      // loadReaderCheckpoints: 2 calls per domain (legacy + goldsky)
+      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length * 2);
+      // saveReaderCheckpoints: 1 per domain per reader type
       expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(
         Object.keys(mockAppContext.config.chains).length,
       );

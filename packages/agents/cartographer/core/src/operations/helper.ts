@@ -40,14 +40,19 @@ export const getSubgraphReaderConfig = (config: CartographerConfig): SubgraphCon
 };
 
 /**
- * Helper to get domains that have valid subgraph configurations
- * Only returns domains that are EVM-based and have non-empty subgraph URLs
+ * Helper to get domains that have valid indexer configurations
+ * Returns EVM-based domains queryable via either Goldsky subgraph URLs or Envio
  * @param config Cartographer config
  * @returns Array of domain IDs that can be queried via subgraph
  */
 export const getSubgraphSupportedDomains = (config: CartographerConfig): string[] => {
+  const envioAvailable = !!config.hub.envioSubgraphUrl;
   return Object.keys(config.chains).filter((domainId) => {
     const chain = config.chains[domainId];
-    return domainId !== config.hub.domain && chain.network === 'evm' && hasValidSubgraphUrls(chain.subgraphUrls);
+    return (
+      domainId !== config.hub.domain &&
+      chain.network === 'evm' &&
+      (hasValidSubgraphUrls(chain.subgraphUrls) || envioAvailable)
+    );
   });
 };

@@ -8,6 +8,7 @@ field_selection:
     - 'hash'
     - 'from'
     - 'gasPrice'
+    - 'gasLimit'
 
 # Define the contract ABIs
 contracts:

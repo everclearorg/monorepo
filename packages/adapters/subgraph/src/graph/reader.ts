@@ -93,6 +93,7 @@ let context: { config: SubgraphConfig };
 export const getContext = () => context;
 
 export class GraphReader implements ISubgraphReader {
+  public readonly readerType = 'goldsky';
   private static instance: GraphReader | undefined;
 
   private constructor(config: SubgraphConfig) {

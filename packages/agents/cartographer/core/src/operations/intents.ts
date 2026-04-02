@@ -1,10 +1,11 @@
-import { createLoggingContext, getMaxTxNonce, jsonifyError } from '@chimera-monorepo/utils';
+import { createLoggingContext, jsonifyError } from '@chimera-monorepo/utils';
 import { SubgraphQueryMetaParams } from '@chimera-monorepo/adapters-subgraph';
 
 import { AppContext } from '../context';
 import { DEFAULT_SAFE_CONFIRMATIONS } from '../config';
 import { getSubgraphSupportedDomains } from './helper';
 import { computeIsSwap } from '../lib/intentHelpers';
+import { loadReaderCheckpoints, saveReaderCheckpoints } from './checkpoints';
 
 export const updateOriginIntents = async (context: AppContext) => {
   const {
@@ -14,18 +15,20 @@ export const updateOriginIntents = async (context: AppContext) => {
   } = context;
   const { requestContext, methodContext } = createLoggingContext(updateOriginIntents.name);
   const domains = getSubgraphSupportedDomains(config);
+  const readerTypes = subgraph.getReaderTypes();
 
   logger.debug('Method start', requestContext, methodContext, { domains, chains: Object.keys(config.chains) });
 
-  const queryMetaParams: Map<string, SubgraphQueryMetaParams> = new Map();
+  // Build per-reader query params: each reader gets its own checkpoint per domain
+  const queryParamsPerReader = new Map<string, Map<string, SubgraphQueryMetaParams>>();
   const latestBlockNumbers: Map<string, number> = await subgraph.getLatestBlockNumber(domains);
+  for (const rt of readerTypes) {
+    queryParamsPerReader.set(rt, new Map());
+  }
+
   await Promise.all(
     domains.map(async (domain) => {
-      let latestBlockNumber: number | undefined = undefined;
-      if (latestBlockNumbers.has(domain)) {
-        latestBlockNumber = latestBlockNumbers.get(domain)!;
-      }
-
+      const latestBlockNumber = latestBlockNumbers.get(domain);
       if (!latestBlockNumber) {
         logger.error('Error getting the latestBlockNumber for domain.', requestContext, methodContext, undefined, {
           domain,
@@ -35,24 +38,27 @@ export const updateOriginIntents = async (context: AppContext) => {
         return;
       }
 
-      // Retrieve the most recent origin intent nonce we've saved for this domain.
       const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
-      const latestNonce = await database.getCheckPoint('origin_intent_' + domain);
-      queryMetaParams.set(domain, {
-        maxBlockNumber: latestBlockNumber - safeConfirmations,
-        latestNonce: latestNonce,
-        orderDirection: 'asc',
-      });
+      const maxBlock = latestBlockNumber - safeConfirmations;
+      const checkpoints = await loadReaderCheckpoints(database, 'origin_intent', domain, readerTypes);
+
+      for (const rt of readerTypes) {
+        queryParamsPerReader.get(rt)!.set(domain, {
+          maxBlockNumber: maxBlock,
+          latestNonce: checkpoints[rt] ?? 0,
+          orderDirection: 'asc',
+        });
+      }
     }),
   );
 
-  if (queryMetaParams.size === 0) {
+  if (queryParamsPerReader.values().next().value?.size === 0) {
     logger.debug('No domains to update', requestContext, methodContext, { domains });
     return;
   }
 
-  // Get origin intents for all domains in the mapping.
-  const intents = await subgraph.getOriginIntentsByNonce(queryMetaParams);
+  // Get origin intents for all domains with per-reader checkpoints
+  const [intents, domainCheckpoints] = await subgraph.getOriginIntentsByNonceWithCheckpoints(queryParamsPerReader);
   logger.info('Retrieved origin intents', requestContext, methodContext, { intents: intents.length });
 
   // Compute is_swap for each intent by comparing ticker hashes
@@ -70,21 +76,11 @@ export const updateOriginIntents = async (context: AppContext) => {
     };
   });
 
-  const checkpoints = domains
-    .map((domain) => {
-      const domainIntents = intentsWithSwapFlag.filter((intent) => intent.origin === domain);
-      const max = getMaxTxNonce(domainIntents);
-      const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-      if (domainIntents.length > 0 && max > latest) {
-        return { domain, checkpoint: max };
-      }
-      return undefined;
-    })
-    .filter((x) => !!x) as { domain: string; checkpoint: number }[];
-
   await database.saveOriginIntents(intentsWithSwapFlag);
-  for (const checkpoint of checkpoints) {
-    await database.saveCheckPoint('origin_intent_' + checkpoint.domain, checkpoint.checkpoint);
+
+  // Save per-reader checkpoints for each domain
+  for (const [domain, readerCps] of domainCheckpoints.entries()) {
+    await saveReaderCheckpoints(database, 'origin_intent', domain, readerCps);
   }
   // Log the successful update
   logger.debug('Updated OriginIntents in database', requestContext, methodContext, { intents });
@@ -99,16 +95,17 @@ export const updateDestinationIntents = async (context: AppContext) => {
   const { requestContext, methodContext } = createLoggingContext(updateDestinationIntents.name);
 
   const domains = getSubgraphSupportedDomains(config);
+  const readerTypes = subgraph.getReaderTypes();
 
-  const queryMetaParams: Map<string, SubgraphQueryMetaParams> = new Map();
+  const queryParamsPerReader = new Map<string, Map<string, SubgraphQueryMetaParams>>();
   const latestBlockNumbers: Map<string, number> = await subgraph.getLatestBlockNumber(domains);
+  for (const rt of readerTypes) {
+    queryParamsPerReader.set(rt, new Map());
+  }
+
   await Promise.all(
     domains.map(async (domain) => {
-      let latestBlockNumber: number | undefined = undefined;
-      if (latestBlockNumbers.has(domain)) {
-        latestBlockNumber = latestBlockNumbers.get(domain)!;
-      }
-
+      const latestBlockNumber = latestBlockNumbers.get(domain);
       if (!latestBlockNumber) {
         logger.error('Error getting the latestBlockNumber for domain.', requestContext, methodContext, undefined, {
           domain,
@@ -118,45 +115,41 @@ export const updateDestinationIntents = async (context: AppContext) => {
         return;
       }
 
-      // Retrieve the most recent destination intent nonce we've saved for this domain.
-      const latestNonce = await database.getCheckPoint('destination_intent_' + domain);
       const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
-      queryMetaParams.set(domain, {
-        maxBlockNumber: latestBlockNumber - safeConfirmations,
-        latestNonce: latestNonce,
-        orderDirection: 'asc',
-      });
+      const maxBlock = latestBlockNumber - safeConfirmations;
+      const checkpoints = await loadReaderCheckpoints(database, 'destination_intent', domain, readerTypes);
+
+      for (const rt of readerTypes) {
+        queryParamsPerReader.get(rt)!.set(domain, {
+          maxBlockNumber: maxBlock,
+          latestNonce: checkpoints[rt] ?? 0,
+          orderDirection: 'asc',
+        });
+      }
     }),
   );
 
-  if (queryMetaParams.size > 0) {
-    // Get destination intents for all domains in the mapping.
-    const intents = await subgraph.getDestinationIntentsByNonce(queryMetaParams);
-    intents.forEach((intent) => {
-      const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(
-        updateDestinationIntents.name,
-      );
-      logger.debug('Retrieved destination intent', _requestContext, _methodContext, { intent });
-    });
-    const checkpoints = domains
-      .map((domain) => {
-        const domainIntents = intents.filter((intent) => intent.destination === domain);
-        const max = getMaxTxNonce(domainIntents);
-        const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-        if (domainIntents.length > 0 && max > latest) {
-          return { domain, checkpoint: max };
-        }
-        return undefined;
-      })
-      .filter((x) => !!x) as { domain: string; checkpoint: number }[];
-
-    await database.saveDestinationIntents(intents);
-    for (const checkpoint of checkpoints) {
-      await database.saveCheckPoint('destination_intent_' + checkpoint.domain, checkpoint.checkpoint);
-    }
-    // Log the successful update
-    logger.debug('Updated DestinationIntents in database', requestContext, methodContext, { intents });
+  if (queryParamsPerReader.values().next().value?.size === 0) {
+    return;
   }
+
+  // Get destination intents with per-reader checkpoints
+  const [intents, domainCheckpoints] = await subgraph.getDestinationIntentsByNonceWithCheckpoints(queryParamsPerReader);
+  intents.forEach((intent) => {
+    const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(
+      updateDestinationIntents.name,
+    );
+    logger.debug('Retrieved destination intent', _requestContext, _methodContext, { intent });
+  });
+
+  await database.saveDestinationIntents(intents);
+
+  // Save per-reader checkpoints for each domain
+  for (const [domain, readerCps] of domainCheckpoints.entries()) {
+    await saveReaderCheckpoints(database, 'destination_intent', domain, readerCps);
+  }
+  // Log the successful update
+  logger.debug('Updated DestinationIntents in database', requestContext, methodContext, { intents });
 };
 
 export const updateHubIntents = async (context: AppContext) => {
@@ -166,6 +159,7 @@ export const updateHubIntents = async (context: AppContext) => {
     logger,
   } = context;
   const { requestContext, methodContext } = createLoggingContext(updateHubIntents.name);
+  const readerTypes = subgraph.getReaderTypes();
 
   logger.debug('Method start', requestContext, methodContext, { hubDomain: config.hub.domain });
   const latestBlockMap = await subgraph.getLatestBlockNumber([config.hub.domain]);
@@ -183,29 +177,32 @@ export const updateHubIntents = async (context: AppContext) => {
     return;
   }
 
-  // Get the latest checkpoint for the hub domain
-  const addedLatestNonce = await database.getCheckPoint('hub_intent_added_' + config.hub.domain);
-  const filledLatestNonce = await database.getCheckPoint('hub_intent_filled_' + config.hub.domain);
-  const enqueuedLatestNonce = await database.getCheckPoint('hub_intent_enqueued_' + config.hub.domain);
+  // Get per-reader checkpoints for the hub domain
+  const [addedCheckpoints, filledCheckpoints, enqueuedCheckpoints] = await Promise.all([
+    loadReaderCheckpoints(database, 'hub_intent_added', config.hub.domain, readerTypes),
+    loadReaderCheckpoints(database, 'hub_intent_filled', config.hub.domain, readerTypes),
+    loadReaderCheckpoints(database, 'hub_intent_enqueued', config.hub.domain, readerTypes),
+  ]);
   const safeConfirmations = config.hub.confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
   const maxBlockNumber = latestBlockMap.get(config.hub.domain)! - safeConfirmations;
   logger.debug('Querying subgraph for hub intents', requestContext, methodContext, {
-    addedLatestNonce,
-    filledLatestNonce,
-    enqueuedLatestNonce,
+    addedCheckpoints,
+    filledCheckpoints,
+    enqueuedCheckpoints,
     domain: config.hub.domain,
     latestBlock: maxBlockNumber,
   });
 
-  // Get intents from subgraph
+  // Get intents from subgraph with per-reader checkpoints
   // NOTE: enqueued intents will also include the slow path intents
-  const [addedIntents, filledIntents, enqueuedIntents] = await subgraph.getHubIntentsByNonce(
-    config.hub.domain,
-    addedLatestNonce,
-    filledLatestNonce,
-    enqueuedLatestNonce,
-    maxBlockNumber,
-  );
+  const [[addedIntents, filledIntents, enqueuedIntents], addedNewCps, filledNewCps, enqueuedNewCps] =
+    await subgraph.getHubIntentsByNonceWithCheckpoints(
+      config.hub.domain,
+      addedCheckpoints,
+      filledCheckpoints,
+      enqueuedCheckpoints,
+      maxBlockNumber,
+    );
   logger.debug('Retrieved hub intents', requestContext, methodContext, {
     addedIntents: addedIntents.map((i) => ({ id: i.id, status: i.status })),
     filledIntents: filledIntents.map((i) => ({ id: i.id, status: i.status })),
@@ -214,7 +211,6 @@ export const updateHubIntents = async (context: AppContext) => {
 
   // Exit early if no new intents are found
   if (addedIntents.length === 0 && filledIntents.length === 0 && enqueuedIntents.length === 0) {
-    // Save latest checkpoint
     logger.debug('No new intents found', requestContext, methodContext);
     return;
   }
@@ -233,22 +229,12 @@ export const updateHubIntents = async (context: AppContext) => {
     'queue_idx',
   ]);
 
-  // Save checkpoints
-  if (addedIntents.length !== 0) {
-    // Save latest checkpoint
-    const latest = getMaxTxNonce(addedIntents.map((i) => ({ txNonce: i.addedTxNonce! })));
-    await database.saveCheckPoint('hub_intent_added_' + config.hub.domain, latest);
-  }
-  if (filledIntents.length !== 0) {
-    // Save latest checkpoint
-    const latest = getMaxTxNonce(filledIntents.map((i) => ({ txNonce: i.filledTxNonce! })));
-    await database.saveCheckPoint('hub_intent_filled_' + config.hub.domain, latest);
-  }
-  if (enqueuedIntents.length !== 0) {
-    // Save latest checkpoint
-    const latest = getMaxTxNonce(enqueuedIntents.map((i) => ({ txNonce: i.settlementEnqueuedTxNonce! })));
-    await database.saveCheckPoint('hub_intent_enqueued_' + config.hub.domain, latest);
-  }
+  // Save per-reader checkpoints
+  await Promise.all([
+    saveReaderCheckpoints(database, 'hub_intent_added', config.hub.domain, addedNewCps),
+    saveReaderCheckpoints(database, 'hub_intent_filled', config.hub.domain, filledNewCps),
+    saveReaderCheckpoints(database, 'hub_intent_enqueued', config.hub.domain, enqueuedNewCps),
+  ]);
 };
 
 export const updateSettlementIntents = async (context: AppContext) => {
@@ -259,18 +245,19 @@ export const updateSettlementIntents = async (context: AppContext) => {
   } = context;
   const { requestContext, methodContext } = createLoggingContext(updateSettlementIntents.name);
   const domains = getSubgraphSupportedDomains(config);
+  const readerTypes = subgraph.getReaderTypes();
 
   logger.debug('Method start', requestContext, methodContext, { domains, chains: Object.keys(config.chains) });
 
-  const queryMetaParams: Map<string, SubgraphQueryMetaParams> = new Map();
+  const queryParamsPerReader = new Map<string, Map<string, SubgraphQueryMetaParams>>();
   const latestBlockNumbers: Map<string, number> = await subgraph.getLatestBlockNumber(domains);
+  for (const rt of readerTypes) {
+    queryParamsPerReader.set(rt, new Map());
+  }
+
   await Promise.all(
     domains.map(async (domain) => {
-      let latestBlockNumber: number | undefined = undefined;
-      if (latestBlockNumbers.has(domain)) {
-        latestBlockNumber = latestBlockNumbers.get(domain)!;
-      }
-
+      const latestBlockNumber = latestBlockNumbers.get(domain);
       if (!latestBlockNumber) {
         logger.error('Error getting the latestBlockNumber for domain.', requestContext, methodContext, undefined, {
           domain,
@@ -280,24 +267,28 @@ export const updateSettlementIntents = async (context: AppContext) => {
         return;
       }
 
-      // Retrieve the most recent settlement intent nonce we've saved for this domain.
-      const latestNonce = await database.getCheckPoint('settlement_intent_' + domain);
       const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
-      queryMetaParams.set(domain, {
-        maxBlockNumber: latestBlockNumber - safeConfirmations,
-        latestNonce: latestNonce,
-        orderDirection: 'asc',
-      });
+      const maxBlock = latestBlockNumber - safeConfirmations;
+      const checkpoints = await loadReaderCheckpoints(database, 'settlement_intent', domain, readerTypes);
+
+      for (const rt of readerTypes) {
+        queryParamsPerReader.get(rt)!.set(domain, {
+          maxBlockNumber: maxBlock,
+          latestNonce: checkpoints[rt] ?? 0,
+          orderDirection: 'asc',
+        });
+      }
     }),
   );
 
-  if (queryMetaParams.size === 0) {
+  if (queryParamsPerReader.values().next().value?.size === 0) {
     logger.debug('No domains to update', requestContext, methodContext, { domains });
     return;
   }
 
-  // Get settlement intents for all domains in the mapping.
-  const intents = await subgraph.getSettlementIntentsByNonce(queryMetaParams);
+  // Get settlement intents with per-reader checkpoints
+  const [intents, domainCheckpoints] =
+    await subgraph.getSettlementIntentsByNonceWithCheckpoints(queryParamsPerReader);
   logger.info('Retrieved settlement intents', requestContext, methodContext, { intents: intents.length });
   intents.forEach((intent) => {
     const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(
@@ -305,21 +296,12 @@ export const updateSettlementIntents = async (context: AppContext) => {
     );
     logger.debug('Retrieved settlement intent', _requestContext, _methodContext, { intent });
   });
-  const checkpoints = domains
-    .map((domain) => {
-      const domainIntents = intents.filter((intent) => intent.domain === domain);
-      const max = getMaxTxNonce(domainIntents);
-      const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-      if (domainIntents.length > 0 && max > latest) {
-        return { domain, checkpoint: max };
-      }
-      return undefined;
-    })
-    .filter((x) => !!x) as { domain: string; checkpoint: number }[];
 
   await database.saveSettlementIntents(intents);
-  for (const checkpoint of checkpoints) {
-    await database.saveCheckPoint('settlement_intent_' + checkpoint.domain, checkpoint.checkpoint);
+
+  // Save per-reader checkpoints for each domain
+  for (const [domain, readerCps] of domainCheckpoints.entries()) {
+    await saveReaderCheckpoints(database, 'settlement_intent', domain, readerCps);
   }
   // Log the successful update
   logger.debug('Updated SettlementIntents in database', requestContext, methodContext, { intents });
@@ -333,18 +315,19 @@ export const updateOrders = async (context: AppContext) => {
   } = context;
   const { requestContext, methodContext } = createLoggingContext(updateOrders.name);
   const domains = getSubgraphSupportedDomains(config);
+  const readerTypes = subgraph.getReaderTypes();
 
   logger.debug('Method start', requestContext, methodContext, { domains, chains: Object.keys(config.chains) });
 
-  const queryMetaParams: Map<string, SubgraphQueryMetaParams> = new Map();
+  const queryParamsPerReader = new Map<string, Map<string, SubgraphQueryMetaParams>>();
   const latestBlockNumbers: Map<string, number> = await subgraph.getLatestBlockNumber(domains);
+  for (const rt of readerTypes) {
+    queryParamsPerReader.set(rt, new Map());
+  }
+
   await Promise.all(
     domains.map(async (domain) => {
-      let latestBlockNumber: number | undefined = undefined;
-      if (latestBlockNumbers.has(domain)) {
-        latestBlockNumber = latestBlockNumbers.get(domain)!;
-      }
-
+      const latestBlockNumber = latestBlockNumbers.get(domain);
       if (!latestBlockNumber) {
         logger.error('Error getting the latestBlockNumber for domain.', requestContext, methodContext, undefined, {
           domain,
@@ -354,45 +337,38 @@ export const updateOrders = async (context: AppContext) => {
         return;
       }
 
-      // Retrieve the most recent order nonce we've saved for this domain
-      const latestNonce = await database.getCheckPoint('order_' + domain);
       const safeConfirmations = config.chains[domain].confirmations ?? DEFAULT_SAFE_CONFIRMATIONS;
-      queryMetaParams.set(domain, {
-        maxBlockNumber: latestBlockNumber - safeConfirmations,
-        latestNonce: latestNonce,
-        orderDirection: 'asc',
-      });
+      const maxBlock = latestBlockNumber - safeConfirmations;
+      const checkpoints = await loadReaderCheckpoints(database, 'order', domain, readerTypes);
+
+      for (const rt of readerTypes) {
+        queryParamsPerReader.get(rt)!.set(domain, {
+          maxBlockNumber: maxBlock,
+          latestNonce: checkpoints[rt] ?? 0,
+          orderDirection: 'asc',
+        });
+      }
     }),
   );
 
-  if (queryMetaParams.size === 0) {
+  if (queryParamsPerReader.values().next().value?.size === 0) {
     logger.debug('No domains to update', requestContext, methodContext, { domains });
     return;
   }
 
-  // Get orders for all domains in the mapping
-  const orders = await subgraph.getOrdersByNonce(queryMetaParams);
+  // Get orders with per-reader checkpoints
+  const [orders, domainCheckpoints] = await subgraph.getOrdersByNonceWithCheckpoints(queryParamsPerReader);
   logger.info('Retrieved orders', requestContext, methodContext, { domains, orders: orders.length });
   orders.forEach((order) => {
     const { requestContext: _requestContext, methodContext: _methodContext } = createLoggingContext(updateOrders.name);
     logger.debug('Retrieved order', _requestContext, _methodContext, { order });
   });
 
-  const checkpoints = domains
-    .map((domain) => {
-      const domainOrders = orders.filter((order) => order.domain === domain);
-      const max = getMaxTxNonce(domainOrders);
-      const latest = queryMetaParams.get(domain)?.latestNonce ?? 0;
-      if (domainOrders.length > 0 && max > latest) {
-        return { domain, checkpoint: max };
-      }
-      return undefined;
-    })
-    .filter((x) => !!x) as { domain: string; checkpoint: number }[];
-
   await database.saveOrders(orders);
-  for (const checkpoint of checkpoints) {
-    await database.saveCheckPoint('order_' + checkpoint.domain, checkpoint.checkpoint);
+
+  // Save per-reader checkpoints for each domain
+  for (const [domain, readerCps] of domainCheckpoints.entries()) {
+    await saveReaderCheckpoints(database, 'order', domain, readerCps);
   }
   // Log the successful update
   logger.debug('Updated Orders in database', requestContext, methodContext, { orders });

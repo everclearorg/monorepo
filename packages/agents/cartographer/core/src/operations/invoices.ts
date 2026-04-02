@@ -3,11 +3,12 @@ import {
   HubInvoice,
   TIntentStatus,
   createLoggingContext,
-  getMaxTxNonce,
   jsonifyError,
 } from '@chimera-monorepo/utils';
+import { ReaderCheckpoints } from '@chimera-monorepo/adapters-subgraph';
 
 import { AppContext } from '../context';
+import { loadReaderCheckpoints, saveReaderCheckpoints } from './checkpoints';
 
 export const updateHubInvoices = async (context: AppContext) => {
   const {
@@ -33,19 +34,20 @@ export const updateHubInvoices = async (context: AppContext) => {
     return;
   }
 
-  // Get the latest checkpoint for the hub domain
-  const enqueuedLatestNonce = await database.getCheckPoint('hub_invoice_' + config.hub.domain);
+  // Get per-reader checkpoints for the hub domain
+  const readerTypes = subgraph.getReaderTypes();
+  const checkpoints = await loadReaderCheckpoints(database, 'hub_invoice', config.hub.domain, readerTypes);
   const maxBlockNumber = latestBlockMap.get(config.hub.domain)!;
   logger.debug('Querying subgraph for hub invoices', requestContext, methodContext, {
-    enqueuedLatestNonce,
+    checkpoints,
     domain: config.hub.domain,
     latestBlock: maxBlockNumber,
   });
 
-  // Get invoices from subgraph
-  const [hubInvoices, hubIntents] = await subgraph.getHubInvoicesByNonce(
+  // Get invoices from subgraph with per-reader checkpoints
+  const [[hubInvoices, hubIntents], newCheckpoints] = await subgraph.getHubInvoicesByNonceWithCheckpoints(
     config.hub.domain,
-    enqueuedLatestNonce,
+    checkpoints,
     maxBlockNumber,
   );
   logger.debug('Retrieved hub invoices', requestContext, methodContext, {
@@ -75,9 +77,8 @@ export const updateHubInvoices = async (context: AppContext) => {
   // Save intents status to database
   await database.saveHubIntents(hubIntents, ['status']);
 
-  // Save latest checkpoint
-  const latest = getMaxTxNonce(hubInvoices.map((i) => ({ txNonce: i.enqueuedTxNonce! })));
-  await database.saveCheckPoint('hub_invoice_' + config.hub.domain, latest);
+  // Save per-reader checkpoints
+  await saveReaderCheckpoints(database, 'hub_invoice', config.hub.domain, newCheckpoints);
 };
 
 /**
@@ -108,23 +109,24 @@ export const updateHubDeposits = async (context: AppContext) => {
     return;
   }
 
-  // Get the latest checkpoint for the hub domain
-  const [enqueuedLatestNonce, processedLatestNonce] = await Promise.all([
-    database.getCheckPoint('hub_deposit_enqueued_' + config.hub.domain),
-    database.getCheckPoint('hub_deposit_processed_' + config.hub.domain),
+  // Get per-reader checkpoints for the hub domain
+  const readerTypes = subgraph.getReaderTypes();
+  const [enqueuedCheckpoints, processedCheckpoints] = await Promise.all([
+    loadReaderCheckpoints(database, 'hub_deposit_enqueued', config.hub.domain, readerTypes),
+    loadReaderCheckpoints(database, 'hub_deposit_processed', config.hub.domain, readerTypes),
   ]);
   const maxBlockNumber = latestBlockMap.get(config.hub.domain)!;
   logger.debug('Querying subgraph for hub deposits', requestContext, methodContext, {
-    processedLatestNonce,
-    enqueuedLatestNonce,
+    enqueuedCheckpoints,
+    processedCheckpoints,
     domain: config.hub.domain,
     latestBlock: maxBlockNumber,
   });
 
-  // Get deposits from subgraph
-  const [enqueuedDeposits, processedDeposits] = await Promise.all([
-    subgraph.getDepositsEnqueuedByNonce(config.hub.domain, enqueuedLatestNonce, maxBlockNumber),
-    subgraph.getDepositsProcessedByNonce(config.hub.domain, processedLatestNonce, maxBlockNumber),
+  // Get deposits from subgraph with per-reader checkpoints
+  const [[enqueuedDeposits, enqueuedNewCps], [processedDeposits, processedNewCps]] = await Promise.all([
+    subgraph.getDepositsEnqueuedByNonceWithCheckpoints(config.hub.domain, enqueuedCheckpoints, maxBlockNumber),
+    subgraph.getDepositsProcessedByNonceWithCheckpoints(config.hub.domain, processedCheckpoints, maxBlockNumber),
   ]);
   logger.debug('Retrieved hub deposits', requestContext, methodContext, {
     enqueuedDeposits: enqueuedDeposits.map((i) => ({ id: i.id })),
@@ -156,9 +158,9 @@ export const updateHubDeposits = async (context: AppContext) => {
     ['status'],
   );
 
-  // Save latest checkpoint
-  const latestEnqueued = getMaxTxNonce(enqueuedDeposits.map((i) => ({ txNonce: i.enqueuedTxNonce })));
-  const latestProcessed = getMaxTxNonce(processedDeposits.map((i) => ({ txNonce: i.processedTxNonce ?? 0 })));
-  await database.saveCheckPoint('hub_deposit_enqueued_' + config.hub.domain, latestEnqueued);
-  await database.saveCheckPoint('hub_deposit_processed_' + config.hub.domain, latestProcessed);
+  // Save per-reader checkpoints
+  await Promise.all([
+    saveReaderCheckpoints(database, 'hub_deposit_enqueued', config.hub.domain, enqueuedNewCps),
+    saveReaderCheckpoints(database, 'hub_deposit_processed', config.hub.domain, processedNewCps),
+  ]);
 };

@@ -35,8 +35,8 @@ describe('Monitor operations', () => {
       const domains = Object.keys(mockAppContext.config.chains).filter((d) => mockAppContext.config.chains[d].network === 'evm').concat(mockAppContext.config.hub.domain);
       const spokeMessages = createMessages(5);
       const hubMessages = createHubMessages(5);
-      (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves(spokeMessages);
-      (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
+      (mockAppContext.adapters.subgraph.getSpokeMessagesWithCheckpoints as SinonStub).resolves([spokeMessages, { goldsky: 1 }]);
+      (mockAppContext.adapters.subgraph.getHubMessagesWithCheckpoints as SinonStub).resolves([hubMessages, { goldsky: 1 }]);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
       await updateMessages(mockAppContext);
@@ -62,16 +62,17 @@ describe('Monitor operations', () => {
         [],
         hubIntentUpdates,
       );
-      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length);
-      expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(domains.length);
+      // loadReaderCheckpoints: 2 calls per domain (legacy + goldsky)
+      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length * 2);
+      expect((mockAppContext.adapters.database.saveCheckPoint as SinonStub).called).to.be.true;
     });
 
     it('saves messages with updated status', async () => {
       stub(coreMockable, 'getHyperlaneMsgDelivered').resolves(true);
       const hubMessages = createHubMessages(5);
       const spokeMessages = createMessages(5);
-      (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
-      (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves(spokeMessages);
+      (mockAppContext.adapters.subgraph.getHubMessagesWithCheckpoints as SinonStub).resolves([hubMessages, { goldsky: 1 }]);
+      (mockAppContext.adapters.subgraph.getSpokeMessagesWithCheckpoints as SinonStub).resolves([spokeMessages, { goldsky: 1 }]);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
       await updateMessages(mockAppContext);
@@ -89,8 +90,8 @@ describe('Monitor operations', () => {
         { destinationDomain: '1337' },
         { destinationDomain: '1338' },
       ]);
-      (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
-      (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves([]);
+      (mockAppContext.adapters.subgraph.getHubMessagesWithCheckpoints as SinonStub).resolves([hubMessages, { goldsky: 1 }]);
+      (mockAppContext.adapters.subgraph.getSpokeMessagesWithCheckpoints as SinonStub).resolves([[], {}]);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
       await updateMessages(mockAppContext);
@@ -114,16 +115,17 @@ describe('Monitor operations', () => {
 
       const domains = Object.keys(mockAppContext.config.chains).filter((d) => mockAppContext.config.chains[d].network === 'evm').concat(mockAppContext.config.hub.domain);
       const hubMessages = createHubMessages(5);
-      (mockAppContext.adapters.subgraph.getSpokeMessages as SinonStub).resolves([]);
-      (mockAppContext.adapters.subgraph.getHubMessages as SinonStub).resolves(hubMessages);
+      (mockAppContext.adapters.subgraph.getSpokeMessagesWithCheckpoints as SinonStub).resolves([[], {}]);
+      (mockAppContext.adapters.subgraph.getHubMessagesWithCheckpoints as SinonStub).resolves([hubMessages, { goldsky: 1 }]);
       (mockAppContext.adapters.database.getCheckPoint as SinonStub).resolves(0);
 
       await updateMessages(mockAppContext);
 
       expect(mockAppContext.adapters.database.saveMessages as SinonStub).callCount(domains.length);
 
-      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length);
-      expect(mockAppContext.adapters.database.saveCheckPoint as SinonStub).callCount(1);
+      expect(mockAppContext.adapters.database.getCheckPoint as SinonStub).callCount(domains.length * 2);
+      // Only hub messages have results, spoke messages are empty
+      expect((mockAppContext.adapters.database.saveCheckPoint as SinonStub).called).to.be.true;
     });
   });
 

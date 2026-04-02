@@ -33,7 +33,7 @@ type Intent @entity {
   txOrigin: Bytes
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
 
   # Fill metadata
   receiveBlockNumber: BigInt # Block number when filled (from Fill event)
@@ -95,7 +95,7 @@ type Fill @entity {
   txOrigin: Bytes
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
 }
 
 type IntentStatistics @entity {
@@ -164,7 +164,7 @@ type ExternalCalldataExecutedEvent @entity {
   txOrigin: Bytes
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
   chainId: Int!
 }
 
@@ -194,7 +194,7 @@ type DepositorEvent @entity {
   blockNumber: BigInt!
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
   chainId: Int!
 }
 
@@ -225,7 +225,7 @@ type AssetTransferFailedEvent @entity {
   txOrigin: Bytes
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
   chainId: Int!
 }
 
@@ -247,7 +247,7 @@ type AssetMintFailedEvent @entity {
   txOrigin: Bytes
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
   chainId: Int!
 }
 
@@ -310,7 +310,7 @@ type Message @entity {
   blockNumber: BigInt!
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
   chainId: Int!
 }
 
@@ -331,7 +331,7 @@ type Order @entity {
   txOrigin: Bytes
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
   chainId: Int!
 }
 
@@ -443,7 +443,7 @@ type SettlementMessage @entity {
   blockNumber: BigInt!
   txNonce: BigInt # Not available on RPC chains (TAC, Hub)
   gasPrice: BigInt # Not available on RPC chains
-  gasLimit: BigInt # Not available via Envio field_selection
+  gasLimit: BigInt
 }
 
 # ============================================================================
