@@ -79,7 +79,7 @@ function getTxMeta(event: any) {
     txOrigin: event.transaction.from ?? undefined,
     gasPrice: event.transaction.gasPrice != null ? BigInt(event.transaction.gasPrice) : undefined,
     txNonce: undefined as bigint | undefined, // Not available via Envio RPC chains
-    gasLimit: undefined as bigint | undefined, // Not available via Envio field_selection
+    gasLimit: event.transaction.gasLimit != null ? BigInt(event.transaction.gasLimit) : undefined,
   };
 }
 
