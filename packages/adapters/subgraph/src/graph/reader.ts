@@ -144,20 +144,28 @@ export class GraphReader implements ISubgraphReader {
   }
 
   public async getLatestBlockNumber(domains: string[]): Promise<Map<string, number>> {
+    const { config } = getContext();
+    const supportedDomains = domains.filter((domain) => {
+      const sub = config.subgraphs[domain];
+      return sub?.endpoints?.some((url) => url && url.trim() !== '');
+    });
+
     const response = await Promise.allSettled(
-      domains.map((domain: string) => {
+      supportedDomains.map((domain: string) => {
         return this.query<{ _meta: MetaEntity }>(domain, [getBlockNumberQuery()]);
       }),
     );
 
     const result: Map<string, number> = new Map();
-    for (let i = 0; i < domains.length; i++) {
+    for (let i = 0; i < supportedDomains.length; i++) {
       if (response[i].status === 'fulfilled') {
         const data = (response[i] as PromiseFulfilledResult<QueryResponse<{ _meta: MetaEntity }>>).value;
         result.set(data.domain, data.data._meta.block.number);
       } else {
         // Check if the response is a rejected promise before accessing reason
-        console.error(jsonifyError((response[i] as PromiseRejectedResult).reason as Error), { domain: domains[i] });
+        console.error(jsonifyError((response[i] as PromiseRejectedResult).reason as Error), {
+          domain: supportedDomains[i],
+        });
       }
     }
 
